@@ -13,6 +13,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { SLANotificationSettings } from "@/components/notifications/SLANotificationSettings";
+import { useGamification } from "@/hooks/useGamification";
 
 function RealtimeIndicator() {
   return (
@@ -28,6 +30,7 @@ function RealtimeIndicator() {
 
 export function Header() {
   const { profile, isAdmin, signOut } = useAuth();
+  const { userLevel } = useGamification();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -64,24 +67,33 @@ export function Header() {
         {/* XP */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
           <Zap className="w-4 h-4 text-primary" />
-          <span className="text-sm font-semibold text-primary">2.450 XP</span>
+          <span className="text-sm font-semibold text-primary">
+            {userLevel?.total_xp?.toLocaleString() || 0} XP
+          </span>
         </div>
 
         {/* Coins */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-coins/10 border border-coins/20">
           <Coins className="w-4 h-4 text-coins" />
-          <span className="text-sm font-semibold text-coins">1.250</span>
+          <span className="text-sm font-semibold text-coins">
+            {userLevel?.coins?.toLocaleString() || 0}
+          </span>
         </div>
 
         {/* Streak */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-streak/10 border border-streak/20">
           <Flame className="w-4 h-4 text-streak animate-pulse" />
-          <span className="text-sm font-semibold text-streak">7 dias</span>
+          <span className="text-sm font-semibold text-streak">
+            {userLevel?.streak_days || 0} dias
+          </span>
         </div>
       </div>
 
       {/* Right Side */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        {/* SLA Notification Settings */}
+        <SLANotificationSettings />
+        
         {/* Notifications */}
         <NotificationCenter />
 
