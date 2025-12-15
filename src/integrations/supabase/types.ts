@@ -630,6 +630,109 @@ export type Database = {
         }
         Relationships: []
       }
+      rastreamento_alertas: {
+        Row: {
+          alert_type: string
+          coleta_id: string | null
+          created_at: string
+          id: string
+          lalamove_order_id: string
+          latitude: number | null
+          longitude: number | null
+          message: string
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: string
+        }
+        Insert: {
+          alert_type: string
+          coleta_id?: string | null
+          created_at?: string
+          id?: string
+          lalamove_order_id: string
+          latitude?: number | null
+          longitude?: number | null
+          message: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity: string
+        }
+        Update: {
+          alert_type?: string
+          coleta_id?: string | null
+          created_at?: string
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number | null
+          longitude?: number | null
+          message?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rastreamento_alertas_coleta_id_fkey"
+            columns: ["coleta_id"]
+            isOneToOne: false
+            referencedRelation: "coletas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rastreamento_historico: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rastreamento_historico_coleta_id_fkey"
+            columns: ["coleta_id"]
+            isOneToOne: false
+            referencedRelation: "coletas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tabelas_frete: {
         Row: {
           ativo: boolean
