@@ -26,6 +26,7 @@ const menuItems = [
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
   { title: "Cotação e Despacho", url: "/despachos", icon: Send },
+  { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
   { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
   { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
   { title: "Envios Clientes", url: "/envios", icon: Package },
