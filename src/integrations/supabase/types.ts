@@ -366,8 +366,11 @@ export type Database = {
           data_despacho: string | null
           data_entrega_efetiva: string | null
           endereco_entrega: string
+          geocoded_at: string | null
           id: string
+          latitude: number | null
           link_rastreamento: string | null
+          longitude: number | null
           nf_remessa: string | null
           nf_remessa_url: string | null
           numero_entrega: string
@@ -390,8 +393,11 @@ export type Database = {
           data_despacho?: string | null
           data_entrega_efetiva?: string | null
           endereco_entrega: string
+          geocoded_at?: string | null
           id?: string
+          latitude?: number | null
           link_rastreamento?: string | null
+          longitude?: number | null
           nf_remessa?: string | null
           nf_remessa_url?: string | null
           numero_entrega: string
@@ -414,8 +420,11 @@ export type Database = {
           data_despacho?: string | null
           data_entrega_efetiva?: string | null
           endereco_entrega?: string
+          geocoded_at?: string | null
           id?: string
+          latitude?: number | null
           link_rastreamento?: string | null
+          longitude?: number | null
           nf_remessa?: string | null
           nf_remessa_url?: string | null
           numero_entrega?: string

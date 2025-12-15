@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -9,6 +9,9 @@ export interface DeliveryRoute {
   endereco_entrega: string;
   previsao_entrega: string | null;
   data_entrega_efetiva: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  geocoded_at: string | null;
   transportadora: {
     id: string;
     nome_fantasia: string;
@@ -61,9 +64,6 @@ const estadoCoordenadas: Record<string, { lat: number; lng: number }> = {
 // Origin point (empresa em São Paulo)
 export const ORIGIN_COORDINATES = { lat: -23.5505, lng: -46.6333 };
 
-// In-memory geocoding cache
-const geocodingCache: Record<string, { lat: number; lng: number } | null> = {};
-
 const getCoordinatesFromEstado = (estado: string | null): { lat: number; lng: number } | null => {
   if (!estado) return null;
   const uf = estado.toUpperCase().trim();
@@ -80,29 +80,46 @@ const addRandomOffset = (coords: { lat: number; lng: number }): { lat: number; l
 
 // Geocode a single address using the edge function
 const geocodeAddress = async (address: string): Promise<{ lat: number; lng: number } | null> => {
-  const cacheKey = address.toLowerCase().trim();
-  
-  // Check cache first
-  if (cacheKey in geocodingCache) {
-    return geocodingCache[cacheKey];
-  }
-
   try {
     const { data, error } = await supabase.functions.invoke('geocode-address', {
       body: { address },
     });
 
     if (error || !data?.coordinates) {
-      geocodingCache[cacheKey] = null;
       return null;
     }
 
-    geocodingCache[cacheKey] = data.coordinates;
     return data.coordinates;
   } catch (error) {
     console.error('Geocoding error for address:', address, error);
-    geocodingCache[cacheKey] = null;
     return null;
+  }
+};
+
+// Save geocoded coordinates to the database
+const saveCoordinatesToDB = async (
+  deliveryId: string, 
+  lat: number, 
+  lng: number
+): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('entregas')
+      .update({
+        latitude: lat,
+        longitude: lng,
+        geocoded_at: new Date().toISOString(),
+      })
+      .eq('id', deliveryId);
+
+    if (error) {
+      console.error('Error saving coordinates:', error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Error saving coordinates:', error);
+    return false;
   }
 };
 
@@ -110,7 +127,6 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
   const [geocodedDeliveries, setGeocodedDeliveries] = useState<DeliveryRoute[]>([]);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
-  const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: ['delivery-routes'],
@@ -124,6 +140,9 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
           endereco_entrega,
           previsao_entrega,
           data_entrega_efetiva,
+          latitude,
+          longitude,
+          geocoded_at,
           transportadora:transportadoras(id, nome_fantasia),
           cliente:clientes(id, nome_fantasia, razao_social, cidade, estado)
         `)
@@ -132,8 +151,18 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
 
       if (error) throw error;
 
-      // Add fallback coordinates based on estado initially
+      // Map deliveries with coordinates from DB or fallback
       return (data || []).map((entrega: any) => {
+        // Check if we have persisted coordinates
+        if (entrega.latitude && entrega.longitude) {
+          return {
+            ...entrega,
+            coordinates: { lat: Number(entrega.latitude), lng: Number(entrega.longitude) },
+            geocoded: true,
+          };
+        }
+
+        // Use fallback based on estado
         const estado = entrega.cliente?.estado;
         const baseCoords = getCoordinatesFromEstado(estado);
         
@@ -147,12 +176,19 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
-  // Geocode addresses after initial load
+  // Geocode addresses that don't have persisted coordinates
   const geocodeDeliveries = useCallback(async (deliveries: DeliveryRoute[]) => {
     if (!enableGeocoding || deliveries.length === 0) return;
 
+    // Only geocode deliveries without persisted coordinates
+    const toGeocode = deliveries.filter(d => !d.geocoded_at && d.endereco_entrega);
+    
+    if (toGeocode.length === 0) {
+      setGeocodedDeliveries(deliveries);
+      return;
+    }
+
     setIsGeocoding(true);
-    const toGeocode = deliveries.filter(d => !d.geocoded && d.endereco_entrega);
     setGeocodingProgress({ current: 0, total: toGeocode.length });
 
     const updatedDeliveries = [...deliveries];
@@ -172,6 +208,12 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
         ].filter(Boolean).join(', ');
 
         const coords = await geocodeAddress(fullAddress);
+        
+        // Save to database if successful
+        if (coords) {
+          await saveCoordinatesToDB(delivery.id, coords.lat, coords.lng);
+        }
+        
         return { id: delivery.id, coords };
       });
 
@@ -185,6 +227,9 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
               ...updatedDeliveries[index],
               coordinates: coords,
               geocoded: true,
+              latitude: coords.lat,
+              longitude: coords.lng,
+              geocoded_at: new Date().toISOString(),
             };
           } else {
             // Keep fallback coordinates but mark as geocoded (failed)
