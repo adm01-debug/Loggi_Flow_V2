@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
+  { title: "Transportadoras", url: "/transportadoras", icon: Truck },
   { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
   { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
   { title: "Envios Clientes", url: "/envios", icon: Send },
