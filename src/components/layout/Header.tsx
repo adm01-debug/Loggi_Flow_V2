@@ -1,4 +1,4 @@
-import { Bell, Search, Zap, Coins, Flame, User } from "lucide-react";
+import { Bell, Search, Zap, Coins, Flame, User, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,9 +27,9 @@ export function Header() {
       {/* Gamification Stats */}
       <div className="hidden md:flex items-center gap-4">
         {/* XP */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-xp/10 border border-xp/20">
-          <Zap className="w-4 h-4 text-xp" />
-          <span className="text-sm font-semibold text-xp">2.450 XP</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+          <Zap className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold text-primary">2.450 XP</span>
         </div>
 
         {/* Coins */}
@@ -79,7 +79,7 @@ export function Header() {
               Perfil
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Zap className="w-4 h-4 mr-2" />
+              <Trophy className="w-4 h-4 mr-2" />
               Minhas Conquistas
             </DropdownMenuItem>
             <DropdownMenuSeparator />
