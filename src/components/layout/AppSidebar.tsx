@@ -18,6 +18,7 @@ import {
   Shield,
   Target,
   CalendarDays,
+  Calculator,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const menuItems = [
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
+  { title: "Cotação Frete", url: "/cotacao-frete", icon: Calculator },
   { title: "Cotação e Despacho", url: "/despachos", icon: Send },
   { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
   { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
