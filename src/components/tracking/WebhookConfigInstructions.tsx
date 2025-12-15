@@ -15,7 +15,12 @@ import {
   Settings,
   Shield,
   Zap,
-  ArrowRight
+  Play,
+  Loader2,
+  MapPin,
+  Truck,
+  AlertTriangle,
+  User
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -24,12 +29,99 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const WEBHOOK_URL = 'https://uwbpzfcysppwikfpnzok.supabase.co/functions/v1/lalamove-webhook';
+
+interface TestPayload {
+  eventType: string;
+  label: string;
+  icon: React.ReactNode;
+  data: object;
+}
+
+const testPayloads: TestPayload[] = [
+  {
+    eventType: 'ORDER_STATUS_CHANGED',
+    label: 'Status do Pedido Alterado',
+    icon: <Truck className="h-4 w-4" />,
+    data: {
+      eventType: 'ORDER_STATUS_CHANGED',
+      data: {
+        orderId: 'TEST-ORDER-001',
+        status: 'ON_GOING',
+        timestamp: new Date().toISOString(),
+        location: {
+          lat: -23.5505,
+          lng: -46.6333,
+        },
+      },
+    },
+  },
+  {
+    eventType: 'DRIVER_LOCATION_UPDATED',
+    label: 'Localização do Motorista',
+    icon: <MapPin className="h-4 w-4" />,
+    data: {
+      eventType: 'DRIVER_LOCATION_UPDATED',
+      data: {
+        orderId: 'TEST-ORDER-001',
+        driverId: 'DRIVER-TEST-001',
+        location: {
+          lat: -23.5605 + (Math.random() * 0.01),
+          lng: -46.6433 + (Math.random() * 0.01),
+        },
+        timestamp: new Date().toISOString(),
+      },
+    },
+  },
+  {
+    eventType: 'DRIVER_ASSIGNED',
+    label: 'Motorista Atribuído',
+    icon: <User className="h-4 w-4" />,
+    data: {
+      eventType: 'DRIVER_ASSIGNED',
+      data: {
+        orderId: 'TEST-ORDER-001',
+        driver: {
+          driverId: 'DRIVER-TEST-001',
+          name: 'João Silva (Teste)',
+          phone: '+5511999999999',
+          plateNumber: 'ABC-1234',
+          location: {
+            lat: -23.5505,
+            lng: -46.6333,
+          },
+        },
+      },
+    },
+  },
+  {
+    eventType: 'ORDER_CANCELED',
+    label: 'Pedido Cancelado',
+    icon: <AlertTriangle className="h-4 w-4" />,
+    data: {
+      eventType: 'ORDER_CANCELED',
+      data: {
+        orderId: 'TEST-ORDER-001',
+        reason: 'Teste de cancelamento via interface',
+      },
+    },
+  },
+];
 
 const WebhookConfigInstructions: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [expandedStep, setExpandedStep] = useState<number | null>(1);
+  const [selectedEvent, setSelectedEvent] = useState<string>('ORDER_STATUS_CHANGED');
+  const [isTesting, setIsTesting] = useState(false);
+  const [lastTestResult, setLastTestResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const copyToClipboard = async () => {
     try {
@@ -39,6 +131,40 @@ const WebhookConfigInstructions: React.FC = () => {
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error('Erro ao copiar URL');
+    }
+  };
+
+  const sendTestWebhook = async () => {
+    const payload = testPayloads.find(p => p.eventType === selectedEvent);
+    if (!payload) return;
+
+    setIsTesting(true);
+    setLastTestResult(null);
+
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload.data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setLastTestResult({ success: true, message: `Evento ${selectedEvent} enviado com sucesso!` });
+        toast.success(`Webhook de teste enviado: ${payload.label}`);
+      } else {
+        setLastTestResult({ success: false, message: result.error || 'Erro ao enviar webhook' });
+        toast.error(`Erro: ${result.error || 'Falha ao enviar webhook'}`);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro desconhecido';
+      setLastTestResult({ success: false, message });
+      toast.error(`Erro ao enviar webhook: ${message}`);
+    } finally {
+      setIsTesting(false);
     }
   };
 
@@ -166,6 +292,8 @@ const WebhookConfigInstructions: React.FC = () => {
     { event: 'ORDER_EXPIRED', description: 'Pedido expira sem motorista' },
   ];
 
+  const selectedPayload = testPayloads.find(p => p.eventType === selectedEvent);
+
   return (
     <Card>
       <CardHeader>
@@ -198,6 +326,92 @@ const WebhookConfigInstructions: React.FC = () => {
               {copied ? 'Copiado!' : 'Copiar'}
             </Button>
           </div>
+        </div>
+
+        {/* Test Webhook Section */}
+        <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+          <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+            <Play className="h-4 w-4 text-primary" />
+            Testar Webhook
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Envie um payload de teste para verificar se o webhook está funcionando corretamente.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Select value={selectedEvent} onValueChange={setSelectedEvent}>
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Selecione o tipo de evento" />
+              </SelectTrigger>
+              <SelectContent>
+                {testPayloads.map((payload) => (
+                  <SelectItem key={payload.eventType} value={payload.eventType}>
+                    <div className="flex items-center gap-2">
+                      {payload.icon}
+                      <span>{payload.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button
+              onClick={sendTestWebhook}
+              disabled={isTesting}
+              className="gap-2"
+            >
+              {isTesting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4" />
+                  Enviar Teste
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Payload Preview */}
+          {selectedPayload && (
+            <div className="mt-4">
+              <p className="text-xs text-muted-foreground mb-2">Payload que será enviado:</p>
+              <pre className="p-3 rounded bg-background text-xs font-mono overflow-x-auto max-h-32">
+                {JSON.stringify(selectedPayload.data, null, 2)}
+              </pre>
+            </div>
+          )}
+
+          {/* Test Result */}
+          {lastTestResult && (
+            <div className={cn(
+              "mt-4 p-3 rounded-lg border",
+              lastTestResult.success 
+                ? "bg-green-500/10 border-green-500/20" 
+                : "bg-destructive/10 border-destructive/20"
+            )}>
+              <div className="flex items-center gap-2">
+                {lastTestResult.success ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                <span className={cn(
+                  "text-sm",
+                  lastTestResult.success ? "text-green-500" : "text-destructive"
+                )}>
+                  {lastTestResult.message}
+                </span>
+              </div>
+              {lastTestResult.success && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Verifique o painel "Monitor em Tempo Real" para ver a atualização.
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Security Note */}
