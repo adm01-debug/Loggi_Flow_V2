@@ -5,7 +5,8 @@ import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Route, Layers, RefreshCw, Loader2, CheckCircle2 } from 'lucide-react';
+import { MapPin, Route, Layers, RefreshCw, Loader2, CheckCircle2, Navigation } from 'lucide-react';
+import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 
@@ -24,8 +25,21 @@ const DeliveryMap = () => {
     isRefetching,
     isGeocoding,
     geocodingProgress,
+    reGeocodingId,
+    reGeocodeDelivery,
     refetchWithGeocoding
   } = useDeliveryRoutes();
+
+  const handleReGeocode = async () => {
+    if (!selectedDelivery) return;
+    
+    const success = await reGeocodeDelivery(selectedDelivery.id);
+    if (success) {
+      toast.success('Coordenadas atualizadas com sucesso!');
+    } else {
+      toast.error('Não foi possível geocodificar o endereço');
+    }
+  };
 
   // Initialize map
   useEffect(() => {
@@ -400,6 +414,34 @@ const DeliveryMap = () => {
                     <p>{new Date(selectedDelivery.previsao_entrega).toLocaleDateString('pt-BR')}</p>
                   </div>
                 )}
+                
+                {/* Re-geocode button */}
+                <div className="pt-2 border-t border-border">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleReGeocode}
+                    disabled={reGeocodingId === selectedDelivery.id}
+                    className="w-full text-xs"
+                  >
+                    {reGeocodingId === selectedDelivery.id ? (
+                      <>
+                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        Geocodificando...
+                      </>
+                    ) : (
+                      <>
+                        <Navigation className="h-3 w-3 mr-1" />
+                        Re-geocodificar Endereço
+                      </>
+                    )}
+                  </Button>
+                  {selectedDelivery.geocoded_at && (
+                    <p className="text-[10px] text-muted-foreground mt-1 text-center">
+                      Última geocodificação: {new Date(selectedDelivery.geocoded_at).toLocaleDateString('pt-BR')}
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           )}
