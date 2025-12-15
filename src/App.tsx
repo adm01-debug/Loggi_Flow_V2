@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import FretesInternos from "./pages/FretesInternos";
 import Fornecedores from "./pages/Fornecedores";
 import Envios from "./pages/Envios";
+import Coletas from "./pages/Coletas";
 import Relatorios from "./pages/Relatorios";
 import Conquistas from "./pages/Conquistas";
 import Ranking from "./pages/Ranking";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/fretes-internos" element={<FretesInternos />} />
             <Route path="/fornecedores" element={<Fornecedores />} />
             <Route path="/envios" element={<Envios />} />
+            <Route path="/coletas" element={<Coletas />} />
             <Route path="/relatorios" element={<Relatorios />} />
             <Route path="/conquistas" element={<Conquistas />} />
             <Route path="/ranking" element={<Ranking />} />

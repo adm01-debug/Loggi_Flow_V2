@@ -14,12 +14,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Box,
+  PackageSearch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
   { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
   { title: "Envios Clientes", url: "/envios", icon: Send },
