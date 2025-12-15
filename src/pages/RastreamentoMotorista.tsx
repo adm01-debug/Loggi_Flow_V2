@@ -1,7 +1,22 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import DriverTrackingMap from "@/components/tracking/DriverTrackingMap";
+import RealtimeMonitoringPanel from "@/components/tracking/RealtimeMonitoringPanel";
+import { toast } from "sonner";
 
 const RastreamentoMotorista = () => {
+  const handleLocationUpdate = (location: any) => {
+    console.log('New location received via realtime:', location);
+  };
+
+  const handleAlertUpdate = (alert: any) => {
+    console.log('New alert received via realtime:', alert);
+    if (alert.severity === 'critical' || alert.severity === 'high') {
+      toast.error(`Alerta: ${alert.message}`);
+    } else if (alert.severity === 'warning' || alert.severity === 'medium') {
+      toast.warning(`Alerta: ${alert.message}`);
+    }
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -12,7 +27,17 @@ const RastreamentoMotorista = () => {
           </p>
         </div>
 
-        <DriverTrackingMap />
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+          <div className="xl:col-span-3">
+            <DriverTrackingMap />
+          </div>
+          <div className="xl:col-span-1">
+            <RealtimeMonitoringPanel 
+              onLocationUpdate={handleLocationUpdate}
+              onAlertUpdate={handleAlertUpdate}
+            />
+          </div>
+        </div>
       </div>
     </MainLayout>
   );
