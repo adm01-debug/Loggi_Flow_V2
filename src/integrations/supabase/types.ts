@@ -527,6 +527,59 @@ export type Database = {
         }
         Relationships: []
       }
+      tabelas_frete: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          estado_destino: string
+          id: string
+          peso_max_kg: number
+          peso_min_kg: number
+          prazo_dias: number
+          preco_por_kg: number
+          regiao_destino: string
+          taxa_fixa: number
+          transportadora_id: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          estado_destino: string
+          id?: string
+          peso_max_kg?: number
+          peso_min_kg?: number
+          prazo_dias?: number
+          preco_por_kg: number
+          regiao_destino: string
+          taxa_fixa?: number
+          transportadora_id: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          estado_destino?: string
+          id?: string
+          peso_max_kg?: number
+          peso_min_kg?: number
+          prazo_dias?: number
+          preco_por_kg?: number
+          regiao_destino?: string
+          taxa_fixa?: number
+          transportadora_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tabelas_frete_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transportadoras: {
         Row: {
           api_disponivel: boolean | null
