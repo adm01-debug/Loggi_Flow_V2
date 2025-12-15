@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, Coins, Sparkles, X } from "lucide-react";
+import { Zap, Coins, Sparkles, X, LucideIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,18 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Achievement } from "@/pages/Conquistas";
+
+export interface AchievementDisplay {
+  id: string;
+  name: string;
+  description: string;
+  icon: LucideIcon;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  xpReward: number;
+  coinsReward: number;
+  unlocked: boolean;
+  unlockedAt?: Date;
+}
 
 const rarityConfig = {
   common: {
@@ -38,7 +49,7 @@ const rarityConfig = {
 };
 
 interface AchievementUnlockModalProps {
-  achievement: Achievement | null;
+  achievement: AchievementDisplay | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }

@@ -1,0 +1,330 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { playCelebrationSound } from "@/utils/celebrationSounds";
+
+export interface UserLevel {
+  id: string;
+  user_id: string;
+  current_xp: number;
+  total_xp: number;
+  level: number;
+  coins: number;
+  streak_days: number;
+  last_activity_date: string | null;
+}
+
+export interface Achievement {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  xp_reward: number;
+  coins_reward: number;
+  requirement_type: string;
+  requirement_value: number;
+}
+
+export interface UserAchievement {
+  id: string;
+  user_id: string;
+  achievement_id: string;
+  unlocked_at: string;
+  achievement?: Achievement;
+}
+
+// Calculate XP needed for a level
+export function xpForLevel(level: number): number {
+  return (level - 1) * (level - 1) * 100;
+}
+
+// Calculate level from XP
+export function calculateLevel(xp: number): number {
+  return Math.max(1, Math.floor(Math.sqrt(xp / 100)) + 1);
+}
+
+// Calculate XP progress within current level
+export function calculateLevelProgress(totalXP: number): {
+  currentLevel: number;
+  currentLevelXP: number;
+  nextLevelXP: number;
+  progress: number;
+} {
+  const currentLevel = calculateLevel(totalXP);
+  const currentLevelStart = xpForLevel(currentLevel);
+  const nextLevelStart = xpForLevel(currentLevel + 1);
+  const currentLevelXP = totalXP - currentLevelStart;
+  const xpNeeded = nextLevelStart - currentLevelStart;
+  
+  return {
+    currentLevel,
+    currentLevelXP,
+    nextLevelXP: xpNeeded,
+    progress: (currentLevelXP / xpNeeded) * 100,
+  };
+}
+
+export function useGamification() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch user level data
+  const { data: userLevel, isLoading: isLoadingLevel } = useQuery({
+    queryKey: ["userLevel", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from("user_levels")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      
+      // Create record if doesn't exist
+      if (!data) {
+        const { data: newData, error: insertError } = await supabase
+          .from("user_levels")
+          .insert({ user_id: user.id })
+          .select()
+          .single();
+        
+        if (insertError) throw insertError;
+        return newData as UserLevel;
+      }
+      
+      return data as UserLevel;
+    },
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Fetch all achievements
+  const { data: achievements = [], isLoading: isLoadingAchievements } = useQuery({
+    queryKey: ["achievements"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("achievements")
+        .select("*")
+        .order("category", { ascending: true });
+      
+      if (error) throw error;
+      return data as Achievement[];
+    },
+    staleTime: 1000 * 60 * 30,
+  });
+
+  // Fetch user's unlocked achievements
+  const { data: userAchievements = [], isLoading: isLoadingUserAchievements } = useQuery({
+    queryKey: ["userAchievements", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from("user_achievements")
+        .select(`
+          *,
+          achievement:achievements(*)
+        `)
+        .eq("user_id", user.id);
+      
+      if (error) throw error;
+      return data as (UserAchievement & { achievement: Achievement })[];
+    },
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Add XP mutation
+  const addXPMutation = useMutation({
+    mutationFn: async ({ amount, reason }: { amount: number; reason?: string }) => {
+      if (!user?.id || !userLevel) throw new Error("User not logged in");
+      
+      const newTotalXP = userLevel.total_xp + amount;
+      const newLevel = calculateLevel(newTotalXP);
+      const leveledUp = newLevel > userLevel.level;
+      
+      const { data, error } = await supabase
+        .from("user_levels")
+        .update({
+          total_xp: newTotalXP,
+          current_xp: userLevel.current_xp + amount,
+          level: newLevel,
+          last_activity_date: new Date().toISOString().split("T")[0],
+        })
+        .eq("user_id", user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return { data, leveledUp, newLevel, amount };
+    },
+    onSuccess: ({ leveledUp, newLevel, amount }) => {
+      queryClient.invalidateQueries({ queryKey: ["userLevel"] });
+      
+      toast({
+        title: `+${amount} XP`,
+        description: leveledUp ? `Você subiu para o Nível ${newLevel}!` : undefined,
+      });
+      
+      if (leveledUp) {
+        playCelebrationSound("legendary");
+      }
+    },
+  });
+
+  // Add coins mutation
+  const addCoinsMutation = useMutation({
+    mutationFn: async ({ amount }: { amount: number }) => {
+      if (!user?.id || !userLevel) throw new Error("User not logged in");
+      
+      const { data, error } = await supabase
+        .from("user_levels")
+        .update({
+          coins: userLevel.coins + amount,
+        })
+        .eq("user_id", user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return { data, amount };
+    },
+    onSuccess: ({ amount }) => {
+      queryClient.invalidateQueries({ queryKey: ["userLevel"] });
+      toast({
+        title: `+${amount} Moedas`,
+      });
+    },
+  });
+
+  // Unlock achievement mutation
+  const unlockAchievementMutation = useMutation({
+    mutationFn: async (achievementId: string) => {
+      if (!user?.id) throw new Error("User not logged in");
+      
+      // Check if already unlocked
+      const existing = userAchievements.find(ua => ua.achievement_id === achievementId);
+      if (existing) return null;
+      
+      const achievement = achievements.find(a => a.id === achievementId);
+      if (!achievement) throw new Error("Achievement not found");
+      
+      // Insert user achievement
+      const { error: achievementError } = await supabase
+        .from("user_achievements")
+        .insert({ user_id: user.id, achievement_id: achievementId });
+      
+      if (achievementError) throw achievementError;
+      
+      // Add rewards
+      if (userLevel) {
+        const newTotalXP = userLevel.total_xp + achievement.xp_reward;
+        const newLevel = calculateLevel(newTotalXP);
+        
+        await supabase
+          .from("user_levels")
+          .update({
+            total_xp: newTotalXP,
+            current_xp: userLevel.current_xp + achievement.xp_reward,
+            coins: userLevel.coins + achievement.coins_reward,
+            level: newLevel,
+          })
+          .eq("user_id", user.id);
+      }
+      
+      return achievement;
+    },
+    onSuccess: (achievement) => {
+      if (!achievement) return;
+      
+      queryClient.invalidateQueries({ queryKey: ["userAchievements"] });
+      queryClient.invalidateQueries({ queryKey: ["userLevel"] });
+      
+      playCelebrationSound(achievement.rarity);
+      
+      toast({
+        title: "🏆 Conquista Desbloqueada!",
+        description: `${achievement.name} - +${achievement.xp_reward} XP, +${achievement.coins_reward} moedas`,
+      });
+    },
+  });
+
+  // Update streak
+  const updateStreakMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id || !userLevel) throw new Error("User not logged in");
+      
+      const today = new Date().toISOString().split("T")[0];
+      const lastActivity = userLevel.last_activity_date;
+      
+      let newStreak = userLevel.streak_days;
+      
+      if (!lastActivity) {
+        newStreak = 1;
+      } else {
+        const lastDate = new Date(lastActivity);
+        const todayDate = new Date(today);
+        const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+          newStreak = userLevel.streak_days + 1;
+        } else if (diffDays > 1) {
+          newStreak = 1;
+        }
+      }
+      
+      const { data, error } = await supabase
+        .from("user_levels")
+        .update({
+          streak_days: newStreak,
+          last_activity_date: today,
+        })
+        .eq("user_id", user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return { data, newStreak };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userLevel"] });
+    },
+  });
+
+  // Get unlocked achievement IDs for easy lookup
+  const unlockedAchievementIds = new Set(userAchievements.map(ua => ua.achievement_id));
+
+  // Calculate level progress
+  const levelProgress = userLevel 
+    ? calculateLevelProgress(userLevel.total_xp)
+    : { currentLevel: 1, currentLevelXP: 0, nextLevelXP: 100, progress: 0 };
+
+  return {
+    // Data
+    userLevel,
+    achievements,
+    userAchievements,
+    unlockedAchievementIds,
+    levelProgress,
+    
+    // Loading states
+    isLoading: isLoadingLevel || isLoadingAchievements || isLoadingUserAchievements,
+    
+    // Actions
+    addXP: addXPMutation.mutate,
+    addCoins: addCoinsMutation.mutate,
+    unlockAchievement: unlockAchievementMutation.mutate,
+    updateStreak: updateStreakMutation.mutate,
+    
+    // Mutation states
+    isAddingXP: addXPMutation.isPending,
+    isUnlockingAchievement: unlockAchievementMutation.isPending,
+  };
+}
