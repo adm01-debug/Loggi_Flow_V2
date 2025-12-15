@@ -5,8 +5,9 @@ import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Route, Layers, RefreshCw } from 'lucide-react';
+import { MapPin, Route, Layers, RefreshCw, Loader2, CheckCircle2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from '@/components/ui/progress';
 
 type ViewMode = 'points' | 'routes' | 'clusters';
 
@@ -17,7 +18,14 @@ const DeliveryMap = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('points');
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryRoute | null>(null);
   
-  const { data: deliveries, isLoading, refetch, isRefetching } = useDeliveryRoutes();
+  const { 
+    data: deliveries, 
+    isLoading, 
+    isRefetching,
+    isGeocoding,
+    geocodingProgress,
+    refetchWithGeocoding
+  } = useDeliveryRoutes();
 
   // Initialize map
   useEffect(() => {
@@ -283,16 +291,28 @@ const DeliveryMap = () => {
             </div>
             
             <div className="flex items-center gap-4">
+              {isGeocoding && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Geocodificando... {geocodingProgress.current}/{geocodingProgress.total}</span>
+                </div>
+              )}
+              {!isGeocoding && deliveries && deliveries.some(d => d.geocoded) && (
+                <div className="flex items-center gap-1 text-xs text-green-500">
+                  <CheckCircle2 className="h-3 w-3" />
+                  <span>Geocodificado</span>
+                </div>
+              )}
               <div className="text-sm text-muted-foreground">
                 {deliveries?.filter(d => d.coordinates).length || 0} entregas ativas
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => refetch()}
-                disabled={isRefetching}
+                onClick={() => refetchWithGeocoding()}
+                disabled={isRefetching || isGeocoding}
               >
-                <RefreshCw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 ${isRefetching || isGeocoding ? 'animate-spin' : ''}`} />
               </Button>
             </div>
           </div>

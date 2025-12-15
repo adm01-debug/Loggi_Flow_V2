@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useCallback, useEffect, useState } from 'react';
 
 export interface DeliveryRoute {
   id: string;
@@ -23,9 +24,10 @@ export interface DeliveryRoute {
     lat: number;
     lng: number;
   };
+  geocoded?: boolean;
 }
 
-// Mock coordinates for Brazilian states (centro aproximado)
+// Fallback coordinates for Brazilian states (centro aproximado)
 const estadoCoordenadas: Record<string, { lat: number; lng: number }> = {
   'SP': { lat: -23.5505, lng: -46.6333 },
   'RJ': { lat: -22.9068, lng: -43.1729 },
@@ -59,22 +61,58 @@ const estadoCoordenadas: Record<string, { lat: number; lng: number }> = {
 // Origin point (empresa em São Paulo)
 export const ORIGIN_COORDINATES = { lat: -23.5505, lng: -46.6333 };
 
+// In-memory geocoding cache
+const geocodingCache: Record<string, { lat: number; lng: number } | null> = {};
+
 const getCoordinatesFromEstado = (estado: string | null): { lat: number; lng: number } | null => {
   if (!estado) return null;
   const uf = estado.toUpperCase().trim();
   return estadoCoordenadas[uf] || null;
 };
 
-// Add some randomness to avoid overlapping markers
+// Add some randomness to avoid overlapping markers when using fallback
 const addRandomOffset = (coords: { lat: number; lng: number }): { lat: number; lng: number } => {
   return {
-    lat: coords.lat + (Math.random() - 0.5) * 0.5,
-    lng: coords.lng + (Math.random() - 0.5) * 0.5,
+    lat: coords.lat + (Math.random() - 0.5) * 0.3,
+    lng: coords.lng + (Math.random() - 0.5) * 0.3,
   };
 };
 
-export const useDeliveryRoutes = () => {
-  return useQuery({
+// Geocode a single address using the edge function
+const geocodeAddress = async (address: string): Promise<{ lat: number; lng: number } | null> => {
+  const cacheKey = address.toLowerCase().trim();
+  
+  // Check cache first
+  if (cacheKey in geocodingCache) {
+    return geocodingCache[cacheKey];
+  }
+
+  try {
+    const { data, error } = await supabase.functions.invoke('geocode-address', {
+      body: { address },
+    });
+
+    if (error || !data?.coordinates) {
+      geocodingCache[cacheKey] = null;
+      return null;
+    }
+
+    geocodingCache[cacheKey] = data.coordinates;
+    return data.coordinates;
+  } catch (error) {
+    console.error('Geocoding error for address:', address, error);
+    geocodingCache[cacheKey] = null;
+    return null;
+  }
+};
+
+export const useDeliveryRoutes = (enableGeocoding = true) => {
+  const [geocodedDeliveries, setGeocodedDeliveries] = useState<DeliveryRoute[]>([]);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
     queryKey: ['delivery-routes'],
     queryFn: async (): Promise<DeliveryRoute[]> => {
       const { data, error } = await supabase
@@ -94,7 +132,7 @@ export const useDeliveryRoutes = () => {
 
       if (error) throw error;
 
-      // Add coordinates based on estado
+      // Add fallback coordinates based on estado initially
       return (data || []).map((entrega: any) => {
         const estado = entrega.cliente?.estado;
         const baseCoords = getCoordinatesFromEstado(estado);
@@ -102,11 +140,97 @@ export const useDeliveryRoutes = () => {
         return {
           ...entrega,
           coordinates: baseCoords ? addRandomOffset(baseCoords) : null,
+          geocoded: false,
         };
       });
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
+
+  // Geocode addresses after initial load
+  const geocodeDeliveries = useCallback(async (deliveries: DeliveryRoute[]) => {
+    if (!enableGeocoding || deliveries.length === 0) return;
+
+    setIsGeocoding(true);
+    const toGeocode = deliveries.filter(d => !d.geocoded && d.endereco_entrega);
+    setGeocodingProgress({ current: 0, total: toGeocode.length });
+
+    const updatedDeliveries = [...deliveries];
+    
+    // Process in batches of 3 to avoid rate limiting
+    const batchSize = 3;
+    for (let i = 0; i < toGeocode.length; i += batchSize) {
+      const batch = toGeocode.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (delivery) => {
+        // Build full address for geocoding
+        const fullAddress = [
+          delivery.endereco_entrega,
+          delivery.cliente?.cidade,
+          delivery.cliente?.estado,
+          'Brasil'
+        ].filter(Boolean).join(', ');
+
+        const coords = await geocodeAddress(fullAddress);
+        return { id: delivery.id, coords };
+      });
+
+      const results = await Promise.all(batchPromises);
+      
+      results.forEach(({ id, coords }) => {
+        const index = updatedDeliveries.findIndex(d => d.id === id);
+        if (index !== -1) {
+          if (coords) {
+            updatedDeliveries[index] = {
+              ...updatedDeliveries[index],
+              coordinates: coords,
+              geocoded: true,
+            };
+          } else {
+            // Keep fallback coordinates but mark as geocoded (failed)
+            updatedDeliveries[index] = {
+              ...updatedDeliveries[index],
+              geocoded: true,
+            };
+          }
+        }
+      });
+
+      setGeocodingProgress({ current: Math.min(i + batchSize, toGeocode.length), total: toGeocode.length });
+      
+      // Small delay between batches
+      if (i + batchSize < toGeocode.length) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+    }
+
+    setGeocodedDeliveries(updatedDeliveries);
+    setIsGeocoding(false);
+  }, [enableGeocoding]);
+
+  // Trigger geocoding when data loads
+  useEffect(() => {
+    if (query.data && query.data.length > 0 && geocodedDeliveries.length === 0) {
+      geocodeDeliveries(query.data);
+    }
+  }, [query.data, geocodeDeliveries, geocodedDeliveries.length]);
+
+  // Return geocoded data if available, otherwise return query data
+  const data = geocodedDeliveries.length > 0 ? geocodedDeliveries : query.data;
+
+  return {
+    ...query,
+    data,
+    isGeocoding,
+    geocodingProgress,
+    refetchWithGeocoding: async () => {
+      setGeocodedDeliveries([]);
+      const result = await query.refetch();
+      if (result.data) {
+        await geocodeDeliveries(result.data);
+      }
+    },
+  };
 };
 
 export const getStatusColor = (status: string): string => {
