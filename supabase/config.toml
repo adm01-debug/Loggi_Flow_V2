@@ -1,1 +1,4 @@
 project_id = "uwbpzfcysppwikfpnzok"
+
+[functions.lalamove-tracking]
+verify_jwt = false
