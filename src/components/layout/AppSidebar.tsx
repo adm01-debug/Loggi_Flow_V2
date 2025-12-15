@@ -16,6 +16,7 @@ import {
   PackageSearch,
   History,
   Shield,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
   { title: "Cotação e Despacho", url: "/despachos", icon: Send },
