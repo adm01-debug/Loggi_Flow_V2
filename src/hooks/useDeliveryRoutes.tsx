@@ -127,6 +127,7 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
   const [geocodedDeliveries, setGeocodedDeliveries] = useState<DeliveryRoute[]>([]);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
+  const [reGeocodingId, setReGeocodingId] = useState<string | null>(null);
 
   const query = useQuery({
     queryKey: ['delivery-routes'],
@@ -260,6 +261,59 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
     }
   }, [query.data, geocodeDeliveries, geocodedDeliveries.length]);
 
+  // Re-geocode a single delivery (for when address is updated)
+  const reGeocodeDelivery = useCallback(async (deliveryId: string) => {
+    const currentData = geocodedDeliveries.length > 0 ? geocodedDeliveries : query.data;
+    const delivery = currentData?.find(d => d.id === deliveryId);
+    
+    if (!delivery || !delivery.endereco_entrega) return false;
+
+    setReGeocodingId(deliveryId);
+
+    try {
+      // Build full address for geocoding
+      const fullAddress = [
+        delivery.endereco_entrega,
+        delivery.cliente?.cidade,
+        delivery.cliente?.estado,
+        'Brasil'
+      ].filter(Boolean).join(', ');
+
+      const coords = await geocodeAddress(fullAddress);
+      
+      if (coords) {
+        // Save to database
+        await saveCoordinatesToDB(deliveryId, coords.lat, coords.lng);
+        
+        // Update local state
+        const updatedDeliveries = (currentData || []).map(d => {
+          if (d.id === deliveryId) {
+            return {
+              ...d,
+              coordinates: coords,
+              geocoded: true,
+              latitude: coords.lat,
+              longitude: coords.lng,
+              geocoded_at: new Date().toISOString(),
+            };
+          }
+          return d;
+        });
+        
+        setGeocodedDeliveries(updatedDeliveries);
+        setReGeocodingId(null);
+        return true;
+      }
+      
+      setReGeocodingId(null);
+      return false;
+    } catch (error) {
+      console.error('Re-geocoding error:', error);
+      setReGeocodingId(null);
+      return false;
+    }
+  }, [geocodedDeliveries, query.data]);
+
   // Return geocoded data if available, otherwise return query data
   const data = geocodedDeliveries.length > 0 ? geocodedDeliveries : query.data;
 
@@ -268,6 +322,8 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
     data,
     isGeocoding,
     geocodingProgress,
+    reGeocodingId,
+    reGeocodeDelivery,
     refetchWithGeocoding: async () => {
       setGeocodedDeliveries([]);
       const result = await query.refetch();
