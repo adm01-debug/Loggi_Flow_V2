@@ -1,4 +1,5 @@
-import { Bell, Search, Zap, Coins, Flame, User, Trophy, Radio } from "lucide-react";
+import { Bell, Search, Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 function RealtimeIndicator() {
   return (
@@ -25,6 +27,24 @@ function RealtimeIndicator() {
 }
 
 export function Header() {
+  const { profile, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  const getInitials = (name: string | null) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between h-16 px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header">
       {/* Search */}
@@ -75,30 +95,35 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-accent">
               <Avatar className="w-8 h-8 border-2 border-primary/20">
-                <AvatarImage src="" />
+                <AvatarImage src={profile?.avatar_url || ""} />
                 <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                  JD
+                  {getInitials(profile?.full_name)}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden sm:flex flex-col items-start">
-                <span className="text-sm font-medium">João Silva</span>
-                <span className="text-xs text-muted-foreground">Operador</span>
+                <span className="text-sm font-medium">
+                  {profile?.full_name || "Usuário"}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {isAdmin ? "Administrador" : profile?.cargo || "Operador"}
+                </span>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/perfil")}>
               <User className="w-4 h-4 mr-2" />
               Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/conquistas")}>
               <Trophy className="w-4 h-4 mr-2" />
               Minhas Conquistas
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+              <LogOut className="w-4 h-4 mr-2" />
               Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
