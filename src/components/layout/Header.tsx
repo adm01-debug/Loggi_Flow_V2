@@ -1,4 +1,4 @@
-import { Bell, Search, Zap, Coins, Flame, User, Trophy } from "lucide-react";
+import { Bell, Search, Zap, Coins, Flame, User, Trophy, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,6 +12,18 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
+function RealtimeIndicator() {
+  return (
+    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
+      </span>
+      <span className="text-sm font-medium text-success">Dados em tempo real</span>
+    </div>
+  );
+}
+
 export function Header() {
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between h-16 px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header">
@@ -23,6 +35,9 @@ export function Header() {
           className="pl-10 bg-background/50 border-border/50 focus:bg-background transition-colors"
         />
       </div>
+
+      {/* Center - Realtime Indicator */}
+      <RealtimeIndicator />
 
       {/* Gamification Stats */}
       <div className="hidden md:flex items-center gap-4">
