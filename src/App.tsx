@@ -27,6 +27,7 @@ import CalendarioLogistico from "./pages/CalendarioLogistico";
 import CotacaoFrete from "./pages/CotacaoFrete";
 import CustosDashboard from "./pages/CustosDashboard";
 import AlertasCusto from "./pages/AlertasCusto";
+import MapaRotas from "./pages/MapaRotas";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="/cotacao-frete" element={<ProtectedRoute><CotacaoFrete /></ProtectedRoute>} />
               <Route path="/custos" element={<ProtectedRoute><CustosDashboard /></ProtectedRoute>} />
               <Route path="/alertas-custo" element={<ProtectedRoute><AlertasCusto /></ProtectedRoute>} />
+              <Route path="/mapa-rotas" element={<ProtectedRoute><MapaRotas /></ProtectedRoute>} />
               <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

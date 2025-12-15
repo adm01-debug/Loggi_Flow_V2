@@ -21,6 +21,7 @@ import {
   Calculator,
   DollarSign,
   AlertTriangle,
+  Map,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const menuItems = [
   { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
   { title: "Custos Logísticos", url: "/custos", icon: DollarSign },
   { title: "Alertas Custo", url: "/alertas-custo", icon: AlertTriangle },
+  { title: "Mapa de Rotas", url: "/mapa-rotas", icon: Map },
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
