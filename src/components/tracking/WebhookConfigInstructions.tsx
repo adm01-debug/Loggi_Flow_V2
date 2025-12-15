@@ -146,6 +146,7 @@ const WebhookConfigInstructions: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-test-mode': 'true', // Skip signature verification for testing
         },
         body: JSON.stringify(payload.data),
       });

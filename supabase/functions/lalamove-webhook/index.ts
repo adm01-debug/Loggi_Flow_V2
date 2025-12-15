@@ -72,17 +72,23 @@ serve(async (req) => {
   try {
     const payload = await req.text();
     const signature = req.headers.get('x-lalamove-signature') || '';
+    const isTestMode = req.headers.get('x-test-mode') === 'true';
     
     console.log('Received Lalamove webhook:', payload);
+    console.log('Test mode:', isTestMode);
 
-    // Verify webhook signature (optional in sandbox)
-    const isValid = await verifySignature(payload, signature);
-    if (!isValid) {
-      console.error('Invalid webhook signature');
-      return new Response(JSON.stringify({ error: 'Invalid signature' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    // Skip signature verification in test mode (internal testing only)
+    if (!isTestMode) {
+      const isValid = await verifySignature(payload, signature);
+      if (!isValid) {
+        console.error('Invalid webhook signature');
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    } else {
+      console.log('Skipping signature verification (test mode)');
     }
 
     const webhookData = JSON.parse(payload);
