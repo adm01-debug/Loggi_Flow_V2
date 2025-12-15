@@ -17,6 +17,7 @@ import {
   History,
   Shield,
   Target,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
+  { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
   { title: "Cotação e Despacho", url: "/despachos", icon: Send },
