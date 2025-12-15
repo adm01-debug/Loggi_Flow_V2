@@ -1,4 +1,5 @@
 import { useState, useCallback, createContext, useContext, ReactNode } from "react";
+import { playCelebrationSound } from "@/utils/celebrationSounds";
 
 export interface Achievement {
   id: string;
@@ -33,6 +34,9 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
     };
     
     setNotifications((prev) => [...prev, notification]);
+    
+    // Play celebration sound based on rarity
+    playCelebrationSound(achievement.rarity);
 
     // Auto-dismiss after 5 seconds
     setTimeout(() => {
