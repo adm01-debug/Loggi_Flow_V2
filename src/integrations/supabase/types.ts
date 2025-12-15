@@ -59,6 +59,56 @@ export type Database = {
         }
         Relationships: []
       }
+      alertas_custo: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          created_by: string | null
+          estado_destino: string | null
+          id: string
+          limite_mensal: number
+          limite_por_entrega: number | null
+          notificar_percentual: number
+          tipo: string
+          transportadora_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string | null
+          estado_destino?: string | null
+          id?: string
+          limite_mensal: number
+          limite_por_entrega?: number | null
+          notificar_percentual?: number
+          tipo: string
+          transportadora_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string | null
+          estado_destino?: string | null
+          id?: string
+          limite_mensal?: number
+          limite_por_entrega?: number | null
+          notificar_percentual?: number
+          tipo?: string
+          transportadora_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alertas_custo_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -442,6 +492,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      notificacoes_custo: {
+        Row: {
+          alerta_id: string | null
+          created_at: string
+          id: string
+          lida: boolean
+          limite: number
+          mensagem: string
+          percentual_atingido: number
+          tipo_notificacao: string
+          valor_atual: number
+        }
+        Insert: {
+          alerta_id?: string | null
+          created_at?: string
+          id?: string
+          lida?: boolean
+          limite: number
+          mensagem: string
+          percentual_atingido: number
+          tipo_notificacao: string
+          valor_atual: number
+        }
+        Update: {
+          alerta_id?: string | null
+          created_at?: string
+          id?: string
+          lida?: boolean
+          limite?: number
+          mensagem?: string
+          percentual_atingido?: number
+          tipo_notificacao?: string
+          valor_atual?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificacoes_custo_alerta_id_fkey"
+            columns: ["alerta_id"]
+            isOneToOne: false
+            referencedRelation: "alertas_custo"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ocorrencias: {
         Row: {

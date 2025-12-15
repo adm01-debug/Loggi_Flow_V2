@@ -20,6 +20,7 @@ import {
   CalendarDays,
   Calculator,
   DollarSign,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
   { title: "Custos Logísticos", url: "/custos", icon: DollarSign },
+  { title: "Alertas Custo", url: "/alertas-custo", icon: AlertTriangle },
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
