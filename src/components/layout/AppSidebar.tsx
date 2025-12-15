@@ -23,11 +23,10 @@ const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
+  { title: "Cotação e Despacho", url: "/despachos", icon: Send },
   { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
   { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
-  { title: "Envios Clientes", url: "/envios", icon: Send },
-  { title: "Mercadorias", url: "/mercadorias", icon: Package },
-  { title: "Motoristas", url: "/motoristas", icon: Users },
+  { title: "Envios Clientes", url: "/envios", icon: Package },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
 ];
 
