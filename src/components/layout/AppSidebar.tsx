@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Truck,
   Package,
-  Users,
   Building2,
   Send,
   BarChart3,
@@ -15,9 +14,12 @@ import {
   ChevronRight,
   Box,
   PackageSearch,
+  History,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -35,9 +37,14 @@ const gamificationItems = [
   { title: "Conquistas", url: "/conquistas", icon: Zap },
 ];
 
+const adminItems = [
+  { title: "Audit Trail", url: "/audit-trail", icon: History },
+];
+
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { isAdmin } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -127,6 +134,40 @@ export function AppSidebar() {
           ))}
         </div>
       </nav>
+
+      {/* Admin Section */}
+      {isAdmin && (
+        <div className="p-3 pt-0 space-y-1">
+          {!collapsed && (
+            <span className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+              <Shield className="w-3 h-3" />
+              Admin
+            </span>
+          )}
+          {adminItems.map((item) => (
+            <NavLink
+              key={item.url}
+              to={item.url}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
+                isActive(item.url)
+                  ? "bg-warning/20 text-warning border border-warning/30"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <item.icon
+                className={cn(
+                  "w-5 h-5 flex-shrink-0 transition-transform duration-200",
+                  !isActive(item.url) && "group-hover:scale-110"
+                )}
+              />
+              {!collapsed && (
+                <span className="font-medium animate-fade-in">{item.title}</span>
+              )}
+            </NavLink>
+          ))}
+        </div>
+      )}
 
       {/* Settings */}
       <div className="p-3 border-t border-sidebar-border">
