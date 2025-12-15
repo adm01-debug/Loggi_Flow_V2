@@ -1,8 +1,21 @@
 import { motion } from "framer-motion";
-import { Lock, Zap, Coins } from "lucide-react";
+import { Lock, Zap, Coins, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import type { Achievement } from "@/pages/Conquistas";
+
+export interface AchievementBadgeData {
+  id: string;
+  name: string;
+  description: string;
+  icon: LucideIcon;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  xpReward: number;
+  coinsReward: number;
+  unlocked: boolean;
+  unlockedAt?: Date;
+  progress?: number;
+  maxProgress?: number;
+}
 
 const rarityConfig = {
   common: {
@@ -36,7 +49,7 @@ const rarityConfig = {
 };
 
 interface AchievementBadgeProps {
-  achievement: Achievement;
+  achievement: AchievementBadgeData;
   compact?: boolean;
   onClick?: () => void;
 }
