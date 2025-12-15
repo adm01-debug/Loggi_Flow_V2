@@ -10,6 +10,8 @@ import {
   ArrowDownRight,
   Target,
   Users,
+  Star,
+  Trophy,
 } from "lucide-react";
 import {
   AreaChart,
@@ -94,6 +96,42 @@ const statusDistribution = [
   { status: "Em Trânsito", count: 42, color: "hsl(199, 89%, 48%)" },
   { status: "Pendente", count: 28, color: "hsl(38, 92%, 50%)" },
   { status: "Atrasado", count: 8, color: "hsl(0, 84%, 60%)" },
+];
+
+// XP Evolution Data
+const xpEvolutionData = [
+  { week: "Sem 1", xp: 1200, level: 8 },
+  { week: "Sem 2", xp: 2450, level: 9 },
+  { week: "Sem 3", xp: 3800, level: 10 },
+  { week: "Sem 4", xp: 5200, level: 11 },
+  { week: "Sem 5", xp: 6900, level: 12 },
+  { week: "Sem 6", xp: 8100, level: 13 },
+  { week: "Sem 7", xp: 9500, level: 14 },
+  { week: "Sem 8", xp: 11200, level: 15 },
+];
+
+// Achievements over time
+const achievementsData = [
+  { month: "Jan", conquistas: 3, xpGanho: 450 },
+  { month: "Fev", conquistas: 5, xpGanho: 720 },
+  { month: "Mar", conquistas: 4, xpGanho: 580 },
+  { month: "Abr", conquistas: 7, xpGanho: 1100 },
+  { month: "Mai", conquistas: 6, xpGanho: 890 },
+  { month: "Jun", conquistas: 9, xpGanho: 1450 },
+];
+
+// Deliveries trend
+const deliveriesTrendData = [
+  { date: "01/12", entregas: 12, meta: 15 },
+  { date: "02/12", entregas: 18, meta: 15 },
+  { date: "03/12", entregas: 14, meta: 15 },
+  { date: "04/12", entregas: 22, meta: 15 },
+  { date: "05/12", entregas: 19, meta: 15 },
+  { date: "06/12", entregas: 25, meta: 15 },
+  { date: "07/12", entregas: 8, meta: 15 },
+  { date: "08/12", entregas: 16, meta: 15 },
+  { date: "09/12", entregas: 21, meta: 15 },
+  { date: "10/12", entregas: 28, meta: 15 },
 ];
 
 interface MetricCardProps {
@@ -508,6 +546,189 @@ export default function Relatorios() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* XP & Gamification Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5 text-xp" />
+            <h2 className="font-display font-semibold text-xl">Evolução de XP e Gamificação</h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* XP Evolution */}
+            <div className="card-base space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display font-semibold text-lg">Evolução de XP</h3>
+                <div className="flex items-center gap-2 text-sm text-xp">
+                  <TrendingUp className="w-4 h-4" />
+                  <span>+833% crescimento</span>
+                </div>
+              </div>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={xpEvolutionData}>
+                    <defs>
+                      <linearGradient id="colorXP" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--xp))" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="hsl(var(--xp))" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis 
+                      dataKey="week" 
+                      stroke="hsl(var(--muted-foreground))" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                        boxShadow: "var(--shadow-lg)",
+                      }}
+                      labelStyle={{ color: "hsl(var(--foreground))" }}
+                      formatter={(value: number, name: string) => [
+                        name === "xp" ? `${value.toLocaleString()} XP` : `Nível ${value}`,
+                        name === "xp" ? "XP Total" : "Nível"
+                      ]}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="xp"
+                      stroke="hsl(var(--xp))"
+                      strokeWidth={3}
+                      fill="url(#colorXP)"
+                      name="xp"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Achievements Over Time */}
+            <div className="card-base space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display font-semibold text-lg">Conquistas Desbloqueadas</h3>
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-coins" />
+                  <span className="text-sm font-semibold text-coins">34 total</span>
+                </div>
+              </div>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={achievementsData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="hsl(var(--muted-foreground))" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                        boxShadow: "var(--shadow-lg)",
+                      }}
+                      labelStyle={{ color: "hsl(var(--foreground))" }}
+                    />
+                    <Bar 
+                      dataKey="conquistas" 
+                      fill="hsl(var(--coins))" 
+                      radius={[4, 4, 0, 0]}
+                      name="Conquistas"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Deliveries Trend with Goal */}
+          <div className="card-base space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-semibold text-lg">Entregas vs Meta Diária</h3>
+              <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-primary" />
+                  <span className="text-muted-foreground">Entregas</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-0.5 bg-destructive" />
+                  <span className="text-muted-foreground">Meta (15)</span>
+                </div>
+              </div>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={deliveriesTrendData}>
+                  <defs>
+                    <linearGradient id="colorDeliveries" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                      boxShadow: "var(--shadow-lg)",
+                    }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="entregas"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    fill="url(#colorDeliveries)"
+                    name="Entregas"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="meta"
+                    stroke="hsl(var(--destructive))"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={false}
+                    name="Meta"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>
