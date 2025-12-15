@@ -4,9 +4,10 @@ import DriverTrackingMap from "@/components/tracking/DriverTrackingMap";
 import RealtimeMonitoringPanel from "@/components/tracking/RealtimeMonitoringPanel";
 import WebhookConfigInstructions from "@/components/tracking/WebhookConfigInstructions";
 import TrackingAnalyticsReport from "@/components/tracking/TrackingAnalyticsReport";
+import TrackingHeatmap from "@/components/tracking/TrackingHeatmap";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, Settings, BarChart3 } from "lucide-react";
+import { MapPin, Settings, BarChart3, Flame } from "lucide-react";
 
 const RastreamentoMotorista = () => {
   const [activeTab, setActiveTab] = useState("rastreamento");
@@ -44,6 +45,10 @@ const RastreamentoMotorista = () => {
               <BarChart3 className="h-4 w-4" />
               Relatório
             </TabsTrigger>
+            <TabsTrigger value="heatmap" className="gap-2">
+              <Flame className="h-4 w-4" />
+              Mapa de Calor
+            </TabsTrigger>
             <TabsTrigger value="configuracao" className="gap-2">
               <Settings className="h-4 w-4" />
               Configurar Webhook
@@ -66,6 +71,10 @@ const RastreamentoMotorista = () => {
 
           <TabsContent value="relatorio" className="mt-4">
             <TrackingAnalyticsReport />
+          </TabsContent>
+
+          <TabsContent value="heatmap" className="mt-4">
+            <TrackingHeatmap />
           </TabsContent>
 
           <TabsContent value="configuracao" className="mt-4">
