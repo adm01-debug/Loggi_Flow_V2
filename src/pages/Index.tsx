@@ -6,7 +6,8 @@ import {
   TrendingUp,
   Package,
   Users,
-  AlertTriangle 
+  AlertTriangle,
+  Trophy
 } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -15,6 +16,7 @@ import { XPProgressBar } from "@/components/dashboard/XPProgressBar";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { Button } from "@/components/ui/button";
+import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
 
 const freights = [
   {
@@ -58,6 +60,20 @@ const freights = [
 ];
 
 export default function Index() {
+  const { unlockAchievement } = useAchievementNotifications();
+
+  const demoAchievements = [
+    { id: "first-delivery", name: "Primeira Entrega", description: "Complete sua primeira entrega", icon: "🚚", rarity: "common" as const, xpReward: 100, coinsReward: 50 },
+    { id: "streak-7", name: "Streak de 7 Dias", description: "Mantenha entregas por 7 dias seguidos", icon: "🔥", rarity: "rare" as const, xpReward: 500, coinsReward: 200 },
+    { id: "top-performer", name: "Top Performer", description: "Seja o melhor da semana", icon: "⭐", rarity: "epic" as const, xpReward: 1000, coinsReward: 500 },
+    { id: "legend", name: "Lenda Logística", description: "Alcance o nível máximo", icon: "👑", rarity: "legendary" as const, xpReward: 5000, coinsReward: 2000 },
+  ];
+
+  const triggerRandomAchievement = () => {
+    const randomIndex = Math.floor(Math.random() * demoAchievements.length);
+    unlockAchievement(demoAchievements[randomIndex]);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -69,10 +85,20 @@ export default function Index() {
               Visão geral das operações logísticas
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground glow-primary press-scale">
-            <Truck className="w-4 h-4 mr-2" />
-            Novo Frete
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={triggerRandomAchievement}
+              className="border-xp/50 text-xp hover:bg-xp/10"
+            >
+              <Trophy className="w-4 h-4 mr-2" />
+              Testar Conquista
+            </Button>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground glow-primary press-scale">
+              <Truck className="w-4 h-4 mr-2" />
+              Novo Frete
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
