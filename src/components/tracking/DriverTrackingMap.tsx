@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Truck, 
   MapPin, 
@@ -20,7 +21,9 @@ import {
   Bell,
   X,
   RefreshCw,
-  Car
+  Car,
+  History,
+  Database
 } from 'lucide-react';
 import { useLalamoveTracking } from '@/hooks/useLalamoveTracking';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -32,15 +35,18 @@ const DriverTrackingMap: React.FC = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const driverMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const routeSourceRef = useRef<boolean>(false);
+  const historySourceRef = useRef<boolean>(false);
   
   const [orderId, setOrderId] = useState('');
   const [useSandbox, setUseSandbox] = useState(true);
+  const [showSavedHistory, setShowSavedHistory] = useState(false);
   
   const {
     driverLocation,
     orderDetails,
     alerts,
     locationHistory,
+    savedHistory,
     isTracking,
     isLoading,
     error,
@@ -59,7 +65,7 @@ const DriverTrackingMap: React.FC = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: [-46.6333, -23.5505], // São Paulo default
+      center: [-46.6333, -23.5505],
       zoom: 12,
     });
 
@@ -79,11 +85,9 @@ const DriverTrackingMap: React.FC = () => {
   useEffect(() => {
     if (!map.current || !orderDetails?.stops) return;
 
-    // Clear existing markers for stops
     const existingMarkers = document.querySelectorAll('.stop-marker');
     existingMarkers.forEach(m => m.remove());
 
-    // Add markers for each stop
     orderDetails.stops.forEach((stop, index) => {
       const isOrigin = index === 0;
       const isDestination = index === orderDetails.stops.length - 1;
@@ -117,7 +121,6 @@ const DriverTrackingMap: React.FC = () => {
         .addTo(map.current!);
     });
 
-    // Draw route line
     if (orderDetails.stops.length >= 2) {
       const routeCoordinates = orderDetails.stops.map(stop => [
         stop.coordinates.lng,
@@ -160,7 +163,6 @@ const DriverTrackingMap: React.FC = () => {
         routeSourceRef.current = true;
       }
 
-      // Fit map to show all stops
       const bounds = new mapboxgl.LngLatBounds();
       orderDetails.stops.forEach(stop => {
         bounds.extend([stop.coordinates.lng, stop.coordinates.lat]);
@@ -206,17 +208,29 @@ const DriverTrackingMap: React.FC = () => {
         .addTo(map.current);
     }
 
-    // Smooth pan to driver
     map.current.panTo([lng, lat], { duration: 1000 });
   }, [driverLocation]);
 
-  // Draw location history trail
+  // Draw location history trail (live or saved)
   useEffect(() => {
-    if (!map.current || locationHistory.length < 2) return;
+    if (!map.current) return;
 
-    const trailCoordinates = locationHistory.map(loc => [loc.lng, loc.lat]);
+    const historyToShow = showSavedHistory ? savedHistory : locationHistory;
+    
+    if (historyToShow.length < 2) {
+      if (map.current.getLayer('trail-line')) {
+        map.current.removeLayer('trail-line');
+        map.current.removeSource('trail');
+        historySourceRef.current = false;
+      }
+      return;
+    }
 
-    if (map.current.getSource('trail')) {
+    const trailCoordinates = showSavedHistory 
+      ? savedHistory.map(loc => [loc.longitude, loc.latitude])
+      : locationHistory.map(loc => [loc.lng, loc.lat]);
+
+    if (historySourceRef.current && map.current.getSource('trail')) {
       (map.current.getSource('trail') as mapboxgl.GeoJSONSource).setData({
         type: 'Feature',
         properties: {},
@@ -226,6 +240,11 @@ const DriverTrackingMap: React.FC = () => {
         },
       });
     } else {
+      if (map.current.getSource('trail')) {
+        map.current.removeLayer('trail-line');
+        map.current.removeSource('trail');
+      }
+
       map.current.addSource('trail', {
         type: 'geojson',
         data: {
@@ -243,13 +262,24 @@ const DriverTrackingMap: React.FC = () => {
         type: 'line',
         source: 'trail',
         paint: {
-          'line-color': '#F59E0B',
+          'line-color': showSavedHistory ? '#10B981' : '#F59E0B',
           'line-width': 3,
           'line-opacity': 0.7,
         },
       });
+
+      historySourceRef.current = true;
     }
-  }, [locationHistory]);
+
+    // If showing saved history, fit bounds to show all points
+    if (showSavedHistory && savedHistory.length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      savedHistory.forEach(loc => {
+        bounds.extend([loc.longitude, loc.latitude]);
+      });
+      map.current.fitBounds(bounds, { padding: 80 });
+    }
+  }, [locationHistory, savedHistory, showSavedHistory]);
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -383,6 +413,21 @@ const DriverTrackingMap: React.FC = () => {
               </div>
             )}
 
+            {/* History toggle */}
+            {savedHistory.length > 0 && (
+              <div className="absolute top-4 right-16 flex items-center gap-2 bg-card/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-border">
+                <Switch
+                  id="showHistory"
+                  checked={showSavedHistory}
+                  onCheckedChange={setShowSavedHistory}
+                />
+                <Label htmlFor="showHistory" className="text-xs flex items-center gap-1">
+                  <Database className="h-3 w-3" />
+                  Histórico Salvo
+                </Label>
+              </div>
+            )}
+
             {/* Tracking indicator */}
             {isTracking && (
               <div className="absolute bottom-4 right-4 bg-green-500 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-2 animate-pulse">
@@ -478,58 +523,104 @@ const DriverTrackingMap: React.FC = () => {
             </Card>
           )}
 
-          {/* Alerts */}
+          {/* Tabs for Alerts and History */}
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Alertas
-                {alerts.length > 0 && (
-                  <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
-                    {alerts.length}
-                  </Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[200px]">
-                {alerts.length === 0 ? (
-                  <p className="text-xs text-muted-foreground text-center py-4">
-                    Nenhum alerta
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {alerts.map((alert) => (
-                      <div
-                        key={alert.id}
-                        className={cn(
-                          "p-2 rounded-md text-xs flex items-start gap-2",
-                          alert.severity === 'critical' && "bg-destructive/10 border border-destructive/20",
-                          alert.severity === 'warning' && "bg-yellow-500/10 border border-yellow-500/20",
-                          alert.severity === 'info' && "bg-muted"
-                        )}
-                      >
-                        {getAlertIcon(alert.severity)}
-                        <div className="flex-1">
-                          <p>{alert.message}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">
-                            {alert.timestamp.toLocaleTimeString('pt-BR')}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-5 w-5"
-                          onClick={() => clearAlert(alert.id)}
+            <Tabs defaultValue="alerts" className="w-full">
+              <TabsList className="w-full">
+                <TabsTrigger value="alerts" className="flex-1 text-xs">
+                  <Bell className="h-3 w-3 mr-1" />
+                  Alertas
+                  {alerts.length > 0 && (
+                    <Badge variant="destructive" className="ml-1 h-4 px-1 text-[10px]">
+                      {alerts.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="history" className="flex-1 text-xs">
+                  <History className="h-3 w-3 mr-1" />
+                  Histórico
+                  {savedHistory.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-[10px]">
+                      {savedHistory.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="alerts" className="m-0 p-3">
+                <ScrollArea className="h-[200px]">
+                  {alerts.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      Nenhum alerta
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {alerts.map((alert) => (
+                        <div
+                          key={alert.id}
+                          className={cn(
+                            "p-2 rounded-md text-xs flex items-start gap-2",
+                            alert.severity === 'critical' && "bg-destructive/10 border border-destructive/20",
+                            alert.severity === 'warning' && "bg-yellow-500/10 border border-yellow-500/20",
+                            alert.severity === 'info' && "bg-muted"
+                          )}
                         >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </CardContent>
+                          {getAlertIcon(alert.severity)}
+                          <div className="flex-1">
+                            <p>{alert.message}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              {alert.timestamp.toLocaleTimeString('pt-BR')}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5"
+                            onClick={() => clearAlert(alert.id)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </TabsContent>
+              
+              <TabsContent value="history" className="m-0 p-3">
+                <ScrollArea className="h-[200px]">
+                  {savedHistory.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      Nenhum histórico salvo
+                    </p>
+                  ) : (
+                    <div className="space-y-1">
+                      {savedHistory.slice().reverse().slice(0, 20).map((record, idx) => (
+                        <div
+                          key={record.id}
+                          className="p-2 rounded-md text-xs bg-muted/50 flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Database className="h-3 w-3 text-green-500" />
+                            <span className="text-[10px]">
+                              {record.latitude.toFixed(4)}, {record.longitude.toFixed(4)}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground">
+                            {new Date(record.recorded_at).toLocaleTimeString('pt-BR')}
+                          </span>
+                        </div>
+                      ))}
+                      {savedHistory.length > 20 && (
+                        <p className="text-[10px] text-muted-foreground text-center mt-2">
+                          +{savedHistory.length - 20} registros anteriores
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </ScrollArea>
+              </TabsContent>
+            </Tabs>
           </Card>
         </div>
       </div>

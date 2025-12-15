@@ -51,7 +51,17 @@ interface LocationHistory {
   timestamp: Date;
 }
 
-export const useLalamoveTracking = (orderId: string | null, useSandbox = true) => {
+interface TrackingHistoryRecord {
+  id: string;
+  lalamove_order_id: string;
+  driver_name: string;
+  latitude: number;
+  longitude: number;
+  recorded_at: string;
+  order_status: string;
+}
+
+export const useLalamoveTracking = (orderId: string | null, useSandbox = true, coletaId?: string) => {
   const [driverLocation, setDriverLocation] = useState<DriverLocation | null>(null);
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [alerts, setAlerts] = useState<TrackingAlert[]>([]);
@@ -59,10 +69,12 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [locationHistory, setLocationHistory] = useState<LocationHistory[]>([]);
+  const [savedHistory, setSavedHistory] = useState<TrackingHistoryRecord[]>([]);
   
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastLocationRef = useRef<{ lat: number; lng: number; timestamp: Date } | null>(null);
   const stoppedTimeRef = useRef<Date | null>(null);
+  const lastSavedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   // Calculate distance between two points (Haversine formula)
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
@@ -88,11 +100,9 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
   ): boolean => {
     if (stops.length < 2) return false;
 
-    // Simple check: distance from the line between origin and destination
     const origin = stops[0].coordinates;
     const destination = stops[stops.length - 1].coordinates;
 
-    // Calculate perpendicular distance from point to line
     const A = driverLat - origin.lat;
     const B = driverLng - origin.lng;
     const C = destination.lat - origin.lat;
@@ -117,15 +127,91 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
 
     const distance = calculateDistance(driverLat, driverLng, nearestLat, nearestLng);
     
-    // Consider deviated if more than 500m from route
     return distance > 500;
+  };
+
+  // Save location to database
+  const saveLocationToDatabase = async (
+    location: DriverLocation,
+    orderInfo: OrderDetails
+  ) => {
+    if (!orderId) return;
+
+    // Only save if driver moved more than 50 meters
+    if (lastSavedLocationRef.current) {
+      const distance = calculateDistance(
+        lastSavedLocationRef.current.lat,
+        lastSavedLocationRef.current.lng,
+        location.coordinates.lat,
+        location.coordinates.lng
+      );
+      if (distance < 50) return;
+    }
+
+    try {
+      const { error } = await supabase.from('rastreamento_historico').insert({
+        coleta_id: coletaId || null,
+        lalamove_order_id: orderId,
+        driver_id: location.driverId,
+        driver_name: location.name,
+        driver_phone: location.phone,
+        driver_plate: location.plateNumber,
+        latitude: location.coordinates.lat,
+        longitude: location.coordinates.lng,
+        order_status: orderInfo.status,
+        recorded_at: location.coordinates.updatedAt,
+      });
+
+      if (error) {
+        console.error('Error saving location to database:', error);
+      } else {
+        lastSavedLocationRef.current = { 
+          lat: location.coordinates.lat, 
+          lng: location.coordinates.lng 
+        };
+        console.log('Location saved to database');
+      }
+    } catch (err) {
+      console.error('Error saving location:', err);
+    }
+  };
+
+  // Save alert to database
+  const saveAlertToDatabase = async (
+    type: string,
+    severity: string,
+    message: string,
+    lat?: number,
+    lng?: number
+  ) => {
+    if (!orderId) return;
+
+    try {
+      const { error } = await supabase.from('rastreamento_alertas').insert({
+        lalamove_order_id: orderId,
+        coleta_id: coletaId || null,
+        alert_type: type,
+        severity,
+        message,
+        latitude: lat,
+        longitude: lng,
+      });
+
+      if (error) {
+        console.error('Error saving alert to database:', error);
+      }
+    } catch (err) {
+      console.error('Error saving alert:', err);
+    }
   };
 
   // Add alert
   const addAlert = (
     type: TrackingAlert['type'],
     message: string,
-    severity: TrackingAlert['severity']
+    severity: TrackingAlert['severity'],
+    lat?: number,
+    lng?: number
   ) => {
     const newAlert: TrackingAlert = {
       id: crypto.randomUUID(),
@@ -135,7 +221,10 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
       severity,
     };
 
-    setAlerts((prev) => [newAlert, ...prev.slice(0, 9)]); // Keep last 10 alerts
+    setAlerts((prev) => [newAlert, ...prev.slice(0, 9)]);
+
+    // Save alert to database
+    saveAlertToDatabase(type, severity, message, lat, lng);
 
     if (severity === 'critical') {
       toast.error(message);
@@ -150,6 +239,25 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
   const clearAlert = (alertId: string) => {
     setAlerts((prev) => prev.filter((a) => a.id !== alertId));
   };
+
+  // Fetch saved history from database
+  const fetchSavedHistory = useCallback(async () => {
+    if (!orderId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('rastreamento_historico')
+        .select('*')
+        .eq('lalamove_order_id', orderId)
+        .order('recorded_at', { ascending: true });
+
+      if (error) throw error;
+
+      setSavedHistory(data || []);
+    } catch (err) {
+      console.error('Error fetching saved history:', err);
+    }
+  }, [orderId]);
 
   // Fetch order details
   const fetchOrderDetails = useCallback(async () => {
@@ -226,7 +334,10 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
       setLocationHistory((prev) => [
         ...prev,
         { lat: currentLat, lng: currentLng, timestamp: new Date() },
-      ].slice(-50)); // Keep last 50 points
+      ].slice(-50));
+
+      // Save to database
+      await saveLocationToDatabase(location, orderDetails);
 
       // Check for alerts
       if (lastLocationRef.current) {
@@ -237,7 +348,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
           currentLng
         );
 
-        // Check if stopped (moved less than 10m in 2 minutes)
+        // Check if stopped
         if (distance < 10) {
           if (!stoppedTimeRef.current) {
             stoppedTimeRef.current = new Date();
@@ -247,7 +358,9 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
               addAlert(
                 'stopped',
                 `Motorista parado há ${Math.round(stoppedDuration)} minutos`,
-                stoppedDuration >= 5 ? 'critical' : 'warning'
+                stoppedDuration >= 5 ? 'critical' : 'warning',
+                currentLat,
+                currentLng
               );
             }
           }
@@ -260,7 +373,9 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
           addAlert(
             'route_deviation',
             'Motorista desviou da rota planejada',
-            'warning'
+            'warning',
+            currentLat,
+            currentLng
           );
         }
 
@@ -274,7 +389,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
             destination.coordinates.lng
           );
           if (distanceToDestination < 100) {
-            addAlert('arrived_delivery', 'Motorista chegou ao destino!', 'info');
+            addAlert('arrived_delivery', 'Motorista chegou ao destino!', 'info', currentLat, currentLng);
           }
         }
       }
@@ -284,12 +399,11 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
       setError(null);
     } catch (err: any) {
       console.error('Error fetching driver location:', err);
-      // Don't set error for 403 (driver not available yet)
       if (!err.message?.includes('403')) {
         setError(err.message);
       }
     }
-  }, [orderId, orderDetails, useSandbox]);
+  }, [orderId, orderDetails, useSandbox, coletaId]);
 
   // Start tracking
   const startTracking = useCallback(async () => {
@@ -302,6 +416,9 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
     setError(null);
 
     try {
+      // Load saved history first
+      await fetchSavedHistory();
+
       const order = await fetchOrderDetails();
       
       if (!order) {
@@ -328,7 +445,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
     } finally {
       setIsLoading(false);
     }
-  }, [orderId, fetchOrderDetails, fetchDriverLocation]);
+  }, [orderId, fetchOrderDetails, fetchDriverLocation, fetchSavedHistory]);
 
   // Stop tracking
   const stopTracking = useCallback(() => {
@@ -343,6 +460,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
     setAlerts([]);
     lastLocationRef.current = null;
     stoppedTimeRef.current = null;
+    lastSavedLocationRef.current = null;
   }, []);
 
   // Cleanup on unmount
@@ -359,6 +477,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
     orderDetails,
     alerts,
     locationHistory,
+    savedHistory,
     isTracking,
     isLoading,
     error,
@@ -366,5 +485,6 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true) =
     stopTracking,
     clearAlert,
     refetchDriverLocation: fetchDriverLocation,
+    refetchSavedHistory: fetchSavedHistory,
   };
 };
