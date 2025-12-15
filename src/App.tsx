@@ -25,6 +25,7 @@ import GestaoBox from "./pages/GestaoBox";
 import SLADashboard from "./pages/SLADashboard";
 import CalendarioLogistico from "./pages/CalendarioLogistico";
 import CotacaoFrete from "./pages/CotacaoFrete";
+import CustosDashboard from "./pages/CustosDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
               <Route path="/sla-dashboard" element={<ProtectedRoute><SLADashboard /></ProtectedRoute>} />
               <Route path="/calendario" element={<ProtectedRoute><CalendarioLogistico /></ProtectedRoute>} />
               <Route path="/cotacao-frete" element={<ProtectedRoute><CotacaoFrete /></ProtectedRoute>} />
+              <Route path="/custos" element={<ProtectedRoute><CustosDashboard /></ProtectedRoute>} />
               <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
