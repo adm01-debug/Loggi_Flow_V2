@@ -14,7 +14,456 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clientes: {
+        Row: {
+          cep: string | null
+          cidade: string | null
+          cnpj: string | null
+          contato_email: string | null
+          contato_nome: string | null
+          contato_telefone: string | null
+          created_at: string
+          endereco_completo: string
+          estado: string | null
+          horario_entrega: string | null
+          id: string
+          nome_fantasia: string | null
+          razao_social: string
+          restricoes_entrega: string | null
+          updated_at: string
+        }
+        Insert: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          endereco_completo: string
+          estado?: string | null
+          horario_entrega?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          razao_social: string
+          restricoes_entrega?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          endereco_completo?: string
+          estado?: string | null
+          horario_entrega?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          razao_social?: string
+          restricoes_entrega?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      coletas: {
+        Row: {
+          codigo_rastreamento: string | null
+          comprovante_coleta_url: string | null
+          contato_coleta: string | null
+          created_at: string
+          data_efetiva_coleta: string | null
+          data_prevista_coleta: string | null
+          data_recebimento: string | null
+          divergencia_percentual: number | null
+          endereco_coleta: string
+          fornecedor_id: string | null
+          id: string
+          link_rastreamento: string | null
+          nf_anexo_url: string | null
+          nf_fornecedor: string | null
+          numero_coleta: string
+          observacoes: string | null
+          peso_estimado_kg: number | null
+          qtd_recebida: number | null
+          qtd_volumes: number | null
+          responsavel_recebimento: string | null
+          status: Database["public"]["Enums"]["coleta_status"]
+          tipo_coleta: Database["public"]["Enums"]["coleta_tipo"]
+          transportadora_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          codigo_rastreamento?: string | null
+          comprovante_coleta_url?: string | null
+          contato_coleta?: string | null
+          created_at?: string
+          data_efetiva_coleta?: string | null
+          data_prevista_coleta?: string | null
+          data_recebimento?: string | null
+          divergencia_percentual?: number | null
+          endereco_coleta: string
+          fornecedor_id?: string | null
+          id?: string
+          link_rastreamento?: string | null
+          nf_anexo_url?: string | null
+          nf_fornecedor?: string | null
+          numero_coleta: string
+          observacoes?: string | null
+          peso_estimado_kg?: number | null
+          qtd_recebida?: number | null
+          qtd_volumes?: number | null
+          responsavel_recebimento?: string | null
+          status?: Database["public"]["Enums"]["coleta_status"]
+          tipo_coleta?: Database["public"]["Enums"]["coleta_tipo"]
+          transportadora_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          codigo_rastreamento?: string | null
+          comprovante_coleta_url?: string | null
+          contato_coleta?: string | null
+          created_at?: string
+          data_efetiva_coleta?: string | null
+          data_prevista_coleta?: string | null
+          data_recebimento?: string | null
+          divergencia_percentual?: number | null
+          endereco_coleta?: string
+          fornecedor_id?: string | null
+          id?: string
+          link_rastreamento?: string | null
+          nf_anexo_url?: string | null
+          nf_fornecedor?: string | null
+          numero_coleta?: string
+          observacoes?: string | null
+          peso_estimado_kg?: number | null
+          qtd_recebida?: number | null
+          qtd_volumes?: number | null
+          responsavel_recebimento?: string | null
+          status?: Database["public"]["Enums"]["coleta_status"]
+          tipo_coleta?: Database["public"]["Enums"]["coleta_tipo"]
+          transportadora_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coletas_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coletas_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cotacoes_frete: {
+        Row: {
+          created_at: string
+          entrega_id: string
+          id: string
+          observacoes: string | null
+          prazo_dias: number | null
+          selecionada: boolean | null
+          transportadora_id: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          entrega_id: string
+          id?: string
+          observacoes?: string | null
+          prazo_dias?: number | null
+          selecionada?: boolean | null
+          transportadora_id: string
+          valor: number
+        }
+        Update: {
+          created_at?: string
+          entrega_id?: string
+          id?: string
+          observacoes?: string | null
+          prazo_dias?: number | null
+          selecionada?: boolean | null
+          transportadora_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cotacoes_frete_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "entregas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cotacoes_frete_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entregas: {
+        Row: {
+          box_alocado: string | null
+          cliente_id: string | null
+          codigo_rastreamento: string | null
+          comprovante_entrega_url: string | null
+          contato_cliente: string | null
+          created_at: string
+          data_despacho: string | null
+          data_entrega_efetiva: string | null
+          endereco_entrega: string
+          id: string
+          link_rastreamento: string | null
+          nf_remessa: string | null
+          nf_remessa_url: string | null
+          numero_entrega: string
+          observacoes: string | null
+          previsao_entrega: string | null
+          recebedor: string | null
+          status: Database["public"]["Enums"]["entrega_status"]
+          tipo_frete: Database["public"]["Enums"]["frete_tipo"] | null
+          transportadora_id: string | null
+          updated_at: string
+          valor_frete: number | null
+        }
+        Insert: {
+          box_alocado?: string | null
+          cliente_id?: string | null
+          codigo_rastreamento?: string | null
+          comprovante_entrega_url?: string | null
+          contato_cliente?: string | null
+          created_at?: string
+          data_despacho?: string | null
+          data_entrega_efetiva?: string | null
+          endereco_entrega: string
+          id?: string
+          link_rastreamento?: string | null
+          nf_remessa?: string | null
+          nf_remessa_url?: string | null
+          numero_entrega: string
+          observacoes?: string | null
+          previsao_entrega?: string | null
+          recebedor?: string | null
+          status?: Database["public"]["Enums"]["entrega_status"]
+          tipo_frete?: Database["public"]["Enums"]["frete_tipo"] | null
+          transportadora_id?: string | null
+          updated_at?: string
+          valor_frete?: number | null
+        }
+        Update: {
+          box_alocado?: string | null
+          cliente_id?: string | null
+          codigo_rastreamento?: string | null
+          comprovante_entrega_url?: string | null
+          contato_cliente?: string | null
+          created_at?: string
+          data_despacho?: string | null
+          data_entrega_efetiva?: string | null
+          endereco_entrega?: string
+          id?: string
+          link_rastreamento?: string | null
+          nf_remessa?: string | null
+          nf_remessa_url?: string | null
+          numero_entrega?: string
+          observacoes?: string | null
+          previsao_entrega?: string | null
+          recebedor?: string | null
+          status?: Database["public"]["Enums"]["entrega_status"]
+          tipo_frete?: Database["public"]["Enums"]["frete_tipo"] | null
+          transportadora_id?: string | null
+          updated_at?: string
+          valor_frete?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entregas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entregas_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fornecedores: {
+        Row: {
+          cep: string | null
+          cidade: string | null
+          cnpj: string | null
+          contato_email: string | null
+          contato_nome: string | null
+          contato_telefone: string | null
+          created_at: string
+          endereco_completo: string
+          estado: string | null
+          id: string
+          nome_fantasia: string | null
+          razao_social: string
+          updated_at: string
+        }
+        Insert: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          endereco_completo: string
+          estado?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          razao_social: string
+          updated_at?: string
+        }
+        Update: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          endereco_completo?: string
+          estado?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          razao_social?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ocorrencias: {
+        Row: {
+          acao_tomada: string | null
+          coleta_id: string | null
+          created_at: string
+          data_resolucao: string | null
+          descricao: string | null
+          entrega_id: string | null
+          fotos_urls: string[] | null
+          id: string
+          resolvida: boolean | null
+          tipo_ocorrencia: string
+        }
+        Insert: {
+          acao_tomada?: string | null
+          coleta_id?: string | null
+          created_at?: string
+          data_resolucao?: string | null
+          descricao?: string | null
+          entrega_id?: string | null
+          fotos_urls?: string[] | null
+          id?: string
+          resolvida?: boolean | null
+          tipo_ocorrencia: string
+        }
+        Update: {
+          acao_tomada?: string | null
+          coleta_id?: string | null
+          created_at?: string
+          data_resolucao?: string | null
+          descricao?: string | null
+          entrega_id?: string | null
+          fotos_urls?: string[] | null
+          id?: string
+          resolvida?: boolean | null
+          tipo_ocorrencia?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocorrencias_coleta_id_fkey"
+            columns: ["coleta_id"]
+            isOneToOne: false
+            referencedRelation: "coletas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocorrencias_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "entregas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transportadoras: {
+        Row: {
+          api_disponivel: boolean | null
+          cnpj: string
+          contato_comercial: string
+          created_at: string
+          data_homologacao: string | null
+          email_comercial: string
+          homologada: boolean | null
+          id: string
+          nome_fantasia: string
+          observacoes: string | null
+          prazo_medio_dias: number | null
+          razao_social: string
+          regioes_atendidas: string[] | null
+          score_performance: number | null
+          updated_at: string
+          url_rastreamento: string | null
+          whatsapp_operacional: string | null
+        }
+        Insert: {
+          api_disponivel?: boolean | null
+          cnpj: string
+          contato_comercial: string
+          created_at?: string
+          data_homologacao?: string | null
+          email_comercial: string
+          homologada?: boolean | null
+          id?: string
+          nome_fantasia: string
+          observacoes?: string | null
+          prazo_medio_dias?: number | null
+          razao_social: string
+          regioes_atendidas?: string[] | null
+          score_performance?: number | null
+          updated_at?: string
+          url_rastreamento?: string | null
+          whatsapp_operacional?: string | null
+        }
+        Update: {
+          api_disponivel?: boolean | null
+          cnpj?: string
+          contato_comercial?: string
+          created_at?: string
+          data_homologacao?: string | null
+          email_comercial?: string
+          homologada?: boolean | null
+          id?: string
+          nome_fantasia?: string
+          observacoes?: string | null
+          prazo_medio_dias?: number | null
+          razao_social?: string
+          regioes_atendidas?: string[] | null
+          score_performance?: number | null
+          updated_at?: string
+          url_rastreamento?: string | null
+          whatsapp_operacional?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +472,27 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      coleta_status:
+        | "aguardando_liberacao"
+        | "solicitada"
+        | "em_transito"
+        | "chegou_expedicao"
+        | "conferencia_ok"
+        | "divergencia"
+        | "finalizada"
+      coleta_tipo: "lalamove" | "transportadora"
+      entrega_status:
+        | "aguardando_producao"
+        | "pronto_despacho"
+        | "cotacao_frete"
+        | "nf_emitida"
+        | "despachado"
+        | "em_transito"
+        | "saiu_entrega"
+        | "entregue"
+        | "ocorrencia"
+        | "finalizado"
+      frete_tipo: "cif" | "fob" | "cortesia"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +619,30 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      coleta_status: [
+        "aguardando_liberacao",
+        "solicitada",
+        "em_transito",
+        "chegou_expedicao",
+        "conferencia_ok",
+        "divergencia",
+        "finalizada",
+      ],
+      coleta_tipo: ["lalamove", "transportadora"],
+      entrega_status: [
+        "aguardando_producao",
+        "pronto_despacho",
+        "cotacao_frete",
+        "nf_emitida",
+        "despachado",
+        "em_transito",
+        "saiu_entrega",
+        "entregue",
+        "ocorrencia",
+        "finalizado",
+      ],
+      frete_tipo: ["cif", "fob", "cortesia"],
+    },
   },
 } as const
