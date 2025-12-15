@@ -1,0 +1,94 @@
+import { Bell, Search, Zap, Coins, Flame, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-40 flex items-center justify-between h-16 px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header">
+      {/* Search */}
+      <div className="relative w-full max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar fretes, motoristas, mercadorias..."
+          className="pl-10 bg-background/50 border-border/50 focus:bg-background transition-colors"
+        />
+      </div>
+
+      {/* Gamification Stats */}
+      <div className="hidden md:flex items-center gap-4">
+        {/* XP */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-xp/10 border border-xp/20">
+          <Zap className="w-4 h-4 text-xp" />
+          <span className="text-sm font-semibold text-xp">2.450 XP</span>
+        </div>
+
+        {/* Coins */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-coins/10 border border-coins/20">
+          <Coins className="w-4 h-4 text-coins" />
+          <span className="text-sm font-semibold text-coins">1.250</span>
+        </div>
+
+        {/* Streak */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-streak/10 border border-streak/20">
+          <Flame className="w-4 h-4 text-streak animate-pulse" />
+          <span className="text-sm font-semibold text-streak">7 dias</span>
+        </div>
+      </div>
+
+      {/* Right Side */}
+      <div className="flex items-center gap-3">
+        {/* Notifications */}
+        <Button variant="ghost" size="icon" className="relative hover:bg-accent">
+          <Bell className="w-5 h-5" />
+          <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs bg-destructive">
+            3
+          </Badge>
+        </Button>
+
+        {/* User Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-accent">
+              <Avatar className="w-8 h-8 border-2 border-primary/20">
+                <AvatarImage src="" />
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  JD
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden sm:flex flex-col items-start">
+                <span className="text-sm font-medium">João Silva</span>
+                <span className="text-xs text-muted-foreground">Operador</span>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <User className="w-4 h-4 mr-2" />
+              Perfil
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Zap className="w-4 h-4 mr-2" />
+              Minhas Conquistas
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive">
+              Sair
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  );
+}
