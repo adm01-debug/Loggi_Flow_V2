@@ -34,6 +34,7 @@ import MapaRotas from "./pages/MapaRotas";
 import RastreamentoMotorista from "./pages/RastreamentoMotorista";
 import Notificacoes from "./pages/Notificacoes";
 import Analytics from "./pages/Analytics";
+import RastreamentoPublico from "./pages/RastreamentoPublico";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -75,6 +76,8 @@ const App = () => (
               <Route path="/notificacoes" element={<ProtectedRoute><Notificacoes /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
+              {/* Public route - no authentication required */}
+              <Route path="/rastrear" element={<RastreamentoPublico />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
