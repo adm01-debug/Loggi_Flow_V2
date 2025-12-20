@@ -9,6 +9,7 @@ import { PerformanceChart } from "@/components/dashboard/PerformanceChart";
 import { TransportadoraRanking } from "@/components/dashboard/TransportadoraRanking";
 import { XPProgressBar } from "@/components/dashboard/XPProgressBar";
 import { QuickActions } from "@/components/dashboard/QuickActions";
+import { DelayPredictionPanel } from "@/components/predictions/DelayPredictionPanel";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
@@ -152,6 +153,7 @@ export default function Index() {
               <TabsContent value="entregas" className="mt-4"><PerformanceChart title="Volume de Operações" subtitle="Últimos 7 dias" type="area" data={weeklyData} dataKey="entregas" /></TabsContent>
               <TabsContent value="status" className="mt-4"><PerformanceChart title="Distribuição por Status" subtitle="Entregas ativas" type="bar" data={statusDistribution} dataKey="value" /></TabsContent>
             </Tabs>
+            <DelayPredictionPanel />
             <QuickActions />
           </div>
           <div className="space-y-6">
