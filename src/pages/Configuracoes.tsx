@@ -353,7 +353,39 @@ export default function Configuracoes() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div><p className="font-medium">Exportar Dados</p><p className="text-sm text-muted-foreground">Baixe todos os seus dados em formato JSON</p></div>
-                <Button variant="outline" size="sm">Exportar</Button>
+                <Button variant="outline" size="sm" onClick={async () => {
+                  try {
+                    toast.info("Exportando dados...");
+                    const exportData: Record<string, unknown[]> = {};
+                    
+                    const { data: coletas } = await supabase.from("coletas").select("*");
+                    const { data: entregas } = await supabase.from("entregas").select("*");
+                    const { data: fretesInternos } = await supabase.from("fretes_internos").select("*");
+                    const { data: ocorrencias } = await supabase.from("ocorrencias").select("*");
+                    const { data: clientes } = await supabase.from("clientes").select("*");
+                    const { data: fornecedores } = await supabase.from("fornecedores").select("*");
+                    const { data: transportadoras } = await supabase.from("transportadoras").select("*");
+                    
+                    exportData["coletas"] = coletas || [];
+                    exportData["entregas"] = entregas || [];
+                    exportData["fretes_internos"] = fretesInternos || [];
+                    exportData["ocorrencias"] = ocorrencias || [];
+                    exportData["clientes"] = clientes || [];
+                    exportData["fornecedores"] = fornecedores || [];
+                    exportData["transportadoras"] = transportadoras || [];
+                    
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `loggiflow-export-${new Date().toISOString().split("T")[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    toast.success("Dados exportados com sucesso!");
+                  } catch (e) {
+                    toast.error("Erro ao exportar: " + (e as Error).message);
+                  }
+                }}>Exportar</Button>
               </div>
               <div className="flex items-center justify-between">
                 <div><p className="font-medium text-destructive">Limpar Cache</p><p className="text-sm text-muted-foreground">Remove dados temporários do navegador</p></div>

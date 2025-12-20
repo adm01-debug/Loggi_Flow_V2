@@ -51,12 +51,32 @@ export default function Ranking() {
   const { data: ranking = [], isLoading } = useQuery({
     queryKey: ["ranking", period],
     queryFn: async () => {
-      // Buscar user_levels ordenado por total_xp
-      const { data: levels, error } = await supabase.from("user_levels").select("*").order("total_xp", { ascending: false }).limit(50);
+      // Calculate date filter based on period
+      let dateFilter: string | null = null;
+      const now = new Date();
+      
+      if (period === "weekly") {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        dateFilter = weekAgo.toISOString();
+      } else if (period === "monthly") {
+        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        dateFilter = monthAgo.toISOString();
+      }
+
+      // Build query with optional date filter
+      let query = supabase.from("user_levels").select("*").order("total_xp", { ascending: false }).limit(50);
+      
+      if (dateFilter) {
+        query = query.gte("updated_at", dateFilter);
+      }
+      
+      const { data: levels, error } = await query;
       if (error) throw error;
       
       // Buscar perfis dos usuários
       const userIds = (levels || []).map((l) => l.user_id);
+      if (userIds.length === 0) return [];
+      
       const { data: profiles } = await supabase.from("profiles").select("id, full_name, avatar_url").in("id", userIds);
       
       const profilesMap = new Map((profiles || []).map((p) => [p.id, p]));

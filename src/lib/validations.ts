@@ -5,11 +5,53 @@ const cnpjRegex = /^\d{14}$|^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
 const phoneRegex = /^\(?\d{2}\)?[\s.-]?\d{4,5}[\s.-]?\d{4}$/;
 const cepRegex = /^\d{5}-?\d{3}$/;
 
+// Função para validar dígitos verificadores do CNPJ
+export function validateCNPJDigits(cnpj: string): boolean {
+  const numbers = cnpj.replace(/\D/g, "");
+  
+  if (numbers.length !== 14) return false;
+  
+  // Check for known invalid patterns
+  if (/^(\d)\1+$/.test(numbers)) return false;
+  
+  // Calculate first check digit
+  let sum = 0;
+  let weight = 5;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(numbers[i]) * weight;
+    weight = weight === 2 ? 9 : weight - 1;
+  }
+  let remainder = sum % 11;
+  const digit1 = remainder < 2 ? 0 : 11 - remainder;
+  
+  if (parseInt(numbers[12]) !== digit1) return false;
+  
+  // Calculate second check digit
+  sum = 0;
+  weight = 6;
+  for (let i = 0; i < 13; i++) {
+    sum += parseInt(numbers[i]) * weight;
+    weight = weight === 2 ? 9 : weight - 1;
+  }
+  remainder = sum % 11;
+  const digit2 = remainder < 2 ? 0 : 11 - remainder;
+  
+  return parseInt(numbers[13]) === digit2;
+}
+
+// Custom CNPJ validation with digit verification
+const cnpjSchema = z.string().refine((val) => {
+  if (!val || val === "") return true; // Allow empty
+  const formatted = val.replace(/\D/g, "");
+  if (formatted.length !== 14) return false;
+  return validateCNPJDigits(formatted);
+}, { message: "CNPJ inválido - dígitos verificadores incorretos" });
+
 // Schema para Cliente
 export const clienteSchema = z.object({
   razao_social: z.string().min(3, "Razão social deve ter no mínimo 3 caracteres"),
   nome_fantasia: z.string().optional(),
-  cnpj: z.string().regex(cnpjRegex, "CNPJ inválido").optional().or(z.literal("")),
+  cnpj: cnpjSchema.optional().or(z.literal("")),
   endereco_completo: z.string().min(10, "Endereço deve ter no mínimo 10 caracteres"),
   cidade: z.string().optional(),
   estado: z.string().length(2, "UF deve ter 2 caracteres").optional().or(z.literal("")),
@@ -25,7 +67,7 @@ export const clienteSchema = z.object({
 export const fornecedorSchema = z.object({
   razao_social: z.string().min(3, "Razão social deve ter no mínimo 3 caracteres"),
   nome_fantasia: z.string().optional(),
-  cnpj: z.string().regex(cnpjRegex, "CNPJ inválido").optional().or(z.literal("")),
+  cnpj: cnpjSchema.optional().or(z.literal("")),
   endereco_completo: z.string().min(10, "Endereço deve ter no mínimo 10 caracteres"),
   cidade: z.string().optional(),
   estado: z.string().length(2, "UF deve ter 2 caracteres").optional().or(z.literal("")),
@@ -38,7 +80,7 @@ export const fornecedorSchema = z.object({
 // Schema para Transportadora
 export const transportadoraSchema = z.object({
   nome: z.string().min(2, "Nome deve ter no mínimo 2 caracteres"),
-  cnpj: z.string().regex(cnpjRegex, "CNPJ inválido").optional().or(z.literal("")),
+  cnpj: cnpjSchema.optional().or(z.literal("")),
   endereco: z.string().optional(),
   cidade: z.string().optional(),
   uf: z.string().length(2, "UF deve ter 2 caracteres").optional().or(z.literal("")),
