@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { UserNotificationCenter } from "@/components/notifications/UserNotificationCenter";
 import { SLANotificationSettings } from "@/components/notifications/SLANotificationSettings";
 import { useGamification } from "@/hooks/useGamification";
 
@@ -94,8 +95,11 @@ export function Header() {
         {/* SLA Notification Settings */}
         <SLANotificationSettings />
         
-        {/* Notifications */}
+        {/* System Alerts */}
         <NotificationCenter />
+        
+        {/* User Notifications */}
+        <UserNotificationCenter />
 
         {/* User Menu */}
         <DropdownMenu>
