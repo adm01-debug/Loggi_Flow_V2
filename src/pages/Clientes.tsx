@@ -1,0 +1,147 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Users, Plus, Search, Phone, Mail, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar } from "lucide-react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+interface Cliente {
+  id: string; razao_social: string; nome_fantasia: string | null; cnpj: string | null;
+  endereco_completo: string; cidade: string | null; estado: string | null; cep: string | null;
+  contato_nome: string | null; contato_email: string | null; contato_telefone: string | null;
+  horario_entrega: string | null; restricoes_entrega: string | null;
+  created_at: string; total_entregas?: number; entregas_pendentes?: number;
+}
+
+const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", endereco_completo: "", cidade: "", estado: "", cep: "", contato_nome: "", contato_email: "", contato_telefone: "", horario_entrega: "", restricoes_entrega: "" };
+
+export default function Clientes() {
+  const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [ufFilter, setUfFilter] = useState("all");
+  const [dlgCreate, setDlgCreate] = useState(false);
+  const [dlgEdit, setDlgEdit] = useState(false);
+  const [dlgView, setDlgView] = useState(false);
+  const [dlgDel, setDlgDel] = useState(false);
+  const [sel, setSel] = useState<Cliente | null>(null);
+  const [form, setForm] = useState(emptyForm);
+
+  const { data: list = [], isLoading, error } = useQuery({
+    queryKey: ["clientes"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("clientes").select("*").order("razao_social");
+      if (error) throw error;
+      const { data: entregas } = await supabase.from("entregas").select("cliente_id, status");
+      return (data || []).map((c) => {
+        const ec = entregas?.filter((e) => e.cliente_id === c.id) || [];
+        const pend = ec.filter((e) => !["entregue", "finalizado"].includes(e.status)).length;
+        return { ...c, total_entregas: ec.length, entregas_pendentes: pend };
+      }) as Cliente[];
+    },
+  });
+
+  const createMut = useMutation({
+    mutationFn: async (d: typeof emptyForm) => {
+      const { error } = await supabase.from("clientes").insert({ razao_social: d.razao_social, nome_fantasia: d.nome_fantasia || null, cnpj: d.cnpj || null, endereco_completo: d.endereco_completo, cidade: d.cidade || null, estado: d.estado || null, cep: d.cep || null, contato_nome: d.contato_nome || null, contato_email: d.contato_email || null, contato_telefone: d.contato_telefone || null, horario_entrega: d.horario_entrega || null, restricoes_entrega: d.restricoes_entrega || null });
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgCreate(false); setForm(emptyForm); toast.success("Cliente cadastrado!"); },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: async ({ id, d }: { id: string; d: typeof emptyForm }) => {
+      const { error } = await supabase.from("clientes").update({ razao_social: d.razao_social, nome_fantasia: d.nome_fantasia || null, cnpj: d.cnpj || null, endereco_completo: d.endereco_completo, cidade: d.cidade || null, estado: d.estado || null, cep: d.cep || null, contato_nome: d.contato_nome || null, contato_email: d.contato_email || null, contato_telefone: d.contato_telefone || null, horario_entrega: d.horario_entrega || null, restricoes_entrega: d.restricoes_entrega || null }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgEdit(false); toast.success("Atualizado!"); },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("clientes").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgDel(false); toast.success("Excluído!"); },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
+
+  const filtered = list.filter((c) => {
+    const s = search.toLowerCase();
+    const ok = c.razao_social.toLowerCase().includes(s) || c.nome_fantasia?.toLowerCase().includes(s) || c.cnpj?.includes(s) || c.cidade?.toLowerCase().includes(s);
+    return ok && (ufFilter === "all" || c.estado === ufFilter);
+  });
+
+  const stats = { total: list.length, com: list.filter((c) => (c.total_entregas || 0) > 0).length, pend: list.reduce((a, c) => a + (c.entregas_pendentes || 0), 0), tot: list.reduce((a, c) => a + (c.total_entregas || 0), 0) };
+
+  const openEdit = (c: Cliente) => { setSel(c); setForm({ razao_social: c.razao_social, nome_fantasia: c.nome_fantasia || "", cnpj: c.cnpj || "", endereco_completo: c.endereco_completo, cidade: c.cidade || "", estado: c.estado || "", cep: c.cep || "", contato_nome: c.contato_nome || "", contato_email: c.contato_email || "", contato_telefone: c.contato_telefone || "", horario_entrega: c.horario_entrega || "", restricoes_entrega: c.restricoes_entrega || "" }); setDlgEdit(true); };
+  const fmtDate = (d: string | null) => d ? format(new Date(d), "dd/MM/yyyy", { locale: ptBR }) : "-";
+  const fmtCNPJ = (c: string) => { const n = c.replace(/\D/g, ""); return n.length === 14 ? n.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5") : c; };
+
+  if (error) return <MainLayout><div className="flex flex-col items-center py-12"><AlertCircle className="w-12 h-12 text-destructive mb-4" /><p className="text-destructive">Erro: {error.message}</p></div></MainLayout>;
+
+  const FormFields = () => (
+    <div className="grid gap-4 py-4">
+      <div className="grid gap-2"><Label>Razão Social *</Label><Input value={form.razao_social} onChange={(e) => setForm({ ...form, razao_social: e.target.value })} /></div>
+      <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Nome Fantasia</Label><Input value={form.nome_fantasia} onChange={(e) => setForm({ ...form, nome_fantasia: e.target.value })} /></div><div className="grid gap-2"><Label>CNPJ</Label><Input value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })} /></div></div>
+      <div className="grid gap-2"><Label>Endereço *</Label><Textarea value={form.endereco_completo} onChange={(e) => setForm({ ...form, endereco_completo: e.target.value })} /></div>
+      <div className="grid grid-cols-3 gap-4"><div className="grid gap-2"><Label>Cidade</Label><Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} /></div><div className="grid gap-2"><Label>UF</Label><Select value={form.estado} onValueChange={(v) => setForm({ ...form, estado: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{UFS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>CEP</Label><Input value={form.cep} onChange={(e) => setForm({ ...form, cep: e.target.value })} /></div></div>
+      <div className="border-t pt-4"><p className="text-sm font-medium mb-3">Contato</p><div className="grid gap-4"><div className="grid gap-2"><Label>Nome</Label><Input value={form.contato_nome} onChange={(e) => setForm({ ...form, contato_nome: e.target.value })} /></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Email</Label><Input type="email" value={form.contato_email} onChange={(e) => setForm({ ...form, contato_email: e.target.value })} /></div><div className="grid gap-2"><Label>Telefone</Label><Input value={form.contato_telefone} onChange={(e) => setForm({ ...form, contato_telefone: e.target.value })} /></div></div></div></div>
+      <div className="border-t pt-4"><p className="text-sm font-medium mb-3">Preferências de Entrega</p><div className="grid gap-4"><div className="grid gap-2"><Label>Horário Preferencial</Label><Input placeholder="Ex: 08:00 às 17:00" value={form.horario_entrega} onChange={(e) => setForm({ ...form, horario_entrega: e.target.value })} /></div><div className="grid gap-2"><Label>Restrições</Label><Textarea placeholder="Restrições ou observações para entrega" value={form.restricoes_entrega} onChange={(e) => setForm({ ...form, restricoes_entrega: e.target.value })} /></div></div></div>
+    </div>
+  );
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Users className="w-6 h-6 text-primary" /></div>Clientes</h1><p className="text-muted-foreground mt-1">Gerencie seus clientes</p></div>
+          <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="stat-card text-center"><Users className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
+          <div className="stat-card text-center"><Package className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.com}</p><p className="text-xs text-muted-foreground">Com Entregas</p></div>
+          <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pend}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
+          <div className="stat-card text-center"><Package className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.tot}</p><p className="text-xs text-muted-foreground">Total Entregas</p></div>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-4"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" /></div><Select value={ufFilter} onValueChange={setUfFilter}><SelectTrigger className="w-full md:w-[140px]"><SelectValue placeholder="Estado" /></SelectTrigger><SelectContent><SelectItem value="all">Todos</SelectItem>{UFS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select></div>
+
+        {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
+
+        {!isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((c, i) => (
+            <div key={c.id} className="card-interactive animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
+              <div className="flex items-start justify-between mb-4"><div className="flex-1 min-w-0"><p className="font-semibold text-lg truncate">{c.nome_fantasia || c.razao_social}</p>{c.nome_fantasia && <p className="text-xs text-muted-foreground truncate">{c.razao_social}</p>}</div>
+                <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(c); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => openEdit(c)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(c); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+              </div>
+              <div className="space-y-2 text-sm">{c.cnpj && <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /><span className="font-mono">{fmtCNPJ(c.cnpj)}</span></div>}{c.contato_nome && <div className="flex items-center gap-2"><User className="w-4 h-4 text-muted-foreground" />{c.contato_nome}</div>}{c.contato_telefone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-4 h-4" />{c.contato_telefone}</div>}<div className="flex items-start gap-2 text-muted-foreground"><MapPin className="w-4 h-4 mt-0.5" /><div><p className="line-clamp-2">{c.endereco_completo}</p>{c.cidade && <p className="font-medium text-foreground">{c.cidade} - {c.estado}</p>}</div></div>{c.horario_entrega && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4" /><span>{c.horario_entrega}</span></div>}</div>
+              <div className="flex items-center justify-between mt-4 pt-4 border-t"><div className="flex items-center gap-2"><Package className="w-4 h-4 text-muted-foreground" /><span className="font-medium">{c.total_entregas || 0}</span>{(c.entregas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{c.entregas_pendentes} pend.</Badge>}</div></div>
+            </div>
+          ))}
+        </div>}
+
+        {!isLoading && filtered.length === 0 && <div className="card-base flex flex-col items-center py-12"><Users className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum cliente</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
+
+        <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Novo Cliente</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.razao_social || !form.endereco_completo || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar</Button></DialogFooter></DialogContent></Dialog>
+
+        <Dialog open={dlgEdit} onOpenChange={setDlgEdit}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Cliente</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgEdit(false)}>Cancelar</Button><Button onClick={() => sel && updateMut.mutate({ id: sel.id, d: form })} disabled={!form.razao_social || !form.endereco_completo || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
+
+        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4 py-4">{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}<div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="text-sm">{sel.cidade} - {sel.estado}</p>}</div><div className="border-t pt-4 grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Contato</p><p>{sel.contato_nome || "-"}</p></div><div><p className="text-sm text-muted-foreground">Tel</p><p>{sel.contato_telefone || "-"}</p></div><div className="col-span-2"><p className="text-sm text-muted-foreground">Email</p><p>{sel.contato_email || "-"}</p></div></div>{(sel.horario_entrega || sel.restricoes_entrega) && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Preferências</p>{sel.horario_entrega && <p className="text-sm"><span className="text-muted-foreground">Horário:</span> {sel.horario_entrega}</p>}{sel.restricoes_entrega && <p className="text-sm mt-1"><span className="text-muted-foreground">Restrições:</span> {sel.restricoes_entrega}</p>}</div>}<div className="border-t pt-4 grid grid-cols-2 gap-4 text-center"><div className="p-2 bg-muted/50 rounded"><p className="text-xl font-bold">{sel.total_entregas || 0}</p><p className="text-xs">Total</p></div><div className="p-2 bg-warning/10 rounded"><p className="text-xl font-bold text-warning">{sel.entregas_pendentes || 0}</p><p className="text-xs">Pend.</p></div></div></div>}<DialogFooter><Button variant="outline" onClick={() => setDlgView(false)}>Fechar</Button><Button onClick={() => { setDlgView(false); sel && openEdit(sel); }}>Editar</Button></DialogFooter></DialogContent></Dialog>
+
+        <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir?</AlertDialogTitle><AlertDialogDescription>Excluir "{sel?.nome_fantasia || sel?.razao_social}"?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Não</AlertDialogCancel><AlertDialogAction className="bg-destructive" onClick={() => sel && deleteMut.mutate(sel.id)}>{deleteMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Sim</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+      </div>
+    </MainLayout>
+  );
+}
