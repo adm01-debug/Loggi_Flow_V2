@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AchievementProvider } from "@/hooks/useAchievementNotifications";
 import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
 import { AuthProvider } from "@/hooks/useAuth";
+import { TimezoneProvider } from "@/hooks/useTimezone";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -40,12 +41,13 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <AchievementProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AchievementNotificationContainer />
-          <BrowserRouter>
+      <TimezoneProvider>
+        <AchievementProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <AchievementNotificationContainer />
+            <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
@@ -79,8 +81,9 @@ const App = () => (
           </BrowserRouter>
         </TooltipProvider>
       </AchievementProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+    </TimezoneProvider>
+  </AuthProvider>
+</QueryClientProvider>
 );
 
 export default App;
