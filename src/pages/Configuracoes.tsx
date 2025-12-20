@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTimezone, brazilianTimezones } from "@/hooks/useTimezone";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Settings, Bell, User, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun, BarChart3, Package, Truck, DollarSign, Trophy, AlertTriangle, Mail, RefreshCw, ExternalLink } from "lucide-react";
+import { Settings, Bell, User, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun, BarChart3, Package, Truck, DollarSign, Trophy, AlertTriangle, Mail, RefreshCw, ExternalLink, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -33,10 +34,11 @@ const defaultAppSettings: AppSettings = {
 
 export default function Configuracoes() {
   const { user } = useAuth();
+  const { timezone, setTimezone } = useTimezone();
   const queryClient = useQueryClient();
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ full_name: "", avatar_url: "" });
-  const [appSettings, setAppSettings] = useState<AppSettings>(defaultAppSettings);
+  const [appSettings, setAppSettings] = useState<AppSettings>({ ...defaultAppSettings, timezone });
   const [hasChanges, setHasChanges] = useState(false);
   const [configDialog, setConfigDialog] = useState<string | null>(null);
   
@@ -100,14 +102,21 @@ export default function Configuracoes() {
     if (user?.id) {
       localStorage.setItem(`app_settings_${user.id}`, JSON.stringify(appSettings));
       setHasChanges(false);
+      
+      // Apply timezone
+      setTimezone(appSettings.timezone);
+      
       toast.success("Configurações salvas!");
       
       // Apply theme
       if (appSettings.theme === "dark") {
         document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
       } else if (appSettings.theme === "light") {
         document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
       } else {
+        localStorage.setItem("theme", "system");
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
           document.documentElement.classList.add("dark");
         } else {
@@ -284,6 +293,20 @@ export default function Configuracoes() {
                     <SelectItem value="pt-BR">Português (BR)</SelectItem>
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-muted-foreground" />
+                  <div><Label>Fuso Horário</Label><p className="text-sm text-muted-foreground">Timezone para datas e horários</p></div>
+                </div>
+                <Select value={appSettings.timezone} onValueChange={(v) => updateAppSetting("timezone", v)}>
+                  <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {brazilianTimezones.map((tz) => (
+                      <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
