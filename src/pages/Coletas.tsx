@@ -18,10 +18,12 @@ import {
   Filter,
   MoreVertical,
   ExternalLink,
-  Building2
+  Building2,
+  Download
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useExport } from "@/hooks/useExport";
 import {
   Dialog,
   DialogContent,
@@ -196,6 +198,7 @@ export default function Coletas() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { exportToExcel, exportToCSV } = useExport();
   const { toast } = useToast();
 
   // Form state
@@ -323,6 +326,11 @@ export default function Coletas() {
                 className="pl-10 w-64"
               />
             </div>
+
+            <Button variant="outline" onClick={() => exportToExcel(coletas.map(c => ({ numero: c.numero_coleta, status: c.status, fornecedor: fornecedores.find(f => f.id === c.fornecedor_id)?.razao_social || '', endereco: c.endereco_coleta, created_at: c.created_at })), { filename: 'coletas' })} className="gap-2">
+              <Download className="w-4 h-4" />
+              Exportar
+            </Button>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
