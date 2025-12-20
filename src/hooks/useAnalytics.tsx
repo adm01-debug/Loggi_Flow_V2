@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { subMonths, startOfMonth, endOfMonth, format, eachDayOfInterval, getHours } from 'date-fns';
+import { subMonths, startOfMonth, endOfMonth, format, getHours, eachMonthOfInterval } from 'date-fns';
 
-interface MonthlyData {
+export interface MonthlyData {
   month: string;
   entregas: number;
   coletas: number;
@@ -11,28 +11,36 @@ interface MonthlyData {
   ocorrencias: number;
 }
 
-interface DemandForecast {
+export interface DemandForecast {
   date: string;
   actual: number | null;
   predicted: number;
 }
 
-interface HeatmapData {
+export interface HeatmapData {
   hour: number;
   region: string;
   count: number;
   intensity: number;
 }
 
-export function useAnalytics() {
-  // Monthly comparison data (last 6 months)
+export interface DateRange {
+  from: Date;
+  to: Date;
+}
+
+export function useAnalytics(dateRange?: DateRange) {
+  const startDate = dateRange?.from || subMonths(new Date(), 6);
+  const endDate = dateRange?.to || new Date();
+
+  // Monthly comparison data
   const { data: monthlyData = [], isLoading: isLoadingMonthly } = useQuery({
-    queryKey: ['analytics-monthly'],
+    queryKey: ['analytics-monthly', startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
       const months: MonthlyData[] = [];
+      const monthsInRange = eachMonthOfInterval({ start: startDate, end: endDate });
       
-      for (let i = 5; i >= 0; i--) {
-        const date = subMonths(new Date(), i);
+      for (const date of monthsInRange) {
         const start = startOfMonth(date).toISOString();
         const end = endOfMonth(date).toISOString();
         const monthLabel = format(date, 'MMM yyyy');
@@ -99,15 +107,14 @@ export function useAnalytics() {
 
   // Demand forecast (next 30 days based on historical patterns)
   const { data: demandForecast = [], isLoading: isLoadingForecast } = useQuery({
-    queryKey: ['analytics-forecast'],
+    queryKey: ['analytics-forecast', startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
-      // Get historical data from last 90 days
-      const ninetyDaysAgo = subMonths(new Date(), 3).toISOString();
-      
+      // Get historical data from the selected range
       const { data: historicalEntregas } = await supabase
         .from('entregas')
         .select('created_at')
-        .gte('created_at', ninetyDaysAgo);
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
       
       // Calculate average daily volume
       const dailyCounts: Record<string, number> = {};
@@ -165,18 +172,22 @@ export function useAnalytics() {
 
   // Heatmap data (peak hours by region/state)
   const { data: heatmapData = [], isLoading: isLoadingHeatmap } = useQuery({
-    queryKey: ['analytics-heatmap'],
+    queryKey: ['analytics-heatmap', startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
-      // Get all entregas with state info
+      // Get entregas within date range
       const { data: entregas } = await supabase
         .from('entregas')
         .select('endereco_entrega, created_at')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString())
         .limit(1000);
       
-      // Get all coletas with state info
+      // Get coletas within date range
       const { data: coletas } = await supabase
         .from('coletas')
         .select('endereco_coleta, created_at')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString())
         .limit(1000);
       
       // Extract state and hour patterns
