@@ -100,7 +100,7 @@ interface Entrega {
     nome_fantasia: string | null;
     cidade: string | null;
     estado: string | null;
-    telefone: string | null;
+    contato_telefone: string | null;
   } | null;
   transportadora: {
     id: string;
@@ -190,7 +190,7 @@ export default function Envios() {
         .from("entregas")
         .select(`
           *,
-          cliente:clientes(id, razao_social, nome_fantasia, cidade, estado, telefone),
+          cliente:clientes(id, razao_social, nome_fantasia, cidade, estado, contato_telefone),
           transportadora:transportadoras(id, nome_fantasia)
         `)
         .order("created_at", { ascending: false });
@@ -206,7 +206,7 @@ export default function Envios() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clientes")
-        .select("id, razao_social, nome_fantasia, cidade, estado, endereco_completo, telefone")
+        .select("id, razao_social, nome_fantasia, cidade, estado, endereco_completo, contato_telefone")
         .order("razao_social");
       if (error) throw error;
       return data;
@@ -270,7 +270,18 @@ export default function Envios() {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<typeof formData & { status: EntregaStatus }> }) => {
-      const { error } = await supabase.from("entregas").update(data).eq("id", id);
+      // Build clean update object
+      const updateData: Record<string, unknown> = {};
+      if (data.cliente_id) updateData.cliente_id = data.cliente_id;
+      if (data.endereco_entrega) updateData.endereco_entrega = data.endereco_entrega;
+      if (data.contato_cliente) updateData.contato_cliente = data.contato_cliente;
+      if (data.previsao_entrega) updateData.previsao_entrega = data.previsao_entrega;
+      if (data.tipo_frete) updateData.tipo_frete = data.tipo_frete;
+      if (data.transportadora_id) updateData.transportadora_id = data.transportadora_id;
+      if (data.observacoes !== undefined) updateData.observacoes = data.observacoes;
+      if (data.status) updateData.status = data.status;
+      
+      const { error } = await supabase.from("entregas").update(updateData).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -375,7 +386,7 @@ export default function Envios() {
         ...prev,
         cliente_id: clienteId,
         endereco_entrega: cliente.endereco_completo || "",
-        contato_cliente: cliente.telefone || "",
+        contato_cliente: cliente.contato_telefone || "",
       }));
     }
   };

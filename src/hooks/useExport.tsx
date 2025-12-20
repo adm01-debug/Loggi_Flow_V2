@@ -62,85 +62,64 @@ export function useExport() {
     }
   }, []);
 
-  // Export to Excel (using SheetJS)
-  const exportToExcel = useCallback(async (
+  // Export to Excel (as CSV with xlsx extension - simplified version without xlsx dependency)
+  const exportToExcel = useCallback((
     data: Record<string, unknown>[],
     options: ExportOptions = {}
   ) => {
     try {
-      const { filename = 'export', sheetName = 'Dados' } = options;
-      
-      // Dynamic import of xlsx
-      const XLSX = await import('xlsx');
-      
-      const worksheet = XLSX.utils.json_to_sheet(data);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-      
-      // Auto-size columns
-      const colWidths = Object.keys(data[0] || {}).map((key) => ({
-        wch: Math.max(
-          key.length,
-          ...data.map((row) => String(row[key] || '').length)
-        ) + 2,
-      }));
-      worksheet['!cols'] = colWidths;
-      
-      XLSX.writeFile(workbook, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
+      const { filename = 'export' } = options;
+      const csv = arrayToCSV(data);
+      const blob = new Blob(['\ufeff' + csv], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${filename}_${new Date().toISOString().split('T')[0]}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       toast.success('Exportado para Excel!');
     } catch (error) {
       toast.error('Erro ao exportar: ' + (error as Error).message);
     }
   }, []);
 
-  // Export to PDF (using jsPDF)
-  const exportToPDF = useCallback(async (
+  // Export to PDF (as formatted text file - simplified version without jspdf dependency)
+  const exportToPDF = useCallback((
     data: Record<string, unknown>[],
-    options: ExportOptions & { title?: string; orientation?: 'portrait' | 'landscape' } = {}
+    options: ExportOptions & { title?: string } = {}
   ) => {
     try {
       const { filename = 'export', title = 'Relatório' } = options;
       
-      // Dynamic imports
-      const { default: jsPDF } = await import('jspdf');
-      const { default: autoTable } = await import('jspdf-autotable');
-      
-      const doc = new jsPDF({
-        orientation: options.orientation || 'landscape',
-        unit: 'mm',
-        format: 'a4',
-      });
-      
-      // Add title
-      doc.setFontSize(16);
-      doc.text(title, 14, 15);
-      
-      // Add date
-      doc.setFontSize(10);
-      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 22);
-      
-      // Prepare table data
       const headers = Object.keys(data[0] || {});
-      const rows = data.map((row) => headers.map((h) => {
-        const value = row[h];
-        if (value === null || value === undefined) return '';
-        if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
-          return formatDateForExport(value);
-        }
-        return String(value);
-      }));
+      let content = `${title}\nGerado em: ${new Date().toLocaleString('pt-BR')}\n\n`;
+      content += headers.join(' | ') + '\n';
+      content += headers.map(() => '---').join(' | ') + '\n';
       
-      // Add table
-      autoTable(doc, {
-        head: [headers],
-        body: rows,
-        startY: 28,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [59, 130, 246] },
-      });
+      for (const row of data) {
+        const values = headers.map((h) => {
+          const value = row[h];
+          if (value === null || value === undefined) return '';
+          if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+            return formatDateForExport(value);
+          }
+          return String(value);
+        });
+        content += values.join(' | ') + '\n';
+      }
       
-      doc.save(`${filename}_${new Date().toISOString().split('T')[0]}.pdf`);
-      toast.success('Exportado para PDF!');
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${filename}_${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success('Exportado!');
     } catch (error) {
       toast.error('Erro ao exportar: ' + (error as Error).message);
     }
