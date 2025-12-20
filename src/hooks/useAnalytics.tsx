@@ -24,6 +24,16 @@ export interface HeatmapData {
   intensity: number;
 }
 
+export interface TransportadoraStats {
+  id: string;
+  nome: string;
+  entregas: number;
+  sla: number;
+  custoMedio: number;
+  ocorrencias: number;
+  prazoMedio: number;
+}
+
 export interface DateRange {
   from: Date;
   to: Date;
@@ -298,11 +308,75 @@ export function useAnalytics(dateRange?: DateRange) {
     enabled: heatmapData.length > 0,
   });
 
+  // Transportadora comparison
+  const { data: transportadoraStats = [], isLoading: isLoadingTransportadoras } = useQuery({
+    queryKey: ['analytics-transportadoras', startDate.toISOString(), endDate.toISOString()],
+    queryFn: async () => {
+      // Get all transportadoras
+      const { data: transportadoras } = await supabase
+        .from('transportadoras')
+        .select('id, nome_fantasia, razao_social, prazo_medio_dias');
+      
+      if (!transportadoras) return [];
+
+      const stats: TransportadoraStats[] = [];
+
+      for (const t of transportadoras) {
+        // Get entregas for this transportadora in date range
+        const { data: entregas } = await supabase
+          .from('entregas')
+          .select('id, status, valor_frete, previsao_entrega, data_entrega_efetiva')
+          .eq('transportadora_id', t.id)
+          .gte('created_at', startDate.toISOString())
+          .lte('created_at', endDate.toISOString());
+
+        if (!entregas || entregas.length === 0) continue;
+
+        // Calculate SLA
+        const entregasConcluidas = entregas.filter(e => e.status === 'entregue' || e.status === 'finalizado');
+        const onTime = entregasConcluidas.filter(e =>
+          e.previsao_entrega && e.data_entrega_efetiva &&
+          new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega)
+        );
+        const sla = entregasConcluidas.length > 0 
+          ? Math.round((onTime.length / entregasConcluidas.length) * 100) 
+          : 100;
+
+        // Calculate average cost
+        const entregasComCusto = entregas.filter(e => e.valor_frete);
+        const custoMedio = entregasComCusto.length > 0
+          ? entregasComCusto.reduce((sum, e) => sum + (Number(e.valor_frete) || 0), 0) / entregasComCusto.length
+          : 0;
+
+        // Get ocorrencias for this transportadora's entregas
+        const entregaIds = entregas.map(e => e.id);
+        const { count: ocorrenciasCount } = await supabase
+          .from('ocorrencias')
+          .select('*', { count: 'exact', head: true })
+          .in('entrega_id', entregaIds);
+
+        stats.push({
+          id: t.id,
+          nome: t.nome_fantasia || t.razao_social,
+          entregas: entregas.length,
+          sla,
+          custoMedio,
+          ocorrencias: ocorrenciasCount || 0,
+          prazoMedio: t.prazo_medio_dias || 5,
+        });
+      }
+
+      // Sort by entregas count descending
+      return stats.sort((a, b) => b.entregas - a.entregas);
+    },
+  });
+
   return {
     monthlyData,
     demandForecast,
     heatmapData,
     summaryMetrics,
-    isLoading: isLoadingMonthly || isLoadingForecast || isLoadingHeatmap || isLoadingSummary,
+    transportadoraStats,
+    isLoading: isLoadingMonthly || isLoadingForecast || isLoadingHeatmap || isLoadingSummary || isLoadingTransportadoras,
   };
 }

@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react';
 import { subMonths, format } from 'date-fns';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useAnalytics, MonthlyData, DemandForecast, HeatmapData } from '@/hooks/useAnalytics';
+import { useAnalytics, MonthlyData, DemandForecast, HeatmapData, TransportadoraStats } from '@/hooks/useAnalytics';
 import { useExport } from '@/hooks/useExport';
 import { AnalyticsSummaryCards } from '@/components/analytics/AnalyticsSummaryCards';
 import { MonthlyComparisonChart } from '@/components/analytics/MonthlyComparisonChart';
 import { DemandForecastChart } from '@/components/analytics/DemandForecastChart';
 import { RegionHeatmap } from '@/components/analytics/RegionHeatmap';
+import { TransportadoraComparisonChart } from '@/components/analytics/TransportadoraComparisonChart';
 import { AnalyticsFilters, DateRange } from '@/components/analytics/AnalyticsFilters';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,7 +21,7 @@ export default function Analytics() {
   });
   const [isExporting, setIsExporting] = useState(false);
 
-  const { monthlyData, demandForecast, heatmapData, summaryMetrics, isLoading } = useAnalytics(dateRange);
+  const { monthlyData, demandForecast, heatmapData, summaryMetrics, transportadoraStats, isLoading } = useAnalytics(dateRange);
   const { exportToPDF, exportToExcel } = useExport();
 
   // Prepare data for export
@@ -68,11 +69,32 @@ export default function Analytics() {
     }));
   }, [heatmapData]);
 
+  // Prepare transportadora export
+  const transportadoraExportData = useMemo(() => {
+    return transportadoraStats.map((t: TransportadoraStats) => ({
+      transportadora: t.nome,
+      entregas: t.entregas,
+      sla: `${t.sla}%`,
+      custo_medio: `R$ ${t.custoMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      ocorrencias: t.ocorrencias,
+      prazo_medio: `${t.prazoMedio} dias`,
+    }));
+  }, [transportadoraStats]);
+
   const handleExportPDF = async () => {
     setIsExporting(true);
     try {
       const allData = [
         ...exportData,
+        ...transportadoraExportData.map(t => ({
+          tipo: 'Transportadora',
+          periodo: t.transportadora,
+          entregas: t.entregas,
+          coletas: '-',
+          custo_total: t.custo_medio,
+          sla_atingido: t.sla,
+          ocorrencias: t.ocorrencias,
+        })),
         ...heatmapExportData.map(h => ({
           tipo: 'Heatmap',
           periodo: h.horario,
@@ -99,11 +121,19 @@ export default function Analytics() {
   const handleExportExcel = async () => {
     setIsExporting(true);
     try {
-      // Create multiple sheets worth of data
+      // Export monthly data
       exportToExcel(exportData, {
         filename: 'analytics_relatorio',
         sheetName: 'Resumo Mensal',
       });
+      
+      // Export transportadora data
+      setTimeout(() => {
+        exportToExcel(transportadoraExportData, {
+          filename: 'analytics_transportadoras',
+          sheetName: 'Transportadoras',
+        });
+      }, 300);
       
       // Export heatmap separately
       setTimeout(() => {
@@ -111,7 +141,7 @@ export default function Analytics() {
           filename: 'analytics_heatmap',
           sheetName: 'Heatmap Horários',
         });
-      }, 500);
+      }, 600);
     } catch (error) {
       toast.error('Erro ao exportar Excel');
     } finally {
@@ -176,6 +206,9 @@ export default function Analytics() {
               <DemandForecastChart data={demandForecast} />
               <RegionHeatmap data={heatmapData} />
             </div>
+
+            {/* Transportadora Comparison */}
+            <TransportadoraComparisonChart data={transportadoraStats} />
           </>
         )}
       </div>
