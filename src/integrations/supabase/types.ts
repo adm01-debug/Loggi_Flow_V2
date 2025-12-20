@@ -502,6 +502,57 @@ export type Database = {
         }
         Relationships: []
       }
+      fretes_internos: {
+        Row: {
+          id: string
+          origem: string
+          destino: string
+          motorista: string | null
+          quantidade_itens: number
+          status: Database["public"]["Enums"]["frete_interno_status"]
+          data_criacao: string
+          previsao_entrega: string | null
+          data_entrega_efetiva: string | null
+          xp_reward: number
+          observacoes: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          origem: string
+          destino: string
+          motorista?: string | null
+          quantidade_itens?: number
+          status?: Database["public"]["Enums"]["frete_interno_status"]
+          data_criacao?: string
+          previsao_entrega?: string | null
+          data_entrega_efetiva?: string | null
+          xp_reward?: number
+          observacoes?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          origem?: string
+          destino?: string
+          motorista?: string | null
+          quantidade_itens?: number
+          status?: Database["public"]["Enums"]["frete_interno_status"]
+          data_criacao?: string
+          previsao_entrega?: string | null
+          data_entrega_efetiva?: string | null
+          xp_reward?: number
+          observacoes?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notificacoes_custo: {
         Row: {
           alerta_id: string | null
@@ -973,6 +1024,7 @@ export type Database = {
         | "ocorrencia"
         | "finalizado"
       frete_tipo: "cif" | "fob" | "cortesia"
+      frete_interno_status: "pendente" | "em_transito" | "entregue" | "atrasado" | "cancelado"
     }
     CompositeTypes: {
       [_ in never]: never
