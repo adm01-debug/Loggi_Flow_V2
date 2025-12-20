@@ -1,0 +1,116 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset Password",
+    "fullName": "Full Name"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "deliveries": "Deliveries",
+    "collections": "Collections",
+    "occurrences": "Occurrences",
+    "carriers": "Carriers",
+    "clients": "Clients",
+    "suppliers": "Suppliers",
+    "internalFreight": "Internal Freight",
+    "reports": "Reports",
+    "settings": "Settings",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "ranking": "Ranking",
+    "achievements": "Achievements"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "pendingDeliveries": "Pending Deliveries",
+    "completedToday": "Completed Today",
+    "delayedItems": "Delayed",
+    "weeklyPerformance": "Weekly Performance"
+  },
+  "delivery": {
+    "number": "Delivery Number",
+    "status": "Status",
+    "client": "Client",
+    "address": "Address",
+    "expectedDate": "Expected Date",
+    "actualDate": "Actual Date",
+    "carrier": "Carrier",
+    "trackingCode": "Tracking Code",
+    "invoice": "Invoice"
+  },
+  "collection": {
+    "number": "Collection Number",
+    "supplier": "Supplier",
+    "type": "Type",
+    "expectedDate": "Expected Date",
+    "actualDate": "Actual Date",
+    "volumes": "Volumes"
+  },
+  "status": {
+    "pending": "Pending",
+    "inTransit": "In Transit",
+    "delivered": "Delivered",
+    "delayed": "Delayed",
+    "cancelled": "Cancelled",
+    "occurrence": "Occurrence"
+  },
+  "gamification": {
+    "level": "Level",
+    "xp": "XP",
+    "coins": "Coins",
+    "streak": "Streak",
+    "achievements": "Achievements",
+    "ranking": "Ranking",
+    "unlocked": "Unlocked!",
+    "progress": "Progress"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "newAchievement": "New Achievement!",
+    "deliveryCompleted": "Delivery Completed",
+    "collectionDelayed": "Collection Delayed"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "appearance": "Appearance",
+    "integrations": "Integrations",
+    "data": "Data",
+    "theme": "Theme",
+    "language": "Language",
+    "timezone": "Timezone"
+  }
+}

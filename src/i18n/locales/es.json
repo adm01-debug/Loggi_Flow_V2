@@ -1,0 +1,116 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "yes": "Sí",
+    "no": "No",
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "signup": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "resetPassword": "Restablecer Contraseña",
+    "fullName": "Nombre Completo"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "deliveries": "Entregas",
+    "collections": "Recogidas",
+    "occurrences": "Incidencias",
+    "carriers": "Transportistas",
+    "clients": "Clientes",
+    "suppliers": "Proveedores",
+    "internalFreight": "Flete Interno",
+    "reports": "Informes",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "notifications": "Notificaciones",
+    "ranking": "Ranking",
+    "achievements": "Logros"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido",
+    "overview": "Resumen",
+    "pendingDeliveries": "Entregas Pendientes",
+    "completedToday": "Completadas Hoy",
+    "delayedItems": "Retrasados",
+    "weeklyPerformance": "Rendimiento Semanal"
+  },
+  "delivery": {
+    "number": "Número de Entrega",
+    "status": "Estado",
+    "client": "Cliente",
+    "address": "Dirección",
+    "expectedDate": "Fecha Prevista",
+    "actualDate": "Fecha Real",
+    "carrier": "Transportista",
+    "trackingCode": "Código de Seguimiento",
+    "invoice": "Factura"
+  },
+  "collection": {
+    "number": "Número de Recogida",
+    "supplier": "Proveedor",
+    "type": "Tipo",
+    "expectedDate": "Fecha Prevista",
+    "actualDate": "Fecha Real",
+    "volumes": "Volúmenes"
+  },
+  "status": {
+    "pending": "Pendiente",
+    "inTransit": "En Tránsito",
+    "delivered": "Entregado",
+    "delayed": "Retrasado",
+    "cancelled": "Cancelado",
+    "occurrence": "Incidencia"
+  },
+  "gamification": {
+    "level": "Nivel",
+    "xp": "XP",
+    "coins": "Monedas",
+    "streak": "Racha",
+    "achievements": "Logros",
+    "ranking": "Ranking",
+    "unlocked": "¡Desbloqueado!",
+    "progress": "Progreso"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar todas como leídas",
+    "noNotifications": "Sin notificaciones",
+    "newAchievement": "¡Nuevo Logro!",
+    "deliveryCompleted": "Entrega Completada",
+    "collectionDelayed": "Recogida Retrasada"
+  },
+  "settings": {
+    "title": "Configuración",
+    "profile": "Perfil",
+    "notifications": "Notificaciones",
+    "appearance": "Apariencia",
+    "integrations": "Integraciones",
+    "data": "Datos",
+    "theme": "Tema",
+    "language": "Idioma",
+    "timezone": "Zona Horaria"
+  }
+}

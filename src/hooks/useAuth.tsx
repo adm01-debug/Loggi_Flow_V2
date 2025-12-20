@@ -28,6 +28,53 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Auto-update streak when user logs in
+async function updateUserStreak(userId: string) {
+  try {
+    const { data: userLevel } = await supabase
+      .from("user_levels")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!userLevel) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    const lastActivity = userLevel.last_activity_date;
+
+    // Already updated today
+    if (lastActivity === today) return;
+
+    let newStreak = userLevel.streak_days;
+
+    if (!lastActivity) {
+      newStreak = 1;
+    } else {
+      const lastDate = new Date(lastActivity);
+      const todayDate = new Date(today);
+      const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        newStreak = userLevel.streak_days + 1;
+      } else if (diffDays > 1) {
+        newStreak = 1;
+      }
+    }
+
+    await supabase
+      .from("user_levels")
+      .update({
+        streak_days: newStreak,
+        last_activity_date: today,
+      })
+      .eq("user_id", userId);
+
+    console.log("[Auth] Streak updated to:", newStreak);
+  } catch (error) {
+    console.error("[Auth] Error updating streak:", error);
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -56,6 +103,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (rolesData) {
       setRoles(rolesData.map((r: UserRole) => r.role));
     }
+
+    // Auto-update streak on login
+    updateUserStreak(userId);
   };
 
   useEffect(() => {

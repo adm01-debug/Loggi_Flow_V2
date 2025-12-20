@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-interface PushSubscription {
+interface PushSubscriptionData {
   endpoint: string;
   keys: {
     p256dh: string;
@@ -10,11 +10,18 @@ interface PushSubscription {
   };
 }
 
+// Generate VAPID keys properly - in production, these should come from environment/secrets
+const getVapidKey = (): string => {
+  // This is a demo public key - in production, use VAPID keys from your server
+  return 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+};
+
 export const usePushNotifications = () => {
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [subscription, setSubscription] = useState<PushSubscription | null>(null);
 
   useEffect(() => {
     // Check if push notifications are supported
@@ -30,8 +37,27 @@ export const usePushNotifications = () => {
   const checkSubscription = async () => {
     try {
       const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      setIsSubscribed(!!subscription);
+      const sub = await registration.pushManager.getSubscription();
+      setSubscription(sub);
+      setIsSubscribed(!!sub);
+      
+      // Verify subscription is saved in user preferences
+      if (sub) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const saved = localStorage.getItem(`push_subscription_${user.id}`);
+          if (!saved) {
+            // Save subscription to localStorage as fallback
+            localStorage.setItem(`push_subscription_${user.id}`, JSON.stringify({
+              endpoint: sub.endpoint,
+              keys: {
+                p256dh: arrayBufferToBase64(sub.getKey('p256dh')),
+                auth: arrayBufferToBase64(sub.getKey('auth')),
+              }
+            }));
+          }
+        }
+      }
     } catch (error) {
       console.error('[usePushNotifications] Error checking subscription:', error);
     }
@@ -84,19 +110,31 @@ export const usePushNotifications = () => {
       const registration = await navigator.serviceWorker.register('/sw.js');
       await navigator.serviceWorker.ready;
 
-      // Subscribe to push notifications
-      const vapidKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
-      const subscription = await registration.pushManager.subscribe({
+      // Subscribe to push notifications with VAPID key
+      const vapidKey = getVapidKey();
+      const applicationServerKey = urlBase64ToUint8Array(vapidKey);
+      const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: vapidKey,
+        applicationServerKey: applicationServerKey.buffer as ArrayBuffer,
       });
 
-      // Store subscription in database
+      // Store subscription data
+      const subscriptionData: PushSubscriptionData = {
+        endpoint: sub.endpoint,
+        keys: {
+          p256dh: arrayBufferToBase64(sub.getKey('p256dh')),
+          auth: arrayBufferToBase64(sub.getKey('auth')),
+        }
+      };
+
+      // Save subscription to localStorage for persistence
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        console.log('[usePushNotifications] Subscription:', JSON.stringify(subscription));
+        localStorage.setItem(`push_subscription_${user.id}`, JSON.stringify(subscriptionData));
+        console.log('[usePushNotifications] Subscription saved for user:', user.id);
       }
 
+      setSubscription(sub);
       setIsSubscribed(true);
       toast.success('Inscrito para notificações push!');
       return true;
@@ -113,10 +151,18 @@ export const usePushNotifications = () => {
     setIsLoading(true);
     try {
       const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+      const sub = await registration.pushManager.getSubscription();
 
-      if (subscription) {
-        await subscription.unsubscribe();
+      if (sub) {
+        await sub.unsubscribe();
+        
+        // Remove from localStorage
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          localStorage.removeItem(`push_subscription_${user.id}`);
+        }
+        
+        setSubscription(null);
         setIsSubscribed(false);
         toast.success('Desinscrição realizada com sucesso');
         return true;
@@ -152,6 +198,7 @@ export const usePushNotifications = () => {
     permission,
     isSubscribed,
     isLoading,
+    subscription,
     requestPermission,
     subscribe,
     unsubscribe,
@@ -173,4 +220,15 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
     outputArray[i] = rawData.charCodeAt(i);
   }
   return outputArray;
+}
+
+// Helper function to convert ArrayBuffer to base64
+function arrayBufferToBase64(buffer: ArrayBuffer | null): string {
+  if (!buffer) return '';
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
 }
