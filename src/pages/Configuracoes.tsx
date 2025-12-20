@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Settings, Bell, User, Shield, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun } from "lucide-react";
+import { Settings, Bell, User, Shield, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { NotificationStats } from "@/components/notifications/NotificationStats";
+import { NotificationPermissionStatus } from "@/components/notifications/BrowserNotificationPrompt";
 
 interface UserSettings {
   notifications_email: boolean;
@@ -153,7 +155,10 @@ export default function Configuracoes() {
 
           {/* Notifications */}
           <div className="card-base space-y-4">
-            <div className="flex items-center gap-3"><Bell className="w-5 h-5 text-warning" /><h2 className="font-display font-semibold text-lg">Notificações</h2></div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3"><Bell className="w-5 h-5 text-warning" /><h2 className="font-display font-semibold text-lg">Notificações</h2></div>
+              <NotificationPermissionStatus />
+            </div>
             <Separator />
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -173,6 +178,13 @@ export default function Configuracoes() {
                 <Switch id="notif-ocor" checked={settings.notifications_ocorrencias} onCheckedChange={(v) => updateSetting("notifications_ocorrencias", v)} />
               </div>
             </div>
+          </div>
+
+          {/* Notification Stats */}
+          <div className="card-base space-y-4">
+            <div className="flex items-center gap-3"><BarChart3 className="w-5 h-5 text-primary" /><h2 className="font-display font-semibold text-lg">Estatísticas de Notificações</h2></div>
+            <Separator />
+            <NotificationStats />
           </div>
 
           {/* Appearance */}
