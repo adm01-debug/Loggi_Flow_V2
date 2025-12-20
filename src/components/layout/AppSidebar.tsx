@@ -32,6 +32,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
   { title: "Custos Logísticos", url: "/custos", icon: DollarSign },
   { title: "Alertas Custo", url: "/alertas-custo", icon: AlertTriangle },
