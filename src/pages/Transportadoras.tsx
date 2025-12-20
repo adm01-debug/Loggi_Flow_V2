@@ -20,10 +20,12 @@ import {
   Globe,
   Building2,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Download
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useExport } from "@/hooks/useExport";
 import {
   Dialog,
   DialogContent,
@@ -243,6 +245,7 @@ export default function Transportadoras() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState(emptyForm);
   const { toast } = useToast();
+  const { exportToExcel } = useExport();
 
   const fetchData = async () => {
     setLoading(true);
@@ -394,6 +397,10 @@ export default function Transportadoras() {
               </SelectContent>
             </Select>
 
+            <Button variant="outline" onClick={() => exportToExcel(transportadoras.map(t => ({ nome: t.nome, cnpj: t.cnpj, cidade: t.cidade, uf: t.uf, telefone: t.telefone, email: t.email, ativa: t.ativa ? 'Sim' : 'Não' })), { filename: 'transportadoras' })} className="gap-2">
+              <Download className="w-4 h-4" />
+              Exportar
+            </Button>
             <Dialog open={isDialogOpen} onOpenChange={(open) => {
               setIsDialogOpen(open);
               if (!open) { setEditingId(null); setFormData(emptyForm); }
