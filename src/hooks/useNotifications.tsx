@@ -76,6 +76,24 @@ export function useNotifications() {
               onClick: () => window.location.href = notification.action_url!,
             } : undefined,
           });
+
+          // Show browser notification if permission granted and tab not focused
+          if (document.hidden && window.Notification?.permission === "granted") {
+            const browserNotification = new window.Notification(notification.title, {
+              body: notification.message,
+              icon: "/favicon.ico",
+              tag: notification.id,
+              requireInteraction: notification.type === "error" || notification.type === "warning",
+            });
+
+            browserNotification.onclick = () => {
+              window.focus();
+              if (notification.action_url) {
+                window.location.href = notification.action_url;
+              }
+              browserNotification.close();
+            };
+          }
         }
       )
       .subscribe();
