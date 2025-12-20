@@ -591,6 +591,45 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          id: string
+          message: string
+          metadata: Json | null
+          read: boolean
+          read_at: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          read?: boolean
+          read_at?: string | null
+          title: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          read?: boolean
+          read_at?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       ocorrencias: {
         Row: {
           acao_tomada: string | null
@@ -1024,6 +1063,12 @@ export type Database = {
         | "atrasado"
         | "cancelado"
       frete_tipo: "cif" | "fob" | "cortesia"
+      notification_type:
+        | "info"
+        | "success"
+        | "warning"
+        | "error"
+        | "achievement"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1182,6 +1227,7 @@ export const Constants = {
         "cancelado",
       ],
       frete_tipo: ["cif", "fob", "cortesia"],
+      notification_type: ["info", "success", "warning", "error", "achievement"],
     },
   },
 } as const
