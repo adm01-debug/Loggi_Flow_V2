@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 
 export interface Notification {
   id: string;
@@ -22,6 +23,7 @@ export function useNotifications() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const { shouldShowNotification, shouldShowBrowserNotification, preferences } = useNotificationPreferences();
 
   // Fetch notifications
   const { data: notifications = [], isLoading } = useQuery({
@@ -63,36 +65,42 @@ export function useNotifications() {
             (old: Notification[] = []) => [notification, ...old]
           );
 
-          // Show toast based on type
-          const toastFn = notification.type === "error" ? toast.error 
-            : notification.type === "warning" ? toast.warning 
-            : notification.type === "success" ? toast.success 
-            : toast.info;
-          
-          toastFn(notification.title, {
-            description: notification.message,
-            action: notification.action_url ? {
-              label: "Ver",
-              onClick: () => window.location.href = notification.action_url!,
-            } : undefined,
-          });
+          // Check if notification should be shown based on preferences
+          const metadata = notification.metadata || {};
+          const shouldShow = shouldShowNotification(notification.type, metadata);
 
-          // Show browser notification if permission granted and tab not focused
-          if (document.hidden && window.Notification?.permission === "granted") {
-            const browserNotification = new window.Notification(notification.title, {
-              body: notification.message,
-              icon: "/favicon.ico",
-              tag: notification.id,
-              requireInteraction: notification.type === "error" || notification.type === "warning",
+          if (shouldShow) {
+            // Show toast based on type
+            const toastFn = notification.type === "error" ? toast.error 
+              : notification.type === "warning" ? toast.warning 
+              : notification.type === "success" ? toast.success 
+              : toast.info;
+            
+            toastFn(notification.title, {
+              description: notification.message,
+              action: notification.action_url ? {
+                label: "Ver",
+                onClick: () => window.location.href = notification.action_url!,
+              } : undefined,
             });
 
-            browserNotification.onclick = () => {
-              window.focus();
-              if (notification.action_url) {
-                window.location.href = notification.action_url;
-              }
-              browserNotification.close();
-            };
+            // Show browser notification if permission granted, tab not focused, and preferences allow
+            if (document.hidden && window.Notification?.permission === "granted" && shouldShowBrowserNotification(notification.type, metadata)) {
+              const browserNotification = new window.Notification(notification.title, {
+                body: notification.message,
+                icon: "/favicon.ico",
+                tag: notification.id,
+                requireInteraction: notification.type === "error" || notification.type === "warning",
+              });
+
+              browserNotification.onclick = () => {
+                window.focus();
+                if (notification.action_url) {
+                  window.location.href = notification.action_url;
+                }
+                browserNotification.close();
+              };
+            }
           }
         }
       )
@@ -103,7 +111,7 @@ export function useNotifications() {
     return () => {
       supabase.removeChannel(newChannel);
     };
-  }, [user?.id, queryClient]);
+  }, [user?.id, queryClient, shouldShowNotification, shouldShowBrowserNotification]);
 
   // Mark as read mutation
   const markAsReadMutation = useMutation({
