@@ -1,172 +1,259 @@
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Settings, Bell, User, Shield, Palette, Link2, Database } from "lucide-react";
+import { Settings, Bell, User, Shield, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "sonner";
+
+interface UserSettings {
+  notifications_email: boolean;
+  notifications_push: boolean;
+  notifications_sla: boolean;
+  notifications_ocorrencias: boolean;
+  theme: "light" | "dark" | "system";
+  language: string;
+  timezone: string;
+}
+
+const defaultSettings: UserSettings = {
+  notifications_email: true,
+  notifications_push: true,
+  notifications_sla: true,
+  notifications_ocorrencias: true,
+  theme: "system",
+  language: "pt-BR",
+  timezone: "America/Sao_Paulo",
+};
 
 export default function Configuracoes() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [editProfile, setEditProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({ full_name: "", avatar_url: "" });
+  const [settings, setSettings] = useState<UserSettings>(defaultSettings);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Fetch profile
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+      if (error && error.code !== "PGRST116") throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Load settings from localStorage (could be moved to Supabase table)
+  useEffect(() => {
+    const saved = localStorage.getItem(`settings_${user?.id}`);
+    if (saved) {
+      setSettings(JSON.parse(saved));
+    }
+  }, [user?.id]);
+
+  // Update profile mutation
+  const updateProfileMut = useMutation({
+    mutationFn: async (data: { full_name: string; avatar_url?: string }) => {
+      if (!user?.id) throw new Error("Not authenticated");
+      const { error } = await supabase.from("profiles").upsert({ id: user.id, ...data, updated_at: new Date().toISOString() });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      setEditProfile(false);
+      toast.success("Perfil atualizado!");
+    },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
+
+  // Save settings
+  const saveSettings = () => {
+    if (user?.id) {
+      localStorage.setItem(`settings_${user.id}`, JSON.stringify(settings));
+      setHasChanges(false);
+      toast.success("Configurações salvas!");
+      
+      // Apply theme
+      if (settings.theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else if (settings.theme === "light") {
+        document.documentElement.classList.remove("dark");
+      } else {
+        // System preference
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      }
+    }
+  };
+
+  const updateSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+    setHasChanges(true);
+  };
+
+  // Integration status (mock - would connect to real checks)
+  const integrations = [
+    { name: "Lalamove", status: "configured", color: "text-success" },
+    { name: "Mapbox", status: "configured", color: "text-success" },
+    { name: "Bitrix24", status: "not_configured", color: "text-muted-foreground" },
+    { name: "n8n", status: "not_configured", color: "text-muted-foreground" },
+  ];
+
   return (
     <MainLayout>
       <div className="space-y-6 max-w-4xl">
         {/* Header */}
-        <div>
-          <h1 className="text-display text-foreground flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-accent">
-              <Settings className="w-6 h-6 text-accent-foreground" />
-            </div>
-            Configurações
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie as configurações do sistema
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-display text-foreground flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-accent"><Settings className="w-6 h-6 text-accent-foreground" /></div>
+              Configurações
+            </h1>
+            <p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p>
+          </div>
+          {hasChanges && (
+            <Button onClick={saveSettings} className="gap-2"><Save className="w-4 h-4" />Salvar Alterações</Button>
+          )}
         </div>
 
-        {/* Settings Sections */}
         <div className="space-y-6">
           {/* Profile */}
           <div className="card-base space-y-4">
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-primary" />
-              <h2 className="font-display font-semibold text-lg">Perfil</h2>
-            </div>
+            <div className="flex items-center gap-3"><User className="w-5 h-5 text-primary" /><h2 className="font-display font-semibold text-lg">Perfil</h2></div>
             <Separator />
             <div className="grid gap-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Nome completo</p>
-                  <p className="text-sm text-muted-foreground">João Silva</p>
+                  <p className="text-sm text-muted-foreground">{profile?.full_name || user?.email || "Não definido"}</p>
                 </div>
-                <Button variant="outline" size="sm">Editar</Button>
+                <Button variant="outline" size="sm" onClick={() => { setProfileForm({ full_name: profile?.full_name || "", avatar_url: profile?.avatar_url || "" }); setEditProfile(true); }}>Editar</Button>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">joao@empresa.com</p>
+                  <p className="text-sm text-muted-foreground">{user?.email}</p>
                 </div>
-                <Button variant="outline" size="sm">Editar</Button>
               </div>
             </div>
           </div>
 
           {/* Notifications */}
           <div className="card-base space-y-4">
-            <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-warning" />
-              <h2 className="font-display font-semibold text-lg">Notificações</h2>
-            </div>
+            <div className="flex items-center gap-3"><Bell className="w-5 h-5 text-warning" /><h2 className="font-display font-semibold text-lg">Notificações</h2></div>
             <Separator />
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="notify-freight" className="flex flex-col gap-1">
-                  <span>Novos fretes</span>
-                  <span className="text-sm text-muted-foreground font-normal">
-                    Receber notificações de novos fretes atribuídos
-                  </span>
-                </Label>
-                <Switch id="notify-freight" defaultChecked />
+                <div><Label htmlFor="notif-email">Notificações por Email</Label><p className="text-sm text-muted-foreground">Receber resumos diários</p></div>
+                <Switch id="notif-email" checked={settings.notifications_email} onCheckedChange={(v) => updateSetting("notifications_email", v)} />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="notify-delivery" className="flex flex-col gap-1">
-                  <span>Entregas concluídas</span>
-                  <span className="text-sm text-muted-foreground font-normal">
-                    Notificar quando uma entrega for finalizada
-                  </span>
-                </Label>
-                <Switch id="notify-delivery" defaultChecked />
+                <div><Label htmlFor="notif-push">Notificações Push</Label><p className="text-sm text-muted-foreground">Alertas em tempo real no navegador</p></div>
+                <Switch id="notif-push" checked={settings.notifications_push} onCheckedChange={(v) => updateSetting("notifications_push", v)} />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="notify-delay" className="flex flex-col gap-1">
-                  <span>Alertas de atraso</span>
-                  <span className="text-sm text-muted-foreground font-normal">
-                    Receber alertas quando fretes estiverem atrasados
-                  </span>
-                </Label>
-                <Switch id="notify-delay" defaultChecked />
-              </div>
-            </div>
-          </div>
-
-          {/* Integrations */}
-          <div className="card-base space-y-4">
-            <div className="flex items-center gap-3">
-              <Link2 className="w-5 h-5 text-info" />
-              <h2 className="font-display font-semibold text-lg">Integrações</h2>
-            </div>
-            <Separator />
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-accent/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#2FC6F6]/10 flex items-center justify-center">
-                    <span className="font-bold text-[#2FC6F6]">B24</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Bitrix24</p>
-                    <p className="text-sm text-muted-foreground">Sincronização de dados</p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm">Configurar</Button>
-              </div>
-              <div className="flex items-center justify-between p-4 rounded-lg bg-accent/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                    <Database className="w-5 h-5 text-success" />
-                  </div>
-                  <div>
-                    <p className="font-medium">ERP</p>
-                    <p className="text-sm text-muted-foreground">Sistema de gestão</p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm">Configurar</Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Security */}
-          <div className="card-base space-y-4">
-            <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-success" />
-              <h2 className="font-display font-semibold text-lg">Segurança</h2>
-            </div>
-            <Separator />
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Alterar senha</p>
-                  <p className="text-sm text-muted-foreground">Última alteração há 30 dias</p>
-                </div>
-                <Button variant="outline" size="sm">Alterar</Button>
+                <div><Label htmlFor="notif-sla">Alertas de SLA</Label><p className="text-sm text-muted-foreground">Avisar quando prazos estiverem próximos</p></div>
+                <Switch id="notif-sla" checked={settings.notifications_sla} onCheckedChange={(v) => updateSetting("notifications_sla", v)} />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="2fa" className="flex flex-col gap-1">
-                  <span>Autenticação em dois fatores</span>
-                  <span className="text-sm text-muted-foreground font-normal">
-                    Adicione uma camada extra de segurança
-                  </span>
-                </Label>
-                <Switch id="2fa" />
+                <div><Label htmlFor="notif-ocor">Novas Ocorrências</Label><p className="text-sm text-muted-foreground">Notificar sobre novas ocorrências</p></div>
+                <Switch id="notif-ocor" checked={settings.notifications_ocorrencias} onCheckedChange={(v) => updateSetting("notifications_ocorrencias", v)} />
               </div>
             </div>
           </div>
 
           {/* Appearance */}
           <div className="card-base space-y-4">
-            <div className="flex items-center gap-3">
-              <Palette className="w-5 h-5 text-xp" />
-              <h2 className="font-display font-semibold text-lg">Aparência</h2>
-            </div>
+            <div className="flex items-center gap-3"><Palette className="w-5 h-5 text-info" /><h2 className="font-display font-semibold text-lg">Aparência</h2></div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <Label htmlFor="dark-mode" className="flex flex-col gap-1">
-                <span>Modo escuro</span>
-                <span className="text-sm text-muted-foreground font-normal">
-                  Alternar entre tema claro e escuro
-                </span>
-              </Label>
-              <Switch id="dark-mode" />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div><Label>Tema</Label><p className="text-sm text-muted-foreground">Escolha o tema do sistema</p></div>
+                <Select value={settings.theme} onValueChange={(v) => updateSetting("theme", v as "light" | "dark" | "system")}>
+                  <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light"><div className="flex items-center gap-2"><Sun className="w-4 h-4" />Claro</div></SelectItem>
+                    <SelectItem value="dark"><div className="flex items-center gap-2"><Moon className="w-4 h-4" />Escuro</div></SelectItem>
+                    <SelectItem value="system">Sistema</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center justify-between">
+                <div><Label>Idioma</Label><p className="text-sm text-muted-foreground">Idioma da interface</p></div>
+                <Select value={settings.language} onValueChange={(v) => updateSetting("language", v)}>
+                  <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pt-BR">Português (BR)</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Integrations */}
+          <div className="card-base space-y-4">
+            <div className="flex items-center gap-3"><Link2 className="w-5 h-5 text-success" /><h2 className="font-display font-semibold text-lg">Integrações</h2></div>
+            <Separator />
+            <div className="space-y-4">
+              {integrations.map((int) => (
+                <div key={int.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${int.status === "configured" ? "bg-success" : "bg-muted"}`} />
+                    <div><p className="font-medium">{int.name}</p><p className="text-sm text-muted-foreground">{int.status === "configured" ? "Conectado" : "Não configurado"}</p></div>
+                  </div>
+                  <Button variant="outline" size="sm">{int.status === "configured" ? "Configurar" : "Conectar"}</Button>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">Veja a documentação em <code>/docs/INTEGRACAO_CONFIG.md</code> para configurar as integrações.</p>
+          </div>
+
+          {/* Data */}
+          <div className="card-base space-y-4">
+            <div className="flex items-center gap-3"><Database className="w-5 h-5 text-destructive" /><h2 className="font-display font-semibold text-lg">Dados</h2></div>
+            <Separator />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div><p className="font-medium">Exportar Dados</p><p className="text-sm text-muted-foreground">Baixe todos os seus dados em formato JSON</p></div>
+                <Button variant="outline" size="sm">Exportar</Button>
+              </div>
+              <div className="flex items-center justify-between">
+                <div><p className="font-medium text-destructive">Limpar Cache</p><p className="text-sm text-muted-foreground">Remove dados temporários do navegador</p></div>
+                <Button variant="destructive" size="sm" onClick={() => { localStorage.clear(); toast.success("Cache limpo!"); }}>Limpar</Button>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Edit Profile Dialog */}
+        <Dialog open={editProfile} onOpenChange={setEditProfile}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Editar Perfil</DialogTitle></DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2"><Label>Nome Completo</Label><Input value={profileForm.full_name} onChange={(e) => setProfileForm({ ...profileForm, full_name: e.target.value })} placeholder="Seu nome" /></div>
+              <div className="grid gap-2"><Label>URL do Avatar</Label><Input value={profileForm.avatar_url} onChange={(e) => setProfileForm({ ...profileForm, avatar_url: e.target.value })} placeholder="https://..." /></div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditProfile(false)}>Cancelar</Button>
+              <Button onClick={() => updateProfileMut.mutate(profileForm)} disabled={updateProfileMut.isPending}>{updateProfileMut.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
