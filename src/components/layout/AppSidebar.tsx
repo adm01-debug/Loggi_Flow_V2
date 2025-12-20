@@ -23,6 +23,7 @@ import {
   AlertTriangle,
   Map,
   Navigation,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -43,7 +44,9 @@ const menuItems = [
   { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
   { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
   { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
+  { title: "Clientes", url: "/clientes", icon: Users },
   { title: "Envios Clientes", url: "/envios", icon: Package },
+  { title: "Ocorrências", url: "/ocorrencias", icon: AlertTriangle },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
 ];
 
