@@ -1,5 +1,8 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 interface ExportOptions {
   filename?: string;
@@ -38,6 +41,24 @@ function formatDateForExport(dateStr: string | null): string {
   }
 }
 
+// Helper to format value for display
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+    return formatDateForExport(value);
+  }
+  if (typeof value === 'number') {
+    return value.toLocaleString('pt-BR');
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'Sim' : 'Não';
+  }
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  return String(value);
+}
+
 export function useExport() {
   // Export to CSV
   const exportToCSV = useCallback((
@@ -56,71 +77,147 @@ export function useExport() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast.success('Exportado com sucesso!');
+      toast.success('Exportado para CSV com sucesso!');
     } catch (error) {
       toast.error('Erro ao exportar: ' + (error as Error).message);
     }
   }, []);
 
-  // Export to Excel (as CSV with xlsx extension - simplified version without xlsx dependency)
+  // Export to Excel (real .xlsx file)
   const exportToExcel = useCallback((
     data: Record<string, unknown>[],
     options: ExportOptions = {}
   ) => {
     try {
-      const { filename = 'export' } = options;
-      const csv = arrayToCSV(data);
-      const blob = new Blob(['\ufeff' + csv], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${filename}_${new Date().toISOString().split('T')[0]}.xls`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast.success('Exportado para Excel!');
+      const { filename = 'export', sheetName = 'Dados' } = options;
+      
+      if (!data.length) {
+        toast.error('Nenhum dado para exportar');
+        return;
+      }
+
+      // Format data for Excel
+      const formattedData = data.map(row => {
+        const formattedRow: Record<string, string> = {};
+        for (const [key, value] of Object.entries(row)) {
+          formattedRow[key] = formatValue(value);
+        }
+        return formattedRow;
+      });
+
+      // Create workbook and worksheet
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      
+      // Auto-size columns
+      const headers = Object.keys(data[0]);
+      const colWidths = headers.map(header => {
+        const maxLength = Math.max(
+          header.length,
+          ...formattedData.map(row => (row[header] || '').toString().length)
+        );
+        return { wch: Math.min(maxLength + 2, 50) };
+      });
+      worksheet['!cols'] = colWidths;
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+      
+      // Generate buffer and download
+      XLSX.writeFile(workbook, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      toast.success('Exportado para Excel com sucesso!');
     } catch (error) {
+      console.error('Excel export error:', error);
       toast.error('Erro ao exportar: ' + (error as Error).message);
     }
   }, []);
 
-  // Export to PDF (as formatted text file - simplified version without jspdf dependency)
+  // Export to PDF (real PDF with jsPDF)
   const exportToPDF = useCallback((
     data: Record<string, unknown>[],
-    options: ExportOptions & { title?: string } = {}
+    options: ExportOptions & { title?: string; subtitle?: string } = {}
   ) => {
     try {
-      const { filename = 'export', title = 'Relatório' } = options;
+      const { filename = 'export', title = 'Relatório', subtitle } = options;
       
-      const headers = Object.keys(data[0] || {});
-      let content = `${title}\nGerado em: ${new Date().toLocaleString('pt-BR')}\n\n`;
-      content += headers.join(' | ') + '\n';
-      content += headers.map(() => '---').join(' | ') + '\n';
-      
-      for (const row of data) {
-        const values = headers.map((h) => {
-          const value = row[h];
-          if (value === null || value === undefined) return '';
-          if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
-            return formatDateForExport(value);
-          }
-          return String(value);
-        });
-        content += values.join(' | ') + '\n';
+      if (!data.length) {
+        toast.error('Nenhum dado para exportar');
+        return;
       }
+
+      // Create PDF document
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
       
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${filename}_${new Date().toISOString().split('T')[0]}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast.success('Exportado!');
+      // Add title
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text(title, pageWidth / 2, 20, { align: 'center' });
+      
+      // Add subtitle/date
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const dateText = subtitle || `Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+      doc.text(dateText, pageWidth / 2, 28, { align: 'center' });
+
+      // Prepare table data
+      const headers = Object.keys(data[0]);
+      const tableData = data.map(row => 
+        headers.map(header => formatValue(row[header]))
+      );
+
+      // Add table using autoTable
+      autoTable(doc, {
+        head: [headers.map(h => h.replace(/_/g, ' ').toUpperCase())],
+        body: tableData,
+        startY: 35,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2,
+          overflow: 'linebreak',
+          halign: 'left'
+        },
+        headStyles: {
+          fillColor: [59, 130, 246], // Blue-500
+          textColor: 255,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        alternateRowStyles: {
+          fillColor: [245, 247, 250]
+        },
+        margin: { top: 35, left: 10, right: 10 },
+        didDrawPage: (hookData) => {
+          // Add page number footer
+          const pageNumber = doc.getNumberOfPages();
+          doc.setFontSize(8);
+          doc.text(
+            `Página ${hookData.pageNumber} de ${pageNumber}`,
+            pageWidth / 2,
+            doc.internal.pageSize.getHeight() - 10,
+            { align: 'center' }
+          );
+        }
+      });
+
+      // Add total records footer on last page
+      const finalY = (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY || 35;
+      if (finalY < doc.internal.pageSize.getHeight() - 30) {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'italic');
+        doc.text(`Total de registros: ${data.length}`, 10, finalY + 10);
+      }
+
+      // Save the PDF
+      doc.save(`${filename}_${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('Exportado para PDF com sucesso!');
     } catch (error) {
+      console.error('PDF export error:', error);
       toast.error('Erro ao exportar: ' + (error as Error).message);
     }
   }, []);

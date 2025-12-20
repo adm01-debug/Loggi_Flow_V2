@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Settings, Bell, User, Shield, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun, BarChart3 } from "lucide-react";
+import { Settings, Bell, User, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun, BarChart3, Package, Truck, DollarSign, Trophy, AlertTriangle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -14,22 +14,15 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { toast } from "sonner";
 import { NotificationStats } from "@/components/notifications/NotificationStats";
 import { NotificationPermissionStatus } from "@/components/notifications/BrowserNotificationPrompt";
+import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 
-interface UserSettings {
-  notifications_email: boolean;
-  notifications_push: boolean;
-  notifications_sla: boolean;
-  notifications_ocorrencias: boolean;
+interface AppSettings {
   theme: "light" | "dark" | "system";
   language: string;
   timezone: string;
 }
 
-const defaultSettings: UserSettings = {
-  notifications_email: true,
-  notifications_push: true,
-  notifications_sla: true,
-  notifications_ocorrencias: true,
+const defaultAppSettings: AppSettings = {
   theme: "system",
   language: "pt-BR",
   timezone: "America/Sao_Paulo",
@@ -40,11 +33,14 @@ export default function Configuracoes() {
   const queryClient = useQueryClient();
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ full_name: "", avatar_url: "" });
-  const [settings, setSettings] = useState<UserSettings>(defaultSettings);
+  const [appSettings, setAppSettings] = useState<AppSettings>(defaultAppSettings);
   const [hasChanges, setHasChanges] = useState(false);
+  
+  // Use the notification preferences hook
+  const { preferences, updatePreference } = useNotificationPreferences();
 
   // Fetch profile
-  const { data: profile, isLoading: profileLoading } = useQuery({
+  const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -55,11 +51,11 @@ export default function Configuracoes() {
     enabled: !!user?.id,
   });
 
-  // Load settings from localStorage (could be moved to Supabase table)
+  // Load app settings from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem(`settings_${user?.id}`);
+    const saved = localStorage.getItem(`app_settings_${user?.id}`);
     if (saved) {
-      setSettings(JSON.parse(saved));
+      setAppSettings(JSON.parse(saved));
     }
   }, [user?.id]);
 
@@ -78,20 +74,19 @@ export default function Configuracoes() {
     onError: (e) => toast.error("Erro: " + e.message),
   });
 
-  // Save settings
-  const saveSettings = () => {
+  // Save app settings
+  const saveAppSettings = () => {
     if (user?.id) {
-      localStorage.setItem(`settings_${user.id}`, JSON.stringify(settings));
+      localStorage.setItem(`app_settings_${user.id}`, JSON.stringify(appSettings));
       setHasChanges(false);
       toast.success("Configurações salvas!");
       
       // Apply theme
-      if (settings.theme === "dark") {
+      if (appSettings.theme === "dark") {
         document.documentElement.classList.add("dark");
-      } else if (settings.theme === "light") {
+      } else if (appSettings.theme === "light") {
         document.documentElement.classList.remove("dark");
       } else {
-        // System preference
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
           document.documentElement.classList.add("dark");
         } else {
@@ -101,12 +96,12 @@ export default function Configuracoes() {
     }
   };
 
-  const updateSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+  const updateAppSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+    setAppSettings((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
   };
 
-  // Integration status (mock - would connect to real checks)
+  // Integration status
   const integrations = [
     { name: "Lalamove", status: "configured", color: "text-success" },
     { name: "Mapbox", status: "configured", color: "text-success" },
@@ -127,7 +122,7 @@ export default function Configuracoes() {
             <p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p>
           </div>
           {hasChanges && (
-            <Button onClick={saveSettings} className="gap-2"><Save className="w-4 h-4" />Salvar Alterações</Button>
+            <Button onClick={saveAppSettings} className="gap-2"><Save className="w-4 h-4" />Salvar Alterações</Button>
           )}
         </div>
 
@@ -153,29 +148,79 @@ export default function Configuracoes() {
             </div>
           </div>
 
-          {/* Notifications */}
+          {/* Notifications - Now using the real preferences hook */}
           <div className="card-base space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3"><Bell className="w-5 h-5 text-warning" /><h2 className="font-display font-semibold text-lg">Notificações</h2></div>
+              <div className="flex items-center gap-3"><Bell className="w-5 h-5 text-warning" /><h2 className="font-display font-semibold text-lg">Preferências de Notificação</h2></div>
               <NotificationPermissionStatus />
             </div>
             <Separator />
+            
+            {/* General Notification Settings */}
             <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Canais de Notificação</h3>
               <div className="flex items-center justify-between">
-                <div><Label htmlFor="notif-email">Notificações por Email</Label><p className="text-sm text-muted-foreground">Receber resumos diários</p></div>
-                <Switch id="notif-email" checked={settings.notifications_email} onCheckedChange={(v) => updateSetting("notifications_email", v)} />
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <div><Label htmlFor="notif-email">Notificações por Email</Label><p className="text-sm text-muted-foreground">Receber resumos e alertas por email</p></div>
+                </div>
+                <Switch id="notif-email" checked={preferences.notifications_email} onCheckedChange={(v) => updatePreference("notifications_email", v)} />
               </div>
               <div className="flex items-center justify-between">
-                <div><Label htmlFor="notif-push">Notificações Push</Label><p className="text-sm text-muted-foreground">Alertas em tempo real no navegador</p></div>
-                <Switch id="notif-push" checked={settings.notifications_push} onCheckedChange={(v) => updateSetting("notifications_push", v)} />
+                <div className="flex items-center gap-3">
+                  <Bell className="w-4 h-4 text-muted-foreground" />
+                  <div><Label htmlFor="notif-push">Notificações Push</Label><p className="text-sm text-muted-foreground">Alertas em tempo real no navegador</p></div>
+                </div>
+                <Switch id="notif-push" checked={preferences.notifications_push} onCheckedChange={(v) => updatePreference("notifications_push", v)} />
+              </div>
+            </div>
+
+            <Separator />
+            
+            {/* Category-specific Settings */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Categorias de Alerta</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-4 h-4 text-warning" />
+                  <div><Label htmlFor="notif-sla">Alertas de SLA</Label><p className="text-sm text-muted-foreground">Avisar quando prazos estiverem próximos</p></div>
+                </div>
+                <Switch id="notif-sla" checked={preferences.notifications_sla} onCheckedChange={(v) => updatePreference("notifications_sla", v)} />
               </div>
               <div className="flex items-center justify-between">
-                <div><Label htmlFor="notif-sla">Alertas de SLA</Label><p className="text-sm text-muted-foreground">Avisar quando prazos estiverem próximos</p></div>
-                <Switch id="notif-sla" checked={settings.notifications_sla} onCheckedChange={(v) => updateSetting("notifications_sla", v)} />
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-4 h-4 text-destructive" />
+                  <div><Label htmlFor="notif-ocor">Novas Ocorrências</Label><p className="text-sm text-muted-foreground">Notificar sobre problemas e incidentes</p></div>
+                </div>
+                <Switch id="notif-ocor" checked={preferences.notifications_ocorrencias} onCheckedChange={(v) => updatePreference("notifications_ocorrencias", v)} />
               </div>
               <div className="flex items-center justify-between">
-                <div><Label htmlFor="notif-ocor">Novas Ocorrências</Label><p className="text-sm text-muted-foreground">Notificar sobre novas ocorrências</p></div>
-                <Switch id="notif-ocor" checked={settings.notifications_ocorrencias} onCheckedChange={(v) => updateSetting("notifications_ocorrencias", v)} />
+                <div className="flex items-center gap-3">
+                  <Package className="w-4 h-4 text-info" />
+                  <div><Label htmlFor="notif-coletas">Coletas</Label><p className="text-sm text-muted-foreground">Atualizações sobre coletas</p></div>
+                </div>
+                <Switch id="notif-coletas" checked={preferences.notifications_coletas} onCheckedChange={(v) => updatePreference("notifications_coletas", v)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Truck className="w-4 h-4 text-success" />
+                  <div><Label htmlFor="notif-entregas">Entregas</Label><p className="text-sm text-muted-foreground">Atualizações sobre entregas</p></div>
+                </div>
+                <Switch id="notif-entregas" checked={preferences.notifications_entregas} onCheckedChange={(v) => updatePreference("notifications_entregas", v)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <DollarSign className="w-4 h-4 text-warning" />
+                  <div><Label htmlFor="notif-custos">Alertas de Custo</Label><p className="text-sm text-muted-foreground">Notificar sobre limites de custo</p></div>
+                </div>
+                <Switch id="notif-custos" checked={preferences.notifications_custos} onCheckedChange={(v) => updatePreference("notifications_custos", v)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Trophy className="w-4 h-4 text-primary" />
+                  <div><Label htmlFor="notif-achievements">Conquistas</Label><p className="text-sm text-muted-foreground">Notificar sobre novas conquistas</p></div>
+                </div>
+                <Switch id="notif-achievements" checked={preferences.notifications_achievements} onCheckedChange={(v) => updatePreference("notifications_achievements", v)} />
               </div>
             </div>
           </div>
@@ -194,7 +239,7 @@ export default function Configuracoes() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div><Label>Tema</Label><p className="text-sm text-muted-foreground">Escolha o tema do sistema</p></div>
-                <Select value={settings.theme} onValueChange={(v) => updateSetting("theme", v as "light" | "dark" | "system")}>
+                <Select value={appSettings.theme} onValueChange={(v) => updateAppSetting("theme", v as "light" | "dark" | "system")}>
                   <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="light"><div className="flex items-center gap-2"><Sun className="w-4 h-4" />Claro</div></SelectItem>
@@ -205,7 +250,7 @@ export default function Configuracoes() {
               </div>
               <div className="flex items-center justify-between">
                 <div><Label>Idioma</Label><p className="text-sm text-muted-foreground">Idioma da interface</p></div>
-                <Select value={settings.language} onValueChange={(v) => updateSetting("language", v)}>
+                <Select value={appSettings.language} onValueChange={(v) => updateAppSetting("language", v)}>
                   <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pt-BR">Português (BR)</SelectItem>
