@@ -1,7 +1,6 @@
-import { Search, Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
+import { Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +15,7 @@ import { NotificationCenter } from "@/components/notifications/NotificationCente
 import { UserNotificationCenter } from "@/components/notifications/UserNotificationCenter";
 import { SLANotificationSettings } from "@/components/notifications/SLANotificationSettings";
 import { useGamification } from "@/hooks/useGamification";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
 
 function RealtimeIndicator() {
   return (
@@ -51,14 +51,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between h-16 px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header">
-      {/* Search */}
-      <div className="relative w-full max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar fretes, motoristas, mercadorias..."
-          className="pl-10 bg-background/50 border-border/50 focus:bg-background transition-colors"
-        />
-      </div>
+      {/* Global Search */}
+      <GlobalSearch />
 
       {/* Center - Realtime Indicator */}
       <RealtimeIndicator />
