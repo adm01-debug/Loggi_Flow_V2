@@ -847,6 +847,83 @@ export type Database = {
           },
         ]
       }
+      reward_items: {
+        Row: {
+          available: boolean
+          category: string
+          coins_cost: number
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          name: string
+          rarity: string
+          stock: number | null
+        }
+        Insert: {
+          available?: boolean
+          category?: string
+          coins_cost?: number
+          created_at?: string
+          description: string
+          icon?: string
+          id?: string
+          name: string
+          rarity?: string
+          stock?: number | null
+        }
+        Update: {
+          available?: boolean
+          category?: string
+          coins_cost?: number
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          rarity?: string
+          stock?: number | null
+        }
+        Relationships: []
+      }
+      reward_purchases: {
+        Row: {
+          coins_spent: number
+          created_at: string
+          id: string
+          redeemed_at: string | null
+          reward_item_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          coins_spent: number
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          reward_item_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          coins_spent?: number
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          reward_item_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_purchases_reward_item_id_fkey"
+            columns: ["reward_item_id"]
+            isOneToOne: false
+            referencedRelation: "reward_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tabelas_frete: {
         Row: {
           ativo: boolean

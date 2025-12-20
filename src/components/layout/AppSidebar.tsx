@@ -55,6 +55,7 @@ const menuItems = [
 const gamificationItems = [
   { title: "Ranking", url: "/ranking", icon: Trophy },
   { title: "Conquistas", url: "/conquistas", icon: Zap },
+  { title: "Loja", url: "/loja", icon: Package },
   { title: "Notificações", url: "/notificacoes", icon: Bell },
 ];
 
