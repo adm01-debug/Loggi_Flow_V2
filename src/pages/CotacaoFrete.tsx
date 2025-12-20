@@ -20,9 +20,11 @@ import {
   Package,
   MapPin,
   DollarSign,
-  Star
+  Star,
+  Brain
 } from 'lucide-react';
 import { useFreightQuotation, QuotationResult } from '@/hooks/useFreightQuotation';
+import { SmartCarrierSelector } from '@/components/freight/SmartCarrierSelector';
 import { toast } from 'sonner';
 
 const ESTADOS_BRASIL = [
@@ -150,6 +152,10 @@ export default function CotacaoFrete() {
             <TabsTrigger value="cotacao" className="gap-2">
               <Calculator className="h-4 w-4" />
               Calculadora
+            </TabsTrigger>
+            <TabsTrigger value="inteligente" className="gap-2">
+              <Brain className="h-4 w-4" />
+              Seleção IA
             </TabsTrigger>
             <TabsTrigger value="tabelas" className="gap-2">
               <DollarSign className="h-4 w-4" />
@@ -600,6 +606,15 @@ export default function CotacaoFrete() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Smart Carrier Selection Tab */}
+          <TabsContent value="inteligente">
+            <SmartCarrierSelector 
+              onSelect={(carrier) => {
+                toast.success(`Transportadora ${carrier.nome} selecionada!`);
+              }}
+            />
           </TabsContent>
         </Tabs>
       </div>
