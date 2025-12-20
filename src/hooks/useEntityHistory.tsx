@@ -63,7 +63,9 @@ export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptio
           description,
           timestamp: log.created_at,
           status: log.action === "DELETE" ? "error" : "completed",
-          metadata: log.new_data,
+          metadata: typeof log.new_data === 'object' && log.new_data !== null 
+            ? log.new_data as Record<string, any> 
+            : undefined,
         };
       });
     },

@@ -53,7 +53,7 @@ export { useEntityHistory } from "./useEntityHistory";
 export { useImageUpload } from "./useImageUpload";
 
 // Utilities
-export { useMobile } from "./use-mobile";
+export { useIsMobile as useMobile } from "./use-mobile";
 export { useToast } from "./use-toast";
 
 // Types

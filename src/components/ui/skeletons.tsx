@@ -116,10 +116,10 @@ export function ChartSkeleton() {
       </div>
       <div className="h-64 flex items-end justify-between gap-2 p-4">
         {Array.from({ length: 7 }).map((_, i) => (
-          <Skeleton 
+          <div 
             key={i} 
-            className="flex-1" 
-            style={{ height: `${Math.random() * 60 + 40}%` }}
+            className="flex-1 animate-pulse rounded-md bg-muted" 
+            style={{ height: `${40 + i * 8}%` }}
           />
         ))}
       </div>
