@@ -3,18 +3,21 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Settings, Bell, User, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun, BarChart3, Package, Truck, DollarSign, Trophy, AlertTriangle, Mail } from "lucide-react";
+import { Settings, Bell, User, Palette, Link2, Database, Loader2, Save, Check, Moon, Sun, BarChart3, Package, Truck, DollarSign, Trophy, AlertTriangle, Mail, RefreshCw, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { NotificationStats } from "@/components/notifications/NotificationStats";
 import { NotificationPermissionStatus } from "@/components/notifications/BrowserNotificationPrompt";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
+import { useIntegrationValidation, getStatusColor, getStatusLabel } from "@/hooks/useIntegrationValidation";
+import { useBitrix24 } from "@/hooks/useBitrix24";
+import { useN8n } from "@/hooks/useN8n";
 
 interface AppSettings {
   theme: "light" | "dark" | "system";
@@ -35,9 +38,18 @@ export default function Configuracoes() {
   const [profileForm, setProfileForm] = useState({ full_name: "", avatar_url: "" });
   const [appSettings, setAppSettings] = useState<AppSettings>(defaultAppSettings);
   const [hasChanges, setHasChanges] = useState(false);
+  const [configDialog, setConfigDialog] = useState<string | null>(null);
   
   // Use the notification preferences hook
   const { preferences, updatePreference } = useNotificationPreferences();
+  
+  // Integration hooks
+  const { integrations, isValidating, validateAll, validateSingle } = useIntegrationValidation();
+  const { webhookUrl: bitrix24Url, setWebhookUrl: setBitrix24Url } = useBitrix24();
+  const { webhookUrl: n8nUrl, setWebhookUrl: setN8nUrl } = useN8n();
+  
+  const [tempBitrix24Url, setTempBitrix24Url] = useState(bitrix24Url);
+  const [tempN8nUrl, setTempN8nUrl] = useState(n8nUrl);
 
   // Fetch profile
   const { data: profile } = useQuery({
@@ -58,6 +70,15 @@ export default function Configuracoes() {
       setAppSettings(JSON.parse(saved));
     }
   }, [user?.id]);
+  
+  // Update temp URLs when hooks change
+  useEffect(() => {
+    setTempBitrix24Url(bitrix24Url);
+  }, [bitrix24Url]);
+  
+  useEffect(() => {
+    setTempN8nUrl(n8nUrl);
+  }, [n8nUrl]);
 
   // Update profile mutation
   const updateProfileMut = useMutation({
@@ -100,14 +121,21 @@ export default function Configuracoes() {
     setAppSettings((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
   };
-
-  // Integration status
-  const integrations = [
-    { name: "Lalamove", status: "configured", color: "text-success" },
-    { name: "Mapbox", status: "configured", color: "text-success" },
-    { name: "Bitrix24", status: "not_configured", color: "text-muted-foreground" },
-    { name: "n8n", status: "not_configured", color: "text-muted-foreground" },
-  ];
+  
+  const handleSaveIntegration = (name: string) => {
+    if (name === 'Bitrix24') {
+      setBitrix24Url(tempBitrix24Url);
+      toast.success('Bitrix24 configurado!');
+    } else if (name === 'n8n') {
+      setN8nUrl(tempN8nUrl);
+      toast.success('n8n configurado!');
+    }
+    setConfigDialog(null);
+  };
+  
+  const handleTestIntegration = async (name: string) => {
+    await validateSingle(name);
+  };
 
   return (
     <MainLayout>
@@ -264,20 +292,35 @@ export default function Configuracoes() {
 
           {/* Integrations */}
           <div className="card-base space-y-4">
-            <div className="flex items-center gap-3"><Link2 className="w-5 h-5 text-success" /><h2 className="font-display font-semibold text-lg">Integrações</h2></div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3"><Link2 className="w-5 h-5 text-success" /><h2 className="font-display font-semibold text-lg">Integrações</h2></div>
+              <Button variant="outline" size="sm" onClick={validateAll} disabled={isValidating}>
+                {isValidating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                Validar Todas
+              </Button>
+            </div>
             <Separator />
             <div className="space-y-4">
               {integrations.map((int) => (
                 <div key={int.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${int.status === "configured" ? "bg-success" : "bg-muted"}`} />
-                    <div><p className="font-medium">{int.name}</p><p className="text-sm text-muted-foreground">{int.status === "configured" ? "Conectado" : "Não configurado"}</p></div>
+                    <div className={`w-2 h-2 rounded-full ${getStatusColor(int.status)}`} />
+                    <div>
+                      <p className="font-medium">{int.name}</p>
+                      <p className="text-sm text-muted-foreground">{getStatusLabel(int.status)}</p>
+                    </div>
                   </div>
-                  <Button variant="outline" size="sm">{int.status === "configured" ? "Configurar" : "Conectar"}</Button>
+                  <div className="flex gap-2">
+                    {(int.name === 'Bitrix24' || int.name === 'n8n') && (
+                      <Button variant="outline" size="sm" onClick={() => setConfigDialog(int.name)}>Configurar</Button>
+                    )}
+                    <Button variant="ghost" size="sm" onClick={() => handleTestIntegration(int.name)} disabled={isValidating}>
+                      <RefreshCw className={`w-4 h-4 ${isValidating ? 'animate-spin' : ''}`} />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground">Veja a documentação em <code>/docs/INTEGRACAO_CONFIG.md</code> para configurar as integrações.</p>
           </div>
 
           {/* Data */}
@@ -308,6 +351,48 @@ export default function Configuracoes() {
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditProfile(false)}>Cancelar</Button>
               <Button onClick={() => updateProfileMut.mutate(profileForm)} disabled={updateProfileMut.isPending}>{updateProfileMut.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Bitrix24 Config Dialog */}
+        <Dialog open={configDialog === 'Bitrix24'} onOpenChange={() => setConfigDialog(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Configurar Bitrix24</DialogTitle>
+              <DialogDescription>Insira a URL do webhook do Bitrix24</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label>Webhook URL</Label>
+                <Input value={tempBitrix24Url} onChange={(e) => setTempBitrix24Url(e.target.value)} placeholder="https://seu-dominio.bitrix24.com.br/rest/..." />
+                <p className="text-xs text-muted-foreground">Obtenha em Bitrix24 → Aplicativos → Webhooks</p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setConfigDialog(null)}>Cancelar</Button>
+              <Button onClick={() => handleSaveIntegration('Bitrix24')}><Save className="w-4 h-4 mr-2" />Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        {/* n8n Config Dialog */}
+        <Dialog open={configDialog === 'n8n'} onOpenChange={() => setConfigDialog(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Configurar n8n</DialogTitle>
+              <DialogDescription>Insira a URL do webhook do n8n</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label>Webhook URL</Label>
+                <Input value={tempN8nUrl} onChange={(e) => setTempN8nUrl(e.target.value)} placeholder="https://seu-n8n.com/webhook/..." />
+                <p className="text-xs text-muted-foreground">Crie um webhook trigger no n8n e cole a URL aqui</p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setConfigDialog(null)}>Cancelar</Button>
+              <Button onClick={() => handleSaveIntegration('n8n')}><Save className="w-4 h-4 mr-2" />Salvar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
