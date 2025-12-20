@@ -857,7 +857,7 @@ export default function Envios() {
 
         {/* View Dialog */}
         <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedEntrega?.numero_entrega}</DialogTitle>
               <Badge
@@ -869,6 +869,49 @@ export default function Envios() {
             </DialogHeader>
             {selectedEntrega && (
               <div className="space-y-4 py-4">
+                {/* Status Timeline */}
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-sm font-medium mb-3">Progresso da Entrega</p>
+                  <div className="flex items-center overflow-x-auto pb-2">
+                    {Object.entries(statusConfig).slice(0, 8).map(([key, config], index, arr) => {
+                      const statusOrder = Object.keys(statusConfig);
+                      const currentIndex = statusOrder.indexOf(selectedEntrega.status);
+                      const stepIndex = statusOrder.indexOf(key);
+                      const isCompleted = stepIndex < currentIndex;
+                      const isCurrent = key === selectedEntrega.status;
+                      const IconStep = config.icon;
+                      
+                      return (
+                        <div key={key} className="flex items-center flex-shrink-0">
+                          <div className="flex flex-col items-center">
+                            <div
+                              className={cn(
+                                "flex h-8 w-8 items-center justify-center rounded-full text-xs",
+                                isCompleted && "bg-success text-white",
+                                isCurrent && "bg-primary text-white",
+                                !isCompleted && !isCurrent && "bg-muted text-muted-foreground"
+                              )}
+                            >
+                              <IconStep className="h-4 w-4" />
+                            </div>
+                            <span className="text-[10px] mt-1 text-center max-w-[60px] truncate">
+                              {config.label.split(" ")[0]}
+                            </span>
+                          </div>
+                          {index < arr.length - 1 && (
+                            <div
+                              className={cn(
+                                "w-6 h-0.5 mx-1",
+                                isCompleted ? "bg-success" : "bg-border"
+                              )}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Cliente</p>
