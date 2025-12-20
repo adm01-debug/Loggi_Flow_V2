@@ -33,6 +33,24 @@ export { useClipboard, useClipboardRead, copyToClipboard, CopyButton, CopyableTe
 export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsList, formatShortcut } from "./useKeyboardShortcuts";
 export { useOnlineStatus, useApiStatus, useOfflineSync, OnlineStatusIndicator } from "./useOnlineStatus";
 export { useExport, exportConfigs } from "./useExport";
+export { useForm } from "./useForm";
+export { useMediaQuery, useIsMobile, useIsTablet, useIsDesktop, usePrefersDarkMode, usePrefersReducedMotion } from "./useMediaQuery";
+
+// NEW: Pagination & Sorting
+export { usePagination } from "./usePagination";
+export { useSorting } from "./useSorting";
+export type { SortDirection, SortState } from "./useSorting";
+
+// NEW: Filters
+export { useFilters } from "./useFilters";
+export type { FilterConfig, FilterState } from "./useFilters";
+
+// NEW: Comments & History
+export { useComments } from "./useComments";
+export { useEntityHistory } from "./useEntityHistory";
+
+// NEW: Image Upload
+export { useImageUpload } from "./useImageUpload";
 
 // Utilities
 export { useMobile } from "./use-mobile";
