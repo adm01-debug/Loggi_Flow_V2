@@ -24,6 +24,7 @@ import {
   Map,
   Navigation,
   Users,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,7 @@ const menuItems = [
 const gamificationItems = [
   { title: "Ranking", url: "/ranking", icon: Trophy },
   { title: "Conquistas", url: "/conquistas", icon: Zap },
+  { title: "Notificações", url: "/notificacoes", icon: Bell },
 ];
 
 const adminItems = [
