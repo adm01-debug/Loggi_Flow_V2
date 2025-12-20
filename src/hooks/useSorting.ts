@@ -68,16 +68,16 @@ export function useSorting<T extends Record<string, any>>(
     }
 
     const sorted = [...data].sort((a, b) => {
-      const aVal = a[sortState.key as keyof T];
-      const bVal = b[sortState.key as keyof T];
+      const aVal = a[sortState.key as keyof T] as unknown;
+      const bVal = b[sortState.key as keyof T] as unknown;
 
       // Handle nulls
       if (aVal == null && bVal == null) return 0;
       if (aVal == null) return sortState.direction === "asc" ? 1 : -1;
       if (bVal == null) return sortState.direction === "asc" ? -1 : 1;
 
-      // Handle dates
-      if (aVal instanceof Date && bVal instanceof Date) {
+      // Handle dates - check if values are Date objects
+      if (typeof aVal === "object" && aVal instanceof Date && typeof bVal === "object" && bVal instanceof Date) {
         return sortState.direction === "asc"
           ? aVal.getTime() - bVal.getTime()
           : bVal.getTime() - aVal.getTime();

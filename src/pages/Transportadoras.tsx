@@ -397,7 +397,7 @@ export default function Transportadoras() {
               </SelectContent>
             </Select>
 
-            <Button variant="outline" onClick={() => exportToExcel(transportadoras.map(t => ({ nome: t.nome, cnpj: t.cnpj, cidade: t.cidade, uf: t.uf, telefone: t.telefone, email: t.email, ativa: t.ativa ? 'Sim' : 'Não' })), { filename: 'transportadoras' })} className="gap-2">
+            <Button variant="outline" onClick={() => exportToExcel(transportadoras.map(t => ({ nome: t.nome_fantasia, cnpj: t.cnpj, contato: t.contato_comercial, email: t.email_comercial, homologada: t.homologada ? 'Sim' : 'Não', score: t.score_performance })), { filename: 'transportadoras' })} className="gap-2">
               <Download className="w-4 h-4" />
               Exportar
             </Button>

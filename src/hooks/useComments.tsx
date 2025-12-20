@@ -29,47 +29,30 @@ export function useComments({ entityType, entityId }: UseCommentsOptions) {
 
   const queryKey = ["comments", entityType, entityId];
 
+  // Comments table doesn't exist yet - this hook is prepared for future implementation
   const { data: comments = [], isLoading } = useQuery({
     queryKey,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("comments")
-        .select(`
-          id, content, created_at, user_id, entity_type, entity_id,
-          profiles:user_id (email, full_name)
-        `)
-        .eq("entity_type", entityType)
-        .eq("entity_id", entityId)
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-      return data as Comment[];
+    queryFn: async (): Promise<Comment[]> => {
+      // TODO: Create comments table in database
+      // For now, return empty array as the table doesn't exist
+      console.warn("Comments table not yet implemented in database");
+      return [];
     },
     enabled: !!entityId,
   });
 
   const addComment = useMutation({
-    mutationFn: async (content: string) => {
+    mutationFn: async (content: string): Promise<Comment | null> => {
       if (!user) throw new Error("Usuário não autenticado");
       
-      const { data, error } = await supabase
-        .from("comments")
-        .insert({
-          content,
-          entity_type: entityType,
-          entity_id: entityId,
-          user_id: user.id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      // TODO: Implement when comments table is created
+      console.warn("Comments table not yet implemented");
+      toast.error("Funcionalidade de comentários ainda não disponível");
+      return null;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
       setNewComment("");
-      toast.success("Comentário adicionado");
     },
     onError: (error: Error) => {
       toast.error(`Erro: ${error.message}`);
@@ -77,17 +60,13 @@ export function useComments({ entityType, entityId }: UseCommentsOptions) {
   });
 
   const deleteComment = useMutation({
-    mutationFn: async (commentId: string) => {
-      const { error } = await supabase
-        .from("comments")
-        .delete()
-        .eq("id", commentId);
-
-      if (error) throw error;
+    mutationFn: async (commentId: string): Promise<void> => {
+      // TODO: Implement when comments table is created
+      console.warn("Comments table not yet implemented");
+      toast.error("Funcionalidade de comentários ainda não disponível");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
-      toast.success("Comentário excluído");
     },
     onError: (error: Error) => {
       toast.error(`Erro: ${error.message}`);

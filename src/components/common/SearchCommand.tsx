@@ -2,7 +2,7 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Package, Truck, Users, AlertTriangle, FileText, Settings, BarChart3, Trophy, Building2 } from "lucide-react";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcuts";
 
 interface SearchResult {
   id: string;
