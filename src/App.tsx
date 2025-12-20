@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import FretesInternos from "./pages/FretesInternos";
 import Fornecedores from "./pages/Fornecedores";
+import Clientes from "./pages/Clientes";
 import Envios from "./pages/Envios";
 import Coletas from "./pages/Coletas";
 import Transportadoras from "./pages/Transportadoras";
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/fretes-internos" element={<ProtectedRoute><FretesInternos /></ProtectedRoute>} />
               <Route path="/fornecedores" element={<ProtectedRoute><Fornecedores /></ProtectedRoute>} />
+              <Route path="/clientes" element={<ProtectedRoute><Clientes /></ProtectedRoute>} />
               <Route path="/envios" element={<ProtectedRoute><Envios /></ProtectedRoute>} />
               <Route path="/coletas" element={<ProtectedRoute><Coletas /></ProtectedRoute>} />
               <Route path="/transportadoras" element={<ProtectedRoute><Transportadoras /></ProtectedRoute>} />
