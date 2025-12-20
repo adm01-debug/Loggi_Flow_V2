@@ -40,9 +40,14 @@ export default function Relatorios() {
     },
   });
 
-  // Removed fretes_internos query - table doesn't exist
-  const fretesInternos: { id: string; status: string; created_at: string; data_entrega_efetiva: string | null }[] = [];
-  const loadingFretes = false;
+  const { data: fretesInternos = [], isLoading: loadingFretes } = useQuery({
+    queryKey: ["relatorios-fretes", period],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("fretes_internos").select("id, status, created_at, data_entrega_efetiva").gte("created_at", startDate.toISOString());
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   const { data: userLevels = [] } = useQuery({
     queryKey: ["relatorios-users"],
