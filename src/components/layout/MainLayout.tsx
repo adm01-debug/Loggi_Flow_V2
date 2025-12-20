@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Header } from "./Header";
+import { BrowserNotificationPrompt } from "@/components/notifications/BrowserNotificationPrompt";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -16,6 +17,9 @@ export function MainLayout({ children }: MainLayoutProps) {
           {children}
         </main>
       </div>
+      
+      {/* Browser notification permission prompt */}
+      <BrowserNotificationPrompt />
     </div>
   );
 }
