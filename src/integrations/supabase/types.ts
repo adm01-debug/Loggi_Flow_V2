@@ -502,6 +502,51 @@ export type Database = {
         }
         Relationships: []
       }
+      fretes_internos: {
+        Row: {
+          created_at: string
+          data_entrega_efetiva: string | null
+          destino: string
+          id: string
+          motorista: string | null
+          observacoes: string | null
+          origem: string
+          previsao_entrega: string | null
+          quantidade_itens: number
+          status: Database["public"]["Enums"]["frete_interno_status"]
+          updated_at: string
+          xp_reward: number
+        }
+        Insert: {
+          created_at?: string
+          data_entrega_efetiva?: string | null
+          destino: string
+          id?: string
+          motorista?: string | null
+          observacoes?: string | null
+          origem: string
+          previsao_entrega?: string | null
+          quantidade_itens?: number
+          status?: Database["public"]["Enums"]["frete_interno_status"]
+          updated_at?: string
+          xp_reward?: number
+        }
+        Update: {
+          created_at?: string
+          data_entrega_efetiva?: string | null
+          destino?: string
+          id?: string
+          motorista?: string | null
+          observacoes?: string | null
+          origem?: string
+          previsao_entrega?: string | null
+          quantidade_itens?: number
+          status?: Database["public"]["Enums"]["frete_interno_status"]
+          updated_at?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       notificacoes_custo: {
         Row: {
           alerta_id: string | null
@@ -972,6 +1017,12 @@ export type Database = {
         | "entregue"
         | "ocorrencia"
         | "finalizado"
+      frete_interno_status:
+        | "pendente"
+        | "em_transito"
+        | "entregue"
+        | "atrasado"
+        | "cancelado"
       frete_tipo: "cif" | "fob" | "cortesia"
     }
     CompositeTypes: {
@@ -1122,6 +1173,13 @@ export const Constants = {
         "entregue",
         "ocorrencia",
         "finalizado",
+      ],
+      frete_interno_status: [
+        "pendente",
+        "em_transito",
+        "entregue",
+        "atrasado",
+        "cancelado",
       ],
       frete_tipo: ["cif", "fob", "cortesia"],
     },
