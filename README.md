@@ -1,73 +1,167 @@
-# Welcome to your Lovable project
+# 🚚 Loggi Flow
 
-## Project info
+Sistema de gestão logística com gamificação para empresas de brindes promocionais.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+![React](https://img.shields.io/badge/React-18.3-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-green)
+![Tailwind](https://img.shields.io/badge/Tailwind-CSS-cyan)
 
-## How can I edit this code?
+## 📋 Funcionalidades
 
-There are several ways of editing your application.
+### Gestão Logística
+- **Coletas**: Gerenciamento de coletas em fornecedores
+- **Entregas**: Controle de entregas para clientes
+- **Fretes Internos**: Movimentação interna entre unidades
+- **Transportadoras**: Cadastro e ranking de transportadoras
+- **Ocorrências**: Registro e resolução de problemas
 
-**Use Lovable**
+### Gamificação
+- **Sistema de XP**: Ganhe pontos ao completar tarefas
+- **Níveis**: Evolua conforme acumula experiência
+- **Conquistas**: Desbloqueie badges especiais
+- **Ranking**: Compete com a equipe
+- **Moedas**: Sistema de recompensas
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Dashboards
+- **KPIs em tempo real**: OTIF, SLA, taxa de ocorrências
+- **Gráficos interativos**: Volume, status, performance
+- **Alertas inteligentes**: Notificações de problemas
+- **Rastreamento**: Integração com Lalamove
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Início Rápido
 
-**Use your preferred IDE**
+### Pré-requisitos
+- Node.js 18+
+- npm ou yarn
+- Conta Supabase
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Instalação
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# Clonar repositório
+git clone https://github.com/adm01-debug/loggi-flow.git
+cd loggi-flow
 
-Follow these steps:
+# Instalar dependências
+npm install
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Configurar variáveis de ambiente
+cp .env.example .env
+# Edite .env com suas credenciais Supabase
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Executar migrations
+npx supabase db push
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Iniciar desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Scripts Disponíveis
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run dev          # Desenvolvimento
+npm run build        # Build produção
+npm run preview      # Preview build
+npm run test         # Executar testes
+npm run lint         # Verificar código
+```
 
-**Use GitHub Codespaces**
+## 🏗️ Arquitetura
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+src/
+├── components/       # Componentes React
+│   ├── common/       # Componentes reutilizáveis
+│   ├── dashboard/    # Componentes do dashboard
+│   ├── layout/       # Layout (Header, Sidebar)
+│   ├── notifications/# Sistema de notificações
+│   └── ui/           # shadcn/ui components
+├── hooks/            # React hooks customizados
+├── integrations/     # Integrações (Supabase)
+├── lib/              # Utilitários e validações
+├── pages/            # Páginas da aplicação
+└── test/             # Testes automatizados
 
-## What technologies are used for this project?
+supabase/
+├── functions/        # Edge Functions
+└── migrations/       # Migrações do banco
+```
 
-This project is built with:
+## 📊 Banco de Dados
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Principais Tabelas
+- `coletas` - Ordens de coleta
+- `entregas` - Ordens de entrega
+- `clientes` - Cadastro de clientes
+- `fornecedores` - Cadastro de fornecedores
+- `transportadoras` - Cadastro de transportadoras
+- `ocorrencias` - Registro de ocorrências
+- `user_levels` - Níveis e XP dos usuários
+- `achievements` - Conquistas disponíveis
+- `notifications` - Sistema de notificações
 
-## How can I deploy this project?
+## 🔧 Configuração
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Variáveis de Ambiente
 
-## Can I connect a custom domain to my Lovable project?
+```env
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=xxx
+```
 
-Yes, you can!
+### Supabase Secrets (Edge Functions)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```bash
+supabase secrets set LALAMOVE_API_KEY=xxx
+supabase secrets set LALAMOVE_API_SECRET=xxx
+supabase secrets set MAPBOX_ACCESS_TOKEN=xxx
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🧪 Testes
+
+```bash
+# Executar todos os testes
+npm run test
+
+# Executar com coverage
+npm run test:coverage
+
+# Executar em watch mode
+npm run test:watch
+```
+
+## 📦 Tecnologias
+
+- **Frontend**: React 18, TypeScript, Vite
+- **Estilização**: Tailwind CSS, shadcn/ui
+- **Estado**: TanStack Query, Zustand
+- **Backend**: Supabase (PostgreSQL, Auth, Realtime)
+- **Mapas**: Mapbox GL
+- **Gráficos**: Recharts
+- **Testes**: Vitest, Testing Library
+
+## 📚 Documentação Adicional
+
+- [Configuração de Integrações](./docs/INTEGRACAO_CONFIG.md)
+- [Melhorias Implementadas](./docs/MELHORIAS.md)
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie sua branch (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto é privado e proprietário.
+
+## 👥 Equipe
+
+Desenvolvido por **Promo Brindes** - Sistema interno de gestão logística.
+
+---
+
+**Loggi Flow** - Transformando logística em jogo! 🎮🚚
