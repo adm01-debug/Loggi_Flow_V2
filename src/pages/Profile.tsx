@@ -1,301 +1,75 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User, Mail, Phone, Camera, Shield, Trophy, Flame, Star, Save, Loader2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { useGamification } from "@/hooks/useGamification";
+import { useImageUpload } from "@/hooks/useImageUpload";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
-import { Camera, Save, User, Mail, Briefcase, Shield, Upload, Loader2 } from "lucide-react";
-import { z } from "zod";
-
-const profileSchema = z.object({
-  full_name: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100, "Nome muito longo"),
-  cargo: z.string().trim().max(100, "Cargo muito longo").optional(),
-});
+import { cn } from "@/lib/utils";
 
 export default function Profile() {
-  const { user, profile, isAdmin, roles } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const [formData, setFormData] = useState({
-    full_name: profile?.full_name || "",
-    cargo: profile?.cargo || "",
-  });
+  const { user, updateProfile, isLoading } = useAuth();
+  const { userLevel, achievements } = useGamification();
+  const { uploadImage, isUploading } = useImageUpload();
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ full_name: user?.user_metadata?.full_name || "", phone: user?.user_metadata?.phone || "" });
 
-  const getInitials = (name: string | null) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSave = async () => { setSaving(true); await updateProfile?.(form); toast.success("Perfil atualizado!"); setSaving(false); };
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
-
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      toast.error("Por favor, selecione uma imagem");
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("A imagem deve ter no máximo 2MB");
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}/avatar.${fileExt}`;
-
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
-
-      // Update profile
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: `${publicUrl}?t=${Date.now()}` })
-        .eq("id", user.id);
-
-      if (updateError) throw updateError;
-
-      toast.success("Avatar atualizado com sucesso!");
-      // Reload page to reflect changes
-      window.location.reload();
-    } catch (error) {
-      console.error("Error uploading avatar:", error);
-      toast.error("Erro ao atualizar avatar");
-    } finally {
-      setIsUploading(false);
-    }
+    if (file) { const url = await uploadImage?.(file, "avatars"); if (url) await updateProfile?.({ avatar_url: url }); }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    // Validate form data
-    const validation = profileSchema.safeParse(formData);
-    if (!validation.success) {
-      const errors = validation.error.errors;
-      toast.error(errors[0].message);
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: formData.full_name.trim(),
-          cargo: formData.cargo?.trim() || null,
-        })
-        .eq("id", user.id);
-
-      if (error) throw error;
-
-      toast.success("Perfil atualizado com sucesso!");
-      // Reload to reflect changes
-      window.location.reload();
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Erro ao atualizar perfil");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const stats = userLevel || { level: 1, xp: 0, coins: 0, streak_days: 0 };
+  const unlockedAchievements = (achievements || []).filter((a: any) => a.unlocked).length;
 
   return (
     <MainLayout>
-      <div className="max-w-3xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-display text-foreground">Meu Perfil</h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie suas informações pessoais
-          </p>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400/20 to-violet-600/10"><User className="w-6 h-6 text-violet-500" /></div>Meu Perfil</h1><p className="text-muted-foreground mt-1">Gerencie suas informações</p></div>
+          <Button onClick={handleSave} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
         </div>
-
-        {/* Profile Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Card className="border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5 text-primary" />
-                Informações Pessoais
-              </CardTitle>
-              <CardDescription>
-                Atualize seu nome, foto e cargo
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Avatar Section */}
-                <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6">
-                  <div className="relative group">
-                    <Avatar className="w-24 h-24 border-2 border-border">
-                      <AvatarImage src={profile?.avatar_url || undefined} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-2xl font-display">
-                        {getInitials(profile?.full_name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <button
-                      type="button"
-                      onClick={handleAvatarClick}
-                      disabled={isUploading}
-                      className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                    >
-                      {isUploading ? (
-                        <Loader2 className="w-6 h-6 text-white animate-spin" />
-                      ) : (
-                        <Camera className="w-6 h-6 text-white" />
-                      )}
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </div>
-                  <div className="flex-1 text-center sm:text-left">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      {profile?.full_name || "Usuário"}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
-                    <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
-                      {roles.map((role) => (
-                        <Badge
-                          key={role}
-                          variant={role === "admin" ? "default" : "secondary"}
-                          className={role === "admin" ? "bg-warning text-warning-foreground" : ""}
-                        >
-                          <Shield className="w-3 h-3 mr-1" />
-                          {role === "admin" ? "Administrador" : "Usuário"}
-                        </Badge>
-                      ))}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAvatarClick}
-                      disabled={isUploading}
-                      className="mt-3"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {isUploading ? "Enviando..." : "Alterar Foto"}
-                    </Button>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="card-base p-6 text-center">
+            <div className="relative inline-block mb-4">
+              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto overflow-hidden">{user?.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} className="w-full h-full object-cover" /> : <User className="w-12 h-12 text-primary" />}</div>
+              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90"><Camera className="w-4 h-4" /><input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={isUploading} /></label>
+            </div>
+            <h2 className="text-xl font-bold">{form.full_name || "Usuário"}</h2>
+            <p className="text-sm text-muted-foreground">{user?.email}</p>
+            <Badge className="mt-2">Nível {stats.level}</Badge>
+          </div>
+          <div className="lg:col-span-2">
+            <Tabs defaultValue="info"><TabsList><TabsTrigger value="info">Informações</TabsTrigger><TabsTrigger value="gamification">Gamificação</TabsTrigger><TabsTrigger value="security">Segurança</TabsTrigger></TabsList>
+              <TabsContent value="info" className="card-base p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>Nome Completo</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
+                  <div><Label>Telefone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(11) 99999-9999" /></div>
                 </div>
-
-                <Separator />
-
-                {/* Form Fields */}
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={user?.email || ""}
-                      disabled
-                      className="bg-muted/50"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      O email não pode ser alterado
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name" className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      Nome Completo
-                    </Label>
-                    <Input
-                      id="full_name"
-                      name="full_name"
-                      type="text"
-                      value={formData.full_name}
-                      onChange={handleInputChange}
-                      placeholder="Seu nome completo"
-                      maxLength={100}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="cargo" className="flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-muted-foreground" />
-                      Cargo
-                    </Label>
-                    <Input
-                      id="cargo"
-                      name="cargo"
-                      type="text"
-                      value={formData.cargo}
-                      onChange={handleInputChange}
-                      placeholder="Ex: Coordenador de Logística"
-                      maxLength={100}
-                    />
-                  </div>
+                <div><Label>Email</Label><Input value={user?.email || ""} disabled /></div>
+              </TabsContent>
+              <TabsContent value="gamification" className="card-base p-6">
+                <div className="grid grid-cols-4 gap-4 mb-6">
+                  <div className="text-center"><Star className="w-6 h-6 text-amber-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.level}</p><p className="text-xs text-muted-foreground">Nível</p></div>
+                  <div className="text-center"><Trophy className="w-6 h-6 text-purple-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.xp}</p><p className="text-xs text-muted-foreground">XP</p></div>
+                  <div className="text-center"><Flame className="w-6 h-6 text-orange-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.streak_days}</p><p className="text-xs text-muted-foreground">Streak</p></div>
+                  <div className="text-center"><CheckCircle2 className="w-6 h-6 text-green-500 mx-auto mb-1" /><p className="text-2xl font-bold">{unlockedAchievements}</p><p className="text-xs text-muted-foreground">Conquistas</p></div>
                 </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-end">
-                  <Button type="submit" disabled={isLoading} className="press-scale">
-                    {isLoading ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="w-4 h-4 mr-2" />
-                    )}
-                    Salvar Alterações
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </motion.div>
+                <div className="flex items-center gap-2 text-amber-600"><span className="text-2xl">🪙</span><span className="text-xl font-bold">{stats.coins}</span><span className="text-sm">moedas</span></div>
+              </TabsContent>
+              <TabsContent value="security" className="card-base p-6 space-y-4">
+                <div><Label>Alterar Senha</Label><div className="flex gap-2 mt-1"><Input type="password" placeholder="Nova senha" /><Button variant="outline">Alterar</Button></div></div>
+                <div className="flex items-center justify-between py-3 border-t"><div><p className="font-medium">Two-Factor Authentication</p><p className="text-sm text-muted-foreground">Segurança extra para sua conta</p></div><Button variant="outline">Configurar</Button></div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </MainLayout>
   );
