@@ -1,167 +1,111 @@
-# 🚚 Loggi Flow
+# 🚚 Loggi-Flow
 
-Sistema de gestão logística com gamificação para empresas de brindes promocionais.
+[![CI/CD](https://github.com/adm01-debug/loggi-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/adm01-debug/loggi-flow/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8.svg)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ecf8e.svg)](https://supabase.com/)
 
-![React](https://img.shields.io/badge/React-18.3-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)
-![Supabase](https://img.shields.io/badge/Supabase-Backend-green)
-![Tailwind](https://img.shields.io/badge/Tailwind-CSS-cyan)
+Sistema completo de gestão logística com gamificação, desenvolvido em React + TypeScript + Supabase.
 
-## 📋 Funcionalidades
+## ✨ Funcionalidades
 
-### Gestão Logística
-- **Coletas**: Gerenciamento de coletas em fornecedores
-- **Entregas**: Controle de entregas para clientes
-- **Fretes Internos**: Movimentação interna entre unidades
-- **Transportadoras**: Cadastro e ranking de transportadoras
-- **Ocorrências**: Registro e resolução de problemas
+### 📦 Gestão de Operações
+- **Coletas** - Gestão completa de coletas com status em tempo real
+- **Envios** - Controle de entregas com rastreamento
+- **Ocorrências** - Registro e acompanhamento de problemas
+- **Fretes Internos** - Movimentações entre unidades
+- **Despachos** - Kanban para gestão de expedição
 
-### Gamificação
-- **Sistema de XP**: Ganhe pontos ao completar tarefas
-- **Níveis**: Evolua conforme acumula experiência
-- **Conquistas**: Desbloqueie badges especiais
-- **Ranking**: Compete com a equipe
-- **Moedas**: Sistema de recompensas
+### 🏆 Gamificação
+- Sistema de XP e níveis
+- Conquistas desbloqueáveis
+- Ranking de operadores
+- Loja de recompensas com moedas virtuais
+- Streak de dias consecutivos
 
-### Dashboards
-- **KPIs em tempo real**: OTIF, SLA, taxa de ocorrências
-- **Gráficos interativos**: Volume, status, performance
-- **Alertas inteligentes**: Notificações de problemas
-- **Rastreamento**: Integração com Lalamove
+### 📊 Analytics & IA
+- Dashboard em tempo real
+- Relatórios customizáveis
+- Previsão de atrasos com IA
+- Métricas de SLA
 
-## 🚀 Início Rápido
+### 🔧 Funcionalidades Técnicas
+- ✅ Paginação avançada
+- ✅ Filtros dinâmicos
+- ✅ Ordenação multi-coluna
+- ✅ Ações em lote (Bulk Actions)
+- ✅ Realtime updates via Supabase
+- ✅ Exportação CSV/JSON
+- ✅ Dark mode
+- ✅ PWA ready
 
-### Pré-requisitos
-- Node.js 18+
-- npm ou yarn
-- Conta Supabase
+## 🚀 Tecnologias
 
-### Instalação
+- **Frontend:** React 18, TypeScript, Vite
+- **UI:** Tailwind CSS, Shadcn/UI, Framer Motion
+- **Backend:** Supabase (PostgreSQL, Auth, Realtime, Storage)
+- **State:** TanStack Query (React Query)
+- **Charts:** Recharts
+- **Testes:** Vitest, Testing Library
+
+## 📦 Instalação
 
 ```bash
-# Clonar repositório
+# Clone o repositório
 git clone https://github.com/adm01-debug/loggi-flow.git
-cd loggi-flow
 
-# Instalar dependências
+# Instale as dependências
+cd loggi-flow
 npm install
 
-# Configurar variáveis de ambiente
+# Configure as variáveis de ambiente
 cp .env.example .env
-# Edite .env com suas credenciais Supabase
 
-# Executar migrations
-npx supabase db push
-
-# Iniciar desenvolvimento
+# Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-### Scripts Disponíveis
+## 🧪 Scripts
 
 ```bash
-npm run dev          # Desenvolvimento
-npm run build        # Build produção
-npm run preview      # Preview build
+npm run dev          # Servidor de desenvolvimento
+npm run build        # Build de produção
 npm run test         # Executar testes
-npm run lint         # Verificar código
+npm run test:ui      # Testes com UI
+npm run test:coverage # Cobertura de testes
+npm run lint         # Linting
+npm run typecheck    # Verificação de tipos
 ```
 
-## 🏗️ Arquitetura
+## 📁 Estrutura
 
 ```
 src/
-├── components/       # Componentes React
-│   ├── common/       # Componentes reutilizáveis
-│   ├── dashboard/    # Componentes do dashboard
-│   ├── layout/       # Layout (Header, Sidebar)
-│   ├── notifications/# Sistema de notificações
-│   └── ui/           # shadcn/ui components
-├── hooks/            # React hooks customizados
-├── integrations/     # Integrações (Supabase)
-├── lib/              # Utilitários e validações
-├── pages/            # Páginas da aplicação
-└── test/             # Testes automatizados
-
-supabase/
-├── functions/        # Edge Functions
-└── migrations/       # Migrações do banco
+├── components/       # Componentes reutilizáveis
+│   ├── common/      # Pagination, FilterBar, BulkActions...
+│   ├── dashboard/   # KPIs, Charts, Rankings
+│   ├── layout/      # MainLayout, Header, Sidebar
+│   └── ui/          # Shadcn/UI components
+├── hooks/           # Custom hooks (48 hooks)
+│   ├── usePagination
+│   ├── useFilters
+│   ├── useSorting
+│   ├── useRealtime
+│   └── ...
+├── pages/           # Páginas da aplicação (30 páginas)
+├── integrations/    # Supabase client
+└── test/            # Testes unitários
 ```
-
-## 📊 Banco de Dados
-
-### Principais Tabelas
-- `coletas` - Ordens de coleta
-- `entregas` - Ordens de entrega
-- `clientes` - Cadastro de clientes
-- `fornecedores` - Cadastro de fornecedores
-- `transportadoras` - Cadastro de transportadoras
-- `ocorrencias` - Registro de ocorrências
-- `user_levels` - Níveis e XP dos usuários
-- `achievements` - Conquistas disponíveis
-- `notifications` - Sistema de notificações
-
-## 🔧 Configuração
-
-### Variáveis de Ambiente
-
-```env
-VITE_SUPABASE_URL=https://xxx.supabase.co
-VITE_SUPABASE_ANON_KEY=xxx
-```
-
-### Supabase Secrets (Edge Functions)
-
-```bash
-supabase secrets set LALAMOVE_API_KEY=xxx
-supabase secrets set LALAMOVE_API_SECRET=xxx
-supabase secrets set MAPBOX_ACCESS_TOKEN=xxx
-```
-
-## 🧪 Testes
-
-```bash
-# Executar todos os testes
-npm run test
-
-# Executar com coverage
-npm run test:coverage
-
-# Executar em watch mode
-npm run test:watch
-```
-
-## 📦 Tecnologias
-
-- **Frontend**: React 18, TypeScript, Vite
-- **Estilização**: Tailwind CSS, shadcn/ui
-- **Estado**: TanStack Query, Zustand
-- **Backend**: Supabase (PostgreSQL, Auth, Realtime)
-- **Mapas**: Mapbox GL
-- **Gráficos**: Recharts
-- **Testes**: Vitest, Testing Library
-
-## 📚 Documentação Adicional
-
-- [Configuração de Integrações](./docs/INTEGRACAO_CONFIG.md)
-- [Melhorias Implementadas](./docs/MELHORIAS.md)
 
 ## 🤝 Contribuição
 
 1. Fork o projeto
-2. Crie sua branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+2. Crie uma branch (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'feat: adicionar nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
 ## 📄 Licença
 
-Este projeto é privado e proprietário.
-
-## 👥 Equipe
-
-Desenvolvido por **Promo Brindes** - Sistema interno de gestão logística.
-
----
-
-**Loggi Flow** - Transformando logística em jogo! 🎮🚚
+MIT © Promo Brindes
