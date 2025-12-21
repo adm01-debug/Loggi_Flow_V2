@@ -1,132 +1,101 @@
-import * as React from "react";
-import { X } from "lucide-react";
+import { ReactNode } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { X, Edit, Trash2, ExternalLink } from "lucide-react";
 
-interface DetailSection {
+interface DetailField {
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
   fullWidth?: boolean;
-}
-
-interface DetailTab {
-  id: string;
-  label: string;
-  content: React.ReactNode;
-  badge?: number;
 }
 
 interface DetailSheetProps {
   open: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   title: string;
-  description?: string;
-  sections?: DetailSection[];
-  tabs?: DetailTab[];
-  actions?: React.ReactNode;
-  footer?: React.ReactNode;
-  side?: "left" | "right";
-  className?: string;
-  children?: React.ReactNode;
+  subtitle?: string;
+  badge?: { label: string; variant?: "default" | "secondary" | "destructive" | "outline" };
+  fields: DetailField[];
+  actions?: {
+    onEdit?: () => void;
+    onDelete?: () => void;
+    onExternalLink?: () => void;
+    custom?: ReactNode;
+  };
+  children?: ReactNode;
 }
 
 export function DetailSheet({
   open,
-  onClose,
+  onOpenChange,
   title,
-  description,
-  sections,
-  tabs,
+  subtitle,
+  badge,
+  fields,
   actions,
-  footer,
-  side = "right",
-  className,
   children,
 }: DetailSheetProps) {
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent side={side} className={cn("w-full sm:max-w-lg", className)}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="w-full sm:max-w-lg">
         <SheetHeader>
           <div className="flex items-start justify-between">
             <div>
-              <SheetTitle>{title}</SheetTitle>
-              {description && (
-                <SheetDescription>{description}</SheetDescription>
-              )}
+              <SheetTitle className="flex items-center gap-2">
+                {title}
+                {badge && <Badge variant={badge.variant}>{badge.label}</Badge>}
+              </SheetTitle>
+              {subtitle && <SheetDescription>{subtitle}</SheetDescription>}
             </div>
-            {actions}
           </div>
         </SheetHeader>
 
-        <div className="mt-6 flex-1 overflow-y-auto">
-          {sections && sections.length > 0 && (
-            <div className="grid gap-4">
-              {sections.map((section, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "grid gap-1",
-                    section.fullWidth ? "col-span-2" : ""
-                  )}
-                >
-                  <dt className="text-sm font-medium text-muted-foreground">
-                    {section.label}
-                  </dt>
-                  <dd className="text-sm">{section.value || "-"}</dd>
+        <ScrollArea className="h-[calc(100vh-200px)] mt-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              {fields.map((field, i) => (
+                <div key={i} className={field.fullWidth ? "col-span-2" : ""}>
+                  <p className="text-sm text-muted-foreground">{field.label}</p>
+                  <div className="mt-1">{field.value || <span className="text-muted-foreground">-</span>}</div>
                 </div>
               ))}
             </div>
-          )}
 
-          {sections && tabs && <Separator className="my-6" />}
+            {children && (
+              <>
+                <Separator />
+                {children}
+              </>
+            )}
+          </div>
+        </ScrollArea>
 
-          {tabs && tabs.length > 0 && (
-            <Tabs defaultValue={tabs[0].id} className="w-full">
-              <TabsList className="w-full justify-start">
-                {tabs.map((tab) => (
-                  <TabsTrigger key={tab.id} value={tab.id} className="gap-2">
-                    {tab.label}
-                    {tab.badge !== undefined && tab.badge > 0 && (
-                      <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium">
-                        {tab.badge}
-                      </span>
-                    )}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {tabs.map((tab) => (
-                <TabsContent key={tab.id} value={tab.id} className="mt-4">
-                  {tab.content}
-                </TabsContent>
-              ))}
-            </Tabs>
-          )}
-
-          {children}
-        </div>
-
-        {footer && (
-          <SheetFooter className="mt-6">
-            {footer}
+        {actions && (
+          <SheetFooter className="mt-4">
+            <div className="flex items-center gap-2 w-full">
+              {actions.onExternalLink && (
+                <Button variant="outline" size="sm" onClick={actions.onExternalLink}>
+                  <ExternalLink className="w-4 h-4 mr-2" />Abrir
+                </Button>
+              )}
+              {actions.onEdit && (
+                <Button variant="outline" size="sm" onClick={actions.onEdit}>
+                  <Edit className="w-4 h-4 mr-2" />Editar
+                </Button>
+              )}
+              {actions.onDelete && (
+                <Button variant="destructive" size="sm" onClick={actions.onDelete}>
+                  <Trash2 className="w-4 h-4 mr-2" />Excluir
+                </Button>
+              )}
+              {actions.custom}
+            </div>
           </SheetFooter>
         )}
       </SheetContent>
     </Sheet>
   );
 }
-
-// Helper para criar seções facilmente
-export function createDetailSections(
-  data: Record<string, any>,
-  labels: Record<string, string>
-): DetailSection[] {
-  return Object.entries(labels).map(([key, label]) => ({
-    label,
-    value: data[key],
-  }));
-}
-
-export default DetailSheet;
