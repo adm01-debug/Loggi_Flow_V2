@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Plus, Search, Phone, Mail, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar } from "lucide-react";
+import { Users, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -15,6 +16,14 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+// Importar novos componentes e hooks
+import { Pagination } from "@/components/common/Pagination";
+import { FilterBar } from "@/components/common/FilterBar";
+import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { usePagination } from "@/hooks/usePagination";
+import { useFilters, FilterConfig } from "@/hooks/useFilters";
+import { useSorting, SortDirection } from "@/hooks/useSorting";
 
 interface Cliente {
   id: string; razao_social: string; nome_fantasia: string | null; cnpj: string | null;
@@ -27,10 +36,14 @@ interface Cliente {
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", endereco_completo: "", cidade: "", estado: "", cep: "", contato_nome: "", contato_email: "", contato_telefone: "", horario_entrega: "", restricoes_entrega: "" };
 
+// Configuração de filtros
+const filterConfig: FilterConfig<Cliente>[] = [
+  { key: "search", type: "search", fields: ["razao_social", "nome_fantasia", "cnpj", "cidade", "contato_nome"] },
+  { key: "estado", type: "select", field: "estado", options: UFS.map(uf => ({ value: uf, label: uf })) }
+];
+
 export default function Clientes() {
   const qc = useQueryClient();
-  const [search, setSearch] = useState("");
-  const [ufFilter, setUfFilter] = useState("all");
   const [dlgCreate, setDlgCreate] = useState(false);
   const [dlgEdit, setDlgEdit] = useState(false);
   const [dlgView, setDlgView] = useState(false);
@@ -52,13 +65,28 @@ export default function Clientes() {
     },
   });
 
+  // Hook de Filtros
+  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(list, filterConfig);
+  
+  // Hook de Ordenação
+  const { sortedData, sortState, toggleSort, getSortDirection } = useSorting(filteredData, {
+    defaultKey: "razao_social",
+    defaultDirection: "asc"
+  });
+  
+  // Hook de Paginação
+  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, nextPage, prevPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 12 });
+  
+  // Hook de Seleção para Bulk Actions
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected, isAllSelected, isPartialSelected } = useSelection(paginatedData);
+
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
       const { error } = await supabase.from("clientes").insert({ razao_social: d.razao_social, nome_fantasia: d.nome_fantasia || null, cnpj: d.cnpj || null, endereco_completo: d.endereco_completo, cidade: d.cidade || null, estado: d.estado || null, cep: d.cep || null, contato_nome: d.contato_nome || null, contato_email: d.contato_email || null, contato_telefone: d.contato_telefone || null, horario_entrega: d.horario_entrega || null, restricoes_entrega: d.restricoes_entrega || null });
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgCreate(false); setForm(emptyForm); toast.success("Cliente cadastrado!"); },
-    onError: (e) => toast.error("Erro: " + e.message),
+    onError: (e) => toast.error("Erro ao cadastrar: " + e.message),
   });
 
   const updateMut = useMutation({
@@ -66,27 +94,48 @@ export default function Clientes() {
       const { error } = await supabase.from("clientes").update({ razao_social: d.razao_social, nome_fantasia: d.nome_fantasia || null, cnpj: d.cnpj || null, endereco_completo: d.endereco_completo, cidade: d.cidade || null, estado: d.estado || null, cep: d.cep || null, contato_nome: d.contato_nome || null, contato_email: d.contato_email || null, contato_telefone: d.contato_telefone || null, horario_entrega: d.horario_entrega || null, restricoes_entrega: d.restricoes_entrega || null }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgEdit(false); toast.success("Atualizado!"); },
-    onError: (e) => toast.error("Erro: " + e.message),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgEdit(false); setSel(null); toast.success("Cliente atualizado!"); },
+    onError: (e) => toast.error("Erro ao atualizar: " + e.message),
   });
 
   const deleteMut = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("clientes").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgDel(false); toast.success("Excluído!"); },
-    onError: (e) => toast.error("Erro: " + e.message),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("clientes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgDel(false); setSel(null); toast.success("Cliente excluído!"); },
+    onError: (e) => toast.error("Erro ao excluir: " + e.message),
   });
 
-  const filtered = list.filter((c) => {
-    const s = search.toLowerCase();
-    const ok = c.razao_social.toLowerCase().includes(s) || c.nome_fantasia?.toLowerCase().includes(s) || c.cnpj?.includes(s) || c.cidade?.toLowerCase().includes(s);
-    return ok && (ufFilter === "all" || c.estado === ufFilter);
+  // Bulk Delete
+  const bulkDeleteMut = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("clientes").delete().in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["clientes"] });
+      clearSelection();
+      toast.success(`${selectedIds.length} cliente(s) excluído(s)!`);
+    },
+    onError: (e) => toast.error("Erro ao excluir: " + e.message),
   });
 
-  const stats = { total: list.length, com: list.filter((c) => (c.total_entregas || 0) > 0).length, pend: list.reduce((a, c) => a + (c.entregas_pendentes || 0), 0), tot: list.reduce((a, c) => a + (c.total_entregas || 0), 0) };
+  const openEdit = (c: Cliente) => {
+    setSel(c);
+    setForm({ razao_social: c.razao_social, nome_fantasia: c.nome_fantasia || "", cnpj: c.cnpj || "", endereco_completo: c.endereco_completo, cidade: c.cidade || "", estado: c.estado || "", cep: c.cep || "", contato_nome: c.contato_nome || "", contato_email: c.contato_email || "", contato_telefone: c.contato_telefone || "", horario_entrega: c.horario_entrega || "", restricoes_entrega: c.restricoes_entrega || "" });
+    setDlgEdit(true);
+  };
 
-  const openEdit = (c: Cliente) => { setSel(c); setForm({ razao_social: c.razao_social, nome_fantasia: c.nome_fantasia || "", cnpj: c.cnpj || "", endereco_completo: c.endereco_completo, cidade: c.cidade || "", estado: c.estado || "", cep: c.cep || "", contato_nome: c.contato_nome || "", contato_email: c.contato_email || "", contato_telefone: c.contato_telefone || "", horario_entrega: c.horario_entrega || "", restricoes_entrega: c.restricoes_entrega || "" }); setDlgEdit(true); };
-  const fmtDate = (d: string | null) => d ? format(new Date(d), "dd/MM/yyyy", { locale: ptBR }) : "-";
+  const stats = { total: list.length, com: list.filter((c) => (c.total_entregas || 0) > 0).length, pend: list.filter((c) => (c.entregas_pendentes || 0) > 0).length, tot: list.reduce((a, c) => a + (c.total_entregas || 0), 0) };
   const fmtCNPJ = (c: string) => { const n = c.replace(/\D/g, ""); return n.length === 14 ? n.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5") : c; };
+
+  // Helper para renderizar ícone de ordenação
+  const SortIcon = ({ field }: { field: keyof Cliente }) => {
+    const dir = getSortDirection(field);
+    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
+    return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
+  };
 
   if (error) return <MainLayout><div className="flex flex-col items-center py-12"><AlertCircle className="w-12 h-12 text-destructive mb-4" /><p className="text-destructive">Erro: {error.message}</p></div></MainLayout>;
 
@@ -116,14 +165,75 @@ export default function Clientes() {
           <div className="stat-card text-center"><Package className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.tot}</p><p className="text-xs text-muted-foreground">Total Entregas</p></div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" /></div><Select value={ufFilter} onValueChange={setUfFilter}><SelectTrigger className="w-full md:w-[140px]"><SelectValue placeholder="Estado" /></SelectTrigger><SelectContent><SelectItem value="all">Todos</SelectItem>{UFS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select></div>
+        {/* Barra de Filtros */}
+        <FilterBar
+          searchValue={filters.search as string || ""}
+          onSearchChange={(value) => setFilter("search", value)}
+          searchPlaceholder="Buscar por nome, CNPJ, cidade..."
+          filters={[
+            {
+              key: "estado",
+              label: "Estado",
+              type: "select",
+              value: filters.estado as string || "",
+              options: [{ value: "", label: "Todos" }, ...UFS.map(uf => ({ value: uf, label: uf }))],
+              onChange: (value) => setFilter("estado", value || undefined)
+            }
+          ]}
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+          totalCount={sortedData.length}
+          filteredCount={sortedData.length}
+        />
+
+        {/* Ordenação */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Ordenar por:</span>
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("razao_social")} className="gap-1">
+            Nome <SortIcon field="razao_social" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("cidade")} className="gap-1">
+            Cidade <SortIcon field="cidade" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("total_entregas")} className="gap-1">
+            Entregas <SortIcon field="total_entregas" />
+          </Button>
+        </div>
+
+        {/* Bulk Actions */}
+        {selectedIds.length > 0 && (
+          <BulkActions
+            selectedIds={selectedIds}
+            totalCount={paginatedData.length}
+            onClearSelection={clearSelection}
+            onSelectAll={selectAll}
+            actions={[
+              {
+                id: "delete",
+                label: "Excluir Selecionados",
+                icon: Trash2,
+                variant: "destructive",
+                onClick: (ids) => bulkDeleteMut.mutate(ids)
+              }
+            ]}
+          />
+        )}
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
         {!isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((c, i) => (
-            <div key={c.id} className="card-interactive animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="flex items-start justify-between mb-4"><div className="flex-1 min-w-0"><p className="font-semibold text-lg truncate">{c.nome_fantasia || c.razao_social}</p>{c.nome_fantasia && <p className="text-xs text-muted-foreground truncate">{c.razao_social}</p>}</div>
+          {paginatedData.map((c, i) => (
+            <div key={c.id} className={`card-interactive animate-fade-in ${isSelected(c.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+              <div className="flex items-start gap-3 mb-4">
+                <Checkbox
+                  checked={isSelected(c.id)}
+                  onCheckedChange={() => toggle(c.id)}
+                  className="mt-1"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-lg truncate">{c.nome_fantasia || c.razao_social}</p>
+                  {c.nome_fantasia && <p className="text-xs text-muted-foreground truncate">{c.razao_social}</p>}
+                </div>
                 <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(c); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => openEdit(c)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(c); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
               </div>
               <div className="space-y-2 text-sm">{c.cnpj && <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /><span className="font-mono">{fmtCNPJ(c.cnpj)}</span></div>}{c.contato_nome && <div className="flex items-center gap-2"><User className="w-4 h-4 text-muted-foreground" />{c.contato_nome}</div>}{c.contato_telefone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-4 h-4" />{c.contato_telefone}</div>}<div className="flex items-start gap-2 text-muted-foreground"><MapPin className="w-4 h-4 mt-0.5" /><div><p className="line-clamp-2">{c.endereco_completo}</p>{c.cidade && <p className="font-medium text-foreground">{c.cidade} - {c.estado}</p>}</div></div>{c.horario_entrega && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4" /><span>{c.horario_entrega}</span></div>}</div>
@@ -132,7 +242,21 @@ export default function Clientes() {
           ))}
         </div>}
 
-        {!isLoading && filtered.length === 0 && <div className="card-base flex flex-col items-center py-12"><Users className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum cliente</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
+        {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Users className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum cliente</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
+
+        {/* Paginação */}
+        {!isLoading && sortedData.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={sortedData.length}
+            onPageChange={goToPage}
+            onPageSizeChange={setPageSize}
+            hasNextPage={hasNextPage}
+            hasPrevPage={hasPrevPage}
+          />
+        )}
 
         <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Novo Cliente</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.razao_social || !form.endereco_completo || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar</Button></DialogFooter></DialogContent></Dialog>
 
