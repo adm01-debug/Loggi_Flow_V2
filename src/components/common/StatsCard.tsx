@@ -1,115 +1,91 @@
-import { LucideIcon, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface StatsCardProps {
   title: string;
-  value: string | number;
-  description?: string;
-  icon?: LucideIcon;
-  trend?: {
-    value: number;
-    label?: string;
-  };
+  value: number | string;
+  icon: LucideIcon;
+  trend?: number;
+  trendLabel?: string;
+  color?: "primary" | "success" | "warning" | "destructive" | "info";
   className?: string;
   loading?: boolean;
 }
 
+const colorClasses = {
+  primary: "text-primary bg-primary/10",
+  success: "text-green-500 bg-green-500/10",
+  warning: "text-yellow-500 bg-yellow-500/10",
+  destructive: "text-red-500 bg-red-500/10",
+  info: "text-blue-500 bg-blue-500/10",
+};
+
 export function StatsCard({
   title,
   value,
-  description,
   icon: Icon,
   trend,
+  trendLabel,
+  color = "primary",
   className,
   loading = false,
 }: StatsCardProps) {
-  const TrendIcon = trend
-    ? trend.value > 0
-      ? TrendingUp
-      : trend.value < 0
-      ? TrendingDown
-      : Minus
-    : null;
-
-  const trendColor = trend
-    ? trend.value > 0
-      ? "text-green-500"
-      : trend.value < 0
-      ? "text-red-500"
-      : "text-muted-foreground"
-    : "";
-
-  if (loading) {
-    return (
-      <Card className={cn("animate-pulse", className)}>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <div className="h-4 w-24 bg-muted rounded" />
-              <div className="h-8 w-16 bg-muted rounded" />
-            </div>
-            <div className="h-10 w-10 bg-muted rounded-full" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className={cn("transition-all hover:shadow-md", className)}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold">{value}</p>
-            {(description || trend) && (
-              <div className="flex items-center gap-2">
-                {trend && TrendIcon && (
-                  <span className={cn("flex items-center text-xs font-medium", trendColor)}>
-                    <TrendIcon className="h-3 w-3 mr-0.5" />
-                    {Math.abs(trend.value)}%
-                  </span>
-                )}
-                {description && (
-                  <span className="text-xs text-muted-foreground">
-                    {description}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-          {Icon && (
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Icon className="h-6 w-6 text-primary" />
-            </div>
-          )}
+    <motion.div
+      className={cn("stat-card", className)}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className={cn("p-2 rounded-lg", colorClasses[color])}>
+          <Icon className="w-5 h-5" />
         </div>
-      </CardContent>
-    </Card>
+        {trend !== undefined && (
+          <div className={cn("flex items-center text-xs font-medium", trend >= 0 ? "text-green-500" : "text-red-500")}>
+            <span>{trend >= 0 ? "↑" : "↓"}</span>
+            <span className="ml-1">{Math.abs(trend)}%</span>
+          </div>
+        )}
+      </div>
+      
+      {loading ? (
+        <div className="animate-pulse">
+          <div className="h-8 bg-muted rounded w-20 mb-1"></div>
+          <div className="h-4 bg-muted rounded w-24"></div>
+        </div>
+      ) : (
+        <>
+          <p className="text-2xl font-bold">
+            {typeof value === "number" ? value.toLocaleString() : value}
+          </p>
+          <p className="text-sm text-muted-foreground">{title}</p>
+          {trendLabel && (
+            <p className="text-xs text-muted-foreground mt-1">{trendLabel}</p>
+          )}
+        </>
+      )}
+    </motion.div>
   );
 }
 
-// Grid de Stats
-interface StatsGridProps {
-  children: React.ReactNode;
-  columns?: 2 | 3 | 4 | 5;
-  className?: string;
-}
-
-export function StatsGrid({ children, columns = 4, className }: StatsGridProps) {
-  const gridCols = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
-    5: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5",
-  };
-
+// Variante compacta
+export function StatsCardCompact({
+  title,
+  value,
+  icon: Icon,
+  color = "primary",
+}: Omit<StatsCardProps, "trend" | "trendLabel" | "loading">) {
   return (
-    <div className={cn("grid gap-4", gridCols[columns], className)}>
-      {children}
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+      <div className={cn("p-2 rounded-lg", colorClasses[color])}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div>
+        <p className="text-lg font-bold">{typeof value === "number" ? value.toLocaleString() : value}</p>
+        <p className="text-xs text-muted-foreground">{title}</p>
+      </div>
     </div>
   );
 }
-
-export default StatsCard;
