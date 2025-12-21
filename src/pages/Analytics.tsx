@@ -1,216 +1,46 @@
-import { useState, useMemo } from 'react';
-import { subMonths, format } from 'date-fns';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { useAnalytics, MonthlyData, DemandForecast, HeatmapData, TransportadoraStats } from '@/hooks/useAnalytics';
-import { useExport } from '@/hooks/useExport';
-import { AnalyticsSummaryCards } from '@/components/analytics/AnalyticsSummaryCards';
-import { MonthlyComparisonChart } from '@/components/analytics/MonthlyComparisonChart';
-import { DemandForecastChart } from '@/components/analytics/DemandForecastChart';
-import { RegionHeatmap } from '@/components/analytics/RegionHeatmap';
-import { TransportadoraComparisonChart } from '@/components/analytics/TransportadoraComparisonChart';
-import { AnalyticsFilters, DateRange } from '@/components/analytics/AnalyticsFilters';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent } from '@/components/ui/card';
-import { BarChart3 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart3, TrendingUp, TrendingDown, Target, Clock, Truck, Package, DollarSign, Loader2, RefreshCw, Calendar } from "lucide-react";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { useKPIBenchmark } from "@/hooks/useKPIBenchmark";
+import { useTrackingAnalytics } from "@/hooks/useTrackingAnalytics";
+import { DateRangePicker } from "@/components/common/DateRangePicker";
+import { useRealtime } from "@/hooks/useRealtime";
+import { cn } from "@/lib/utils";
+import { subDays } from "date-fns";
 
 export default function Analytics() {
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: subMonths(new Date(), 6),
-    to: new Date(),
-  });
-  const [isExporting, setIsExporting] = useState(false);
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({ from: subDays(new Date(), 30), to: new Date() });
+  const { data: analytics, isLoading, refetch } = useAnalytics?.({ startDate: dateRange.from, endDate: dateRange.to }) || { data: null, isLoading: false };
+  const { benchmarks, compareToBenchmark } = useKPIBenchmark?.() || { benchmarks: null };
+  const { trackingData, conversionRates } = useTrackingAnalytics?.() || { trackingData: null };
 
-  const { monthlyData, demandForecast, heatmapData, summaryMetrics, transportadoraStats, isLoading } = useAnalytics(dateRange);
-  const { exportToPDF, exportToExcel } = useExport();
+  useRealtime({ table: "entregas", onUpdate: () => refetch?.() });
 
-  // Prepare data for export
-  const exportData = useMemo(() => {
-    const data: Record<string, unknown>[] = [];
-    
-    // Add monthly summary
-    monthlyData.forEach((m: MonthlyData) => {
-      data.push({
-        tipo: 'Resumo Mensal',
-        periodo: m.month,
-        entregas: m.entregas,
-        coletas: m.coletas,
-        custo_total: `R$ ${m.custoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-        sla_atingido: `${m.slaAtingido}%`,
-        ocorrencias: m.ocorrencias,
-      });
-    });
-
-    // Add forecast data
-    demandForecast.slice(-30).forEach((f: DemandForecast) => {
-      if (f.actual === null) {
-        data.push({
-          tipo: 'Previsão',
-          periodo: f.date,
-          entregas: f.predicted,
-          coletas: '-',
-          custo_total: '-',
-          sla_atingido: '-',
-          ocorrencias: '-',
-        });
-      }
-    });
-
-    return data;
-  }, [monthlyData, demandForecast]);
-
-  // Prepare heatmap export
-  const heatmapExportData = useMemo(() => {
-    return heatmapData.map((h: HeatmapData) => ({
-      regiao: h.region,
-      horario: `${h.hour.toString().padStart(2, '0')}:00`,
-      operacoes: h.count,
-      intensidade: `${Math.round(h.intensity * 100)}%`,
-    }));
-  }, [heatmapData]);
-
-  // Prepare transportadora export
-  const transportadoraExportData = useMemo(() => {
-    return transportadoraStats.map((t: TransportadoraStats) => ({
-      transportadora: t.nome,
-      entregas: t.entregas,
-      sla: `${t.sla}%`,
-      custo_medio: `R$ ${t.custoMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      ocorrencias: t.ocorrencias,
-      prazo_medio: `${t.prazoMedio} dias`,
-    }));
-  }, [transportadoraStats]);
-
-  const handleExportPDF = async () => {
-    setIsExporting(true);
-    try {
-      const allData = [
-        ...exportData,
-        ...transportadoraExportData.map(t => ({
-          tipo: 'Transportadora',
-          periodo: t.transportadora,
-          entregas: t.entregas,
-          coletas: '-',
-          custo_total: t.custo_medio,
-          sla_atingido: t.sla,
-          ocorrencias: t.ocorrencias,
-        })),
-        ...heatmapExportData.map(h => ({
-          tipo: 'Heatmap',
-          periodo: h.horario,
-          entregas: h.operacoes,
-          coletas: '-',
-          custo_total: '-',
-          sla_atingido: h.intensidade,
-          ocorrencias: h.regiao,
-        })),
-      ];
-      
-      exportToPDF(allData, {
-        filename: 'analytics_relatorio',
-        title: 'Relatório de Analytics',
-        subtitle: `Período: ${format(dateRange.from, 'dd/MM/yyyy')} a ${format(dateRange.to, 'dd/MM/yyyy')}`,
-      });
-    } catch (error) {
-      toast.error('Erro ao exportar PDF');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const handleExportExcel = async () => {
-    setIsExporting(true);
-    try {
-      // Export monthly data
-      exportToExcel(exportData, {
-        filename: 'analytics_relatorio',
-        sheetName: 'Resumo Mensal',
-      });
-      
-      // Export transportadora data
-      setTimeout(() => {
-        exportToExcel(transportadoraExportData, {
-          filename: 'analytics_transportadoras',
-          sheetName: 'Transportadoras',
-        });
-      }, 300);
-      
-      // Export heatmap separately
-      setTimeout(() => {
-        exportToExcel(heatmapExportData, {
-          filename: 'analytics_heatmap',
-          sheetName: 'Heatmap Horários',
-        });
-      }, 600);
-    } catch (error) {
-      toast.error('Erro ao exportar Excel');
-    } finally {
-      setIsExporting(false);
-    }
-  };
+  const stats = analytics || { totalDeliveries: 0, onTimeRate: 0, avgDeliveryTime: 0, totalRevenue: 0, growthRate: 0 };
 
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-display font-bold flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <BarChart3 className="w-8 h-8 text-primary" />
-              </div>
-              Analytics Avançado
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Análise detalhada de performance, previsões e padrões operacionais
-            </p>
-          </div>
-          
-          {/* Filters */}
-          <AnalyticsFilters
-            dateRange={dateRange}
-            onDateRangeChange={setDateRange}
-            onExportPDF={handleExportPDF}
-            onExportExcel={handleExportExcel}
-            isExporting={isExporting}
-          />
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400/20 to-orange-600/10"><BarChart3 className="w-6 h-6 text-orange-500" /></div>Analytics</h1><p className="text-muted-foreground mt-1">Análise completa de performance logística</p></div>
+          <div className="flex gap-2"><DateRangePicker value={dateRange} onChange={setDateRange} /><Button variant="outline" onClick={() => refetch?.()}><RefreshCw className="w-4 h-4 mr-2" />Atualizar</Button></div>
         </div>
-
-        {isLoading ? (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <Card key={i}>
-                  <CardContent className="p-6">
-                    <Skeleton className="h-20 w-full" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <Card>
-              <CardContent className="p-6">
-                <Skeleton className="h-[400px] w-full" />
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <>
-            {/* Summary Cards */}
-            <AnalyticsSummaryCards metrics={summaryMetrics} />
-
-            {/* Monthly Comparison */}
-            <MonthlyComparisonChart data={monthlyData} />
-
-            {/* Forecast and Heatmap */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <DemandForecastChart data={demandForecast} />
-              <RegionHeatmap data={heatmapData} />
-            </div>
-
-            {/* Transportadora Comparison */}
-            <TransportadoraComparisonChart data={transportadoraStats} />
-          </>
-        )}
+        <div className="grid grid-cols-5 gap-4">
+          <div className="stat-card text-center"><Truck className="w-5 h-5 text-blue-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.totalDeliveries}</p><p className="text-xs text-muted-foreground">Entregas</p></div>
+          <div className="stat-card text-center"><Target className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.onTimeRate}%</p><p className="text-xs text-muted-foreground">No Prazo</p></div>
+          <div className="stat-card text-center"><Clock className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.avgDeliveryTime}h</p><p className="text-xs text-muted-foreground">Tempo Médio</p></div>
+          <div className="stat-card text-center"><DollarSign className="w-5 h-5 text-emerald-500 mx-auto mb-2" /><p className="text-2xl font-bold">R$ {(stats.totalRevenue / 1000).toFixed(0)}k</p><p className="text-xs text-muted-foreground">Receita</p></div>
+          <div className="stat-card text-center">{stats.growthRate >= 0 ? <TrendingUp className="w-5 h-5 text-green-500 mx-auto mb-2" /> : <TrendingDown className="w-5 h-5 text-red-500 mx-auto mb-2" />}<p className={cn("text-2xl font-bold", stats.growthRate >= 0 ? "text-green-600" : "text-red-600")}>{stats.growthRate >= 0 ? "+" : ""}{stats.growthRate}%</p><p className="text-xs text-muted-foreground">Crescimento</p></div>
+        </div>
+        <Tabs defaultValue="kpis"><TabsList><TabsTrigger value="kpis">KPIs</TabsTrigger><TabsTrigger value="benchmark">Benchmark</TabsTrigger><TabsTrigger value="tracking">Tracking</TabsTrigger></TabsList>
+          <TabsContent value="kpis" className="space-y-4">{isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : <div className="grid grid-cols-2 gap-4">{[{ label: "Taxa de Entrega", value: "98.5%", target: "95%", status: "above" }, { label: "Satisfação Cliente", value: "4.7/5", target: "4.5/5", status: "above" }, { label: "Custo por Entrega", value: "R$ 12.50", target: "R$ 15.00", status: "below" }, { label: "Tempo de Resposta", value: "2.3h", target: "4h", status: "below" }].map((kpi, i) => (<div key={i} className="card-interactive"><div className="flex justify-between items-start mb-2"><span className="text-sm text-muted-foreground">{kpi.label}</span><Badge variant={kpi.status === "above" || kpi.status === "below" ? "default" : "secondary"}>{kpi.status === "above" ? "Acima" : "Abaixo"} da meta</Badge></div><p className="text-2xl font-bold">{kpi.value}</p><p className="text-xs text-muted-foreground">Meta: {kpi.target}</p></div>))}</div>}</TabsContent>
+          <TabsContent value="benchmark" className="space-y-4"><div className="card-base p-4"><h3 className="font-semibold mb-4">Comparação com Mercado</h3>{benchmarks ? <div className="space-y-3">{Object.entries(benchmarks).map(([key, val]: [string, any], i) => (<div key={i} className="flex items-center justify-between py-2 border-b last:border-0"><span className="text-sm">{key}</span><div className="flex items-center gap-2"><span className="font-semibold">{val.current}</span><Badge variant={val.diff >= 0 ? "default" : "destructive"}>{val.diff >= 0 ? "+" : ""}{val.diff}%</Badge></div></div>))}</div> : <p className="text-muted-foreground text-center py-4">Carregando benchmarks...</p>}</div></TabsContent>
+          <TabsContent value="tracking" className="space-y-4"><div className="card-base p-4"><h3 className="font-semibold mb-4">Funil de Conversão</h3>{conversionRates ? <div className="space-y-2">{Object.entries(conversionRates).map(([stage, rate]: [string, any], i) => (<div key={i} className="flex items-center gap-3"><div className="w-24 text-sm text-muted-foreground">{stage}</div><div className="flex-1 bg-muted rounded-full h-3"><div className="bg-primary rounded-full h-3" style={{ width: `${rate}%` }} /></div><span className="text-sm font-semibold w-12">{rate}%</span></div>))}</div> : <p className="text-muted-foreground text-center py-4">Carregando dados...</p>}</div></TabsContent>
+        </Tabs>
       </div>
     </MainLayout>
   );
