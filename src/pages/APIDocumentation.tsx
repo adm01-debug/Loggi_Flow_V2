@@ -1,480 +1,74 @@
-import { useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Code2, 
-  Key, 
-  Copy, 
-  CheckCircle2,
-  ExternalLink,
-  Globe,
-  Lock,
-  Zap,
-  Package,
-  Truck,
-  Users,
-  Search
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Code, Copy, CheckCircle2, ExternalLink, Search, Book, Zap, Shield, Globe } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { FilterBar } from "@/components/common/FilterBar";
+import { useFilters, FilterConfig } from "@/hooks/useFilters";
 
-const API_BASE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-api`;
-
-interface Endpoint {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  path: string;
-  description: string;
-  params?: { name: string; type: string; required: boolean; description: string }[];
-  example?: string;
-  response?: string;
-}
+interface Endpoint { id: string; method: string; path: string; description: string; category: string; }
 
 const endpoints: Endpoint[] = [
-  {
-    method: 'GET',
-    path: '/entregas',
-    description: 'Lista todas as entregas',
-    params: [
-      { name: 'status', type: 'string', required: false, description: 'Filtrar por status' },
-      { name: 'limit', type: 'number', required: false, description: 'Limite de resultados (default: 50)' },
-      { name: 'offset', type: 'number', required: false, description: 'Offset para paginação' },
-    ],
-    response: `{
-  "data": [
-    {
-      "id": "uuid",
-      "numero_entrega": "ENT-001",
-      "status": "em_transito",
-      "endereco_entrega": "Rua...",
-      "previsao_entrega": "2024-01-15",
-      "cliente": { "razao_social": "..." },
-      "transportadora": { "nome_fantasia": "..." }
-    }
-  ],
-  "total": 100,
-  "limit": 50,
-  "offset": 0
-}`,
-  },
-  {
-    method: 'GET',
-    path: '/entregas/:id',
-    description: 'Obtém uma entrega específica pelo ID',
-    response: `{
-  "data": {
-    "id": "uuid",
-    "numero_entrega": "ENT-001",
-    "status": "em_transito",
-    ...
-  }
-}`,
-  },
-  {
-    method: 'GET',
-    path: '/coletas',
-    description: 'Lista todas as coletas',
-    params: [
-      { name: 'status', type: 'string', required: false, description: 'Filtrar por status' },
-      { name: 'limit', type: 'number', required: false, description: 'Limite de resultados' },
-      { name: 'offset', type: 'number', required: false, description: 'Offset para paginação' },
-    ],
-  },
-  {
-    method: 'GET',
-    path: '/coletas/:id',
-    description: 'Obtém uma coleta específica pelo ID',
-  },
-  {
-    method: 'GET',
-    path: '/transportadoras',
-    description: 'Lista todas as transportadoras',
-    params: [
-      { name: 'homologada', type: 'boolean', required: false, description: 'Filtrar por status de homologação' },
-    ],
-  },
-  {
-    method: 'GET',
-    path: '/clientes',
-    description: 'Lista todos os clientes',
-  },
-  {
-    method: 'GET',
-    path: '/rastrear/:codigo',
-    description: 'Rastreia uma entrega ou coleta pelo código',
-    response: `{
-  "type": "entrega",
-  "data": {
-    "id": "uuid",
-    "numero_entrega": "ENT-001",
-    "status": "em_transito",
-    "link_rastreamento": "...",
-    ...
-  }
-}`,
-  },
-  {
-    method: 'GET',
-    path: '/stats',
-    description: 'Obtém estatísticas gerais do sistema',
-    response: `{
-  "data": {
-    "total_entregas": 150,
-    "total_coletas": 80,
-    "transportadoras_ativas": 5,
-    "timestamp": "2024-01-15T10:30:00Z"
-  }
-}`,
-  },
-  {
-    method: 'POST',
-    path: '/webhook/status',
-    description: 'Recebe atualizações de status (webhook)',
-    params: [
-      { name: 'tipo', type: 'string', required: true, description: '"entrega" ou "coleta"' },
-      { name: 'codigo', type: 'string', required: true, description: 'Código da entrega/coleta' },
-      { name: 'status', type: 'string', required: true, description: 'Novo status' },
-      { name: 'data_atualizacao', type: 'string', required: false, description: 'Data da atualização (ISO 8601)' },
-      { name: 'observacao', type: 'string', required: false, description: 'Observação adicional' },
-    ],
-    example: `{
-  "tipo": "entrega",
-  "codigo": "ENT-001",
-  "status": "entregue",
-  "observacao": "Entregue para porteiro"
-}`,
-  },
+  { id: "1", method: "GET", path: "/api/entregas", description: "Listar todas entregas", category: "entregas" },
+  { id: "2", method: "GET", path: "/api/entregas/:id", description: "Buscar entrega por ID", category: "entregas" },
+  { id: "3", method: "POST", path: "/api/entregas", description: "Criar nova entrega", category: "entregas" },
+  { id: "4", method: "PUT", path: "/api/entregas/:id", description: "Atualizar entrega", category: "entregas" },
+  { id: "5", method: "GET", path: "/api/coletas", description: "Listar todas coletas", category: "coletas" },
+  { id: "6", method: "POST", path: "/api/coletas", description: "Criar nova coleta", category: "coletas" },
+  { id: "7", method: "GET", path: "/api/clientes", description: "Listar clientes", category: "clientes" },
+  { id: "8", method: "GET", path: "/api/transportadoras", description: "Listar transportadoras", category: "transportadoras" },
+  { id: "9", method: "POST", path: "/api/predict-delays", description: "Prever atrasos (IA)", category: "ia" },
+  { id: "10", method: "POST", path: "/api/smart-carrier", description: "Seleção inteligente de transportadora", category: "ia" },
 ];
 
-const getMethodColor = (method: string) => {
-  switch (method) {
-    case 'GET': return 'bg-green-500';
-    case 'POST': return 'bg-blue-500';
-    case 'PUT': return 'bg-amber-500';
-    case 'DELETE': return 'bg-red-500';
-    default: return 'bg-gray-500';
-  }
-};
+const methodColors: Record<string, string> = { GET: "bg-green-100 text-green-700", POST: "bg-blue-100 text-blue-700", PUT: "bg-amber-100 text-amber-700", DELETE: "bg-red-100 text-red-700" };
+
+const filterConfig: FilterConfig<Endpoint>[] = [
+  { key: "search", type: "search", fields: ["path", "description"] },
+  { key: "method", type: "select", field: "method", options: [{ value: "GET", label: "GET" }, { value: "POST", label: "POST" }, { value: "PUT", label: "PUT" }, { value: "DELETE", label: "DELETE" }] },
+  { key: "category", type: "select", field: "category", options: [{ value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "clientes", label: "Clientes" }, { value: "transportadoras", label: "Transportadoras" }, { value: "ia", label: "IA" }] }
+];
 
 export default function APIDocumentation() {
-  const [apiKey, setApiKey] = useState('');
-  const [generatedKey, setGeneratedKey] = useState('');
+  const [copied, setCopied] = useState<string | null>(null);
+  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(endpoints, filterConfig);
 
-  const generateApiKey = () => {
-    const key = `lf_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`;
-    setGeneratedKey(key);
-    toast.success('Chave API gerada com sucesso!');
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success('Copiado para a área de transferência!');
-  };
+  const copyToClipboard = (text: string, id: string) => { navigator.clipboard.writeText(text); setCopied(id); toast.success("Copiado!"); setTimeout(() => setCopied(null), 2000); };
 
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <Code2 className="w-8 h-8 text-primary" />
-              </div>
-              API Pública
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Documentação da API REST para integração externa
-            </p>
-          </div>
-          <Badge variant="outline" className="gap-2 px-4 py-2">
-            <Globe className="h-4 w-4" />
-            v1.0.0
-          </Badge>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-slate-400/20 to-slate-600/10"><Code className="w-6 h-6 text-slate-500" /></div>API Documentation</h1><p className="text-muted-foreground mt-1">Documentação da API REST</p></div>
+          <Button variant="outline"><ExternalLink className="w-4 h-4 mr-2" />Swagger UI</Button>
         </div>
-
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="authentication">Autenticação</TabsTrigger>
-            <TabsTrigger value="endpoints">Endpoints</TabsTrigger>
-            <TabsTrigger value="examples">Exemplos</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg bg-green-500/10">
-                      <Zap className="h-6 w-6 text-green-500" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">RESTful API</p>
-                      <p className="text-sm text-muted-foreground">Endpoints JSON padronizados</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg bg-blue-500/10">
-                      <Lock className="h-6 w-6 text-blue-500" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">API Key Auth</p>
-                      <p className="text-sm text-muted-foreground">Autenticação via header</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg bg-purple-500/10">
-                      <Globe className="h-6 w-6 text-purple-500" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">CORS Enabled</p>
-                      <p className="text-sm text-muted-foreground">Aceita requisições de qualquer origem</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Base URL</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-muted font-mono text-sm">
-                  <code className="flex-1">{API_BASE_URL}</code>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => copyToClipboard(API_BASE_URL)}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Recursos Disponíveis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg border">
-                    <Package className="h-5 w-5 text-primary" />
-                    <span>Entregas</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg border">
-                    <Package className="h-5 w-5 text-primary" />
-                    <span>Coletas</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg border">
-                    <Truck className="h-5 w-5 text-primary" />
-                    <span>Transportadoras</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg border">
-                    <Users className="h-5 w-5 text-primary" />
-                    <span>Clientes</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Authentication Tab */}
-          <TabsContent value="authentication" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Key className="h-5 w-5" />
-                  Autenticação via API Key
-                </CardTitle>
-                <CardDescription>
-                  Todas as requisições devem incluir uma chave API válida no header
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 rounded-lg bg-muted font-mono text-sm">
-                  <p className="text-muted-foreground mb-2">Header requerido:</p>
-                  <code>x-api-key: sua_chave_api</code>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Gerar Nova Chave de Teste</Label>
-                  <div className="flex gap-2">
-                    <Button onClick={generateApiKey} className="gap-2">
-                      <Key className="h-4 w-4" />
-                      Gerar Chave
-                    </Button>
-                    {generatedKey && (
-                      <div className="flex-1 flex items-center gap-2 p-2 rounded-lg bg-muted font-mono text-sm">
-                        <code className="flex-1">{generatedKey}</code>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => copyToClipboard(generatedKey)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    ⚠️ Esta é uma chave de demonstração. Em produção, implemente validação adequada.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Exemplo de Requisição</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <pre className="p-4 rounded-lg bg-muted font-mono text-sm overflow-x-auto">
-{`curl -X GET "${API_BASE_URL}/entregas" \\
-  -H "x-api-key: lf_sua_chave_aqui" \\
-  -H "Content-Type: application/json"`}
-                </pre>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Endpoints Tab */}
+        <div className="grid grid-cols-4 gap-4">
+          <div className="stat-card text-center"><Globe className="w-5 h-5 text-blue-500 mx-auto mb-2" /><p className="text-2xl font-bold">{endpoints.length}</p><p className="text-xs text-muted-foreground">Endpoints</p></div>
+          <div className="stat-card text-center"><Zap className="w-5 h-5 text-amber-500 mx-auto mb-2" /><p className="text-2xl font-bold">REST</p><p className="text-xs text-muted-foreground">Protocolo</p></div>
+          <div className="stat-card text-center"><Shield className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">JWT</p><p className="text-xs text-muted-foreground">Auth</p></div>
+          <div className="stat-card text-center"><Book className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">v1</p><p className="text-xs text-muted-foreground">Versão</p></div>
+        </div>
+        <Tabs defaultValue="endpoints"><TabsList><TabsTrigger value="endpoints">Endpoints</TabsTrigger><TabsTrigger value="auth">Autenticação</TabsTrigger><TabsTrigger value="examples">Exemplos</TabsTrigger></TabsList>
           <TabsContent value="endpoints" className="space-y-4">
-            {endpoints.map((endpoint, index) => (
-              <Card key={index}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <Badge className={getMethodColor(endpoint.method)}>
-                      {endpoint.method}
-                    </Badge>
-                    <code className="font-mono text-lg">{endpoint.path}</code>
-                  </div>
-                  <CardDescription>{endpoint.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {endpoint.params && endpoint.params.length > 0 && (
-                    <div>
-                      <h4 className="font-medium mb-2">Parâmetros</h4>
-                      <div className="space-y-2">
-                        {endpoint.params.map((param, pIndex) => (
-                          <div key={pIndex} className="flex items-start gap-3 p-2 rounded bg-muted/50">
-                            <code className="font-mono text-sm">{param.name}</code>
-                            <Badge variant="outline" className="text-xs">{param.type}</Badge>
-                            {param.required && <Badge variant="destructive" className="text-xs">required</Badge>}
-                            <span className="text-sm text-muted-foreground">{param.description}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {endpoint.example && (
-                    <div>
-                      <h4 className="font-medium mb-2">Request Body</h4>
-                      <pre className="p-3 rounded bg-muted font-mono text-sm overflow-x-auto">
-                        {endpoint.example}
-                      </pre>
-                    </div>
-                  )}
-
-                  {endpoint.response && (
-                    <div>
-                      <h4 className="font-medium mb-2">Response</h4>
-                      <pre className="p-3 rounded bg-muted font-mono text-sm overflow-x-auto">
-                        {endpoint.response}
-                      </pre>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+            <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar endpoint..." filters={[{ key: "method", label: "Método", type: "select", value: filters.method as string || "", options: [{ value: "", label: "Todos" }, { value: "GET", label: "GET" }, { value: "POST", label: "POST" }, { value: "PUT", label: "PUT" }], onChange: (v) => setFilter("method", v || undefined) }, { key: "category", label: "Categoria", type: "select", value: filters.category as string || "", options: [{ value: "", label: "Todas" }, { value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "ia", label: "IA" }], onChange: (v) => setFilter("category", v || undefined) }]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={filteredData.length} filteredCount={filteredData.length} />
+            <div className="space-y-2">{filteredData.map((e) => (
+              <div key={e.id} className="card-interactive flex items-center gap-4">
+                <Badge className={cn("font-mono w-16 justify-center", methodColors[e.method])}>{e.method}</Badge>
+                <code className="flex-1 font-mono text-sm">{e.path}</code>
+                <span className="text-sm text-muted-foreground">{e.description}</span>
+                <Badge variant="outline">{e.category}</Badge>
+                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(e.path, e.id)}>{copied === e.id ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}</Button>
+              </div>
+            ))}</div>
           </TabsContent>
-
-          {/* Examples Tab */}
-          <TabsContent value="examples" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>JavaScript / Fetch</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <pre className="p-4 rounded-lg bg-muted font-mono text-sm overflow-x-auto">
-{`// Listar entregas
-const response = await fetch('${API_BASE_URL}/entregas?limit=10', {
-  headers: {
-    'x-api-key': 'sua_chave_api',
-    'Content-Type': 'application/json'
-  }
-});
-const data = await response.json();
-console.log(data);`}
-                </pre>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Python / Requests</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <pre className="p-4 rounded-lg bg-muted font-mono text-sm overflow-x-auto">
-{`import requests
-
-headers = {
-    'x-api-key': 'sua_chave_api',
-    'Content-Type': 'application/json'
-}
-
-# Rastrear uma entrega
-response = requests.get(
-    '${API_BASE_URL}/rastrear/ENT-001',
-    headers=headers
-)
-print(response.json())`}
-                </pre>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Webhook de Atualização</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <pre className="p-4 rounded-lg bg-muted font-mono text-sm overflow-x-auto">
-{`// Enviar atualização de status via webhook
-const response = await fetch('${API_BASE_URL}/webhook/status', {
-  method: 'POST',
-  headers: {
-    'x-api-key': 'sua_chave_api',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    tipo: 'entrega',
-    codigo: 'ENT-001',
-    status: 'entregue',
-    observacao: 'Entregue para o destinatário'
-  })
-});`}
-                </pre>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <TabsContent value="auth" className="card-base p-6"><h3 className="font-semibold mb-4">Autenticação</h3><p className="text-sm text-muted-foreground mb-4">Todas as requisições devem incluir o header Authorization com um token JWT válido.</p><div className="bg-muted p-4 rounded-lg font-mono text-sm"><p>Authorization: Bearer {'<seu_token>'}</p></div></TabsContent>
+          <TabsContent value="examples" className="card-base p-6"><h3 className="font-semibold mb-4">Exemplo de Requisição</h3><pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">{`curl -X GET https://api.loggi-flow.com/api/entregas \\
+  -H "Authorization: Bearer <token>" \\
+  -H "Content-Type: application/json"`}</pre></TabsContent>
         </Tabs>
       </div>
     </MainLayout>
