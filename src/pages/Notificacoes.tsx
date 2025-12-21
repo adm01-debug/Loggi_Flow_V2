@@ -1,425 +1,115 @@
-import { useState, useMemo } from "react";
-import { 
-  Bell, 
-  Search, 
-  Filter,
-  CheckCircle, 
-  AlertTriangle, 
-  AlertCircle, 
-  Trophy, 
-  Info,
-  X,
-  CheckCheck,
-  Trash2,
-  Calendar,
-  ExternalLink,
-  RefreshCw,
-} from "lucide-react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Bell, Check, Trash2, CheckCheck, Loader2, AlertCircle, Package, Truck, AlertTriangle, Info, Filter } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { motion, AnimatePresence } from "framer-motion";
-import { useNotifications, Notification } from "@/hooks/useNotifications";
-import { NotificationStats } from "@/components/notifications/NotificationStats";
-import { NotificationPermissionStatus } from "@/components/notifications/BrowserNotificationPrompt";
-import { format, subDays, subMonths, isAfter, startOfDay } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { format, formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-type Period = "today" | "week" | "month" | "all";
-type TypeFilter = "all" | "info" | "success" | "warning" | "error" | "achievement";
-type StatusFilter = "all" | "read" | "unread";
+import { Pagination } from "@/components/common/Pagination";
+import { FilterBar } from "@/components/common/FilterBar";
+import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { usePagination } from "@/hooks/usePagination";
+import { useFilters, FilterConfig } from "@/hooks/useFilters";
+import { useRealtime } from "@/hooks/useRealtime";
 
-const TYPE_CONFIG = {
-  info: { 
-    label: "Informação", 
-    icon: Info,
-    bgColor: "bg-info/10",
-    textColor: "text-info",
-    borderColor: "border-info/30",
-  },
-  success: { 
-    label: "Sucesso", 
-    icon: CheckCircle,
-    bgColor: "bg-success/10",
-    textColor: "text-success",
-    borderColor: "border-success/30",
-  },
-  warning: { 
-    label: "Alerta", 
-    icon: AlertTriangle,
-    bgColor: "bg-warning/10",
-    textColor: "text-warning",
-    borderColor: "border-warning/30",
-  },
-  error: { 
-    label: "Erro", 
-    icon: AlertCircle,
-    bgColor: "bg-destructive/10",
-    textColor: "text-destructive",
-    borderColor: "border-destructive/30",
-  },
-  achievement: { 
-    label: "Conquista", 
-    icon: Trophy,
-    bgColor: "bg-coins/10",
-    textColor: "text-coins",
-    borderColor: "border-coins/30",
-  },
+interface Notification { id: string; title: string; message: string; type: string; read: boolean; created_at: string; user_id: string; }
+
+const typeConfig: Record<string, { icon: any; color: string }> = {
+  info: { icon: Info, color: "text-blue-500" },
+  success: { icon: Check, color: "text-green-500" },
+  warning: { icon: AlertTriangle, color: "text-yellow-500" },
+  error: { icon: AlertCircle, color: "text-red-500" },
+  coleta: { icon: Package, color: "text-purple-500" },
+  entrega: { icon: Truck, color: "text-cyan-500" },
 };
 
+const filterConfig: FilterConfig<Notification>[] = [
+  { key: "search", type: "search", fields: ["title", "message"] },
+  { key: "type", type: "select", field: "type", options: Object.keys(typeConfig).map(t => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) })) },
+  { key: "read", type: "custom", filterFn: (item, value) => value === "unread" ? !item.read : value === "read" ? item.read : true }
+];
+
 export default function Notificacoes() {
-  const { 
-    notifications,
-    unreadCount,
-    isLoading,
-    markAsRead, 
-    markAllAsRead, 
-    deleteNotification,
-  } = useNotifications();
+  const qc = useQueryClient();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [period, setPeriod] = useState<Period>("all");
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [showStats, setShowStats] = useState(false);
+  const { data: list = [], isLoading, error, refetch } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data, error } = await supabase.from("notifications").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Notification[];
+    },
+  });
 
-  // Filter notifications
-  const filteredNotifications = useMemo(() => {
-    let result = [...notifications];
+  // Realtime updates
+  useRealtime({ table: "notifications", onInsert: () => refetch(), onUpdate: () => refetch(), onDelete: () => refetch() });
 
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(n => 
-        n.title.toLowerCase().includes(query) ||
-        n.message.toLowerCase().includes(query)
-      );
-    }
+  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(list, filterConfig);
+  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(filteredData, { initialPageSize: 15 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
 
-    // Period filter
-    if (period !== "all") {
-      const now = new Date();
-      let startDate: Date;
-      switch (period) {
-        case "today":
-          startDate = startOfDay(now);
-          break;
-        case "week":
-          startDate = subDays(now, 7);
-          break;
-        case "month":
-          startDate = subMonths(now, 1);
-          break;
-        default:
-          startDate = new Date(0);
-      }
-      result = result.filter(n => isAfter(new Date(n.created_at), startDate));
-    }
+  const markReadMut = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("notifications").update({ read: true }).eq("id", id); if (error) throw error; },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+  });
 
-    // Type filter
-    if (typeFilter !== "all") {
-      result = result.filter(n => n.type === typeFilter);
-    }
+  const markAllReadMut = useMutation({
+    mutationFn: async () => { const { data: { user } } = await supabase.auth.getUser(); if (!user) return; const { error } = await supabase.from("notifications").update({ read: true }).eq("user_id", user.id).eq("read", false); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["notifications"] }); toast.success("Todas marcadas como lidas!"); },
+  });
 
-    // Status filter
-    if (statusFilter === "read") {
-      result = result.filter(n => n.read);
-    } else if (statusFilter === "unread") {
-      result = result.filter(n => !n.read);
-    }
+  const deleteMut = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("notifications").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["notifications"] }); toast.success("Excluída!"); },
+  });
 
-    return result;
-  }, [notifications, searchQuery, period, typeFilter, statusFilter]);
-
-  const handleClearFilters = () => {
-    setSearchQuery("");
-    setPeriod("all");
-    setTypeFilter("all");
-    setStatusFilter("all");
+  const bulkMarkRead = async (ids: string[]) => {
+    const { error } = await supabase.from("notifications").update({ read: true }).in("id", ids);
+    if (error) toast.error("Erro"); else { qc.invalidateQueries({ queryKey: ["notifications"] }); clearSelection(); toast.success(`${ids.length} marcada(s) como lida(s)`); }
   };
 
-  const hasActiveFilters = searchQuery || period !== "all" || typeFilter !== "all" || statusFilter !== "all";
-
-  const renderNotification = (notification: Notification, index: number) => {
-    const config = TYPE_CONFIG[notification.type];
-    const Icon = config.icon;
-
-    return (
-      <motion.div
-        key={notification.id}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, x: -50 }}
-        transition={{ delay: index * 0.02 }}
-        className={cn(
-          "group relative p-4 rounded-lg border transition-all",
-          !notification.read ? "bg-muted/50 border-primary/20" : "bg-card border-border",
-          "hover:shadow-md hover:border-primary/30"
-        )}
-      >
-        <div className="flex gap-4">
-          {/* Icon */}
-          <div className={cn(
-            "flex items-center justify-center w-12 h-12 rounded-xl shrink-0",
-            config.bgColor
-          )}>
-            <Icon className={cn("w-6 h-6", config.textColor)} />
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="font-semibold text-foreground">
-                    {notification.title}
-                  </h3>
-                  {!notification.read && (
-                    <Badge variant="default" className="text-[10px] h-5">
-                      Nova
-                    </Badge>
-                  )}
-                  <Badge variant="outline" className={cn("text-[10px] h-5", config.textColor, config.borderColor)}>
-                    {config.label}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {notification.message}
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {!notification.read && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => markAsRead(notification.id)}
-                    title="Marcar como lida"
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-                  onClick={() => deleteNotification(notification.id)}
-                  title="Excluir"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
-                {format(new Date(notification.created_at), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
-              </span>
-              {notification.action_url && (
-                <a 
-                  href={notification.action_url}
-                  className="flex items-center gap-1 text-primary hover:underline"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  Ver detalhes
-                </a>
-              )}
-              {notification.read && notification.read_at && (
-                <span className="flex items-center gap-1 text-success">
-                  <CheckCheck className="w-3 h-3" />
-                  Lida em {format(new Date(notification.read_at), "dd/MM HH:mm")}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    );
+  const bulkDelete = async (ids: string[]) => {
+    const { error } = await supabase.from("notifications").delete().in("id", ids);
+    if (error) toast.error("Erro"); else { qc.invalidateQueries({ queryKey: ["notifications"] }); clearSelection(); toast.success(`${ids.length} excluída(s)`); }
   };
+
+  const stats = { total: list.length, unread: list.filter(n => !n.read).length };
+
+  if (error) return <MainLayout><div className="flex flex-col items-center py-12"><AlertCircle className="w-12 h-12 text-destructive mb-4" /><p>Erro: {error.message}</p></div></MainLayout>;
 
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-display text-foreground flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-                <Bell className="w-6 h-6 text-primary" />
-              </div>
-              Notificações
-              {unreadCount > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {unreadCount} nova{unreadCount > 1 ? "s" : ""}
-                </Badge>
-              )}
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Central de notificações e alertas do sistema
-            </p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Bell className="w-6 h-6 text-primary" /></div>Notificações</h1><p className="text-muted-foreground mt-1">{stats.unread} não lida(s) de {stats.total}</p></div>
+          <Button variant="outline" onClick={() => markAllReadMut.mutate()} disabled={stats.unread === 0}><CheckCheck className="w-4 h-4 mr-2" />Marcar todas como lidas</Button>
+        </div>
+
+        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar..." filters={[{ key: "type", label: "Tipo", type: "select", value: filters.type as string || "", options: [{ value: "", label: "Todos" }, ...Object.keys(typeConfig).map(t => ({ value: t, label: t }))], onChange: (v) => setFilter("type", v || undefined) }, { key: "read", label: "Status", type: "select", value: filters.read as string || "", options: [{ value: "", label: "Todas" }, { value: "unread", label: "Não lidas" }, { value: "read", label: "Lidas" }], onChange: (v) => setFilter("read", v || undefined) }]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={filteredData.length} filteredCount={filteredData.length} />
+
+        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "read", label: "Marcar Lidas", icon: Check, onClick: bulkMarkRead }, { id: "delete", label: "Excluir", icon: Trash2, variant: "destructive", onClick: bulkDelete }]} />}
+
+        {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
+
+        {!isLoading && <div className="space-y-2">{paginatedData.map((n) => { const config = typeConfig[n.type] || typeConfig.info; const Icon = config.icon; return (
+          <div key={n.id} className={cn("card-interactive flex items-start gap-3", !n.read && "bg-primary/5 border-primary/20", isSelected(n.id) && "ring-2 ring-primary")} onClick={() => !n.read && markReadMut.mutate(n.id)}>
+            <Checkbox checked={isSelected(n.id)} onCheckedChange={() => toggle(n.id)} onClick={(e) => e.stopPropagation()} />
+            <div className={cn("p-2 rounded-lg", n.read ? "bg-muted" : "bg-primary/10")}><Icon className={cn("w-5 h-5", config.color)} /></div>
+            <div className="flex-1 min-w-0"><div className="flex items-center gap-2"><p className={cn("font-medium", !n.read && "font-semibold")}>{n.title}</p>{!n.read && <Badge variant="secondary" className="text-xs">Nova</Badge>}</div><p className="text-sm text-muted-foreground line-clamp-2">{n.message}</p><p className="text-xs text-muted-foreground mt-1">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ptBR })}</p></div>
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); deleteMut.mutate(n.id); }}><Trash2 className="w-4 h-4 text-muted-foreground" /></Button>
           </div>
-          
-          <div className="flex items-center gap-2">
-            <NotificationPermissionStatus />
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowStats(!showStats)}
-            >
-              {showStats ? "Ocultar Estatísticas" : "Ver Estatísticas"}
-            </Button>
-            {unreadCount > 0 && (
-              <Button onClick={() => markAllAsRead()} className="gap-2">
-                <CheckCheck className="w-4 h-4" />
-                Marcar todas como lidas
-              </Button>
-            )}
-          </div>
-        </div>
+        ); })}</div>}
 
-        {/* Stats Panel */}
-        <AnimatePresence>
-          {showStats && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <Card>
-                <CardContent className="pt-6">
-                  <NotificationStats />
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Filters */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Search */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por título ou mensagem..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-
-              {/* Period filter */}
-              <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
-                <SelectTrigger className="w-[150px]">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <SelectValue placeholder="Período" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">Hoje</SelectItem>
-                  <SelectItem value="week">Últimos 7 dias</SelectItem>
-                  <SelectItem value="month">Últimos 30 dias</SelectItem>
-                  <SelectItem value="all">Todo o histórico</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Type filter */}
-              <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as TypeFilter)}>
-                <SelectTrigger className="w-[150px]">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os tipos</SelectItem>
-                  <SelectItem value="info">Informação</SelectItem>
-                  <SelectItem value="success">Sucesso</SelectItem>
-                  <SelectItem value="warning">Alerta</SelectItem>
-                  <SelectItem value="error">Erro</SelectItem>
-                  <SelectItem value="achievement">Conquista</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Status filter */}
-              <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
-                <TabsList>
-                  <TabsTrigger value="all">Todas</TabsTrigger>
-                  <TabsTrigger value="unread">Não lidas</TabsTrigger>
-                  <TabsTrigger value="read">Lidas</TabsTrigger>
-                </TabsList>
-              </Tabs>
-
-              {/* Clear filters */}
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={handleClearFilters} className="gap-2">
-                  <X className="w-4 h-4" />
-                  Limpar filtros
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Results info */}
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>
-            {filteredNotifications.length} notificação{filteredNotifications.length !== 1 ? "ões" : ""} encontrada{filteredNotifications.length !== 1 ? "s" : ""}
-            {hasActiveFilters && ` (de ${notifications.length} total)`}
-          </span>
-        </div>
-
-        {/* Notification list */}
-        <div className="space-y-3">
-          {isLoading ? (
-            <Card>
-              <CardContent className="flex items-center justify-center py-12">
-                <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
-              </CardContent>
-            </Card>
-          ) : filteredNotifications.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-                  <Bell className="w-8 h-8 text-muted-foreground" />
-                </div>
-                {hasActiveFilters ? (
-                  <>
-                    <p className="font-medium text-foreground">Nenhuma notificação encontrada</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Tente ajustar os filtros para ver mais resultados
-                    </p>
-                    <Button variant="outline" className="mt-4" onClick={handleClearFilters}>
-                      Limpar filtros
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <p className="font-medium text-foreground">Nenhuma notificação</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Você será notificado sobre eventos importantes do sistema
-                    </p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <AnimatePresence mode="popLayout">
-              {filteredNotifications.map((notification, index) => 
-                renderNotification(notification, index)
-              )}
-            </AnimatePresence>
-          )}
-        </div>
+        {!isLoading && filteredData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Bell className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma notificação</p></div>}
+        {!isLoading && filteredData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={filteredData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
       </div>
     </MainLayout>
   );
