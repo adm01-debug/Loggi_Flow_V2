@@ -4,18 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ChevronLeft, ChevronRight, Truck, Package, Clock, AlertTriangle, Loader2 } from "lucide-react";
 import { useLogisticsCalendar } from "@/hooks/useLogisticsCalendar";
-import { useRealtime } from "@/hooks/useRealtime";
 import { cn } from "@/lib/utils";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function CalendarioLogistico() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const { events, isLoading, refetch, getEventsForDate } = useLogisticsCalendar({ month: currentMonth });
+  
+  // Use proper filter format
+  const calendarResult = useLogisticsCalendar({ 
+    status: [], 
+    transportadoraId: null, 
+    type: 'all' 
+  });
 
-  useRealtime({ table: "entregas", onInsert: () => refetch?.(), onUpdate: () => refetch?.() });
-  useRealtime({ table: "coletas", onInsert: () => refetch?.(), onUpdate: () => refetch?.() });
+  const events = calendarResult.data || [];
+  const isLoading = calendarResult.isLoading;
+  const refetch = calendarResult.refetch;
 
   const days = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -23,51 +29,113 @@ export default function CalendarioLogistico() {
     return eachDayOfInterval({ start, end });
   }, [currentMonth]);
 
-  const selectedEvents = selectedDate ? getEventsForDate?.(selectedDate) || [] : [];
+  const getEventsForDate = (date: Date) => {
+    return events.filter((e) => isSameDay(new Date(e.date), date));
+  };
 
-  const getEventCountForDay = (date: Date) => (events || []).filter((e: any) => isSameDay(new Date(e.date), date)).length;
+  const selectedEvents = selectedDate ? getEventsForDate(selectedDate) : [];
+  const getEventCountForDay = (date: Date) => getEventsForDate(date).length;
 
   return (
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400/20 to-violet-600/10"><Calendar className="w-6 h-6 text-violet-500" /></div>Calendário Logístico</h1><p className="text-muted-foreground mt-1">Visualize entregas e coletas agendadas</p></div>
+          <div>
+            <h1 className="text-display flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400/20 to-violet-600/10">
+                <Calendar className="w-6 h-6 text-violet-500" />
+              </div>
+              Calendário Logístico
+            </h1>
+            <p className="text-muted-foreground mt-1">Visualize entregas e coletas agendadas</p>
+          </div>
         </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 card-base p-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}><ChevronLeft className="w-5 h-5" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
               <h2 className="text-lg font-semibold">{format(currentMonth, "MMMM yyyy", { locale: ptBR })}</h2>
-              <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}><ChevronRight className="w-5 h-5" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+                <ChevronRight className="w-5 h-5" />
+              </Button>
             </div>
-            <div className="grid grid-cols-7 gap-1 mb-2">{["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map(d => <div key={d} className="text-center text-sm font-medium text-muted-foreground py-2">{d}</div>)}</div>
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto my-12" /> : (
+
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map(d => (
+                <div key={d} className="text-center text-sm font-medium text-muted-foreground py-2">{d}</div>
+              ))}
+            </div>
+
+            {isLoading ? (
+              <Loader2 className="w-6 h-6 animate-spin mx-auto my-12" />
+            ) : (
               <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, i) => <div key={`empty-${i}`} />)}
+                {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, i) => (
+                  <div key={`empty-${i}`} />
+                ))}
                 {days.map(day => {
                   const count = getEventCountForDay(day);
                   const isSelected = selectedDate && isSameDay(day, selectedDate);
                   return (
-                    <button key={day.toISOString()} onClick={() => setSelectedDate(day)} className={cn("p-2 rounded-lg text-center transition-all min-h-[60px]", isToday(day) && "ring-2 ring-primary", isSelected && "bg-primary text-primary-foreground", !isSelected && "hover:bg-muted", count > 0 && !isSelected && "bg-primary/10")}>
+                    <button 
+                      key={day.toISOString()} 
+                      onClick={() => setSelectedDate(day)} 
+                      className={cn(
+                        "p-2 rounded-lg text-center transition-all min-h-[60px]", 
+                        isToday(day) && "ring-2 ring-primary", 
+                        isSelected && "bg-primary text-primary-foreground", 
+                        !isSelected && "hover:bg-muted", 
+                        count > 0 && !isSelected && "bg-primary/10"
+                      )}
+                    >
                       <span className="text-sm">{format(day, "d")}</span>
-                      {count > 0 && <div className="flex justify-center mt-1"><Badge variant={isSelected ? "secondary" : "default"} className="text-xs px-1">{count}</Badge></div>}
+                      {count > 0 && (
+                        <div className="flex justify-center mt-1">
+                          <Badge variant={isSelected ? "secondary" : "default"} className="text-xs px-1">{count}</Badge>
+                        </div>
+                      )}
                     </button>
                   );
                 })}
               </div>
             )}
           </div>
+
           <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">{selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : "Selecione uma data"}</h3>
+            <h3 className="font-semibold mb-4">
+              {selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : "Selecione uma data"}
+            </h3>
             {selectedDate ? (
-              <div className="space-y-3 max-h-[400px] overflow-y-auto">{selectedEvents.length > 0 ? selectedEvents.map((e: any, i: number) => (
-                <div key={i} className="card-interactive flex items-center gap-3">
-                  {e.type === "entrega" ? <Truck className="w-5 h-5 text-blue-500" /> : <Package className="w-5 h-5 text-green-500" />}
-                  <div className="flex-1"><p className="font-medium text-sm">{e.title}</p><p className="text-xs text-muted-foreground">{e.description}</p></div>
-                  <Badge variant={e.status === "pendente" ? "secondary" : e.status === "concluido" ? "default" : "destructive"}>{e.status}</Badge>
-                </div>
-              )) : <p className="text-sm text-muted-foreground text-center py-8">Nenhum evento nesta data</p>}</div>
-            ) : <p className="text-sm text-muted-foreground text-center py-8">Clique em uma data para ver os eventos</p>}
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {selectedEvents.length > 0 ? selectedEvents.map((e, i) => (
+                  <div key={i} className="card-interactive flex items-center gap-3">
+                    {e.type === "entrega" ? (
+                      <Truck className="w-5 h-5 text-blue-500" />
+                    ) : (
+                      <Package className="w-5 h-5 text-green-500" />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{e.title}</p>
+                      <p className="text-xs text-muted-foreground">{e.details.endereco}</p>
+                    </div>
+                    <Badge variant={
+                      e.status === "pendente" ? "secondary" : 
+                      e.status === "finalizada" || e.status === "entregue" ? "default" : 
+                      "destructive"
+                    }>
+                      {e.status}
+                    </Badge>
+                  </div>
+                )) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">Nenhum evento nesta data</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">Clique em uma data para ver os eventos</p>
+            )}
           </div>
         </div>
       </div>

@@ -9,6 +9,6 @@ export { useEntityHistory } from './useEntityHistory';
 export { useGamification } from './useGamification';
 export { useExport } from './useExport';
 export { useAuth } from './useAuth';
-export { useKeyboardShortcuts } from './useKeyboardShortcuts';
+export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsList, formatShortcut } from './useKeyboardShortcuts';
 export { useDebounce } from './useDebounce';
 export { useLocalStorage } from './useLocalStorage';
