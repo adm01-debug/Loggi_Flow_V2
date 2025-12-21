@@ -1,555 +1,111 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
-import { 
-  AlertTriangle, 
-  Bell,
-  Plus,
-  Trash2,
-  DollarSign,
-  Truck,
-  MapPin,
-  Globe,
-  TrendingUp,
-  CheckCircle2,
-  XCircle,
-  RefreshCw
-} from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { AlertTriangle, Bell, Plus, Trash2, DollarSign, Truck, MapPin, Globe, TrendingUp, CheckCircle2, XCircle, RefreshCw, ArrowUpDown, ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
 import { useCostAlerts, CostCheckResult } from '@/hooks/useCostAlerts';
+import { useSmartAlerts } from '@/hooks/useSmartAlerts';
+import { cn } from '@/lib/utils';
 
-const ESTADOS_BRASIL = [
-  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
-  'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
-  'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+import { Pagination } from '@/components/common/Pagination';
+import { FilterBar } from '@/components/common/FilterBar';
+import { BulkActions, useSelection } from '@/components/common/BulkActions';
+import { usePagination } from '@/hooks/usePagination';
+import { useFilters, FilterConfig } from '@/hooks/useFilters';
+import { useSorting } from '@/hooks/useSorting';
+import { useRealtime } from '@/hooks/useRealtime';
+
+const ESTADOS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+
+interface Alerta { id: string; nome: string; tipo: string; valor_limite: number; estado_origem?: string; estado_destino?: string; ativo: boolean; created_at: string; }
+
+const filterConfig: FilterConfig<Alerta>[] = [
+  { key: "search", type: "search", fields: ["nome", "tipo"] },
+  { key: "tipo", type: "select", field: "tipo", options: [{ value: "valor_maximo", label: "Valor Máximo" }, { value: "valor_minimo", label: "Valor Mínimo" }, { value: "variacao", label: "Variação %" }] },
+  { key: "ativo", type: "custom", filterFn: (item, value) => value === "sim" ? item.ativo : value === "nao" ? !item.ativo : true }
 ];
 
 export default function AlertasCusto() {
-  const {
-    alertas,
-    notificacoes,
-    transportadoras,
-    costCheckResults,
-    isLoadingAlertas,
-    checkCosts,
-    createAlerta,
-    deleteAlerta,
-    updateAlerta,
-    markAllAsRead,
-  } = useCostAlerts();
-
+  const { alertas = [], notificacoes, transportadoras, costCheckResults, isLoadingAlertas, checkCosts, createAlerta, deleteAlerta, updateAlerta, markAllAsRead, refetch } = useCostAlerts();
+  const { smartAlerts } = useSmartAlerts();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newAlertForm, setNewAlertForm] = useState({
-    tipo: 'transportadora' as 'transportadora' | 'rota' | 'global',
-    transportadora_id: '',
-    estado_destino: '',
-    limite_mensal: '',
-    limite_por_entrega: '',
-    notificar_percentual: '80',
-  });
+  const [newAlertForm, setNewAlertForm] = useState({ nome: '', tipo: 'valor_maximo', valor_limite: 0, estado_origem: '', estado_destino: '', ativo: true });
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
+  useRealtime({ table: "cost_alerts", onInsert: () => refetch?.(), onUpdate: () => refetch?.(), onDelete: () => refetch?.() });
+
+  const alertasList = useMemo(() => (alertas || []).map((a: any) => ({ id: a.id, nome: a.nome || a.name || 'Alerta', tipo: a.tipo || a.type || 'valor_maximo', valor_limite: a.valor_limite || a.threshold || 0, estado_origem: a.estado_origem, estado_destino: a.estado_destino, ativo: a.ativo ?? true, created_at: a.created_at })), [alertas]);
+
+  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(alertasList, filterConfig);
+  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
+  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 10 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
 
   const handleCreateAlert = async () => {
-    if (!newAlertForm.limite_mensal) {
-      return;
-    }
-
-    await createAlerta.mutateAsync({
-      tipo: newAlertForm.tipo,
-      transportadora_id: newAlertForm.tipo === 'transportadora' ? newAlertForm.transportadora_id : null,
-      estado_destino: newAlertForm.tipo === 'rota' ? newAlertForm.estado_destino : null,
-      limite_mensal: parseFloat(newAlertForm.limite_mensal),
-      limite_por_entrega: newAlertForm.limite_por_entrega ? parseFloat(newAlertForm.limite_por_entrega) : null,
-      notificar_percentual: parseInt(newAlertForm.notificar_percentual),
-      ativo: true,
-      created_by: null,
-    });
-
+    await createAlerta?.(newAlertForm);
     setIsAddDialogOpen(false);
-    setNewAlertForm({
-      tipo: 'transportadora',
-      transportadora_id: '',
-      estado_destino: '',
-      limite_mensal: '',
-      limite_por_entrega: '',
-      notificar_percentual: '80',
-    });
+    setNewAlertForm({ nome: '', tipo: 'valor_maximo', valor_limite: 0, estado_origem: '', estado_destino: '', ativo: true });
   };
 
-  const getStatusColor = (status: CostCheckResult['status']) => {
-    switch (status) {
-      case 'exceeded': return 'text-destructive';
-      case 'critical': return 'text-warning';
-      case 'warning': return 'text-amber-500';
-      default: return 'text-success';
-    }
+  const bulkDelete = async (ids: string[]) => {
+    for (const id of ids) { await deleteAlerta?.(id); }
+    clearSelection();
   };
 
-  const getStatusBadge = (status: CostCheckResult['status']) => {
-    switch (status) {
-      case 'exceeded': 
-        return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" /> Excedido</Badge>;
-      case 'critical': 
-        return <Badge className="bg-warning text-warning-foreground gap-1"><AlertTriangle className="h-3 w-3" /> Crítico</Badge>;
-      case 'warning': 
-        return <Badge className="bg-amber-500/20 text-amber-600 gap-1"><Bell className="h-3 w-3" /> Alerta</Badge>;
-      default: 
-        return <Badge className="bg-success/20 text-success gap-1"><CheckCircle2 className="h-3 w-3" /> OK</Badge>;
-    }
+  const bulkToggle = async (ids: string[], ativo: boolean) => {
+    for (const id of ids) { await updateAlerta?.(id, { ativo }); }
+    clearSelection();
   };
 
-  const getProgressColor = (percentual: number) => {
-    if (percentual >= 100) return 'bg-destructive';
-    if (percentual >= 95) return 'bg-warning';
-    if (percentual >= 80) return 'bg-amber-500';
-    return 'bg-success';
-  };
-
-  // Summary stats
-  const alertsExceeded = costCheckResults.filter(r => r.status === 'exceeded').length;
-  const alertsCritical = costCheckResults.filter(r => r.status === 'critical').length;
-  const alertsWarning = costCheckResults.filter(r => r.status === 'warning').length;
-  const alertsOk = costCheckResults.filter(r => r.status === 'ok').length;
+  const stats = { total: alertasList.length, ativos: alertasList.filter(a => a.ativo).length, notificacoes: notificacoes?.length || 0 };
+  const SortIcon = ({ field }: { field: string }) => { const dir = getSortDirection(field as any); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
 
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              Alertas de Custo
-            </h1>
-            <p className="text-muted-foreground">
-              Configure limites de gastos e receba alertas automáticos
-            </p>
-          </div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-red-400/20 to-red-600/10"><AlertTriangle className="w-6 h-6 text-red-500" /></div>Alertas de Custo</h1><p className="text-muted-foreground mt-1">Configure alertas para monitorar custos de frete</p></div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => checkCosts()} className="gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Verificar Agora
-            </Button>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Novo Alerta
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Criar Alerta de Custo</DialogTitle>
-                  <DialogDescription>
-                    Configure um limite de gastos para monitoramento automático
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <Label>Tipo de Alerta</Label>
-                    <Select
-                      value={newAlertForm.tipo}
-                      onValueChange={(value: 'transportadora' | 'rota' | 'global') =>
-                        setNewAlertForm({ ...newAlertForm, tipo: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="transportadora">
-                          <div className="flex items-center gap-2">
-                            <Truck className="h-4 w-4" />
-                            Por Transportadora
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="rota">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            Por Rota (Estado)
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="global">
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4" />
-                            Total Global
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {newAlertForm.tipo === 'transportadora' && (
-                    <div className="space-y-2">
-                      <Label>Transportadora</Label>
-                      <Select
-                        value={newAlertForm.transportadora_id}
-                        onValueChange={(value) =>
-                          setNewAlertForm({ ...newAlertForm, transportadora_id: value })
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a transportadora" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {transportadoras?.map((t) => (
-                            <SelectItem key={t.id} value={t.id}>
-                              {t.nome_fantasia}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {newAlertForm.tipo === 'rota' && (
-                    <div className="space-y-2">
-                      <Label>Estado de Destino</Label>
-                      <Select
-                        value={newAlertForm.estado_destino}
-                        onValueChange={(value) =>
-                          setNewAlertForm({ ...newAlertForm, estado_destino: value })
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o estado" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ESTADOS_BRASIL.map((estado) => (
-                            <SelectItem key={estado} value={estado}>
-                              {estado}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Limite Mensal (R$)</Label>
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="5000.00"
-                        value={newAlertForm.limite_mensal}
-                        onChange={(e) =>
-                          setNewAlertForm({ ...newAlertForm, limite_mensal: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Limite por Entrega (R$)</Label>
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="Opcional"
-                        value={newAlertForm.limite_por_entrega}
-                        onChange={(e) =>
-                          setNewAlertForm({ ...newAlertForm, limite_por_entrega: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Notificar ao atingir (%)</Label>
-                    <Select
-                      value={newAlertForm.notificar_percentual}
-                      onValueChange={(value) =>
-                        setNewAlertForm({ ...newAlertForm, notificar_percentual: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="50">50%</SelectItem>
-                        <SelectItem value="60">60%</SelectItem>
-                        <SelectItem value="70">70%</SelectItem>
-                        <SelectItem value="80">80%</SelectItem>
-                        <SelectItem value="90">90%</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleCreateAlert} disabled={createAlerta.isPending}>
-                    {createAlerta.isPending ? 'Salvando...' : 'Criar Alerta'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button variant="outline" onClick={() => checkCosts?.()}><RefreshCw className="w-4 h-4 mr-2" />Verificar</Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Novo Alerta</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Novo Alerta</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div className="grid gap-2"><Label>Nome</Label><Input value={newAlertForm.nome} onChange={(e) => setNewAlertForm({ ...newAlertForm, nome: e.target.value })} /></div><div className="grid gap-2"><Label>Tipo</Label><Select value={newAlertForm.tipo} onValueChange={(v) => setNewAlertForm({ ...newAlertForm, tipo: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="valor_maximo">Valor Máximo</SelectItem><SelectItem value="valor_minimo">Valor Mínimo</SelectItem><SelectItem value="variacao">Variação %</SelectItem></SelectContent></Select></div><div className="grid gap-2"><Label>Valor Limite</Label><Input type="number" value={newAlertForm.valor_limite} onChange={(e) => setNewAlertForm({ ...newAlertForm, valor_limite: Number(e.target.value) })} /></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Origem</Label><Select value={newAlertForm.estado_origem} onValueChange={(v) => setNewAlertForm({ ...newAlertForm, estado_origem: v })}><SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger><SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Destino</Label><Select value={newAlertForm.estado_destino} onValueChange={(v) => setNewAlertForm({ ...newAlertForm, estado_destino: v })}><SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger><SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent></Select></div></div></div><DialogFooter><Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancelar</Button><Button onClick={handleCreateAlert}>Criar</Button></DialogFooter></DialogContent></Dialog>
           </div>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card className={alertsExceeded > 0 ? 'border-destructive/50 bg-destructive/5' : ''}>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Excedidos</p>
-                  <p className="text-2xl font-bold text-foreground">{alertsExceeded}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-destructive/20 flex items-center justify-center">
-                  <XCircle className="h-6 w-6 text-destructive" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className={alertsCritical > 0 ? 'border-warning/50 bg-warning/5' : ''}>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Críticos</p>
-                  <p className="text-2xl font-bold text-foreground">{alertsCritical}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-warning/20 flex items-center justify-center">
-                  <AlertTriangle className="h-6 w-6 text-warning" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className={alertsWarning > 0 ? 'border-amber-500/50 bg-amber-500/5' : ''}>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Em Alerta</p>
-                  <p className="text-2xl font-bold text-foreground">{alertsWarning}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-                  <Bell className="h-6 w-6 text-amber-500" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Dentro do Limite</p>
-                  <p className="text-2xl font-bold text-foreground">{alertsOk}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center">
-                  <CheckCircle2 className="h-6 w-6 text-success" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="stat-card text-center"><AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total Alertas</p></div>
+          <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.ativos}</p><p className="text-xs text-muted-foreground">Ativos</p></div>
+          <div className="stat-card text-center"><Bell className="w-5 h-5 text-amber-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.notificacoes}</p><p className="text-xs text-muted-foreground">Notificações</p></div>
         </div>
 
-        {/* Current Status */}
-        {costCheckResults.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Status Atual dos Limites
-              </CardTitle>
-              <CardDescription>
-                Monitoramento em tempo real dos gastos vs limites configurados
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {costCheckResults.map((result) => (
-                  <div key={result.alerta.id} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {result.alerta.tipo === 'transportadora' && <Truck className="h-4 w-4 text-muted-foreground" />}
-                        {result.alerta.tipo === 'rota' && <MapPin className="h-4 w-4 text-muted-foreground" />}
-                        {result.alerta.tipo === 'global' && <Globe className="h-4 w-4 text-muted-foreground" />}
-                        <span className="font-medium">
-                          {result.alerta.tipo === 'transportadora' 
-                            ? result.alerta.transportadora?.nome_fantasia 
-                            : result.alerta.tipo === 'rota' 
-                              ? `Rota ${result.alerta.estado_destino}` 
-                              : 'Total Global'}
-                        </span>
-                        {getStatusBadge(result.status)}
-                      </div>
-                      <div className="text-right">
-                        <span className={`font-semibold ${getStatusColor(result.status)}`}>
-                          {formatCurrency(result.valor_atual)}
-                        </span>
-                        <span className="text-muted-foreground"> / {formatCurrency(result.alerta.limite_mensal)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Progress 
-                        value={Math.min(result.percentual, 100)} 
-                        className="h-2 flex-1"
-                      />
-                      <span className={`text-sm font-medium ${getStatusColor(result.status)}`}>
-                        {result.percentual.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar alertas..." filters={[{ key: "tipo", label: "Tipo", type: "select", value: filters.tipo as string || "", options: [{ value: "", label: "Todos" }, { value: "valor_maximo", label: "Valor Máximo" }, { value: "valor_minimo", label: "Valor Mínimo" }, { value: "variacao", label: "Variação %" }], onChange: (v) => setFilter("tipo", v || undefined) }, { key: "ativo", label: "Status", type: "select", value: filters.ativo as string || "", options: [{ value: "", label: "Todos" }, { value: "sim", label: "Ativos" }, { value: "nao", label: "Inativos" }], onChange: (v) => setFilter("ativo", v || undefined) }]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
 
-        {/* Notifications */}
-        {notificacoes && notificacoes.length > 0 && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-primary" />
-                  Notificações Recentes
-                </CardTitle>
-                <CardDescription>
-                  {notificacoes.length} notificação(ões) não lida(s)
-                </CardDescription>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => markAllAsRead.mutate()}>
-                Marcar todas como lidas
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {notificacoes.slice(0, 5).map((notif) => (
-                  <div 
-                    key={notif.id} 
-                    className={`p-3 rounded-lg border ${
-                      notif.tipo_notificacao === 'exceeded' 
-                        ? 'bg-destructive/10 border-destructive/30' 
-                        : notif.tipo_notificacao === 'critical'
-                          ? 'bg-warning/10 border-warning/30'
-                          : 'bg-amber-500/10 border-amber-500/30'
-                    }`}
-                  >
-                    <p className="text-sm">{notif.mensagem}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(notif.created_at).toLocaleString('pt-BR')}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("valor_limite")} className="gap-1">Valor <SortIcon field="valor_limite" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">Data <SortIcon field="created_at" /></Button></div>
 
-        {/* Alerts Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-primary" />
-              Alertas Configurados
-            </CardTitle>
-            <CardDescription>
-              Gerencie os limites de custo monitorados
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingAlertas ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-              </div>
-            ) : alertas && alertas.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Referência</TableHead>
-                    <TableHead className="text-right">Limite Mensal</TableHead>
-                    <TableHead className="text-right">Limite/Entrega</TableHead>
-                    <TableHead className="text-center">Notificar em</TableHead>
-                    <TableHead className="text-center">Ativo</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {alertas.map((alerta) => (
-                    <TableRow key={alerta.id}>
-                      <TableCell>
-                        <Badge variant="outline" className="gap-1">
-                          {alerta.tipo === 'transportadora' && <Truck className="h-3 w-3" />}
-                          {alerta.tipo === 'rota' && <MapPin className="h-3 w-3" />}
-                          {alerta.tipo === 'global' && <Globe className="h-3 w-3" />}
-                          {alerta.tipo === 'transportadora' ? 'Transportadora' : alerta.tipo === 'rota' ? 'Rota' : 'Global'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {alerta.tipo === 'transportadora' 
-                          ? alerta.transportadora?.nome_fantasia 
-                          : alerta.tipo === 'rota' 
-                            ? alerta.estado_destino 
-                            : 'Total Geral'}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold">
-                        {formatCurrency(alerta.limite_mensal)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {alerta.limite_por_entrega ? formatCurrency(alerta.limite_por_entrega) : '-'}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {alerta.notificar_percentual}%
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Switch
-                          checked={alerta.ativo}
-                          onCheckedChange={(checked) => 
-                            updateAlerta.mutate({ id: alerta.id, ativo: checked })
-                          }
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => deleteAlerta.mutate(alerta.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <AlertTriangle className="h-12 w-12 text-muted-foreground/50" />
-                <p className="mt-4 text-muted-foreground">
-                  Nenhum alerta de custo configurado.
-                </p>
-                <Button
-                  variant="outline"
-                  className="mt-4 gap-2"
-                  onClick={() => setIsAddDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4" />
-                  Criar primeiro alerta
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "ativar", label: "Ativar", icon: CheckCircle2, onClick: (ids) => bulkToggle(ids, true) }, { id: "desativar", label: "Desativar", icon: XCircle, onClick: (ids) => bulkToggle(ids, false) }, { id: "delete", label: "Excluir", icon: Trash2, variant: "destructive", onClick: bulkDelete }]} />}
+
+        {isLoadingAlertas && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
+
+        {!isLoadingAlertas && <div className="space-y-3">{paginatedData.map((a, i) => (
+          <div key={a.id} className={cn("card-interactive", isSelected(a.id) && "ring-2 ring-primary")} style={{ animationDelay: `${i * 30}ms` }}>
+            <div className="flex items-center gap-3">
+              <Checkbox checked={isSelected(a.id)} onCheckedChange={() => toggle(a.id)} />
+              <div className={cn("p-2 rounded-lg", a.ativo ? "bg-green-100" : "bg-gray-100")}><DollarSign className={cn("w-5 h-5", a.ativo ? "text-green-600" : "text-gray-400")} /></div>
+              <div className="flex-1"><p className="font-semibold">{a.nome}</p><div className="flex items-center gap-2 text-sm text-muted-foreground"><Badge variant="outline">{a.tipo}</Badge>{a.estado_origem && <span><MapPin className="w-3 h-3 inline" /> {a.estado_origem} → {a.estado_destino || "Todos"}</span>}</div></div>
+              <div className="text-right"><p className="font-bold text-lg">R$ {a.valor_limite.toFixed(2)}</p><Badge variant={a.ativo ? "default" : "secondary"}>{a.ativo ? "Ativo" : "Inativo"}</Badge></div>
+              <Switch checked={a.ativo} onCheckedChange={(v) => updateAlerta?.(a.id, { ativo: v })} />
+              <Button variant="ghost" size="icon" onClick={() => deleteAlerta?.(a.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+            </div>
+          </div>
+        ))}</div>}
+
+        {!isLoadingAlertas && sortedData.length === 0 && <div className="flex flex-col items-center py-12"><AlertTriangle className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum alerta configurado</p></div>}
+        {!isLoadingAlertas && sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
       </div>
     </MainLayout>
   );
