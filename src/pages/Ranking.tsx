@@ -1,193 +1,85 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trophy, Medal, Crown, TrendingUp, Star, Flame, Package, Loader2, Users } from "lucide-react";
-import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trophy, Medal, Star, TrendingUp, Flame, Crown, Award, ArrowUpDown, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { useGamification } from "@/hooks/useGamification";
+import { Pagination } from "@/components/common/Pagination";
+import { FilterBar } from "@/components/common/FilterBar";
+import { usePagination } from "@/hooks/usePagination";
+import { useFilters, FilterConfig } from "@/hooks/useFilters";
+import { useSorting } from "@/hooks/useSorting";
+import { useRealtime } from "@/hooks/useRealtime";
+import { cn } from "@/lib/utils";
 
-type Period = "weekly" | "monthly" | "all";
+interface RankUser { id: string; name: string; avatar?: string; xp: number; level: number; streak: number; deliveries: number; }
 
-interface RankingUser {
-  id: string;
-  name: string;
-  avatar: string;
-  xp: number;
-  level: number;
-  streak: number;
-  coins: number;
-  position: number;
-}
-
-function PodiumPlace({ user, place, delay }: { user: RankingUser; place: 1 | 2 | 3; delay: number }) {
-  const heights = { 1: "h-32", 2: "h-24", 3: "h-20" };
-  const colors = { 1: "from-amber-400 to-amber-600", 2: "from-slate-300 to-slate-500", 3: "from-orange-400 to-orange-600" };
-  const icons = { 1: Crown, 2: Medal, 3: Medal };
-  const Icon = icons[place];
-  const order = { 1: "order-2", 2: "order-1", 3: "order-3" };
-
-  return (
-    <motion.div className={`flex flex-col items-center ${order[place]}`} initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay }}>
-      <motion.div className="relative mb-3" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.4, delay: delay + 0.3 }}>
-        <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${colors[place]} flex items-center justify-center text-white font-bold text-xl shadow-lg ${place === 1 ? "ring-4 ring-amber-400/30" : ""}`}>{user.avatar}</div>
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-background rounded-full flex items-center justify-center shadow"><Icon className={`w-4 h-4 ${place === 1 ? "text-amber-500" : place === 2 ? "text-slate-400" : "text-orange-500"}`} /></div>
-      </motion.div>
-      <p className="font-semibold text-sm text-center truncate max-w-[100px]">{user.name}</p>
-      <div className="flex items-center gap-1 mt-1"><Star className="w-3 h-3 text-amber-500" /><span className="text-xs font-medium">Nv. {user.level}</span></div>
-      <motion.div className={`${heights[place]} w-20 bg-gradient-to-t ${colors[place]} rounded-t-lg mt-2 flex items-end justify-center pb-2`} initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.5, delay: delay + 0.5 }}>
-        <span className="text-white font-bold text-lg">{place}º</span>
-      </motion.div>
-      <div className="bg-muted/50 w-20 py-2 rounded-b-lg text-center"><p className="text-sm font-bold text-primary">{user.xp.toLocaleString()} XP</p></div>
-    </motion.div>
-  );
-}
+const filterConfig: FilterConfig<RankUser>[] = [
+  { key: "search", type: "search", fields: ["name"] },
+  { key: "level", type: "custom", filterFn: (item, value) => !value || item.level >= parseInt(value as string) }
+];
 
 export default function Ranking() {
-  const [period, setPeriod] = useState<Period>("all");
+  const { leaderboard, userLevel, isLoading, refetch } = useGamification();
+  const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("weekly");
 
-  const { data: ranking = [], isLoading } = useQuery({
-    queryKey: ["ranking", period],
-    queryFn: async () => {
-      // Calculate date filter based on period
-      let dateFilter: string | null = null;
-      const now = new Date();
-      
-      if (period === "weekly") {
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        dateFilter = weekAgo.toISOString();
-      } else if (period === "monthly") {
-        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-        dateFilter = monthAgo.toISOString();
-      }
+  useRealtime({ table: "user_levels", onUpdate: () => refetch?.() });
 
-      // Build query with optional date filter
-      let query = supabase.from("user_levels").select("*").order("total_xp", { ascending: false }).limit(50);
-      
-      if (dateFilter) {
-        query = query.gte("updated_at", dateFilter);
-      }
-      
-      const { data: levels, error } = await query;
-      if (error) throw error;
-      
-      // Buscar perfis dos usuários
-      const userIds = (levels || []).map((l) => l.user_id);
-      if (userIds.length === 0) return [];
-      
-      const { data: profiles } = await supabase.from("profiles").select("id, full_name, avatar_url").in("id", userIds);
-      
-      const profilesMap = new Map((profiles || []).map((p) => [p.id, p]));
-      
-      return (levels || []).map((l, idx) => {
-        const profile = profilesMap.get(l.user_id);
-        const name = profile?.full_name || `Usuário ${l.user_id.slice(0, 6)}`;
-        return {
-          id: l.user_id,
-          name,
-          avatar: name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase(),
-          xp: l.total_xp,
-          level: l.level,
-          streak: l.streak_days,
-          coins: l.coins,
-          position: idx + 1,
-        } as RankingUser;
-      });
-    },
-  });
+  const users: RankUser[] = useMemo(() => (leaderboard || []).map((u: any) => ({ id: u.user_id, name: u.full_name || "Usuário", avatar: u.avatar_url, xp: u.xp || 0, level: u.level || 1, streak: u.streak_days || 0, deliveries: u.total_deliveries || 0 })), [leaderboard]);
 
-  const top3 = ranking.slice(0, 3);
-  const rest = ranking.slice(3);
+  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(users, filterConfig);
+  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "xp", defaultDirection: "desc" });
+  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 10 });
+
+  const top3 = sortedData.slice(0, 3);
+  const SortIcon = ({ field }: { field: string }) => { const dir = getSortDirection(field as any); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
+
+  const podiumColors = ["from-amber-400 to-amber-600", "from-gray-300 to-gray-500", "from-amber-600 to-amber-800"];
+  const podiumIcons = [Crown, Medal, Award];
 
   return (
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-display text-foreground flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-500/10"><Trophy className="w-6 h-6 text-amber-500" /></div>
-              Ranking
-            </h1>
-            <p className="text-muted-foreground mt-1">Os melhores colaboradores por XP</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant={period === "weekly" ? "default" : "outline"} size="sm" onClick={() => setPeriod("weekly")}>Semana</Button>
-            <Button variant={period === "monthly" ? "default" : "outline"} size="sm" onClick={() => setPeriod("monthly")}>Mês</Button>
-            <Button variant={period === "all" ? "default" : "outline"} size="sm" onClick={() => setPeriod("all")}>Geral</Button>
-          </div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10"><Trophy className="w-6 h-6 text-amber-500" /></div>Ranking</h1><p className="text-muted-foreground mt-1">Top operadores por XP e entregas</p></div>
+          <Tabs value={period} onValueChange={(v) => setPeriod(v as any)}><TabsList><TabsTrigger value="weekly">Semanal</TabsTrigger><TabsTrigger value="monthly">Mensal</TabsTrigger><TabsTrigger value="all">Geral</TabsTrigger></TabsList></Tabs>
         </div>
 
-        {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
-
-        {!isLoading && ranking.length === 0 && (
-          <Card><CardContent className="flex flex-col items-center py-12"><Users className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum usuário no ranking ainda</p><p className="text-sm text-muted-foreground mt-1">Complete atividades para ganhar XP!</p></CardContent></Card>
-        )}
-
-        {!isLoading && ranking.length > 0 && (
-          <>
-            {/* Pódio */}
-            <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><Trophy className="w-5 h-5 text-amber-500" />Pódio</CardTitle></CardHeader>
-              <CardContent>
-                <div className="flex justify-center items-end gap-4 py-4">
-                  {top3[1] && <PodiumPlace user={top3[1]} place={2} delay={0.1} />}
-                  {top3[0] && <PodiumPlace user={top3[0]} place={1} delay={0} />}
-                  {top3[2] && <PodiumPlace user={top3[2]} place={3} delay={0.2} />}
+        {isLoading ? <Loader2 className="w-8 h-8 animate-spin mx-auto" /> : top3.length > 0 && (
+          <div className="flex items-end justify-center gap-4 py-8">
+            {[1, 0, 2].map((pos) => {
+              const user = top3[pos];
+              if (!user) return null;
+              const Icon = podiumIcons[pos];
+              return (
+                <div key={pos} className={cn("text-center", pos === 0 && "order-2", pos === 1 && "order-1", pos === 2 && "order-3")}>
+                  <div className={cn("w-20 h-20 rounded-full bg-gradient-to-br flex items-center justify-center mx-auto mb-2", podiumColors[pos])}>{user.avatar ? <img src={user.avatar} className="w-16 h-16 rounded-full" /> : <Icon className="w-8 h-8 text-white" />}</div>
+                  <p className="font-bold">{user.name}</p>
+                  <p className="text-sm text-muted-foreground">{user.xp.toLocaleString()} XP</p>
+                  <div className={cn("w-16 mx-auto mt-2 rounded-t-lg flex items-center justify-center text-white font-bold", pos === 0 ? "h-24 bg-amber-500" : pos === 1 ? "h-16 bg-gray-400" : "h-12 bg-amber-700")}>{pos + 1}º</div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Stats dos Top 3 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {top3.map((user, idx) => (
-                <motion.div key={user.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + idx * 0.1 }}>
-                  <Card className={idx === 0 ? "border-amber-500/30 bg-amber-500/5" : ""}>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${idx === 0 ? "bg-gradient-to-br from-amber-400 to-amber-600" : idx === 1 ? "bg-gradient-to-br from-slate-300 to-slate-500" : "bg-gradient-to-br from-orange-400 to-orange-600"}`}>{user.avatar}</div>
-                        <div className="flex-1 min-w-0"><p className="font-semibold truncate">{user.name}</p><p className="text-sm text-muted-foreground">{user.xp.toLocaleString()} XP</p></div>
-                        <Badge variant="outline" className={idx === 0 ? "bg-amber-500/10 text-amber-600" : ""}>{user.position}º</Badge>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 mt-4">
-                        <div className="text-center p-2 bg-muted/50 rounded"><Star className="w-4 h-4 mx-auto text-amber-500 mb-1" /><p className="text-sm font-medium">Nv. {user.level}</p></div>
-                        <div className="text-center p-2 bg-muted/50 rounded"><Flame className="w-4 h-4 mx-auto text-orange-500 mb-1" /><p className="text-sm font-medium">{user.streak} dias</p></div>
-                        <div className="text-center p-2 bg-muted/50 rounded"><Package className="w-4 h-4 mx-auto text-primary mb-1" /><p className="text-sm font-medium">{user.coins} 🪙</p></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Tabela completa */}
-            {rest.length > 0 && (
-              <Card>
-                <CardHeader><CardTitle>Classificação Completa</CardTitle></CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow><TableHead className="w-16">#</TableHead><TableHead>Usuário</TableHead><TableHead className="text-right">XP</TableHead><TableHead className="text-right">Nível</TableHead><TableHead className="text-right">Streak</TableHead><TableHead className="text-right">Moedas</TableHead></TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {rest.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.position}º</TableCell>
-                          <TableCell><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium">{user.avatar}</div><span>{user.name}</span></div></TableCell>
-                          <TableCell className="text-right font-medium">{user.xp.toLocaleString()}</TableCell>
-                          <TableCell className="text-right"><Badge variant="outline">Nv. {user.level}</Badge></TableCell>
-                          <TableCell className="text-right"><div className="flex items-center justify-end gap-1"><Flame className="w-4 h-4 text-orange-500" />{user.streak}</div></TableCell>
-                          <TableCell className="text-right">{user.coins} 🪙</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
-          </>
+              );
+            })}
+          </div>
         )}
+
+        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar usuário..." filters={[{ key: "level", label: "Nível mín.", type: "select", value: filters.level as string || "", options: [{ value: "", label: "Todos" }, { value: "5", label: "5+" }, { value: "10", label: "10+" }, { value: "20", label: "20+" }], onChange: (v) => setFilter("level", v || undefined) }]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("xp")} className="gap-1">XP <SortIcon field="xp" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("deliveries")} className="gap-1">Entregas <SortIcon field="deliveries" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("streak")} className="gap-1">Streak <SortIcon field="streak" /></Button></div>
+
+        <div className="space-y-2">{paginatedData.map((user, i) => {
+          const rank = sortedData.indexOf(user) + 1;
+          return (
+            <div key={user.id} className="card-interactive flex items-center gap-4">
+              <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold", rank <= 3 ? "bg-amber-100 text-amber-700" : "bg-muted")}>{rank}</div>
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">{user.avatar ? <img src={user.avatar} className="w-10 h-10 rounded-full" /> : <span className="text-lg font-bold">{user.name.charAt(0)}</span>}</div>
+              <div className="flex-1"><p className="font-semibold">{user.name}</p><div className="flex items-center gap-2 text-sm text-muted-foreground"><Badge variant="outline">Nível {user.level}</Badge>{user.streak > 0 && <span className="flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500" />{user.streak} dias</span>}</div></div>
+              <div className="text-right"><p className="text-lg font-bold text-primary">{user.xp.toLocaleString()} XP</p><p className="text-sm text-muted-foreground">{user.deliveries} entregas</p></div>
+            </div>
+          );
+        })}</div>
+
+        {sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
       </div>
     </MainLayout>
   );
