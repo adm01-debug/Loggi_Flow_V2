@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Building2, Plus, Search, Phone, Mail, MapPin, Package, MoreVertical, Eye, Edit, Trash2, TrendingUp, Clock, Loader2, AlertCircle, User, FileText } from "lucide-react";
+import { Building2, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, TrendingUp, Clock, Loader2, AlertCircle, User, FileText, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -15,6 +16,14 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+// Importar novos hooks e componentes
+import { Pagination } from "@/components/common/Pagination";
+import { FilterBar } from "@/components/common/FilterBar";
+import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { usePagination } from "@/hooks/usePagination";
+import { useFilters, FilterConfig } from "@/hooks/useFilters";
+import { useSorting } from "@/hooks/useSorting";
 
 interface Fornecedor {
   id: string; razao_social: string; nome_fantasia: string | null; cnpj: string | null;
@@ -26,10 +35,13 @@ interface Fornecedor {
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", endereco_completo: "", cidade: "", estado: "", cep: "", contato_nome: "", contato_email: "", contato_telefone: "" };
 
+const filterConfig: FilterConfig<Fornecedor>[] = [
+  { key: "search", type: "search", fields: ["razao_social", "nome_fantasia", "cnpj", "cidade", "contato_nome"] },
+  { key: "estado", type: "select", field: "estado", options: UFS.map(uf => ({ value: uf, label: uf })) }
+];
+
 export default function Fornecedores() {
   const qc = useQueryClient();
-  const [search, setSearch] = useState("");
-  const [ufFilter, setUfFilter] = useState("all");
   const [dlgCreate, setDlgCreate] = useState(false);
   const [dlgEdit, setDlgEdit] = useState(false);
   const [dlgView, setDlgView] = useState(false);
@@ -52,6 +64,12 @@ export default function Fornecedores() {
     },
   });
 
+  // Hooks de filtros, ordenação e paginação
+  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(list, filterConfig);
+  const { sortedData, sortState, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "razao_social", defaultDirection: "asc" });
+  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 12 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
+
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
       const { error } = await supabase.from("fornecedores").insert({ razao_social: d.razao_social, nome_fantasia: d.nome_fantasia || null, cnpj: d.cnpj || null, endereco_completo: d.endereco_completo, cidade: d.cidade || null, estado: d.estado || null, cep: d.cep || null, contato_nome: d.contato_nome || null, contato_email: d.contato_email || null, contato_telefone: d.contato_telefone || null });
@@ -66,27 +84,32 @@ export default function Fornecedores() {
       const { error } = await supabase.from("fornecedores").update({ razao_social: d.razao_social, nome_fantasia: d.nome_fantasia || null, cnpj: d.cnpj || null, endereco_completo: d.endereco_completo, cidade: d.cidade || null, estado: d.estado || null, cep: d.cep || null, contato_nome: d.contato_nome || null, contato_email: d.contato_email || null, contato_telefone: d.contato_telefone || null }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); setDlgEdit(false); toast.success("Atualizado!"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); setDlgEdit(false); setSel(null); toast.success("Fornecedor atualizado!"); },
     onError: (e) => toast.error("Erro: " + e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: async (id: string) => { const { error } = await supabase.from("fornecedores").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); setDlgDel(false); toast.success("Excluído!"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); setDlgDel(false); setSel(null); toast.success("Fornecedor excluído!"); },
     onError: (e) => toast.error("Erro: " + e.message),
   });
 
-  const filtered = list.filter((f) => {
-    const s = search.toLowerCase();
-    const ok = f.razao_social.toLowerCase().includes(s) || f.nome_fantasia?.toLowerCase().includes(s) || f.cnpj?.includes(s) || f.cidade?.toLowerCase().includes(s);
-    return ok && (ufFilter === "all" || f.estado === ufFilter);
+  const bulkDeleteMut = useMutation({
+    mutationFn: async (ids: string[]) => { const { error } = await supabase.from("fornecedores").delete().in("id", ids); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); clearSelection(); toast.success(`${selectedIds.length} fornecedor(es) excluído(s)!`); },
+    onError: (e) => toast.error("Erro: " + e.message),
   });
 
-  const stats = { total: list.length, com: list.filter((f) => (f.total_coletas || 0) > 0).length, pend: list.reduce((a, f) => a + (f.coletas_pendentes || 0), 0), tot: list.reduce((a, f) => a + (f.total_coletas || 0), 0) };
-
   const openEdit = (f: Fornecedor) => { setSel(f); setForm({ razao_social: f.razao_social, nome_fantasia: f.nome_fantasia || "", cnpj: f.cnpj || "", endereco_completo: f.endereco_completo, cidade: f.cidade || "", estado: f.estado || "", cep: f.cep || "", contato_nome: f.contato_nome || "", contato_email: f.contato_email || "", contato_telefone: f.contato_telefone || "" }); setDlgEdit(true); };
-  const fmtDate = (d: string | null) => d ? format(new Date(d), "dd/MM/yyyy", { locale: ptBR }) : "-";
+
+  const stats = { total: list.length, com: list.filter((f) => (f.total_coletas || 0) > 0).length, pend: list.filter((f) => (f.coletas_pendentes || 0) > 0).length, tot: list.reduce((a, f) => a + (f.total_coletas || 0), 0) };
   const fmtCNPJ = (c: string) => { const n = c.replace(/\D/g, ""); return n.length === 14 ? n.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5") : c; };
+
+  const SortIcon = ({ field }: { field: keyof Fornecedor }) => {
+    const dir = getSortDirection(field);
+    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
+    return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
+  };
 
   if (error) return <MainLayout><div className="flex flex-col items-center py-12"><AlertCircle className="w-12 h-12 text-destructive mb-4" /><p className="text-destructive">Erro: {error.message}</p></div></MainLayout>;
 
@@ -104,41 +127,65 @@ export default function Fornecedores() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-info/20 to-info/10"><Building2 className="w-6 h-6 text-info" /></div>Fornecedores</h1><p className="text-muted-foreground mt-1">Gerencie seus fornecedores</p></div>
+          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Building2 className="w-6 h-6 text-primary" /></div>Fornecedores</h1><p className="text-muted-foreground mt-1">Gerencie seus fornecedores</p></div>
           <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Building2 className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
+          <div className="stat-card text-center"><Building2 className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
           <div className="stat-card text-center"><Package className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.com}</p><p className="text-xs text-muted-foreground">Com Coletas</p></div>
           <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pend}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-          <div className="stat-card text-center"><TrendingUp className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.tot}</p><p className="text-xs text-muted-foreground">Total Coletas</p></div>
+          <div className="stat-card text-center"><TrendingUp className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.tot}</p><p className="text-xs text-muted-foreground">Total Coletas</p></div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" /></div><Select value={ufFilter} onValueChange={setUfFilter}><SelectTrigger className="w-full md:w-[140px]"><SelectValue placeholder="Estado" /></SelectTrigger><SelectContent><SelectItem value="all">Todos</SelectItem>{UFS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select></div>
+        <FilterBar
+          searchValue={filters.search as string || ""}
+          onSearchChange={(value) => setFilter("search", value)}
+          searchPlaceholder="Buscar por nome, CNPJ, cidade..."
+          filters={[{ key: "estado", label: "Estado", type: "select", value: filters.estado as string || "", options: [{ value: "", label: "Todos" }, ...UFS.map(uf => ({ value: uf, label: uf }))], onChange: (value) => setFilter("estado", value || undefined) }]}
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+          totalCount={sortedData.length}
+          filteredCount={sortedData.length}
+        />
+
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Ordenar por:</span>
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("razao_social")} className="gap-1">Nome <SortIcon field="razao_social" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("cidade")} className="gap-1">Cidade <SortIcon field="cidade" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("total_coletas")} className="gap-1">Coletas <SortIcon field="total_coletas" /></Button>
+        </div>
+
+        {selectedIds.length > 0 && (
+          <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll}
+            actions={[{ id: "delete", label: "Excluir Selecionados", icon: Trash2, variant: "destructive", onClick: (ids) => bulkDeleteMut.mutate(ids) }]} />
+        )}
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
         {!isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((f, i) => (
-            <div key={f.id} className="card-interactive animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="flex items-start justify-between mb-4"><div className="flex-1 min-w-0"><p className="font-semibold text-lg truncate">{f.nome_fantasia || f.razao_social}</p>{f.nome_fantasia && <p className="text-xs text-muted-foreground truncate">{f.razao_social}</p>}</div>
+          {paginatedData.map((f, i) => (
+            <div key={f.id} className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+              <div className="flex items-start gap-3 mb-4">
+                <Checkbox checked={isSelected(f.id)} onCheckedChange={() => toggle(f.id)} className="mt-1" />
+                <div className="flex-1 min-w-0"><p className="font-semibold text-lg truncate">{f.nome_fantasia || f.razao_social}</p>{f.nome_fantasia && <p className="text-xs text-muted-foreground truncate">{f.razao_social}</p>}</div>
                 <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(f); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => openEdit(f)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(f); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
               </div>
               <div className="space-y-2 text-sm">{f.cnpj && <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /><span className="font-mono">{fmtCNPJ(f.cnpj)}</span></div>}{f.contato_nome && <div className="flex items-center gap-2"><User className="w-4 h-4 text-muted-foreground" />{f.contato_nome}</div>}{f.contato_telefone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-4 h-4" />{f.contato_telefone}</div>}<div className="flex items-start gap-2 text-muted-foreground"><MapPin className="w-4 h-4 mt-0.5" /><div><p className="line-clamp-2">{f.endereco_completo}</p>{f.cidade && <p className="font-medium text-foreground">{f.cidade} - {f.estado}</p>}</div></div></div>
-              <div className="flex items-center justify-between mt-4 pt-4 border-t"><div className="flex items-center gap-2"><Package className="w-4 h-4 text-muted-foreground" /><span className="font-medium">{f.total_coletas || 0}</span>{(f.coletas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{f.coletas_pendentes}</Badge>}</div></div>
+              <div className="flex items-center justify-between mt-4 pt-4 border-t"><div className="flex items-center gap-2"><Package className="w-4 h-4 text-muted-foreground" /><span className="font-medium">{f.total_coletas || 0}</span>{(f.coletas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{f.coletas_pendentes} pend.</Badge>}</div>{f.ultima_coleta && <span className="text-xs text-muted-foreground">{format(new Date(f.ultima_coleta), "dd/MM/yy", { locale: ptBR })}</span>}</div>
             </div>
           ))}
         </div>}
 
-        {!isLoading && filtered.length === 0 && <div className="card-base flex flex-col items-center py-12"><Building2 className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum fornecedor</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
+        {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Building2 className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum fornecedor</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
+
+        {!isLoading && sortedData.length > 0 && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />
+        )}
 
         <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Novo Fornecedor</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.razao_social || !form.endereco_completo || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar</Button></DialogFooter></DialogContent></Dialog>
-
         <Dialog open={dlgEdit} onOpenChange={setDlgEdit}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Fornecedor</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgEdit(false)}>Cancelar</Button><Button onClick={() => sel && updateMut.mutate({ id: sel.id, d: form })} disabled={!form.razao_social || !form.endereco_completo || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
-
-        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4 py-4">{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}<div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="text-sm">{sel.cidade} - {sel.estado}</p>}</div><div className="border-t pt-4 grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Contato</p><p>{sel.contato_nome || "-"}</p></div><div><p className="text-sm text-muted-foreground">Tel</p><p>{sel.contato_telefone || "-"}</p></div><div className="col-span-2"><p className="text-sm text-muted-foreground">Email</p><p>{sel.contato_email || "-"}</p></div></div><div className="border-t pt-4 grid grid-cols-3 gap-2 text-center"><div className="p-2 bg-muted/50 rounded"><p className="text-xl font-bold">{sel.total_coletas || 0}</p><p className="text-xs">Total</p></div><div className="p-2 bg-warning/10 rounded"><p className="text-xl font-bold text-warning">{sel.coletas_pendentes || 0}</p><p className="text-xs">Pend.</p></div><div className="p-2 bg-muted/50 rounded"><p className="text-sm">{fmtDate(sel.ultima_coleta)}</p><p className="text-xs">Última</p></div></div></div>}<DialogFooter><Button variant="outline" onClick={() => setDlgView(false)}>Fechar</Button><Button onClick={() => { setDlgView(false); sel && openEdit(sel); }}>Editar</Button></DialogFooter></DialogContent></Dialog>
-
+        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4 py-4">{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}<div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="text-sm">{sel.cidade} - {sel.estado}</p>}</div><div className="border-t pt-4 grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Contato</p><p>{sel.contato_nome || "-"}</p></div><div><p className="text-sm text-muted-foreground">Tel</p><p>{sel.contato_telefone || "-"}</p></div></div><div className="border-t pt-4 grid grid-cols-2 gap-4 text-center"><div className="p-2 bg-muted/50 rounded"><p className="text-xl font-bold">{sel.total_coletas || 0}</p><p className="text-xs">Total</p></div><div className="p-2 bg-warning/10 rounded"><p className="text-xl font-bold text-warning">{sel.coletas_pendentes || 0}</p><p className="text-xs">Pend.</p></div></div></div>}<DialogFooter><Button variant="outline" onClick={() => setDlgView(false)}>Fechar</Button><Button onClick={() => { setDlgView(false); sel && openEdit(sel); }}>Editar</Button></DialogFooter></DialogContent></Dialog>
         <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir?</AlertDialogTitle><AlertDialogDescription>Excluir "{sel?.nome_fantasia || sel?.razao_social}"?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Não</AlertDialogCancel><AlertDialogAction className="bg-destructive" onClick={() => sel && deleteMut.mutate(sel.id)}>{deleteMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Sim</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
     </MainLayout>
