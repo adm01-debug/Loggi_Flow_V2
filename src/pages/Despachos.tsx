@@ -2,8 +2,7 @@ import { useState, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Truck, Clock, CheckCircle2, AlertTriangle, Plus, Loader2, RefreshCw, ArrowRight } from "lucide-react";
+import { Package, Truck, Clock, CheckCircle2, Plus, Loader2, RefreshCw, ArrowRight } from "lucide-react";
 import { useRealtime } from "@/hooks/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
@@ -13,10 +12,21 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface Despacho { id: string; numero: string; cliente: string; destino: string; status: string; transportadora?: string; created_at: string; }
 
-const filterConfig: FilterConfig<Despacho>[] = [
-  { key: "search", type: "search", fields: ["numero", "cliente", "destino"] },
-  { key: "status", type: "select", field: "status", options: [{ value: "aguardando", label: "Aguardando" }, { value: "em_separacao", label: "Em Separação" }, { value: "pronto", label: "Pronto" }, { value: "despachado", label: "Despachado" }] }
-];
+const filterConfig: FilterConfig<Despacho> = {
+  search: {
+    fields: ["numero", "cliente", "destino"],
+    placeholder: "Buscar despacho..."
+  },
+  status: {
+    field: "status",
+    options: [
+      { value: "aguardando", label: "Aguardando" },
+      { value: "em_separacao", label: "Em Separação" },
+      { value: "pronto", label: "Pronto" },
+      { value: "despachado", label: "Despachado" }
+    ]
+  }
+};
 
 const statusConfig: Record<string, { color: string; icon: any }> = {
   aguardando: { color: "bg-gray-100 text-gray-700", icon: Clock },
@@ -40,7 +50,7 @@ export default function Despachos() {
 
   useRealtime({ table: "entregas", onInsert: () => refetch(), onUpdate: () => refetch() });
 
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(despachos, filterConfig);
+  const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(despachos, filterConfig);
 
   const columns = ["aguardando", "em_separacao", "pronto", "despachado"];
   const getColumnItems = (status: string) => filteredData.filter(d => d.status === status);
@@ -48,7 +58,7 @@ export default function Despachos() {
 
   const moveToNext = async (item: Despacho) => {
     const idx = columns.indexOf(item.status);
-    if (idx < columns.length - 1) {
+    if (idx < columns.length - 1 && idx >= 0) {
       const nextStatus = columns[idx + 1];
       await supabase.from("entregas").update({ status: nextStatus }).eq("id", item.id);
       refetch();
@@ -68,7 +78,18 @@ export default function Despachos() {
           <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pronto}</p><p className="text-xs text-muted-foreground">Prontos</p></div>
           <div className="stat-card text-center"><Truck className="w-5 h-5 text-blue-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.despachado}</p><p className="text-xs text-muted-foreground">Despachados</p></div>
         </div>
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar despacho..." filters={[]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={filteredData.length} filteredCount={filteredData.length} />
+        <FilterBar 
+          search={filters.search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Buscar despacho..."
+          status={filters.status}
+          onStatusChange={setStatus}
+          statusOptions={filterConfig.status?.options}
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={clearFilters}
+          totalFiltered={totalFiltered}
+          totalOriginal={totalOriginal}
+        />
         {isLoading ? <Loader2 className="w-8 h-8 animate-spin mx-auto" /> : (
           <div className="grid grid-cols-4 gap-4">
             {columns.map((col) => {

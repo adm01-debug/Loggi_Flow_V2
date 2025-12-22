@@ -35,10 +35,19 @@ interface Fornecedor {
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", endereco_completo: "", cidade: "", estado: "", cep: "", contato_nome: "", contato_email: "", contato_telefone: "" };
 
-const filterConfig: FilterConfig<Fornecedor>[] = [
-  { key: "search", type: "search", fields: ["razao_social", "nome_fantasia", "cnpj", "cidade", "contato_nome"] },
-  { key: "estado", type: "select", field: "estado", options: UFS.map(uf => ({ value: uf, label: uf })) }
-];
+const filterConfig: FilterConfig<Fornecedor> = {
+  search: {
+    fields: ["razao_social", "nome_fantasia", "cnpj", "cidade", "contato_nome"],
+    placeholder: "Buscar por nome, CNPJ, cidade..."
+  },
+  select: {
+    estado: {
+      field: "estado",
+      options: UFS.map(uf => ({ value: uf, label: uf })),
+      label: "Estado"
+    }
+  }
+};
 
 export default function Fornecedores() {
   const qc = useQueryClient();
@@ -65,10 +74,10 @@ export default function Fornecedores() {
   });
 
   // Hooks de filtros, ordenação e paginação
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(list, filterConfig);
-  const { sortedData, sortState, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "razao_social", defaultDirection: "asc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 12 });
-  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
+  const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(list, filterConfig);
+  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "razao_social", defaultDirection: "asc" });
+  const pagination = usePagination(sortedData, { initialPageSize: 12 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
 
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
@@ -139,14 +148,22 @@ export default function Fornecedores() {
         </div>
 
         <FilterBar
-          searchValue={filters.search as string || ""}
-          onSearchChange={(value) => setFilter("search", value)}
+          search={filters.search}
+          onSearchChange={setSearch}
           searchPlaceholder="Buscar por nome, CNPJ, cidade..."
-          filters={[{ key: "estado", label: "Estado", type: "select", value: filters.estado as string || "", options: [{ value: "", label: "Todos" }, ...UFS.map(uf => ({ value: uf, label: uf }))], onChange: (value) => setFilter("estado", value || undefined) }]}
-          onClearFilters={clearFilters}
+          extraFilters={[
+            {
+              key: "estado",
+              value: (filters.estado as string) || "",
+              onChange: (value) => setFilter("estado", value || undefined),
+              options: UFS.map(uf => ({ value: uf, label: uf })),
+              label: "Estado"
+            }
+          ]}
           hasActiveFilters={hasActiveFilters}
-          totalCount={sortedData.length}
-          filteredCount={sortedData.length}
+          onClearFilters={clearFilters}
+          totalFiltered={totalFiltered}
+          totalOriginal={totalOriginal}
         />
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -157,14 +174,14 @@ export default function Fornecedores() {
         </div>
 
         {selectedIds.length > 0 && (
-          <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll}
+          <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll}
             actions={[{ id: "delete", label: "Excluir Selecionados", icon: Trash2, variant: "destructive", onClick: (ids) => bulkDeleteMut.mutate(ids) }]} />
         )}
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
         {!isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginatedData.map((f, i) => (
+          {pagination.paginatedData.map((f, i) => (
             <div key={f.id} className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
               <div className="flex items-start gap-3 mb-4">
                 <Checkbox checked={isSelected(f.id)} onCheckedChange={() => toggle(f.id)} className="mt-1" />
@@ -180,13 +197,29 @@ export default function Fornecedores() {
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Building2 className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum fornecedor</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
 
         {!isLoading && sortedData.length > 0 && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={pagination.pageSize}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+          />
         )}
 
         <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Novo Fornecedor</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.razao_social || !form.endereco_completo || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar</Button></DialogFooter></DialogContent></Dialog>
         <Dialog open={dlgEdit} onOpenChange={setDlgEdit}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Fornecedor</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgEdit(false)}>Cancelar</Button><Button onClick={() => sel && updateMut.mutate({ id: sel.id, d: form })} disabled={!form.razao_social || !form.endereco_completo || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
-        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4 py-4">{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}<div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="text-sm">{sel.cidade} - {sel.estado}</p>}</div><div className="border-t pt-4 grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Contato</p><p>{sel.contato_nome || "-"}</p></div><div><p className="text-sm text-muted-foreground">Tel</p><p>{sel.contato_telefone || "-"}</p></div></div><div className="border-t pt-4 grid grid-cols-2 gap-4 text-center"><div className="p-2 bg-muted/50 rounded"><p className="text-xl font-bold">{sel.total_coletas || 0}</p><p className="text-xs">Total</p></div><div className="p-2 bg-warning/10 rounded"><p className="text-xl font-bold text-warning">{sel.coletas_pendentes || 0}</p><p className="text-xs">Pend.</p></div></div></div>}<DialogFooter><Button variant="outline" onClick={() => setDlgView(false)}>Fechar</Button><Button onClick={() => { setDlgView(false); sel && openEdit(sel); }}>Editar</Button></DialogFooter></DialogContent></Dialog>
-        <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir?</AlertDialogTitle><AlertDialogDescription>Excluir "{sel?.nome_fantasia || sel?.razao_social}"?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Não</AlertDialogCancel><AlertDialogAction className="bg-destructive" onClick={() => sel && deleteMut.mutate(sel.id)}>{deleteMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Sim</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>Detalhes do Fornecedor</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><p className="text-lg font-semibold">{sel.nome_fantasia || sel.razao_social}</p>{sel.cnpj && <p className="font-mono">{fmtCNPJ(sel.cnpj)}</p>}<div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p></div><div><p className="text-muted-foreground">Cidade/UF</p><p>{sel.cidade} - {sel.estado}</p></div></div>{sel.contato_nome && <div className="text-sm"><p className="text-muted-foreground">Contato</p><p>{sel.contato_nome} - {sel.contato_telefone}</p></div>}</div>}</DialogContent></Dialog>
+        <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir fornecedor?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
     </MainLayout>
   );
