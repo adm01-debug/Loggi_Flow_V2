@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Phone, Calendar, MoreVertical, ExternalLink, Building2, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, MoreVertical, Building2, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-// Novos imports
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
@@ -50,11 +49,24 @@ const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: a
   finalizada: { label: "Finalizada", color: "bg-emerald-100 text-emerald-800", icon: CheckCircle2 },
 };
 
-const filterConfig: FilterConfig<Coleta>[] = [
-  { key: "search", type: "search", fields: ["numero_coleta", "endereco_coleta", "observacoes"] },
-  { key: "status", type: "select", field: "status", options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label })) },
-  { key: "tipo", type: "select", field: "tipo_coleta", options: [{ value: "lalamove", label: "Lalamove" }, { value: "transportadora", label: "Transportadora" }] }
-];
+const filterConfig: FilterConfig<Coleta> = {
+  search: {
+    fields: ["numero_coleta", "endereco_coleta", "observacoes"],
+    placeholder: "Buscar coletas..."
+  },
+  status: {
+    field: "status",
+    options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label })),
+    label: "Status"
+  },
+  select: {
+    tipo: {
+      field: "tipo_coleta",
+      options: [{ value: "lalamove", label: "Lalamove" }, { value: "transportadora", label: "Transportadora" }],
+      label: "Tipo"
+    }
+  }
+};
 
 export default function Coletas() {
   const { toast } = useToast();
@@ -70,10 +82,10 @@ export default function Coletas() {
   const [formData, setFormData] = useState({ fornecedor_id: "", tipo_coleta: "lalamove" as ColetaTipo, transportadora_id: "", endereco_coleta: "", contato_coleta: "", data_prevista_coleta: "", qtd_volumes: "", peso_estimado_kg: "", observacoes: "" });
 
   // Hooks de filtros, ordenação e paginação
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(coletas, filterConfig);
+  const { filteredData, filters, setSearch, setStatus, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(coletas, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 10 });
-  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
+  const pagination = usePagination(sortedData, { initialPageSize: 10 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
   const { history } = useEntityHistory({ entityType: "coleta", entityId: sel?.id || "" });
 
   useEffect(() => { fetchData(); }, []);
@@ -124,6 +136,17 @@ export default function Coletas() {
     else { toast({ title: "Sucesso", description: `${ids.length} coleta(s) atualizada(s)!` }); clearSelection(); fetchData(); }
   };
 
+  // Preparar dados para exportação
+  const exportData = coletas.map(c => ({
+    numero_coleta: c.numero_coleta,
+    status: statusConfig[c.status]?.label || c.status,
+    tipo: c.tipo_coleta,
+    endereco: c.endereco_coleta,
+    data_prevista: c.data_prevista_coleta,
+    volumes: c.qtd_volumes,
+    peso_kg: c.peso_estimado_kg
+  }));
+
   const stats = { total: coletas.length, aguardando: coletas.filter(c => c.status === "aguardando_liberacao").length, transito: coletas.filter(c => c.status === "em_transito").length, finalizadas: coletas.filter(c => c.status === "finalizada").length };
   const SortIcon = ({ field }: { field: keyof Coleta }) => { const dir = getSortDirection(field); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
 
@@ -133,7 +156,7 @@ export default function Coletas() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/10"><Package className="w-6 h-6 text-blue-600" /></div>Coletas</h1><p className="text-muted-foreground mt-1">Gerencie coletas de fornecedores</p></div>
           <div className="flex gap-2">
-            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(coletas, "coletas")}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(coletas, "coletas")}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(exportData, { filename: "coletas" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(exportData, { filename: "coletas" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger>
               <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Coleta</DialogTitle></DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -158,19 +181,30 @@ export default function Coletas() {
           <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.finalizadas}</p><p className="text-xs text-muted-foreground">Finalizadas</p></div>
         </div>
 
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar coletas..." 
-          filters={[
-            { key: "status", label: "Status", type: "select", value: filters.status as string || "", options: [{ value: "", label: "Todos" }, ...Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label }))], onChange: (v) => setFilter("status", v || undefined) },
-            { key: "tipo", label: "Tipo", type: "select", value: filters.tipo as string || "", options: [{ value: "", label: "Todos" }, { value: "lalamove", label: "Lalamove" }, { value: "transportadora", label: "Transportadora" }], onChange: (v) => setFilter("tipo", v || undefined) }
-          ]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <FilterBar 
+          search={filters.search} 
+          onSearchChange={setSearch} 
+          searchPlaceholder="Buscar coletas..." 
+          status={filters.status}
+          onStatusChange={setStatus}
+          statusOptions={Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label }))}
+          statusLabel="Status"
+          extraFilters={[
+            { key: "tipo", label: "Tipo", value: filters.tipo as string || "all", options: [{ value: "lalamove", label: "Lalamove" }, { value: "transportadora", label: "Transportadora" }], onChange: (v) => setFilter("tipo", v === "all" ? undefined : v) }
+          ]} 
+          onClearFilters={clearFilters} 
+          hasActiveFilters={hasActiveFilters} 
+          totalFiltered={totalFiltered} 
+          totalOriginal={totalOriginal} 
+        />
 
         <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">Data <SortIcon field="created_at" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("status")} className="gap-1">Status <SortIcon field="status" /></Button></div>
 
-        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "finalizar", label: "Finalizar", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "finalizada") }]} />}
+        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "finalizar", label: "Finalizar", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "finalizada") }]} />}
 
         {loading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!loading && <div className="space-y-3">{paginatedData.map((coleta, i) => { const config = statusConfig[coleta.status]; const StatusIcon = config.icon; return (
+        {!loading && <div className="space-y-3">{pagination.paginatedData.map((coleta, i) => { const config = statusConfig[coleta.status]; const StatusIcon = config.icon; return (
           <Card key={coleta.id} className={`animate-fade-in ${isSelected(coleta.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
@@ -190,13 +224,50 @@ export default function Coletas() {
               </div>
             </CardContent>
           </Card>
-        ); })}</div>}
+        )})}</div>}
 
-        {!loading && sortedData.length === 0 && <Card><CardContent className="flex flex-col items-center py-12"><Package className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma coleta</p></CardContent></Card>}
-        {!loading && sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
+        {!loading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Package className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma coleta</p></div>}
 
-        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>Detalhes da Coleta</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="flex items-center gap-3"><Badge className={statusConfig[sel.status].color}>{statusConfig[sel.status].label}</Badge><span className="font-semibold">{sel.numero_coleta}</span></div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Fornecedor</p><p>{sel.fornecedores?.nome_fantasia || sel.fornecedores?.razao_social || "-"}</p></div><div><p className="text-sm text-muted-foreground">Tipo</p><p>{sel.tipo_coleta}</p></div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_coleta}</p></div><div><p className="text-sm text-muted-foreground">Volumes</p><p>{sel.qtd_volumes || "-"}</p></div></div><div className="border-t pt-4"><p className="text-sm font-medium mb-2">Histórico</p><Timeline events={history.map(h => ({ id: h.id, title: h.title, description: h.description, timestamp: h.timestamp, status: h.status }))} /></div></div>}</DialogContent></Dialog>
+        {!loading && sortedData.length > 0 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+          />
+        )}
       </div>
+
+      {/* Dialog de detalhes */}
+      <Dialog open={dlgView} onOpenChange={setDlgView}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Detalhes da Coleta</DialogTitle></DialogHeader>
+          {sel && <div className="space-y-4">
+            <div className="flex items-center gap-2"><span className="font-semibold text-lg">{sel.numero_coleta}</span><Badge className={statusConfig[sel.status].color}>{statusConfig[sel.status].label}</Badge></div>
+            <div className="grid gap-2 text-sm">
+              <div><span className="text-muted-foreground">Tipo:</span> {sel.tipo_coleta === "lalamove" ? "Lalamove" : "Transportadora"}</div>
+              <div><span className="text-muted-foreground">Endereço:</span> {sel.endereco_coleta}</div>
+              {sel.fornecedores && <div><span className="text-muted-foreground">Fornecedor:</span> {sel.fornecedores.nome_fantasia || sel.fornecedores.razao_social}</div>}
+              {sel.data_prevista_coleta && <div><span className="text-muted-foreground">Data Prevista:</span> {new Date(sel.data_prevista_coleta).toLocaleDateString()}</div>}
+              {sel.qtd_volumes && <div><span className="text-muted-foreground">Volumes:</span> {sel.qtd_volumes}</div>}
+              {sel.peso_estimado_kg && <div><span className="text-muted-foreground">Peso:</span> {sel.peso_estimado_kg} kg</div>}
+              {sel.observacoes && <div><span className="text-muted-foreground">Observações:</span> {sel.observacoes}</div>}
+            </div>
+            {history.length > 0 && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Histórico</p><Timeline events={history.map(h => ({ id: h.id, title: h.action, description: h.description || "", date: new Date(h.created_at), type: "default" as const }))} /></div>}
+          </div>}
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }

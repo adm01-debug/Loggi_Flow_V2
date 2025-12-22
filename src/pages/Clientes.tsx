@@ -17,13 +17,12 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-// Importar novos componentes e hooks
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
-import { useSorting, SortDirection } from "@/hooks/useSorting";
+import { useSorting } from "@/hooks/useSorting";
 
 interface Cliente {
   id: string; razao_social: string; nome_fantasia: string | null; cnpj: string | null;
@@ -36,11 +35,20 @@ interface Cliente {
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", endereco_completo: "", cidade: "", estado: "", cep: "", contato_nome: "", contato_email: "", contato_telefone: "", horario_entrega: "", restricoes_entrega: "" };
 
-// Configuração de filtros
-const filterConfig: FilterConfig<Cliente>[] = [
-  { key: "search", type: "search", fields: ["razao_social", "nome_fantasia", "cnpj", "cidade", "contato_nome"] },
-  { key: "estado", type: "select", field: "estado", options: UFS.map(uf => ({ value: uf, label: uf })) }
-];
+// Configuração de filtros - formato correto como objeto
+const filterConfig: FilterConfig<Cliente> = {
+  search: {
+    fields: ["razao_social", "nome_fantasia", "cnpj", "cidade", "contato_nome"],
+    placeholder: "Buscar por nome, CNPJ, cidade..."
+  },
+  select: {
+    estado: {
+      field: "estado",
+      options: UFS.map(uf => ({ value: uf, label: uf })),
+      label: "Estado"
+    }
+  }
+};
 
 export default function Clientes() {
   const qc = useQueryClient();
@@ -66,19 +74,19 @@ export default function Clientes() {
   });
 
   // Hook de Filtros
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(list, filterConfig);
+  const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(list, filterConfig);
   
   // Hook de Ordenação
-  const { sortedData, sortState, toggleSort, getSortDirection } = useSorting(filteredData, {
+  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, {
     defaultKey: "razao_social",
     defaultDirection: "asc"
   });
   
   // Hook de Paginação
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, nextPage, prevPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 12 });
+  const pagination = usePagination(sortedData, { initialPageSize: 12 });
   
   // Hook de Seleção para Bulk Actions
-  const { selectedIds, toggle, selectAll, clearSelection, isSelected, isAllSelected, isPartialSelected } = useSelection(paginatedData);
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected, isAllSelected, isPartialSelected } = useSelection(pagination.paginatedData);
 
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
@@ -107,7 +115,6 @@ export default function Clientes() {
     onError: (e) => toast.error("Erro ao excluir: " + e.message),
   });
 
-  // Bulk Delete
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
       const { error } = await supabase.from("clientes").delete().in("id", ids);
@@ -130,7 +137,6 @@ export default function Clientes() {
   const stats = { total: list.length, com: list.filter((c) => (c.total_entregas || 0) > 0).length, pend: list.filter((c) => (c.entregas_pendentes || 0) > 0).length, tot: list.reduce((a, c) => a + (c.total_entregas || 0), 0) };
   const fmtCNPJ = (c: string) => { const n = c.replace(/\D/g, ""); return n.length === 14 ? n.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5") : c; };
 
-  // Helper para renderizar ícone de ordenação
   const SortIcon = ({ field }: { field: keyof Cliente }) => {
     const dir = getSortDirection(field);
     if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
@@ -167,23 +173,22 @@ export default function Clientes() {
 
         {/* Barra de Filtros */}
         <FilterBar
-          searchValue={filters.search as string || ""}
-          onSearchChange={(value) => setFilter("search", value)}
+          search={filters.search}
+          onSearchChange={setSearch}
           searchPlaceholder="Buscar por nome, CNPJ, cidade..."
-          filters={[
+          extraFilters={[
             {
               key: "estado",
               label: "Estado",
-              type: "select",
-              value: filters.estado as string || "",
-              options: [{ value: "", label: "Todos" }, ...UFS.map(uf => ({ value: uf, label: uf }))],
-              onChange: (value) => setFilter("estado", value || undefined)
+              value: filters.estado as string || "all",
+              options: UFS.map(uf => ({ value: uf, label: uf })),
+              onChange: (value) => setFilter("estado", value === "all" ? undefined : value)
             }
           ]}
           onClearFilters={clearFilters}
           hasActiveFilters={hasActiveFilters}
-          totalCount={sortedData.length}
-          filteredCount={sortedData.length}
+          totalFiltered={totalFiltered}
+          totalOriginal={totalOriginal}
         />
 
         {/* Ordenação */}
@@ -204,7 +209,7 @@ export default function Clientes() {
         {selectedIds.length > 0 && (
           <BulkActions
             selectedIds={selectedIds}
-            totalCount={paginatedData.length}
+            totalCount={pagination.paginatedData.length}
             onClearSelection={clearSelection}
             onSelectAll={selectAll}
             actions={[
@@ -222,7 +227,7 @@ export default function Clientes() {
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
         {!isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginatedData.map((c, i) => (
+          {pagination.paginatedData.map((c, i) => (
             <div key={c.id} className={`card-interactive animate-fade-in ${isSelected(c.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
               <div className="flex items-start gap-3 mb-4">
                 <Checkbox
@@ -247,25 +252,33 @@ export default function Clientes() {
         {/* Paginação */}
         {!isLoading && sortedData.length > 0 && (
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            totalItems={sortedData.length}
-            onPageChange={goToPage}
-            onPageSizeChange={setPageSize}
-            hasNextPage={hasNextPage}
-            hasPrevPage={hasPrevPage}
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
           />
         )}
-
-        <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Novo Cliente</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.razao_social || !form.endereco_completo || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar</Button></DialogFooter></DialogContent></Dialog>
-
-        <Dialog open={dlgEdit} onOpenChange={setDlgEdit}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Cliente</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgEdit(false)}>Cancelar</Button><Button onClick={() => sel && updateMut.mutate({ id: sel.id, d: form })} disabled={!form.razao_social || !form.endereco_completo || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
-
-        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4 py-4">{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}<div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="text-sm">{sel.cidade} - {sel.estado}</p>}</div><div className="border-t pt-4 grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Contato</p><p>{sel.contato_nome || "-"}</p></div><div><p className="text-sm text-muted-foreground">Tel</p><p>{sel.contato_telefone || "-"}</p></div><div className="col-span-2"><p className="text-sm text-muted-foreground">Email</p><p>{sel.contato_email || "-"}</p></div></div>{(sel.horario_entrega || sel.restricoes_entrega) && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Preferências</p>{sel.horario_entrega && <p className="text-sm"><span className="text-muted-foreground">Horário:</span> {sel.horario_entrega}</p>}{sel.restricoes_entrega && <p className="text-sm mt-1"><span className="text-muted-foreground">Restrições:</span> {sel.restricoes_entrega}</p>}</div>}<div className="border-t pt-4 grid grid-cols-2 gap-4 text-center"><div className="p-2 bg-muted/50 rounded"><p className="text-xl font-bold">{sel.total_entregas || 0}</p><p className="text-xs">Total</p></div><div className="p-2 bg-warning/10 rounded"><p className="text-xl font-bold text-warning">{sel.entregas_pendentes || 0}</p><p className="text-xs">Pend.</p></div></div></div>}<DialogFooter><Button variant="outline" onClick={() => setDlgView(false)}>Fechar</Button><Button onClick={() => { setDlgView(false); sel && openEdit(sel); }}>Editar</Button></DialogFooter></DialogContent></Dialog>
-
-        <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir?</AlertDialogTitle><AlertDialogDescription>Excluir "{sel?.nome_fantasia || sel?.razao_social}"?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Não</AlertDialogCancel><AlertDialogAction className="bg-destructive" onClick={() => sel && deleteMut.mutate(sel.id)}>{deleteMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Sim</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
+
+      {/* Dialogs */}
+      <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Novo Cliente</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.razao_social || !form.endereco_completo || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar</Button></DialogFooter></DialogContent></Dialog>
+
+      <Dialog open={dlgEdit} onOpenChange={setDlgEdit}><DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Cliente</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDlgEdit(false)}>Cancelar</Button><Button onClick={() => sel && updateMut.mutate({ id: sel.id, d: form })} disabled={!form.razao_social || !form.endereco_completo || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
+
+      <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Razão Social</p><p className="font-medium">{sel.razao_social}</p></div>{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}</div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="font-medium">{sel.cidade} - {sel.estado} {sel.cep}</p>}</div>{sel.contato_nome && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Contato</p><p>{sel.contato_nome}</p>{sel.contato_email && <p className="text-muted-foreground">{sel.contato_email}</p>}{sel.contato_telefone && <p className="text-muted-foreground">{sel.contato_telefone}</p>}</div>}{(sel.horario_entrega || sel.restricoes_entrega) && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Preferências de Entrega</p>{sel.horario_entrega && <p>Horário: {sel.horario_entrega}</p>}{sel.restricoes_entrega && <p className="text-muted-foreground">{sel.restricoes_entrega}</p>}</div>}<div className="flex gap-4 text-sm text-muted-foreground"><span>Entregas: {sel.total_entregas || 0}</span>{(sel.entregas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{sel.entregas_pendentes} pendentes</Badge>}</div></div>}</DialogContent></Dialog>
+
+      <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir cliente?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita. O cliente "{sel?.nome_fantasia || sel?.razao_social}" será excluído permanentemente.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{deleteMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
     </MainLayout>
   );
 }

@@ -6,25 +6,61 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Key } from "lucide-react";
+import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database } from "lucide-react";
 import { useIntegrationValidation } from "@/hooks/useIntegrationValidation";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export default function Configuracoes() {
-  const { integrations, validateIntegration, isValidating, validationResults } = useIntegrationValidation?.() || { integrations: [] };
-  const { preferences, updatePreference, isLoading: loadingPrefs } = useNotificationPreferences?.() || { preferences: {} };
+  const integrationValidation = useIntegrationValidation();
+  const notificationPrefs = useNotificationPreferences();
   const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => { setSaving(true); await new Promise(r => setTimeout(r, 1000)); toast.success("Configurações salvas!"); setSaving(false); };
+  const integrations = integrationValidation?.integrations || [];
+  const isValidating = integrationValidation?.isValidating || false;
+  const validateAll = integrationValidation?.validateAll;
+  const validateSingle = integrationValidation?.validateSingle;
+
+  const preferences = notificationPrefs?.preferences || {};
+  const updatePreference = notificationPrefs?.updatePreference;
+  const isLoaded = notificationPrefs?.isLoaded ?? true;
+
+  const handleSave = async () => { 
+    setSaving(true); 
+    await new Promise(r => setTimeout(r, 1000)); 
+    toast.success("Configurações salvas!"); 
+    setSaving(false); 
+  };
 
   const integrationsList = [
     { id: "supabase", name: "Supabase", icon: Database, status: "connected" },
-    { id: "bitrix24", name: "Bitrix24", icon: Link, status: validationResults?.bitrix24 || "unknown" },
-    { id: "lalamove", name: "Lalamove", icon: Globe, status: validationResults?.lalamove || "unknown" },
-    { id: "n8n", name: "n8n", icon: Settings, status: validationResults?.n8n || "unknown" },
+    { id: "bitrix24", name: "Bitrix24", icon: Link, status: integrations.find(i => i.name === "bitrix24")?.status || "unknown" },
+    { id: "lalamove", name: "Lalamove", icon: Globe, status: integrations.find(i => i.name === "lalamove")?.status || "unknown" },
+    { id: "n8n", name: "n8n", icon: Settings, status: integrations.find(i => i.name === "n8n")?.status || "unknown" },
   ];
+
+  const handleValidateIntegration = (id: string) => {
+    if (validateSingle) {
+      validateSingle(id);
+    }
+  };
+
+  const handleValidateAll = () => {
+    if (validateAll) {
+      validateAll();
+    }
+  };
+
+  const handleUpdatePreference = (key: string, value: boolean) => {
+    if (updatePreference) {
+      // Cast to the correct type
+      const validKeys = ['email', 'push', 'sms', 'slack', 'desktop', 'sound'] as const;
+      if (validKeys.includes(key as any)) {
+        updatePreference(key as 'email' | 'push' | 'sms' | 'slack' | 'desktop' | 'sound', value);
+      }
+    }
+  };
 
   return (
     <MainLayout>
@@ -35,7 +71,7 @@ export default function Configuracoes() {
         </div>
         <Tabs defaultValue="integrations"><TabsList><TabsTrigger value="integrations"><Link className="w-4 h-4 mr-2" />Integrações</TabsTrigger><TabsTrigger value="notifications"><Bell className="w-4 h-4 mr-2" />Notificações</TabsTrigger><TabsTrigger value="security"><Shield className="w-4 h-4 mr-2" />Segurança</TabsTrigger></TabsList>
           <TabsContent value="integrations" className="space-y-4">
-            <div className="flex justify-end"><Button variant="outline" onClick={() => integrationsList.forEach(i => validateIntegration?.(i.id))} disabled={isValidating}><RefreshCw className={cn("w-4 h-4 mr-2", isValidating && "animate-spin")} />Validar Todas</Button></div>
+            <div className="flex justify-end"><Button variant="outline" onClick={handleValidateAll} disabled={isValidating}><RefreshCw className={cn("w-4 h-4 mr-2", isValidating && "animate-spin")} />Validar Todas</Button></div>
             <div className="grid gap-4">{integrationsList.map((int) => {
               const Icon = int.icon;
               const isConnected = int.status === "connected";
@@ -44,7 +80,7 @@ export default function Configuracoes() {
                   <div className="flex items-center gap-3"><div className={cn("p-2 rounded-lg", isConnected ? "bg-green-100" : "bg-muted")}><Icon className={cn("w-5 h-5", isConnected ? "text-green-600" : "text-muted-foreground")} /></div><div><p className="font-semibold">{int.name}</p><p className="text-sm text-muted-foreground">ID: {int.id}</p></div></div>
                   <div className="flex items-center gap-3">
                     <Badge variant={isConnected ? "default" : int.status === "error" ? "destructive" : "secondary"}>{isConnected ? <><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</> : int.status === "error" ? <><XCircle className="w-3 h-3 mr-1" />Erro</> : "Pendente"}</Badge>
-                    <Button variant="outline" size="sm" onClick={() => validateIntegration?.(int.id)}>Testar</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleValidateIntegration(int.id)}>Testar</Button>
                   </div>
                 </div>
               );
@@ -55,7 +91,11 @@ export default function Configuracoes() {
               {[{ key: "email", label: "Notificações por Email" }, { key: "push", label: "Notificações Push" }, { key: "sms", label: "Notificações SMS" }, { key: "slack", label: "Integração Slack" }].map((pref) => (
                 <div key={pref.key} className="flex items-center justify-between py-2">
                   <div><p className="font-medium">{pref.label}</p><p className="text-sm text-muted-foreground">Receber alertas via {pref.key}</p></div>
-                  <Switch checked={preferences?.[pref.key] ?? false} onCheckedChange={(v) => updatePreference?.(pref.key, v)} disabled={loadingPrefs} />
+                  <Switch 
+                    checked={(preferences as Record<string, boolean>)?.[pref.key] ?? false} 
+                    onCheckedChange={(v) => handleUpdatePreference(pref.key, v)} 
+                    disabled={!isLoaded} 
+                  />
                 </div>
               ))}
             </div>

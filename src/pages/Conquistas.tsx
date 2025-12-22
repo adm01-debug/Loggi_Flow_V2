@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, Calendar, Package, Users, Lock, CheckCircle2, Sparkles, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins, LucideIcon, Search, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+import { Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, Calendar, Package, Users, Lock, CheckCircle2, Sparkles, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins, LucideIcon, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,21 +33,33 @@ const achievements: Achievement[] = [
 const rarityColors = { common: "from-gray-400 to-gray-500", rare: "from-blue-400 to-blue-600", epic: "from-purple-400 to-purple-600", legendary: "from-amber-400 to-amber-600" };
 const rarityLabels = { common: "Comum", rare: "Raro", epic: "Épico", legendary: "Lendário" };
 
-const filterConfig: FilterConfig<Achievement>[] = [
-  { key: "search", type: "search", fields: ["name", "description"] },
-  { key: "category", type: "select", field: "category", options: [{ value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "performance", label: "Performance" }, { value: "streak", label: "Streak" }, { value: "cadastros", label: "Cadastros" }] },
-  { key: "rarity", type: "select", field: "rarity", options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }] },
-  { key: "status", type: "custom", filterFn: (item, value) => value === "unlocked" ? item.unlocked : value === "locked" ? !item.unlocked : true }
-];
+const filterConfig: FilterConfig<Achievement> = {
+  search: {
+    fields: ["name", "description"],
+    placeholder: "Buscar conquistas..."
+  },
+  select: {
+    category: {
+      field: "category",
+      options: [{ value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "performance", label: "Performance" }, { value: "streak", label: "Streak" }, { value: "cadastros", label: "Cadastros" }],
+      label: "Categoria"
+    },
+    rarity: {
+      field: "rarity",
+      options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }],
+      label: "Raridade"
+    }
+  }
+};
 
 export default function Conquistas() {
   const { userLevel } = useGamification();
   const [tab, setTab] = useState("all");
 
   const tabFiltered = useMemo(() => tab === "all" ? achievements : tab === "unlocked" ? achievements.filter(a => a.unlocked) : achievements.filter(a => !a.unlocked), [tab]);
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(tabFiltered, filterConfig);
+  const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(tabFiltered, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "rarity", defaultDirection: "desc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 12 });
+  const pagination = usePagination(sortedData, { initialPageSize: 12 });
 
   const stats = { total: achievements.length, unlocked: achievements.filter(a => a.unlocked).length, totalXp: achievements.filter(a => a.unlocked).reduce((s, a) => s + a.xpReward, 0) };
   const SortIcon = ({ field }: { field: string }) => { const dir = getSortDirection(field as any); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
@@ -67,15 +79,24 @@ export default function Conquistas() {
 
         <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="all">Todas</TabsTrigger><TabsTrigger value="unlocked">Desbloqueadas</TabsTrigger><TabsTrigger value="locked">Bloqueadas</TabsTrigger></TabsList></Tabs>
 
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar conquistas..." filters={[
-          { key: "category", label: "Categoria", type: "select", value: filters.category as string || "", options: [{ value: "", label: "Todas" }, { value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "performance", label: "Performance" }, { value: "streak", label: "Streak" }], onChange: (v) => setFilter("category", v || undefined) },
-          { key: "rarity", label: "Raridade", type: "select", value: filters.rarity as string || "", options: [{ value: "", label: "Todas" }, { value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }], onChange: (v) => setFilter("rarity", v || undefined) }
-        ]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <FilterBar 
+          search={filters.search} 
+          onSearchChange={setSearch} 
+          searchPlaceholder="Buscar conquistas..." 
+          extraFilters={[
+            { key: "category", label: "Categoria", value: filters.category as string || "all", options: [{ value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "performance", label: "Performance" }, { value: "streak", label: "Streak" }], onChange: (v) => setFilter("category", v === "all" ? undefined : v) },
+            { key: "rarity", label: "Raridade", value: filters.rarity as string || "all", options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }], onChange: (v) => setFilter("rarity", v === "all" ? undefined : v) }
+          ]} 
+          onClearFilters={clearFilters} 
+          hasActiveFilters={hasActiveFilters} 
+          totalFiltered={totalFiltered} 
+          totalOriginal={totalOriginal} 
+        />
 
         <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("xpReward")} className="gap-1">XP <SortIcon field="xpReward" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("progress")} className="gap-1">Progresso <SortIcon field="progress" /></Button></div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginatedData.map((a, i) => {
+          {pagination.paginatedData.map((a, i) => {
             const Icon = a.icon;
             const progress = (a.progress / a.maxProgress) * 100;
             return (
@@ -98,7 +119,26 @@ export default function Conquistas() {
         </div>
 
         {sortedData.length === 0 && <div className="flex flex-col items-center py-12"><Trophy className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma conquista encontrada</p></div>}
-        {sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
+        
+        {sortedData.length > 0 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+          />
+        )}
       </div>
     </MainLayout>
   );
