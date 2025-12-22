@@ -264,7 +264,7 @@ export default function Coletas() {
               {sel.peso_estimado_kg && <div><span className="text-muted-foreground">Peso:</span> {sel.peso_estimado_kg} kg</div>}
               {sel.observacoes && <div><span className="text-muted-foreground">Observações:</span> {sel.observacoes}</div>}
             </div>
-            {history.length > 0 && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Histórico</p><Timeline events={history.map(h => ({ id: h.id, title: h.action, description: h.description || "", date: new Date(h.created_at), type: "default" as const }))} /></div>}
+            {history.length > 0 && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Histórico</p><Timeline events={history} /></div>}
           </div>}
         </DialogContent>
       </Dialog>

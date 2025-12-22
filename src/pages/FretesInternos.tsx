@@ -45,10 +45,16 @@ const statusConfig: Record<FreteStatus, { label: string; color: string; icon: Re
   cancelado: { label: "Cancelado", color: "bg-muted text-muted-foreground border-muted", icon: XCircle },
 };
 
-const filterConfig: FilterConfig<FreteInterno>[] = [
-  { key: "search", type: "search", fields: ["origem", "destino", "motorista", "observacoes"] },
-  { key: "status", type: "select", field: "status", options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label })) }
-];
+const filterConfig: FilterConfig<FreteInterno> = {
+  search: {
+    fields: ["origem", "destino", "motorista", "observacoes"],
+    placeholder: "Buscar fretes..."
+  },
+  status: {
+    field: "status",
+    options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label }))
+  }
+};
 
 const emptyForm = { origem: "", destino: "", motorista: "", quantidade_itens: 1, previsao_entrega: "", xp_reward: 50, observacoes: "" };
 
@@ -71,10 +77,10 @@ export default function FretesInternos() {
   });
 
   // Hooks integrados
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(fretes, filterConfig);
+  const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(fretes, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 10 });
-  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
+  const pagination = usePagination(sortedData, { initialPageSize: 10 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
   const { history } = useEntityHistory({ entityType: "frete_interno", entityId: selected?.id || "" });
 
   const createMut = useMutation({
@@ -147,17 +153,26 @@ export default function FretesInternos() {
           <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregues}</p><p className="text-xs text-muted-foreground">Entregues</p></div>
         </div>
 
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar fretes..."
-          filters={[{ key: "status", label: "Status", type: "select", value: filters.status as string || "", options: [{ value: "", label: "Todos" }, ...Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label }))], onChange: (v) => setFilter("status", v || undefined) }]}
-          onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <FilterBar 
+          search={filters.search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Buscar fretes..."
+          status={filters.status}
+          onStatusChange={setStatus}
+          statusOptions={filterConfig.status?.options}
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={clearFilters}
+          totalFiltered={totalFiltered}
+          totalOriginal={totalOriginal}
+        />
 
         <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">Data <SortIcon field="created_at" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("origem")} className="gap-1">Origem <SortIcon field="origem" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("status")} className="gap-1">Status <SortIcon field="status" /></Button></div>
 
-        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "entregue", label: "Marcar Entregue", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "entregue") }, { id: "cancelar", label: "Cancelar", icon: XCircle, variant: "destructive", onClick: (ids) => bulkUpdateStatus(ids, "cancelado") }]} />}
+        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "entregue", label: "Marcar Entregue", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "entregue") }, { id: "cancelar", label: "Cancelar", icon: XCircle, variant: "destructive", onClick: (ids) => bulkUpdateStatus(ids, "cancelado") }]} />}
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!isLoading && <div className="space-y-3">{paginatedData.map((f, i) => { const config = statusConfig[f.status]; const StatusIcon = config.icon; return (
+        {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((f, i) => { const config = statusConfig[f.status]; const StatusIcon = config.icon; return (
           <div key={f.id} className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
             <div className="flex items-start gap-3">
               <Checkbox checked={isSelected(f.id)} onCheckedChange={() => toggle(f.id)} className="mt-1" />
@@ -172,12 +187,30 @@ export default function FretesInternos() {
         ); })}</div>}
 
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Truck className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum frete</p></div>}
-        {!isLoading && sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
+        {!isLoading && sortedData.length > 0 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={pagination.pageSize}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+          />
+        )}
 
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}><DialogContent className="max-w-lg"><DialogHeader><DialogTitle>Novo Frete</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.origem || !form.destino || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Criar</Button></DialogFooter></DialogContent></Dialog>
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}><DialogContent className="max-w-lg"><DialogHeader><DialogTitle>Editar Frete</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancelar</Button><Button onClick={() => selected && updateMut.mutate({ id: selected.id, data: form })} disabled={!form.origem || !form.destino || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
-        <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>Detalhes do Frete</DialogTitle></DialogHeader>{selected && <Tabs defaultValue="detalhes"><TabsList className="w-full"><TabsTrigger value="detalhes" className="flex-1">Detalhes</TabsTrigger><TabsTrigger value="historico" className="flex-1">Histórico</TabsTrigger></TabsList><TabsContent value="detalhes" className="space-y-4 pt-4"><div className="flex items-center gap-3"><Badge className={statusConfig[selected.status].color}>{statusConfig[selected.status].label}</Badge>{selected.xp_reward > 0 && <Badge variant="outline" className="gap-1"><Star className="w-3 h-3 text-yellow-500" />{selected.xp_reward} XP</Badge>}</div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Origem</p><p className="font-medium">{selected.origem}</p></div><div><p className="text-sm text-muted-foreground">Destino</p><p className="font-medium">{selected.destino}</p></div><div><p className="text-sm text-muted-foreground">Motorista</p><p>{selected.motorista || "-"}</p></div><div><p className="text-sm text-muted-foreground">Itens</p><p>{selected.quantidade_itens}</p></div></div>{selected.observacoes && <div><p className="text-sm text-muted-foreground">Observações</p><p>{selected.observacoes}</p></div>}</TabsContent><TabsContent value="historico" className="pt-4"><Timeline events={history.map(h => ({ id: h.id, title: h.title, description: h.description, timestamp: h.timestamp, status: h.status }))} /></TabsContent></Tabs>}</DialogContent></Dialog>
-        <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir Frete?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction className="bg-destructive" onClick={() => selected && deleteMut.mutate(selected.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+        <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>Detalhes do Frete</DialogTitle></DialogHeader>{selected && <Tabs defaultValue="detalhes"><TabsList className="w-full"><TabsTrigger value="detalhes" className="flex-1">Detalhes</TabsTrigger><TabsTrigger value="historico" className="flex-1">Histórico</TabsTrigger></TabsList><TabsContent value="detalhes" className="space-y-4 pt-4"><div className="flex items-center gap-3"><Badge className={statusConfig[selected.status].color}>{statusConfig[selected.status].label}</Badge>{selected.xp_reward > 0 && <Badge variant="outline" className="gap-1"><Star className="w-3 h-3 text-yellow-500" />{selected.xp_reward} XP</Badge>}</div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Origem</p><p className="font-medium">{selected.origem}</p></div><div><p className="text-sm text-muted-foreground">Destino</p><p className="font-medium">{selected.destino}</p></div><div><p className="text-sm text-muted-foreground">Motorista</p><p>{selected.motorista || "-"}</p></div><div><p className="text-sm text-muted-foreground">Itens</p><p>{selected.quantidade_itens}</p></div></div>{selected.observacoes && <div><p className="text-sm text-muted-foreground">Observações</p><p>{selected.observacoes}</p></div>}</TabsContent><TabsContent value="historico" className="pt-4"><Timeline events={history} /></TabsContent></Tabs>}</DialogContent></Dialog>
+        <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir frete?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => selected && deleteMut.mutate(selected.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
     </MainLayout>
   );

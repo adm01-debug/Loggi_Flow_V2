@@ -52,10 +52,16 @@ const statusConfig: Record<EntregaStatus, { label: string; color: string; icon: 
   finalizado: { label: "Finalizado", color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
 };
 
-const filterConfig: FilterConfig<Entrega>[] = [
-  { key: "search", type: "search", fields: ["numero_entrega", "endereco_entrega", "nf_remessa", "codigo_rastreamento"] },
-  { key: "status", type: "select", field: "status", options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label })) }
-];
+const filterConfig: FilterConfig<Entrega> = {
+  search: {
+    fields: ["numero_entrega", "endereco_entrega", "nf_remessa", "codigo_rastreamento"],
+    placeholder: "Buscar entregas..."
+  },
+  status: {
+    field: "status",
+    options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label }))
+  }
+};
 
 const emptyForm = { cliente_id: "", endereco_entrega: "", contato_cliente: "", tipo_frete: "cif" as FreteType, transportadora_id: "", previsao_entrega: "", observacoes: "" };
 
@@ -81,10 +87,10 @@ export default function Envios() {
   const { data: transportadoras = [] } = useQuery({ queryKey: ["transportadoras-select"], queryFn: async () => { const { data } = await supabase.from("transportadoras").select("id, nome_fantasia").order("nome_fantasia"); return data || []; } });
 
   // Hooks integrados
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(list, filterConfig);
+  const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(list, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 10 });
-  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
+  const pagination = usePagination(sortedData, { initialPageSize: 10 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
 
   // Realtime
   useRealtime({ table: "entregas", onInsert: () => refetch(), onUpdate: () => refetch(), onDelete: () => refetch() });
@@ -145,15 +151,26 @@ export default function Envios() {
           <div className="stat-card text-center"><AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.ocorrencias}</p><p className="text-xs text-muted-foreground">Ocorrências</p></div>
         </div>
 
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar entregas..." filters={[{ key: "status", label: "Status", type: "select", value: filters.status as string || "", options: [{ value: "", label: "Todos" }, ...Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label }))], onChange: (v) => setFilter("status", v || undefined) }]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <FilterBar 
+          search={filters.search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Buscar entregas..."
+          status={filters.status}
+          onStatusChange={setStatus}
+          statusOptions={filterConfig.status?.options}
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={clearFilters}
+          totalFiltered={totalFiltered}
+          totalOriginal={totalOriginal}
+        />
 
         <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">Data <SortIcon field="created_at" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("status")} className="gap-1">Status <SortIcon field="status" /></Button></div>
 
-        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "entregue", label: "Marcar Entregue", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "entregue") }]} />}
+        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "entregue", label: "Marcar Entregue", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "entregue") }]} />}
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!isLoading && <div className="space-y-3">{paginatedData.map((e, i) => { const config = statusConfig[e.status]; const StatusIcon = config.icon; return (
+        {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((e, i) => { const config = statusConfig[e.status]; const StatusIcon = config.icon; return (
           <div key={e.id} className={`card-interactive animate-fade-in ${isSelected(e.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 30}ms` }}>
             <div className="flex items-start gap-3">
               <Checkbox checked={isSelected(e.id)} onCheckedChange={() => toggle(e.id)} className="mt-1" />
@@ -172,13 +189,31 @@ export default function Envios() {
         ); })}</div>}
 
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Send className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma entrega</p></div>}
-        {!isLoading && sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
+        {!isLoading && sortedData.length > 0 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={pagination.pageSize}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+          />
+        )}
 
         <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Entrega</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div className="grid gap-2"><Label>Cliente</Label><Select value={form.cliente_id} onValueChange={handleClienteChange}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{clientes.map(c => <SelectItem key={c.id} value={c.id}>{c.nome_fantasia || c.razao_social}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Endereço *</Label><Textarea value={form.endereco_entrega} onChange={(e) => setForm({ ...form, endereco_entrega: e.target.value })} /></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Contato</Label><Input value={form.contato_cliente} onChange={(e) => setForm({ ...form, contato_cliente: e.target.value })} /></div><div className="grid gap-2"><Label>Tipo Frete</Label><Select value={form.tipo_frete} onValueChange={(v: FreteType) => setForm({ ...form, tipo_frete: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="cif">CIF</SelectItem><SelectItem value="fob">FOB</SelectItem><SelectItem value="cortesia">Cortesia</SelectItem></SelectContent></Select></div></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Transportadora</Label><Select value={form.transportadora_id} onValueChange={(v) => setForm({ ...form, transportadora_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{transportadoras.map(t => <SelectItem key={t.id} value={t.id}>{t.nome_fantasia}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Previsão</Label><Input type="date" value={form.previsao_entrega} onChange={(e) => setForm({ ...form, previsao_entrega: e.target.value })} /></div></div><div className="grid gap-2"><Label>Observações</Label><Textarea value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} /></div></div><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.endereco_entrega || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Criar</Button></DialogFooter></DialogContent></Dialog>
 
         <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.numero_entrega}</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="flex items-center gap-2"><Badge className={statusConfig[sel.status].color}>{statusConfig[sel.status].label}</Badge></div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Cliente</p><p>{sel.cliente?.nome_fantasia || sel.cliente?.razao_social || "-"}</p></div><div><p className="text-sm text-muted-foreground">Transportadora</p><p>{sel.transportadora?.nome_fantasia || "-"}</p></div></div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_entrega}</p></div>{sel.observacoes && <div><p className="text-sm text-muted-foreground">Observações</p><p>{sel.observacoes}</p></div>}</div>}</DialogContent></Dialog>
 
-        <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir?</AlertDialogTitle><AlertDialogDescription>Excluir entrega {sel?.numero_entrega}?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Não</AlertDialogCancel><AlertDialogAction className="bg-destructive" onClick={() => sel && deleteMut.mutate(sel.id)}>Sim</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+        <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir entrega?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
     </MainLayout>
   );

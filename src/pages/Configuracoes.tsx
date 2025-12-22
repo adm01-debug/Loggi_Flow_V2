@@ -54,10 +54,20 @@ export default function Configuracoes() {
 
   const handleUpdatePreference = (key: string, value: boolean) => {
     if (updatePreference) {
-      // Cast to the correct type
-      const validKeys = ['email', 'push', 'sms', 'slack', 'desktop', 'sound'] as const;
-      if (validKeys.includes(key as any)) {
-        updatePreference(key as 'email' | 'push' | 'sms' | 'slack' | 'desktop' | 'sound', value);
+      // Map UI keys to actual preference keys
+      const keyMap: Record<string, keyof import('@/hooks/useNotificationPreferences').NotificationPreferences> = {
+        'email': 'notifications_email',
+        'push': 'notifications_push',
+        'sla': 'notifications_sla',
+        'ocorrencias': 'notifications_ocorrencias',
+        'coletas': 'notifications_coletas',
+        'entregas': 'notifications_entregas',
+        'custos': 'notifications_custos',
+        'achievements': 'notifications_achievements',
+      };
+      const mappedKey = keyMap[key];
+      if (mappedKey) {
+        updatePreference(mappedKey, value);
       }
     }
   };
