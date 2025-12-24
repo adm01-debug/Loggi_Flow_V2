@@ -6,24 +6,62 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Navigation, Truck, MapPin, Clock, Phone, RefreshCw, Loader2, Radio } from "lucide-react";
 import { useLalamoveTracking } from "@/hooks/useLalamoveTracking";
 import { useRealtime } from "@/hooks/useRealtime";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function RastreamentoMotorista() {
   const [selectedOrder, setSelectedOrder] = useState<string>("");
-  const { trackingData, orders, isLoading, refetch, startTracking, stopTracking } = useLalamoveTracking({ orderId: selectedOrder });
+  const { 
+    driverLocation, 
+    orderDetails, 
+    isLoading, 
+    isTracking,
+    startTracking, 
+    stopTracking,
+    refetchDriverLocation 
+  } = useLalamoveTracking(selectedOrder || null);
   const [isLive, setIsLive] = useState(false);
 
-  useRealtime({ table: "lalamove_orders", onUpdate: () => refetch?.() });
+  // Fetch orders from coletas table
+  const { data: orders = [], refetch: refetchOrders } = useQuery({
+    queryKey: ["lalamove-orders"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("coletas")
+        .select("id, numero_coleta, codigo_rastreamento, fornecedor:fornecedores(razao_social)")
+        .eq("tipo_coleta", "lalamove")
+        .not("codigo_rastreamento", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data?.map(c => ({
+        id: c.codigo_rastreamento || c.id,
+        cliente: (c.fornecedor as any)?.razao_social || c.numero_coleta
+      })) || [];
+    }
+  });
+
+  useRealtime({ table: "coletas", onUpdate: () => refetchOrders() });
 
   useEffect(() => {
-    if (isLive && selectedOrder) { const interval = setInterval(() => refetch?.(), 10000); return () => clearInterval(interval); }
+    if (isLive && selectedOrder) { 
+      const interval = setInterval(() => refetchDriverLocation?.(), 10000); 
+      return () => clearInterval(interval); 
+    }
   }, [isLive, selectedOrder]);
 
-  const driver = trackingData?.driver || {};
-  const location = trackingData?.location || {};
-  const status = trackingData?.status || "unknown";
+  useEffect(() => {
+    if (selectedOrder && !isTracking) {
+      startTracking();
+    }
+  }, [selectedOrder]);
+
+  const driver = driverLocation || { name: "", phone: "", plateNumber: "", coordinates: { lat: 0, lng: 0 } };
+  const location = driverLocation?.coordinates || { lat: 0, lng: 0 };
+  const status = orderDetails?.status || "unknown";
 
   const statusColors: Record<string, string> = { "em_rota": "bg-blue-500", "coletando": "bg-amber-500", "entregando": "bg-green-500", "aguardando": "bg-gray-500" };
 
@@ -35,31 +73,31 @@ export default function RastreamentoMotorista() {
           <div className="flex gap-2">
             <Select value={selectedOrder} onValueChange={setSelectedOrder}><SelectTrigger className="w-56"><SelectValue placeholder="Selecione pedido" /></SelectTrigger><SelectContent>{(orders || []).map((o: any) => <SelectItem key={o.id} value={o.id}>#{o.id.slice(0, 8)} - {o.cliente}</SelectItem>)}</SelectContent></Select>
             <Button variant={isLive ? "destructive" : "default"} onClick={() => setIsLive(!isLive)}><Radio className={cn("w-4 h-4 mr-2", isLive && "animate-pulse")} />{isLive ? "Parar" : "Ao Vivo"}</Button>
-            <Button variant="outline" onClick={() => refetch?.()}><RefreshCw className="w-4 h-4" /></Button>
+            <Button variant="outline" onClick={() => refetchDriverLocation?.()}><RefreshCw className="w-4 h-4" /></Button>
           </div>
         </div>
         {selectedOrder ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 card-base p-4 min-h-[400px] flex items-center justify-center bg-muted/50">
-              {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : <div className="text-center text-muted-foreground"><Navigation className="w-16 h-16 mx-auto mb-4 opacity-30" /><p>Mapa de rastreamento</p><p className="text-sm">Integração Lalamove</p>{location.lat && <p className="text-xs mt-2">Lat: {location.lat}, Lng: {location.lng}</p>}</div>}
+              {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : <div className="text-center text-muted-foreground"><Navigation className="w-16 h-16 mx-auto mb-4 opacity-30" /><p>Mapa de rastreamento</p><p className="text-sm">Integração Lalamove</p>{location.lat !== 0 && <p className="text-xs mt-2">Lat: {location.lat}, Lng: {location.lng}</p>}</div>}
             </div>
             <div className="space-y-4">
               <div className="card-base p-4">
                 <div className="flex items-center gap-3 mb-4"><div className={cn("w-3 h-3 rounded-full animate-pulse", statusColors[status] || "bg-gray-500")} /><span className="font-semibold">Status: {status}</span></div>
                 {driver.name ? (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3"><div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"><Truck className="w-6 h-6 text-primary" /></div><div><p className="font-semibold">{driver.name}</p><p className="text-sm text-muted-foreground">{driver.vehicle || "Veículo não informado"}</p></div></div>
+                    <div className="flex items-center gap-3"><div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"><Truck className="w-6 h-6 text-primary" /></div><div><p className="font-semibold">{driver.name}</p><p className="text-sm text-muted-foreground">Motorista</p></div></div>
                     {driver.phone && <div className="flex items-center gap-2 text-sm"><Phone className="w-4 h-4 text-muted-foreground" /><span>{driver.phone}</span></div>}
-                    {driver.plate && <div className="flex items-center gap-2 text-sm"><Truck className="w-4 h-4 text-muted-foreground" /><span>Placa: {driver.plate}</span></div>}
+                    {driver.plateNumber && <div className="flex items-center gap-2 text-sm"><Truck className="w-4 h-4 text-muted-foreground" /><span>Placa: {driver.plateNumber}</span></div>}
                   </div>
                 ) : <p className="text-sm text-muted-foreground">Aguardando motorista...</p>}
               </div>
               <div className="card-base p-4">
                 <h3 className="font-semibold mb-3">Timeline</h3>
-                <div className="space-y-3">{(trackingData?.timeline || []).map((t: any, i: number) => (
+                <div className="space-y-3">{(orderDetails?.stops || []).map((stop: any, i: number) => (
                   <div key={i} className="flex gap-3">
-                    <div className="flex flex-col items-center"><div className={cn("w-3 h-3 rounded-full", i === 0 ? "bg-primary" : "bg-muted")} />{i < (trackingData?.timeline?.length || 0) - 1 && <div className="w-0.5 h-full bg-muted" />}</div>
-                    <div><p className="text-sm font-medium">{t.status}</p><p className="text-xs text-muted-foreground">{format(new Date(t.timestamp), "HH:mm", { locale: ptBR })}</p></div>
+                    <div className="flex flex-col items-center"><div className={cn("w-3 h-3 rounded-full", i === 0 ? "bg-primary" : "bg-muted")} />{i < (orderDetails?.stops?.length || 0) - 1 && <div className="w-0.5 h-full bg-muted" />}</div>
+                    <div><p className="text-sm font-medium">{stop.name || `Parada ${i + 1}`}</p><p className="text-xs text-muted-foreground">{stop.address}</p></div>
                   </div>
                 ))}</div>
               </div>

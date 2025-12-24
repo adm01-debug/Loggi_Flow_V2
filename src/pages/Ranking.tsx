@@ -11,32 +11,67 @@ import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 import { useRealtime } from "@/hooks/useRealtime";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 interface RankUser { id: string; name: string; avatar?: string; xp: number; level: number; streak: number; deliveries: number; }
 
-const filterConfig: FilterConfig<RankUser>[] = [
-  { key: "search", type: "search", fields: ["name"] },
-  { key: "level", type: "custom", filterFn: (item, value) => !value || item.level >= parseInt(value as string) }
-];
+const filterConfig: FilterConfig<RankUser> = {
+  searchFields: ["name"],
+};
 
 export default function Ranking() {
-  const { leaderboard, userLevel, isLoading, refetch } = useGamification();
+  const { userLevel, isLoading: gamificationLoading } = useGamification();
   const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("weekly");
+  const [levelFilter, setLevelFilter] = useState("");
 
-  useRealtime({ table: "user_levels", onUpdate: () => refetch?.() });
+  // Fetch leaderboard data
+  const { data: leaderboard = [], isLoading, refetch } = useQuery({
+    queryKey: ["leaderboard"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_levels")
+        .select("*, profile:profiles(full_name, avatar_url)")
+        .order("total_xp", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data;
+    }
+  });
 
-  const users: RankUser[] = useMemo(() => (leaderboard || []).map((u: any) => ({ id: u.user_id, name: u.full_name || "Usuário", avatar: u.avatar_url, xp: u.xp || 0, level: u.level || 1, streak: u.streak_days || 0, deliveries: u.total_deliveries || 0 })), [leaderboard]);
+  useRealtime({ table: "user_levels", onUpdate: () => refetch() });
 
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(users, filterConfig);
+  const users: RankUser[] = useMemo(() => (leaderboard || []).map((u: any) => ({ 
+    id: u.user_id, 
+    name: u.profile?.full_name || "Usuário", 
+    avatar: u.profile?.avatar_url, 
+    xp: u.total_xp || 0, 
+    level: u.level || 1, 
+    streak: u.streak_days || 0, 
+    deliveries: 0 
+  })), [leaderboard]);
+
+  // Filter by level
+  const filteredByLevel = users.filter(u => {
+    if (!levelFilter) return true;
+    return u.level >= parseInt(levelFilter);
+  });
+
+  const { filteredData, search, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByLevel, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "xp", defaultDirection: "desc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 10 });
+  const pagination = usePagination(sortedData, { initialPageSize: 10 });
 
   const top3 = sortedData.slice(0, 3);
   const SortIcon = ({ field }: { field: string }) => { const dir = getSortDirection(field as any); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
 
   const podiumColors = ["from-amber-400 to-amber-600", "from-gray-300 to-gray-500", "from-amber-600 to-amber-800"];
   const podiumIcons = [Crown, Medal, Award];
+
+  const handleClearFilters = () => {
+    clearFilters();
+    setLevelFilter("");
+  };
 
   return (
     <MainLayout>
@@ -64,10 +99,22 @@ export default function Ranking() {
           </div>
         )}
 
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar usuário..." filters={[{ key: "level", label: "Nível mín.", type: "select", value: filters.level as string || "", options: [{ value: "", label: "Todos" }, { value: "5", label: "5+" }, { value: "10", label: "10+" }, { value: "20", label: "20+" }], onChange: (v) => setFilter("level", v || undefined) }]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <FilterBar 
+          search={search} 
+          onSearchChange={setSearch} 
+          searchPlaceholder="Buscar usuário..." 
+          filters={[
+            { key: "level", label: "Nível mín.", type: "select", value: levelFilter, options: [{ value: "", label: "Todos" }, { value: "5", label: "5+" }, { value: "10", label: "10+" }, { value: "20", label: "20+" }], onChange: (v) => setLevelFilter(v) }
+          ]} 
+          onClearFilters={handleClearFilters} 
+          hasActiveFilters={hasActiveFilters || !!levelFilter} 
+          totalCount={users.length} 
+          filteredCount={sortedData.length} 
+        />
+        
         <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("xp")} className="gap-1">XP <SortIcon field="xp" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("deliveries")} className="gap-1">Entregas <SortIcon field="deliveries" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("streak")} className="gap-1">Streak <SortIcon field="streak" /></Button></div>
 
-        <div className="space-y-2">{paginatedData.map((user, i) => {
+        <div className="space-y-2">{pagination.paginatedData.map((user, i) => {
           const rank = sortedData.indexOf(user) + 1;
           return (
             <div key={user.id} className="card-interactive flex items-center gap-4">
@@ -79,7 +126,25 @@ export default function Ranking() {
           );
         })}</div>
 
-        {sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
+        {sortedData.length > 0 && (
+          <Pagination 
+            currentPage={pagination.currentPage} 
+            totalPages={pagination.totalPages} 
+            pageSize={pagination.pageSize} 
+            totalItems={sortedData.length}
+            startIndex={(pagination.currentPage - 1) * pagination.pageSize + 1}
+            endIndex={Math.min(pagination.currentPage * pagination.pageSize, sortedData.length)}
+            pageSizeOptions={[10, 25, 50]}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+          />
+        )}
       </div>
     </MainLayout>
   );

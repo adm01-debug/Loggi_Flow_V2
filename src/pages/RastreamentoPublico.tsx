@@ -29,7 +29,11 @@ export default function RastreamentoPublico() {
     queryKey: ["tracking-public", searchCode],
     queryFn: async () => {
       if (!searchCode) return null;
-      const { data, error } = await supabase.from("entregas").select("*, timeline:activity_logs(*)").or(`codigo_rastreamento.eq.${searchCode},numero_nf.eq.${searchCode}`).single();
+      const { data, error } = await supabase
+        .from("entregas")
+        .select("*")
+        .or(`codigo_rastreamento.eq.${searchCode},nf_remessa.eq.${searchCode}`)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -38,7 +42,13 @@ export default function RastreamentoPublico() {
 
   const handleSearch = () => { if (code.trim()) setSearchCode(code.trim()); };
 
-  const timelineEvents = (tracking?.timeline || []).map((t: any) => ({ id: t.id, title: t.action || t.tipo, description: t.description || t.descricao, timestamp: t.created_at, status: t.status || "completed" }));
+  // Create timeline events from status history
+  const timelineEvents = tracking ? [
+    { id: "1", title: "Pedido criado", description: "Entrega registrada no sistema", timestamp: tracking.created_at, status: "completed" as const },
+    ...(tracking.data_despacho ? [{ id: "2", title: "Despachado", description: "Enviado para transportadora", timestamp: tracking.data_despacho, status: "completed" as const }] : []),
+    ...(tracking.data_entrega_efetiva ? [{ id: "3", title: "Entregue", description: `Recebido por ${tracking.recebedor || 'destinatário'}`, timestamp: tracking.data_entrega_efetiva, status: "completed" as const }] : []),
+  ] : [];
+
   const currentStatus = tracking?.status || "pendente";
   const StatusIcon = statusConfig[currentStatus]?.icon || Clock;
 
@@ -53,9 +63,9 @@ export default function RastreamentoPublico() {
           <div className="space-y-6">
             <div className="card-base p-6">
               <div className="flex items-center gap-4 mb-4"><div className={cn("p-3 rounded-xl", statusConfig[currentStatus]?.color.replace("text-", "bg-").replace("500", "100"))}><StatusIcon className={cn("w-6 h-6", statusConfig[currentStatus]?.color)} /></div><div><Badge className={cn(statusConfig[currentStatus]?.color.replace("text-", "bg-").replace("500", "500"), "text-white")}>{statusConfig[currentStatus]?.label || currentStatus}</Badge><p className="text-sm text-muted-foreground mt-1">Última atualização: {format(new Date(tracking.updated_at || tracking.created_at), "dd/MM HH:mm", { locale: ptBR })}</p></div></div>
-              <div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Código</p><p className="font-mono font-semibold">{tracking.codigo_rastreamento || tracking.numero_nf}</p></div><div><p className="text-muted-foreground">Previsão</p><p className="font-semibold">{tracking.previsao_entrega ? format(new Date(tracking.previsao_entrega), "dd/MM/yyyy") : "A definir"}</p></div></div>
+              <div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Código</p><p className="font-mono font-semibold">{tracking.codigo_rastreamento || tracking.nf_remessa}</p></div><div><p className="text-muted-foreground">Previsão</p><p className="font-semibold">{tracking.previsao_entrega ? format(new Date(tracking.previsao_entrega), "dd/MM/yyyy") : "A definir"}</p></div></div>
             </div>
-            <div className="card-base p-6"><div className="flex items-center gap-2 mb-4"><MapPin className="w-5 h-5 text-muted-foreground" /><span className="font-semibold">Destino</span></div><p className="text-sm">{tracking.endereco_destino || "Endereço não informado"}</p></div>
+            <div className="card-base p-6"><div className="flex items-center gap-2 mb-4"><MapPin className="w-5 h-5 text-muted-foreground" /><span className="font-semibold">Destino</span></div><p className="text-sm">{tracking.endereco_entrega || "Endereço não informado"}</p></div>
             {timelineEvents.length > 0 && <div className="card-base p-6"><h3 className="font-semibold mb-4 flex items-center gap-2"><Clock className="w-5 h-5" />Histórico</h3><Timeline events={timelineEvents} /></div>}
             <div className="card-base p-4 text-center text-sm text-muted-foreground"><p>Dúvidas? Entre em contato</p><div className="flex items-center justify-center gap-2 mt-2"><Phone className="w-4 h-4" /><span>(11) 99999-9999</span></div></div>
           </div>
