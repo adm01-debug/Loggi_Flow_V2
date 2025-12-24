@@ -337,6 +337,128 @@ export type Database = {
         }
         Relationships: []
       }
+      conciliacao_itens_importados: {
+        Row: {
+          conciliacao_id: string
+          conciliado_em: string | null
+          conciliado_por: string | null
+          created_at: string
+          dados_originais: Json | null
+          data_documento: string | null
+          descricao: string | null
+          diferenca_valor: number | null
+          id: string
+          item_sistema_id: string | null
+          linha_arquivo: number | null
+          observacoes: string | null
+          referencia_externa: string | null
+          status: string
+          transportadora_nome: string | null
+          valor: number
+        }
+        Insert: {
+          conciliacao_id: string
+          conciliado_em?: string | null
+          conciliado_por?: string | null
+          created_at?: string
+          dados_originais?: Json | null
+          data_documento?: string | null
+          descricao?: string | null
+          diferenca_valor?: number | null
+          id?: string
+          item_sistema_id?: string | null
+          linha_arquivo?: number | null
+          observacoes?: string | null
+          referencia_externa?: string | null
+          status?: string
+          transportadora_nome?: string | null
+          valor: number
+        }
+        Update: {
+          conciliacao_id?: string
+          conciliado_em?: string | null
+          conciliado_por?: string | null
+          created_at?: string
+          dados_originais?: Json | null
+          data_documento?: string | null
+          descricao?: string | null
+          diferenca_valor?: number | null
+          id?: string
+          item_sistema_id?: string | null
+          linha_arquivo?: number | null
+          observacoes?: string | null
+          referencia_externa?: string | null
+          status?: string
+          transportadora_nome?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conciliacao_itens_importados_conciliacao_id_fkey"
+            columns: ["conciliacao_id"]
+            isOneToOne: false
+            referencedRelation: "conciliacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conciliacoes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          diferenca_total: number | null
+          id: string
+          nome: string
+          periodo_fim: string | null
+          periodo_inicio: string | null
+          status: string
+          tipo: string
+          total_divergencias: number
+          total_itens_conciliados: number
+          total_itens_importados: number
+          updated_at: string
+          valor_total_importado: number | null
+          valor_total_sistema: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          diferenca_total?: number | null
+          id?: string
+          nome: string
+          periodo_fim?: string | null
+          periodo_inicio?: string | null
+          status?: string
+          tipo: string
+          total_divergencias?: number
+          total_itens_conciliados?: number
+          total_itens_importados?: number
+          updated_at?: string
+          valor_total_importado?: number | null
+          valor_total_sistema?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          diferenca_total?: number | null
+          id?: string
+          nome?: string
+          periodo_fim?: string | null
+          periodo_inicio?: string | null
+          status?: string
+          tipo?: string
+          total_divergencias?: number
+          total_itens_conciliados?: number
+          total_itens_importados?: number
+          updated_at?: string
+          valor_total_importado?: number | null
+          valor_total_sistema?: number | null
+        }
+        Relationships: []
+      }
       cotacoes_frete: {
         Row: {
           created_at: string

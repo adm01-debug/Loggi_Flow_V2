@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 interface RankUser { id: string; name: string; avatar?: string; xp: number; level: number; streak: number; deliveries: number; }
 
 const filterConfig: FilterConfig<RankUser> = {
-  searchFields: ["name"],
+  search: { fields: ["name"] },
 };
 
 export default function Ranking() {
@@ -58,7 +58,7 @@ export default function Ranking() {
     return u.level >= parseInt(levelFilter);
   });
 
-  const { filteredData, search, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByLevel, filterConfig);
+  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByLevel, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "xp", defaultDirection: "desc" });
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
 
@@ -100,16 +100,16 @@ export default function Ranking() {
         )}
 
         <FilterBar 
-          search={search} 
+          search={filters.search} 
           onSearchChange={setSearch} 
           searchPlaceholder="Buscar usuário..." 
-          filters={[
-            { key: "level", label: "Nível mín.", type: "select", value: levelFilter, options: [{ value: "", label: "Todos" }, { value: "5", label: "5+" }, { value: "10", label: "10+" }, { value: "20", label: "20+" }], onChange: (v) => setLevelFilter(v) }
+          extraFilters={[
+            { key: "level", label: "Nível mín.", value: levelFilter, options: [{ value: "5", label: "5+" }, { value: "10", label: "10+" }, { value: "20", label: "20+" }], onChange: (v) => setLevelFilter(v) }
           ]} 
           onClearFilters={handleClearFilters} 
           hasActiveFilters={hasActiveFilters || !!levelFilter} 
-          totalCount={users.length} 
-          filteredCount={sortedData.length} 
+          totalFiltered={sortedData.length}
+          totalOriginal={users.length} 
         />
         
         <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("xp")} className="gap-1">XP <SortIcon field="xp" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("deliveries")} className="gap-1">Entregas <SortIcon field="deliveries" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("streak")} className="gap-1">Streak <SortIcon field="streak" /></Button></div>

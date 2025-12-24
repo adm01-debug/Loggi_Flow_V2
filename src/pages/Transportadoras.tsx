@@ -35,7 +35,7 @@ interface Transportadora {
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 
 const filterConfig: FilterConfig<Transportadora> = {
-  searchFields: ["nome_fantasia", "razao_social", "cnpj"],
+  search: { fields: ["nome_fantasia", "razao_social", "cnpj"] },
 };
 
 const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", contato_comercial: "", email_comercial: "", whatsapp_operacional: "", url_rastreamento: "", observacoes: "", homologada: true };
@@ -60,7 +60,7 @@ export default function Transportadoras() {
     return true;
   });
 
-  const { filteredData, search, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByCustom, filterConfig);
+  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByCustom, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "nome_fantasia", defaultDirection: "asc" });
   const pagination = usePagination(sortedData, { initialPageSize: 12 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
@@ -169,7 +169,7 @@ export default function Transportadoras() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>Transportadoras</h1><p className="text-muted-foreground mt-1">Gerencie suas transportadoras</p></div>
           <div className="flex gap-2">
-            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(list, "transportadoras")}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(list, "transportadoras")}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button></DialogFooter></DialogContent></Dialog>
           </div>
         </div>
@@ -181,17 +181,17 @@ export default function Transportadoras() {
         </div>
 
         <FilterBar 
-          search={search} 
+          search={filters.search} 
           onSearchChange={setSearch} 
           searchPlaceholder="Buscar..." 
-          filters={[
-            { key: "estado", label: "Estado", type: "select", value: estadoFilter, options: [{ value: "", label: "Todos" }, ...UFS.map(uf => ({ value: uf, label: uf }))], onChange: (v) => setEstadoFilter(v) }, 
-            { key: "ativa", label: "Status", type: "select", value: ativaFilter, options: [{ value: "", label: "Todos" }, { value: "sim", label: "Ativas" }, { value: "nao", label: "Inativas" }], onChange: (v) => setAtivaFilter(v) }
+          extraFilters={[
+            { key: "estado", label: "Estado", value: estadoFilter, options: UFS.map(uf => ({ value: uf, label: uf })), onChange: (v) => setEstadoFilter(v) }, 
+            { key: "ativa", label: "Status", value: ativaFilter, options: [{ value: "sim", label: "Ativas" }, { value: "nao", label: "Inativas" }], onChange: (v) => setAtivaFilter(v) }
           ]} 
           onClearFilters={handleClearFilters} 
           hasActiveFilters={hasActiveFilters || !!estadoFilter || !!ativaFilter} 
-          totalCount={list.length} 
-          filteredCount={sortedData.length} 
+          totalFiltered={sortedData.length}
+          totalOriginal={list.length} 
         />
 
         <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("nome_fantasia")} className="gap-1">Nome <SortIcon field="nome_fantasia" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("score_performance")} className="gap-1">Score <SortIcon field="score_performance" /></Button></div>

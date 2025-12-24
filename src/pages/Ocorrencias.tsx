@@ -48,7 +48,9 @@ const TIPOS = [
 ];
 
 const filterConfig: FilterConfig<Ocorrencia> = {
-  searchFields: ["tipo_ocorrencia", "descricao", "acao_tomada"],
+  search: {
+    fields: ["tipo_ocorrencia", "descricao", "acao_tomada"],
+  },
 };
 
 const emptyForm = { tipo_ocorrencia: "", descricao: "", acao_tomada: "", coleta_id: "", entrega_id: "" };
@@ -85,7 +87,7 @@ export default function Ocorrencias() {
     return true;
   });
 
-  const { filteredData, search, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByCustom, filterConfig);
+  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByCustom, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
@@ -129,10 +131,9 @@ export default function Ocorrencias() {
     setStatusFilter("");
   };
 
-  const handleAddComment = async () => {
+  const handleAddComment = () => {
     if (newComment.trim()) {
-      await addComment.mutateAsync(newComment);
-      setNewComment("");
+      addComment();
     }
   };
 
@@ -158,17 +159,17 @@ export default function Ocorrencias() {
         </div>
 
         <FilterBar 
-          search={search} 
+          search={filters.search} 
           onSearchChange={setSearch} 
           searchPlaceholder="Buscar..." 
-          filters={[
-            { key: "tipo", label: "Tipo", type: "select", value: tipoFilter, options: [{ value: "", label: "Todos" }, ...TIPOS.map(t => ({ value: t.value, label: t.label }))], onChange: (v) => setTipoFilter(v) }, 
-            { key: "status", label: "Status", type: "select", value: statusFilter, options: [{ value: "", label: "Todos" }, { value: "pendente", label: "Pendentes" }, { value: "resolvida", label: "Resolvidas" }], onChange: (v) => setStatusFilter(v) }
+          extraFilters={[
+            { key: "tipo", label: "Tipo", value: tipoFilter, options: TIPOS.map(t => ({ value: t.value, label: t.label })), onChange: (v) => setTipoFilter(v) }, 
+            { key: "status", label: "Status", value: statusFilter, options: [{ value: "pendente", label: "Pendentes" }, { value: "resolvida", label: "Resolvidas" }], onChange: (v) => setStatusFilter(v) }
           ]} 
           onClearFilters={handleClearFilters} 
           hasActiveFilters={hasActiveFilters || !!tipoFilter || !!statusFilter} 
-          totalCount={list.length} 
-          filteredCount={sortedData.length} 
+          totalFiltered={sortedData.length}
+          totalOriginal={list.length} 
         />
 
         <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">Data <SortIcon field="created_at" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("tipo_ocorrencia")} className="gap-1">Tipo <SortIcon field="tipo_ocorrencia" /></Button></div>
@@ -220,9 +221,9 @@ export default function Ocorrencias() {
               newComment={newComment}
               onNewCommentChange={setNewComment}
               onSubmit={handleAddComment}
-              onDelete={(id) => deleteComment.mutate(id)}
-              isAdding={addComment.isPending}
-              isDeleting={deleteComment.isPending}
+              onDelete={(id) => deleteComment(id)}
+              isAdding={false}
+              isDeleting={false}
             />
           </TabsContent>
           <TabsContent value="historico">{history.length > 0 ? <Timeline events={history} /> : <p className="text-muted-foreground text-center py-4">Nenhum histórico</p>}</TabsContent></Tabs></>)}</DialogContent></Dialog>
