@@ -1,18 +1,15 @@
 import { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Gift, Coins, ShoppingCart, Calendar, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, CheckCircle2, Clock, Loader2, Sparkles, ArrowUpDown, ChevronUp, ChevronDown, LucideIcon } from "lucide-react";
+import { Gift, Coins, ShoppingCart, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Loader2, Sparkles, ArrowUpDown, ChevronUp, ChevronDown, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -34,12 +31,19 @@ const mockRewards: RewardItem[] = [
   { id: "6", name: "Day Off", description: "Um dia de folga extra", coins_cost: 1500, category: "experiencia", icon: "Sparkles", rarity: "legendary", available: false },
 ];
 
-const filterConfig: FilterConfig<RewardItem>[] = [
-  { key: "search", type: "search", fields: ["name", "description"] },
-  { key: "category", type: "select", field: "category", options: [{ value: "alimentacao", label: "Alimentação" }, { value: "vestuario", label: "Vestuário" }, { value: "tecnologia", label: "Tecnologia" }, { value: "vale", label: "Vales" }, { value: "experiencia", label: "Experiências" }] },
-  { key: "rarity", type: "select", field: "rarity", options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }] },
-  { key: "available", type: "custom", filterFn: (item, value) => value === "yes" ? item.available : value === "no" ? !item.available : true }
-];
+const filterConfig: FilterConfig<RewardItem> = {
+  search: {
+    fields: ["name", "description"],
+    placeholder: "Buscar recompensas..."
+  },
+  select: {
+    rarity: {
+      field: "rarity",
+      options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }],
+      label: "Raridade"
+    }
+  }
+};
 
 export default function LojaRecompensas() {
   const qc = useQueryClient();
@@ -48,13 +52,20 @@ export default function LojaRecompensas() {
   const [selectedReward, setSelectedReward] = useState<RewardItem | null>(null);
   const [confirmDialog, setConfirmDialog] = useState(false);
   const [tab, setTab] = useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
 
   const coins = userLevel?.coins || 0;
 
-  const tabFiltered = useMemo(() => tab === "all" ? mockRewards : mockRewards.filter(r => r.category === tab), [tab]);
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(tabFiltered, filterConfig);
+  const tabFiltered = useMemo(() => {
+    let result = tab === "all" ? mockRewards : mockRewards.filter(r => r.category === tab);
+    if (availabilityFilter === "yes") result = result.filter(r => r.available);
+    if (availabilityFilter === "no") result = result.filter(r => !r.available);
+    return result;
+  }, [tab, availabilityFilter]);
+  
+  const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters } = useFilters(tabFiltered, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "coins_cost", defaultDirection: "asc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 9 });
+  const pagination = usePagination(sortedData, { initialPageSize: 9 });
 
   const redeemMutation = useMutation({
     mutationFn: async (reward: RewardItem) => {
@@ -70,6 +81,11 @@ export default function LojaRecompensas() {
   const handleRedeem = (reward: RewardItem) => { setSelectedReward(reward); setConfirmDialog(true); };
   const SortIcon = ({ field }: { field: string }) => { const dir = getSortDirection(field as any); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
 
+  const handleClearFilters = () => {
+    clearFilters();
+    setAvailabilityFilter("all");
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -80,15 +96,24 @@ export default function LojaRecompensas() {
 
         <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="all">Todos</TabsTrigger><TabsTrigger value="alimentacao">Alimentação</TabsTrigger><TabsTrigger value="vestuario">Vestuário</TabsTrigger><TabsTrigger value="tecnologia">Tecnologia</TabsTrigger><TabsTrigger value="experiencia">Experiências</TabsTrigger></TabsList></Tabs>
 
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar recompensas..." filters={[
-          { key: "rarity", label: "Raridade", type: "select", value: filters.rarity as string || "", options: [{ value: "", label: "Todas" }, { value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }], onChange: (v) => setFilter("rarity", v || undefined) },
-          { key: "available", label: "Disponível", type: "select", value: filters.available as string || "", options: [{ value: "", label: "Todos" }, { value: "yes", label: "Disponível" }, { value: "no", label: "Indisponível" }], onChange: (v) => setFilter("available", v || undefined) }
-        ]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <FilterBar 
+          search={filters.search} 
+          onSearchChange={setSearch} 
+          searchPlaceholder="Buscar recompensas..." 
+          extraFilters={[
+            { key: "rarity", label: "Raridade", value: filters.rarity as string || "all", options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }], onChange: (v) => setFilter("rarity", v === "all" ? undefined : v) },
+            { key: "available", label: "Disponível", value: availabilityFilter, options: [{ value: "yes", label: "Disponível" }, { value: "no", label: "Indisponível" }], onChange: setAvailabilityFilter }
+          ]} 
+          onClearFilters={handleClearFilters} 
+          hasActiveFilters={hasActiveFilters || availabilityFilter !== "all"} 
+          totalFiltered={sortedData.length} 
+          totalOriginal={tabFiltered.length} 
+        />
 
         <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("coins_cost")} className="gap-1">Preço <SortIcon field="coins_cost" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("rarity")} className="gap-1">Raridade <SortIcon field="rarity" /></Button></div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginatedData.map((r, i) => {
+          {pagination.paginatedData.map((r, i) => {
             const Icon = iconMap[r.icon] || Gift;
             const canAfford = coins >= r.coins_cost;
             return (
@@ -112,7 +137,25 @@ export default function LojaRecompensas() {
         </div>
 
         {sortedData.length === 0 && <div className="flex flex-col items-center py-12"><ShoppingCart className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma recompensa encontrada</p></div>}
-        {sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
+        {sortedData.length > 0 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+          />
+        )}
 
         <Dialog open={confirmDialog} onOpenChange={setConfirmDialog}><DialogContent><DialogHeader><DialogTitle>Confirmar Resgate</DialogTitle><DialogDescription>Deseja resgatar {selectedReward?.name} por {selectedReward?.coins_cost} moedas?</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={() => setConfirmDialog(false)}>Cancelar</Button><Button onClick={() => selectedReward && redeemMutation.mutate(selectedReward)} disabled={redeemMutation.isPending}>{redeemMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Confirmar</Button></DialogFooter></DialogContent></Dialog>
       </div>

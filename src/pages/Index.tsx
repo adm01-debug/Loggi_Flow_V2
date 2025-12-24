@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Truck, Building2, Send, Clock, TrendingUp, Package, AlertTriangle, Trophy, Target, Timer, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
@@ -15,19 +15,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
 import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } from "@/hooks/useDashboardMetrics";
 import { useRealtime } from "@/hooks/useRealtime";
+import { useGamification } from "@/hooks/useGamification";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { motion } from "framer-motion";
 import { format, subDays, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DateRange } from "react-day-picker";
 
 export default function Index() {
   const { unlockAchievement } = useAchievementNotifications();
   const { data: metrics, refetch: refetchMetrics } = useDashboardMetrics();
   const { data: alerts = [], isLoading: alertsLoading, refetch: refetchAlerts } = useRecentAlerts();
   const { data: transportadoras = [], isLoading: transportadorasLoading } = useTransportadoraPerformance();
+  const { userLevel } = useGamification();
 
   // Estado para DateRangePicker
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 6),
     to: new Date()
   });
@@ -49,6 +52,7 @@ export default function Index() {
   const { data: weeklyChartData, refetch: refetchChart } = useQuery({
     queryKey: ["dashboard-weekly", dateRange.from, dateRange.to],
     queryFn: async () => {
+      if (!dateRange.from || !dateRange.to) return { coletas: [], entregas: [] };
       const [{ data: coletas }, { data: entregas }] = await Promise.all([
         supabase.from("coletas").select("created_at").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
         supabase.from("entregas").select("created_at").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
@@ -60,6 +64,7 @@ export default function Index() {
   const { data: statusData } = useQuery({
     queryKey: ["dashboard-status", dateRange.from, dateRange.to],
     queryFn: async () => {
+      if (!dateRange.from || !dateRange.to) return { coletas: [], entregas: [] };
       const [{ data: coletas }, { data: entregas }] = await Promise.all([
         supabase.from("coletas").select("status").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
         supabase.from("entregas").select("status").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
@@ -69,13 +74,13 @@ export default function Index() {
   });
 
   const chartData = useMemo(() => {
-    if (!weeklyChartData) return [];
+    if (!weeklyChartData || !dateRange.from || !dateRange.to) return [];
     const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
     return days.map((day) => {
       const dayStr = format(day, "yyyy-MM-dd");
       const coletas = weeklyChartData.coletas.filter((c) => format(new Date(c.created_at), "yyyy-MM-dd") === dayStr).length;
       const entregas = weeklyChartData.entregas.filter((e) => format(new Date(e.created_at), "yyyy-MM-dd") === dayStr).length;
-      return { name: format(day, "EEE", { locale: ptBR }), coletas, entregas };
+      return { name: format(day, "EEE", { locale: ptBR }), coletas, entregas, total: coletas + entregas };
     });
   }, [weeklyChartData, dateRange]);
 
@@ -85,14 +90,18 @@ export default function Index() {
     const coletasTransito = statusData.coletas.filter((c) => c.status === "em_transito").length;
     const coletasOk = statusData.coletas.filter((c) => ["conferencia_ok", "finalizada"].includes(c.status)).length;
     const coletasProblema = statusData.coletas.filter((c) => c.status === "divergencia").length;
-    const entregasPendentes = statusData.entregas.filter((e) => e.status === "pendente").length;
-    const entregasTransito = statusData.entregas.filter((e) => e.status === "em_transito").length;
-    const entregasOk = statusData.entregas.filter((e) => e.status === "entregue").length;
-    const entregasProblema = statusData.entregas.filter((e) => ["cancelada", "tentativa_falha"].includes(e.status)).length;
+    const entregasPendentes = statusData.entregas.filter((e) => ["aguardando_producao", "pronto_despacho", "cotacao_frete"].includes(e.status)).length;
+    const entregasTransito = statusData.entregas.filter((e) => ["em_transito", "despachado", "saiu_entrega"].includes(e.status)).length;
+    const entregasOk = statusData.entregas.filter((e) => ["entregue", "finalizado"].includes(e.status)).length;
+    const entregasProblema = statusData.entregas.filter((e) => e.status === "ocorrencia").length;
     return { pendentes: coletasPendentes + entregasPendentes, transito: coletasTransito + entregasTransito, finalizadas: coletasOk + entregasOk, problemas: coletasProblema + entregasProblema };
   }, [statusData]);
 
   const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); };
+
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    if (range) setDateRange(range);
+  };
 
   return (
     <MainLayout>
@@ -103,25 +112,31 @@ export default function Index() {
             <p className="text-muted-foreground mt-1">Visão geral das operações logísticas</p>
           </motion.div>
           <div className="flex items-center gap-3">
-            <DateRangePicker value={dateRange} onChange={setDateRange} />
+            <DateRangePicker value={dateRange} onChange={handleDateRangeChange} />
             <Button variant="outline" size="icon" onClick={handleRefresh}><RefreshCw className="w-4 h-4" /></Button>
           </div>
         </div>
 
-        <XPProgressBar />
+        {userLevel && (
+          <XPProgressBar 
+            currentXP={userLevel.current_xp} 
+            nextLevelXP={userLevel.level * 1000} 
+            level={userLevel.level} 
+          />
+        )}
 
         <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend={0} color="warning" />
-          <KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend={0} color="info" />
-          <KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend={0} color="success" />
-          <KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend={0} color="destructive" />
+          <KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" />
+          <KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" />
+          <KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" />
+          <KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" />
         </motion.div>
 
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList><TabsTrigger value="overview">Visão Geral</TabsTrigger><TabsTrigger value="performance">Performance</TabsTrigger><TabsTrigger value="predictions">Previsões IA</TabsTrigger></TabsList>
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2"><PerformanceChart data={chartData} /></div>
+              <div className="lg:col-span-2"><PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas por dia" data={chartData} dataKey="total" /></div>
               <div><AlertsPanel alerts={alerts} isLoading={alertsLoading} /></div>
             </div>
             <QuickActions />
