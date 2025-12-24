@@ -22,6 +22,9 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 
 const TIPOS_CONCILIACAO = [
   { value: "faturas_entregas", label: "Faturas x Entregas", description: "Compare faturas de transportadoras com entregas" },
@@ -87,6 +90,156 @@ export default function ConciliacaoFinanceira() {
 
   const handleIgnoreItem = (itemId: string) => {
     manualMatch.mutate({ itemId, status: "ignorado" });
+  };
+
+  const exportToPDF = () => {
+    if (!selectedConciliacao) return;
+    
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Header
+    doc.setFontSize(18);
+    doc.text("Relatório de Conciliação", pageWidth / 2, 20, { align: "center" });
+    doc.setFontSize(12);
+    doc.text(selectedConciliacao.nome, pageWidth / 2, 28, { align: "center" });
+    
+    // Info
+    doc.setFontSize(10);
+    doc.text(`Tipo: ${TIPOS_CONCILIACAO.find(t => t.value === selectedConciliacao.tipo)?.label || selectedConciliacao.tipo}`, 14, 40);
+    doc.text(`Data: ${format(new Date(), "dd/MM/yyyy HH:mm", { locale: ptBR })}`, 14, 46);
+    doc.text(`Status: ${selectedConciliacao.status}`, 14, 52);
+    
+    // Summary
+    doc.setFontSize(12);
+    doc.text("Resumo", 14, 64);
+    doc.setFontSize(10);
+    doc.text(`Total Importados: ${stats.total}`, 14, 72);
+    doc.text(`Conciliados: ${stats.conciliados}`, 14, 78);
+    doc.text(`Divergências: ${stats.divergencias}`, 14, 84);
+    doc.text(`Pendentes: ${stats.pendentes}`, 14, 90);
+    doc.text(`Diferença Total: ${formatCurrency(stats.diferenca)}`, 14, 96);
+    
+    // Table - All items
+    const tableData = itensImportados.map(item => [
+      item.linha_arquivo?.toString() || "-",
+      item.referencia_externa || "-",
+      (item.descricao || "-").substring(0, 30),
+      item.data_documento ? formatDate(item.data_documento) : "-",
+      item.transportadora_nome || "-",
+      formatCurrency(item.valor),
+      item.diferenca_valor !== null ? formatCurrency(item.diferenca_valor) : "-",
+      item.status === "pendente" ? "Pendente" : 
+        item.status === "conciliado" ? "Conciliado" : 
+        item.status === "divergencia" ? "Divergência" : "Ignorado"
+    ]);
+    
+    autoTable(doc, {
+      head: [["Linha", "Referência", "Descrição", "Data", "Transportadora", "Valor", "Diferença", "Status"]],
+      body: tableData,
+      startY: 106,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [59, 130, 246] },
+    });
+    
+    // Divergences section
+    const divergencias = itensImportados.filter(i => i.status === "divergencia");
+    if (divergencias.length > 0) {
+      const finalY = (doc as any).lastAutoTable.finalY || 106;
+      
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text("Detalhamento de Divergências", 14, 20);
+      
+      const divTableData = divergencias.map(item => [
+        item.linha_arquivo?.toString() || "-",
+        item.referencia_externa || "-",
+        (item.descricao || "-").substring(0, 40),
+        formatCurrency(item.valor),
+        item.diferenca_valor !== null ? formatCurrency(item.diferenca_valor) : "-",
+        item.observacoes || "-"
+      ]);
+      
+      autoTable(doc, {
+        head: [["Linha", "Referência", "Descrição", "Valor", "Diferença", "Observações"]],
+        body: divTableData,
+        startY: 30,
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [234, 179, 8] },
+      });
+    }
+    
+    doc.save(`conciliacao-${selectedConciliacao.nome.replace(/\s+/g, "-").toLowerCase()}.pdf`);
+    toast.success("PDF exportado com sucesso!");
+  };
+
+  const exportToExcel = () => {
+    if (!selectedConciliacao) return;
+    
+    // Summary sheet
+    const summaryData = [
+      ["Relatório de Conciliação"],
+      [],
+      ["Nome", selectedConciliacao.nome],
+      ["Tipo", TIPOS_CONCILIACAO.find(t => t.value === selectedConciliacao.tipo)?.label || selectedConciliacao.tipo],
+      ["Status", selectedConciliacao.status],
+      ["Data Exportação", format(new Date(), "dd/MM/yyyy HH:mm", { locale: ptBR })],
+      [],
+      ["Resumo"],
+      ["Total Importados", stats.total],
+      ["Conciliados", stats.conciliados],
+      ["Divergências", stats.divergencias],
+      ["Pendentes", stats.pendentes],
+      ["Diferença Total", stats.diferenca],
+    ];
+    
+    // Items sheet
+    const itemsData = [
+      ["Linha", "Referência", "Descrição", "Data", "Transportadora", "Valor", "Diferença", "Status", "Observações"],
+      ...itensImportados.map(item => [
+        item.linha_arquivo || "",
+        item.referencia_externa || "",
+        item.descricao || "",
+        item.data_documento ? formatDate(item.data_documento) : "",
+        item.transportadora_nome || "",
+        item.valor,
+        item.diferenca_valor ?? "",
+        item.status === "pendente" ? "Pendente" : 
+          item.status === "conciliado" ? "Conciliado" : 
+          item.status === "divergencia" ? "Divergência" : "Ignorado",
+        item.observacoes || ""
+      ])
+    ];
+    
+    // Divergences sheet
+    const divergencias = itensImportados.filter(i => i.status === "divergencia");
+    const divData = [
+      ["Linha", "Referência", "Descrição", "Valor", "Diferença", "Observações"],
+      ...divergencias.map(item => [
+        item.linha_arquivo || "",
+        item.referencia_externa || "",
+        item.descricao || "",
+        item.valor,
+        item.diferenca_valor ?? "",
+        item.observacoes || ""
+      ])
+    ];
+    
+    const wb = XLSX.utils.book_new();
+    
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Resumo");
+    
+    const wsItems = XLSX.utils.aoa_to_sheet(itemsData);
+    XLSX.utils.book_append_sheet(wb, wsItems, "Todos os Itens");
+    
+    if (divergencias.length > 0) {
+      const wsDiv = XLSX.utils.aoa_to_sheet(divData);
+      XLSX.utils.book_append_sheet(wb, wsDiv, "Divergências");
+    }
+    
+    XLSX.writeFile(wb, `conciliacao-${selectedConciliacao.nome.replace(/\s+/g, "-").toLowerCase()}.xlsx`);
+    toast.success("Excel exportado com sucesso!");
   };
 
   const filteredItens = filterStatus === "all" 
@@ -271,6 +424,27 @@ export default function ConciliacaoFinanceira() {
                       {autoMatch.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2" />}
                       Matching Automático
                     </Button>
+                    
+                    <div className="flex-1" />
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" disabled={stats.total === 0}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Exportar
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={exportToPDF}>
+                          <FileText className="w-4 h-4 mr-2" />
+                          Exportar PDF
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={exportToExcel}>
+                          <FileSpreadsheet className="w-4 h-4 mr-2" />
+                          Exportar Excel
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
 
