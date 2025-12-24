@@ -9,24 +9,43 @@ import { User, Mail, Phone, Camera, Shield, Trophy, Flame, Star, Save, Loader2, 
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export default function Profile() {
-  const { user, updateProfile, isLoading } = useAuth();
+  const { user, profile, isLoading } = useAuth();
   const { userLevel, achievements } = useGamification();
-  const { uploadImage, isUploading } = useImageUpload();
+  const { uploadImage, uploading } = useImageUpload("avatars");
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ full_name: user?.user_metadata?.full_name || "", phone: user?.user_metadata?.phone || "" });
+  const [form, setForm] = useState({ full_name: profile?.full_name || user?.user_metadata?.full_name || "", phone: user?.user_metadata?.phone || "" });
 
-  const handleSave = async () => { setSaving(true); await updateProfile?.(form); toast.success("Perfil atualizado!"); setSaving(false); };
+  const handleSave = async () => { 
+    if (!user) return;
+    setSaving(true); 
+    try {
+      const { error } = await supabase.from("profiles").update({ full_name: form.full_name }).eq("id", user.id);
+      if (error) throw error;
+      toast.success("Perfil atualizado!"); 
+    } catch (e: any) {
+      toast.error("Erro: " + e.message);
+    }
+    setSaving(false); 
+  };
+  
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) { const url = await uploadImage?.(file, "avatars"); if (url) await updateProfile?.({ avatar_url: url }); }
+    if (file && user) { 
+      const result = await uploadImage(file); 
+      if (result) {
+        await supabase.from("profiles").update({ avatar_url: result.url }).eq("id", user.id);
+        toast.success("Avatar atualizado!");
+      }
+    }
   };
 
-  const stats = userLevel || { level: 1, xp: 0, coins: 0, streak_days: 0 };
-  const unlockedAchievements = (achievements || []).filter((a: any) => a.unlocked).length;
+  const stats = userLevel || { level: 1, current_xp: 0, total_xp: 0, coins: 0, streak_days: 0 };
+  const unlockedAchievements = (achievements || []).length;
 
   return (
     <MainLayout>
@@ -38,8 +57,8 @@ export default function Profile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="card-base p-6 text-center">
             <div className="relative inline-block mb-4">
-              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto overflow-hidden">{user?.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} className="w-full h-full object-cover" /> : <User className="w-12 h-12 text-primary" />}</div>
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90"><Camera className="w-4 h-4" /><input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={isUploading} /></label>
+              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto overflow-hidden">{profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <User className="w-12 h-12 text-primary" />}</div>
+              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90"><Camera className="w-4 h-4" /><input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploading} /></label>
             </div>
             <h2 className="text-xl font-bold">{form.full_name || "Usuário"}</h2>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
@@ -57,7 +76,7 @@ export default function Profile() {
               <TabsContent value="gamification" className="card-base p-6">
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   <div className="text-center"><Star className="w-6 h-6 text-amber-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.level}</p><p className="text-xs text-muted-foreground">Nível</p></div>
-                  <div className="text-center"><Trophy className="w-6 h-6 text-purple-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.xp}</p><p className="text-xs text-muted-foreground">XP</p></div>
+                  <div className="text-center"><Trophy className="w-6 h-6 text-purple-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.total_xp}</p><p className="text-xs text-muted-foreground">XP</p></div>
                   <div className="text-center"><Flame className="w-6 h-6 text-orange-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.streak_days}</p><p className="text-xs text-muted-foreground">Streak</p></div>
                   <div className="text-center"><CheckCircle2 className="w-6 h-6 text-green-500 mx-auto mb-1" /><p className="text-2xl font-bold">{unlockedAchievements}</p><p className="text-xs text-muted-foreground">Conquistas</p></div>
                 </div>

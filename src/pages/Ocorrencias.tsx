@@ -47,11 +47,9 @@ const TIPOS = [
   { value: "outros", label: "Outros", icon: MessageSquare },
 ];
 
-const filterConfig: FilterConfig<Ocorrencia>[] = [
-  { key: "search", type: "search", fields: ["tipo_ocorrencia", "descricao", "acao_tomada"] },
-  { key: "tipo", type: "select", field: "tipo_ocorrencia", options: TIPOS.map(t => ({ value: t.value, label: t.label })) },
-  { key: "status", type: "custom", filterFn: (item, value) => value === "pendente" ? !item.resolvida : value === "resolvida" ? item.resolvida === true : true }
-];
+const filterConfig: FilterConfig<Ocorrencia> = {
+  searchFields: ["tipo_ocorrencia", "descricao", "acao_tomada"],
+};
 
 const emptyForm = { tipo_ocorrencia: "", descricao: "", acao_tomada: "", coleta_id: "", entrega_id: "" };
 
@@ -63,6 +61,9 @@ export default function Ocorrencias() {
   const [sel, setSel] = useState<Ocorrencia | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
+  const [tipoFilter, setTipoFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [newComment, setNewComment] = useState("");
 
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["ocorrencias"],
@@ -76,12 +77,20 @@ export default function Ocorrencias() {
   const { data: coletas = [] } = useQuery({ queryKey: ["coletas-select"], queryFn: async () => { const { data } = await supabase.from("coletas").select("id, numero_coleta").order("created_at", { ascending: false }).limit(50); return data || []; } });
   const { data: entregas = [] } = useQuery({ queryKey: ["entregas-select"], queryFn: async () => { const { data } = await supabase.from("entregas").select("id, numero_entrega").order("created_at", { ascending: false }).limit(50); return data || []; } });
 
-  const { filteredData, filters, setFilter, clearFilters, hasActiveFilters } = useFilters(list, filterConfig);
+  // Apply filters manually
+  const filteredByCustom = list.filter(o => {
+    if (tipoFilter && o.tipo_ocorrencia !== tipoFilter) return false;
+    if (statusFilter === "pendente" && o.resolvida) return false;
+    if (statusFilter === "resolvida" && !o.resolvida) return false;
+    return true;
+  });
+
+  const { filteredData, search, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByCustom, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
-  const { paginatedData, currentPage, totalPages, pageSize, setPageSize, goToPage, hasNextPage, hasPrevPage } = usePagination(sortedData, { initialPageSize: 10 });
-  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(paginatedData);
+  const pagination = usePagination(sortedData, { initialPageSize: 10 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
   const { comments, addComment, deleteComment, isLoading: commentsLoading } = useComments({ entityType: "ocorrencia", entityId: sel?.id || "" });
-  const { uploadImage, isUploading } = useImageUpload({ bucket: "ocorrencias-fotos" });
+  const { uploadImage, uploading } = useImageUpload("ocorrencias-fotos");
   const { history } = useEntityHistory({ entityType: "ocorrencia", entityId: sel?.id || "" });
 
   const createMut = useMutation({
@@ -106,7 +115,26 @@ export default function Ocorrencias() {
   const bulkResolveMut = useMutation({ mutationFn: async (ids: string[]) => { const { error } = await supabase.from("ocorrencias").update({ resolvida: true, data_resolucao: new Date().toISOString() }).in("id", ids); if (error) throw error; }, onSuccess: () => { qc.invalidateQueries({ queryKey: ["ocorrencias"] }); clearSelection(); toast.success(`${selectedIds.length} resolvida(s)!`); } });
 
   const openEdit = (o: Ocorrencia) => { setSel(o); setForm({ tipo_ocorrencia: o.tipo_ocorrencia, descricao: o.descricao || "", acao_tomada: o.acao_tomada || "", coleta_id: o.coleta_id || "", entrega_id: o.entrega_id || "" }); setUploadedPhotos(o.fotos_urls || []); setDlgEdit(true); };
-  const handlePhotoUpload = async (files: File[]) => { for (const f of files) { const url = await uploadImage(f); if (url) setUploadedPhotos(p => [...p, url]); } };
+  
+  const handlePhotoUpload = async (files: File[]) => { 
+    for (const f of files) { 
+      const result = await uploadImage(f); 
+      if (result) setUploadedPhotos(p => [...p, result.url]); 
+    } 
+  };
+
+  const handleClearFilters = () => {
+    clearFilters();
+    setTipoFilter("");
+    setStatusFilter("");
+  };
+
+  const handleAddComment = async () => {
+    if (newComment.trim()) {
+      await addComment.mutateAsync(newComment);
+      setNewComment("");
+    }
+  };
 
   const stats = { total: list.length, pendentes: list.filter(o => !o.resolvida).length, resolvidas: list.filter(o => o.resolvida).length, hoje: list.filter(o => format(new Date(o.created_at), "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")).length };
   const getTipoInfo = (tipo: string) => TIPOS.find(t => t.value === tipo) || { label: tipo, icon: AlertTriangle };
@@ -129,15 +157,27 @@ export default function Ocorrencias() {
           <div className="stat-card text-center"><Calendar className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.hoje}</p><p className="text-xs text-muted-foreground">Hoje</p></div>
         </div>
 
-        <FilterBar searchValue={filters.search as string || ""} onSearchChange={(v) => setFilter("search", v)} searchPlaceholder="Buscar..." filters={[{ key: "tipo", label: "Tipo", type: "select", value: filters.tipo as string || "", options: [{ value: "", label: "Todos" }, ...TIPOS.map(t => ({ value: t.value, label: t.label }))], onChange: (v) => setFilter("tipo", v || undefined) }, { key: "status", label: "Status", type: "select", value: filters.status as string || "", options: [{ value: "", label: "Todos" }, { value: "pendente", label: "Pendentes" }, { value: "resolvida", label: "Resolvidas" }], onChange: (v) => setFilter("status", v || undefined) }]} onClearFilters={clearFilters} hasActiveFilters={hasActiveFilters} totalCount={sortedData.length} filteredCount={sortedData.length} />
+        <FilterBar 
+          search={search} 
+          onSearchChange={setSearch} 
+          searchPlaceholder="Buscar..." 
+          filters={[
+            { key: "tipo", label: "Tipo", type: "select", value: tipoFilter, options: [{ value: "", label: "Todos" }, ...TIPOS.map(t => ({ value: t.value, label: t.label }))], onChange: (v) => setTipoFilter(v) }, 
+            { key: "status", label: "Status", type: "select", value: statusFilter, options: [{ value: "", label: "Todos" }, { value: "pendente", label: "Pendentes" }, { value: "resolvida", label: "Resolvidas" }], onChange: (v) => setStatusFilter(v) }
+          ]} 
+          onClearFilters={handleClearFilters} 
+          hasActiveFilters={hasActiveFilters || !!tipoFilter || !!statusFilter} 
+          totalCount={list.length} 
+          filteredCount={sortedData.length} 
+        />
 
         <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">Data <SortIcon field="created_at" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("tipo_ocorrencia")} className="gap-1">Tipo <SortIcon field="tipo_ocorrencia" /></Button></div>
 
-        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "resolve", label: "Resolver", icon: CheckCircle2, onClick: (ids) => bulkResolveMut.mutate(ids) }]} />}
+        {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "resolve", label: "Resolver", icon: CheckCircle2, onClick: (ids) => bulkResolveMut.mutate(ids) }]} />}
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!isLoading && <div className="space-y-3">{paginatedData.map((o, i) => { const tipoInfo = getTipoInfo(o.tipo_ocorrencia); const TipoIcon = tipoInfo.icon; return (
+        {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((o, i) => { const tipoInfo = getTipoInfo(o.tipo_ocorrencia); const TipoIcon = tipoInfo.icon; return (
           <div key={o.id} className={`card-interactive animate-fade-in ${isSelected(o.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
             <div className="flex items-start gap-3"><Checkbox checked={isSelected(o.id)} onCheckedChange={() => toggle(o.id)} className="mt-1" /><div className={cn("p-2 rounded-lg", o.resolvida ? "bg-success/10" : "bg-warning/10")}><TipoIcon className={cn("w-5 h-5", o.resolvida ? "text-success" : "text-warning")} /></div>
               <div className="flex-1 min-w-0"><div className="flex items-center gap-2 mb-1"><p className="font-semibold">{tipoInfo.label}</p><Badge variant={o.resolvida ? "default" : "secondary"} className={o.resolvida ? "bg-success/20 text-success" : ""}>{o.resolvida ? "Resolvida" : "Pendente"}</Badge>{o.fotos_urls && o.fotos_urls.length > 0 && <Badge variant="outline" className="gap-1"><Camera className="w-3 h-3" />{o.fotos_urls.length}</Badge>}</div>{o.descricao && <p className="text-sm text-muted-foreground line-clamp-2">{o.descricao}</p>}<div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground"><span>{format(new Date(o.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}</span>{o.coleta && <span className="flex items-center gap-1"><Package className="w-3 h-3" />{o.coleta.numero_coleta}</span>}{o.entrega && <span className="flex items-center gap-1"><Send className="w-3 h-3" />{o.entrega.numero_entrega}</span>}</div></div>
@@ -147,13 +187,45 @@ export default function Ocorrencias() {
         ); })}</div>}
 
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><AlertTriangle className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma ocorrência</p></div>}
-        {!isLoading && sortedData.length > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={sortedData.length} onPageChange={goToPage} onPageSizeChange={setPageSize} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} />}
+        
+        {!isLoading && sortedData.length > 0 && (
+          <Pagination 
+            currentPage={pagination.currentPage} 
+            totalPages={pagination.totalPages} 
+            pageSize={pagination.pageSize} 
+            totalItems={sortedData.length}
+            startIndex={(pagination.currentPage - 1) * pagination.pageSize + 1}
+            endIndex={Math.min(pagination.currentPage * pagination.pageSize, sortedData.length)}
+            pageSizeOptions={[10, 25, 50]}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onNextPage={pagination.nextPage}
+            onPrevPage={pagination.prevPage}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+          />
+        )}
 
-        <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Ocorrência</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div className="grid gap-2"><Label>Tipo *</Label><Select value={form.tipo_ocorrencia} onValueChange={(v) => setForm({ ...form, tipo_ocorrencia: v })}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{TIPOS.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Descrição</Label><Textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} rows={3} /></div><div className="grid gap-2"><Label>Ação Tomada</Label><Textarea value={form.acao_tomada} onChange={(e) => setForm({ ...form, acao_tomada: e.target.value })} rows={2} /></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Coleta</Label><Select value={form.coleta_id} onValueChange={(v) => setForm({ ...form, coleta_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{coletas.map(c => <SelectItem key={c.id} value={c.id}>{c.numero_coleta}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Entrega</Label><Select value={form.entrega_id} onValueChange={(v) => setForm({ ...form, entrega_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{entregas.map(e => <SelectItem key={e.id} value={e.id}>{e.numero_entrega}</SelectItem>)}</SelectContent></Select></div></div><div className="grid gap-2"><Label>Fotos</Label><ImageUploader value={uploadedPhotos} onChange={setUploadedPhotos} onUpload={handlePhotoUpload} maxFiles={5} isUploading={isUploading} /></div></div><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate({ ...form, fotos_urls: uploadedPhotos })} disabled={!form.tipo_ocorrencia || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Registrar</Button></DialogFooter></DialogContent></Dialog>
+        <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Ocorrência</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div className="grid gap-2"><Label>Tipo *</Label><Select value={form.tipo_ocorrencia} onValueChange={(v) => setForm({ ...form, tipo_ocorrencia: v })}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{TIPOS.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Descrição</Label><Textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} rows={3} /></div><div className="grid gap-2"><Label>Ação Tomada</Label><Textarea value={form.acao_tomada} onChange={(e) => setForm({ ...form, acao_tomada: e.target.value })} rows={2} /></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Coleta</Label><Select value={form.coleta_id} onValueChange={(v) => setForm({ ...form, coleta_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{coletas.map(c => <SelectItem key={c.id} value={c.id}>{c.numero_coleta}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Entrega</Label><Select value={form.entrega_id} onValueChange={(v) => setForm({ ...form, entrega_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{entregas.map(e => <SelectItem key={e.id} value={e.id}>{e.numero_entrega}</SelectItem>)}</SelectContent></Select></div></div><div className="grid gap-2"><Label>Fotos</Label><ImageUploader images={uploadedPhotos} onImagesChange={setUploadedPhotos} maxImages={5} disabled={uploading} bucket="ocorrencias-fotos" /></div></div><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate({ ...form, fotos_urls: uploadedPhotos })} disabled={!form.tipo_ocorrencia || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Registrar</Button></DialogFooter></DialogContent></Dialog>
 
-        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Detalhes</DialogTitle></DialogHeader>{sel && <Tabs defaultValue="detalhes" className="w-full"><TabsList className="w-full"><TabsTrigger value="detalhes" className="flex-1">Detalhes</TabsTrigger><TabsTrigger value="comentarios" className="flex-1">Comentários</TabsTrigger><TabsTrigger value="historico" className="flex-1">Histórico</TabsTrigger></TabsList><TabsContent value="detalhes" className="space-y-4 pt-4"><div className="flex items-center gap-3"><Badge variant={sel.resolvida ? "default" : "secondary"} className={sel.resolvida ? "bg-success/20 text-success" : ""}>{sel.resolvida ? "Resolvida" : "Pendente"}</Badge><span className="text-sm text-muted-foreground">{format(new Date(sel.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}</span></div><div><p className="text-sm text-muted-foreground">Tipo</p><p className="font-medium">{getTipoInfo(sel.tipo_ocorrencia).label}</p></div>{sel.descricao && <div><p className="text-sm text-muted-foreground">Descrição</p><p>{sel.descricao}</p></div>}{sel.acao_tomada && <div><p className="text-sm text-muted-foreground">Ação Tomada</p><p>{sel.acao_tomada}</p></div>}{sel.fotos_urls && sel.fotos_urls.length > 0 && <div><p className="text-sm text-muted-foreground mb-2">Fotos</p><div className="grid grid-cols-3 gap-2">{sel.fotos_urls.map((url, i) => <img key={i} src={url} alt={`Foto ${i+1}`} className="rounded-lg object-cover w-full h-24" />)}</div></div>}</TabsContent><TabsContent value="comentarios" className="pt-4"><CommentSection entityType="ocorrencia" entityId={sel.id} comments={comments} onAddComment={addComment} onDeleteComment={deleteComment} isLoading={commentsLoading} /></TabsContent><TabsContent value="historico" className="pt-4"><Timeline events={history.map(h => ({ id: h.id, title: h.title, description: h.description, timestamp: h.timestamp, status: h.status }))} /></TabsContent></Tabs>}<DialogFooter><Button variant="outline" onClick={() => setDlgView(false)}>Fechar</Button><Button onClick={() => { setDlgView(false); sel && openEdit(sel); }}>Editar</Button></DialogFooter></DialogContent></Dialog>
+        <Dialog open={dlgEdit} onOpenChange={setDlgEdit}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Ocorrência</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div className="grid gap-2"><Label>Tipo *</Label><Select value={form.tipo_ocorrencia} onValueChange={(v) => setForm({ ...form, tipo_ocorrencia: v })}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{TIPOS.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Descrição</Label><Textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} rows={3} /></div><div className="grid gap-2"><Label>Ação Tomada</Label><Textarea value={form.acao_tomada} onChange={(e) => setForm({ ...form, acao_tomada: e.target.value })} rows={2} /></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Coleta</Label><Select value={form.coleta_id} onValueChange={(v) => setForm({ ...form, coleta_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{coletas.map(c => <SelectItem key={c.id} value={c.id}>{c.numero_coleta}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Entrega</Label><Select value={form.entrega_id} onValueChange={(v) => setForm({ ...form, entrega_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{entregas.map(e => <SelectItem key={e.id} value={e.id}>{e.numero_entrega}</SelectItem>)}</SelectContent></Select></div></div><div className="grid gap-2"><Label>Fotos</Label><ImageUploader images={uploadedPhotos} onImagesChange={setUploadedPhotos} maxImages={5} disabled={uploading} bucket="ocorrencias-fotos" /></div></div><DialogFooter><Button variant="outline" onClick={() => setDlgEdit(false)}>Cancelar</Button><Button onClick={() => sel && updateMut.mutate({ id: sel.id, d: { ...form, fotos_urls: uploadedPhotos, resolvida: sel.resolvida ?? false } })} disabled={!form.tipo_ocorrencia || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
 
-        <Dialog open={dlgEdit} onOpenChange={setDlgEdit}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div className="grid gap-2"><Label>Tipo *</Label><Select value={form.tipo_ocorrencia} onValueChange={(v) => setForm({ ...form, tipo_ocorrencia: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{TIPOS.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Descrição</Label><Textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} rows={3} /></div><div className="grid gap-2"><Label>Ação Tomada</Label><Textarea value={form.acao_tomada} onChange={(e) => setForm({ ...form, acao_tomada: e.target.value })} rows={2} /></div><div className="grid gap-2"><Label>Fotos</Label><ImageUploader value={uploadedPhotos} onChange={setUploadedPhotos} onUpload={handlePhotoUpload} maxFiles={5} isUploading={isUploading} /></div></div><DialogFooter><Button variant="outline" onClick={() => setDlgEdit(false)}>Cancelar</Button><Button onClick={() => sel && updateMut.mutate({ id: sel.id, d: { ...form, fotos_urls: uploadedPhotos, resolvida: sel.resolvida || false } })} disabled={!form.tipo_ocorrencia || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
+        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">{sel && (<><DialogHeader><DialogTitle className="flex items-center gap-2">{getTipoInfo(sel.tipo_ocorrencia).label}<Badge variant={sel.resolvida ? "default" : "secondary"} className={sel.resolvida ? "bg-success/20 text-success" : ""}>{sel.resolvida ? "Resolvida" : "Pendente"}</Badge></DialogTitle></DialogHeader><Tabs defaultValue="detalhes"><TabsList><TabsTrigger value="detalhes">Detalhes</TabsTrigger><TabsTrigger value="comments">Comentários</TabsTrigger><TabsTrigger value="historico">Histórico</TabsTrigger></TabsList><TabsContent value="detalhes" className="space-y-4"><div className="grid gap-4"><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Criada em</p><p>{format(new Date(sel.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</p></div>{sel.data_resolucao && <div><p className="text-sm text-muted-foreground">Resolvida em</p><p>{format(new Date(sel.data_resolucao), "dd/MM/yyyy HH:mm", { locale: ptBR })}</p></div>}</div>{sel.descricao && <div><p className="text-sm text-muted-foreground">Descrição</p><p className="whitespace-pre-wrap">{sel.descricao}</p></div>}{sel.acao_tomada && <div><p className="text-sm text-muted-foreground">Ação Tomada</p><p className="whitespace-pre-wrap">{sel.acao_tomada}</p></div>}<div className="flex gap-4">{sel.coleta && <Badge variant="outline" className="gap-1"><Package className="w-3 h-3" />{sel.coleta.numero_coleta}</Badge>}{sel.entrega && <Badge variant="outline" className="gap-1"><Send className="w-3 h-3" />{sel.entrega.numero_entrega}</Badge>}</div>{sel.fotos_urls && sel.fotos_urls.length > 0 && <div><p className="text-sm text-muted-foreground mb-2">Fotos</p><div className="flex flex-wrap gap-2">{sel.fotos_urls.map((url, i) => <img key={i} src={url} alt={`Foto ${i + 1}`} className="w-24 h-24 object-cover rounded-lg cursor-pointer hover:opacity-80" onClick={() => window.open(url, "_blank")} />)}</div></div>}</div></TabsContent>
+          <TabsContent value="comments">
+            <CommentSection 
+              comments={comments} 
+              isLoading={commentsLoading}
+              newComment={newComment}
+              onNewCommentChange={setNewComment}
+              onSubmit={handleAddComment}
+              onDelete={(id) => deleteComment.mutate(id)}
+              isAdding={addComment.isPending}
+              isDeleting={deleteComment.isPending}
+            />
+          </TabsContent>
+          <TabsContent value="historico">{history.length > 0 ? <Timeline events={history} /> : <p className="text-muted-foreground text-center py-4">Nenhum histórico</p>}</TabsContent></Tabs></>)}</DialogContent></Dialog>
       </div>
     </MainLayout>
   );
