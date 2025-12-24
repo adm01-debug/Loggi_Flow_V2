@@ -57,9 +57,9 @@ export default function Despachos() {
   const stats = { total: despachos.length, aguardando: getColumnItems("aguardando").length, pronto: getColumnItems("pronto").length, despachado: getColumnItems("despachado").length };
 
   const moveToNext = async (item: Despacho) => {
-    const idx = columns.indexOf(item.status as typeof columns[number]);
+    const idx = columns.indexOf(item.status);
     if (idx >= 0 && idx < columns.length - 1) {
-      const nextStatus = columns[idx + 1];
+      const nextStatus = columns[idx + 1] as "aguardando_producao" | "pronto_despacho" | "cotacao_frete" | "nf_emitida" | "despachado" | "em_transito" | "saiu_entrega" | "entregue" | "ocorrencia" | "finalizado";
       await supabase.from("entregas").update({ status: nextStatus }).eq("id", item.id);
       refetch();
     }
