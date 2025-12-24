@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,19 +23,12 @@ import { useSorting } from '@/hooks/useSorting';
 
 const ESTADOS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
-interface TabelaFrete { id: string; transportadora_id: string; transportadora_nome?: string; estado_destino: string; peso_min: number; peso_max: number; valor_kg: number; prazo_dias: number; }
+interface TabelaFreteLocal { id: string; transportadora_id: string; transportadora_nome?: string; estado_destino: string; peso_min: number; peso_max: number; valor_kg: number; prazo_dias: number; }
 
-const filterConfig: FilterConfig<TabelaFrete> = {
+const filterConfig: FilterConfig<TabelaFreteLocal> = {
   search: {
     fields: ["transportadora_nome", "estado_destino"],
     placeholder: "Buscar tabelas..."
-  },
-  select: {
-    estado_destino: {
-      field: "estado_destino",
-      options: ESTADOS_BRASIL.map(uf => ({ value: uf, label: uf })),
-      label: "Estado"
-    }
   }
 };
 
@@ -61,11 +53,12 @@ export default function CotacaoFrete() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newTableForm, setNewTableForm] = useState({ transportadora_id: '', estado_destino: '', peso_min: 0, peso_max: 100, valor_kg: 0, prazo_dias: 5 });
   const [tab, setTab] = useState("cotacao");
+  const [estadoFilter, setEstadoFilter] = useState("all");
 
   const tabelasList = useMemo(() => (tabelasFrete || []).map((t: any) => ({ 
     id: t.id, 
     transportadora_id: t.transportadora_id, 
-    transportadora_nome: t.transportadoras?.nome_fantasia || 'N/A', 
+    transportadora_nome: t.transportadora?.nome_fantasia || 'N/A', 
     estado_destino: t.estado_destino, 
     peso_min: t.peso_min_kg || 0, 
     peso_max: t.peso_max_kg || 100, 
@@ -73,7 +66,13 @@ export default function CotacaoFrete() {
     prazo_dias: t.prazo_dias || 5 
   })), [tabelasFrete]);
 
-  const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(tabelasList, filterConfig);
+  // Apply estado filter
+  const estadoFiltered = useMemo(() => {
+    if (estadoFilter === "all") return tabelasList;
+    return tabelasList.filter(t => t.estado_destino === estadoFilter);
+  }, [tabelasList, estadoFilter]);
+
+  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(estadoFiltered, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "valor_kg", defaultDirection: "asc" });
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
@@ -81,13 +80,13 @@ export default function CotacaoFrete() {
   const handleCalculate = async () => {
     if (!estadoDestino || !pesoKg) { toast.error("Preencha estado e peso"); return; }
     if (calculateQuotations) {
-      const results = calculateQuotations({ destinationState: estadoDestino, weight: parseFloat(pesoKg) });
+      const results = calculateQuotations({ estado_destino: estadoDestino, peso_kg: parseFloat(pesoKg) });
       setQuotationResults(results || []);
       setHasSearched(true);
     }
     // Chamar IA para recomendação
     if (analyzeCarriers) {
-      analyzeCarriers({ destination: estadoDestino, weight: parseFloat(pesoKg), urgency: 'normal' });
+      analyzeCarriers({ estado_destino: estadoDestino, peso_kg: parseFloat(pesoKg), urgencia: 'normal' });
     }
   };
 
@@ -100,7 +99,9 @@ export default function CotacaoFrete() {
         peso_min_kg: newTableForm.peso_min,
         peso_max_kg: newTableForm.peso_max,
         preco_por_kg: newTableForm.valor_kg,
-        prazo_dias: newTableForm.prazo_dias
+        prazo_dias: newTableForm.prazo_dias,
+        taxa_fixa: 0,
+        ativo: true
       });
     }
     setIsAddDialogOpen(false);
@@ -118,6 +119,11 @@ export default function CotacaoFrete() {
       handleDeleteTable(id); 
     } 
     clearSelection(); 
+  };
+
+  const handleClearFilters = () => {
+    clearFilters();
+    setEstadoFilter("all");
   };
 
   const stats = { tabelas: tabelasList.length, transportadoras: transportadoras?.length || 0, estados: [...new Set(tabelasList.map(t => t.estado_destino))].length };
@@ -164,10 +170,10 @@ export default function CotacaoFrete() {
               onSearchChange={setSearch} 
               searchPlaceholder="Buscar tabelas..." 
               extraFilters={[
-                { key: "estado_destino", label: "Estado", value: filters.estado_destino as string || "all", options: ESTADOS_BRASIL.map(uf => ({ value: uf, label: uf })), onChange: (v) => setFilter("estado_destino", v === "all" ? undefined : v) }
+                { key: "estado_destino", label: "Estado", value: estadoFilter, options: ESTADOS_BRASIL.map(uf => ({ value: uf, label: uf })), onChange: setEstadoFilter }
               ]} 
-              onClearFilters={clearFilters} 
-              hasActiveFilters={hasActiveFilters} 
+              onClearFilters={handleClearFilters} 
+              hasActiveFilters={hasActiveFilters || estadoFilter !== "all"} 
               totalFiltered={totalFiltered} 
               totalOriginal={totalOriginal} 
             />
