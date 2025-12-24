@@ -41,6 +41,7 @@ const Analytics = lazy(() => import("./pages/Analytics"));
 const RastreamentoPublico = lazy(() => import("./pages/RastreamentoPublico"));
 const APIDocumentation = lazy(() => import("./pages/APIDocumentation"));
 const LojaRecompensas = lazy(() => import("./pages/LojaRecompensas"));
+const ConciliacaoFinanceira = lazy(() => import("./pages/ConciliacaoFinanceira"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -93,6 +94,7 @@ const App = () => (
                   <Route path="/notificacoes" element={<ProtectedRoute><Notificacoes /></ProtectedRoute>} />
                   <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                   <Route path="/loja" element={<ProtectedRoute><LojaRecompensas /></ProtectedRoute>} />
+                  <Route path="/conciliacao" element={<ProtectedRoute><ConciliacaoFinanceira /></ProtectedRoute>} />
                   <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
                   <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
                   {/* Public route - no authentication required */}
