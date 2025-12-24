@@ -25,6 +25,7 @@ import {
   Navigation,
   Users,
   Bell,
+  FileCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const menuItems = [
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
   { title: "Custos Logísticos", url: "/custos", icon: DollarSign },
+  { title: "Conciliação", url: "/conciliacao", icon: FileCheck },
   { title: "Alertas Custo", url: "/alertas-custo", icon: AlertTriangle },
   { title: "Mapa de Rotas", url: "/mapa-rotas", icon: Map },
   { title: "Rastreamento", url: "/rastreamento-motorista", icon: Navigation },
