@@ -210,6 +210,42 @@ export default {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-2px)" },
+          "20%, 40%, 60%, 80%": { transform: "translateX(2px)" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        ripple: {
+          "0%": { transform: "scale(0)", opacity: "0.5" },
+          "100%": { transform: "scale(4)", opacity: "0" },
+        },
+        "slide-in-right": {
+          from: { transform: "translateX(100%)", opacity: "0" },
+          to: { transform: "translateX(0)", opacity: "1" },
+        },
+        "slide-out-right": {
+          from: { transform: "translateX(0)", opacity: "1" },
+          to: { transform: "translateX(100%)", opacity: "0" },
+        },
+        "gradient-x": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "gradient-y": {
+          "0%, 100%": { backgroundPosition: "50% 0%" },
+          "50%": { backgroundPosition: "50% 100%" },
+        },
+        sparkle: {
+          "0%, 100%": { opacity: "0", transform: "scale(0)" },
+          "50%": { opacity: "1", transform: "scale(1)" },
+        },
+        "ping-slow": {
+          "75%, 100%": { transform: "scale(1.5)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -229,6 +265,15 @@ export default {
         wiggle: "wiggle 0.3s ease-in-out",
         pop: "pop 0.3s ease-out",
         "count-up": "count-up 0.4s ease-out forwards",
+        shake: "shake 0.5s ease-in-out",
+        "spin-slow": "spin-slow 3s linear infinite",
+        ripple: "ripple 0.6s linear",
+        "slide-in-right": "slide-in-right 0.3s ease-out",
+        "slide-out-right": "slide-out-right 0.3s ease-out",
+        "gradient-x": "gradient-x 3s ease infinite",
+        "gradient-y": "gradient-y 3s ease infinite",
+        sparkle: "sparkle 1.5s ease-in-out infinite",
+        "ping-slow": "ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite",
       },
       transitionDuration: {
         "150": "150ms",

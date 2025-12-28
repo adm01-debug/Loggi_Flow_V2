@@ -10,4 +10,4 @@ export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 export { StatsCard, StatsCardCompact } from './StatsCard';
 export { TagInput } from './TagInput';
 export { DetailSheet } from './DetailSheet';
-export { EmptyState } from './EmptyState';
+export { EmptyState, EmptyStatePresets } from './EmptyState';
