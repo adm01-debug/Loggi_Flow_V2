@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine } from "lucide-react";
+import { ScannerButton } from "@/components/scanner/ScannerButton";
+import { ScanResult } from "@/hooks/useQRScanner";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -142,14 +144,28 @@ export default function Envios() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Send className="w-6 h-6 text-primary" /></div>Envios</h1><p className="text-muted-foreground mt-1">Gerencie entregas aos clientes</p></div>
-          <OnboardingTooltip
-            id="envios-novo-btn"
-            title="Crie sua primeira entrega"
-            description="Registre uma nova entrega e acompanhe todo o ciclo de envio. Ganhe XP a cada entrega finalizada!"
-            position="left"
-          >
-            <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
-          </OnboardingTooltip>
+          <div className="flex gap-2">
+            <ScannerButton
+              onScan={(result: ScanResult) => {
+                const entrega = list.find(e => e.codigo_rastreamento === result.text || e.numero_entrega === result.text);
+                if (entrega) {
+                  setSel(entrega);
+                  setDlgView(true);
+                } else {
+                  toast.error(`Código não encontrado: ${result.text}`);
+                }
+              }}
+              variant="outline"
+            />
+            <OnboardingTooltip
+              id="envios-novo-btn"
+              title="Crie sua primeira entrega"
+              description="Registre uma nova entrega e acompanhe todo o ciclo de envio. Ganhe XP a cada entrega finalizada!"
+              position="left"
+            >
+              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+            </OnboardingTooltip>
+          </div>
         </div>
 
         <OnboardingTooltip
