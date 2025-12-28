@@ -1,17 +1,19 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle, MousePointer } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle, MousePointer, Mail } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DrillDownModal } from "@/components/analytics/DrillDownModal";
 import { useDrillDown } from "@/hooks/useDrillDown";
+import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
 
 type Period = "7d" | "30d" | "90d" | "12m";
 
@@ -165,16 +167,32 @@ export default function Relatorios() {
               </span>
             </p>
           </div>
-          <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
-            <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="90d">Últimos 90 dias</SelectItem>
-              <SelectItem value="12m">Último ano</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
+
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="dashboard" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="agendados" className="gap-2">
+              <Mail className="h-4 w-4" />
+              Agendados
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dashboard" className="space-y-6">
+            <div className="flex justify-end">
+              <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
+                <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7d">Últimos 7 dias</SelectItem>
+                  <SelectItem value="30d">Últimos 30 dias</SelectItem>
+                  <SelectItem value="90d">Últimos 90 dias</SelectItem>
+                  <SelectItem value="12m">Último ano</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
         {/* KPI Cards - Now clickable */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -324,15 +342,21 @@ export default function Relatorios() {
             </CardContent>
           </Card>
         </div>
-      </div>
+          </TabsContent>
 
-      {/* Drill-down Modal */}
-      <DrillDownModal
-        open={drillDown.isOpen}
-        onOpenChange={drillDown.setIsOpen}
-        data={drillDown.data}
-        isLoading={drillDown.isLoading}
-      />
+          <TabsContent value="agendados">
+            <ScheduledReportsManager />
+          </TabsContent>
+        </Tabs>
+
+        {/* Drill-down Modal */}
+        <DrillDownModal
+          open={drillDown.isOpen}
+          onOpenChange={drillDown.setIsOpen}
+          data={drillDown.data}
+          isLoading={drillDown.isLoading}
+        />
+      </div>
     </MainLayout>
   );
 }
