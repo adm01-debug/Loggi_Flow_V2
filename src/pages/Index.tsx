@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react";
+import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
@@ -10,46 +10,37 @@ import { TransportadoraRanking } from "@/components/dashboard/TransportadoraRank
 import { XPProgressBar } from "@/components/dashboard/XPProgressBar";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { DelayPredictionPanel } from "@/components/predictions/DelayPredictionPanel";
+import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/DraggableDashboard";
+import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
 import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } from "@/hooks/useDashboardMetrics";
 import { useRealtime } from "@/hooks/useRealtime";
 import { useGamification } from "@/hooks/useGamification";
+import { useDashboardWidgets } from "@/hooks/useDashboardWidgets";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
-import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { motion } from "framer-motion";
 import { format, subDays, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function Index() {
-  const { unlockAchievement } = useAchievementNotifications();
   const { data: metrics, refetch: refetchMetrics } = useDashboardMetrics();
   const { data: alerts = [], isLoading: alertsLoading, refetch: refetchAlerts } = useRecentAlerts();
   const { data: transportadoras = [], isLoading: transportadorasLoading } = useTransportadoraPerformance();
   const { userLevel } = useGamification();
+  const { isEditMode, toggleEditMode, resetLayout, getAvailableWidgetsToAdd, addWidget } = useDashboardWidgets();
 
-  // Estado para DateRangePicker
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: subDays(new Date(), 6),
-    to: new Date()
-  });
+  const [dateRange, setDateRange] = useState<DateRange>({ from: subDays(new Date(), 6), to: new Date() });
 
-  // Realtime updates
-  useRealtime({
-    table: "entregas",
-    onInsert: () => { refetchMetrics(); refetchAlerts(); },
-    onUpdate: () => { refetchMetrics(); refetchAlerts(); },
-  });
+  const [widgetOrder, setWidgetOrder] = useLocalStorage<string[]>("dashboard-widget-order", [
+    "xp-progress", "kpi-pendentes", "kpi-transito", "kpi-finalizadas", "kpi-problemas",
+    "chart-performance", "alerts-panel", "quick-actions"
+  ]);
 
-  useRealtime({
-    table: "coletas",
-    onInsert: () => refetchMetrics(),
-    onUpdate: () => refetchMetrics(),
-  });
+  useRealtime({ table: "entregas", onInsert: () => { refetchMetrics(); refetchAlerts(); }, onUpdate: () => { refetchMetrics(); refetchAlerts(); } });
+  useRealtime({ table: "coletas", onInsert: () => refetchMetrics(), onUpdate: () => refetchMetrics() });
 
-  // Fetch data based on date range
   const { data: weeklyChartData, refetch: refetchChart } = useQuery({
     queryKey: ["dashboard-weekly", dateRange.from, dateRange.to],
     queryFn: async () => {
@@ -99,89 +90,55 @@ export default function Index() {
   }, [statusData]);
 
   const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); };
+  const handleDateRangeChange = (range: DateRange | undefined) => { if (range) setDateRange(range); };
 
-  const handleDateRangeChange = (range: DateRange | undefined) => {
-    if (range) setDateRange(range);
+  const widgetDefinitions: Record<string, { size: DashboardWidget["size"]; render: () => React.ReactNode }> = {
+    "xp-progress": { size: "full", render: () => userLevel ? <XPProgressBar currentXP={userLevel.current_xp} nextLevelXP={userLevel.level * 1000} level={userLevel.level} /> : null },
+    "kpi-pendentes": { size: "small", render: () => <KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" /> },
+    "kpi-transito": { size: "small", render: () => <KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" /> },
+    "kpi-finalizadas": { size: "small", render: () => <KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" /> },
+    "kpi-problemas": { size: "small", render: () => <KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" /> },
+    "chart-performance": { size: "large", render: () => <PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas" data={chartData} dataKey="total" /> },
+    "alerts-panel": { size: "large", render: () => <AlertsPanel alerts={alerts} isLoading={alertsLoading} /> },
+    "quick-actions": { size: "full", render: () => <QuickActions /> },
+    "transportadora-ranking": { size: "large", render: () => <TransportadoraRanking transportadoras={transportadoras} isLoading={transportadorasLoading} /> },
+    "delay-prediction": { size: "full", render: () => <DelayPredictionPanel /> },
   };
+
+  const widgets: DashboardWidget[] = widgetOrder.filter(id => widgetDefinitions[id]).map(id => ({ id, ...widgetDefinitions[id] }));
+
+  const handleReorder = (newWidgets: DashboardWidget[]) => setWidgetOrder(newWidgets.map(w => w.id));
+  const handleRemove = (id: string) => setWidgetOrder(widgetOrder.filter(wid => wid !== id));
 
   return (
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>Dashboard</h1>
+            <h1 className="text-display text-foreground flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>
+              Dashboard
+            </h1>
             <p className="text-muted-foreground mt-1">Visão geral das operações logísticas</p>
           </motion.div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <DateRangePicker value={dateRange} onChange={handleDateRangeChange} />
             <Button variant="outline" size="icon" onClick={handleRefresh}><RefreshCw className="w-4 h-4" /></Button>
+            <div className="h-6 w-px bg-border" />
+            {isEditMode && (
+              <>
+                <WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} />
+                <Button variant="outline" size="sm" onClick={resetLayout}><RotateCcw className="w-4 h-4 mr-2" />Resetar</Button>
+              </>
+            )}
+            <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode}>
+              <Settings2 className="w-4 h-4 mr-2" />{isEditMode ? "Salvar" : "Personalizar"}
+            </Button>
           </div>
         </div>
-
-        {userLevel && (
-          <XPProgressBar 
-            currentXP={userLevel.current_xp} 
-            nextLevelXP={userLevel.level * 1000} 
-            level={userLevel.level} 
-          />
-        )}
-
-        <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <OnboardingTooltip
-            id="dashboard-kpi-pendentes"
-            title="KPIs em Tempo Real"
-            description="Estes cards mostram suas métricas principais atualizadas em tempo real. Monitore pendentes, em trânsito e finalizadas de uma só vez."
-            position="bottom"
-          >
-            <KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" />
-          </OnboardingTooltip>
-          <KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" />
-          <KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" />
-          <OnboardingTooltip
-            id="dashboard-kpi-problemas"
-            title="Alertas de Ocorrências"
-            description="Fique atento às entregas com problemas! Clique para ver detalhes e tomar ações corretivas rapidamente."
-            position="bottom"
-            delay={3000}
-          >
-            <KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" />
-          </OnboardingTooltip>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+          <DraggableDashboard widgets={widgets} isEditMode={isEditMode} onReorder={handleReorder} onRemove={handleRemove} />
         </motion.div>
-
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <OnboardingTooltip
-              id="dashboard-predictions-tab"
-              title="Previsões com IA"
-              description="Use inteligência artificial para prever atrasos e otimizar suas operações. Clique para explorar!"
-              position="bottom"
-              delay={5000}
-            >
-              <TabsTrigger value="predictions">Previsões IA</TabsTrigger>
-            </OnboardingTooltip>
-          </TabsList>
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2">
-                <OnboardingTooltip
-                  id="dashboard-chart"
-                  title="Gráfico de Performance"
-                  description="Visualize a movimentação de coletas e entregas ao longo do tempo. Use o seletor de datas para filtrar períodos específicos."
-                  position="top"
-                  delay={2000}
-                >
-                  <PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas por dia" data={chartData} dataKey="total" />
-                </OnboardingTooltip>
-              </div>
-              <div><AlertsPanel alerts={alerts} isLoading={alertsLoading} /></div>
-            </div>
-            <QuickActions />
-          </TabsContent>
-          <TabsContent value="performance"><div className="grid grid-cols-1 lg:grid-cols-2 gap-4"><TransportadoraRanking transportadoras={transportadoras} isLoading={transportadorasLoading} /><div className="stat-card"><h3 className="font-semibold mb-4">Métricas do Período</h3><div className="space-y-3"><div className="flex justify-between"><span className="text-muted-foreground">Total Coletas</span><span className="font-bold">{metrics?.totalColetas || 0}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Total Entregas</span><span className="font-bold">{metrics?.totalEntregas || 0}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Taxa Sucesso</span><span className="font-bold text-success">{((statusStats.finalizadas / (statusStats.finalizadas + statusStats.problemas || 1)) * 100).toFixed(1)}%</span></div></div></div></div></TabsContent>
-          <TabsContent value="predictions"><DelayPredictionPanel /></TabsContent>
-        </Tabs>
       </div>
     </MainLayout>
   );
