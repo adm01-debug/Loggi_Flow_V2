@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle, MousePointer } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DrillDownModal } from "@/components/analytics/DrillDownModal";
+import { useDrillDown } from "@/hooks/useDrillDown";
 
 type Period = "7d" | "30d" | "90d" | "12m";
 
@@ -17,6 +19,7 @@ const COLORS = { success: "hsl(142, 71%, 45%)", info: "hsl(199, 89%, 48%)", warn
 
 export default function Relatorios() {
   const [period, setPeriod] = useState<Period>("30d");
+  const drillDown = useDrillDown();
 
   const periodDays = { "7d": 7, "30d": 30, "90d": 90, "12m": 365 };
   const startDate = subDays(new Date(), periodDays[period]);
@@ -71,7 +74,7 @@ export default function Relatorios() {
       const dayLabel = format(day, "EEE", { locale: ptBR });
       const coletasDia = coletas.filter((c) => c.created_at?.startsWith(dayStr)).length;
       const entregasDia = entregas.filter((e) => e.created_at?.startsWith(dayStr)).length;
-      return { day: dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1), coletas: coletasDia, entregas: entregasDia };
+      return { day: dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1), coletas: coletasDia, entregas: entregasDia, fullDate: dayStr };
     });
   }, [coletas, entregas]);
 
@@ -81,7 +84,7 @@ export default function Relatorios() {
     all.forEach((item) => { counts[item.status] = (counts[item.status] || 0) + 1; });
     const statusLabels: Record<string, string> = { entregue: "Entregue", finalizado: "Finalizado", em_transito: "Em Trânsito", pendente: "Pendente", aguardando_producao: "Aguardando", ocorrencia: "Ocorrência", atrasado: "Atrasado" };
     const statusColors: Record<string, string> = { entregue: COLORS.success, finalizado: COLORS.success, em_transito: COLORS.info, pendente: COLORS.warning, aguardando_producao: COLORS.warning, ocorrencia: COLORS.danger, atrasado: COLORS.danger };
-    return Object.entries(counts).slice(0, 6).map(([status, count]) => ({ status: statusLabels[status] || status, count, color: statusColors[status] || COLORS.primary }));
+    return Object.entries(counts).slice(0, 6).map(([status, count]) => ({ status: statusLabels[status] || status, statusKey: status, count, color: statusColors[status] || COLORS.primary }));
   }, [coletas, entregas, fretesInternos]);
 
   const freteTypeData = useMemo(() => {
@@ -108,6 +111,39 @@ export default function Relatorios() {
     taxaSucesso: coletas.length ? Math.round((coletas.filter((c) => c.status === "finalizada").length / coletas.length) * 100) : 0,
   };
 
+  // Drill-down handlers
+  const handleBarClick = (data: { activePayload?: Array<{ payload: { fullDate: string; coletas: number; entregas: number } }> }) => {
+    if (data.activePayload?.[0]) {
+      const payload = data.activePayload[0].payload;
+      drillDown.openDrillDown({
+        category: "entregas",
+        filter: { day: payload.fullDate },
+        title: `Atividades em ${format(new Date(payload.fullDate), "dd/MM/yyyy")}`,
+        value: payload.coletas + payload.entregas,
+      });
+    }
+  };
+
+  const handlePieClick = (data: { statusKey?: string; status?: string; count?: number }) => {
+    if (data.statusKey) {
+      drillDown.openDrillDown({
+        category: "entregas",
+        filter: { status: data.statusKey },
+        title: `Registros com status: ${data.status}`,
+        value: data.count || 0,
+      });
+    }
+  };
+
+  const handleKPIClick = (category: "coletas" | "entregas" | "fretes_internos", title: string, value: number) => {
+    drillDown.openDrillDown({
+      category,
+      filter: { dateRange: { start: startDate.toISOString(), end: new Date().toISOString() } },
+      title,
+      value,
+    });
+  };
+
   if (isLoading) {
     return <MainLayout><div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div></MainLayout>;
   }
@@ -122,7 +158,12 @@ export default function Relatorios() {
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><BarChart3 className="w-6 h-6 text-primary" /></div>
               Relatórios
             </h1>
-            <p className="text-muted-foreground mt-1">Análises e métricas de desempenho</p>
+            <p className="text-muted-foreground mt-1 flex items-center gap-2">
+              Análises e métricas de desempenho
+              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full flex items-center gap-1">
+                <MousePointer className="w-3 h-3" /> Clique para detalhes
+              </span>
+            </p>
           </div>
           <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
             <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
@@ -135,30 +176,38 @@ export default function Relatorios() {
           </Select>
         </div>
 
-        {/* KPI Cards */}
+        {/* KPI Cards - Now clickable */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card><CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-info/10"><Package className="w-6 h-6 text-info" /></div><div><p className="text-2xl font-bold">{stats.totalColetas}</p><p className="text-sm text-muted-foreground">Coletas</p></div></div></CardContent></Card>
-          <Card><CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-success/10"><Truck className="w-6 h-6 text-success" /></div><div><p className="text-2xl font-bold">{stats.totalEntregas}</p><p className="text-sm text-muted-foreground">Entregas</p></div></div></CardContent></Card>
-          <Card><CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-primary/10"><TrendingUp className="w-6 h-6 text-primary" /></div><div><p className="text-2xl font-bold">{stats.totalFretes}</p><p className="text-sm text-muted-foreground">Fretes Int.</p></div></div></CardContent></Card>
-          <Card><CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-warning/10"><Target className="w-6 h-6 text-warning" /></div><div><p className="text-2xl font-bold">{stats.taxaSucesso}%</p><p className="text-sm text-muted-foreground">Taxa Sucesso</p></div></div></CardContent></Card>
+          <Card className="cursor-pointer transition-all hover:shadow-md hover:border-info/50" onClick={() => handleKPIClick("coletas", "Todas as Coletas", stats.totalColetas)}>
+            <CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-info/10"><Package className="w-6 h-6 text-info" /></div><div><p className="text-2xl font-bold">{stats.totalColetas}</p><p className="text-sm text-muted-foreground">Coletas</p></div></div></CardContent>
+          </Card>
+          <Card className="cursor-pointer transition-all hover:shadow-md hover:border-success/50" onClick={() => handleKPIClick("entregas", "Todas as Entregas", stats.totalEntregas)}>
+            <CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-success/10"><Truck className="w-6 h-6 text-success" /></div><div><p className="text-2xl font-bold">{stats.totalEntregas}</p><p className="text-sm text-muted-foreground">Entregas</p></div></div></CardContent>
+          </Card>
+          <Card className="cursor-pointer transition-all hover:shadow-md hover:border-primary/50" onClick={() => handleKPIClick("fretes_internos", "Fretes Internos", stats.totalFretes)}>
+            <CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-primary/10"><TrendingUp className="w-6 h-6 text-primary" /></div><div><p className="text-2xl font-bold">{stats.totalFretes}</p><p className="text-sm text-muted-foreground">Fretes Int.</p></div></div></CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6"><div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-warning/10"><Target className="w-6 h-6 text-warning" /></div><div><p className="text-2xl font-bold">{stats.taxaSucesso}%</p><p className="text-sm text-muted-foreground">Taxa Sucesso</p></div></div></CardContent>
+          </Card>
         </div>
 
         {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Daily Activity */}
+          {/* Daily Activity - Clickable */}
           <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><Calendar className="w-5 h-5" />Atividade Diária</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="flex items-center gap-2"><Calendar className="w-5 h-5" />Atividade Diária <span className="text-xs font-normal text-muted-foreground">(clique na barra)</span></CardTitle></CardHeader>
             <CardContent>
               {dailyData.some((d) => d.coletas > 0 || d.entregas > 0) ? (
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={dailyData}>
+                  <BarChart data={dailyData} onClick={handleBarClick}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="day" className="text-xs" />
                     <YAxis className="text-xs" />
                     <Tooltip contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))" }} />
                     <Legend />
-                    <Bar dataKey="coletas" name="Coletas" fill={COLORS.info} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="entregas" name="Entregas" fill={COLORS.success} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="coletas" name="Coletas" fill={COLORS.info} radius={[4, 4, 0, 0]} className="cursor-pointer" />
+                    <Bar dataKey="entregas" name="Entregas" fill={COLORS.success} radius={[4, 4, 0, 0]} className="cursor-pointer" />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -167,14 +216,26 @@ export default function Relatorios() {
             </CardContent>
           </Card>
 
-          {/* Status Distribution */}
+          {/* Status Distribution - Clickable */}
           <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><BarChart3 className="w-5 h-5" />Distribuição por Status</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="flex items-center gap-2"><BarChart3 className="w-5 h-5" />Distribuição por Status <span className="text-xs font-normal text-muted-foreground">(clique na fatia)</span></CardTitle></CardHeader>
             <CardContent>
               {statusDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
-                    <Pie data={statusDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="count" nameKey="status" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                    <Pie 
+                      data={statusDistribution} 
+                      cx="50%" 
+                      cy="50%" 
+                      innerRadius={60} 
+                      outerRadius={80} 
+                      paddingAngle={5} 
+                      dataKey="count" 
+                      nameKey="status" 
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      onClick={handlePieClick}
+                      className="cursor-pointer"
+                    >
                       {statusDistribution.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
                     </Pie>
                     <Tooltip contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))" }} />
@@ -230,9 +291,9 @@ export default function Relatorios() {
           </Card>
         </div>
 
-        {/* Summary Cards */}
+        {/* Summary Cards - Clickable */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-info/20 bg-info/5">
+          <Card className="border-info/20 bg-info/5 cursor-pointer transition-all hover:shadow-md" onClick={() => drillDown.openDrillDown({ category: "coletas", filter: { status: "finalizada" }, title: "Coletas Finalizadas", value: stats.coletasConcluidas })}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div><p className="text-3xl font-bold text-info">{stats.coletasConcluidas}</p><p className="text-sm text-muted-foreground">Coletas Finalizadas</p></div>
@@ -243,7 +304,7 @@ export default function Relatorios() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-success/20 bg-success/5">
+          <Card className="border-success/20 bg-success/5 cursor-pointer transition-all hover:shadow-md" onClick={() => drillDown.openDrillDown({ category: "entregas", filter: { status: "entregue" }, title: "Entregas Concluídas", value: stats.entregasConcluidas })}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div><p className="text-3xl font-bold text-success">{stats.entregasConcluidas}</p><p className="text-sm text-muted-foreground">Entregas Concluídas</p></div>
@@ -264,6 +325,14 @@ export default function Relatorios() {
           </Card>
         </div>
       </div>
+
+      {/* Drill-down Modal */}
+      <DrillDownModal
+        open={drillDown.isOpen}
+        onOpenChange={drillDown.setIsOpen}
+        data={drillDown.data}
+        isLoading={drillDown.isLoading}
+      />
     </MainLayout>
   );
 }
