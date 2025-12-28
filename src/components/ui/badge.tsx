@@ -72,38 +72,35 @@ export interface BadgeProps
   onRemove?: () => void;
 }
 
-function Badge({
-  className,
-  variant,
-  size,
-  animation,
-  icon,
-  removable,
-  onRemove,
-  children,
-  ...props
-}: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant, size, animation }), className)} {...props}>
-      {icon && <span className="flex-shrink-0">{icon}</span>}
-      {children}
-      {removable && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove?.();
-          }}
-          className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors"
-        >
-          <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
-            <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </button>
-      )}
-    </div>
-  );
-}
+const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
+  ({ className, variant, size, animation, icon, removable, onRemove, children, ...props }, ref) => {
+    return (
+      <div 
+        ref={ref}
+        className={cn(badgeVariants({ variant, size, animation }), className)} 
+        {...props}
+      >
+        {icon && <span className="flex-shrink-0">{icon}</span>}
+        {children}
+        {removable && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove?.();
+            }}
+            className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors"
+          >
+            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
+              <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        )}
+      </div>
+    );
+  }
+);
+Badge.displayName = "Badge";
 
 // ============================================
 // BADGE GROUP - For multiple badges
