@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, MoreVertical, Building2, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, MoreVertical, Building2, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, ScanLine } from "lucide-react";
+import { ScannerButton } from "@/components/scanner/ScannerButton";
+import { ScanResult } from "@/hooks/useQRScanner";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
@@ -157,6 +159,18 @@ export default function Coletas() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/10"><Package className="w-6 h-6 text-blue-600" /></div>Coletas</h1><p className="text-muted-foreground mt-1">Gerencie coletas de fornecedores</p></div>
           <div className="flex gap-2">
+            <ScannerButton
+              onScan={(result: ScanResult) => {
+                const coleta = coletas.find(c => c.codigo_rastreamento === result.text || c.numero_coleta === result.text);
+                if (coleta) {
+                  setSel(coleta);
+                  setDlgView(true);
+                } else {
+                  toast({ title: "Código não encontrado", description: `Código: ${result.text}`, variant: "destructive" });
+                }
+              }}
+              variant="outline"
+            />
             <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(exportData, { filename: "coletas" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(exportData, { filename: "coletas" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             <OnboardingTooltip
               id="coletas-nova-btn"

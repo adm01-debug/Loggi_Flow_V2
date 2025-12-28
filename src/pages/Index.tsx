@@ -12,6 +12,7 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { DelayPredictionPanel } from "@/components/predictions/DelayPredictionPanel";
 import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/DraggableDashboard";
 import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
+import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
 import { Button } from "@/components/ui/button";
 import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } from "@/hooks/useDashboardMetrics";
 import { useRealtime } from "@/hooks/useRealtime";
@@ -137,6 +138,9 @@ export default function Index() {
           </div>
         </div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+          <FavoriteMetricsBar />
+        </motion.div>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
           <DraggableDashboard widgets={widgets} isEditMode={isEditMode} onReorder={handleReorder} onRemove={handleRemove} />
         </motion.div>
       </div>
