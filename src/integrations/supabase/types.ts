@@ -1287,6 +1287,20 @@ export type Database = {
     }
     Functions: {
       calculate_level: { Args: { xp: number }; Returns: number }
+      get_leaderboard: {
+        Args: { limit_count?: number; period_filter?: string }
+        Returns: {
+          achievements_count: number
+          avatar_url: string
+          coins: number
+          full_name: string
+          level: number
+          rank: number
+          streak_days: number
+          total_xp: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
