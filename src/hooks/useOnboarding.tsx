@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useGamification } from './useGamification';
+import { useAchievementNotifications } from './useAchievementNotifications';
 import { toast } from 'sonner';
 
 export interface OnboardingStep {
@@ -11,6 +12,7 @@ export interface OnboardingStep {
   description: string;
   icon: string;
   xpReward: number;
+  achievementCode?: string;
   action?: () => void;
   route?: string;
   checkCompleted?: () => Promise<boolean>;
@@ -23,6 +25,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Adicione sua foto e informações básicas',
     icon: 'User',
     xpReward: 50,
+    achievementCode: 'onboarding_profile',
     route: '/perfil'
   },
   {
@@ -31,6 +34,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Adicione seu primeiro cliente ao sistema',
     icon: 'Users',
     xpReward: 100,
+    achievementCode: 'onboarding_cliente',
     route: '/clientes'
   },
   {
@@ -39,6 +43,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Adicione uma transportadora parceira',
     icon: 'Truck',
     xpReward: 100,
+    achievementCode: 'onboarding_transportadora',
     route: '/transportadoras'
   },
   {
@@ -47,6 +52,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Registre uma entrega no sistema',
     icon: 'Package',
     xpReward: 150,
+    achievementCode: 'onboarding_entrega',
     route: '/envios'
   },
   {
@@ -55,6 +61,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Conheça as métricas e indicadores',
     icon: 'LayoutDashboard',
     xpReward: 50,
+    achievementCode: 'onboarding_welcome',
     route: '/'
   },
   {
@@ -63,13 +70,15 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Personalize seus alertas',
     icon: 'Bell',
     xpReward: 75,
+    achievementCode: 'onboarding_coleta',
     route: '/notificacoes'
   }
 ];
 
 export function useOnboarding() {
   const { user } = useAuth();
-  const { addXP } = useGamification();
+  const { addXP, unlockAchievement, achievements } = useGamification();
+  const { unlockAchievement: showAchievementNotification } = useAchievementNotifications();
   const queryClient = useQueryClient();
   const [showWizard, setShowWizard] = useState(false);
 
@@ -111,7 +120,7 @@ export function useOnboarding() {
     }
   });
 
-  // Complete a step
+  // Complete a step and unlock achievement
   const completeStepMutation = useMutation({
     mutationFn: async (stepId: string) => {
       if (!user?.id || !progress) throw new Error('User or progress not found');
@@ -138,10 +147,59 @@ export function useOnboarding() {
       // Award XP
       await addXP({ amount: step.xpReward, reason: 'onboarding' });
       
-      return { stepId, xpEarned: step.xpReward, allCompleted };
+      // Unlock step achievement
+      let unlockedAchievement = null;
+      if (step.achievementCode && achievements) {
+        const achievement = achievements.find(a => a.code === step.achievementCode);
+        if (achievement) {
+          await unlockAchievement(achievement.id);
+          unlockedAchievement = achievement;
+        }
+      }
+
+      // Unlock master achievement if all completed
+      let masterAchievement = null;
+      if (allCompleted && achievements) {
+        const master = achievements.find(a => a.code === 'onboarding_master');
+        if (master) {
+          await unlockAchievement(master.id);
+          masterAchievement = master;
+        }
+      }
+      
+      return { stepId, xpEarned: step.xpReward, allCompleted, unlockedAchievement, masterAchievement };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['onboarding'] });
+      
+      // Show achievement notification
+      if (data.unlockedAchievement) {
+        showAchievementNotification({
+          id: data.unlockedAchievement.id,
+          name: data.unlockedAchievement.name,
+          description: data.unlockedAchievement.description,
+          icon: data.unlockedAchievement.icon,
+          rarity: data.unlockedAchievement.rarity as "common" | "rare" | "epic" | "legendary",
+          xpReward: data.unlockedAchievement.xp_reward,
+          coinsReward: data.unlockedAchievement.coins_reward
+        });
+      }
+
+      // Show master achievement notification
+      if (data.masterAchievement) {
+        setTimeout(() => {
+          showAchievementNotification({
+            id: data.masterAchievement.id,
+            name: data.masterAchievement.name,
+            description: data.masterAchievement.description,
+            icon: data.masterAchievement.icon,
+            rarity: data.masterAchievement.rarity as "common" | "rare" | "epic" | "legendary",
+            xpReward: data.masterAchievement.xp_reward,
+            coinsReward: data.masterAchievement.coins_reward
+          });
+        }, 2000);
+      }
+
       toast.success(`+${data.xpEarned} XP conquistados!`, {
         description: data.allCompleted 
           ? '🎉 Parabéns! Você completou o onboarding!' 
