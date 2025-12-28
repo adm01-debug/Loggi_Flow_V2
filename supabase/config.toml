@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.ai-logistics-assistant]
 verify_jwt = false
+
+[functions.scheduled-reports]
+verify_jwt = false
