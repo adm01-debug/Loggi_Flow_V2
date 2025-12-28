@@ -59,6 +59,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alertas_custo: {
         Row: {
           ativo: boolean
@@ -1238,6 +1265,74 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "tabelas_frete_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transportadora_rotas: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          destino_cep_fim: string | null
+          destino_cep_inicio: string | null
+          destino_cidade: string | null
+          destino_estado: string
+          id: string
+          observacoes: string | null
+          origem_cep_fim: string | null
+          origem_cep_inicio: string | null
+          origem_cidade: string | null
+          origem_estado: string
+          prazo_dias: number | null
+          preco_por_kg: number | null
+          taxa_fixa: number | null
+          transportadora_id: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          destino_cep_fim?: string | null
+          destino_cep_inicio?: string | null
+          destino_cidade?: string | null
+          destino_estado: string
+          id?: string
+          observacoes?: string | null
+          origem_cep_fim?: string | null
+          origem_cep_inicio?: string | null
+          origem_cidade?: string | null
+          origem_estado: string
+          prazo_dias?: number | null
+          preco_por_kg?: number | null
+          taxa_fixa?: number | null
+          transportadora_id: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          destino_cep_fim?: string | null
+          destino_cep_inicio?: string | null
+          destino_cidade?: string | null
+          destino_estado?: string
+          id?: string
+          observacoes?: string | null
+          origem_cep_fim?: string | null
+          origem_cep_inicio?: string | null
+          origem_cidade?: string | null
+          origem_estado?: string
+          prazo_dias?: number | null
+          preco_por_kg?: number | null
+          taxa_fixa?: number | null
+          transportadora_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transportadora_rotas_transportadora_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
             referencedRelation: "transportadoras"
