@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database } from "lucide-react";
+import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Zap } from "lucide-react";
 import { useIntegrationValidation } from "@/hooks/useIntegrationValidation";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
+import { BusinessRulesManager } from "@/components/automation/BusinessRulesManager";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -89,6 +90,7 @@ export default function Configuracoes() {
           <Tabs defaultValue="integrations">
             <TabsList>
               <TabsTrigger value="integrations"><Link className="w-4 h-4 mr-2" />Integrações</TabsTrigger>
+              <TabsTrigger value="automation"><Zap className="w-4 h-4 mr-2" />Automações</TabsTrigger>
               <TabsTrigger value="notifications"><Bell className="w-4 h-4 mr-2" />Notificações</TabsTrigger>
               <TabsTrigger value="security"><Shield className="w-4 h-4 mr-2" />Segurança</TabsTrigger>
             </TabsList>
@@ -107,6 +109,9 @@ export default function Configuracoes() {
                   </div>
                 );
               })}</div>
+            </TabsContent>
+            <TabsContent value="automation" className="space-y-4">
+              <BusinessRulesManager />
             </TabsContent>
             <TabsContent value="notifications" className="space-y-4">
               <div className="card-base p-4 space-y-4">
