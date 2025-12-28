@@ -26,10 +26,20 @@ import {
   Users,
   Bell,
   FileCheck,
+  Route,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { AIAssistant } from "@/components/ai/AIAssistant";
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -43,6 +53,7 @@ const menuItems = [
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
   { title: "Transportadoras", url: "/transportadoras", icon: Truck },
+  { title: "Rotas Transportadoras", url: "/rotas-transportadoras", icon: Route },
   { title: "Cotação Frete", url: "/cotacao-frete", icon: Calculator },
   { title: "Cotação e Despacho", url: "/despachos", icon: Send },
   { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
@@ -192,6 +203,36 @@ export function AppSidebar() {
           ))}
         </div>
       )}
+
+      {/* AI Assistant Button */}
+      <div className="p-3 border-t border-sidebar-border">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group w-full",
+                "bg-gradient-to-r from-primary/10 to-primary/5 text-primary hover:from-primary/20 hover:to-primary/10 border border-primary/20"
+              )}
+            >
+              <Bot className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />
+              {!collapsed && (
+                <span className="font-medium animate-fade-in">Assistente IA</span>
+              )}
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[400px] sm:w-[540px] p-0">
+            <SheetHeader className="p-4 border-b">
+              <SheetTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5 text-primary" />
+                Assistente de Logística
+              </SheetTitle>
+            </SheetHeader>
+            <div className="p-4 h-[calc(100vh-80px)]">
+              <AIAssistant />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
 
       {/* Settings */}
       <div className="p-3 border-t border-sidebar-border">
