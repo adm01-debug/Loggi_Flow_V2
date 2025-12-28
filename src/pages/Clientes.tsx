@@ -20,6 +20,7 @@ import { ptBR } from "date-fns/locale";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
@@ -161,7 +162,14 @@ export default function Clientes() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Users className="w-6 h-6 text-primary" /></div>Clientes</h1><p className="text-muted-foreground mt-1">Gerencie seus clientes</p></div>
-          <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+          <OnboardingTooltip
+            id="clientes-novo-btn"
+            title="Cadastre seu primeiro cliente"
+            description="Clique aqui para adicionar um novo cliente. Você ganhará XP ao completar o cadastro!"
+            position="left"
+          >
+            <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+          </OnboardingTooltip>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -172,24 +180,32 @@ export default function Clientes() {
         </div>
 
         {/* Barra de Filtros */}
-        <FilterBar
-          search={filters.search}
-          onSearchChange={setSearch}
-          searchPlaceholder="Buscar por nome, CNPJ, cidade..."
-          extraFilters={[
-            {
-              key: "estado",
-              label: "Estado",
-              value: filters.estado as string || "all",
-              options: UFS.map(uf => ({ value: uf, label: uf })),
-              onChange: (value) => setFilter("estado", value === "all" ? undefined : value)
-            }
-          ]}
-          onClearFilters={clearFilters}
-          hasActiveFilters={hasActiveFilters}
-          totalFiltered={totalFiltered}
-          totalOriginal={totalOriginal}
-        />
+        <OnboardingTooltip
+          id="clientes-filtros"
+          title="Filtros Avançados"
+          description="Use a barra de busca e filtros para encontrar clientes rapidamente. Você pode filtrar por nome, CNPJ, cidade e estado."
+          position="bottom"
+          delay={2000}
+        >
+          <FilterBar
+            search={filters.search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Buscar por nome, CNPJ, cidade..."
+            extraFilters={[
+              {
+                key: "estado",
+                label: "Estado",
+                value: filters.estado as string || "all",
+                options: UFS.map(uf => ({ value: uf, label: uf })),
+                onChange: (value) => setFilter("estado", value === "all" ? undefined : value)
+              }
+            ]}
+            onClearFilters={clearFilters}
+            hasActiveFilters={hasActiveFilters}
+            totalFiltered={totalFiltered}
+            totalOriginal={totalOriginal}
+          />
+        </OnboardingTooltip>
 
         {/* Ordenação */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -22,6 +22,7 @@ import { ptBR } from "date-fns/locale";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
@@ -141,15 +142,30 @@ export default function Envios() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Send className="w-6 h-6 text-primary" /></div>Envios</h1><p className="text-muted-foreground mt-1">Gerencie entregas aos clientes</p></div>
-          <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+          <OnboardingTooltip
+            id="envios-novo-btn"
+            title="Crie sua primeira entrega"
+            description="Registre uma nova entrega e acompanhe todo o ciclo de envio. Ganhe XP a cada entrega finalizada!"
+            position="left"
+          >
+            <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+          </OnboardingTooltip>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Send className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.transito}</p><p className="text-xs text-muted-foreground">Em Trânsito</p></div>
-          <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregues}</p><p className="text-xs text-muted-foreground">Entregues</p></div>
-          <div className="stat-card text-center"><AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.ocorrencias}</p><p className="text-xs text-muted-foreground">Ocorrências</p></div>
-        </div>
+        <OnboardingTooltip
+          id="envios-stats"
+          title="Estatísticas de Envios"
+          description="Acompanhe o resumo das suas entregas: total, em trânsito, entregues e ocorrências. Clique nos cards para filtrar."
+          position="bottom"
+          delay={1500}
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="stat-card text-center"><Send className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
+            <div className="stat-card text-center"><Truck className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.transito}</p><p className="text-xs text-muted-foreground">Em Trânsito</p></div>
+            <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregues}</p><p className="text-xs text-muted-foreground">Entregues</p></div>
+            <div className="stat-card text-center"><AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.ocorrencias}</p><p className="text-xs text-muted-foreground">Ocorrências</p></div>
+          </div>
+        </OnboardingTooltip>
 
         <FilterBar 
           search={filters.search}
