@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, Calendar, Package, Users, Lock, CheckCircle2, Sparkles, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins, LucideIcon, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+import { Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, Calendar, Package, Users, Lock, CheckCircle2, Sparkles, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins, LucideIcon, ArrowUpDown, ChevronUp, ChevronDown, GraduationCap, User, Bell } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,7 +17,7 @@ import { useSorting } from "@/hooks/useSorting";
 
 interface Achievement { id: string; name: string; description: string; category: string; xpReward: number; icon: LucideIcon; unlocked: boolean; progress: number; maxProgress: number; rarity: "common" | "rare" | "epic" | "legendary"; }
 
-const iconMap: Record<string, LucideIcon> = { Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, Calendar, Package, Users, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins };
+const iconMap: Record<string, LucideIcon> = { Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, Calendar, Package, Users, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins, GraduationCap, User, Bell };
 
 const achievements: Achievement[] = [
   { id: "1", name: "Primeiro Passo", description: "Complete sua primeira entrega", category: "entregas", xpReward: 50, icon: Truck, unlocked: true, progress: 1, maxProgress: 1, rarity: "common" },
@@ -52,9 +52,83 @@ const filterConfig: FilterConfig<Achievement> = {
   }
 };
 
+// Onboarding achievement card component
+function OnboardingAchievementCard({ achievement, isUnlocked }: { 
+  achievement: { id: string; name: string; description: string; icon: string; rarity: string; xp_reward: number; coins_reward: number }; 
+  isUnlocked: boolean;
+}) {
+  const Icon = iconMap[achievement.icon] || GraduationCap;
+  const rarity = achievement.rarity as keyof typeof rarityColors;
+  
+  return (
+    <motion.div 
+      className={cn(
+        "relative overflow-hidden rounded-xl border transition-all duration-300",
+        isUnlocked 
+          ? "bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border-emerald-500/30 shadow-lg shadow-emerald-500/10" 
+          : "bg-card/50 border-border/50 opacity-60"
+      )}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ scale: isUnlocked ? 1.02 : 1 }}
+    >
+      <div className="p-4">
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "p-2.5 rounded-lg",
+            isUnlocked 
+              ? `bg-gradient-to-br ${rarityColors[rarity]} text-white shadow-lg` 
+              : "bg-muted text-muted-foreground"
+          )}>
+            <Icon className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h4 className="font-medium text-sm truncate">{achievement.name}</h4>
+              {isUnlocked ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              ) : (
+                <Lock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground truncate">{achievement.description}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-3">
+          <Badge variant={isUnlocked ? "default" : "outline"} className="text-xs">
+            +{achievement.xp_reward} XP
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            <Coins className="w-3 h-3 mr-1" />
+            {achievement.coins_reward}
+          </Badge>
+        </div>
+      </div>
+      {isUnlocked && (
+        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-emerald-500/20 to-transparent" />
+      )}
+    </motion.div>
+  );
+}
+
 export default function Conquistas() {
-  const { userLevel } = useGamification();
+  const { userLevel, achievements: dbAchievements, userAchievements, unlockedAchievementIds } = useGamification();
   const [tab, setTab] = useState("all");
+
+  // Filter onboarding achievements from database
+  const onboardingAchievements = useMemo(() => {
+    if (!dbAchievements) return [];
+    return dbAchievements.filter(a => a.category === 'onboarding');
+  }, [dbAchievements]);
+
+  const onboardingStats = useMemo(() => {
+    const total = onboardingAchievements.length;
+    const unlocked = onboardingAchievements.filter(a => unlockedAchievementIds.has(a.id)).length;
+    const xpEarned = onboardingAchievements
+      .filter(a => unlockedAchievementIds.has(a.id))
+      .reduce((sum, a) => sum + a.xp_reward, 0);
+    return { total, unlocked, xpEarned, progress: total > 0 ? (unlocked / total) * 100 : 0 };
+  }, [onboardingAchievements, unlockedAchievementIds]);
 
   const tabFiltered = useMemo(() => tab === "all" ? achievements : tab === "unlocked" ? achievements.filter(a => a.unlocked) : achievements.filter(a => !a.unlocked), [tab]);
   const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(tabFiltered, filterConfig);
@@ -76,6 +150,68 @@ export default function Conquistas() {
           <div className="stat-card text-center"><Sparkles className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.totalXp}</p><p className="text-xs text-muted-foreground">XP Ganho</p></div>
           <div className="stat-card text-center"><Star className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-2xl font-bold">Nível {userLevel?.level || 1}</p><p className="text-xs text-muted-foreground">Atual</p></div>
         </div>
+
+        {/* Onboarding Achievements Section */}
+        {onboardingAchievements.length > 0 && (
+          <motion.div 
+            className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="absolute inset-0 bg-grid-white/5" />
+            <div className="relative p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/20">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold">Conquistas de Onboarding</h2>
+                    <p className="text-sm text-muted-foreground">Complete a configuração inicial do sistema</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-primary">{onboardingStats.unlocked}/{onboardingStats.total}</p>
+                  <p className="text-xs text-muted-foreground">Completadas</p>
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <div className="flex justify-between text-sm mb-1.5">
+                  <span className="text-muted-foreground">Progresso do Onboarding</span>
+                  <span className="font-medium text-primary">{Math.round(onboardingStats.progress)}%</span>
+                </div>
+                <Progress value={onboardingStats.progress} className="h-2" />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {onboardingAchievements.map((achievement) => (
+                  <OnboardingAchievementCard
+                    key={achievement.id}
+                    achievement={achievement}
+                    isUnlocked={unlockedAchievementIds.has(achievement.id)}
+                  />
+                ))}
+              </div>
+
+              {onboardingStats.unlocked === onboardingStats.total && onboardingStats.total > 0 && (
+                <motion.div 
+                  className="mt-4 p-3 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 flex items-center gap-3"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
+                  <div className="p-2 rounded-lg bg-emerald-500 text-white">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-emerald-600 dark:text-emerald-400">Onboarding Completo!</p>
+                    <p className="text-sm text-muted-foreground">Você ganhou {onboardingStats.xpEarned} XP com as conquistas de onboarding</p>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        )}
 
         <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="all">Todas</TabsTrigger><TabsTrigger value="unlocked">Desbloqueadas</TabsTrigger><TabsTrigger value="locked">Bloqueadas</TabsTrigger></TabsList></Tabs>
 
