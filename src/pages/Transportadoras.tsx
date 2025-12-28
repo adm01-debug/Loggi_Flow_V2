@@ -19,6 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
@@ -170,7 +171,14 @@ export default function Transportadoras() {
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>Transportadoras</h1><p className="text-muted-foreground mt-1">Gerencie suas transportadoras</p></div>
           <div className="flex gap-2">
             <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button></DialogFooter></DialogContent></Dialog>
+            <OnboardingTooltip
+              id="transportadoras-nova-btn"
+              title="Cadastre uma transportadora"
+              description="Adicione transportadoras parceiras para gerenciar seus fretes. Compare performance e custos entre elas."
+              position="left"
+            >
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button></DialogFooter></DialogContent></Dialog>
+            </OnboardingTooltip>
           </div>
         </div>
 
