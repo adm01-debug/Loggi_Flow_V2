@@ -1138,6 +1138,60 @@ export type Database = {
           },
         ]
       }
+      scheduled_reports: {
+        Row: {
+          created_at: string
+          day_of_month: number | null
+          day_of_week: number | null
+          filters: Json | null
+          frequency: string
+          id: string
+          is_active: boolean
+          last_sent_at: string | null
+          name: string
+          next_send_at: string | null
+          recipients: string[]
+          report_type: string
+          time_of_day: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_month?: number | null
+          day_of_week?: number | null
+          filters?: Json | null
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          last_sent_at?: string | null
+          name: string
+          next_send_at?: string | null
+          recipients?: string[]
+          report_type: string
+          time_of_day?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_of_month?: number | null
+          day_of_week?: number | null
+          filters?: Json | null
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          last_sent_at?: string | null
+          name?: string
+          next_send_at?: string | null
+          recipients?: string[]
+          report_type?: string
+          time_of_day?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tabelas_frete: {
         Row: {
           ativo: boolean
