@@ -63,9 +63,12 @@ export function AIAssistant() {
   };
 
   const suggestions = [
-    "Quais transportadoras fazem Curitiba → São Paulo?",
-    "Qual a melhor transportadora para MG?",
-    "Mostre as entregas pendentes",
+    "Transportadoras Curitiba → SP",
+    "Qual a mais barata PR → SP?",
+    "Rotas para Rio de Janeiro",
+    "Entregas atrasadas",
+    "Melhor transportadora MG → RJ",
+    "Coletas pendentes",
   ];
 
   return (
