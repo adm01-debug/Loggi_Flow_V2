@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, userId, conversationHistory = [] } = await req.json();
+    const { message, userId, conversationHistory = [], stream = false } = await req.json();
 
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY not configured");
@@ -44,7 +44,7 @@ serve(async (req) => {
     ).join('\n') || 'Nenhuma transportadora cadastrada';
 
     const rotasContext = rotas?.map(r => 
-      `- ${r.transportadora?.nome_fantasia}: ${r.origem_cidade || r.origem_estado} → ${r.destino_cidade || r.destino_estado} (${r.prazo_dias} dias, R$${r.taxa_fixa} + R$${r.preco_por_kg}/kg)`
+      `- ${(r.transportadora as any)?.nome_fantasia}: ${r.origem_cidade || r.origem_estado} → ${r.destino_cidade || r.destino_estado} (${r.prazo_dias} dias, R$${r.taxa_fixa} + R$${r.preco_por_kg}/kg)`
     ).join('\n') || 'Nenhuma rota cadastrada';
 
     const now = new Date();
@@ -118,13 +118,13 @@ INSTRUÇÕES:
     // Build messages array
     const messages = [
       { role: "system", content: systemPrompt },
-      ...conversationHistory.slice(-10), // Last 10 messages for context
+      ...conversationHistory.slice(-10),
       { role: "user", content: message }
     ];
 
-    console.log(`[AI Assistant] Processing message for user ${userId}: "${message.substring(0, 100)}..."`);
+    console.log(`[AI Assistant] Processing message for user ${userId}: "${message.substring(0, 100)}..." (stream: ${stream})`);
 
-    // Call Lovable AI
+    // Call Lovable AI with streaming support
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -134,7 +134,7 @@ INSTRUÇÕES:
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages,
-        stream: false,
+        stream,
       }),
     });
 
@@ -165,6 +165,23 @@ INSTRUÇÕES:
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
+    // If streaming, pass through the stream directly
+    if (stream) {
+      console.log(`[AI Assistant] Streaming response`);
+      
+      // Save user message to chat history
+      if (userId) {
+        await supabase.from('ai_chat_messages').insert([
+          { user_id: userId, role: 'user', content: message }
+        ]);
+      }
+
+      return new Response(response.body, {
+        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      });
+    }
+
+    // Non-streaming response
     const data = await response.json();
     const assistantMessage = data.choices?.[0]?.message?.content || "Desculpe, não consegui processar sua pergunta.";
 
