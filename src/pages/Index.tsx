@@ -17,6 +17,7 @@ import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } fr
 import { useRealtime } from "@/hooks/useRealtime";
 import { useGamification } from "@/hooks/useGamification";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
+import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { motion } from "framer-motion";
 import { format, subDays, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -126,17 +127,54 @@ export default function Index() {
         )}
 
         <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" />
+          <OnboardingTooltip
+            id="dashboard-kpi-pendentes"
+            title="KPIs em Tempo Real"
+            description="Estes cards mostram suas métricas principais atualizadas em tempo real. Monitore pendentes, em trânsito e finalizadas de uma só vez."
+            position="bottom"
+          >
+            <KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" />
+          </OnboardingTooltip>
           <KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" />
           <KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" />
-          <KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" />
+          <OnboardingTooltip
+            id="dashboard-kpi-problemas"
+            title="Alertas de Ocorrências"
+            description="Fique atento às entregas com problemas! Clique para ver detalhes e tomar ações corretivas rapidamente."
+            position="bottom"
+            delay={3000}
+          >
+            <KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" />
+          </OnboardingTooltip>
         </motion.div>
 
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList><TabsTrigger value="overview">Visão Geral</TabsTrigger><TabsTrigger value="performance">Performance</TabsTrigger><TabsTrigger value="predictions">Previsões IA</TabsTrigger></TabsList>
+          <TabsList>
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <OnboardingTooltip
+              id="dashboard-predictions-tab"
+              title="Previsões com IA"
+              description="Use inteligência artificial para prever atrasos e otimizar suas operações. Clique para explorar!"
+              position="bottom"
+              delay={5000}
+            >
+              <TabsTrigger value="predictions">Previsões IA</TabsTrigger>
+            </OnboardingTooltip>
+          </TabsList>
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2"><PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas por dia" data={chartData} dataKey="total" /></div>
+              <div className="lg:col-span-2">
+                <OnboardingTooltip
+                  id="dashboard-chart"
+                  title="Gráfico de Performance"
+                  description="Visualize a movimentação de coletas e entregas ao longo do tempo. Use o seletor de datas para filtrar períodos específicos."
+                  position="top"
+                  delay={2000}
+                >
+                  <PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas por dia" data={chartData} dataKey="total" />
+                </OnboardingTooltip>
+              </div>
               <div><AlertsPanel alerts={alerts} isLoading={alertsLoading} /></div>
             </div>
             <QuickActions />
