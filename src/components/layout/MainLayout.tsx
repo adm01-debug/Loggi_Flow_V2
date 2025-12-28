@@ -4,6 +4,7 @@ import { Header } from "./Header";
 import { BrowserNotificationPrompt } from "@/components/notifications/BrowserNotificationPrompt";
 import { KeyboardShortcutsHelp } from "@/components/common/KeyboardShortcutsHelp";
 import { SearchCommand } from "@/components/common/SearchCommand";
+import { OnboardingWizard, OnboardingProgress } from "@/components/onboarding";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -16,6 +17,8 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6">
+          {/* Onboarding progress bar for new users */}
+          <OnboardingProgress variant="full" className="mb-6" />
           {children}
         </main>
       </div>
@@ -28,6 +31,9 @@ export function MainLayout({ children }: MainLayoutProps) {
       
       {/* Global search command (Ctrl+K) */}
       <SearchCommand />
+      
+      {/* Onboarding wizard modal */}
+      <OnboardingWizard />
     </div>
   );
 }
