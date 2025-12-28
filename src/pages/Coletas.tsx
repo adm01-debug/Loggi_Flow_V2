@@ -19,6 +19,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
 import { Timeline } from "@/components/common/Timeline";
+import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
@@ -157,20 +158,27 @@ export default function Coletas() {
           <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/10"><Package className="w-6 h-6 text-blue-600" /></div>Coletas</h1><p className="text-muted-foreground mt-1">Gerencie coletas de fornecedores</p></div>
           <div className="flex gap-2">
             <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(exportData, { filename: "coletas" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(exportData, { filename: "coletas" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger>
-              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Coleta</DialogTitle></DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2"><Label>Fornecedor</Label><Select value={formData.fornecedor_id} onValueChange={handleFornecedorChange}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{fornecedores.map(f => <SelectItem key={f.id} value={f.id}>{f.nome_fantasia || f.razao_social}</SelectItem>)}</SelectContent></Select></div>
-                  <div className="grid gap-2"><Label>Tipo</Label><Select value={formData.tipo_coleta} onValueChange={(v: ColetaTipo) => setFormData({ ...formData, tipo_coleta: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="lalamove">Lalamove</SelectItem><SelectItem value="transportadora">Transportadora</SelectItem></SelectContent></Select></div>
-                  {formData.tipo_coleta === "transportadora" && <div className="grid gap-2"><Label>Transportadora</Label><Select value={formData.transportadora_id} onValueChange={(v) => setFormData({ ...formData, transportadora_id: v })}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{transportadoras.map(t => <SelectItem key={t.id} value={t.id}>{t.nome_fantasia}</SelectItem>)}</SelectContent></Select></div>}
-                  <div className="grid gap-2"><Label>Endereço</Label><Textarea value={formData.endereco_coleta} onChange={(e) => setFormData({ ...formData, endereco_coleta: e.target.value })} /></div>
-                  <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Contato</Label><Input value={formData.contato_coleta} onChange={(e) => setFormData({ ...formData, contato_coleta: e.target.value })} /></div><div className="grid gap-2"><Label>Data Prevista</Label><Input type="date" value={formData.data_prevista_coleta} onChange={(e) => setFormData({ ...formData, data_prevista_coleta: e.target.value })} /></div></div>
-                  <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Volumes</Label><Input type="number" value={formData.qtd_volumes} onChange={(e) => setFormData({ ...formData, qtd_volumes: e.target.value })} /></div><div className="grid gap-2"><Label>Peso (kg)</Label><Input type="number" step="0.1" value={formData.peso_estimado_kg} onChange={(e) => setFormData({ ...formData, peso_estimado_kg: e.target.value })} /></div></div>
-                  <div className="grid gap-2"><Label>Observações</Label><Textarea value={formData.observacoes} onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })} /></div>
-                </div>
-                <DialogFooter><Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button onClick={handleSubmit} disabled={!formData.endereco_coleta}>Registrar</Button></DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <OnboardingTooltip
+              id="coletas-nova-btn"
+              title="Registre uma coleta"
+              description="Crie uma nova coleta para buscar materiais de fornecedores. Acompanhe o status em tempo real."
+              position="left"
+            >
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger>
+                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Coleta</DialogTitle></DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2"><Label>Fornecedor</Label><Select value={formData.fornecedor_id} onValueChange={handleFornecedorChange}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{fornecedores.map(f => <SelectItem key={f.id} value={f.id}>{f.nome_fantasia || f.razao_social}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="grid gap-2"><Label>Tipo</Label><Select value={formData.tipo_coleta} onValueChange={(v: ColetaTipo) => setFormData({ ...formData, tipo_coleta: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="lalamove">Lalamove</SelectItem><SelectItem value="transportadora">Transportadora</SelectItem></SelectContent></Select></div>
+                    {formData.tipo_coleta === "transportadora" && <div className="grid gap-2"><Label>Transportadora</Label><Select value={formData.transportadora_id} onValueChange={(v) => setFormData({ ...formData, transportadora_id: v })}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{transportadoras.map(t => <SelectItem key={t.id} value={t.id}>{t.nome_fantasia}</SelectItem>)}</SelectContent></Select></div>}
+                    <div className="grid gap-2"><Label>Endereço</Label><Textarea value={formData.endereco_coleta} onChange={(e) => setFormData({ ...formData, endereco_coleta: e.target.value })} /></div>
+                    <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Contato</Label><Input value={formData.contato_coleta} onChange={(e) => setFormData({ ...formData, contato_coleta: e.target.value })} /></div><div className="grid gap-2"><Label>Data Prevista</Label><Input type="date" value={formData.data_prevista_coleta} onChange={(e) => setFormData({ ...formData, data_prevista_coleta: e.target.value })} /></div></div>
+                    <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Volumes</Label><Input type="number" value={formData.qtd_volumes} onChange={(e) => setFormData({ ...formData, qtd_volumes: e.target.value })} /></div><div className="grid gap-2"><Label>Peso (kg)</Label><Input type="number" step="0.1" value={formData.peso_estimado_kg} onChange={(e) => setFormData({ ...formData, peso_estimado_kg: e.target.value })} /></div></div>
+                    <div className="grid gap-2"><Label>Observações</Label><Textarea value={formData.observacoes} onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })} /></div>
+                  </div>
+                  <DialogFooter><Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button onClick={handleSubmit} disabled={!formData.endereco_coleta}>Registrar</Button></DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </OnboardingTooltip>
           </div>
         </div>
 
