@@ -43,6 +43,8 @@ const APIDocumentation = lazy(() => import("./pages/APIDocumentation"));
 const LojaRecompensas = lazy(() => import("./pages/LojaRecompensas"));
 const ConciliacaoFinanceira = lazy(() => import("./pages/ConciliacaoFinanceira"));
 const RotasTransportadoras = lazy(() => import("./pages/RotasTransportadoras"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const GerenciamentoUsuarios = lazy(() => import("./pages/GerenciamentoUsuarios"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -99,8 +101,10 @@ const App = () => (
                   <Route path="/rotas-transportadoras" element={<ProtectedRoute><RotasTransportadoras /></ProtectedRoute>} />
                   <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
                   <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
-                  {/* Public route - no authentication required */}
+                  <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
+                  {/* Public routes - no authentication required */}
                   <Route path="/rastrear" element={<RastreamentoPublico />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
