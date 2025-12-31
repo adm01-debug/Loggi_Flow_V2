@@ -9,6 +9,7 @@ import { RateLimitDashboardPanel } from "@/components/security/RateLimitDashboar
 import { PermissionMatrix } from "@/components/security/PermissionMatrix";
 import { SecurityOverviewPanel } from "@/components/security/SecurityOverviewPanel";
 import { SecurityNotificationSettings } from "@/components/security/SecurityNotificationSettings";
+import { PasskeyManager } from "@/components/security/PasskeyManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AlertTriangle, 
@@ -20,7 +21,8 @@ import {
   Lock,
   Users,
   LayoutDashboard,
-  Bell
+  Bell,
+  Fingerprint
 } from "lucide-react";
 
 export default function Seguranca() {
@@ -65,6 +67,10 @@ export default function Seguranca() {
               <Shield className="h-4 w-4" />
               <span className="hidden sm:inline">2FA</span>
             </TabsTrigger>
+            <TabsTrigger value="passkeys" className="flex items-center gap-2">
+              <Fingerprint className="h-4 w-4" />
+              <span className="hidden sm:inline">Passkeys</span>
+            </TabsTrigger>
             <TabsTrigger value="devices" className="flex items-center gap-2">
               <Smartphone className="h-4 w-4" />
               <span className="hidden sm:inline">Dispositivos</span>
@@ -101,6 +107,10 @@ export default function Seguranca() {
 
           <TabsContent value="2fa">
             <TwoFactorSetup />
+          </TabsContent>
+
+          <TabsContent value="passkeys">
+            <PasskeyManager />
           </TabsContent>
 
           <TabsContent value="devices">
