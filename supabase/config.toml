@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.verify-reauth]
 verify_jwt = true
+
+[functions.new-device-alert]
+verify_jwt = true

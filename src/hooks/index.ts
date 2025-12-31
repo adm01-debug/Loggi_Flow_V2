@@ -12,3 +12,4 @@ export { useAuth } from './useAuth';
 export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsList, formatShortcut } from './useKeyboardShortcuts';
 export { useDebounce } from './useDebounce';
 export { useLocalStorage } from './useLocalStorage';
+export { useNewDeviceDetection } from './useNewDeviceDetection';
