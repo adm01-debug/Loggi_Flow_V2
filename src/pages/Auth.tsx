@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Box, Loader2, Mail, Lock, User } from "lucide-react";
+import { Box, Loader2, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -21,6 +22,10 @@ const signupSchema = z.object({
   fullName: z.string().min(2, "Nome deve ter no mínimo 2 caracteres"),
 });
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
+
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
@@ -28,7 +33,10 @@ export default function Auth() {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupFullName, setSignupFullName] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
   
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -125,10 +133,134 @@ export default function Auth() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+
+    const validation = forgotPasswordSchema.safeParse({ email: forgotEmail });
+    if (!validation.success) {
+      const fieldErrors: Record<string, string> = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[`forgot_${err.path[0]}`] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      toast({
+        title: "Erro ao enviar email",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      setForgotPasswordSent(true);
+      toast({ 
+        title: "Email enviado!", 
+        description: "Verifique sua caixa de entrada para redefinir sua senha." 
+      });
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Forgot Password View
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+        <Card className="w-full max-w-md shadow-xl border-border/50">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-2xl bg-primary glow-primary">
+              <Mail className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl font-display">Esqueci Minha Senha</CardTitle>
+              <CardDescription>
+                {forgotPasswordSent 
+                  ? "Email enviado! Verifique sua caixa de entrada." 
+                  : "Digite seu email para receber um link de recuperação"}
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {forgotPasswordSent ? (
+              <div className="space-y-4">
+                <p className="text-center text-muted-foreground">
+                  Enviamos um email para <strong>{forgotEmail}</strong> com instruções para redefinir sua senha.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setForgotPasswordSent(false);
+                    setForgotEmail("");
+                  }}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Voltar para Login
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  {errors.forgot_email && (
+                    <p className="text-sm text-destructive">{errors.forgot_email}</p>
+                  )}
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    "Enviar Link de Recuperação"
+                  )}
+                </Button>
+
+                <Button 
+                  type="button"
+                  variant="ghost" 
+                  className="w-full" 
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Voltar para Login
+                </Button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -173,7 +305,17 @@ export default function Auth() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Senha</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="login-password">Senha</Label>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="px-0 h-auto font-normal text-xs text-muted-foreground hover:text-primary"
+                      onClick={() => setShowForgotPassword(true)}
+                    >
+                      Esqueci minha senha
+                    </Button>
+                  </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input

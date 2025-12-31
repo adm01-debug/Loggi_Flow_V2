@@ -89,6 +89,7 @@ const gamificationItems = [
 ];
 
 const adminItems = [
+  { title: "Usuários", url: "/gerenciamento-usuarios", icon: Users },
   { title: "Audit Trail", url: "/audit-trail", icon: History },
 ];
 
