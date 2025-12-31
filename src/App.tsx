@@ -46,6 +46,7 @@ const RotasTransportadoras = lazy(() => import("./pages/RotasTransportadoras"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const GerenciamentoUsuarios = lazy(() => import("./pages/GerenciamentoUsuarios"));
 const AprovacaoResetSenha = lazy(() => import("./pages/AprovacaoResetSenha"));
+const Seguranca = lazy(() => import("./pages/Seguranca"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -104,6 +105,7 @@ const App = () => (
                   <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
                   <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
                   <Route path="/aprovacao-reset-senha" element={<ProtectedRoute requiredRole="admin"><AprovacaoResetSenha /></ProtectedRoute>} />
+                  <Route path="/seguranca" element={<ProtectedRoute requiredRole="admin"><Seguranca /></ProtectedRoute>} />
                   {/* Public routes - no authentication required */}
                   <Route path="/rastrear" element={<RastreamentoPublico />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
