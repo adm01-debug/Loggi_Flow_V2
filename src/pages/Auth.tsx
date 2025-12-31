@@ -151,23 +151,28 @@ export default function Auth() {
 
     setIsLoading(true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    // Create a password reset request instead of sending email directly
+    const { error } = await supabase
+      .from("password_reset_requests")
+      .insert({
+        email: forgotEmail,
+        status: "pending",
+        requested_at: new Date().toISOString(),
+      });
 
     setIsLoading(false);
 
     if (error) {
       toast({
-        title: "Erro ao enviar email",
+        title: "Erro ao solicitar reset",
         description: error.message,
         variant: "destructive",
       });
     } else {
       setForgotPasswordSent(true);
       toast({ 
-        title: "Email enviado!", 
-        description: "Verifique sua caixa de entrada para redefinir sua senha." 
+        title: "Solicitação enviada!", 
+        description: "Aguarde a aprovação do gestor para receber o link de recuperação." 
       });
     }
   };
@@ -193,8 +198,8 @@ export default function Auth() {
               <CardTitle className="text-2xl font-display">Esqueci Minha Senha</CardTitle>
               <CardDescription>
                 {forgotPasswordSent 
-                  ? "Email enviado! Verifique sua caixa de entrada." 
-                  : "Digite seu email para receber um link de recuperação"}
+                  ? "Solicitação enviada! Aguarde aprovação." 
+                  : "Digite seu email para solicitar recuperação de senha"}
               </CardDescription>
             </div>
           </CardHeader>
@@ -202,7 +207,9 @@ export default function Auth() {
             {forgotPasswordSent ? (
               <div className="space-y-4">
                 <p className="text-center text-muted-foreground">
-                  Enviamos um email para <strong>{forgotEmail}</strong> com instruções para redefinir sua senha.
+                  Sua solicitação foi enviada para <strong>{forgotEmail}</strong>.
+                  <br /><br />
+                  Um gestor precisa aprovar a solicitação antes que você receba o email de recuperação.
                 </p>
                 <Button 
                   variant="outline" 

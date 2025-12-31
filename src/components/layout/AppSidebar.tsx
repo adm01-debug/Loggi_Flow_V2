@@ -5,7 +5,7 @@ import {
   Trophy, Zap, ChevronLeft, ChevronRight, Box, PackageSearch, History,
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
-  Sparkles, TrendingUp, Gamepad2, Cog,
+  Sparkles, TrendingUp, Gamepad2, Cog, KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -90,6 +90,7 @@ const gamificationItems = [
 
 const adminItems = [
   { title: "Usuários", url: "/gerenciamento-usuarios", icon: Users },
+  { title: "Reset Senha", url: "/aprovacao-reset-senha", icon: KeyRound },
   { title: "Audit Trail", url: "/audit-trail", icon: History },
 ];
 
