@@ -894,6 +894,51 @@ export type Database = {
         }
         Relationships: []
       }
+      known_devices: {
+        Row: {
+          browser: string | null
+          device_fingerprint: string
+          device_type: string | null
+          first_seen_at: string
+          id: string
+          ip_address: string | null
+          is_trusted: boolean | null
+          last_seen_at: string
+          location: string | null
+          name: string | null
+          os: string | null
+          user_id: string
+        }
+        Insert: {
+          browser?: string | null
+          device_fingerprint: string
+          device_type?: string | null
+          first_seen_at?: string
+          id?: string
+          ip_address?: string | null
+          is_trusted?: boolean | null
+          last_seen_at?: string
+          location?: string | null
+          name?: string | null
+          os?: string | null
+          user_id: string
+        }
+        Update: {
+          browser?: string | null
+          device_fingerprint?: string
+          device_type?: string | null
+          first_seen_at?: string
+          id?: string
+          ip_address?: string | null
+          is_trusted?: boolean | null
+          last_seen_at?: string
+          location?: string | null
+          name?: string | null
+          os?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           created_at: string

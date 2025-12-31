@@ -10,6 +10,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { TimezoneProvider } from "@/hooks/useTimezone";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SessionTimeoutWarning } from "@/components/security/SessionTimeoutWarning";
+import { NewDeviceDetector } from "@/components/security/NewDeviceDetector";
 import { Loader2 } from "lucide-react";
 
 // Lazy load all pages for better initial performance
@@ -73,6 +74,7 @@ const App = () => (
             <Sonner />
             <AchievementNotificationContainer />
             <SessionTimeoutWarning />
+            <NewDeviceDetector />
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
