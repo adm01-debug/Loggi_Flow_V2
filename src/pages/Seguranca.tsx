@@ -3,8 +3,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
 import { IPAccessControl } from "@/components/security/IPAccessControl";
 import { LoginAttemptsLog } from "@/components/security/LoginAttemptsLog";
+import { DeviceManagement } from "@/components/security/DeviceManagement";
+import { SecurityEventsPanel } from "@/components/security/SecurityEventsPanel";
+import { RateLimitDashboardPanel } from "@/components/security/RateLimitDashboardPanel";
+import { PermissionMatrix } from "@/components/security/PermissionMatrix";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Shield, Globe, Activity } from "lucide-react";
+import { 
+  AlertTriangle, 
+  Shield, 
+  Globe, 
+  Activity, 
+  Smartphone, 
+  Gauge, 
+  Lock,
+  Users
+} from "lucide-react";
 
 export default function Seguranca() {
   const { isAdmin } = useAuth();
@@ -33,24 +46,40 @@ export default function Seguranca() {
             Central de Segurança
           </h1>
           <p className="text-muted-foreground mt-1">
-            Configure autenticação de dois fatores, controle de acesso por IP e monitore tentativas de login
+            Gerencie autenticação, controle de acesso, rate limiting e monitore eventos de segurança
           </p>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="2fa" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg">
+          <TabsList className="flex flex-wrap gap-1 h-auto p-1">
             <TabsTrigger value="2fa" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              2FA
+              <span className="hidden sm:inline">2FA</span>
+            </TabsTrigger>
+            <TabsTrigger value="devices" className="flex items-center gap-2">
+              <Smartphone className="h-4 w-4" />
+              <span className="hidden sm:inline">Dispositivos</span>
             </TabsTrigger>
             <TabsTrigger value="ip" className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
-              Acesso IP
+              <span className="hidden sm:inline">Acesso IP</span>
+            </TabsTrigger>
+            <TabsTrigger value="rate-limit" className="flex items-center gap-2">
+              <Gauge className="h-4 w-4" />
+              <span className="hidden sm:inline">Rate Limit</span>
+            </TabsTrigger>
+            <TabsTrigger value="permissions" className="flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              <span className="hidden sm:inline">Permissões</span>
+            </TabsTrigger>
+            <TabsTrigger value="events" className="flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              <span className="hidden sm:inline">Eventos</span>
             </TabsTrigger>
             <TabsTrigger value="logs" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Logs
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Logins</span>
             </TabsTrigger>
           </TabsList>
 
@@ -58,8 +87,24 @@ export default function Seguranca() {
             <TwoFactorSetup />
           </TabsContent>
 
+          <TabsContent value="devices">
+            <DeviceManagement />
+          </TabsContent>
+
           <TabsContent value="ip">
             <IPAccessControl />
+          </TabsContent>
+
+          <TabsContent value="rate-limit">
+            <RateLimitDashboardPanel />
+          </TabsContent>
+
+          <TabsContent value="permissions">
+            <PermissionMatrix />
+          </TabsContent>
+
+          <TabsContent value="events">
+            <SecurityEventsPanel />
           </TabsContent>
 
           <TabsContent value="logs">
