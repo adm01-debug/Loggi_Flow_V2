@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Box, Loader2, Mail, Lock, User, ArrowLeft, Shield, Eye, EyeOff } from "lucide-react";
+import { Box, Loader2, Mail, Lock, User, ArrowLeft, Shield, Eye, EyeOff, Clock } from "lucide-react";
 import { z } from "zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
@@ -26,7 +26,15 @@ async function getClientIP(): Promise<string | null> {
 }
 
 // Validate login with IP check
-async function validateLoginIP(email: string, ipAddress: string | null): Promise<{ allowed: boolean; reason?: string }> {
+interface ValidateLoginResult {
+  allowed: boolean;
+  reason?: string;
+  lockout_ends_at?: string;
+  remaining_seconds?: number;
+  failure_count?: number;
+}
+
+async function validateLoginIP(email: string, ipAddress: string | null): Promise<ValidateLoginResult> {
   try {
     const { data, error } = await supabase.functions.invoke("validate-login", {
       body: {
@@ -42,7 +50,7 @@ async function validateLoginIP(email: string, ipAddress: string | null): Promise
       return { allowed: true };
     }
 
-    return data;
+    return data as ValidateLoginResult;
   } catch (err) {
     console.error("Error calling validate-login:", err);
     return { allowed: true };
@@ -95,6 +103,8 @@ export default function Auth() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
   const [ipBlocked, setIpBlocked] = useState<string | null>(null);
+  const [lockoutEndsAt, setLockoutEndsAt] = useState<Date | null>(null);
+  const [lockoutRemaining, setLockoutRemaining] = useState<number>(0);
   const [clientIP, setClientIP] = useState<string | null>(null);
   const [isPasswordStrong, setIsPasswordStrong] = useState(false);
   const [isPasswordPwned, setIsPasswordPwned] = useState(false);
@@ -109,6 +119,26 @@ export default function Auth() {
   useEffect(() => {
     getClientIP().then(setClientIP);
   }, []);
+
+  // Countdown timer for lockout
+  useEffect(() => {
+    if (!lockoutEndsAt) return;
+
+    const updateRemaining = () => {
+      const now = new Date();
+      const remaining = Math.max(0, Math.ceil((lockoutEndsAt.getTime() - now.getTime()) / 1000));
+      setLockoutRemaining(remaining);
+      
+      if (remaining <= 0) {
+        setIpBlocked(null);
+        setLockoutEndsAt(null);
+      }
+    };
+
+    updateRemaining();
+    const interval = setInterval(updateRemaining, 1000);
+    return () => clearInterval(interval);
+  }, [lockoutEndsAt]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -142,6 +172,12 @@ export default function Auth() {
     if (!ipValidation.allowed) {
       setIsLoading(false);
       setIpBlocked(ipValidation.reason || "Acesso bloqueado");
+      
+      // Set lockout timer if provided
+      if (ipValidation.lockout_ends_at) {
+        setLockoutEndsAt(new Date(ipValidation.lockout_ends_at));
+      }
+      
       toast({
         title: "Acesso Bloqueado",
         description: ipValidation.reason || "Seu IP foi bloqueado.",
@@ -402,7 +438,19 @@ export default function Auth() {
               {ipBlocked && (
                 <Alert variant="destructive">
                   <Shield className="h-4 w-4" />
-                  <AlertDescription>{ipBlocked}</AlertDescription>
+                  <AlertDescription>
+                    <div className="space-y-1">
+                      <p>{ipBlocked}</p>
+                      {lockoutRemaining > 0 && (
+                        <div className="flex items-center gap-2 mt-2 text-sm font-medium">
+                          <Clock className="h-4 w-4 animate-pulse" />
+                          <span>
+                            Tempo restante: {Math.floor(lockoutRemaining / 60)}:{String(lockoutRemaining % 60).padStart(2, '0')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </AlertDescription>
                 </Alert>
               )}
               <form onSubmit={handleLogin} className="space-y-4">
