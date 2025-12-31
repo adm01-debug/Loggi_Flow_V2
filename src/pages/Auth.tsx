@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Box, Loader2, Mail, Lock, User, ArrowLeft, Shield } from "lucide-react";
 import { z } from "zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
 
 // Helper to get client IP using external service
 async function getClientIP(): Promise<string | null> {
@@ -494,6 +495,7 @@ export default function Auth() {
                       className="pl-10"
                     />
                   </div>
+                  <PasswordStrengthIndicator password={signupPassword} />
                   {errors.signup_password && (
                     <p className="text-sm text-destructive">{errors.signup_password}</p>
                   )}
