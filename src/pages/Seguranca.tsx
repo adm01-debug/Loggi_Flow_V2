@@ -7,6 +7,7 @@ import { DeviceManagement } from "@/components/security/DeviceManagement";
 import { SecurityEventsPanel } from "@/components/security/SecurityEventsPanel";
 import { RateLimitDashboardPanel } from "@/components/security/RateLimitDashboardPanel";
 import { PermissionMatrix } from "@/components/security/PermissionMatrix";
+import { SecurityOverviewPanel } from "@/components/security/SecurityOverviewPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AlertTriangle, 
@@ -16,7 +17,8 @@ import {
   Smartphone, 
   Gauge, 
   Lock,
-  Users
+  Users,
+  LayoutDashboard
 } from "lucide-react";
 
 export default function Seguranca() {
@@ -51,8 +53,12 @@ export default function Seguranca() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="2fa" className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="flex flex-wrap gap-1 h-auto p-1">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="hidden sm:inline">Visão Geral</span>
+            </TabsTrigger>
             <TabsTrigger value="2fa" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               <span className="hidden sm:inline">2FA</span>
@@ -82,6 +88,10 @@ export default function Seguranca() {
               <span className="hidden sm:inline">Logins</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview">
+            <SecurityOverviewPanel />
+          </TabsContent>
 
           <TabsContent value="2fa">
             <TwoFactorSetup />
