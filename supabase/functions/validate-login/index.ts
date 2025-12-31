@@ -199,35 +199,60 @@ serve(async (req: Request) => {
       }
     }
 
-    // Check for too many failed attempts from this IP in last 15 minutes
+    // Check for too many failed attempts with exponential backoff
     if (ip_address) {
-      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+      // Get all failed attempts from this IP in the last 24 hours
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       
       const { data: recentFailures, error: failuresError } = await supabaseAdmin
         .from("login_attempts")
-        .select("id")
+        .select("id, created_at")
         .eq("ip_address", ip_address)
         .eq("success", false)
-        .gte("created_at", fifteenMinutesAgo);
+        .gte("created_at", twentyFourHoursAgo)
+        .order("created_at", { ascending: false });
 
       if (!failuresError && recentFailures && recentFailures.length >= 5) {
-        // Log the blocked attempt
-        await supabaseAdmin.from("login_attempts").insert({
-          email,
-          ip_address,
-          user_agent,
-          success: false,
-          failure_reason: "Muitas tentativas falhas",
-        });
+        // Calculate lockout duration based on number of failed attempts (exponential backoff)
+        // 5 attempts: 1 min, 6: 2 min, 7: 4 min, 8: 8 min, 9: 16 min, 10+: 30 min max
+        const failureCount = recentFailures.length;
+        const baseMinutes = 1;
+        const exponent = Math.min(failureCount - 5, 5); // Cap at 5 (32 minutes max)
+        const lockoutMinutes = Math.min(baseMinutes * Math.pow(2, exponent), 30);
+        
+        // Check if the most recent failure is within the lockout period
+        const lastFailure = new Date(recentFailures[0].created_at);
+        const lockoutEndsAt = new Date(lastFailure.getTime() + lockoutMinutes * 60 * 1000);
+        const now = new Date();
+        
+        if (now < lockoutEndsAt) {
+          const remainingSeconds = Math.ceil((lockoutEndsAt.getTime() - now.getTime()) / 1000);
+          const remainingMinutes = Math.ceil(remainingSeconds / 60);
+          
+          // Log the blocked attempt
+          await supabaseAdmin.from("login_attempts").insert({
+            email,
+            ip_address,
+            user_agent,
+            success: false,
+            failure_reason: `Bloqueado temporariamente (${failureCount} tentativas falhas)`,
+          });
 
-        console.log(`Too many failed attempts from IP ${ip_address}`);
-        return new Response(
-          JSON.stringify({ 
-            allowed: false, 
-            reason: "Muitas tentativas falhas. Tente novamente em 15 minutos." 
-          }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+          console.log(`IP ${ip_address} is temporarily blocked. ${failureCount} failures, ${remainingMinutes} min remaining`);
+          
+          return new Response(
+            JSON.stringify({ 
+              allowed: false, 
+              reason: `Conta temporariamente bloqueada após ${failureCount} tentativas falhas. Tente novamente em ${remainingMinutes} minuto${remainingMinutes > 1 ? 's' : ''}.`,
+              lockout_ends_at: lockoutEndsAt.toISOString(),
+              remaining_seconds: remainingSeconds,
+              failure_count: failureCount
+            }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        } else {
+          console.log(`Lockout period expired for IP ${ip_address}, allowing attempt`);
+        }
       }
     }
 
