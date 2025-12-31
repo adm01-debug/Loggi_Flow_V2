@@ -1,28 +1,42 @@
-import { useMemo } from "react";
-import { Check, X } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+import { Check, X, AlertTriangle, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/integrations/supabase/client";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface PasswordStrengthIndicatorProps {
   password: string;
   className?: string;
+  onStrengthChange?: (isStrong: boolean, isPwned: boolean) => void;
 }
 
 interface PasswordCriteria {
   label: string;
   met: boolean;
+  required: boolean;
 }
 
-export function PasswordStrengthIndicator({ password, className }: PasswordStrengthIndicatorProps) {
+export function PasswordStrengthIndicator({ 
+  password, 
+  className,
+  onStrengthChange 
+}: PasswordStrengthIndicatorProps) {
+  const [isPwned, setIsPwned] = useState(false);
+  const [pwnedCount, setPwnedCount] = useState(0);
+  const [isCheckingPwned, setIsCheckingPwned] = useState(false);
+  const debouncedPassword = useDebounce(password, 500);
+
   const analysis = useMemo(() => {
     const criteria: PasswordCriteria[] = [
-      { label: "Mínimo 8 caracteres", met: password.length >= 8 },
-      { label: "Letra maiúscula", met: /[A-Z]/.test(password) },
-      { label: "Letra minúscula", met: /[a-z]/.test(password) },
-      { label: "Número", met: /[0-9]/.test(password) },
-      { label: "Caractere especial (!@#$%...)", met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) },
+      { label: "Mínimo 8 caracteres", met: password.length >= 8, required: true },
+      { label: "Letra maiúscula", met: /[A-Z]/.test(password), required: false },
+      { label: "Letra minúscula", met: /[a-z]/.test(password), required: false },
+      { label: "Número", met: /[0-9]/.test(password), required: false },
+      { label: "Caractere especial (!@#$%...)", met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password), required: true },
     ];
 
+    const requiredCriteria = criteria.filter(c => c.required);
+    const allRequiredMet = requiredCriteria.every(c => c.met);
     const metCount = criteria.filter((c) => c.met).length;
     const strength = password.length === 0 ? 0 : Math.round((metCount / criteria.length) * 100);
 
@@ -30,11 +44,11 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
     let label = "Muito fraca";
     let color = "bg-destructive";
 
-    if (strength >= 80) {
+    if (strength >= 80 && allRequiredMet) {
       level = "strong";
       label = "Forte";
       color = "bg-green-500";
-    } else if (strength >= 60) {
+    } else if (strength >= 60 && allRequiredMet) {
       level = "good";
       label = "Boa";
       color = "bg-yellow-500";
@@ -44,8 +58,44 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
       color = "bg-orange-500";
     }
 
-    return { criteria, strength, level, label, color };
+    return { criteria, strength, level, label, color, allRequiredMet };
   }, [password]);
+
+  // Check for pwned passwords
+  useEffect(() => {
+    const checkPwned = async () => {
+      if (debouncedPassword.length < 8) {
+        setIsPwned(false);
+        setPwnedCount(0);
+        return;
+      }
+
+      setIsCheckingPwned(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("check-password-breach", {
+          body: { password: debouncedPassword },
+        });
+
+        if (!error && data) {
+          setIsPwned(data.pwned);
+          setPwnedCount(data.count || 0);
+        }
+      } catch (err) {
+        console.error("Error checking password breach:", err);
+      } finally {
+        setIsCheckingPwned(false);
+      }
+    };
+
+    checkPwned();
+  }, [debouncedPassword]);
+
+  // Notify parent of strength changes
+  useEffect(() => {
+    if (onStrengthChange) {
+      onStrengthChange(analysis.allRequiredMet && analysis.strength >= 60, isPwned);
+    }
+  }, [analysis.allRequiredMet, analysis.strength, isPwned, onStrengthChange]);
 
   if (!password) return null;
 
@@ -85,7 +135,7 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
             key={index}
             className={cn(
               "flex items-center gap-2 text-xs transition-colors",
-              criterion.met ? "text-green-500" : "text-muted-foreground"
+              criterion.met ? "text-green-500" : criterion.required ? "text-destructive" : "text-muted-foreground"
             )}
           >
             {criterion.met ? (
@@ -93,9 +143,39 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
             ) : (
               <X className="h-3.5 w-3.5" />
             )}
-            <span>{criterion.label}</span>
+            <span>
+              {criterion.label}
+              {criterion.required && !criterion.met && (
+                <span className="ml-1 text-destructive">(obrigatório)</span>
+              )}
+            </span>
           </div>
         ))}
+      </div>
+
+      {/* Pwned password check */}
+      <div className="pt-2 border-t border-border">
+        {isCheckingPwned ? (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <span>Verificando vazamentos...</span>
+          </div>
+        ) : isPwned ? (
+          <div className="flex items-start gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded-md">
+            <ShieldAlert className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium">Senha comprometida!</p>
+              <p className="text-destructive/80">
+                Esta senha foi encontrada em {pwnedCount.toLocaleString()} vazamentos. Escolha outra.
+              </p>
+            </div>
+          </div>
+        ) : password.length >= 8 ? (
+          <div className="flex items-center gap-2 text-xs text-green-500">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            <span>Senha não encontrada em vazamentos conhecidos</span>
+          </div>
+        ) : null}
       </div>
     </div>
   );
