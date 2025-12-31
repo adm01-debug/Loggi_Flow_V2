@@ -8,8 +8,62 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Box, Loader2, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { Box, Loader2, Mail, Lock, User, ArrowLeft, Shield } from "lucide-react";
 import { z } from "zod";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+// Helper to get client IP using external service
+async function getClientIP(): Promise<string | null> {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    return data.ip || null;
+  } catch {
+    console.warn("Could not fetch client IP");
+    return null;
+  }
+}
+
+// Validate login with IP check
+async function validateLoginIP(email: string, ipAddress: string | null): Promise<{ allowed: boolean; reason?: string }> {
+  try {
+    const { data, error } = await supabase.functions.invoke("validate-login", {
+      body: {
+        email,
+        ip_address: ipAddress,
+        user_agent: navigator.userAgent,
+      },
+    });
+
+    if (error) {
+      console.error("Error validating login:", error);
+      // Allow login if validation service fails
+      return { allowed: true };
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Error calling validate-login:", err);
+    return { allowed: true };
+  }
+}
+
+// Log login attempt
+async function logLoginAttempt(email: string, ipAddress: string | null, success: boolean, failureReason?: string): Promise<void> {
+  try {
+    await supabase.functions.invoke("log-login-attempt", {
+      body: {
+        email,
+        ip_address: ipAddress,
+        user_agent: navigator.userAgent,
+        success,
+        failure_reason: failureReason,
+      },
+    });
+  } catch (err) {
+    console.error("Error logging login attempt:", err);
+  }
+}
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -37,10 +91,17 @@ export default function Auth() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
+  const [ipBlocked, setIpBlocked] = useState<string | null>(null);
+  const [clientIP, setClientIP] = useState<string | null>(null);
   
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Fetch client IP on mount
+  useEffect(() => {
+    getClientIP().then(setClientIP);
+  }, []);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -52,6 +113,7 @@ export default function Auth() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setIpBlocked(null);
 
     const validation = loginSchema.safeParse({ email: loginEmail, password: loginPassword });
     if (!validation.success) {
@@ -66,10 +128,29 @@ export default function Auth() {
     }
 
     setIsLoading(true);
-    const { error } = await signIn(loginEmail, loginPassword);
-    setIsLoading(false);
 
+    // Step 1: Validate IP before attempting login
+    const ipValidation = await validateLoginIP(loginEmail, clientIP);
+    
+    if (!ipValidation.allowed) {
+      setIsLoading(false);
+      setIpBlocked(ipValidation.reason || "Acesso bloqueado");
+      toast({
+        title: "Acesso Bloqueado",
+        description: ipValidation.reason || "Seu IP foi bloqueado.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Step 2: Attempt login
+    const { error } = await signIn(loginEmail, loginPassword);
+    
     if (error) {
+      // Log failed attempt
+      await logLoginAttempt(loginEmail, clientIP, false, error.message);
+      
+      setIsLoading(false);
       if (error.message.includes("Invalid login credentials")) {
         toast({
           title: "Credenciais inválidas",
@@ -84,6 +165,10 @@ export default function Auth() {
         });
       }
     } else {
+      // Log successful attempt
+      await logLoginAttempt(loginEmail, clientIP, true);
+      
+      setIsLoading(false);
       toast({ title: "Login realizado com sucesso!" });
       navigate("/");
     }
@@ -292,6 +377,12 @@ export default function Auth() {
             </TabsList>
 
             <TabsContent value="login" className="space-y-4 mt-6">
+              {ipBlocked && (
+                <Alert variant="destructive">
+                  <Shield className="h-4 w-4" />
+                  <AlertDescription>{ipBlocked}</AlertDescription>
+                </Alert>
+              )}
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="login-email">Email</Label>
