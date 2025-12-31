@@ -73,7 +73,9 @@ const loginSchema = z.object({
 
 const signupSchema = z.object({
   email: z.string().email("Email inválido"),
-  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+  password: z.string()
+    .min(8, "Senha deve ter no mínimo 8 caracteres")
+    .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, "Senha deve conter pelo menos um caractere especial"),
   fullName: z.string().min(2, "Nome deve ter no mínimo 2 caracteres"),
 });
 
@@ -94,6 +96,8 @@ export default function Auth() {
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
   const [ipBlocked, setIpBlocked] = useState<string | null>(null);
   const [clientIP, setClientIP] = useState<string | null>(null);
+  const [isPasswordStrong, setIsPasswordStrong] = useState(false);
+  const [isPasswordPwned, setIsPasswordPwned] = useState(false);
   
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -175,9 +179,24 @@ export default function Auth() {
     }
   };
 
+  const handlePasswordStrengthChange = (isStrong: boolean, isPwned: boolean) => {
+    setIsPasswordStrong(isStrong);
+    setIsPasswordPwned(isPwned);
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+
+    // Check if password is pwned
+    if (isPasswordPwned) {
+      toast({
+        title: "Senha comprometida",
+        description: "Esta senha foi encontrada em vazamentos de dados. Escolha outra senha mais segura.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const validation = signupSchema.safeParse({
       email: signupEmail,
@@ -489,13 +508,16 @@ export default function Auth() {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Mínimo 6 caracteres"
+                      placeholder="Mínimo 8 caracteres"
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
                       className="pl-10"
                     />
                   </div>
-                  <PasswordStrengthIndicator password={signupPassword} />
+                  <PasswordStrengthIndicator 
+                    password={signupPassword} 
+                    onStrengthChange={handlePasswordStrengthChange}
+                  />
                   {errors.signup_password && (
                     <p className="text-sm text-destructive">{errors.signup_password}</p>
                   )}
