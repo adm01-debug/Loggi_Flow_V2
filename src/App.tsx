@@ -11,6 +11,7 @@ import { TimezoneProvider } from "@/hooks/useTimezone";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SessionTimeoutWarning } from "@/components/security/SessionTimeoutWarning";
 import { NewDeviceDetector } from "@/components/security/NewDeviceDetector";
+import { SecurityPushNotificationProvider } from "@/components/security/SecurityPushNotificationProvider";
 import { Loader2 } from "lucide-react";
 
 // Lazy load all pages for better initial performance
@@ -75,6 +76,7 @@ const App = () => (
             <AchievementNotificationContainer />
             <SessionTimeoutWarning />
             <NewDeviceDetector />
+            <SecurityPushNotificationProvider />
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
