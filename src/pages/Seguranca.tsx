@@ -10,6 +10,7 @@ import { PermissionMatrix } from "@/components/security/PermissionMatrix";
 import { SecurityOverviewPanel } from "@/components/security/SecurityOverviewPanel";
 import { SecurityNotificationSettings } from "@/components/security/SecurityNotificationSettings";
 import { PasskeyManager } from "@/components/security/PasskeyManager";
+import { GeoBlockingPanel } from "@/components/security/GeoBlockingPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AlertTriangle, 
@@ -22,7 +23,8 @@ import {
   Users,
   LayoutDashboard,
   Bell,
-  Fingerprint
+  Fingerprint,
+  MapPin
 } from "lucide-react";
 
 export default function Seguranca() {
@@ -79,6 +81,10 @@ export default function Seguranca() {
               <Globe className="h-4 w-4" />
               <span className="hidden sm:inline">Acesso IP</span>
             </TabsTrigger>
+            <TabsTrigger value="geo" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span className="hidden sm:inline">Geo</span>
+            </TabsTrigger>
             <TabsTrigger value="rate-limit" className="flex items-center gap-2">
               <Gauge className="h-4 w-4" />
               <span className="hidden sm:inline">Rate Limit</span>
@@ -119,6 +125,10 @@ export default function Seguranca() {
 
           <TabsContent value="ip">
             <IPAccessControl />
+          </TabsContent>
+
+          <TabsContent value="geo">
+            <GeoBlockingPanel />
           </TabsContent>
 
           <TabsContent value="rate-limit">
