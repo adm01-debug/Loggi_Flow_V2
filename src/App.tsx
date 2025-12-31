@@ -9,6 +9,7 @@ import { AchievementNotificationContainer } from "@/components/achievements/Achi
 import { AuthProvider } from "@/hooks/useAuth";
 import { TimezoneProvider } from "@/hooks/useTimezone";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SessionTimeoutWarning } from "@/components/security/SessionTimeoutWarning";
 import { Loader2 } from "lucide-react";
 
 // Lazy load all pages for better initial performance
@@ -47,6 +48,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const GerenciamentoUsuarios = lazy(() => import("./pages/GerenciamentoUsuarios"));
 const AprovacaoResetSenha = lazy(() => import("./pages/AprovacaoResetSenha"));
 const Seguranca = lazy(() => import("./pages/Seguranca"));
+const RateLimitDashboard = lazy(() => import("./pages/RateLimitDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -70,6 +72,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <AchievementNotificationContainer />
+            <SessionTimeoutWarning />
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
@@ -106,6 +109,7 @@ const App = () => (
                   <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
                   <Route path="/aprovacao-reset-senha" element={<ProtectedRoute requiredRole="admin"><AprovacaoResetSenha /></ProtectedRoute>} />
                   <Route path="/seguranca" element={<ProtectedRoute requiredRole="admin"><Seguranca /></ProtectedRoute>} />
+                  <Route path="/rate-limit" element={<ProtectedRoute requiredRole="admin"><RateLimitDashboard /></ProtectedRoute>} />
                   {/* Public routes - no authentication required */}
                   <Route path="/rastrear" element={<RastreamentoPublico />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
