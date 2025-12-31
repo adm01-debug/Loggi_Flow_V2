@@ -12,6 +12,45 @@ interface ValidateLoginRequest {
   user_agent?: string;
 }
 
+interface GeoLocation {
+  country_code: string;
+  country_name: string;
+}
+
+// Get country from IP using free API
+async function getCountryFromIP(ip: string): Promise<GeoLocation | null> {
+  try {
+    // Skip geolocation for localhost/private IPs
+    if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("192.168.") || ip.startsWith("10.") || ip.startsWith("172.")) {
+      console.log(`Skipping geolocation for private/local IP: ${ip}`);
+      return null;
+    }
+
+    // Use ip-api.com (free, no API key required, 45 req/min limit)
+    const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,countryCode,country`);
+    
+    if (!response.ok) {
+      console.error(`Geolocation API error: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    
+    if (data.status === "success") {
+      return {
+        country_code: data.countryCode,
+        country_name: data.country,
+      };
+    }
+
+    console.log(`Geolocation failed for IP ${ip}: ${data.message || "Unknown error"}`);
+    return null;
+  } catch (error) {
+    console.error(`Error getting geolocation for IP ${ip}:`, error);
+    return null;
+  }
+}
+
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -108,6 +147,54 @@ serve(async (req: Request) => {
             }),
             { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
+        }
+      }
+
+      // Check geographic restrictions
+      const { data: geoRules, error: geoError } = await supabaseAdmin
+        .from("geo_access_rules")
+        .select("country_code")
+        .eq("is_active", true);
+
+      if (!geoError && geoRules && geoRules.length > 0) {
+        // Geo whitelist is enabled - check user's country
+        const geoLocation = await getCountryFromIP(ip_address);
+        
+        if (geoLocation) {
+          const allowedCountries = geoRules.map(r => r.country_code);
+          
+          if (!allowedCountries.includes(geoLocation.country_code)) {
+            // Log the blocked attempt to geo_blocked_attempts
+            await supabaseAdmin.from("geo_blocked_attempts").insert({
+              ip_address,
+              country_code: geoLocation.country_code,
+              country_name: geoLocation.country_name,
+              email,
+              user_agent,
+            });
+
+            // Also log to login_attempts
+            await supabaseAdmin.from("login_attempts").insert({
+              email,
+              ip_address,
+              user_agent,
+              success: false,
+              failure_reason: `País bloqueado: ${geoLocation.country_name}`,
+            });
+
+            console.log(`Access denied for country ${geoLocation.country_name} (${geoLocation.country_code})`);
+            return new Response(
+              JSON.stringify({ 
+                allowed: false, 
+                reason: `Acesso negado: País não autorizado (${geoLocation.country_name})` 
+              }),
+              { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          
+          console.log(`Country ${geoLocation.country_name} is allowed`);
+        } else {
+          console.log(`Could not determine country for IP ${ip_address}, allowing access`);
         }
       }
     }
