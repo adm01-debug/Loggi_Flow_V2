@@ -8,6 +8,7 @@ import { SecurityEventsPanel } from "@/components/security/SecurityEventsPanel";
 import { RateLimitDashboardPanel } from "@/components/security/RateLimitDashboardPanel";
 import { PermissionMatrix } from "@/components/security/PermissionMatrix";
 import { SecurityOverviewPanel } from "@/components/security/SecurityOverviewPanel";
+import { SecurityNotificationSettings } from "@/components/security/SecurityNotificationSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AlertTriangle, 
@@ -18,7 +19,8 @@ import {
   Gauge, 
   Lock,
   Users,
-  LayoutDashboard
+  LayoutDashboard,
+  Bell
 } from "lucide-react";
 
 export default function Seguranca() {
@@ -87,6 +89,10 @@ export default function Seguranca() {
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Logins</span>
             </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span className="hidden sm:inline">Alertas</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -119,6 +125,10 @@ export default function Seguranca() {
 
           <TabsContent value="logs">
             <LoginAttemptsLog />
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <SecurityNotificationSettings />
           </TabsContent>
         </Tabs>
       </div>
