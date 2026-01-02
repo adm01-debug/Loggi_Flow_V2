@@ -25,3 +25,12 @@ export { useSoftDelete } from './useSoftDelete';
 // CRUD Advanced Hooks
 export { useBulkActions } from './useBulkActions';
 export { useActivityLog, useRecentActivity } from './useActivityLog';
+
+// Real Data Hooks (Production)
+export { useAnalyticsReal } from './useAnalyticsReal';
+export { useDashboardMetricsReal } from './useDashboardMetricsReal';
+export { useSLAMetricsReal } from './useSLAMetricsReal';
+export { useLogisticsCostsReal } from './useLogisticsCostsReal';
+export { useGamificationReal } from './useGamificationReal';
+export { useLalamoveTrackingReal, useLalamoveOrders } from './useLalamoveTrackingReal';
+export { useBitrix24SPA, useBitrix24Lalamove, useBitrix24Expedicao, useBitrix24Sync } from './useBitrix24Real';
