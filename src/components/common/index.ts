@@ -11,3 +11,9 @@ export { StatsCard, StatsCardCompact } from './StatsCard';
 export { TagInput } from './TagInput';
 export { DetailSheet } from './DetailSheet';
 export { EmptyState, EmptyStatePresets } from './EmptyState';
+
+// CRUD Improvements
+export { SavedFiltersDropdown } from './SavedFiltersDropdown';
+export { CSVImporter } from './CSVImporter';
+export { VersionHistory } from './VersionHistory';
+export { TrashBin } from './TrashBin';
