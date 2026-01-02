@@ -13,3 +13,11 @@ export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsL
 export { useDebounce } from './useDebounce';
 export { useLocalStorage } from './useLocalStorage';
 export { useNewDeviceDetection } from './useNewDeviceDetection';
+
+// CRUD Improvements
+export { useSavedFilters } from './useSavedFilters';
+export { useVersions } from './useVersions';
+export { useDuplicate } from './useDuplicate';
+export { useInfiniteScroll } from './useInfiniteScroll';
+export { useFulltextSearch, useGlobalSearch } from './useFulltextSearch';
+export { useSoftDelete } from './useSoftDelete';
