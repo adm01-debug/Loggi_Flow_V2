@@ -34,3 +34,11 @@ export { useLogisticsCostsReal } from './useLogisticsCostsReal';
 export { useGamificationReal } from './useGamificationReal';
 export { useLalamoveTrackingReal, useLalamoveOrders } from './useLalamoveTrackingReal';
 export { useBitrix24SPA, useBitrix24Lalamove, useBitrix24Expedicao, useBitrix24Sync } from './useBitrix24Real';
+
+// Core Entity Hooks (Real)
+export { useEntregasReal } from './useEntregasReal';
+export { useColetasReal } from './useColetasReal';
+export { useTransportadorasReal } from './useTransportadorasReal';
+
+// Integration Hooks (Real)
+export { useN8nWorkflows, useN8nTrigger, useN8nLogs } from './useN8nReal';
