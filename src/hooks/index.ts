@@ -21,3 +21,7 @@ export { useDuplicate } from './useDuplicate';
 export { useInfiniteScroll } from './useInfiniteScroll';
 export { useFulltextSearch, useGlobalSearch } from './useFulltextSearch';
 export { useSoftDelete } from './useSoftDelete';
+
+// CRUD Advanced Hooks
+export { useBulkActions } from './useBulkActions';
+export { useActivityLog, useRecentActivity } from './useActivityLog';
