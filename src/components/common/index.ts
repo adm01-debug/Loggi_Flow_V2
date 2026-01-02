@@ -17,3 +17,12 @@ export { SavedFiltersDropdown } from './SavedFiltersDropdown';
 export { CSVImporter } from './CSVImporter';
 export { VersionHistory } from './VersionHistory';
 export { TrashBin } from './TrashBin';
+
+// CRUD Advanced Components
+export { ExcelImporter } from './ExcelImporter';
+export { ActivityTimeline } from './ActivityTimeline';
+export { DataExporter } from './DataExporter';
+export { DataImporter } from './DataImporter';
+export { AdvancedFilter } from './AdvancedFilter';
+export { DuplicateDialog } from './DuplicateDialog';
+export { InfiniteList, VirtualList } from './InfiniteList';
