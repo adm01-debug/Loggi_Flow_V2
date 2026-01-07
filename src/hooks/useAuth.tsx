@@ -69,9 +69,9 @@ async function updateUserStreak(userId: string) {
       })
       .eq("user_id", userId);
 
-    console.log("[Auth] Streak updated to:", newStreak);
-  } catch (error) {
-    console.error("[Auth] Error updating streak:", error);
+    // Streak updated successfully
+  } catch {
+    // Error updating streak - silent fail
   }
 }
 

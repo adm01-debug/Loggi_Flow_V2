@@ -152,8 +152,6 @@ export function useSecurityPushNotifications() {
   useEffect(() => {
     if (!user?.id) return;
 
-    console.log('Setting up security events realtime subscription...');
-
     const channel = supabase
       .channel('security-events-realtime')
       .on(
@@ -164,7 +162,6 @@ export function useSecurityPushNotifications() {
           table: 'security_events',
         },
         (payload) => {
-          console.log('New security event:', payload);
           const event = payload.new as SecurityEvent;
           
           // For admins, show all events
@@ -178,12 +175,9 @@ export function useSecurityPushNotifications() {
           }
         }
       )
-      .subscribe((status) => {
-        console.log('Security events subscription status:', status);
-      });
+      .subscribe();
 
     return () => {
-      console.log('Cleaning up security events subscription...');
       supabase.removeChannel(channel);
     };
   }, [user?.id, isAdmin, showNotification, showInAppAlert]);

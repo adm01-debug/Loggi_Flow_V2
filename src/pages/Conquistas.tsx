@@ -136,7 +136,11 @@ export default function Conquistas() {
   const pagination = usePagination(sortedData, { initialPageSize: 12 });
 
   const stats = { total: achievements.length, unlocked: achievements.filter(a => a.unlocked).length, totalXp: achievements.filter(a => a.unlocked).reduce((s, a) => s + a.xpReward, 0) };
-  const SortIcon = ({ field }: { field: string }) => { const dir = getSortDirection(field as any); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
+  const SortIcon = ({ field }: { field: string }) => { 
+    const dir = getSortDirection(field as keyof Achievement); 
+    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; 
+    return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; 
+  };
 
   return (
     <MainLayout>

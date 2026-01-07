@@ -164,7 +164,7 @@ export function ScheduledReportsManager() {
                   <Label>Frequência</Label>
                   <Select
                     value={formData.frequency}
-                    onValueChange={v => setFormData(prev => ({ ...prev, frequency: v as any }))}
+                    onValueChange={v => setFormData(prev => ({ ...prev, frequency: v as 'daily' | 'weekly' | 'monthly' }))}
                   >
                     <SelectTrigger>
                       <SelectValue />

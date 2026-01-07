@@ -117,8 +117,6 @@ const RealtimeMonitoringPanel: React.FC<RealtimeMonitoringPanelProps> = ({
 
   // Subscribe to realtime updates
   useEffect(() => {
-    console.log('Setting up Supabase Realtime subscriptions...');
-
     const channel = supabase
       .channel('tracking-realtime')
       .on(
@@ -129,9 +127,7 @@ const RealtimeMonitoringPanel: React.FC<RealtimeMonitoringPanelProps> = ({
           table: 'rastreamento_historico',
         },
         (payload) => {
-          console.log('New location received:', payload.new);
           const newLocation = payload.new as RealtimeLocation;
-          
           setRecentLocations(prev => [newLocation, ...prev.slice(0, 19)]);
           setStats(prev => ({
             ...prev,
@@ -152,10 +148,7 @@ const RealtimeMonitoringPanel: React.FC<RealtimeMonitoringPanelProps> = ({
           table: 'rastreamento_alertas',
         },
         (payload) => {
-          console.log('New alert received:', payload.new);
           const newAlert = payload.new as RealtimeAlert;
-          
-          setRecentAlerts(prev => [newAlert, ...prev.slice(0, 19)]);
           setStats(prev => ({
             ...prev,
             unresolvedAlerts: prev.unresolvedAlerts + 1,
@@ -174,7 +167,6 @@ const RealtimeMonitoringPanel: React.FC<RealtimeMonitoringPanelProps> = ({
           table: 'rastreamento_alertas',
         },
         (payload) => {
-          console.log('Alert updated:', payload.new);
           const updatedAlert = payload.new as RealtimeAlert;
           
           setRecentAlerts(prev => 
@@ -191,12 +183,10 @@ const RealtimeMonitoringPanel: React.FC<RealtimeMonitoringPanelProps> = ({
         }
       )
       .subscribe((status) => {
-        console.log('Realtime subscription status:', status);
         setIsConnected(status === 'SUBSCRIBED');
       });
 
     return () => {
-      console.log('Cleaning up Supabase Realtime subscriptions...');
       supabase.removeChannel(channel);
     };
   }, [onLocationUpdate, onAlertUpdate]);

@@ -75,9 +75,16 @@ function showBrowserNotification(
 }
 
 // Play alert sound
+// Type for webkit audio context
+interface WindowWithWebkit extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 function playAlertSound(type: "critical" | "warning") {
   try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextClass = window.AudioContext || (window as WindowWithWebkit).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const audioContext = new AudioContextClass();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -265,7 +272,7 @@ export function useSLANotifications() {
   useEffect(() => {
     if (!config.enabled) return;
 
-    console.log("Setting up SLA notifications realtime subscription...");
+    // Setting up SLA notifications realtime subscription
 
     const channel = supabase
       .channel("sla-alerts")
@@ -277,7 +284,7 @@ export function useSLANotifications() {
           table: "entregas",
         },
         (payload) => {
-          console.log("Entrega change detected:", payload);
+          // Entrega change detected
           
           if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
             const alert = checkEntregaSLA(payload.new);
@@ -295,7 +302,7 @@ export function useSLANotifications() {
           table: "coletas",
         },
         (payload) => {
-          console.log("Coleta change detected:", payload);
+          // Coleta change detected
           
           if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
             const alert = checkColetaSLA(payload.new);
@@ -306,11 +313,11 @@ export function useSLANotifications() {
         }
       )
       .subscribe((status) => {
-        console.log("SLA notifications subscription status:", status);
+        // SLA notifications subscription status updated
       });
 
     return () => {
-      console.log("Cleaning up SLA notifications subscription");
+      // Cleaning up SLA notifications subscription
       supabase.removeChannel(channel);
     };
   }, [config.enabled, checkEntregaSLA, checkColetaSLA, handleSLAAlert]);

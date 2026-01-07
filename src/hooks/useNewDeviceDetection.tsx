@@ -100,7 +100,7 @@ export function useNewDeviceDetection() {
           })
           .eq('id', existingDevice.id);
         
-        console.log('Known device updated');
+        // Known device updated
         return;
       }
 
@@ -132,8 +132,6 @@ export function useNewDeviceDetection() {
 
       // If not first device, send email alert
       if (!isFirstDevice) {
-        console.log('New device detected, sending alert email...');
-        
         const { error: emailError } = await supabase.functions.invoke('new-device-alert', {
           body: {
             user_id: user.id,

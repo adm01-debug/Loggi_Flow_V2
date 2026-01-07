@@ -341,9 +341,8 @@ function DemoPreview() {
 
 // Social Login Buttons
 function SocialLoginButtons({ isLoading }: { isLoading: boolean }) {
-  const handleSocialLogin = async (provider: 'google' | 'github' | 'microsoft') => {
+  const handleSocialLogin = async (_provider: 'google' | 'github' | 'microsoft') => {
     // Placeholder for social login - would need OAuth setup
-    console.log(`Social login with ${provider}`);
   };
 
   return (

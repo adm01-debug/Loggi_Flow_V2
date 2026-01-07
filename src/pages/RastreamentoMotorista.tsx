@@ -26,6 +26,13 @@ export default function RastreamentoMotorista() {
   const [isLive, setIsLive] = useState(false);
 
   // Fetch orders from coletas table
+  interface ColetaWithFornecedor {
+    id: string;
+    numero_coleta: string;
+    codigo_rastreamento: string | null;
+    fornecedor: { razao_social: string } | null;
+  }
+  
   const { data: orders = [], refetch: refetchOrders } = useQuery({
     queryKey: ["lalamove-orders"],
     queryFn: async () => {
@@ -37,9 +44,9 @@ export default function RastreamentoMotorista() {
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;
-      return data?.map(c => ({
+      return (data as unknown as ColetaWithFornecedor[])?.map(c => ({
         id: c.codigo_rastreamento || c.id,
-        cliente: (c.fornecedor as any)?.razao_social || c.numero_coleta
+        cliente: c.fornecedor?.razao_social || c.numero_coleta
       })) || [];
     }
   });

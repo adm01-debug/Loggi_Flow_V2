@@ -131,7 +131,6 @@ export const usePushNotifications = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         localStorage.setItem(`push_subscription_${user.id}`, JSON.stringify(subscriptionData));
-        console.log('[usePushNotifications] Subscription saved for user:', user.id);
       }
 
       setSubscription(sub);
