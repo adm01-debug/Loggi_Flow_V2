@@ -11,13 +11,15 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Box, Loader2, Mail, Lock, User, ArrowLeft, Shield, Eye, EyeOff, Clock, 
   Truck, Package, MapPin, Star, TrendingUp, Users, CheckCircle2, Zap, 
-  BarChart3, Award, ArrowRight
+  BarChart3, Award, ArrowRight, Play, ShieldCheck, Globe, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { z } from "zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
 import { motion, AnimatePresence } from "framer-motion";
 import { FadeIn, Floating, StaggerContainer, StaggerItem } from "@/components/ui/micro-interactions";
+import { AnimatedNumber } from "@/components/ui/animated-number";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 // Helper to get client IP
 async function getClientIP(): Promise<string | null> {
@@ -81,7 +83,7 @@ const features = [
   { icon: BarChart3, title: "Analytics", description: "Insights poderosos" },
 ];
 
-// Testimonials
+// Testimonials - Expanded
 const testimonials = [
   { 
     name: "Carlos Silva", 
@@ -89,7 +91,8 @@ const testimonials = [
     company: "TransLog BR",
     avatar: "CS",
     content: "Reduzimos 40% do tempo de gestão com o LogiFlow. A gamificação transformou nossa equipe!",
-    rating: 5
+    rating: 5,
+    image: "/placeholder.svg"
   },
   { 
     name: "Ana Beatriz", 
@@ -97,7 +100,8 @@ const testimonials = [
     company: "Express Cargo",
     avatar: "AB",
     content: "A visibilidade em tempo real mudou completamente nossa operação. Recomendo demais!",
-    rating: 5
+    rating: 5,
+    image: "/placeholder.svg"
   },
   { 
     name: "Roberto Mendes", 
@@ -105,16 +109,43 @@ const testimonials = [
     company: "FastShip",
     avatar: "RM",
     content: "ROI positivo em 3 meses. A melhor decisão que tomamos para nossa logística.",
-    rating: 5
+    rating: 5,
+    image: "/placeholder.svg"
+  },
+  { 
+    name: "Fernanda Costa", 
+    role: "Coordenadora", 
+    company: "LogiMaster",
+    avatar: "FC",
+    content: "Interface intuitiva e relatórios detalhados. Perfeito para gestão de frotas!",
+    rating: 5,
+    image: "/placeholder.svg"
+  },
+  { 
+    name: "Pedro Santos", 
+    role: "Diretor de TI", 
+    company: "RápidoLog",
+    avatar: "PS",
+    content: "Integração perfeita com nossos sistemas. Suporte excepcional!",
+    rating: 5,
+    image: "/placeholder.svg"
   },
 ];
 
-// Stats
+// Stats with numeric values for animation
 const stats = [
-  { value: "10K+", label: "Entregas/mês" },
-  { value: "98.5%", label: "Satisfação" },
-  { value: "150+", label: "Empresas" },
-  { value: "-35%", label: "Custos" },
+  { value: 10000, label: "Entregas/mês", prefix: "", suffix: "+" },
+  { value: 98.5, label: "Satisfação", prefix: "", suffix: "%", decimals: 1 },
+  { value: 150, label: "Empresas", prefix: "", suffix: "+" },
+  { value: 35, label: "Redução Custos", prefix: "-", suffix: "%" },
+];
+
+// Trust badges / Customer logos
+const trustBadges = [
+  { name: "ISO 27001", icon: ShieldCheck },
+  { name: "LGPD Compliant", icon: Shield },
+  { name: "99.9% Uptime", icon: Globe },
+  { name: "Suporte 24/7", icon: Users },
 ];
 
 // Animated Background
@@ -184,31 +215,189 @@ function AnimatedBackground() {
   );
 }
 
-// Testimonial Card
-function TestimonialCard({ testimonial, index }: { testimonial: typeof testimonials[0]; index: number }) {
+// Enhanced Testimonial Card with hover effects
+function TestimonialCard({ testimonial, isActive }: { testimonial: typeof testimonials[0]; isActive?: boolean }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 + index * 0.15 }}
-      className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:border-primary/30 transition-all duration-300"
+      whileHover={{ scale: 1.02, y: -5 }}
+      className={`bg-card/60 backdrop-blur-md border rounded-2xl p-6 transition-all duration-300 h-full
+        ${isActive ? 'border-primary/50 shadow-lg shadow-primary/10' : 'border-border/50 hover:border-primary/30'}`}
     >
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-semibold text-sm">
+      <div className="flex items-start gap-4 mb-4">
+        <motion.div 
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          className="w-12 h-12 rounded-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg"
+        >
           {testimonial.avatar}
-        </div>
+        </motion.div>
         <div className="flex-1">
-          <p className="font-medium text-sm">{testimonial.name}</p>
-          <p className="text-xs text-muted-foreground">{testimonial.role} • {testimonial.company}</p>
+          <p className="font-semibold">{testimonial.name}</p>
+          <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+          <p className="text-xs text-primary font-medium">{testimonial.company}</p>
         </div>
       </div>
-      <p className="text-sm text-muted-foreground leading-relaxed mb-3">"{testimonial.content}"</p>
-      <div className="flex gap-0.5">
+      <p className="text-muted-foreground leading-relaxed mb-4 italic">"{testimonial.content}"</p>
+      <div className="flex gap-1">
         {[...Array(testimonial.rating)].map((_, i) => (
-          <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
+          <motion.div
+            key={i}
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: i * 0.1, type: "spring" }}
+          >
+            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+          </motion.div>
         ))}
       </div>
     </motion.div>
+  );
+}
+
+// Animated Stat Card
+function StatCard({ stat, index }: { stat: typeof stats[0]; index: number }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 800 + index * 200);
+    return () => clearTimeout(timer);
+  }, [index]);
+
+  return (
+    <motion.div 
+      className="text-center group"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8 + index * 0.15 }}
+      whileHover={{ scale: 1.05 }}
+    >
+      <div className="text-2xl xl:text-3xl font-display font-bold gradient-text tabular-nums">
+        {isVisible ? (
+          <AnimatedNumber 
+            value={stat.value} 
+            prefix={stat.prefix}
+            suffix={stat.suffix}
+            duration={1.5}
+            formatValue={(v) => stat.decimals ? v.toFixed(stat.decimals) : v.toLocaleString('pt-BR')}
+          />
+        ) : (
+          <span className="opacity-0">{stat.prefix}0{stat.suffix}</span>
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground mt-1 group-hover:text-foreground transition-colors">{stat.label}</p>
+    </motion.div>
+  );
+}
+
+// Trust Badge Component
+function TrustBadge({ badge, index }: { badge: typeof trustBadges[0]; index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 1.5 + index * 0.1 }}
+      whileHover={{ scale: 1.1, y: -2 }}
+      className="flex items-center gap-2 px-3 py-2 rounded-full bg-card/50 border border-border/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all cursor-default"
+    >
+      <badge.icon className="w-3.5 h-3.5 text-primary" />
+      <span>{badge.name}</span>
+    </motion.div>
+  );
+}
+
+// Demo Video Preview
+function DemoPreview() {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.3 }}
+      className="relative mt-8"
+    >
+      <motion.div 
+        className="relative rounded-xl overflow-hidden border border-border/50 bg-card/30 backdrop-blur-sm cursor-pointer group"
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        whileHover={{ scale: 1.02 }}
+      >
+        <div className="aspect-video bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
+          <motion.div
+            animate={{ scale: isHovered ? 1.1 : 1 }}
+            className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center shadow-lg shadow-primary/30"
+          >
+            <Play className="w-7 h-7 text-primary-foreground ml-1" />
+          </motion.div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+        <div className="absolute bottom-4 left-4 right-4">
+          <p className="font-medium text-sm">Veja o LogiFlow em ação</p>
+          <p className="text-xs text-muted-foreground">Tour de 2 minutos pela plataforma</p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// Social Login Buttons
+function SocialLoginButtons({ isLoading }: { isLoading: boolean }) {
+  const handleSocialLogin = async (provider: 'google' | 'github' | 'microsoft') => {
+    // Placeholder for social login - would need OAuth setup
+    console.log(`Social login with ${provider}`);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-2 text-muted-foreground">Ou continue com</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 hover:bg-muted/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          onClick={() => handleSocialLogin('google')}
+          disabled={isLoading}
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 hover:bg-muted/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          onClick={() => handleSocialLogin('microsoft')}
+          disabled={isLoading}
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#F25022" d="M1 1h10v10H1z"/>
+            <path fill="#00A4EF" d="M1 13h10v10H1z"/>
+            <path fill="#7FBA00" d="M13 1h10v10H13z"/>
+            <path fill="#FFB900" d="M13 13h10v10H13z"/>
+          </svg>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 hover:bg-muted/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          onClick={() => handleSocialLogin('github')}
+          disabled={isLoading}
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -232,12 +421,21 @@ export default function Auth() {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => { getClientIP().then(setClientIP); }, []);
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!lockoutEndsAt) return;
@@ -378,8 +576,8 @@ export default function Auth() {
               <AnimatePresence mode="wait">
                 {forgotPasswordSent ? (
                   <motion.div key="sent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-4">
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring" }} className="mx-auto w-16 h-16 rounded-full bg-success/20 flex items-center justify-center">
-                      <CheckCircle2 className="w-8 h-8 text-success" />
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring" }} className="mx-auto w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <CheckCircle2 className="w-8 h-8 text-green-500" />
                     </motion.div>
                     <p className="text-center text-muted-foreground">Sua solicitação foi enviada para <strong className="text-foreground">{forgotEmail}</strong>. Aguarde aprovação.</p>
                     <Button variant="outline" className="w-full" onClick={() => { setShowForgotPassword(false); setForgotPasswordSent(false); setForgotEmail(""); }}>
@@ -426,9 +624,13 @@ export default function Auth() {
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
+            <motion.div 
+              whileHover={{ rotate: [0, -10, 10, 0], scale: 1.05 }}
+              transition={{ duration: 0.5 }}
+              className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30"
+            >
               <Box className="w-6 h-6 text-primary-foreground" />
-            </div>
+            </motion.div>
             <span className="font-display text-2xl font-bold">LogiFlow</span>
           </div>
           <p className="text-muted-foreground">Logística Gamificada • Resultados Reais</p>
@@ -458,7 +660,8 @@ export default function Auth() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + i * 0.1 }}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-card/30 border border-border/30"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-card/30 border border-border/30 hover:border-primary/30 transition-all cursor-default"
                 >
                   <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <feature.icon className="w-4.5 h-4.5 text-primary" />
@@ -472,7 +675,7 @@ export default function Auth() {
             </div>
           </motion.div>
 
-          {/* Stats */}
+          {/* Animated Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -480,36 +683,84 @@ export default function Auth() {
             className="flex gap-8 pt-10"
           >
             {stats.map((stat, i) => (
-              <div key={stat.label} className="text-center">
-                <motion.p 
-                  className="text-2xl xl:text-3xl font-display font-bold gradient-text"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1 + i * 0.1, type: "spring" }}
-                >
-                  {stat.value}
-                </motion.p>
-                <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-              </div>
+              <StatCard key={stat.label} stat={stat} index={i} />
+            ))}
+          </motion.div>
+
+          {/* Trust Badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4 }}
+            className="flex flex-wrap gap-2 pt-8"
+          >
+            {trustBadges.map((badge, i) => (
+              <TrustBadge key={badge.name} badge={badge} index={i} />
             ))}
           </motion.div>
         </div>
 
-        {/* Testimonials */}
+        {/* Testimonials Carousel */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
           className="space-y-4"
         >
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <Users className="w-4 h-4" />
-            <span>Empresas que confiam em nós</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Users className="w-4 h-4" />
+              <span>O que nossos clientes dizem</span>
+            </div>
+            <div className="flex gap-1">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentTestimonial(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === currentTestimonial ? 'bg-primary w-4' : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            {testimonials.map((testimonial, i) => (
-              <TestimonialCard key={testimonial.name} testimonial={testimonial} index={i} />
-            ))}
+          
+          <div className="relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentTestimonial}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1"
+              >
+                <TestimonialCard 
+                  testimonial={testimonials[currentTestimonial]} 
+                  isActive={true}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation arrows */}
+          <div className="flex justify-center gap-2 pt-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={() => setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={() => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </motion.div>
       </div>
@@ -521,9 +772,12 @@ export default function Auth() {
             {/* Mobile logo */}
             <div className="lg:hidden text-center pt-6 pb-2">
               <div className="inline-flex items-center gap-2 mb-1">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md shadow-primary/30">
+                <motion.div 
+                  whileHover={{ rotate: [0, -10, 10, 0] }}
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md shadow-primary/30"
+                >
                   <Box className="w-5 h-5 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <span className="font-display text-xl font-bold">LogiFlow</span>
               </div>
             </div>
@@ -580,7 +834,14 @@ export default function Auth() {
                               <Label htmlFor="login-email">Email</Label>
                               <div className="relative group">
                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                                <Input id="login-email" type="email" placeholder="seu@email.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} className="pl-10 h-11" />
+                                <Input 
+                                  id="login-email" 
+                                  type="email" 
+                                  placeholder="seu@email.com" 
+                                  value={loginEmail} 
+                                  onChange={(e) => setLoginEmail(e.target.value)} 
+                                  className="pl-10 h-11 transition-all focus:ring-2 focus:ring-primary/20" 
+                                />
                               </div>
                               {errors.login_email && <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-destructive">{errors.login_email}</motion.p>}
                             </div>
@@ -589,13 +850,20 @@ export default function Auth() {
                             <div className="space-y-2">
                               <div className="flex items-center justify-between">
                                 <Label htmlFor="login-password">Senha</Label>
-                                <button type="button" onClick={() => setShowForgotPassword(true)} className="text-xs text-primary hover:underline">
+                                <button type="button" onClick={() => setShowForgotPassword(true)} className="text-xs text-primary hover:underline hover:text-primary/80 transition-colors">
                                   Esqueceu a senha?
                                 </button>
                               </div>
                               <div className="relative group">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                                <Input id="login-password" type={showLoginPassword ? "text" : "password"} placeholder="••••••••" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} className="pl-10 pr-10 h-11" />
+                                <Input 
+                                  id="login-password" 
+                                  type={showLoginPassword ? "text" : "password"} 
+                                  placeholder="••••••••" 
+                                  value={loginPassword} 
+                                  onChange={(e) => setLoginPassword(e.target.value)} 
+                                  className="pl-10 pr-10 h-11 transition-all focus:ring-2 focus:ring-primary/20" 
+                                />
                                 <button type="button" onClick={() => setShowLoginPassword(!showLoginPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                                   {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
@@ -604,7 +872,17 @@ export default function Auth() {
                             </div>
                           </StaggerItem>
                           <StaggerItem>
-                            <Button type="submit" className="w-full h-11 font-semibold text-base group" disabled={isLoading || !!ipBlocked}>
+                            <Button 
+                              type="submit" 
+                              className="w-full h-11 font-semibold text-base group relative overflow-hidden" 
+                              disabled={isLoading || !!ipBlocked}
+                            >
+                              <motion.span
+                                className="absolute inset-0 bg-gradient-to-r from-primary-foreground/0 via-primary-foreground/10 to-primary-foreground/0"
+                                initial={{ x: "-100%" }}
+                                whileHover={{ x: "100%" }}
+                                transition={{ duration: 0.6 }}
+                              />
                               {isLoading ? (
                                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...</>
                               ) : (
@@ -616,6 +894,10 @@ export default function Auth() {
                             </Button>
                           </StaggerItem>
                         </form>
+                        
+                        <StaggerItem>
+                          <SocialLoginButtons isLoading={isLoading} />
+                        </StaggerItem>
                       </StaggerContainer>
                     </motion.div>
                   </TabsContent>
@@ -629,7 +911,14 @@ export default function Auth() {
                               <Label htmlFor="signup-name">Nome Completo</Label>
                               <div className="relative group">
                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                                <Input id="signup-name" type="text" placeholder="João Silva" value={signupFullName} onChange={(e) => setSignupFullName(e.target.value)} className="pl-10 h-11" />
+                                <Input 
+                                  id="signup-name" 
+                                  type="text" 
+                                  placeholder="João Silva" 
+                                  value={signupFullName} 
+                                  onChange={(e) => setSignupFullName(e.target.value)} 
+                                  className="pl-10 h-11 transition-all focus:ring-2 focus:ring-primary/20" 
+                                />
                               </div>
                               {errors.signup_fullName && <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-destructive">{errors.signup_fullName}</motion.p>}
                             </div>
@@ -639,7 +928,14 @@ export default function Auth() {
                               <Label htmlFor="signup-email">Email</Label>
                               <div className="relative group">
                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                                <Input id="signup-email" type="email" placeholder="seu@email.com" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} className="pl-10 h-11" />
+                                <Input 
+                                  id="signup-email" 
+                                  type="email" 
+                                  placeholder="seu@email.com" 
+                                  value={signupEmail} 
+                                  onChange={(e) => setSignupEmail(e.target.value)} 
+                                  className="pl-10 h-11 transition-all focus:ring-2 focus:ring-primary/20" 
+                                />
                               </div>
                               {errors.signup_email && <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-destructive">{errors.signup_email}</motion.p>}
                             </div>
@@ -649,7 +945,14 @@ export default function Auth() {
                               <Label htmlFor="signup-password">Senha</Label>
                               <div className="relative group">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                                <Input id="signup-password" type={showSignupPassword ? "text" : "password"} placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} className="pl-10 pr-10 h-11" />
+                                <Input 
+                                  id="signup-password" 
+                                  type={showSignupPassword ? "text" : "password"} 
+                                  placeholder="••••••••" 
+                                  value={signupPassword} 
+                                  onChange={(e) => setSignupPassword(e.target.value)} 
+                                  className="pl-10 pr-10 h-11 transition-all focus:ring-2 focus:ring-primary/20" 
+                                />
                                 <button type="button" onClick={() => setShowSignupPassword(!showSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                                   {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
@@ -659,17 +962,32 @@ export default function Auth() {
                             </div>
                           </StaggerItem>
                           <StaggerItem>
-                            <Button type="submit" className="w-full h-11 font-semibold text-base group" disabled={isLoading || isPasswordPwned}>
+                            <Button 
+                              type="submit" 
+                              className="w-full h-11 font-semibold text-base group relative overflow-hidden" 
+                              disabled={isLoading || isPasswordPwned}
+                            >
+                              <motion.span
+                                className="absolute inset-0 bg-gradient-to-r from-primary-foreground/0 via-primary-foreground/10 to-primary-foreground/0"
+                                initial={{ x: "-100%" }}
+                                whileHover={{ x: "100%" }}
+                                transition={{ duration: 0.6 }}
+                              />
                               {isLoading ? (
                                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando conta...</>
                               ) : (
                                 <>
-                                  Criar Conta
+                                  Criar Conta Grátis
                                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                                 </>
                               )}
                             </Button>
                           </StaggerItem>
+                          
+                          <StaggerItem>
+                            <SocialLoginButtons isLoading={isLoading} />
+                          </StaggerItem>
+                          
                           <StaggerItem>
                             <p className="text-xs text-center text-muted-foreground">
                               Ao criar uma conta, você concorda com nossos{" "}
@@ -695,12 +1013,25 @@ export default function Auth() {
           >
             <div className="flex items-center justify-center gap-1 mb-2">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
               Mais de <span className="font-semibold text-foreground">150 empresas</span> confiam no LogiFlow
             </p>
+            
+            {/* Mobile trust badges */}
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
+              {trustBadges.slice(0, 2).map((badge, i) => (
+                <div 
+                  key={badge.name}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-card/50 border border-border/50 text-xs"
+                >
+                  <badge.icon className="w-3 h-3 text-primary" />
+                  <span className="text-muted-foreground">{badge.name}</span>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </FadeIn>
       </div>
