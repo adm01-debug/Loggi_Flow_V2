@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const cardVariants = cva(
   "rounded-xl text-card-foreground transition-all duration-300",
@@ -192,4 +193,124 @@ const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
 );
 StatCard.displayName = "StatCard";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, StatCard, cardVariants };
+// ============================================
+// MAGNETIC CARD - 3D Hover Effect
+// ============================================
+
+interface MagneticCardProps {
+  children: React.ReactNode;
+  intensity?: number;
+  glare?: boolean;
+  className?: string;
+}
+
+const MagneticCard = ({ children, className, intensity = 10, glare = true }: MagneticCardProps) => {
+  const cardRef = React.useRef<HTMLDivElement>(null);
+  
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
+  const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
+  
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], [intensity, -intensity]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-intensity, intensity]);
+  
+  const glareX = useTransform(mouseX, [-0.5, 0.5], [0, 100]);
+  const glareY = useTransform(mouseY, [-0.5, 0.5], [0, 100]);
+  
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((e.clientX - centerX) / rect.width);
+    y.set((e.clientY - centerY) / rect.height);
+  };
+  
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className={cn(
+        "relative rounded-xl bg-card border border-border shadow-lg overflow-hidden",
+        "transition-shadow duration-300 hover:shadow-xl",
+        className
+      )}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+        perspective: 1000,
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+        {/* Glare overlay */}
+        {glare && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{
+              background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
+            }}
+          />
+        )}
+        
+        {/* Content */}
+        <div style={{ transform: "translateZ(50px)" }} className="relative z-0">
+          {children}
+        </div>
+    </motion.div>
+  );
+};
+MagneticCard.displayName = "MagneticCard";
+
+// ============================================
+// GLASS CARD - Glassmorphism Effect
+// ============================================
+
+interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  blur?: "sm" | "md" | "lg" | "xl";
+  opacity?: number;
+}
+
+const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
+  ({ className, blur = "lg", opacity = 0.8, children, ...props }, ref) => {
+    const blurMap = { sm: "backdrop-blur-sm", md: "backdrop-blur-md", lg: "backdrop-blur-lg", xl: "backdrop-blur-xl" };
+    
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "relative rounded-xl border border-white/20 shadow-xl overflow-hidden",
+          blurMap[blur],
+          className
+        )}
+        style={{ backgroundColor: `hsl(var(--card) / ${opacity})` }}
+        {...props}
+      >
+        {/* Glass highlight */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+        {children}
+      </div>
+    );
+  }
+);
+GlassCard.displayName = "GlassCard";
+
+export { 
+  Card, 
+  CardHeader, 
+  CardFooter, 
+  CardTitle, 
+  CardDescription, 
+  CardContent, 
+  StatCard, 
+  MagneticCard,
+  GlassCard,
+  cardVariants 
+};

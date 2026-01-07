@@ -2,6 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Search, X, Eye, EyeOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const inputVariants = cva(
   "flex w-full rounded-lg border bg-background text-foreground transition-all duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground/60 disabled:cursor-not-allowed disabled:opacity-50",
@@ -37,11 +38,13 @@ export interface InputProps
   hint?: string;
   clearable?: boolean;
   onClear?: () => void;
+  animated?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, variant, inputSize, leftIcon, rightIcon, error, hint, clearable, onClear, ...props }, ref) => {
+  ({ className, type, variant, inputSize, leftIcon, rightIcon, error, hint, clearable, onClear, animated = true, ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
     const isPassword = type === "password";
     const inputType = isPassword ? (showPassword ? "text" : "password") : type;
 
@@ -49,11 +52,27 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="relative w-full">
-        <div className="relative">
+        <div className="relative group">
+          {/* Animated focus ring */}
+          {animated && (
+            <motion.div
+              className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-primary/50 via-primary to-primary/50 opacity-0 blur-sm transition-opacity pointer-events-none"
+              animate={{ opacity: isFocused ? 0.3 : 0 }}
+              transition={{ duration: 0.2 }}
+            />
+          )}
+          
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+            <motion.div 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10"
+              animate={{ 
+                scale: isFocused ? 1.1 : 1,
+                color: isFocused ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"
+              }}
+              transition={{ duration: 0.2 }}
+            >
               {leftIcon}
-            </div>
+            </motion.div>
           )}
           <input
             type={inputType}
@@ -61,40 +80,64 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               inputVariants({ variant: error ? "error" : variant, inputSize }),
               leftIcon && "pl-10",
               (rightIcon || isPassword || clearable) && "pr-10",
+              "relative z-0",
               className
             )}
             ref={ref}
+            onFocus={(e) => {
+              setIsFocused(true);
+              props.onFocus?.(e);
+            }}
+            onBlur={(e) => {
+              setIsFocused(false);
+              props.onBlur?.(e);
+            }}
             {...props}
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            {clearable && hasValue && (
-              <button
-                type="button"
-                onClick={onClear}
-                className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
+            <AnimatePresence>
+              {clearable && hasValue && (
+                <motion.button
+                  type="button"
+                  onClick={onClear}
+                  className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <X className="w-4 h-4" />
+                </motion.button>
+              )}
+            </AnimatePresence>
             {isPassword && (
-              <button
+              <motion.button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                whileTap={{ scale: 0.9 }}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              </motion.button>
             )}
             {rightIcon && !isPassword && !clearable && (
               <span className="text-muted-foreground pointer-events-none">{rightIcon}</span>
             )}
           </div>
         </div>
-        {(error || hint) && (
-          <p className={cn("mt-1.5 text-xs font-medium", error ? "text-destructive" : "text-muted-foreground")}>
-            {error || hint}
-          </p>
-        )}
+        <AnimatePresence>
+          {(error || hint) && (
+            <motion.p 
+              className={cn("mt-1.5 text-xs font-medium", error ? "text-destructive" : "text-muted-foreground")}
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              {error || hint}
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
