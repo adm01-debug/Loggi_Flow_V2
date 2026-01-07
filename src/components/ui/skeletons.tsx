@@ -1,17 +1,54 @@
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface SkeletonProps {
   className?: string;
+  shimmer?: boolean;
 }
 
-export function Skeleton({ className }: SkeletonProps) {
+export function Skeleton({ className, shimmer = true }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-md bg-muted",
+        "relative rounded-md bg-muted overflow-hidden",
+        !shimmer && "animate-pulse",
         className
       )}
-    />
+    >
+      {shimmer && (
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          initial={{ x: "-100%" }}
+          animate={{ x: "100%" }}
+          transition={{
+            duration: 1.5,
+            repeat: Infinity,
+            ease: "linear",
+            repeatDelay: 0.5
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// Premium Skeleton with glow effect
+export function SkeletonPremium({ className }: { className?: string }) {
+  return (
+    <div className={cn("relative rounded-md overflow-hidden", className)}>
+      <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/80 to-muted" />
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent"
+        initial={{ x: "-100%" }}
+        animate={{ x: "100%" }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
+    </div>
   );
 }
 
