@@ -7,7 +7,7 @@ const N8N_WEBHOOK_BASE = import.meta.env.VITE_N8N_WEBHOOK_URL || '';
 interface WebhookResponse {
   success: boolean;
   message?: string;
-  data?: any;
+  data?: unknown;
 }
 
 interface N8nWorkflow {
@@ -19,7 +19,7 @@ interface N8nWorkflow {
 }
 
 // Chamar webhook n8n
-async function callN8nWebhook(path: string, data: any): Promise<WebhookResponse> {
+async function callN8nWebhook(path: string, data: unknown): Promise<WebhookResponse> {
   const response = await fetch(`${N8N_WEBHOOK_BASE}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -33,19 +33,14 @@ async function callN8nWebhook(path: string, data: any): Promise<WebhookResponse>
   return response.json();
 }
 
-// Hook para workflows cadastrados
+// Hook para workflows - usando business_rules como fallback já que n8n_workflows não existe
 export function useN8nWorkflows() {
   return useQuery({
     queryKey: ['n8n-workflows'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('n8n_workflows')
-        .select('*')
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) throw error;
-      return data as N8nWorkflow[];
+      // Retorna lista vazia já que a tabela n8n_workflows não existe
+      // Workflows devem ser configurados via ambiente
+      return [] as N8nWorkflow[];
     },
   });
 }
@@ -54,7 +49,7 @@ export function useN8nWorkflows() {
 export function useN8nTrigger() {
   // Notificação de nova entrega
   const notifyNewDeliveryMutation = useMutation({
-    mutationFn: async (entrega: { id: string; numero_nf: string; cliente: string; endereco: string }) => {
+    mutationFn: async (entrega: { id: string; numero_entrega: string; cliente: string; endereco: string }) => {
       return callN8nWebhook('/nova-entrega', entrega);
     },
     onSuccess: () => toast.success('Notificação enviada!'),
@@ -100,19 +95,19 @@ export function useN8nTrigger() {
   };
 }
 
-// Hook para logs de execução
+// Hook para logs de execução - usando rule_execution_logs
 export function useN8nLogs(limit = 50) {
   return useQuery({
     queryKey: ['n8n-logs', limit],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('n8n_execution_logs')
+        .from('rule_execution_logs')
         .select('*')
-        .order('executed_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(limit);
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 }

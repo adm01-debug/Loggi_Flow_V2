@@ -1,30 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Database } from '@/integrations/supabase/types';
 
-interface Entrega {
-  id: string;
-  numero_nf: string;
-  cliente_id: string;
-  cliente_nome: string;
-  endereco_entrega: string;
-  cidade: string;
-  uf: string;
-  cep: string;
-  status: 'pendente' | 'em_separacao' | 'em_transito' | 'entregue' | 'devolvida' | 'cancelada';
-  transportadora_id: string | null;
-  motorista_nome: string | null;
-  custo_frete: number | null;
-  peso: number | null;
-  volume: number | null;
-  data_previsao: string | null;
-  data_entrega: string | null;
-  sla_atingido: boolean | null;
-  tempo_entrega: number | null;
-  observacoes: string | null;
-  created_at: string;
-  updated_at: string;
-}
+type EntregaRow = Database['public']['Tables']['entregas']['Row'];
+type EntregaInsert = Database['public']['Tables']['entregas']['Insert'];
+type EntregaUpdate = Database['public']['Tables']['entregas']['Update'];
+type EntregaStatus = Database['public']['Enums']['entrega_status'];
 
 interface EntregaFilters {
   status?: string;
@@ -45,23 +27,22 @@ export function useEntregasReal(filters?: EntregaFilters) {
         .from('entregas')
         .select(`
           *,
-          transportadoras(id, nome),
-          clientes(id, nome, email)
+          transportadoras(id, nome_fantasia),
+          clientes(id, razao_social, contato_email)
         `)
-        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
-      if (filters?.status) query = query.eq('status', filters.status);
+      if (filters?.status) query = query.eq('status', filters.status as EntregaStatus);
       if (filters?.transportadora_id) query = query.eq('transportadora_id', filters.transportadora_id);
       if (filters?.data_inicio) query = query.gte('created_at', filters.data_inicio);
       if (filters?.data_fim) query = query.lte('created_at', filters.data_fim);
       if (filters?.search) {
-        query = query.or(`numero_nf.ilike.%${filters.search}%,cliente_nome.ilike.%${filters.search}%`);
+        query = query.or(`numero_entrega.ilike.%${filters.search}%,endereco_entrega.ilike.%${filters.search}%`);
       }
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Entrega[];
+      return data || [];
     },
   });
 
@@ -74,12 +55,12 @@ export function useEntregasReal(filters?: EntregaFilters) {
       .single();
     
     if (error) throw error;
-    return data as Entrega;
+    return data;
   };
 
   // Criar entrega
   const createMutation = useMutation({
-    mutationFn: async (entrega: Omit<Entrega, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (entrega: EntregaInsert) => {
       const { data, error } = await supabase
         .from('entregas')
         .insert(entrega)
@@ -98,7 +79,7 @@ export function useEntregasReal(filters?: EntregaFilters) {
 
   // Atualizar entrega
   const updateMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Entrega> & { id: string }) => {
+    mutationFn: async ({ id, ...updates }: EntregaUpdate & { id: string }) => {
       const { data, error } = await supabase
         .from('entregas')
         .update({ ...updates, updated_at: new Date().toISOString() })
@@ -117,11 +98,11 @@ export function useEntregasReal(filters?: EntregaFilters) {
 
   // Atualizar status
   const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: Entrega['status'] }) => {
-      const updates: any = { status, updated_at: new Date().toISOString() };
+    mutationFn: async ({ id, status }: { id: string; status: EntregaStatus }) => {
+      const updates: EntregaUpdate = { status, updated_at: new Date().toISOString() };
       
       if (status === 'entregue') {
-        updates.data_entrega = new Date().toISOString();
+        updates.data_entrega_efetiva = new Date().toISOString();
       }
 
       const { error } = await supabase.from('entregas').update(updates).eq('id', id);
@@ -133,12 +114,12 @@ export function useEntregasReal(filters?: EntregaFilters) {
     },
   });
 
-  // Soft delete
+  // Delete (not soft delete since deleted_at doesn't exist)
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('entregas')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', id);
       
       if (error) throw error;

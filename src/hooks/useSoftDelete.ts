@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableNames = keyof Database['public']['Tables'];
 
 interface SoftDeleteOptions {
   deletedAtColumn?: string;
   deletedByColumn?: string;
 }
 
-export function useSoftDelete(table: string, queryKey: string[], options: SoftDeleteOptions = {}) {
+export function useSoftDelete(table: TableNames, queryKey: string[], options: SoftDeleteOptions = {}) {
   const queryClient = useQueryClient();
   const { deletedAtColumn = 'deleted_at', deletedByColumn = 'deleted_by' } = options;
 
@@ -15,14 +18,10 @@ export function useSoftDelete(table: string, queryKey: string[], options: SoftDe
     mutationFn: async (id: string) => {
       const { data: { user } } = await supabase.auth.getUser();
       
-      const { error } = await supabase
-        .from(table)
-        .update({ 
-          [deletedAtColumn]: new Date().toISOString(),
-          [deletedByColumn]: user?.id 
-        })
-        .eq('id', id);
+      const updates: Record<string, unknown> = { [deletedAtColumn]: new Date().toISOString() };
+      if (deletedByColumn) updates[deletedByColumn] = user?.id;
       
+      const { error } = await supabase.from(table).update(updates as never).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -34,14 +33,10 @@ export function useSoftDelete(table: string, queryKey: string[], options: SoftDe
 
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from(table)
-        .update({ 
-          [deletedAtColumn]: null,
-          [deletedByColumn]: null 
-        })
-        .eq('id', id);
+      const updates: Record<string, unknown> = { [deletedAtColumn]: null };
+      if (deletedByColumn) updates[deletedByColumn] = null;
       
+      const { error } = await supabase.from(table).update(updates as never).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -53,11 +48,7 @@ export function useSoftDelete(table: string, queryKey: string[], options: SoftDe
 
   const permanentDeleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from(table)
-        .delete()
-        .eq('id', id);
-      
+      const { error } = await supabase.from(table).delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

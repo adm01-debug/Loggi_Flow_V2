@@ -43,12 +43,14 @@ export function useActivityLog(entityType: string, entityId?: string) {
   const logMutation = useMutation({
     mutationFn: async (log: { action: string; description: string; entity_id: string; old_data?: unknown; new_data?: unknown }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase.from('audit_logs').insert({
-        table_name: entityType, record_id: log.entity_id, action: log.action,
-        old_data: log.old_data as Record<string, unknown> | null,
-        new_data: log.new_data as Record<string, unknown> | null,
+      const { error } = await supabase.from('audit_logs').insert([{
+        table_name: entityType, 
+        record_id: log.entity_id, 
+        action: log.action,
+        old_data: log.old_data ?? null,
+        new_data: log.new_data ?? null,
         user_id: user?.id,
-      });
+      }]);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['activity-logs', entityType] }),

@@ -18,26 +18,19 @@ interface CostByTransportadora {
   mediaPorEntrega: number;
 }
 
-interface CostByRegiao {
-  regiao: string;
-  custo: number;
-  percentual: number;
-}
-
 export function useLogisticsCostsReal(dateRange?: { start: Date; end: Date }) {
   const start = dateRange?.start || startOfMonth(new Date());
   const end = dateRange?.end || endOfMonth(new Date());
 
-  // Métricas de custo
+  // Métricas de custo - usando valor_frete da tabela entregas
   const metricsQuery = useQuery({
     queryKey: ['costs-metrics-real', format(start, 'yyyy-MM-dd')],
     queryFn: async () => {
       const { data: entregas, error } = await supabase
         .from('entregas')
-        .select('custo_frete, peso')
+        .select('valor_frete')
         .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString())
-        .is('deleted_at', null);
+        .lte('created_at', end.toISOString());
 
       if (error) throw error;
 
@@ -46,24 +39,22 @@ export function useLogisticsCostsReal(dateRange?: { start: Date; end: Date }) {
       const prevEnd = subMonths(end, 1);
       const { data: prevEntregas } = await supabase
         .from('entregas')
-        .select('custo_frete')
+        .select('valor_frete')
         .gte('created_at', prevStart.toISOString())
-        .lte('created_at', prevEnd.toISOString())
-        .is('deleted_at', null);
+        .lte('created_at', prevEnd.toISOString());
 
-      const custoTotal = entregas?.reduce((acc, e) => acc + (e.custo_frete || 0), 0) || 0;
-      const pesoTotal = entregas?.reduce((acc, e) => acc + (e.peso || 0), 0) || 0;
+      const custoTotal = entregas?.reduce((acc, e) => acc + (e.valor_frete || 0), 0) || 0;
       const totalEntregas = entregas?.length || 0;
 
-      const custoPrevio = prevEntregas?.reduce((acc, e) => acc + (e.custo_frete || 0), 0) || 0;
+      const custoPrevio = prevEntregas?.reduce((acc, e) => acc + (e.valor_frete || 0), 0) || 0;
       const variacaoMensal = custoPrevio > 0 ? ((custoTotal - custoPrevio) / custoPrevio) * 100 : 0;
 
       return {
         custoTotal,
         custoMedioPorEntrega: totalEntregas > 0 ? custoTotal / totalEntregas : 0,
-        custoMedioPorKg: pesoTotal > 0 ? custoTotal / pesoTotal : 0,
+        custoMedioPorKg: 0, // Não temos peso na tabela
         totalEntregas,
-        pesoTotal,
+        pesoTotal: 0,
         variacaoMensal,
       } as CostMetrics;
     },
@@ -75,17 +66,16 @@ export function useLogisticsCostsReal(dateRange?: { start: Date; end: Date }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('entregas')
-        .select('custo_frete, transportadora_id, transportadoras(nome)')
+        .select('valor_frete, transportadora_id, transportadoras(nome_fantasia)')
         .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString())
-        .is('deleted_at', null);
+        .lte('created_at', end.toISOString());
 
       if (error) throw error;
 
       const grouped = (data || []).reduce((acc, item) => {
-        const nome = (item as any).transportadoras?.nome || 'Não definida';
+        const nome = (item.transportadoras as { nome_fantasia?: string })?.nome_fantasia || 'Não definida';
         if (!acc[nome]) acc[nome] = { custo: 0, entregas: 0 };
-        acc[nome].custo += item.custo_frete || 0;
+        acc[nome].custo += item.valor_frete || 0;
         acc[nome].entregas++;
         return acc;
       }, {} as Record<string, { custo: number; entregas: number }>);
@@ -107,10 +97,9 @@ export function useLogisticsCostsReal(dateRange?: { start: Date; end: Date }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('entregas')
-        .select('created_at, custo_frete')
+        .select('created_at, valor_frete')
         .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString())
-        .is('deleted_at', null);
+        .lte('created_at', end.toISOString());
 
       if (error) throw error;
 
@@ -121,7 +110,7 @@ export function useLogisticsCostsReal(dateRange?: { start: Date; end: Date }) {
         
         return {
           date: format(day, 'dd/MM'),
-          custo: dayEntregas.reduce((acc, e) => acc + (e.custo_frete || 0), 0),
+          custo: dayEntregas.reduce((acc, e) => acc + (e.valor_frete || 0), 0),
           entregas: dayEntregas.length,
         };
       });

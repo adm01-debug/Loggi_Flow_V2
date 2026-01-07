@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useDebouncedValue } from '@/hooks/useDebounce';
+import { useDebounce } from '@/hooks/useDebounce';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableNames = keyof Database['public']['Tables'];
 
 interface FulltextSearchOptions {
   minLength?: number;
@@ -8,13 +11,13 @@ interface FulltextSearchOptions {
 }
 
 export function useFulltextSearch<T>(
-  table: string,
+  table: TableNames,
   searchTerm: string,
   searchColumns: string[],
   options: FulltextSearchOptions = {}
 ) {
   const { minLength = 2, debounceMs = 300 } = options;
-  const debouncedTerm = useDebouncedValue(searchTerm, debounceMs);
+  const debouncedTerm = useDebounce(searchTerm, debounceMs);
 
   return useQuery({
     queryKey: ['fulltext-search', table, debouncedTerm],
@@ -41,7 +44,7 @@ export function useFulltextSearch<T>(
 
 // Hook para busca em múltiplas tabelas
 export function useGlobalSearch(searchTerm: string) {
-  const debouncedTerm = useDebouncedValue(searchTerm, 300);
+  const debouncedTerm = useDebounce(searchTerm, 300);
 
   return useQuery({
     queryKey: ['global-search', debouncedTerm],
@@ -49,9 +52,9 @@ export function useGlobalSearch(searchTerm: string) {
       if (!debouncedTerm || debouncedTerm.length < 2) return { clientes: [], entregas: [], coletas: [], fornecedores: [] };
 
       const [clientes, entregas, coletas, fornecedores] = await Promise.all([
-        supabase.from('clientes').select('id, nome, email').ilike('nome', `%${debouncedTerm}%`).limit(5),
-        supabase.from('entregas').select('id, numero_nf, cliente_nome').or(`numero_nf.ilike.%${debouncedTerm}%,cliente_nome.ilike.%${debouncedTerm}%`).limit(5),
-        supabase.from('coletas').select('id, numero_nf, cliente_nome').or(`numero_nf.ilike.%${debouncedTerm}%,cliente_nome.ilike.%${debouncedTerm}%`).limit(5),
+        supabase.from('clientes').select('id, razao_social, contato_email').ilike('razao_social', `%${debouncedTerm}%`).limit(5),
+        supabase.from('entregas').select('id, numero_entrega, endereco_entrega').or(`numero_entrega.ilike.%${debouncedTerm}%,endereco_entrega.ilike.%${debouncedTerm}%`).limit(5),
+        supabase.from('coletas').select('id, numero_coleta, endereco_coleta').or(`numero_coleta.ilike.%${debouncedTerm}%,endereco_coleta.ilike.%${debouncedTerm}%`).limit(5),
         supabase.from('fornecedores').select('id, razao_social, nome_fantasia').or(`razao_social.ilike.%${debouncedTerm}%,nome_fantasia.ilike.%${debouncedTerm}%`).limit(5),
       ]);
 

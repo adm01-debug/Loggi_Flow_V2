@@ -1,15 +1,18 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useRef, useCallback } from 'react';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableNames = keyof Database['public']['Tables'];
 
 interface InfiniteScrollOptions {
   pageSize?: number;
   orderBy?: { column: string; ascending?: boolean };
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 }
 
 export function useInfiniteScroll<T>(
-  table: string,
+  table: TableNames,
   queryKey: string[],
   options: InfiniteScrollOptions = {}
 ) {
@@ -26,7 +29,7 @@ export function useInfiniteScroll<T>(
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
-            q = q.eq(key, value);
+            q = q.eq(key, value as never);
           }
         });
       }
@@ -40,39 +43,29 @@ export function useInfiniteScroll<T>(
       const { data, error, count } = await q;
       if (error) throw error;
 
-      return { data: data as T[], nextPage: pageParam + 1, totalCount: count || 0, hasMore: (data?.length || 0) === pageSize };
+      return { data: (data || []) as T[], nextPage: pageParam + 1, totalCount: count || 0, hasMore: (data?.length || 0) === pageSize };
     },
     getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextPage : undefined,
   });
 
   const setLoadMoreRef = useCallback((node: HTMLDivElement | null) => {
     if (observerRef.current) observerRef.current.disconnect();
-    
     if (node && query.hasNextPage && !query.isFetchingNextPage) {
       observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          query.fetchNextPage();
-        }
+        if (entries[0].isIntersecting) query.fetchNextPage();
       }, { threshold: 0.1 });
-      
       observerRef.current.observe(node);
     }
-    
     loadMoreRef.current = node;
   }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 
   useEffect(() => {
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect();
-    };
+    return () => { if (observerRef.current) observerRef.current.disconnect(); };
   }, []);
 
-  const allData = query.data?.pages.flatMap(page => page.data) ?? [];
-  const totalCount = query.data?.pages[0]?.totalCount ?? 0;
-
   return {
-    data: allData,
-    totalCount,
+    data: query.data?.pages.flatMap(page => page.data) ?? [],
+    totalCount: query.data?.pages[0]?.totalCount ?? 0,
     isLoading: query.isLoading,
     isFetchingNextPage: query.isFetchingNextPage,
     hasNextPage: query.hasNextPage,

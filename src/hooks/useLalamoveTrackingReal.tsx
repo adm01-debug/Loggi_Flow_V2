@@ -32,23 +32,11 @@ interface LalamoveQuote {
 const LALAMOVE_API_BASE = '/api/lalamove';
 
 export function useLalamoveTrackingReal(orderId: string | null) {
-  // Tracking de pedido
+  // Tracking de pedido via API
   const trackingQuery = useQuery({
     queryKey: ['lalamove-tracking', orderId],
     queryFn: async () => {
       if (!orderId) return null;
-
-      // Primeiro, tentar buscar do Supabase (cache local)
-      const { data: cached } = await supabase
-        .from('lalamove_orders')
-        .select('*')
-        .eq('order_id', orderId)
-        .single();
-
-      // Se cache válido (menos de 30s), retornar
-      if (cached && new Date(cached.updated_at).getTime() > Date.now() - 30000) {
-        return cached as LalamoveOrder;
-      }
 
       // Buscar da API Lalamove via Edge Function
       const response = await fetch(`${LALAMOVE_API_BASE}/orders/${orderId}`, {
@@ -58,44 +46,33 @@ export function useLalamoveTrackingReal(orderId: string | null) {
       if (!response.ok) throw new Error('Erro ao buscar pedido Lalamove');
       
       const data = await response.json();
-
-      // Salvar/atualizar cache
-      await supabase.from('lalamove_orders').upsert({
-        order_id: orderId,
-        status: data.status,
-        driver_name: data.driverName,
-        driver_phone: data.driverPhone,
-        plate_number: data.plateNumber,
-        current_lat: data.currentLocation?.lat,
-        current_lng: data.currentLocation?.lng,
-        updated_at: new Date().toISOString(),
-      });
-
       return data as LalamoveOrder;
     },
     enabled: !!orderId,
     refetchInterval: 30000, // Atualiza a cada 30s
   });
 
-  // Listar pedidos ativos
-  const activeOrdersQuery = useQuery({
-    queryKey: ['lalamove-active-orders'],
+  // Listar alertas de rastreamento
+  const alertsQuery = useQuery({
+    queryKey: ['lalamove-alerts', orderId],
     queryFn: async () => {
+      if (!orderId) return [];
+      
       const { data, error } = await supabase
-        .from('lalamove_orders')
+        .from('rastreamento_alertas')
         .select('*')
-        .not('status', 'in', '("COMPLETED","CANCELLED","EXPIRED")')
+        .eq('lalamove_order_id', orderId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data || [];
     },
-    refetchInterval: 60000,
+    enabled: !!orderId,
   });
 
   return {
     order: trackingQuery.data,
-    activeOrders: activeOrdersQuery.data || [],
+    alerts: alertsQuery.data || [],
     isLoading: trackingQuery.isLoading,
     isRefetching: trackingQuery.isRefetching,
     error: trackingQuery.error,
@@ -121,7 +98,7 @@ export function useLalamoveOrders() {
 
   // Criar pedido
   const createOrderMutation = useMutation({
-    mutationFn: async (params: { quotationId: string; senderStop: any; recipientStops: any[] }) => {
+    mutationFn: async (params: { quotationId: string; senderStop: unknown; recipientStops: unknown[] }) => {
       const response = await fetch(`${LALAMOVE_API_BASE}/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,17 +106,7 @@ export function useLalamoveOrders() {
       });
 
       if (!response.ok) throw new Error('Erro ao criar pedido');
-      
-      const data = await response.json();
-
-      // Salvar no Supabase
-      await supabase.from('lalamove_orders').insert({
-        order_id: data.orderId,
-        status: 'ASSIGNING_DRIVER',
-        created_at: new Date().toISOString(),
-      });
-
-      return data;
+      return response.json();
     },
   });
 
@@ -152,8 +119,6 @@ export function useLalamoveOrders() {
       });
 
       if (!response.ok) throw new Error('Erro ao cancelar pedido');
-
-      await supabase.from('lalamove_orders').update({ status: 'CANCELLED' }).eq('order_id', orderId);
     },
   });
 

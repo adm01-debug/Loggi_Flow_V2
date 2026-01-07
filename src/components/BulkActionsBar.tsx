@@ -16,17 +16,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { X, Loader2 } from 'lucide-react';
-import { BulkAction } from '@/hooks/useBulkActions';
+import { X, Loader2, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ReactNode } from 'react';
 
-interface BulkActionsBarProps<T> {
+interface BulkAction<T> {
+  id: string;
+  label: string;
+  icon?: LucideIcon | ReactNode;
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  confirm?: {
+    title: string;
+    description: string;
+  };
+}
+
+export interface BulkActionsBarProps<T> {
   selectionCount: number;
   actions: BulkAction<T>[];
-  onAction: (actionId: string) => Promise<void>;
-  onClear: () => void;
+  onAction?: (actionId: string) => Promise<void>;
+  onClear?: () => void;
+  onClearSelection?: () => void;
   isExecuting?: boolean;
   className?: string;
+}
+
+function isLucideIcon(icon: unknown): icon is LucideIcon {
+  return typeof icon === 'function';
 }
 
 export function BulkActionsBar<T>({
@@ -34,10 +50,23 @@ export function BulkActionsBar<T>({
   actions,
   onAction,
   onClear,
+  onClearSelection,
   isExecuting = false,
   className,
 }: BulkActionsBarProps<T>) {
   if (selectionCount === 0) return null;
+
+  const handleClear = onClear || onClearSelection;
+  const handleAction = async (actionId: string) => {
+    if (onAction) {
+      await onAction(actionId);
+    } else {
+      const action = actions.find(a => a.id === actionId);
+      if (action && 'onClick' in action && typeof (action as any).onClick === 'function') {
+        (action as any).onClick();
+      }
+    }
+  };
 
   return (
     <div
@@ -54,7 +83,7 @@ export function BulkActionsBar<T>({
           variant="ghost"
           size="icon"
           className="h-6 w-6"
-          onClick={onClear}
+          onClick={handleClear}
           disabled={isExecuting}
         >
           <X className="h-4 w-4" />
@@ -66,19 +95,28 @@ export function BulkActionsBar<T>({
 
       <div className="flex items-center gap-1">
         {actions.map((action) => {
+          const renderIcon = () => {
+            if (!action.icon) return null;
+            if (isLucideIcon(action.icon)) {
+              const IconComponent = action.icon;
+              return <IconComponent className="h-4 w-4" />;
+            }
+            return action.icon as ReactNode;
+          };
+
           const ActionButton = (
             <Button
               key={action.id}
               variant={action.variant ?? 'outline'}
               size="sm"
               disabled={isExecuting}
-              onClick={action.confirm ? undefined : () => onAction(action.id)}
+              onClick={action.confirm ? undefined : () => handleAction(action.id)}
               className="gap-2"
             >
               {isExecuting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                action.icon && <action.icon className="h-4 w-4" />
+                renderIcon()
               )}
               {action.label}
             </Button>
@@ -98,7 +136,7 @@ export function BulkActionsBar<T>({
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => onAction(action.id)}
+                      onClick={() => handleAction(action.id)}
                       className={
                         action.variant === 'destructive'
                           ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
