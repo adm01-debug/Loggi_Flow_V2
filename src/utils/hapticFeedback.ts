@@ -1,37 +1,87 @@
-// Haptic Feedback Utilities
-// Provides tactile feedback for touch interactions on supported devices
+// ============================================
+// PREMIUM HAPTIC FEEDBACK SYSTEM
+// Advanced tactile feedback for mobile devices
+// ============================================
 
-type HapticPattern = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection';
+type HapticPattern = 
+  | 'light' 
+  | 'medium' 
+  | 'heavy' 
+  | 'success' 
+  | 'warning' 
+  | 'error' 
+  | 'selection'
+  | 'impact'
+  | 'notification'
+  | 'celebration'
+  | 'heartbeat'
+  | 'countdown'
+  | 'levelUp'
+  | 'achievement'
+  | 'refresh'
+  | 'swipe';
 
 interface HapticOptions {
   duration?: number;
   intensity?: number;
+  repeat?: number;
 }
 
 // Check if the Vibration API is supported
 const isVibrationSupported = (): boolean => {
-  return 'vibrate' in navigator;
+  return typeof navigator !== 'undefined' && 'vibrate' in navigator;
 };
 
-// Vibration patterns for different feedback types
+// Advanced vibration patterns for different feedback types
 const vibrationPatterns: Record<HapticPattern, number | number[]> = {
+  // Basic patterns
   light: 10,
   medium: 25,
   heavy: 50,
-  success: [30, 50, 30],
-  warning: [50, 30, 50],
+  selection: 5,
+  
+  // Status patterns
+  success: [30, 60, 30],
+  warning: [50, 40, 50, 40, 50],
   error: [100, 50, 100, 50, 100],
-  selection: 5
+  
+  // Action patterns
+  impact: 80,
+  notification: [50, 100, 50],
+  refresh: [20, 30, 20, 30, 50],
+  swipe: 15,
+  
+  // Celebration patterns
+  celebration: [50, 50, 50, 50, 100, 100, 50, 50, 200],
+  heartbeat: [100, 100, 100, 400, 100, 100],
+  countdown: [50, 200, 50, 200, 50, 200, 150],
+  
+  // Gamification patterns
+  levelUp: [50, 100, 50, 100, 50, 100, 200, 200],
+  achievement: [30, 50, 30, 50, 100, 50, 100, 50, 200],
 };
 
-// Trigger haptic feedback
+// Trigger haptic feedback with pattern
 export const triggerHaptic = (pattern: HapticPattern = 'light', options?: HapticOptions): boolean => {
   if (!isVibrationSupported()) {
     return false;
   }
 
   try {
-    const vibrationPattern = vibrationPatterns[pattern];
+    let vibrationPattern = vibrationPatterns[pattern];
+    
+    // Apply options if provided
+    if (options?.repeat && options.repeat > 1 && Array.isArray(vibrationPattern)) {
+      const repeated: number[] = [];
+      for (let i = 0; i < options.repeat; i++) {
+        repeated.push(...vibrationPattern);
+        if (i < options.repeat - 1) {
+          repeated.push(100); // Gap between repetitions
+        }
+      }
+      vibrationPattern = repeated;
+    }
+    
     navigator.vibrate(vibrationPattern);
     return true;
   } catch (error) {
@@ -47,10 +97,25 @@ export const customHaptic = (duration: number): boolean => {
   }
 
   try {
-    navigator.vibrate(duration);
+    navigator.vibrate(Math.min(duration, 500)); // Max 500ms for safety
     return true;
   } catch (error) {
     console.warn('Custom haptic failed:', error);
+    return false;
+  }
+};
+
+// Custom pattern haptic
+export const patternHaptic = (pattern: number[]): boolean => {
+  if (!isVibrationSupported()) {
+    return false;
+  }
+
+  try {
+    navigator.vibrate(pattern);
+    return true;
+  } catch (error) {
+    console.warn('Pattern haptic failed:', error);
     return false;
   }
 };
@@ -62,61 +127,154 @@ export const stopHaptic = (): void => {
   }
 };
 
-// Haptic feedback for common UI actions
+// Create rhythmic pattern
+export const rhythmicHaptic = (bpm: number = 120, beats: number = 4): boolean => {
+  if (!isVibrationSupported()) {
+    return false;
+  }
+  
+  const interval = 60000 / bpm; // milliseconds per beat
+  const pattern: number[] = [];
+  
+  for (let i = 0; i < beats; i++) {
+    pattern.push(30); // vibration duration
+    if (i < beats - 1) {
+      pattern.push(interval - 30); // pause between beats
+    }
+  }
+  
+  try {
+    navigator.vibrate(pattern);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+// Intensity-based haptic (0-100)
+export const intensityHaptic = (intensity: number): boolean => {
+  const clampedIntensity = Math.max(0, Math.min(100, intensity));
+  const duration = Math.round(5 + (clampedIntensity / 100) * 95); // 5ms to 100ms
+  return customHaptic(duration);
+};
+
+// Haptic feedback presets for common UI actions
 export const hapticFeedback = {
-  // Button press
+  // Basic interactions
   buttonPress: () => triggerHaptic('light'),
-  
-  // Toggle switch
+  buttonRelease: () => triggerHaptic('selection'),
   toggle: () => triggerHaptic('selection'),
+  tap: () => triggerHaptic('light'),
+  doubleTap: () => patternHaptic([15, 50, 15]),
   
-  // Successful action
+  // Status feedback
   success: () => triggerHaptic('success'),
-  
-  // Warning or attention needed
   warning: () => triggerHaptic('warning'),
-  
-  // Error occurred
   error: () => triggerHaptic('error'),
   
-  // Item selected
+  // Selection
   select: () => triggerHaptic('selection'),
+  deselect: () => triggerHaptic('light'),
   
-  // Item deleted
+  // Actions
   delete: () => triggerHaptic('medium'),
-  
-  // Pull to refresh triggered
-  pullRefresh: () => triggerHaptic('medium'),
+  confirm: () => triggerHaptic('success'),
+  cancel: () => triggerHaptic('light'),
   
   // Navigation
   navigate: () => triggerHaptic('light'),
+  back: () => triggerHaptic('selection'),
+  tabChange: () => triggerHaptic('selection'),
   
-  // Long press detected
+  // Gestures
+  pullRefresh: () => triggerHaptic('refresh'),
   longPress: () => triggerHaptic('heavy'),
+  swipe: () => triggerHaptic('swipe'),
+  pinch: () => triggerHaptic('light'),
   
-  // Drag started
+  // Drag and drop
   dragStart: () => triggerHaptic('light'),
-  
-  // Drag ended
+  dragMove: () => triggerHaptic('selection'),
   dragEnd: () => triggerHaptic('medium'),
+  drop: () => triggerHaptic('impact'),
   
-  // Swipe action
-  swipe: () => triggerHaptic('light'),
+  // Lists
+  reorder: () => triggerHaptic('medium'),
+  expand: () => triggerHaptic('light'),
+  collapse: () => triggerHaptic('light'),
   
-  // Impact (collision during drag)
-  impact: () => triggerHaptic('heavy'),
+  // Forms
+  inputFocus: () => triggerHaptic('selection'),
+  inputError: () => triggerHaptic('error'),
+  formSubmit: () => triggerHaptic('success'),
   
-  // Notification received
-  notification: () => triggerHaptic('medium'),
+  // Notifications
+  notification: () => triggerHaptic('notification'),
+  message: () => triggerHaptic('medium'),
+  reminder: () => triggerHaptic('warning'),
   
-  // Achievement unlocked
-  achievement: () => {
-    // Special pattern for achievements
-    if (isVibrationSupported()) {
-      navigator.vibrate([50, 100, 50, 100, 200]);
+  // Gamification
+  achievement: () => triggerHaptic('achievement'),
+  levelUp: () => triggerHaptic('levelUp'),
+  celebration: () => triggerHaptic('celebration'),
+  reward: () => patternHaptic([50, 100, 50, 100, 200]),
+  coinCollect: () => patternHaptic([20, 30, 20]),
+  xpGain: () => patternHaptic([30, 50, 30]),
+  streak: () => patternHaptic([40, 60, 40, 60, 40, 60, 100]),
+  
+  // Special effects
+  heartbeat: () => triggerHaptic('heartbeat'),
+  countdown: () => triggerHaptic('countdown'),
+  explosion: () => patternHaptic([100, 50, 80, 50, 60, 50, 40, 50, 20]),
+  magic: () => patternHaptic([10, 20, 20, 20, 30, 20, 40, 20, 50]),
+  
+  // Impact effects
+  impactLight: () => triggerHaptic('light'),
+  impactMedium: () => triggerHaptic('medium'),
+  impactHeavy: () => triggerHaptic('heavy'),
+  impactRigid: () => patternHaptic([5, 5, 5]),
+  impactSoft: () => patternHaptic([40]),
+};
+
+// Context-aware haptic wrapper
+export const contextualHaptic = {
+  // Provides haptic feedback based on action result
+  onAction: (success: boolean) => {
+    if (success) {
+      hapticFeedback.success();
+    } else {
+      hapticFeedback.error();
     }
-  }
+  },
+  
+  // Provides haptic feedback based on importance level
+  byImportance: (level: 'low' | 'medium' | 'high' | 'critical') => {
+    switch (level) {
+      case 'low':
+        hapticFeedback.tap();
+        break;
+      case 'medium':
+        hapticFeedback.notification();
+        break;
+      case 'high':
+        hapticFeedback.warning();
+        break;
+      case 'critical':
+        hapticFeedback.error();
+        break;
+    }
+  },
+  
+  // Progress feedback (0-100)
+  progress: (percent: number) => {
+    if (percent === 100) {
+      hapticFeedback.success();
+    } else if (percent % 25 === 0) {
+      hapticFeedback.tap();
+    }
+  },
 };
 
 // Export types for external use
 export type { HapticPattern, HapticOptions };
+export { isVibrationSupported };
