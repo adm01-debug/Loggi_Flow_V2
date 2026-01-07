@@ -163,16 +163,15 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
       });
 
       if (error) {
-        console.error('Error saving location to database:', error);
+        // Error saving location to database - silent fail
       } else {
         lastSavedLocationRef.current = { 
           lat: location.coordinates.lat, 
           lng: location.coordinates.lng 
         };
-        console.log('Location saved to database');
       }
-    } catch (err) {
-      console.error('Error saving location:', err);
+    } catch {
+      // Error saving location - silent fail
     }
   };
 

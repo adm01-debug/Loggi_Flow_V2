@@ -51,8 +51,8 @@ const addAlert = (alert: Omit<SystemAlert, 'id' | 'createdAt' | 'read'>) => {
       action: alert.entityId ? {
         label: 'Ver detalhes',
         onClick: () => {
-          // Navigate to entity (would use router in real app)
-          console.log(`Navigate to ${alert.entityType}/${alert.entityId}`);
+          // Navigate to entity
+          window.location.href = `/${alert.entityType}`;
         },
       } : undefined,
     });

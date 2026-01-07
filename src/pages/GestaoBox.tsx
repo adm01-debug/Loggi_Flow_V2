@@ -13,7 +13,7 @@ import { useFilters, FilterConfig } from "@/hooks/useFilters";
 
 const filterConfig: FilterConfig<BoxData> = {
   search: {
-    fields: ["number"] as any,
+    fields: ["number" as keyof BoxData],
     placeholder: "Buscar box..."
   }
 };

@@ -184,10 +184,18 @@ export function useDelayNotifications() {
   };
 }
 
+// Type for webkit audio context
+interface WindowWithWebkit extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 // Simple audio alert
 function playAlertSound() {
   try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextClass = window.AudioContext || (window as WindowWithWebkit).webkitAudioContext;
+    if (!AudioContextClass) return;
+    
+    const audioContext = new AudioContextClass();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
@@ -209,7 +217,7 @@ function playAlertSound() {
       osc2.start();
       osc2.stop(audioContext.currentTime + 0.15);
     }, 200);
-  } catch (e) {
-    console.log('Audio not available');
+  } catch {
+    // Audio not available
   }
 }
