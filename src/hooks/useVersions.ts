@@ -1,72 +1,54 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 
 interface Version {
   id: string;
   version_number: number;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   changed_by: string;
   changed_at: string;
   change_summary: string;
-  user?: { full_name: string; email: string };
 }
 
+// Usando localStorage já que a tabela entity_versions não existe
 export function useVersions(entityType: string, entityId: string | null) {
-  const queryClient = useQueryClient();
-
-  const { data: versions = [], isLoading } = useQuery({
-    queryKey: ['versions', entityType, entityId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('entity_versions')
-        .select('*')
-        .eq('entity_type', entityType)
-        .eq('entity_id', entityId)
-        .order('version_number', { ascending: false });
-      
-      if (error) throw error;
-      return data as Version[];
-    },
-    enabled: !!entityId,
+  const storageKey = `versions-${entityType}-${entityId}`;
+  const [versions, setVersions] = useState<Version[]>(() => {
+    if (!entityId) return [];
+    const stored = localStorage.getItem(storageKey);
+    return stored ? JSON.parse(stored) : [];
   });
+  const [isLoading] = useState(false);
 
-  const createVersionMutation = useMutation({
-    mutationFn: async ({ entityId, data, summary }: { entityId: string; data: Record<string, any>; summary?: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      const nextVersion = versions.length > 0 ? versions[0].version_number + 1 : 1;
-      
-      const { error } = await supabase.from('entity_versions').insert({
-        entity_type: entityType,
-        entity_id: entityId,
-        version_number: nextVersion,
-        data,
-        changed_by: user?.id,
-        change_summary: summary || `Versão ${nextVersion}`,
-      });
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['versions', entityType, entityId] });
-      toast.success('Versão salva');
-    },
-  });
+  const createVersion = useCallback(({ entityId: eId, data, summary }: { entityId: string; data: Record<string, unknown>; summary?: string }) => {
+    const nextVersion = versions.length > 0 ? versions[0].version_number + 1 : 1;
+    const newVersion: Version = {
+      id: crypto.randomUUID(),
+      version_number: nextVersion,
+      data,
+      changed_by: 'current_user',
+      changed_at: new Date().toISOString(),
+      change_summary: summary || `Versão ${nextVersion}`,
+    };
 
-  const restoreVersionMutation = useMutation({
-    mutationFn: async (versionId: string) => {
-      const version = versions.find(v => v.id === versionId);
-      if (!version) throw new Error('Versão não encontrada');
-      return version.data;
-    },
-    onSuccess: () => toast.success('Versão restaurada'),
-  });
+    const updated = [newVersion, ...versions];
+    setVersions(updated);
+    localStorage.setItem(`versions-${entityType}-${eId}`, JSON.stringify(updated));
+    toast.success('Versão salva');
+  }, [versions, entityType]);
+
+  const restoreVersion = useCallback(async (versionId: string) => {
+    const version = versions.find(v => v.id === versionId);
+    if (!version) throw new Error('Versão não encontrada');
+    toast.success('Versão restaurada');
+    return version.data;
+  }, [versions]);
 
   return {
     versions,
     isLoading,
     latestVersion: versions[0],
-    createVersion: createVersionMutation.mutate,
-    restoreVersion: restoreVersionMutation.mutateAsync,
+    createVersion,
+    restoreVersion,
   };
 }

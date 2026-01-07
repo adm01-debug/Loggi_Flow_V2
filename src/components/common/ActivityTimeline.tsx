@@ -1,7 +1,7 @@
 import { useActivityLog, useRecentActivity } from '@/hooks/useActivityLog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Plus, Pencil, Trash2, RotateCcw, User } from 'lucide-react';
+import { Clock, Plus, Pencil, Trash2, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -36,7 +36,7 @@ export function ActivityTimeline({ entityType, entityId, limit = 20, showGlobal 
                   <span className="text-xs text-muted-foreground">{format(new Date(log.created_at), "dd/MM HH:mm", { locale: ptBR })}</span>
                 </div>
                 <p className="text-sm">{log.description}</p>
-                {log.user && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><User className="h-3 w-3" />{log.user.full_name || log.user.email}</p>}
+                {log.user_id && <p className="text-xs text-muted-foreground mt-1">User ID: {log.user_id}</p>}
               </div>
             </div>
           );

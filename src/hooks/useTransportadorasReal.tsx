@@ -1,23 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Database } from '@/integrations/supabase/types';
 
-interface Transportadora {
-  id: string;
-  nome: string;
-  cnpj: string;
-  tipo: 'propria' | 'terceira' | 'lalamove' | 'correios';
-  contato_nome: string | null;
-  contato_telefone: string | null;
-  contato_email: string | null;
-  custo_base: number | null;
-  custo_kg: number | null;
-  regioes_atendidas: string[];
-  sla_horas: number | null;
-  taxa_sla: number | null;
-  is_active: boolean;
-  created_at: string;
-}
+type TransportadoraRow = Database['public']['Tables']['transportadoras']['Row'];
+type TransportadoraInsert = Database['public']['Tables']['transportadoras']['Insert'];
+type TransportadoraUpdate = Database['public']['Tables']['transportadoras']['Update'];
 
 export function useTransportadorasReal() {
   const queryClient = useQueryClient();
@@ -28,11 +16,10 @@ export function useTransportadorasReal() {
       const { data, error } = await supabase
         .from('transportadoras')
         .select('*')
-        .is('deleted_at', null)
-        .order('nome');
+        .order('nome_fantasia');
 
       if (error) throw error;
-      return data as Transportadora[];
+      return data || [];
     },
   });
 
@@ -42,17 +29,16 @@ export function useTransportadorasReal() {
       const { data, error } = await supabase
         .from('transportadoras')
         .select('*')
-        .is('deleted_at', null)
-        .eq('is_active', true)
-        .order('nome');
+        .eq('homologada', true)
+        .order('nome_fantasia');
 
       if (error) throw error;
-      return data as Transportadora[];
+      return data || [];
     },
   });
 
   const createMutation = useMutation({
-    mutationFn: async (transportadora: Omit<Transportadora, 'id' | 'created_at'>) => {
+    mutationFn: async (transportadora: TransportadoraInsert) => {
       const { data, error } = await supabase.from('transportadoras').insert(transportadora).select().single();
       if (error) throw error;
       return data;
@@ -64,7 +50,7 @@ export function useTransportadorasReal() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Transportadora> & { id: string }) => {
+    mutationFn: async ({ id, ...updates }: TransportadoraUpdate & { id: string }) => {
       const { error } = await supabase.from('transportadoras').update(updates).eq('id', id);
       if (error) throw error;
     },
@@ -76,7 +62,7 @@ export function useTransportadorasReal() {
 
   // Calcular melhor transportadora para uma entrega
   const getBestTransportadora = async (params: { peso: number; regiao: string; urgente: boolean }) => {
-    const { peso, regiao, urgente } = params;
+    const { regiao, urgente } = params;
     
     const transportadoras = activeQuery.data || [];
     
@@ -87,14 +73,15 @@ export function useTransportadorasReal() {
 
     if (disponiveis.length === 0) return null;
 
-    // Calcular custo e ordenar
-    const ranked = disponiveis.map(t => ({
-      ...t,
-      custoEstimado: (t.custo_base || 0) + (peso * (t.custo_kg || 0)),
-      score: urgente 
-        ? (t.taxa_sla || 0) * 100 - (t.sla_horas || 24)
-        : -((t.custo_base || 0) + (peso * (t.custo_kg || 0))),
-    })).sort((a, b) => b.score - a.score);
+    // Ordenar por performance score
+    const ranked = disponiveis.sort((a, b) => {
+      if (urgente) {
+        // Priorizar por prazo
+        return (a.prazo_medio_dias || 99) - (b.prazo_medio_dias || 99);
+      }
+      // Priorizar por score de performance
+      return (b.score_performance || 0) - (a.score_performance || 0);
+    });
 
     return ranked[0];
   };

@@ -6,12 +6,10 @@ interface UserGamification {
   id: string;
   user_id: string;
   level: number;
-  xp: number;
-  xp_to_next_level: number;
+  current_xp: number;
+  total_xp: number;
   coins: number;
   streak_days: number;
-  total_deliveries: number;
-  achievements: string[];
 }
 
 interface Achievement {
@@ -31,7 +29,6 @@ interface LeaderboardEntry {
   avatar_url: string | null;
   level: number;
   xp: number;
-  total_deliveries: number;
   position: number;
 }
 
@@ -46,7 +43,7 @@ export function useGamificationReal() {
       if (!user) throw new Error('Não autenticado');
 
       const { data, error } = await supabase
-        .from('user_gamification')
+        .from('user_levels')
         .select('*')
         .eq('user_id', user.id)
         .single();
@@ -56,8 +53,8 @@ export function useGamificationReal() {
       // Se não existe, criar registro
       if (!data) {
         const { data: newData, error: insertError } = await supabase
-          .from('user_gamification')
-          .insert({ user_id: user.id, level: 1, xp: 0, coins: 0, streak_days: 0, total_deliveries: 0, achievements: [] })
+          .from('user_levels')
+          .insert({ user_id: user.id, level: 1, current_xp: 0, total_xp: 0, coins: 0, streak_days: 0 })
           .select()
           .single();
         
@@ -88,22 +85,33 @@ export function useGamificationReal() {
     queryKey: ['leaderboard'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_gamification')
-        .select('user_id, level, xp, total_deliveries, profiles(full_name, avatar_url)')
-        .order('xp', { ascending: false })
+        .from('user_levels')
+        .select('user_id, level, current_xp, total_xp, coins')
+        .order('total_xp', { ascending: false })
         .limit(50);
 
       if (error) throw error;
 
-      return (data || []).map((entry, index) => ({
-        user_id: entry.user_id,
-        user_name: (entry as any).profiles?.full_name || 'Anônimo',
-        avatar_url: (entry as any).profiles?.avatar_url,
-        level: entry.level,
-        xp: entry.xp,
-        total_deliveries: entry.total_deliveries,
-        position: index + 1,
-      })) as LeaderboardEntry[];
+      // Get profiles separately
+      const userIds = (data || []).map(entry => entry.user_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+
+      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
+      return (data || []).map((entry, index) => {
+        const profile = profileMap.get(entry.user_id);
+        return {
+          user_id: entry.user_id,
+          user_name: profile?.full_name || 'Anônimo',
+          avatar_url: profile?.avatar_url || null,
+          level: entry.level,
+          xp: entry.total_xp,
+          position: index + 1,
+        };
+      }) as LeaderboardEntry[];
     },
   });
 
@@ -114,27 +122,27 @@ export function useGamificationReal() {
       if (!user) throw new Error('Não autenticado');
 
       const { data: current } = await supabase
-        .from('user_gamification')
-        .select('xp, level, xp_to_next_level')
+        .from('user_levels')
+        .select('current_xp, total_xp, level')
         .eq('user_id', user.id)
         .single();
 
       if (!current) throw new Error('Perfil de gamificação não encontrado');
 
-      let newXP = (current.xp || 0) + amount;
+      const xpToNextLevel = Math.floor(100 * Math.pow(1.5, current.level - 1));
+      let newXP = (current.current_xp || 0) + amount;
+      let newTotalXP = (current.total_xp || 0) + amount;
       let newLevel = current.level || 1;
-      let xpToNext = current.xp_to_next_level || 100;
 
       // Level up
-      while (newXP >= xpToNext) {
-        newXP -= xpToNext;
+      while (newXP >= xpToNextLevel) {
+        newXP -= xpToNextLevel;
         newLevel++;
-        xpToNext = Math.floor(xpToNext * 1.5);
       }
 
       const { error } = await supabase
-        .from('user_gamification')
-        .update({ xp: newXP, level: newLevel, xp_to_next_level: xpToNext })
+        .from('user_levels')
+        .update({ current_xp: newXP, total_xp: newTotalXP, level: newLevel })
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -156,7 +164,7 @@ export function useGamificationReal() {
       if (!user) throw new Error('Não autenticado');
 
       const { data: current } = await supabase
-        .from('user_gamification')
+        .from('user_levels')
         .select('coins')
         .eq('user_id', user.id)
         .single();
@@ -166,16 +174,16 @@ export function useGamificationReal() {
       }
 
       const { error } = await supabase
-        .from('user_gamification')
+        .from('user_levels')
         .update({ coins: current.coins - cost })
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       // Registrar resgate
-      await supabase.from('reward_redemptions').insert({
+      await supabase.from('reward_purchases').insert({
         user_id: user.id,
-        reward_id: rewardId,
+        reward_item_id: rewardId,
         coins_spent: cost,
       });
     },
