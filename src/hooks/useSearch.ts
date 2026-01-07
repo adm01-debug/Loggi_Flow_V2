@@ -46,11 +46,11 @@ export function useSearch<T extends Record<string, unknown>>(
     queryFn: async () => {
       if (!shouldSearch) return [];
       const orConditions = columns.map((col) => `${col}.ilike.%${debouncedTerm}%`).join(',');
-      let query = supabase.from(tableName).select('*').or(orConditions).limit(limit);
+      let query = supabase.from(tableName).select('*').or(orConditions).limit(limit) as any;
       if (orderBy) query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
       const { data, error } = await query;
       if (error) throw error;
-      return (data || []) as T[];
+      return (data || []) as unknown as T[];
     },
     enabled: shouldSearch,
     staleTime: 60000,

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { History, RotateCcw, Clock, User } from 'lucide-react';
+import { History, RotateCcw, Clock } from 'lucide-react';
 import { useVersions } from '@/hooks/useVersions';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -52,7 +52,6 @@ export function VersionHistory({ entityType, entityId, onRestore }: VersionHisto
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{format(new Date(version.changed_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</span>
-                  {version.user && <span className="flex items-center gap-1"><User className="h-3 w-3" />{version.user.full_name}</span>}
                 </div>
                 {version.change_summary && <p className="text-sm mt-2">{version.change_summary}</p>}
               </div>
