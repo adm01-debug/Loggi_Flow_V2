@@ -5,7 +5,7 @@ import { Search, X, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const inputVariants = cva(
-  "flex w-full rounded-lg border bg-background text-foreground transition-all duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground/60 disabled:cursor-not-allowed disabled:opacity-50",
+  "flex w-full rounded-lg border bg-background text-foreground transition-all duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground/60 disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation",
   {
     variants: {
       variant: {
@@ -16,10 +16,10 @@ const inputVariants = cva(
         success: "border-success focus:border-success focus:ring-2 focus:ring-success/20",
       },
       inputSize: {
-        default: "h-10 px-3 py-2 text-sm",
-        sm: "h-8 px-2.5 py-1.5 text-xs rounded-md",
-        lg: "h-12 px-4 py-3 text-base rounded-xl",
-        xl: "h-14 px-5 py-4 text-lg rounded-xl",
+        default: "h-11 min-h-[44px] px-3 py-2 text-base sm:text-sm",
+        sm: "h-9 min-h-[36px] px-2.5 py-1.5 text-sm rounded-md",
+        lg: "h-12 min-h-[48px] px-4 py-3 text-base rounded-xl",
+        xl: "h-14 min-h-[56px] px-5 py-4 text-lg rounded-xl",
       },
     },
     defaultVariants: {
@@ -94,17 +94,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             }}
             {...props}
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 z-10">
             <AnimatePresence>
               {clearable && hasValue && (
                 <motion.button
                   type="button"
                   onClick={onClear}
-                  className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.15 }}
+                  aria-label="Limpar campo"
                 >
                   <X className="w-4 h-4" />
                 </motion.button>
@@ -114,14 +115,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               <motion.button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 whileTap={{ scale: 0.9 }}
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </motion.button>
             )}
             {rightIcon && !isPassword && !clearable && (
-              <span className="text-muted-foreground pointer-events-none">{rightIcon}</span>
+              <span className="text-muted-foreground pointer-events-none p-1">{rightIcon}</span>
             )}
           </div>
         </div>

@@ -5,39 +5,39 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 transform-gpu",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 transform-gpu touch-manipulation select-none",
   {
     variants: {
       variant: {
         default: 
-          "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-md hover:shadow-lg hover:shadow-primary/25 hover:from-primary/95 hover:to-primary/85 active:shadow-sm",
+          "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-md hover:shadow-lg hover:shadow-primary/25 hover:from-primary/95 hover:to-primary/85 active:shadow-sm active:scale-[0.98]",
         destructive: 
-          "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground shadow-md hover:shadow-lg hover:shadow-destructive/25 active:shadow-sm",
+          "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground shadow-md hover:shadow-lg hover:shadow-destructive/25 active:shadow-sm active:scale-[0.98]",
         outline: 
-          "border-2 border-input bg-background/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20 active:bg-accent/80",
+          "border-2 border-input bg-background/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20 active:bg-accent/80 active:scale-[0.98]",
         secondary: 
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md active:shadow-none",
+          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md active:shadow-none active:scale-[0.98]",
         ghost: 
-          "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+          "hover:bg-accent hover:text-accent-foreground active:bg-accent/80 active:scale-[0.98]",
         link: 
           "text-primary underline-offset-4 hover:underline active:opacity-80",
         premium: 
-          "relative bg-gradient-to-r from-primary via-primary-glow to-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700 overflow-hidden",
+          "relative bg-gradient-to-r from-primary via-primary-glow to-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700 overflow-hidden active:scale-[0.98]",
         success:
-          "bg-gradient-to-r from-success to-success/90 text-success-foreground shadow-md hover:shadow-lg hover:shadow-success/25 active:shadow-sm",
+          "bg-gradient-to-r from-success to-success/90 text-success-foreground shadow-md hover:shadow-lg hover:shadow-success/25 active:shadow-sm active:scale-[0.98]",
         warning:
-          "bg-gradient-to-r from-warning to-warning/90 text-warning-foreground shadow-md hover:shadow-lg hover:shadow-warning/25 active:shadow-sm",
+          "bg-gradient-to-r from-warning to-warning/90 text-warning-foreground shadow-md hover:shadow-lg hover:shadow-warning/25 active:shadow-sm active:scale-[0.98]",
         glow:
-          "relative bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] active:shadow-[0_0_15px_hsl(var(--primary)/0.4)]",
+          "relative bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] active:shadow-[0_0_15px_hsl(var(--primary)/0.4)] active:scale-[0.98]",
       },
       size: {
-        default: "h-10 px-5 py-2",
-        sm: "h-9 rounded-md px-4 text-xs",
-        lg: "h-12 rounded-lg px-8 text-base",
-        xl: "h-14 rounded-xl px-10 text-lg",
-        icon: "h-10 w-10",
-        "icon-sm": "h-8 w-8",
-        "icon-lg": "h-12 w-12",
+        default: "h-10 px-5 py-2 min-h-[44px]",
+        sm: "h-9 rounded-md px-4 text-xs min-h-[36px]",
+        lg: "h-12 rounded-lg px-8 text-base min-h-[48px]",
+        xl: "h-14 rounded-xl px-10 text-lg min-h-[56px]",
+        icon: "h-10 w-10 min-h-[44px] min-w-[44px]",
+        "icon-sm": "h-8 w-8 min-h-[36px] min-w-[36px]",
+        "icon-lg": "h-12 w-12 min-h-[48px] min-w-[48px]",
       },
     },
     defaultVariants: {

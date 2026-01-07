@@ -30,10 +30,10 @@ const cardVariants = cva(
         danger: "bg-destructive/5 border-2 border-destructive/30 shadow-destructive/10",
       },
       size: {
-        default: "p-6",
-        sm: "p-4",
-        lg: "p-8",
-        xl: "p-10",
+        default: "p-4 sm:p-6",
+        sm: "p-3 sm:p-4",
+        lg: "p-5 sm:p-8",
+        xl: "p-6 sm:p-10",
       },
       hover: {
         none: "",
@@ -73,8 +73,8 @@ const CardHeader = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex flex-col space-y-1.5 p-6",
-      gradient && "bg-gradient-to-r from-muted/50 to-transparent rounded-t-xl -m-6 mb-0 p-6",
+      "flex flex-col space-y-1.5 p-4 sm:p-6",
+      gradient && "bg-gradient-to-r from-muted/50 to-transparent rounded-t-xl -m-4 sm:-m-6 mb-0 p-4 sm:p-6",
       className
     )}
     {...props}
@@ -114,7 +114,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("p-4 sm:p-6 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
@@ -125,7 +125,7 @@ const CardFooter = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex items-center p-6 pt-0",
+      "flex flex-col sm:flex-row items-center gap-2 p-4 sm:p-6 pt-0",
       separated && "border-t border-border mt-4 pt-4",
       className
     )}
