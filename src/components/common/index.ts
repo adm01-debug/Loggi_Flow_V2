@@ -25,4 +25,12 @@ export { DataExporter } from './DataExporter';
 export { DataImporter } from './DataImporter';
 export { AdvancedFilter } from './AdvancedFilter';
 export { DuplicateDialog } from './DuplicateDialog';
-export { InfiniteList, VirtualList } from './InfiniteList';
+export { InfiniteList } from './InfiniteList';
+
+// Premium UX Components
+export { ActionTooltip, IconWithTooltip, QuickAction } from './ActionTooltip';
+export { Breadcrumbs } from './Breadcrumbs';
+export { ConfirmDialog } from './ConfirmDialog';
+export { PageTransition } from './PageTransition';
+export { PullToRefresh } from './PullToRefresh';
+export { StepProgress, LinearProgress } from './StepProgress';
