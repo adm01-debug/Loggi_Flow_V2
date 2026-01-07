@@ -2,31 +2,42 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { differenceInHours, differenceInDays, parseISO, isAfter, isBefore, startOfDay, subDays } from "date-fns";
 
-export interface SLAMetrics {
-  // Overall metrics
-  totalEntregas: number;
-  entregasNoPrazo: number;
-  entregasAtrasadas: number;
-  entregasPendentes: number;
-  taxaOTIF: number;
-  tempoMedioEntrega: number;
-  
-  // Coletas
-  totalColetas: number;
-  coletasNoPrazo: number;
-  coletasAtrasadas: number;
-  tempoMedioColeta: number;
-  
-  // Alerts
-  alertasCriticos: SLAAlert[];
-  alertasAviso: SLAAlert[];
-  
-  // Performance by carrier
-  performancePorTransportadora: TransportadoraPerformance[];
-  
-  // Trends
-  tendenciaSemanal: TrendData[];
-  tendenciaMensal: TrendData[];
+// Type definitions for joined data
+interface TransportadoraJoin {
+  id: string;
+  nome_fantasia: string;
+  score_performance?: number;
+}
+
+interface ClienteJoin {
+  razao_social: string;
+}
+
+interface FornecedorJoin {
+  razao_social: string;
+}
+
+interface EntregaWithJoins {
+  id: string;
+  numero_entrega: string;
+  status: string;
+  previsao_entrega: string | null;
+  data_entrega_efetiva: string | null;
+  data_despacho: string | null;
+  created_at: string;
+  transportadora: TransportadoraJoin | null;
+  cliente: ClienteJoin | null;
+}
+
+interface ColetaWithJoins {
+  id: string;
+  numero_coleta: string;
+  status: string;
+  data_prevista_coleta: string | null;
+  data_efetiva_coleta: string | null;
+  created_at: string;
+  transportadora: TransportadoraJoin | null;
+  fornecedor: FornecedorJoin | null;
 }
 
 export interface SLAAlert {
@@ -37,7 +48,7 @@ export interface SLAAlert {
   fornecedor?: string;
   transportadora?: string;
   prazo: Date;
-  atraso: number; // hours or days
+  atraso: number;
   nivel: "critico" | "aviso" | "info";
   mensagem: string;
 }
@@ -59,6 +70,43 @@ export interface TrendData {
   atrasadas: number;
   total: number;
   taxaOTIF: number;
+}
+
+export interface SLAMetrics {
+  totalEntregas: number;
+  entregasNoPrazo: number;
+  entregasAtrasadas: number;
+  entregasPendentes: number;
+  taxaOTIF: number;
+  tempoMedioEntrega: number;
+  totalColetas: number;
+  coletasNoPrazo: number;
+  coletasAtrasadas: number;
+  tempoMedioColeta: number;
+  alertasCriticos: SLAAlert[];
+  alertasAviso: SLAAlert[];
+  performancePorTransportadora: TransportadoraPerformance[];
+  tendenciaSemanal: TrendData[];
+  tendenciaMensal: TrendData[];
+}
+
+// Helper functions to safely extract joined data
+function getTransportadora(item: { transportadora: unknown }): TransportadoraJoin | null {
+  const t = item.transportadora;
+  if (t && typeof t === 'object' && 'id' in t) return t as TransportadoraJoin;
+  return null;
+}
+
+function getCliente(item: { cliente: unknown }): ClienteJoin | null {
+  const c = item.cliente;
+  if (c && typeof c === 'object' && 'razao_social' in c) return c as ClienteJoin;
+  return null;
+}
+
+function getFornecedor(item: { fornecedor: unknown }): FornecedorJoin | null {
+  const f = item.fornecedor;
+  if (f && typeof f === 'object' && 'razao_social' in f) return f as FornecedorJoin;
+  return null;
 }
 
 export function useSLAMetrics() {
@@ -154,24 +202,28 @@ export function useSLAMetrics() {
         const horasAtraso = differenceInHours(now, prazo);
         
         if (horasAtraso > 0) {
+          const cliente = getCliente(e as { cliente: unknown });
+          const transportadora = getTransportadora(e as { transportadora: unknown });
           alertasCriticos.push({
             id: e.id,
             tipo: "entrega",
             numero: e.numero_entrega,
-            cliente: (e.cliente as any)?.razao_social,
-            transportadora: (e.transportadora as any)?.nome_fantasia,
+            cliente: cliente?.razao_social,
+            transportadora: transportadora?.nome_fantasia,
             prazo,
             atraso: horasAtraso,
             nivel: "critico",
             mensagem: `Entrega ${e.numero_entrega} atrasada em ${Math.floor(horasAtraso / 24)} dias e ${horasAtraso % 24} horas`,
           });
         } else if (horasAtraso > -24) {
+          const cliente = getCliente(e as { cliente: unknown });
+          const transportadora = getTransportadora(e as { transportadora: unknown });
           alertasAviso.push({
             id: e.id,
             tipo: "entrega",
             numero: e.numero_entrega,
-            cliente: (e.cliente as any)?.razao_social,
-            transportadora: (e.transportadora as any)?.nome_fantasia,
+            cliente: cliente?.razao_social,
+            transportadora: transportadora?.nome_fantasia,
             prazo,
             atraso: Math.abs(horasAtraso),
             nivel: "aviso",
@@ -192,24 +244,28 @@ export function useSLAMetrics() {
         const horasAtraso = differenceInHours(now, prazo);
         
         if (horasAtraso > 0) {
+          const fornecedor = getFornecedor(c as { fornecedor: unknown });
+          const transportadora = getTransportadora(c as { transportadora: unknown });
           alertasCriticos.push({
             id: c.id,
             tipo: "coleta",
             numero: c.numero_coleta,
-            fornecedor: (c.fornecedor as any)?.razao_social,
-            transportadora: (c.transportadora as any)?.nome_fantasia,
+            fornecedor: fornecedor?.razao_social,
+            transportadora: transportadora?.nome_fantasia,
             prazo,
             atraso: horasAtraso,
             nivel: "critico",
             mensagem: `Coleta ${c.numero_coleta} atrasada em ${Math.floor(horasAtraso / 24)} dias`,
           });
         } else if (horasAtraso > -12) {
+          const fornecedor = getFornecedor(c as { fornecedor: unknown });
+          const transportadora = getTransportadora(c as { transportadora: unknown });
           alertasAviso.push({
             id: c.id,
             tipo: "coleta",
             numero: c.numero_coleta,
-            fornecedor: (c.fornecedor as any)?.razao_social,
-            transportadora: (c.transportadora as any)?.nome_fantasia,
+            fornecedor: fornecedor?.razao_social,
+            transportadora: transportadora?.nome_fantasia,
             prazo,
             atraso: Math.abs(horasAtraso),
             nivel: "aviso",
@@ -220,9 +276,10 @@ export function useSLAMetrics() {
       
       // Performance by carrier
       const performancePorTransportadora: TransportadoraPerformance[] = (transportadoras || []).map(t => {
-        const entregasTransp = (entregas || []).filter(e => 
-          (e.transportadora as any)?.id === t.id && e.status === "entregue"
-        );
+        const entregasTransp = (entregas || []).filter(e => {
+          const transp = getTransportadora(e as { transportadora: unknown });
+          return transp?.id === t.id && e.status === "entregue";
+        });
         const entregasNoPrazoTransp = entregasTransp.filter(e => {
           if (!e.previsao_entrega || !e.data_entrega_efetiva) return true;
           return isBefore(parseISO(e.data_entrega_efetiva), parseISO(e.previsao_entrega));

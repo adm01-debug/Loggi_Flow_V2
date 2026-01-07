@@ -95,34 +95,20 @@ TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> & { animated?: boolean }
->(({ className, animated = true, ...props }, ref) => {
-  if (animated) {
-    return (
-      <TabsPrimitive.Content
-        ref={ref}
-        asChild
-        className={cn("focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)}
-        {...props}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
-        />
-      </TabsPrimitive.Content>
-    );
-  }
-
+>(({ className, animated = false, children, ...props }, ref) => {
+  // Simplified TabsContent - animation should be handled externally with AnimatePresence
+  // Setting animated=false by default to prevent duplicate key issues
   return (
     <TabsPrimitive.Content
       ref={ref}
       className={cn(
-        "mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </TabsPrimitive.Content>
   );
 });
 TabsContent.displayName = TabsPrimitive.Content.displayName;

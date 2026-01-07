@@ -25,6 +25,7 @@ interface BulkAction<T> {
   label: string;
   icon?: LucideIcon | ReactNode;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  onClick?: () => void;
   confirm?: {
     title: string;
     description: string;
@@ -62,8 +63,8 @@ export function BulkActionsBar<T>({
       await onAction(actionId);
     } else {
       const action = actions.find(a => a.id === actionId);
-      if (action && 'onClick' in action && typeof (action as any).onClick === 'function') {
-        (action as any).onClick();
+      if (action?.onClick) {
+        action.onClick();
       }
     }
   };

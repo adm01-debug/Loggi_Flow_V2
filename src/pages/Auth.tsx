@@ -808,9 +808,13 @@ export default function Auth() {
                   </TabsTrigger>
                 </TabsList>
 
-                <AnimatePresence mode="wait">
-                  <TabsContent value="login" className="mt-0" asChild>
-                    <motion.div key="login" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+                <TabsContent value="login" className="mt-0">
+                  <motion.div 
+                    key={`tab-login-${activeTab}`}
+                    initial={{ opacity: 0, x: activeTab === "login" ? 0 : -20 }} 
+                    animate={{ opacity: 1, x: 0 }} 
+                    transition={{ duration: 0.2 }}
+                  >
                       <StaggerContainer className="space-y-4" staggerDelay={0.05}>
                         {ipBlocked && (
                           <StaggerItem>
@@ -902,8 +906,13 @@ export default function Auth() {
                     </motion.div>
                   </TabsContent>
 
-                  <TabsContent value="signup" className="mt-0" asChild>
-                    <motion.div key="signup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+                <TabsContent value="signup" className="mt-0">
+                  <motion.div 
+                    key={`tab-signup-${activeTab}`}
+                    initial={{ opacity: 0, x: activeTab === "signup" ? 0 : 20 }} 
+                    animate={{ opacity: 1, x: 0 }} 
+                    transition={{ duration: 0.2 }}
+                  >
                       <form onSubmit={handleSignup}>
                         <StaggerContainer className="space-y-4" staggerDelay={0.05}>
                           <StaggerItem>
@@ -999,7 +1008,6 @@ export default function Auth() {
                       </form>
                     </motion.div>
                   </TabsContent>
-                </AnimatePresence>
               </Tabs>
             </CardContent>
           </Card>
