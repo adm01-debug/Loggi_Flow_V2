@@ -113,35 +113,42 @@ export default function Index() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="space-y-4 md:space-y-6">
+        {/* Header with responsive layout */}
+        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
           <FadeIn direction="left">
-            <h1 className="text-display text-foreground flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>
-              Dashboard
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              </div>
+              <span className="truncate">Dashboard</span>
             </h1>
-            <p className="text-muted-foreground mt-1">Visão geral das operações logísticas</p>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Visão geral das operações logísticas</p>
           </FadeIn>
-          <StaggerContainer className="flex items-center gap-2 flex-wrap" staggerDelay={0.05}>
-            <StaggerItem><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></StaggerItem>
-            <StaggerItem><Button variant="outline" size="icon" onClick={handleRefresh}><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
-            <StaggerItem><div className="h-6 w-px bg-border" /></StaggerItem>
+          
+          {/* Actions - Scrollable on mobile */}
+          <StaggerContainer className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none" staggerDelay={0.05}>
+            <StaggerItem className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></StaggerItem>
+            <StaggerItem className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10"><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
+            <StaggerItem className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></StaggerItem>
             {isEditMode && (
               <>
-                <StaggerItem><WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} /></StaggerItem>
-                <StaggerItem><Button variant="outline" size="sm" onClick={resetLayout}><RotateCcw className="w-4 h-4 mr-2" />Resetar</Button></StaggerItem>
+                <StaggerItem className="shrink-0"><WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} /></StaggerItem>
+                <StaggerItem className="shrink-0"><Button variant="outline" size="sm" onClick={resetLayout} className="whitespace-nowrap"><RotateCcw className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Resetar</span></Button></StaggerItem>
               </>
             )}
-            <StaggerItem>
-              <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode}>
-                <Settings2 className="w-4 h-4 mr-2" />{isEditMode ? "Salvar" : "Personalizar"}
+            <StaggerItem className="shrink-0">
+              <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode} className="whitespace-nowrap">
+                <Settings2 className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">{isEditMode ? "Salvar" : "Personalizar"}</span>
               </Button>
             </StaggerItem>
           </StaggerContainer>
         </div>
+        
         <FadeIn delay={0.1}>
           <FavoriteMetricsBar />
         </FadeIn>
+        
         <FadeIn delay={0.2}>
           <DraggableDashboard widgets={widgets} isEditMode={isEditMode} onReorder={handleReorder} onRemove={handleRemove} />
         </FadeIn>

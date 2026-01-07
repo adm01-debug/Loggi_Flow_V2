@@ -114,11 +114,11 @@ export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsPr
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       aria-label="Breadcrumb"
-      className={cn("flex items-center text-sm", className)}
+      className={cn("flex items-center text-sm overflow-x-auto scrollbar-none", className)}
     >
-      <ol className="flex items-center gap-1 flex-wrap">
+      <ol className="flex items-center gap-1 flex-nowrap min-w-0">
         {showHome && (
-          <li className="flex items-center">
+          <li className="flex items-center shrink-0">
             <Link
               to="/"
               className={cn(
@@ -129,7 +129,7 @@ export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsPr
               aria-label="Ir para Dashboard"
             >
               <Home className="w-4 h-4" />
-              <span className="sr-only md:not-sr-only">Início</span>
+              <span className="sr-only sm:not-sr-only">Início</span>
             </Link>
           </li>
         )}
@@ -138,33 +138,35 @@ export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsPr
           const isLast = index === breadcrumbItems.length - 1;
           
           return (
-            <li key={index} className="flex items-center">
-              <ChevronRight className="w-4 h-4 text-muted-foreground/50 mx-1" />
+            <li key={index} className="flex items-center shrink-0 min-w-0">
+              <ChevronRight className="w-4 h-4 text-muted-foreground/50 mx-0.5 sm:mx-1 shrink-0" />
               
               {item.path && !isLast ? (
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200",
+                    "flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-md transition-all duration-200",
                     "text-muted-foreground hover:text-foreground hover:bg-accent",
-                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                    "truncate max-w-[120px] sm:max-w-none"
                   )}
                 >
                   {item.icon}
-                  <span>{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 </Link>
               ) : (
                 <span
                   className={cn(
-                    "flex items-center gap-1.5 px-2 py-1 rounded-md",
+                    "flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-md",
                     isLast 
                       ? "font-medium text-foreground bg-accent/50" 
-                      : "text-muted-foreground"
+                      : "text-muted-foreground",
+                    "truncate max-w-[150px] sm:max-w-none"
                   )}
                   aria-current={isLast ? "page" : undefined}
                 >
                   {item.icon}
-                  <span>{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 </span>
               )}
             </li>
