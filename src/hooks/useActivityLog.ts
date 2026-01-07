@@ -1,7 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-interface ActivityLog { id: string; entity_type: string; entity_id: string; action: string; description: string; old_data?: Record<string, any>; new_data?: Record<string, any>; user_id: string; created_at: string; user?: { full_name: string; email: string }; }
+interface ActivityLog { 
+  id: string; 
+  entity_type: string; 
+  entity_id: string; 
+  action: string; 
+  description: string; 
+  old_data?: Record<string, unknown>; 
+  new_data?: Record<string, unknown>; 
+  user_id: string; 
+  created_at: string; 
+}
 
 export function useActivityLog(entityType: string, entityId?: string) {
   const queryClient = useQueryClient();
@@ -9,18 +19,36 @@ export function useActivityLog(entityType: string, entityId?: string) {
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ['activity-logs', entityType, entityId],
     queryFn: async () => {
-      let q = supabase.from('activity_logs').select('*').eq('entity_type', entityType).order('created_at', { ascending: false }).limit(100);
-      if (entityId) q = q.eq('entity_id', entityId);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data as ActivityLog[];
+      let query = supabase
+        .from('audit_logs')
+        .select('id, table_name, record_id, action, old_data, new_data, user_id, created_at')
+        .eq('table_name', entityType)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      if (entityId) query = query.eq('record_id', entityId);
+      const { data, error } = await query;
+      if (error) { console.warn('Activity logs query failed:', error.message); return []; }
+      
+      return (data || []).map(item => ({
+        id: item.id, entity_type: item.table_name, entity_id: item.record_id, action: item.action,
+        description: `${item.action} em ${item.table_name}`,
+        old_data: item.old_data as Record<string, unknown> | undefined,
+        new_data: item.new_data as Record<string, unknown> | undefined,
+        user_id: item.user_id || '', created_at: item.created_at,
+      })) as ActivityLog[];
     },
   });
 
   const logMutation = useMutation({
-    mutationFn: async (log: { action: string; description: string; entity_id: string; old_data?: any; new_data?: any }) => {
+    mutationFn: async (log: { action: string; description: string; entity_id: string; old_data?: unknown; new_data?: unknown }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase.from('activity_logs').insert({ entity_type: entityType, user_id: user?.id, ...log });
+      const { error } = await supabase.from('audit_logs').insert({
+        table_name: entityType, record_id: log.entity_id, action: log.action,
+        old_data: log.old_data as Record<string, unknown> | null,
+        new_data: log.new_data as Record<string, unknown> | null,
+        user_id: user?.id,
+      });
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['activity-logs', entityType] }),
@@ -33,9 +61,17 @@ export function useRecentActivity(limit = 20) {
   return useQuery({
     queryKey: ['recent-activity', limit],
     queryFn: async () => {
-      const { data, error } = await supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(limit);
-      if (error) throw error;
-      return data as ActivityLog[];
+      const { data, error } = await supabase.from('audit_logs')
+        .select('id, table_name, record_id, action, old_data, new_data, user_id, created_at')
+        .order('created_at', { ascending: false }).limit(limit);
+      if (error) { console.warn('Recent activity query failed:', error.message); return []; }
+      return (data || []).map(item => ({
+        id: item.id, entity_type: item.table_name, entity_id: item.record_id, action: item.action,
+        description: `${item.action} em ${item.table_name}`,
+        old_data: item.old_data as Record<string, unknown> | undefined,
+        new_data: item.new_data as Record<string, unknown> | undefined,
+        user_id: item.user_id || '', created_at: item.created_at,
+      })) as ActivityLog[];
     },
   });
 }

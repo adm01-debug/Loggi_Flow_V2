@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 interface DuplicateOptions {
   excludeFields?: string[];
-  modifyFields?: Record<string, any>;
+  modifyFields?: Record<string, unknown>;
   onSuccess?: (newId: string) => void;
 }
 
@@ -20,9 +20,8 @@ export function useDuplicate<T extends { id: string }>(table: string, queryKey: 
           acc[key] = modifyFields[key] !== undefined ? modifyFields[key] : value;
         }
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, unknown>);
 
-      // Adicionar sufixo "(Cópia)" em campos de nome/título
       const nameFields = ['nome', 'name', 'titulo', 'title', 'descricao'];
       nameFields.forEach(field => {
         if (duplicatedData[field] && typeof duplicatedData[field] === 'string') {
@@ -30,7 +29,7 @@ export function useDuplicate<T extends { id: string }>(table: string, queryKey: 
         }
       });
 
-      const { data, error } = await supabase.from(table).insert(duplicatedData).select().single();
+      const { data, error } = await (supabase.from(table as any) as any).insert(duplicatedData).select().single();
       if (error) throw error;
       return data;
     },

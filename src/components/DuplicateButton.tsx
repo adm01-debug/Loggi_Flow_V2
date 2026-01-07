@@ -14,10 +14,14 @@ interface DuplicateButtonProps<T extends { id: string }> {
 export function DuplicateButton<T extends { id: string }>({
   item, tableName, queryKey, onSuccess, variant = 'ghost', size = 'icon'
 }: DuplicateButtonProps<T>) {
-  const { mutate, isPending } = useDuplicate<T>({ tableName, queryKey });
+  const { mutate, isPending } = useDuplicate<T>(tableName, queryKey);
+
+  const handleDuplicate = () => {
+    mutate({ original: item }, { onSuccess: (data) => onSuccess?.(data as T) });
+  };
 
   return (
-    <Button variant={variant} size={size} onClick={() => mutate(item, { onSuccess })} disabled={isPending} title="Duplicar">
+    <Button variant={variant} size={size} onClick={handleDuplicate} disabled={isPending} title="Duplicar">
       {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
     </Button>
   );

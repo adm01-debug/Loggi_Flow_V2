@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { startOfMonth, endOfMonth, subMonths, format, eachDayOfInterval, parseISO } from 'date-fns';
+import { startOfMonth, endOfMonth, subMonths, format, eachDayOfInterval } from 'date-fns';
 
 interface AnalyticsMetrics {
   totalEntregas: number;
@@ -28,26 +28,27 @@ export function useAnalyticsReal(dateRange?: { start: Date; end: Date }) {
     queryFn: async () => {
       const { data: entregas, error } = await supabase
         .from('entregas')
-        .select('id, created_at, status, custo_frete, tempo_entrega, volume, sla_atingido')
+        .select('id, created_at, status, valor_frete, previsao_entrega, data_entrega_efetiva')
         .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString())
-        .is('deleted_at', null);
+        .lte('created_at', end.toISOString());
 
       if (error) throw error;
 
       const total = entregas?.length || 0;
-      const noPrazo = entregas?.filter(e => e.sla_atingido).length || 0;
-      const custoTotal = entregas?.reduce((acc, e) => acc + (e.custo_frete || 0), 0) || 0;
-      const tempoTotal = entregas?.reduce((acc, e) => acc + (e.tempo_entrega || 0), 0) || 0;
-      const volumeTotal = entregas?.reduce((acc, e) => acc + (e.volume || 0), 0) || 0;
+      // Consider delivered on time if delivered before or on the predicted date
+      const noPrazo = entregas?.filter(e => {
+        if (!e.previsao_entrega || !e.data_entrega_efetiva) return false;
+        return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega);
+      }).length || 0;
+      const custoTotal = entregas?.reduce((acc, e) => acc + (e.valor_frete || 0), 0) || 0;
 
       return {
         totalEntregas: total,
         entregasNoPrazo: noPrazo,
         taxaSLA: total > 0 ? (noPrazo / total) * 100 : 0,
         custoMedio: total > 0 ? custoTotal / total : 0,
-        tempoMedioEntrega: total > 0 ? tempoTotal / total : 0,
-        volumeTotal,
+        tempoMedioEntrega: 0,
+        volumeTotal: total,
       } as AnalyticsMetrics;
     },
   });
@@ -58,10 +59,9 @@ export function useAnalyticsReal(dateRange?: { start: Date; end: Date }) {
     queryFn: async () => {
       const { data: entregas, error } = await supabase
         .from('entregas')
-        .select('created_at, custo_frete, sla_atingido')
+        .select('created_at, valor_frete, previsao_entrega, data_entrega_efetiva')
         .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString())
-        .is('deleted_at', null);
+        .lte('created_at', end.toISOString());
 
       if (error) throw error;
 
@@ -73,8 +73,11 @@ export function useAnalyticsReal(dateRange?: { start: Date; end: Date }) {
         return {
           date: dayStr,
           entregas: dayEntregas.length,
-          custoTotal: dayEntregas.reduce((acc, e) => acc + (e.custo_frete || 0), 0),
-          slaAtingido: dayEntregas.filter(e => e.sla_atingido).length,
+          custoTotal: dayEntregas.reduce((acc, e) => acc + (e.valor_frete || 0), 0),
+          slaAtingido: dayEntregas.filter(e => {
+            if (!e.previsao_entrega || !e.data_entrega_efetiva) return false;
+            return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega);
+          }).length,
         };
       });
 
@@ -91,16 +94,18 @@ export function useAnalyticsReal(dateRange?: { start: Date; end: Date }) {
 
       const { data: prevEntregas, error } = await supabase
         .from('entregas')
-        .select('id, sla_atingido, custo_frete')
+        .select('id, previsao_entrega, data_entrega_efetiva, valor_frete')
         .gte('created_at', prevStart.toISOString())
-        .lte('created_at', prevEnd.toISOString())
-        .is('deleted_at', null);
+        .lte('created_at', prevEnd.toISOString());
 
       if (error) throw error;
 
       const prevTotal = prevEntregas?.length || 0;
-      const prevNoPrazo = prevEntregas?.filter(e => e.sla_atingido).length || 0;
-      const prevCusto = prevEntregas?.reduce((acc, e) => acc + (e.custo_frete || 0), 0) || 0;
+      const prevNoPrazo = prevEntregas?.filter(e => {
+        if (!e.previsao_entrega || !e.data_entrega_efetiva) return false;
+        return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega);
+      }).length || 0;
+      const prevCusto = prevEntregas?.reduce((acc, e) => acc + (e.valor_frete || 0), 0) || 0;
 
       return {
         prevTotalEntregas: prevTotal,

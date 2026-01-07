@@ -9,9 +9,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableName = keyof Database['public']['Tables'];
 
 interface TrashBinProps {
-  table: string;
+  table: TableName;
   queryKey: string[];
   displayField: string;
   deletedAtColumn?: string;
@@ -24,16 +27,23 @@ export function TrashBin({ table, queryKey, displayField, deletedAtColumn = 'del
   const { data: trashedItems = [], isLoading } = useQuery({
     queryKey: [...queryKey, 'trash'],
     queryFn: async () => {
-      const { data, error } = await supabase.from(table).select('*').not(deletedAtColumn, 'is', null).order(deletedAtColumn, { ascending: false });
+      const { data, error } = await supabase
+        .from(table)
+        .select('*')
+        .not(deletedAtColumn, 'is', null)
+        .order(deletedAtColumn, { ascending: false });
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: open,
   });
 
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table).update({ [deletedAtColumn]: null }).eq('id', id);
+      const { error } = await supabase
+        .from(table)
+        .update({ [deletedAtColumn]: null } as never)
+        .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -45,7 +55,10 @@ export function TrashBin({ table, queryKey, displayField, deletedAtColumn = 'del
 
   const permanentDeleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table).delete().eq('id', id);
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -56,7 +69,10 @@ export function TrashBin({ table, queryKey, displayField, deletedAtColumn = 'del
 
   const emptyTrashMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from(table).delete().not(deletedAtColumn, 'is', null);
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .not(deletedAtColumn, 'is', null);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -83,14 +99,14 @@ export function TrashBin({ table, queryKey, displayField, deletedAtColumn = 'del
         ) : (
           <>
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
-              {trashedItems.map((item: any) => (
-                <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div><p className="font-medium">{item[displayField]}</p><p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />Excluído em {format(new Date(item[deletedAtColumn]), "dd/MM/yyyy HH:mm", { locale: ptBR })}</p></div>
+              {trashedItems.map((item: Record<string, unknown>) => (
+                <div key={String(item.id)} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div><p className="font-medium">{String(item[displayField] || '')}</p><p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />Excluído em {item[deletedAtColumn] ? format(new Date(String(item[deletedAtColumn])), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '-'}</p></div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => restoreMutation.mutate(item.id)} disabled={restoreMutation.isPending}><RotateCcw className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="sm" onClick={() => restoreMutation.mutate(String(item.id))} disabled={restoreMutation.isPending}><RotateCcw className="h-4 w-4" /></Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild><Button variant="destructive" size="sm"><Trash2 className="h-4 w-4" /></Button></AlertDialogTrigger>
-                      <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir permanentemente?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => permanentDeleteMutation.mutate(item.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
+                      <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir permanentemente?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => permanentDeleteMutation.mutate(String(item.id))}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                     </AlertDialog>
                   </div>
                 </div>
