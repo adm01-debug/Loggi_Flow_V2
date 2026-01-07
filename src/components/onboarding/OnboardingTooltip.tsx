@@ -140,3 +140,72 @@ export function OnboardingTooltip({
     </div>
   );
 }
+
+// Feature Spotlight - Destaca uma feature específica
+interface FeatureSpotlightProps {
+  id: string;
+  title: string;
+  description: string;
+  targetSelector?: string;
+  children: React.ReactNode;
+}
+
+export function FeatureSpotlight({
+  id,
+  title,
+  description,
+  children
+}: FeatureSpotlightProps) {
+  return (
+    <OnboardingTooltip
+      id={`spotlight-${id}`}
+      title={title}
+      description={description}
+      position="bottom"
+      delay={500}
+    >
+      {children}
+    </OnboardingTooltip>
+  );
+}
+
+// Pulsing Beacon - Indicador visual pulsante
+interface PulsingBeaconProps {
+  isVisible?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  color?: 'primary' | 'success' | 'warning';
+}
+
+export function PulsingBeacon({ 
+  isVisible = true, 
+  size = 'md',
+  color = 'primary' 
+}: PulsingBeaconProps) {
+  if (!isVisible) return null;
+
+  const sizeClasses = {
+    sm: 'w-2 h-2',
+    md: 'w-3 h-3',
+    lg: 'w-4 h-4'
+  };
+
+  const colorClasses = {
+    primary: 'bg-primary',
+    success: 'bg-green-500',
+    warning: 'bg-amber-500'
+  };
+
+  return (
+    <span className="relative inline-flex">
+      <span className={cn(
+        "absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping",
+        colorClasses[color]
+      )} />
+      <span className={cn(
+        "relative inline-flex rounded-full",
+        sizeClasses[size],
+        colorClasses[color]
+      )} />
+    </span>
+  );
+}
