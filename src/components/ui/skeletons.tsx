@@ -4,13 +4,22 @@ import { motion } from "framer-motion";
 interface SkeletonProps {
   className?: string;
   shimmer?: boolean;
+  variant?: 'default' | 'circular' | 'rectangular' | 'text';
 }
 
-export function Skeleton({ className, shimmer = true }: SkeletonProps) {
+export function Skeleton({ className, shimmer = true, variant = 'default' }: SkeletonProps) {
+  const variantClasses = {
+    default: 'rounded-md',
+    circular: 'rounded-full',
+    rectangular: 'rounded-none',
+    text: 'rounded h-4'
+  };
+
   return (
     <div
       className={cn(
-        "relative rounded-md bg-muted overflow-hidden",
+        "relative bg-muted/60 overflow-hidden",
+        variantClasses[variant],
         !shimmer && "animate-pulse",
         className
       )}
@@ -52,46 +61,59 @@ export function SkeletonPremium({ className }: { className?: string }) {
   );
 }
 
-export function CardSkeleton() {
+export function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className="card-base space-y-4">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-4 w-24" />
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn("rounded-xl border border-border/50 bg-card/50 p-6 space-y-4", className)}
+    >
+      <div className="flex items-center gap-4">
+        <Skeleton variant="circular" className="w-12 h-12" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
         </div>
-        <Skeleton className="h-8 w-8 rounded-full" />
       </div>
       <div className="space-y-2">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-5/6" />
+        <Skeleton className="h-3 w-4/6" />
       </div>
-      <div className="flex items-center gap-2 pt-2">
-        <Skeleton className="h-6 w-16 rounded-full" />
-        <Skeleton className="h-4 w-20" />
+      <div className="flex gap-2 pt-2">
+        <Skeleton className="h-8 w-20 rounded-full" />
+        <Skeleton className="h-8 w-20 rounded-full" />
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
   return (
-    <tr className="border-b">
+    <motion.tr 
+      className="border-b border-border/30"
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+    >
       {Array.from({ length: columns }).map((_, i) => (
         <td key={i} className="p-4">
           <Skeleton className="h-4 w-full" />
         </td>
       ))}
-    </tr>
+    </motion.tr>
   );
 }
 
-export function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; columns?: number }) {
+export function TableSkeleton({ rows = 5, columns = 5, className }: { rows?: number; columns?: number; className?: string }) {
   return (
-    <div className="rounded-md border">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn("rounded-lg border border-border/50 overflow-hidden", className)}
+    >
       <table className="w-full">
         <thead>
-          <tr className="border-b bg-muted/50">
+          <tr className="border-b bg-muted/30">
             {Array.from({ length: columns }).map((_, i) => (
               <th key={i} className="p-4 text-left">
                 <Skeleton className="h-4 w-20" />
@@ -101,130 +123,315 @@ export function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; column
         </thead>
         <tbody>
           {Array.from({ length: rows }).map((_, i) => (
-            <TableRowSkeleton key={i} columns={columns} />
+            <motion.tr
+              key={i}
+              className="border-b border-border/30"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              {Array.from({ length: columns }).map((_, j) => (
+                <td key={j} className="p-4">
+                  <Skeleton className={cn("h-4", j === 0 ? "w-32" : "w-full")} />
+                </td>
+              ))}
+            </motion.tr>
           ))}
         </tbody>
       </table>
-    </div>
+    </motion.div>
   );
 }
 
-export function StatCardSkeleton() {
+export function StatCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className="stat-card flex items-center gap-4">
-      <Skeleton className="h-12 w-12 rounded-xl" />
-      <div className="space-y-2">
-        <Skeleton className="h-6 w-16" />
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={cn("rounded-xl border border-border/50 bg-card/50 p-6 space-y-3", className)}
+    >
+      <div className="flex items-center justify-between">
         <Skeleton className="h-4 w-24" />
+        <Skeleton variant="circular" className="w-10 h-10" />
       </div>
-    </div>
+      <Skeleton className="h-8 w-32" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-3 w-12" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+    </motion.div>
   );
 }
 
-export function StatsGridSkeleton({ count = 4 }: { count?: number }) {
+export function StatsGridSkeleton({ count = 4, className }: { count?: number; className?: string }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className={cn("grid grid-cols-2 md:grid-cols-4 gap-4", className)}>
       {Array.from({ length: count }).map((_, i) => (
-        <StatCardSkeleton key={i} />
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.1 }}
+        >
+          <StatCardSkeleton />
+        </motion.div>
       ))}
     </div>
   );
 }
 
-export function CardGridSkeleton({ count = 6 }: { count?: number }) {
+export function CardGridSkeleton({ count = 6, className }: { count?: number; className?: string }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", className)}>
       {Array.from({ length: count }).map((_, i) => (
-        <CardSkeleton key={i} />
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05 }}
+        >
+          <CardSkeleton />
+        </motion.div>
       ))}
     </div>
   );
 }
 
-export function ChartSkeleton() {
+export function ChartSkeleton({ type = 'bar', className }: { type?: 'bar' | 'line' | 'pie'; className?: string }) {
   return (
-    <div className="card-base">
-      <div className="flex items-center justify-between mb-4">
-        <div className="space-y-2">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn("rounded-xl border border-border/50 bg-card/50 p-6", className)}
+    >
+      <div className="flex items-center justify-between mb-6">
+        <div className="space-y-1">
           <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-48" />
         </div>
-        <Skeleton className="h-8 w-24" />
+        <Skeleton className="h-8 w-24 rounded-full" />
       </div>
-      <div className="h-64 flex items-end justify-between gap-2 p-4">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <div 
-            key={i} 
-            className="flex-1 animate-pulse rounded-md bg-muted" 
-            style={{ height: `${40 + i * 8}%` }}
-          />
+
+      {type === 'bar' && (
+        <div className="h-48 flex items-end gap-3 pt-4">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ height: 0 }}
+              animate={{ height: `${30 + Math.random() * 70}%` }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+              className="flex-1"
+            >
+              <Skeleton className="w-full h-full rounded-t-md" />
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {type === 'line' && (
+        <div className="h-48 relative">
+          <svg className="w-full h-full" viewBox="0 0 400 200">
+            <motion.path
+              d="M 0 150 Q 50 100, 100 120 T 200 80 T 300 100 T 400 60"
+              fill="none"
+              stroke="hsl(var(--muted))"
+              strokeWidth="3"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            />
+          </svg>
+        </div>
+      )}
+
+      {type === 'pie' && (
+        <div className="h-48 flex items-center justify-center">
+          <Skeleton variant="circular" className="w-40 h-40" />
+        </div>
+      )}
+
+      <div className="flex gap-4 mt-4 pt-4 border-t border-border/30">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <Skeleton variant="circular" className="w-3 h-3" />
+            <Skeleton className="h-3 w-16" />
+          </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-export function FormSkeleton({ fields = 4 }: { fields?: number }) {
+export function FormSkeleton({ fields = 4, className }: { fields?: number; className?: string }) {
   return (
-    <div className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn("space-y-6", className)}
+    >
       {Array.from({ length: fields }).map((_, i) => (
-        <div key={i} className="space-y-2">
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.1 }}
+          className="space-y-2"
+        >
           <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-10 w-full" />
-        </div>
+          <Skeleton className="h-11 w-full rounded-lg" />
+        </motion.div>
       ))}
-      <div className="flex justify-end gap-2 pt-4">
-        <Skeleton className="h-10 w-24" />
-        <Skeleton className="h-10 w-24" />
-      </div>
-    </div>
+      <motion.div 
+        className="flex justify-end gap-2 pt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: fields * 0.1 + 0.2 }}
+      >
+        <Skeleton className="h-10 w-24 rounded-lg" />
+        <Skeleton className="h-10 w-32 rounded-lg" />
+      </motion.div>
+    </motion.div>
   );
 }
 
-export function ProfileSkeleton() {
+export function ProfileSkeleton({ className }: { className?: string }) {
   return (
-    <div className="flex items-center gap-4">
-      <Skeleton className="h-16 w-16 rounded-full" />
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn("space-y-6", className)}
+    >
+      <div className="flex items-center gap-4">
+        <Skeleton variant="circular" className="w-20 h-20" />
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-4 w-32" />
+          <div className="flex gap-2 pt-1">
+            <Skeleton className="h-6 w-16 rounded-full" />
+            <Skeleton className="h-6 w-16 rounded-full" />
+          </div>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="text-center space-y-1">
+            <Skeleton className="h-6 w-12 mx-auto" />
+            <Skeleton className="h-3 w-16 mx-auto" />
+          </div>
+        ))}
+      </div>
+
       <div className="space-y-2">
-        <Skeleton className="h-5 w-32" />
-        <Skeleton className="h-4 w-48" />
-        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-4 w-4/6" />
       </div>
+    </motion.div>
+  );
+}
+
+export function ListItemSkeleton({ className }: { className?: string }) {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className={cn("flex items-center gap-4 p-4", className)}
+    >
+      <Skeleton variant="circular" className="w-10 h-10 shrink-0" />
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
+      <Skeleton className="h-8 w-8 rounded-lg" />
+    </motion.div>
+  );
+}
+
+export function NotificationSkeleton({ className }: { className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className={cn(
+        "flex items-start gap-3 p-4 rounded-lg border border-border/50 bg-card/50",
+        className
+      )}
+    >
+      <Skeleton variant="circular" className="w-10 h-10 shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-16" />
+        </div>
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-4/5" />
+      </div>
+    </motion.div>
+  );
+}
+
+export function SearchResultsSkeleton({ count = 5, className }: { count?: number; className?: string }) {
+  return (
+    <div className={cn("space-y-3", className)}>
+      {Array.from({ length: count }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05 }}
+          className="flex items-center gap-3 p-3 rounded-lg border border-border/30"
+        >
+          <Skeleton className="w-12 h-12 rounded-lg shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full" />
+        </motion.div>
+      ))}
     </div>
   );
 }
 
-export function DashboardSkeleton() {
+export function DashboardSkeleton({ className }: { className?: string }) {
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn("space-y-6", className)}
+    >
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <Skeleton className="h-10 w-32" />
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-32 rounded-lg" />
+          <Skeleton className="h-10 w-10 rounded-lg" />
+        </div>
       </div>
-      
-      {/* Stats */}
+
       <StatsGridSkeleton count={4} />
-      
-      {/* Charts */}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartSkeleton />
-        <ChartSkeleton />
+        <ChartSkeleton type="bar" />
+        <ChartSkeleton type="line" />
       </div>
-      
-      {/* Cards */}
-      <CardGridSkeleton count={3} />
-    </div>
+
+      <TableSkeleton rows={5} columns={5} />
+    </motion.div>
   );
 }
 
-export function PageSkeleton() {
+export function PageSkeleton({ className }: { className?: string }) {
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn("space-y-6", className)}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Skeleton className="h-12 w-12 rounded-xl" />
@@ -234,22 +441,36 @@ export function PageSkeleton() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Skeleton className="h-10 w-24" />
-          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-24 rounded-lg" />
+          <Skeleton className="h-10 w-32 rounded-lg" />
         </div>
       </div>
       
-      {/* Stats */}
       <StatsGridSkeleton count={4} />
       
-      {/* Filters */}
       <div className="flex gap-4">
-        <Skeleton className="h-10 flex-1 max-w-md" />
-        <Skeleton className="h-10 w-32" />
+        <Skeleton className="h-10 flex-1 max-w-md rounded-lg" />
+        <Skeleton className="h-10 w-32 rounded-lg" />
       </div>
       
-      {/* Content */}
       <CardGridSkeleton count={6} />
+    </motion.div>
+  );
+}
+
+// Full Page Loading Skeleton
+export function FullPageSkeleton() {
+  return (
+    <div className="min-h-screen bg-background p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-8 w-32" />
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-64 rounded-lg" />
+          <Skeleton variant="circular" className="w-10 h-10" />
+        </div>
+      </div>
+      
+      <DashboardSkeleton />
     </div>
   );
 }
