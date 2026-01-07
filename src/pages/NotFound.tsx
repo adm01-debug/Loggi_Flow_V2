@@ -13,7 +13,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-background relative overflow-hidden p-4">
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating circles */}
@@ -22,8 +22,8 @@ const NotFound = () => {
             key={i}
             className="absolute rounded-full bg-primary/5"
             style={{
-              width: 100 + i * 50,
-              height: 100 + i * 50,
+              width: Math.min(100 + i * 50, 300),
+              height: Math.min(100 + i * 50, 300),
               left: `${10 + i * 15}%`,
               top: `${20 + (i % 3) * 20}%`,
             }}
@@ -53,20 +53,20 @@ const NotFound = () => {
 
       {/* Content */}
       <motion.div 
-        className="relative z-10 text-center px-6 max-w-lg"
+        className="relative z-10 text-center px-4 sm:px-6 max-w-lg w-full"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
       >
         {/* 404 Number with animation */}
         <motion.div
-          className="relative mb-8"
+          className="relative mb-6 sm:mb-8"
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <motion.span
-            className="text-[180px] md:text-[240px] font-bold leading-none bg-gradient-to-br from-primary via-primary/70 to-primary/40 bg-clip-text text-transparent select-none"
+            className="text-[120px] sm:text-[180px] md:text-[240px] font-bold leading-none bg-gradient-to-br from-primary via-primary/70 to-primary/40 bg-clip-text text-transparent select-none"
             animate={{ 
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}
@@ -88,7 +88,7 @@ const NotFound = () => {
             }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
-            <MapPin className="w-16 h-16 text-primary/30" />
+            <MapPin className="w-10 h-10 sm:w-16 sm:h-16 text-primary/30" />
           </motion.div>
         </motion.div>
 
@@ -98,17 +98,17 @@ const NotFound = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">
             Página não encontrada
           </h1>
-          <p className="text-muted-foreground mb-8 text-lg">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 sm:mb-8">
             Parece que você se perdeu no caminho. A página que você está procurando não existe ou foi movida.
           </p>
         </motion.div>
 
         {/* Action buttons */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 justify-center"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.5 }}
@@ -116,7 +116,7 @@ const NotFound = () => {
           <Button
             size="lg"
             onClick={() => navigate("/")}
-            className="gap-2 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-shadow"
+            className="gap-2 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-shadow min-h-[48px] w-full sm:w-auto"
           >
             <Home className="w-5 h-5" />
             Ir para o Início
@@ -125,7 +125,7 @@ const NotFound = () => {
             size="lg"
             variant="outline"
             onClick={() => navigate(-1)}
-            className="gap-2"
+            className="gap-2 min-h-[48px] w-full sm:w-auto"
           >
             <ArrowLeft className="w-5 h-5" />
             Voltar
@@ -134,13 +134,13 @@ const NotFound = () => {
 
         {/* Path info */}
         <motion.div
-          className="mt-8 p-4 bg-muted/50 rounded-xl border border-border"
+          className="mt-6 sm:mt-8 p-3 sm:p-4 bg-muted/50 rounded-xl border border-border"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          <p className="text-xs text-muted-foreground font-mono">
-            Caminho solicitado: <span className="text-foreground">{location.pathname}</span>
+          <p className="text-xs text-muted-foreground font-mono break-all">
+            Caminho: <span className="text-foreground">{location.pathname}</span>
           </p>
         </motion.div>
       </motion.div>
