@@ -1,12 +1,12 @@
 import { useActivityLog, useRecentActivity } from '@/hooks/useActivityLog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Plus, Pencil, Trash2, RotateCcw } from 'lucide-react';
+import { Clock, Plus, Pencil, Trash2, RotateCcw, LucideIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
-const actionIcons: Record<string, any> = { create: Plus, update: Pencil, delete: Trash2, restore: RotateCcw };
+const actionIcons: Record<string, LucideIcon> = { create: Plus, update: Pencil, delete: Trash2, restore: RotateCcw };
 const actionColors: Record<string, string> = { create: 'bg-green-100 text-green-700', update: 'bg-blue-100 text-blue-700', delete: 'bg-red-100 text-red-700', restore: 'bg-amber-100 text-amber-700' };
 
 interface ActivityTimelineProps { entityType?: string; entityId?: string; limit?: number; showGlobal?: boolean; }
