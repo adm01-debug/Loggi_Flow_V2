@@ -129,6 +129,25 @@
     --spacing-card-lg: 2rem;
     --spacing-section: 2rem;
     --spacing-section-lg: 3rem;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+
+    /* ===== Z-INDEX SCALE ===== */
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-popover: 600;
+    --z-tooltip: 700;
+    --z-toast: 800;
+    --z-max: 9999;
   }
 
   /* Light mode - optional, keeping dark as default */
@@ -252,6 +271,22 @@
     @apply border-border;
   }
 
+  /* Focus Indicators - Acessibilidade WCAG 2.1 AA */
+  :focus {
+    @apply outline-none;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+
+  /* Skip to main content - Acessibilidade */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999];
+    @apply bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium;
+    @apply focus:ring-2 focus:ring-offset-2 focus:ring-primary;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
@@ -260,6 +295,18 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+
+  /* Smooth scrolling com respeito a preferência do usuário */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Selection colors */
+  ::selection {
+    @apply bg-primary/30 text-foreground;
   }
 }
 
