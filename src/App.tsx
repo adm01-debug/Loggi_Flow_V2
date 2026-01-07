@@ -12,6 +12,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SessionTimeoutWarning } from "@/components/security/SessionTimeoutWarning";
 import { NewDeviceDetector } from "@/components/security/NewDeviceDetector";
 import { SecurityPushNotificationProvider } from "@/components/security/SecurityPushNotificationProvider";
+import { LiveRegionProvider } from "@/components/accessibility/LiveRegion";
+import { ReducedMotionProvider } from "@/components/accessibility/ReducedMotion";
 import { Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -144,25 +146,29 @@ function AnimatedRoutes() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TimezoneProvider>
-        <AchievementProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <AchievementNotificationContainer />
-            <SessionTimeoutWarning />
-            <NewDeviceDetector />
-            <SecurityPushNotificationProvider />
-            <BrowserRouter>
-              <Suspense fallback={<PageLoader />}>
-                <AnimatedRoutes />
-              </Suspense>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AchievementProvider>
-      </TimezoneProvider>
-    </AuthProvider>
+    <ReducedMotionProvider>
+      <LiveRegionProvider>
+        <AuthProvider>
+          <TimezoneProvider>
+            <AchievementProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <AchievementNotificationContainer />
+                <SessionTimeoutWarning />
+                <NewDeviceDetector />
+                <SecurityPushNotificationProvider />
+                <BrowserRouter>
+                  <Suspense fallback={<PageLoader />}>
+                    <AnimatedRoutes />
+                  </Suspense>
+                </BrowserRouter>
+              </TooltipProvider>
+            </AchievementProvider>
+          </TimezoneProvider>
+        </AuthProvider>
+      </LiveRegionProvider>
+    </ReducedMotionProvider>
   </QueryClientProvider>
 );
 

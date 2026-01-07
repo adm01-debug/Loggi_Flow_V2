@@ -8,6 +8,10 @@ import { SearchCommand } from "@/components/common/SearchCommand";
 import { OnboardingWizard, OnboardingProgress } from "@/components/onboarding";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { PageSkeleton } from "@/components/ui/skeletons";
+import { SkipLinks } from "@/components/accessibility/SkipLinks";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { UpdatePrompt } from "@/components/pwa/UpdatePrompt";
+import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -16,16 +20,14 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen w-full bg-background">
-      {/* Skip Link - Acessibilidade */}
-      <a 
-        href="#main-content" 
-        className="skip-link sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-primary focus:rounded-md focus:top-4 focus:left-4"
-      >
-        Pular para conteúdo principal
-      </a>
+      {/* Skip Links - Acessibilidade aprimorada */}
+      <SkipLinks />
+      
+      {/* Offline Banner - PWA */}
+      <OfflineBanner />
       
       {/* Sidebar - hidden on mobile */}
-      <aside className="hidden md:block" aria-label="Navegação principal">
+      <aside className="hidden md:block" aria-label="Navegação principal" id="main-navigation">
         <AppSidebar />
       </aside>
       
@@ -55,6 +57,10 @@ export function MainLayout({ children }: MainLayoutProps) {
       
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
+      
+      {/* PWA Prompts */}
+      <InstallPrompt />
+      <UpdatePrompt />
       
       {/* Browser notification permission prompt */}
       <BrowserNotificationPrompt />
