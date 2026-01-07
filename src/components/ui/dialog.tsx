@@ -37,8 +37,9 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 // Content variants for different dialog styles
 const dialogContentVariants = cva(
   cn(
-    "fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%]",
-    "gap-4 border bg-background p-6 shadow-2xl",
+    "fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] sm:w-full translate-x-[-50%] translate-y-[-50%]",
+    "gap-4 border bg-background p-4 sm:p-6 shadow-2xl",
+    "max-h-[calc(100vh-2rem)] sm:max-h-[90vh] overflow-y-auto",
     "data-[state=open]:animate-in data-[state=closed]:animate-out",
     "duration-300"
   ),
@@ -125,15 +126,16 @@ const DialogContent = React.forwardRef<
       {children}
       {!hideCloseButton && (
         <DialogPrimitive.Close className={cn(
-          "absolute right-4 top-4 rounded-full p-1",
+          "absolute right-3 top-3 sm:right-4 sm:top-4 rounded-full p-2",
+          "min-h-[44px] min-w-[44px] flex items-center justify-center",
           "opacity-70 ring-offset-background transition-all",
           "hover:opacity-100 hover:bg-muted hover:scale-110",
           "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
           "disabled:pointer-events-none",
           "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
         )}>
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
+          <X className="h-5 w-5" />
+          <span className="sr-only">Fechar</span>
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>

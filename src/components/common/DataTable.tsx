@@ -160,7 +160,7 @@ export function DataTable<T extends Record<string, unknown>>({
   return (
     <div className="space-y-4">
       {searchable && (
-        <div className="relative w-64">
+        <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={searchPlaceholder}
@@ -169,83 +169,126 @@ export function DataTable<T extends Record<string, unknown>>({
             className="pl-9 pr-8"
           />
           {search && (
-            <button onClick={() => handleSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            <button onClick={() => handleSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-1">
               <X className="w-4 h-4" />
             </button>
           )}
         </div>
       )}
 
+      {/* Mobile-friendly scrollable table container */}
       <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader className={cn(stickyHeader && "sticky top-0 bg-background z-10")}>
-            <TableRow>
-              {columns.map((col, i) => (
-                <TableHead
-                  key={i}
-                  style={{ width: col.width }}
-                  className={cn(col.sortable && "cursor-pointer select-none hover:bg-muted/50", col.align === "center" && "text-center", col.align === "right" && "text-right")}
-                  onClick={() => col.sortable && handleSort(col.key as string)}
-                >
-                  <div className={cn("flex items-center", col.align === "center" && "justify-center", col.align === "right" && "justify-end")}>
-                    {col.header}
-                    <SortIcon column={col} />
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedData.length === 0 ? (
+        <div className="overflow-x-auto scrollbar-thin">
+          <Table>
+            <TableHeader className={cn(stickyHeader && "sticky top-0 bg-background z-10")}>
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
-                  {emptyMessage}
-                </TableCell>
+                {columns.map((col, i) => (
+                  <TableHead
+                    key={i}
+                    style={{ width: col.width }}
+                    className={cn(
+                      "whitespace-nowrap",
+                      col.sortable && "cursor-pointer select-none hover:bg-muted/50 active:bg-muted",
+                      col.align === "center" && "text-center",
+                      col.align === "right" && "text-right"
+                    )}
+                    onClick={() => col.sortable && handleSort(col.key as string)}
+                  >
+                    <div className={cn("flex items-center", col.align === "center" && "justify-center", col.align === "right" && "justify-end")}>
+                      {col.header}
+                      <SortIcon column={col} />
+                    </div>
+                  </TableHead>
+                ))}
               </TableRow>
-            ) : (
-              paginatedData.map((row, rowIndex) => (
-                <TableRow
-                  key={rowIndex}
-                  onClick={() => onRowClick?.(row, rowIndex)}
-                  className={cn(onRowClick && "cursor-pointer hover:bg-muted/50", rowClassName?.(row, rowIndex))}
-                >
-                  {columns.map((col, colIndex) => {
-                    const value = getValue(row, col.key as string);
-                    return (
-                      <TableCell key={colIndex} className={cn(col.align === "center" && "text-center", col.align === "right" && "text-right")}>
-                        {col.render ? col.render(value, row, rowIndex) : value !== null && value !== undefined ? String(value) : "-"}
-                      </TableCell>
-                    );
-                  })}
+            </TableHeader>
+            <TableBody>
+              {paginatedData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
+                    {emptyMessage}
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                paginatedData.map((row, rowIndex) => (
+                  <TableRow
+                    key={rowIndex}
+                    onClick={() => onRowClick?.(row, rowIndex)}
+                    className={cn(
+                      onRowClick && "cursor-pointer hover:bg-muted/50 active:bg-muted",
+                      rowClassName?.(row, rowIndex)
+                    )}
+                  >
+                    {columns.map((col, colIndex) => {
+                      const value = getValue(row, col.key as string);
+                      return (
+                        <TableCell 
+                          key={colIndex} 
+                          className={cn(
+                            "whitespace-nowrap",
+                            col.align === "center" && "text-center", 
+                            col.align === "right" && "text-right"
+                          )}
+                        >
+                          {col.render ? col.render(value, row, rowIndex) : value !== null && value !== undefined ? String(value) : "-"}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
+      {/* Responsive pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Mostrando</span>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground order-2 sm:order-1">
+            <span className="hidden sm:inline">Mostrando</span>
             <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
-              <SelectTrigger className="w-16 h-8"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-16 h-9 min-h-[44px]"><SelectValue /></SelectTrigger>
               <SelectContent>{pageSizeOptions.map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}</SelectContent>
             </Select>
             <span>de {sortedData.length}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(1)} disabled={page === 1}>
+          <div className="flex items-center gap-1 order-1 sm:order-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-9 w-9 min-h-[44px] min-w-[44px]" 
+              onClick={() => setPage(1)} 
+              disabled={page === 1}
+            >
               <ChevronLeft className="w-4 h-4" /><ChevronLeft className="w-4 h-4 -ml-2" />
             </Button>
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(page - 1)} disabled={page === 1}>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-9 w-9 min-h-[44px] min-w-[44px]" 
+              onClick={() => setPage(page - 1)} 
+              disabled={page === 1}
+            >
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <span className="px-3 text-sm">{page} / {totalPages}</span>
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(page + 1)} disabled={page === totalPages}>
+            <span className="px-3 text-sm font-medium min-w-[60px] text-center">{page} / {totalPages}</span>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-9 w-9 min-h-[44px] min-w-[44px]" 
+              onClick={() => setPage(page + 1)} 
+              disabled={page === totalPages}
+            >
               <ChevronRight className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-9 w-9 min-h-[44px] min-w-[44px]" 
+              onClick={() => setPage(totalPages)} 
+              disabled={page === totalPages}
+            >
               <ChevronRight className="w-4 h-4" /><ChevronRight className="w-4 h-4 -ml-2" />
             </Button>
           </div>
