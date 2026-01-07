@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-// Confetti effect inline
+import { ConfettiExplosion } from '@/components/ui/confetti';
 
 interface Achievement {
   id: string;
@@ -177,7 +177,7 @@ export function AchievementUnlockModalPremium({
     <AnimatePresence>
       {isOpen && (
         <>
-          <Confetti active={showConfetti} />
+          <ConfettiExplosion isActive={showConfetti} particleCount={100} />
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
