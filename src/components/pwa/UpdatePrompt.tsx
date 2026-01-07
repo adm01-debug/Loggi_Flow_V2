@@ -11,6 +11,8 @@ export function UpdatePrompt() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
+    let updateInterval: ReturnType<typeof setInterval> | null = null;
+
     const handleControllerChange = () => {
       window.location.reload();
     };
@@ -31,13 +33,14 @@ export function UpdatePrompt() {
       });
 
       // Check for updates periodically
-      setInterval(() => {
+      updateInterval = setInterval(() => {
         registration.update();
       }, 60 * 60 * 1000); // Every hour
     });
 
     return () => {
       navigator.serviceWorker.removeEventListener("controllerchange", handleControllerChange);
+      if (updateInterval) clearInterval(updateInterval);
     };
   }, []);
 

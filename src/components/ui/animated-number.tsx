@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -11,41 +11,41 @@ interface AnimatedNumberProps {
   suffix?: string;
 }
 
-export function AnimatedNumber({
-  value,
-  duration = 1,
-  formatValue,
-  className,
-  prefix = '',
-  suffix = ''
-}: AnimatedNumberProps) {
-  const spring = useSpring(0, {
-    mass: 1,
-    stiffness: 75,
-    damping: 15,
-    duration: duration * 1000
-  });
+export const AnimatedNumber = forwardRef<HTMLSpanElement, AnimatedNumberProps>(
+  function AnimatedNumber(
+    { value, duration = 1, formatValue, className, prefix = '', suffix = '' },
+    ref
+  ) {
+    const spring = useSpring(0, {
+      mass: 1,
+      stiffness: 75,
+      damping: 15,
+      duration: duration * 1000
+    });
 
-  const display = useTransform(spring, (current) => {
-    const rounded = Math.round(current);
-    if (formatValue) {
-      return formatValue(rounded);
-    }
-    return rounded.toLocaleString('pt-BR');
-  });
+    const display = useTransform(spring, (current) => {
+      const rounded = Math.round(current);
+      if (formatValue) {
+        return formatValue(rounded);
+      }
+      return rounded.toLocaleString('pt-BR');
+    });
 
-  useEffect(() => {
-    spring.set(value);
-  }, [spring, value]);
+    useEffect(() => {
+      spring.set(value);
+    }, [spring, value]);
 
-  return (
-    <span className={cn("tabular-nums", className)}>
-      {prefix}
-      <motion.span>{display}</motion.span>
-      {suffix}
-    </span>
-  );
-}
+    return (
+      <span ref={ref} className={cn("tabular-nums", className)}>
+        {prefix}
+        <motion.span>{display}</motion.span>
+        {suffix}
+      </span>
+    );
+  }
+);
+
+AnimatedNumber.displayName = 'AnimatedNumber';
 
 // Counter com efeito de flip
 interface FlipCounterProps {
