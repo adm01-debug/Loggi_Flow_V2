@@ -3,6 +3,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+export interface BulkAction<T> {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+  variant?: 'default' | 'destructive';
+  confirm?: { title: string; description: string };
+  handler?: (items: T[]) => Promise<void>;
+}
+
 interface BulkActionOptions { table: string; queryKey: string[]; onSuccess?: () => void; }
 
 export function useBulkActions<T extends { id: string }>(options: BulkActionOptions) {
@@ -22,7 +31,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       setIsProcessing(true);
-      const { error } = await supabase.from(table).delete().in('id', ids);
+      const { error } = await (supabase.from(table as any) as any).delete().in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey }); clearSelection(); toast.success(`${selectedIds.length} itens excluídos`); onSuccess?.(); },
@@ -33,7 +42,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkUpdateMutation = useMutation({
     mutationFn: async ({ ids, data }: { ids: string[]; data: Partial<T> }) => {
       setIsProcessing(true);
-      const { error } = await supabase.from(table).update(data).in('id', ids);
+      const { error } = await (supabase.from(table as any) as any).update(data).in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey }); clearSelection(); toast.success(`${selectedIds.length} itens atualizados`); onSuccess?.(); },
@@ -44,7 +53,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkSoftDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       setIsProcessing(true);
-      const { error } = await supabase.from(table).update({ deleted_at: new Date().toISOString() }).in('id', ids);
+      const { error } = await (supabase.from(table as any) as any).update({ deleted_at: new Date().toISOString() }).in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey }); clearSelection(); toast.success(`${selectedIds.length} itens movidos para lixeira`); onSuccess?.(); },
@@ -55,7 +64,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkRestoreMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       setIsProcessing(true);
-      const { error } = await supabase.from(table).update({ deleted_at: null }).in('id', ids);
+      const { error } = await (supabase.from(table as any) as any).update({ deleted_at: null }).in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey }); clearSelection(); toast.success(`${selectedIds.length} itens restaurados`); onSuccess?.(); },

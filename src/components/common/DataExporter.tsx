@@ -16,9 +16,9 @@ export function DataExporter<T extends Record<string, any>>({ data, filename, co
     return data.map(item => columns.reduce((acc, col) => ({ ...acc, [col.label]: item[col.key] }), {}));
   };
 
-  const handleExportCSV = () => { setIsExporting(true); try { exportToCSV(formatData(), filename); } finally { setIsExporting(false); } };
+  const handleExportCSV = () => { setIsExporting(true); try { exportToCSV(formatData(), { filename }); } finally { setIsExporting(false); } };
   const handleExportExcel = () => { setIsExporting(true); try { exportToExcel(formatData(), filename); } finally { setIsExporting(false); } };
-  const handleExportJSON = () => { setIsExporting(true); try { exportToJSON(data, filename); } finally { setIsExporting(false); } };
+  const handleExportJSON = () => { setIsExporting(true); try { exportToJSON(data, { filename }); } finally { setIsExporting(false); } };
 
   return (
     <DropdownMenu>
