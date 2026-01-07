@@ -49,7 +49,7 @@ export function MobileBottomNav() {
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50 md:hidden",
           "bg-card/95 backdrop-blur-lg border-t border-border",
-          "safe-area-inset-bottom"
+          "pb-[env(safe-area-inset-bottom)]"
         )}
         role="navigation"
         aria-label="Mobile navigation"
@@ -171,7 +171,7 @@ export function MobileBottomNav() {
       </nav>
 
       {/* Spacer to prevent content from being hidden behind nav */}
-      <div className="h-16 md:hidden" />
+      <div className="h-[calc(4rem+env(safe-area-inset-bottom))] md:hidden" aria-hidden="true" />
     </>
   );
 }

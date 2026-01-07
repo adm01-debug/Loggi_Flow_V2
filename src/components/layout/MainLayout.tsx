@@ -35,7 +35,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <Header />
         <main 
           id="main-content" 
-          className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6 scroll-smooth" 
+          className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 scroll-smooth overscroll-contain" 
           tabIndex={-1}
           role="main"
           aria-label="Conteúdo principal"

@@ -548,7 +548,7 @@ export default function Auth() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-background">
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring" }}>
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
         </motion.div>
@@ -559,7 +559,7 @@ export default function Auth() {
   // Forgot Password View
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-background p-4 relative overflow-hidden">
         <AnimatedBackground />
         <FadeIn>
           <Card className="w-full max-w-md shadow-2xl border-border/50 backdrop-blur-xl bg-card/95">
@@ -612,7 +612,7 @@ export default function Auth() {
 
   // Main Auth Page - Split Layout
   return (
-    <div className="min-h-screen flex bg-background relative overflow-hidden">
+    <div className="min-h-[100dvh] flex flex-col lg:flex-row bg-background relative overflow-hidden">
       <AnimatedBackground />
       
       {/* Left Side - Hero Section */}
@@ -766,9 +766,9 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Auth Form */}
-      <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-4 md:p-8 relative z-10">
+      <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-4 sm:p-6 md:p-8 relative z-10 min-h-[100dvh] lg:min-h-0">
         <FadeIn direction="up" duration={0.6} className="w-full max-w-md">
-          <Card className="shadow-2xl border-border/50 backdrop-blur-xl bg-card/95 overflow-hidden">
+          <Card className="shadow-2xl border-border/50 backdrop-blur-xl bg-card/95 overflow-hidden mx-auto">
             {/* Mobile logo */}
             <div className="lg:hidden text-center pt-6 pb-2">
               <div className="inline-flex items-center gap-2 mb-1">

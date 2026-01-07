@@ -136,11 +136,12 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         whileHover={{ y: -4, scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className={cn(
-          "group relative rounded-2xl border-2 p-5 transition-all duration-300 overflow-hidden cursor-default",
+          "group relative rounded-xl sm:rounded-2xl border-2 p-3 sm:p-5 transition-all duration-300 overflow-hidden cursor-default touch-manipulation",
           "hover:shadow-xl hover:shadow-foreground/5",
-          "after:absolute after:inset-0 after:rounded-2xl after:opacity-0 after:blur-2xl after:transition-opacity after:duration-500",
+          "after:absolute after:inset-0 after:rounded-xl sm:after:rounded-2xl after:opacity-0 after:blur-2xl after:transition-opacity after:duration-500",
           "hover:after:opacity-100",
           config.border,
           config.bg,
@@ -155,17 +156,17 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
 
         <div className="relative z-10">
           {/* Header */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-3 sm:mb-4">
             <motion.div 
               whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
               transition={{ duration: 0.4 }}
               className={cn(
-                "flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300",
+                "flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all duration-300",
                 "group-hover:shadow-lg",
                 config.iconBg
               )}
             >
-              <Icon className="w-6 h-6" />
+              <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
             </motion.div>
             
             <div className="flex flex-col items-end gap-1">
@@ -200,29 +201,29 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
           </div>
 
           {/* Content */}
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground tracking-wide uppercase">
+          <div className="space-y-0.5 sm:space-y-1">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground tracking-wide uppercase">
               {title}
             </p>
             <motion.p 
               key={animatedValue}
-              className="text-4xl font-display font-bold tracking-tight bg-clip-text"
+              className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold tracking-tight bg-clip-text"
             >
               {typeof value === 'string' && value.includes('R$') ? value : animatedValue}
             </motion.p>
             {subtitle && (
-              <p className="text-xs text-muted-foreground/80 font-medium">{subtitle}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground/80 font-medium">{subtitle}</p>
             )}
           </div>
 
           {/* Progress bar */}
           {target && (
-            <div className="mt-5">
-              <div className="flex justify-between text-xs text-muted-foreground mb-2 font-medium">
+            <div className="mt-3 sm:mt-5">
+              <div className="flex justify-between text-[10px] sm:text-xs text-muted-foreground mb-1.5 sm:mb-2 font-medium">
                 <span>{progressPercent.toFixed(0)}% atingido</span>
                 <span>Meta: {target}</span>
               </div>
-              <div className="h-2 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
+              <div className="h-1.5 sm:h-2 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
