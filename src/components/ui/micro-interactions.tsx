@@ -1,6 +1,66 @@
-import { motion, HTMLMotionProps, Variants } from "framer-motion";
+import { motion, HTMLMotionProps, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState, useCallback } from "react";
+
+// ============================================
+// RIPPLE EFFECT FOR BUTTONS
+// ============================================
+
+interface Ripple {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+}
+
+interface RippleContainerProps {
+  children: React.ReactNode;
+  className?: string;
+  rippleColor?: string;
+  disabled?: boolean;
+}
+
+export function RippleContainer({ children, className, rippleColor = "currentColor", disabled }: RippleContainerProps) {
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+
+  const createRipple = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 2;
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    const id = Date.now();
+    setRipples(prev => [...prev, { id, x, y, size }]);
+    setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 600);
+  }, [disabled]);
+
+  return (
+    <div className={cn("relative overflow-hidden", className)} onMouseDown={createRipple}>
+      {children}
+      <AnimatePresence>
+        {ripples.map(ripple => (
+          <motion.span
+            key={ripple.id}
+            initial={{ scale: 0, opacity: 0.35 }}
+            animate={{ scale: 1, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            style={{
+              position: "absolute",
+              left: ripple.x,
+              top: ripple.y,
+              width: ripple.size,
+              height: ripple.size,
+              borderRadius: "50%",
+              backgroundColor: rippleColor,
+              pointerEvents: "none",
+            }}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 // ============================================
 // STAGGER ANIMATIONS FOR LISTS

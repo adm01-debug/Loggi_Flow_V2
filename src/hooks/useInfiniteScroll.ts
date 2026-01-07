@@ -24,12 +24,12 @@ export function useInfiniteScroll<T>(
     queryKey: [...queryKey, filters],
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
-      let q = supabase.from(table).select('*', { count: 'exact' });
+      let q = supabase.from(table).select('*', { count: 'exact' }) as any;
 
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
-            q = q.eq(key, value as never);
+            q = q.eq(key, value);
           }
         });
       }

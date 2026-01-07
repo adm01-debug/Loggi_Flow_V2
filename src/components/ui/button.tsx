@@ -2,9 +2,10 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.98] transform-gpu",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 transform-gpu",
   {
     variants: {
       variant: {
@@ -46,21 +47,44 @@ const buttonVariants = cva(
   },
 );
 
+interface Ripple {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+}
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
+  enableRipple?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading, children, disabled, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, loading, enableRipple = true, children, disabled, ...props }, ref) => {
+    const [ripples, setRipples] = React.useState<Ripple[]>([]);
     const Comp = asChild ? Slot : "button";
+
+    const createRipple = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!enableRipple || disabled || loading) return;
+      const button = e.currentTarget;
+      const rect = button.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 2;
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      const id = Date.now();
+      setRipples(prev => [...prev, { id, x, y, size }]);
+      setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 600);
+    }, [enableRipple, disabled, loading]);
+
     return (
       <Comp 
-        className={cn(buttonVariants({ variant, size, className }))} 
+        className={cn(buttonVariants({ variant, size, className }), "relative overflow-hidden")} 
         ref={ref} 
         disabled={disabled || loading}
+        onMouseDown={createRipple}
         {...props}
       >
         {loading ? (
@@ -72,6 +96,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <span>Carregando...</span>
           </>
         ) : children}
+        <AnimatePresence>
+          {ripples.map(ripple => (
+            <motion.span
+              key={ripple.id}
+              initial={{ scale: 0, opacity: 0.3 }}
+              animate={{ scale: 1, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="absolute rounded-full bg-white/30 pointer-events-none"
+              style={{
+                left: ripple.x,
+                top: ripple.y,
+                width: ripple.size,
+                height: ripple.size,
+              }}
+            />
+          ))}
+        </AnimatePresence>
       </Comp>
     );
   },

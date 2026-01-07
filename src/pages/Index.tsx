@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw } from "lucide-react";
@@ -19,7 +19,7 @@ import { useRealtime } from "@/hooks/useRealtime";
 import { useGamification } from "@/hooks/useGamification";
 import { useDashboardWidgets } from "@/hooks/useDashboardWidgets";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
-import { motion } from "framer-motion";
+import { StaggerContainer, StaggerItem, FadeIn } from "@/components/ui/micro-interactions";
 import { format, subDays, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
@@ -115,34 +115,36 @@ export default function Index() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <FadeIn direction="left">
             <h1 className="text-display text-foreground flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>
               Dashboard
             </h1>
             <p className="text-muted-foreground mt-1">Visão geral das operações logísticas</p>
-          </motion.div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <DateRangePicker value={dateRange} onChange={handleDateRangeChange} />
-            <Button variant="outline" size="icon" onClick={handleRefresh}><RefreshCw className="w-4 h-4" /></Button>
-            <div className="h-6 w-px bg-border" />
+          </FadeIn>
+          <StaggerContainer className="flex items-center gap-2 flex-wrap" staggerDelay={0.05}>
+            <StaggerItem><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></StaggerItem>
+            <StaggerItem><Button variant="outline" size="icon" onClick={handleRefresh}><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
+            <StaggerItem><div className="h-6 w-px bg-border" /></StaggerItem>
             {isEditMode && (
               <>
-                <WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} />
-                <Button variant="outline" size="sm" onClick={resetLayout}><RotateCcw className="w-4 h-4 mr-2" />Resetar</Button>
+                <StaggerItem><WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} /></StaggerItem>
+                <StaggerItem><Button variant="outline" size="sm" onClick={resetLayout}><RotateCcw className="w-4 h-4 mr-2" />Resetar</Button></StaggerItem>
               </>
             )}
-            <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode}>
-              <Settings2 className="w-4 h-4 mr-2" />{isEditMode ? "Salvar" : "Personalizar"}
-            </Button>
-          </div>
+            <StaggerItem>
+              <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode}>
+                <Settings2 className="w-4 h-4 mr-2" />{isEditMode ? "Salvar" : "Personalizar"}
+              </Button>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+        <FadeIn delay={0.1}>
           <FavoriteMetricsBar />
-        </motion.div>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+        </FadeIn>
+        <FadeIn delay={0.2}>
           <DraggableDashboard widgets={widgets} isEditMode={isEditMode} onReorder={handleReorder} onRemove={handleRemove} />
-        </motion.div>
+        </FadeIn>
       </div>
     </MainLayout>
   );
