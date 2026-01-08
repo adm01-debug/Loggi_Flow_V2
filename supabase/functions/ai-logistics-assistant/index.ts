@@ -16,7 +16,22 @@ serve(async (req) => {
   }
 
   try {
-    const { message, userId, conversationHistory = [], stream = false } = await req.json();
+    const body = await req.json();
+    const message = body.message || body.prompt;
+    const userId = body.userId;
+    const conversationHistory = body.conversationHistory || [];
+    const stream = body.stream || false;
+
+    if (!message) {
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: "Message is required",
+        message: "Por favor, envie uma mensagem."
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY not configured");
