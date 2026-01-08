@@ -143,7 +143,15 @@ export default function Envios() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Send className="w-6 h-6 text-primary" /></div>Envios</h1><p className="text-muted-foreground mt-1">Gerencie entregas aos clientes</p></div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <Send className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              </div>
+              <span className="truncate">Envios</span>
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie entregas aos clientes</p>
+          </div>
           <div className="flex gap-2">
             <ScannerButton
               onScan={(result: ScanResult) => {
@@ -175,11 +183,11 @@ export default function Envios() {
           position="bottom"
           delay={1500}
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="stat-card text-center"><Send className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-            <div className="stat-card text-center"><Truck className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.transito}</p><p className="text-xs text-muted-foreground">Em Trânsito</p></div>
-            <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregues}</p><p className="text-xs text-muted-foreground">Entregues</p></div>
-            <div className="stat-card text-center"><AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.ocorrencias}</p><p className="text-xs text-muted-foreground">Ocorrências</p></div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="stat-card text-center p-3 sm:p-4"><Send className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
+            <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
+            <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregues}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregues</p></div>
+            <div className="stat-card text-center p-3 sm:p-4"><AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ocorrencias}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ocorrências</p></div>
           </div>
         </OnboardingTooltip>
 
@@ -196,7 +204,7 @@ export default function Envios() {
           totalOriginal={totalOriginal}
         />
 
-        <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">Data <SortIcon field="created_at" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("status")} className="gap-1">Status <SortIcon field="status" /></Button></div>
+        <div className="flex items-center gap-2 text-sm overflow-x-auto pb-1 scrollbar-none"><span className="text-muted-foreground shrink-0">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1 shrink-0">Data <SortIcon field="created_at" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("status")} className="gap-1 shrink-0">Status <SortIcon field="status" /></Button></div>
 
         {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "entregue", label: "Marcar Entregue", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "entregue") }]} />}
 

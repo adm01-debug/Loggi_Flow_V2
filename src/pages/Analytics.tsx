@@ -43,53 +43,57 @@ export default function Analytics() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400/20 to-orange-600/10">
-                <BarChart3 className="w-6 h-6 text-orange-500" />
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-orange-400/20 to-orange-600/10">
+                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
               </div>
-              Analytics
+              <span className="truncate">Analytics</span>
             </h1>
-            <p className="text-muted-foreground mt-1">Análise completa de performance logística</p>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Análise completa de performance logística</p>
           </div>
-          <div className="flex gap-2">
-            <DateRangePicker value={dateRange} onChange={handleDateRangeChange} />
-            <Button variant="outline" onClick={() => {}}>
-              <RefreshCw className="w-4 h-4 mr-2" />Atualizar
+          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
+            <div className="shrink-0">
+              <DateRangePicker value={dateRange} onChange={handleDateRangeChange} />
+            </div>
+            <Button variant="outline" size="sm" onClick={() => {}} className="shrink-0 h-10">
+              <RefreshCw className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Atualizar</span>
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-5 gap-4">
-          <div className="stat-card text-center">
+        {/* Stats Grid - Responsive */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="stat-card text-center p-3 sm:p-4">
             <Truck className="w-5 h-5 text-blue-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{stats.totalDeliveries}</p>
-            <p className="text-xs text-muted-foreground">Entregas</p>
+            <p className="text-xl sm:text-2xl font-bold">{stats.totalDeliveries}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Entregas</p>
           </div>
-          <div className="stat-card text-center">
+          <div className="stat-card text-center p-3 sm:p-4">
             <Target className="w-5 h-5 text-green-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{stats.onTimeRate}%</p>
-            <p className="text-xs text-muted-foreground">No Prazo</p>
+            <p className="text-xl sm:text-2xl font-bold">{stats.onTimeRate}%</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">No Prazo</p>
           </div>
-          <div className="stat-card text-center">
+          <div className="stat-card text-center p-3 sm:p-4">
             <Clock className="w-5 h-5 text-purple-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{stats.avgDeliveryTime}h</p>
-            <p className="text-xs text-muted-foreground">Tempo Médio</p>
+            <p className="text-xl sm:text-2xl font-bold">{stats.avgDeliveryTime}h</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Tempo Médio</p>
           </div>
-          <div className="stat-card text-center">
+          <div className="stat-card text-center p-3 sm:p-4">
             <DollarSign className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">R$ {(stats.totalRevenue / 1000).toFixed(0)}k</p>
-            <p className="text-xs text-muted-foreground">Receita</p>
+            <p className="text-xl sm:text-2xl font-bold">R$ {(stats.totalRevenue / 1000).toFixed(0)}k</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Receita</p>
           </div>
-          <div className="stat-card text-center">
+          <div className="stat-card text-center p-3 sm:p-4 col-span-2 sm:col-span-1">
             {stats.growthRate >= 0 ? (
               <TrendingUp className="w-5 h-5 text-green-500 mx-auto mb-2" />
             ) : (
               <TrendingDown className="w-5 h-5 text-red-500 mx-auto mb-2" />
             )}
-            <p className={cn("text-2xl font-bold", stats.growthRate >= 0 ? "text-green-600" : "text-red-600")}>
+            <p className={cn("text-xl sm:text-2xl font-bold", stats.growthRate >= 0 ? "text-green-600" : "text-red-600")}>
               {stats.growthRate >= 0 ? "+" : ""}{stats.growthRate}%
             </p>
-            <p className="text-xs text-muted-foreground">Crescimento</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Crescimento</p>
           </div>
         </div>
 
@@ -100,25 +104,27 @@ export default function Analytics() {
             <TabsTrigger value="tracking">Tracking</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="kpis" className="space-y-4">
+          <TabsContent value="kpis" className="space-y-4 mt-4">
             {isLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+              <div className="flex justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin" />
+              </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {[
                   { label: "Taxa de Entrega", value: "98.5%", target: "95%", status: "above" },
                   { label: "Satisfação Cliente", value: "4.7/5", target: "4.5/5", status: "above" },
                   { label: "Custo por Entrega", value: "R$ 12.50", target: "R$ 15.00", status: "below" },
                   { label: "Tempo de Resposta", value: "2.3h", target: "4h", status: "below" },
                 ].map((kpi, i) => (
-                  <div key={i} className="card-interactive">
-                    <div className="flex justify-between items-start mb-2">
+                  <div key={i} className="card-interactive p-4">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                       <span className="text-sm text-muted-foreground">{kpi.label}</span>
-                      <Badge variant={kpi.status === "above" || kpi.status === "below" ? "default" : "secondary"}>
+                      <Badge variant={kpi.status === "above" || kpi.status === "below" ? "default" : "secondary"} className="w-fit text-xs">
                         {kpi.status === "above" ? "Acima" : "Abaixo"} da meta
                       </Badge>
                     </div>
-                    <p className="text-2xl font-bold">{kpi.value}</p>
+                    <p className="text-xl sm:text-2xl font-bold">{kpi.value}</p>
                     <p className="text-xs text-muted-foreground">Meta: {kpi.target}</p>
                   </div>
                 ))}

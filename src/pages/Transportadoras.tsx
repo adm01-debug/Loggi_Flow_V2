@@ -168,7 +168,15 @@ export default function Transportadoras() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>Transportadoras</h1><p className="text-muted-foreground mt-1">Gerencie suas transportadoras</p></div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              </div>
+              <span className="truncate">Transportadoras</span>
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie suas transportadoras</p>
+          </div>
           <div className="flex gap-2">
             <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             <OnboardingTooltip
@@ -182,10 +190,10 @@ export default function Transportadoras() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.ativas}</p><p className="text-xs text-muted-foreground">Ativas</p></div>
-          <div className="stat-card text-center"><TrendingUp className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregas}</p><p className="text-xs text-muted-foreground">Entregas</p></div>
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
+          <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ativas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ativas</p></div>
+          <div className="stat-card text-center p-3 sm:p-4"><TrendingUp className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregas</p></div>
         </div>
 
         <FilterBar 
@@ -202,7 +210,7 @@ export default function Transportadoras() {
           totalOriginal={list.length} 
         />
 
-        <div className="flex items-center gap-2 text-sm"><span className="text-muted-foreground">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("nome_fantasia")} className="gap-1">Nome <SortIcon field="nome_fantasia" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("score_performance")} className="gap-1">Score <SortIcon field="score_performance" /></Button></div>
+        <div className="flex items-center gap-2 text-sm overflow-x-auto pb-1 scrollbar-none"><span className="text-muted-foreground shrink-0">Ordenar:</span><Button variant="ghost" size="sm" onClick={() => toggleSort("nome_fantasia")} className="gap-1 shrink-0">Nome <SortIcon field="nome_fantasia" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("score_performance")} className="gap-1 shrink-0">Score <SortIcon field="score_performance" /></Button></div>
 
         {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "ativar", label: "Ativar", icon: CheckCircle2, onClick: (ids) => bulkToggleAtiva(ids, true) }, { id: "desativar", label: "Desativar", icon: XCircle, variant: "destructive", onClick: (ids) => bulkToggleAtiva(ids, false) }]} />}
 

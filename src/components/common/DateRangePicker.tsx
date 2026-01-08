@@ -41,26 +41,30 @@ export function DateRangePicker({
             variant="outline"
             disabled={disabled}
             className={cn(
-              "justify-start text-left font-normal",
+              "justify-start text-left font-normal h-10 min-h-[44px] text-xs sm:text-sm",
               !value && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-1.5 sm:mr-2 h-4 w-4 shrink-0" />
             {value?.from ? (
               value.to ? (
-                <>
-                  {format(value.from, "dd/MM/yyyy", { locale: ptBR })} -{" "}
-                  {format(value.to, "dd/MM/yyyy", { locale: ptBR })}
-                </>
+                <span className="truncate">
+                  <span className="hidden sm:inline">
+                    {format(value.from, "dd/MM/yyyy", { locale: ptBR })} - {format(value.to, "dd/MM/yyyy", { locale: ptBR })}
+                  </span>
+                  <span className="sm:hidden">
+                    {format(value.from, "dd/MM", { locale: ptBR })} - {format(value.to, "dd/MM", { locale: ptBR })}
+                  </span>
+                </span>
               ) : (
-                format(value.from, "dd/MM/yyyy", { locale: ptBR })
+                <span className="truncate">{format(value.from, "dd/MM/yyyy", { locale: ptBR })}</span>
               )
             ) : (
-              <span>{placeholder}</span>
+              <span className="truncate">{placeholder}</span>
             )}
             {value && (
               <X
-                className="ml-auto h-4 w-4 opacity-50 hover:opacity-100"
+                className="ml-auto h-4 w-4 opacity-50 hover:opacity-100 shrink-0"
                 onClick={handleClear}
               />
             )}
@@ -78,10 +82,11 @@ export function DateRangePicker({
                 setOpen(false);
               }
             }}
-            numberOfMonths={2}
+            numberOfMonths={typeof window !== 'undefined' && window.innerWidth < 640 ? 1 : 2}
             locale={ptBR}
+            className="text-sm"
           />
-          <div className="flex justify-end gap-2 p-3 border-t">
+          <div className="flex justify-end gap-2 p-2 sm:p-3 border-t">
             <Button
               variant="ghost"
               size="sm"
@@ -89,12 +94,14 @@ export function DateRangePicker({
                 onChange(undefined);
                 setOpen(false);
               }}
+              className="h-8 text-xs sm:text-sm"
             >
               Limpar
             </Button>
             <Button
               size="sm"
               onClick={() => setOpen(false)}
+              className="h-8 text-xs sm:text-sm"
             >
               Aplicar
             </Button>
