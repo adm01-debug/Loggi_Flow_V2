@@ -164,13 +164,15 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
         animate={{ opacity: 1, y: 0 }}
         className={cn("card-base", className)}
       >
-        <div className="mb-4">
-          <h3 className="font-display font-semibold text-lg">{title}</h3>
+        <div className="mb-3 sm:mb-4">
+          <h3 className="font-display font-semibold text-base sm:text-lg">{title}</h3>
           {subtitle && (
-            <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">{subtitle}</p>
           )}
         </div>
-        {renderChart()}
+        <div className="w-full overflow-x-auto">
+          {renderChart()}
+        </div>
       </motion.div>
     );
   }

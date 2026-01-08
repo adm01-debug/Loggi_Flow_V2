@@ -58,8 +58,8 @@ function SortableWidget({ id, children, isEditMode, onRemove, size = "medium", i
   };
 
   const sizeClasses = {
-    small: "col-span-1 md:col-span-1",
-    medium: "col-span-2 md:col-span-1",
+    small: "col-span-1",
+    medium: "col-span-1 sm:col-span-2 md:col-span-1",
     large: "col-span-2",
     full: "col-span-2 md:col-span-4",
   };
@@ -272,7 +272,7 @@ export function DraggableDashboard({
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={widgets.map((w) => w.id)} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <AnimatePresence mode="popLayout">
               {widgets.map((widget) => (
                 <SortableWidget

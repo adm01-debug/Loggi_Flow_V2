@@ -115,44 +115,44 @@ export default function Ranking() {
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10">
-                <Trophy className="w-6 h-6 text-amber-500" />
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10">
+                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
               </div>
-              Ranking Global
+              <span className="truncate">Ranking Global</span>
             </h1>
-            <p className="text-muted-foreground mt-1">Competição saudável entre operadores</p>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Competição saudável entre operadores</p>
           </div>
-          <Tabs value={period} onValueChange={(v) => setPeriod(v as any)}>
-            <TabsList>
-              <TabsTrigger value="weekly">Semanal</TabsTrigger>
-              <TabsTrigger value="monthly">Mensal</TabsTrigger>
-              <TabsTrigger value="all">Geral</TabsTrigger>
+          <Tabs value={period} onValueChange={(v) => setPeriod(v as any)} className="w-full md:w-auto">
+            <TabsList className="grid grid-cols-3 w-full md:w-auto">
+              <TabsTrigger value="weekly" className="text-xs sm:text-sm">Semanal</TabsTrigger>
+              <TabsTrigger value="monthly" className="text-xs sm:text-sm">Mensal</TabsTrigger>
+              <TabsTrigger value="all" className="text-xs sm:text-sm">Geral</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <motion.div className="stat-card text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Users className="w-5 h-5 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-bold">{totalPlayers}</p>
-            <p className="text-xs text-muted-foreground">Jogadores</p>
+            <p className="text-xl sm:text-2xl font-bold">{totalPlayers}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Jogadores</p>
           </motion.div>
-          <motion.div className="stat-card text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Zap className="w-5 h-5 text-yellow-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{totalXP.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">XP Total</p>
+            <p className="text-xl sm:text-2xl font-bold">{totalXP.toLocaleString()}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">XP Total</p>
           </motion.div>
-          <motion.div className="stat-card text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <Trophy className="w-5 h-5 text-amber-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{totalAchievements}</p>
-            <p className="text-xs text-muted-foreground">Conquistas</p>
+            <p className="text-xl sm:text-2xl font-bold">{totalAchievements}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Conquistas</p>
           </motion.div>
-          <motion.div className="stat-card text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <Target className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{currentUserRank?.rank || "-"}</p>
-            <p className="text-xs text-muted-foreground">Sua Posição</p>
+            <p className="text-xl sm:text-2xl font-bold">{currentUserRank?.rank || "-"}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Sua Posição</p>
           </motion.div>
         </div>
 
@@ -286,17 +286,20 @@ export default function Ranking() {
         />
 
         {/* Sort Buttons */}
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => toggleSort("xp")} className="gap-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-muted-foreground text-sm shrink-0">Ordenar:</span>
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("xp")} className="gap-1 shrink-0">
             XP <SortIcon field="xp" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => toggleSort("level")} className="gap-1">
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("level")} className="gap-1 shrink-0">
             Nível <SortIcon field="level" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => toggleSort("achievements")} className="gap-1">
-            Conquistas <SortIcon field="achievements" />
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("achievements")} className="gap-1 shrink-0">
+            <span className="hidden sm:inline">Conquistas</span>
+            <span className="sm:hidden">Conq.</span>
+            <SortIcon field="achievements" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => toggleSort("streak")} className="gap-1">
+          <Button variant="ghost" size="sm" onClick={() => toggleSort("streak")} className="gap-1 shrink-0">
             Streak <SortIcon field="streak" />
           </Button>
         </div>

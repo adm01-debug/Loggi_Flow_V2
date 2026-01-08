@@ -32,22 +32,22 @@ interface QuickActionsProps extends React.HTMLAttributes<HTMLDivElement> {}
 const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
   ({ className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn("card-base space-y-4", className)} {...props}>
-        <h3 className="font-display font-semibold text-lg">Ações Rápidas</h3>
+      <div ref={ref} className={cn("card-base space-y-3 sm:space-y-4", className)} {...props}>
+        <h3 className="font-display font-semibold text-base sm:text-lg">Ações Rápidas</h3>
         
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {actions.map((action, index) => (
             <Button
               key={action.label}
               className={cn(
-                "h-auto py-4 flex-col gap-2 transition-all duration-200 press-scale",
+                "h-auto py-3 sm:py-4 flex-col gap-1.5 sm:gap-2 transition-all duration-200 press-scale",
                 action.color,
                 action.glow && "glow-primary"
               )}
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              <action.icon className="w-5 h-5" />
-              <span className="text-sm font-medium">{action.label}</span>
+              <action.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm font-medium text-center leading-tight">{action.label}</span>
             </Button>
           ))}
         </div>
