@@ -11,11 +11,11 @@ export { useBulkActions } from '@/hooks/useBulkActions';
 export { useSoftDelete } from '@/hooks/useSoftDelete';
 
 // Components
-export { DataImporter } from '@/components/DataImporter';
-export { SavedFiltersDropdown } from '@/components/SavedFiltersDropdown';
+export { DataImporter } from '@/components/common/DataImporter';
+export { SavedFiltersDropdown } from '@/components/common/SavedFiltersDropdown';
 export { AdvancedFilter } from '@/components/common/AdvancedFilter';
-export { SearchInput } from '@/components/SearchInput';
-export { BulkActionsBar } from '@/components/BulkActionsBar';
+export { SearchInput } from '@/components/common/SearchInput';
+export { BulkActionsBar } from '@/components/common/BulkActionsBar';
 export { VersionHistory } from '@/components/common/VersionHistory';
 export { Pagination } from '@/components/common/Pagination';
 export { EmptyState } from '@/components/common/EmptyState';

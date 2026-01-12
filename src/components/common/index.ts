@@ -86,3 +86,9 @@ export {
 
 // Gestures & Mobile
 export { SwipeActions, swipeActionPresets } from './SwipeActions';
+
+// Moved from root components folder
+export { SearchInput } from './SearchInput';
+export { SavedFiltersDropdown } from './SavedFiltersDropdown';
+export { DataImporter } from './DataImporter';
+export { BulkActionsBar } from './BulkActionsBar';
