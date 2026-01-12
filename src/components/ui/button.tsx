@@ -54,18 +54,52 @@ interface Ripple {
   size: number;
 }
 
+type LoadingState = boolean | "success" | "error";
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
-  loading?: boolean;
+  loading?: LoadingState;
+  loadingText?: string;
+  successText?: string;
+  errorText?: string;
   enableRipple?: boolean;
+  iconLeft?: React.ReactNode;
+  iconRight?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading, enableRipple = true, children, disabled, ...props }, ref) => {
+  ({ 
+    className, 
+    variant, 
+    size, 
+    asChild = false, 
+    loading, 
+    loadingText = "Carregando...",
+    successText = "Sucesso!",
+    errorText = "Erro!",
+    enableRipple = true, 
+    iconLeft,
+    iconRight,
+    children, 
+    disabled, 
+    ...props 
+  }, ref) => {
     const [ripples, setRipples] = React.useState<Ripple[]>([]);
+    const [internalState, setInternalState] = React.useState<LoadingState>(false);
     const Comp = asChild ? Slot : "button";
+
+    // Sync internal state with loading prop
+    React.useEffect(() => {
+      if (loading === "success" || loading === "error") {
+        setInternalState(loading);
+        const timer = setTimeout(() => setInternalState(false), 2000);
+        return () => clearTimeout(timer);
+      } else {
+        setInternalState(loading || false);
+      }
+    }, [loading]);
 
     const createRipple = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
       if (!enableRipple || disabled || loading) return;
@@ -79,23 +113,101 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 600);
     }, [enableRipple, disabled, loading]);
 
-    return (
-      <Comp 
-        className={cn(buttonVariants({ variant, size, className }), "relative overflow-hidden")} 
-        ref={ref} 
-        disabled={disabled || loading}
-        onMouseDown={createRipple}
-        {...props}
-      >
-        {loading ? (
-          <>
+    const isLoading = internalState === true;
+    const isSuccess = internalState === "success";
+    const isError = internalState === "error";
+
+    const renderContent = () => {
+      if (isLoading) {
+        return (
+          <motion.span
+            key="loading"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            className="flex items-center gap-2"
+          >
             <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>Carregando...</span>
-          </>
-        ) : children}
+            <span>{loadingText}</span>
+          </motion.span>
+        );
+      }
+      
+      if (isSuccess) {
+        return (
+          <motion.span
+            key="success"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="flex items-center gap-2 text-success"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <motion.path
+                d="M5 12l5 5L20 7"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.3 }}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>{successText}</span>
+          </motion.span>
+        );
+      }
+      
+      if (isError) {
+        return (
+          <motion.span
+            key="error"
+            initial={{ opacity: 0, x: -5 }}
+            animate={{ opacity: 1, x: [0, -3, 3, -3, 3, 0] }}
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-2 text-destructive"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>{errorText}</span>
+          </motion.span>
+        );
+      }
+
+      return (
+        <motion.span
+          key="content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex items-center gap-2"
+        >
+          {iconLeft}
+          {children}
+          {iconRight}
+        </motion.span>
+      );
+    };
+
+    return (
+      <Comp 
+        className={cn(
+          buttonVariants({ variant, size, className }), 
+          "relative overflow-hidden",
+          isSuccess && "!bg-success/20 !text-success",
+          isError && "!bg-destructive/20 !text-destructive"
+        )} 
+        ref={ref} 
+        disabled={disabled || isLoading}
+        onMouseDown={createRipple}
+        {...props}
+      >
+        <AnimatePresence mode="wait">
+          {renderContent()}
+        </AnimatePresence>
         <AnimatePresence>
           {ripples.map(ripple => (
             <motion.span
