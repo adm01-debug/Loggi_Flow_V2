@@ -38,7 +38,6 @@ export function useMFA() {
       const { data, error } = await supabase.auth.mfa.listFactors();
       
       if (error) {
-        console.error("Error checking MFA status:", error);
         return false;
       }
 
@@ -47,8 +46,7 @@ export function useMFA() {
       setIsEnrolled(verifiedFactors.length > 0);
       
       return verifiedFactors.length > 0;
-    } catch (error) {
-      console.error("Error checking MFA:", error);
+    } catch {
       return false;
     } finally {
       setIsLoading(false);
@@ -72,7 +70,6 @@ export function useMFA() {
       setEnrollmentData(data as EnrollmentData);
       return data;
     } catch (error) {
-      console.error("Error starting enrollment:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -111,7 +108,6 @@ export function useMFA() {
       
       return data;
     } catch (error) {
-      console.error("Error verifying enrollment:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -140,7 +136,6 @@ export function useMFA() {
 
       return data;
     } catch (error) {
-      console.error("Error verifying code:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -166,7 +161,6 @@ export function useMFA() {
       await logSecurityEvent("mfa_disabled", "2FA foi desativado para a conta");
       
     } catch (error) {
-      console.error("Error disabling MFA:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -178,7 +172,6 @@ export function useMFA() {
     const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     
     if (error) {
-      console.error("Error getting assurance level:", error);
       return null;
     }
     
@@ -194,8 +187,8 @@ export function useMFA() {
         description,
         severity: "info",
       });
-    } catch (error) {
-      console.error("Error logging security event:", error);
+    } catch {
+      // Silent fail - security event logging is non-critical
     }
   };
 

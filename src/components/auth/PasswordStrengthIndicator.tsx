@@ -80,8 +80,8 @@ export function PasswordStrengthIndicator({
           setIsPwned(data.pwned);
           setPwnedCount(data.count || 0);
         }
-      } catch (err) {
-        console.error("Error checking password breach:", err);
+      } catch {
+        // Silent fail - breach check is non-critical
       } finally {
         setIsCheckingPwned(false);
       }

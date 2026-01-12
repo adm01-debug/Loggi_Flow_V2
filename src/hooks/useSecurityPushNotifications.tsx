@@ -52,8 +52,7 @@ export function useSecurityPushNotifications() {
       }
       
       return result === 'granted';
-    } catch (error) {
-      console.error('Error requesting notification permission:', error);
+    } catch {
       return false;
     }
   }, []);
@@ -111,8 +110,8 @@ export function useSecurityPushNotifications() {
       if (event.severity !== 'critical') {
         setTimeout(() => notification.close(), 10000);
       }
-    } catch (error) {
-      console.error('Error showing notification:', error);
+    } catch {
+      // Silent fail - notification display is non-critical
     }
   }, [permission]);
 

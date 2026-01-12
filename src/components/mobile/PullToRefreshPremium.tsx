@@ -211,8 +211,8 @@ export function PullToRefreshPremium({
           setState('success');
           await new Promise(resolve => setTimeout(resolve, successDuration));
         }
-      } catch (error) {
-        console.error('Refresh failed:', error);
+      } catch {
+        // Refresh failed - state will reset
       } finally {
         setState('idle');
         pullDistance.set(0);

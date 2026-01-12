@@ -89,8 +89,8 @@ export function useWebAuthn() {
 
       if (error) throw error;
       setCredentials(data || []);
-    } catch (error) {
-      console.error("[WebAuthn] Error fetching credentials:", error);
+    } catch {
+      // Silent fail - credentials list is non-critical
     }
   }, [user]);
 
@@ -193,8 +193,6 @@ export function useWebAuthn() {
       await fetchCredentials();
       return true;
     } catch (error: unknown) {
-      console.error("[WebAuthn] Registration error:", error);
-      
       if (error instanceof Error) {
         if (error.name === "NotAllowedError") {
           toast.error("Registro cancelado pelo usuário");
@@ -320,8 +318,6 @@ export function useWebAuthn() {
         credentialId: storedCredential.credential_id,
       };
     } catch (error: unknown) {
-      console.error("[WebAuthn] Authentication error:", error);
-      
       if (error instanceof Error) {
         if (error.name === "NotAllowedError") {
           toast.error("Autenticação cancelada");
@@ -361,8 +357,7 @@ export function useWebAuthn() {
       toast.success("Passkey removida com sucesso");
       await fetchCredentials();
       return true;
-    } catch (error) {
-      console.error("[WebAuthn] Delete error:", error);
+    } catch {
       toast.error("Erro ao remover passkey");
       return false;
     } finally {
@@ -386,8 +381,7 @@ export function useWebAuthn() {
       toast.success("Nome atualizado");
       await fetchCredentials();
       return true;
-    } catch (error) {
-      console.error("[WebAuthn] Rename error:", error);
+    } catch {
       toast.error("Erro ao renomear passkey");
       return false;
     }

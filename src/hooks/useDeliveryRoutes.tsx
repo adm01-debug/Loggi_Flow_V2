@@ -90,8 +90,7 @@ const geocodeAddress = async (address: string): Promise<{ lat: number; lng: numb
     }
 
     return data.coordinates;
-  } catch (error) {
-    console.error('Geocoding error for address:', address, error);
+  } catch {
     return null;
   }
 };
@@ -113,12 +112,10 @@ const saveCoordinatesToDB = async (
       .eq('id', deliveryId);
 
     if (error) {
-      console.error('Error saving coordinates:', error);
       return false;
     }
     return true;
-  } catch (error) {
-    console.error('Error saving coordinates:', error);
+  } catch {
     return false;
   }
 };
@@ -321,8 +318,7 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
       
       setReGeocodingId(null);
       return false;
-    } catch (error) {
-      console.error('Re-geocoding error:', error);
+    } catch {
       setReGeocodingId(null);
       return false;
     }

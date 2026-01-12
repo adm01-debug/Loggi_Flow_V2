@@ -117,8 +117,7 @@ export function ChartExportButton({
         setIsSuccess(false);
       }, 2000);
 
-    } catch (error) {
-      console.error('Erro ao exportar gráfico:', error);
+    } catch {
       toast.error('Erro ao exportar gráfico');
     } finally {
       setIsExporting(false);
@@ -167,8 +166,7 @@ export function ChartExportButton({
         }
       }, 'image/png');
 
-    } catch (error) {
-      console.error('Erro ao copiar gráfico:', error);
+    } catch {
       toast.error('Erro ao copiar gráfico');
     } finally {
       setIsExporting(false);

@@ -30,7 +30,6 @@ export const useGeocoding = () => {
       });
 
       if (error) {
-        console.error('Geocoding error:', error);
         return { coordinates: null };
       }
 
@@ -44,8 +43,7 @@ export const useGeocoding = () => {
       geocodingCache[cacheKey] = result;
 
       return result;
-    } catch (error) {
-      console.error('Geocoding failed:', error);
+    } catch {
       return { coordinates: null };
     }
   }, []);

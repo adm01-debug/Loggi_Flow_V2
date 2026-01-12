@@ -17,7 +17,7 @@ export function DuplicateDialog<T>({ item, nameField, onDuplicate, relatedLabel 
   const handleDuplicate = async () => {
     setIsLoading(true);
     try { await onDuplicate(item, { newName, copyRelated }); setOpen(false); }
-    catch (err) { console.error(err); }
+    catch { /* Silent fail - error handled by parent */ }
     finally { setIsLoading(false); }
   };
 
