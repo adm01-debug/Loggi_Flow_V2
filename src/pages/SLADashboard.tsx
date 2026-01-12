@@ -13,6 +13,18 @@ import { format, subDays, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 
+interface PerformanceTransportadora {
+  nome: string;
+  totalEntregas: number;
+  taxaOTIF: number;
+}
+
+interface TendenciaSemanal {
+  data: string;
+  total: number;
+  taxaOTIF: number;
+}
+
 export default function SLADashboard() {
   const [dateRange, setDateRange] = useState<DateRange>({ from: subDays(new Date(), 30), to: new Date() });
   const { data: metrics, isLoading, refetch } = useSLAMetrics();
@@ -49,7 +61,7 @@ export default function SLADashboard() {
         <div className="card-base p-6"><div className="flex items-center justify-between mb-4"><h3 className="font-semibold">Taxa de Cumprimento SLA</h3><Badge variant={slaRate >= 95 ? "default" : slaRate >= 80 ? "secondary" : "destructive"}>{slaRate >= 95 ? "Excelente" : slaRate >= 80 ? "Bom" : "Crítico"}</Badge></div><Progress value={slaRate} className={cn("h-4", slaRate >= 95 ? "[&>div]:bg-green-500" : slaRate >= 80 ? "[&>div]:bg-yellow-500" : "[&>div]:bg-red-500")} /><div className="flex justify-between mt-2 text-sm text-muted-foreground"><span>Meta: 95%</span><span>Atual: {slaRate}%</span></div></div>
         <Tabs defaultValue="carriers"><TabsList><TabsTrigger value="carriers">Por Transportadora</TabsTrigger><TabsTrigger value="trends">Tendências</TabsTrigger></TabsList>
           <TabsContent value="carriers" className="space-y-3">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (stats.performancePorTransportadora || []).map((c: any, i: number) => (
+            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (stats.performancePorTransportadora || []).map((c: PerformanceTransportadora, i: number) => (
               <div key={i} className="card-interactive flex items-center justify-between">
                 <div><p className="font-semibold">{c.nome}</p><p className="text-sm text-muted-foreground">{c.totalEntregas} entregas</p></div>
                 <div className="text-right"><p className={cn("text-xl font-bold", c.taxaOTIF >= 95 ? "text-green-600" : c.taxaOTIF >= 80 ? "text-yellow-600" : "text-red-600")}>{c.taxaOTIF.toFixed(0)}%</p><Progress value={c.taxaOTIF} className="w-24 h-2" /></div>
@@ -57,7 +69,7 @@ export default function SLADashboard() {
             ))}
           </TabsContent>
           <TabsContent value="trends" className="space-y-3">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (metrics?.tendenciaSemanal || []).map((t: any, i: number) => (
+            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (metrics?.tendenciaSemanal || []).map((t: TendenciaSemanal, i: number) => (
               <div key={i} className="card-interactive flex items-center justify-between">
                 <div><p className="font-semibold">{t.data}</p><p className="text-sm text-muted-foreground">{t.total} entregas</p></div>
                 <div className="text-right"><p className={cn("text-xl font-bold", t.taxaOTIF >= 95 ? "text-green-600" : t.taxaOTIF >= 80 ? "text-yellow-600" : "text-red-600")}>{t.taxaOTIF.toFixed(0)}%</p></div>

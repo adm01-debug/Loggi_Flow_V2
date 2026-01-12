@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, MoreVertical, Building2, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, ScanLine } from "lucide-react";
+import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, MoreVertical, Building2, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, ScanLine, LucideIcon } from "lucide-react";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
 import { ScanResult } from "@/hooks/useQRScanner";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,7 +42,7 @@ interface Coleta {
 interface Fornecedor { id: string; razao_social: string; nome_fantasia: string | null; endereco_completo: string; contato_nome: string | null; contato_telefone: string | null; }
 interface Transportadora { id: string; nome_fantasia: string; }
 
-const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: any }> = {
+const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: LucideIcon }> = {
   aguardando_liberacao: { label: "Aguardando", color: "bg-gray-100 text-gray-800", icon: Clock },
   solicitada: { label: "Solicitada", color: "bg-blue-100 text-blue-800", icon: Package },
   em_transito: { label: "Em Trânsito", color: "bg-yellow-100 text-yellow-800", icon: Truck },
@@ -126,7 +126,7 @@ export default function Coletas() {
   };
 
   const updateStatus = async (id: string, status: ColetaStatus) => {
-    const update: any = { status };
+    const update: { status: ColetaStatus; data_efetiva_coleta?: string } = { status };
     if (status === "em_transito") update.data_efetiva_coleta = new Date().toISOString();
     const { error } = await supabase.from("coletas").update(update).eq("id", id);
     if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });

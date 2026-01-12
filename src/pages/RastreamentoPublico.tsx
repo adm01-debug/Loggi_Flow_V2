@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, CheckCircle2, Clock, MapPin, Search, Loader2, AlertTriangle, Phone, Calendar } from "lucide-react";
+import { Package, Truck, CheckCircle2, Clock, MapPin, Search, Loader2, AlertTriangle, Phone, Calendar, LucideIcon } from "lucide-react";
 import { Timeline } from "@/components/common/Timeline";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
+const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
   coletado: { label: "Coletado", color: "text-blue-500", icon: Package },
   em_transito: { label: "Em Trânsito", color: "text-amber-500", icon: Truck },
   saiu_entrega: { label: "Saiu para Entrega", color: "text-purple-500", icon: Truck },

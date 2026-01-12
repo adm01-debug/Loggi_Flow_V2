@@ -27,8 +27,9 @@ export default function Profile() {
       const { error } = await supabase.from("profiles").update({ full_name: form.full_name }).eq("id", user.id);
       if (error) throw error;
       toast.success("Perfil atualizado!"); 
-    } catch (e: any) {
-      toast.error("Erro: " + e.message);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Erro desconhecido";
+      toast.error("Erro: " + message);
     }
     setSaving(false); 
   };

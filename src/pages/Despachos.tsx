@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, Clock, CheckCircle2, Plus, Loader2, RefreshCw, ArrowRight } from "lucide-react";
+import { Package, Truck, Clock, CheckCircle2, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon } from "lucide-react";
 import { useRealtime } from "@/hooks/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
@@ -28,7 +28,7 @@ const filterConfig: FilterConfig<Despacho> = {
   }
 };
 
-const statusConfig: Record<string, { color: string; icon: any }> = {
+const statusConfig: Record<string, { color: string; icon: LucideIcon }> = {
   aguardando: { color: "bg-gray-100 text-gray-700", icon: Clock },
   em_separacao: { color: "bg-amber-100 text-amber-700", icon: Package },
   pronto: { color: "bg-green-100 text-green-700", icon: CheckCircle2 },
@@ -44,7 +44,16 @@ export default function Despachos() {
     queryFn: async () => {
       const { data, error } = await supabase.from("entregas").select("*").order("created_at", { ascending: false }).limit(100);
       if (error) throw error;
-      return (data || []).map((d: any) => ({ id: d.id, numero: d.numero_nf || d.id.slice(0, 8), cliente: d.cliente_nome || "Cliente", destino: d.endereco_destino || "Endereço", status: d.status || "aguardando", transportadora: d.transportadora_nome, created_at: d.created_at }));
+      interface EntregaRow {
+        id: string;
+        numero_nf?: string;
+        cliente_nome?: string;
+        endereco_destino?: string;
+        status?: string;
+        transportadora_nome?: string;
+        created_at: string;
+      }
+      return (data || []).map((d: EntregaRow) => ({ id: d.id, numero: d.numero_nf || d.id.slice(0, 8), cliente: d.cliente_nome || "Cliente", destino: d.endereco_destino || "Endereço", status: d.status || "aguardando", transportadora: d.transportadora_nome, created_at: d.created_at }));
     },
   });
 

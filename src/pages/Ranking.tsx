@@ -55,9 +55,21 @@ export default function Ranking() {
 
   useRealtime({ table: "user_levels", onUpdate: () => refetch() });
 
+  interface LeaderboardEntry {
+    user_id: string;
+    full_name?: string;
+    avatar_url?: string;
+    total_xp?: number;
+    level?: number;
+    streak_days?: number;
+    coins?: number;
+    achievements_count?: string | number;
+    rank?: string | number;
+  }
+
   const users: RankUser[] = useMemo(
     () =>
-      (leaderboard || []).map((u: any) => ({
+      (leaderboard || []).map((u: LeaderboardEntry) => ({
         id: u.user_id,
         name: u.full_name || "Usuário",
         avatar: u.avatar_url,
@@ -88,8 +100,9 @@ export default function Ranking() {
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
 
   const top3 = sortedData.slice(0, 3);
-  const SortIcon = ({ field }: { field: string }) => {
-    const dir = getSortDirection(field as any);
+  type SortableField = keyof RankUser;
+  const SortIcon = ({ field }: { field: SortableField }) => {
+    const dir = getSortDirection(field);
     if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
     return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
   };
