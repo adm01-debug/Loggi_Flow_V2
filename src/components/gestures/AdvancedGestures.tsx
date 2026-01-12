@@ -248,7 +248,7 @@ export function LongPress({
       {/* Progress indicator */}
       {isPressed && (
         <motion.div
-          className="absolute inset-0 bg-foreground/10 rounded-inherit pointer-events-none"
+          className="absolute inset-0 bg-foreground/10 rounded-lg pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
