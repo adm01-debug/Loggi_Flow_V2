@@ -36,7 +36,6 @@ export { DuplicateDialog } from './DuplicateDialog';
 
 // Data Import/Export
 export { DataExporter } from './DataExporter';
-export { DataImporter } from './DataImporter';
 export { CSVImporter } from './CSVImporter';
 export { ExcelImporter } from './ExcelImporter';
 export { ExportButton } from './ExportButton';
@@ -47,7 +46,6 @@ export { CommentSectionWithMentions } from './CommentSectionWithMentions';
 
 // Filters & Search
 export { AdvancedFilter } from './AdvancedFilter';
-export { SavedFiltersDropdown } from './SavedFiltersDropdown';
 
 // History & Versioning
 export { VersionHistory } from './VersionHistory';
