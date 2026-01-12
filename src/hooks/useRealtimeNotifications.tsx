@@ -59,8 +59,8 @@ export function useRealtimeNotifications(options: UseRealtimeNotificationsOption
             metadata: n.metadata as Record<string, unknown> | undefined
           }))
         );
-      } catch (error) {
-        console.error('Error loading notifications:', error);
+      } catch {
+        // Silent fail - notification loading is non-critical
       } finally {
         setIsLoading(false);
       }
@@ -167,8 +167,8 @@ export function useRealtimeNotifications(options: UseRealtimeNotificationsOption
       setNotifications(prev =>
         prev.map(n => (n.id === id ? { ...n, read: true } : n))
       );
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
+    } catch {
+      // Silent fail
     }
   }, [user?.id]);
 
@@ -183,8 +183,8 @@ export function useRealtimeNotifications(options: UseRealtimeNotificationsOption
         .eq('read', false);
 
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+    } catch {
+      // Silent fail
     }
   }, [user?.id]);
 
@@ -199,8 +199,8 @@ export function useRealtimeNotifications(options: UseRealtimeNotificationsOption
         .eq('user_id', user.id);
 
       setNotifications(prev => prev.filter(n => n.id !== id));
-    } catch (error) {
-      console.error('Error deleting notification:', error);
+    } catch {
+      // Silent fail
     }
   }, [user?.id]);
 
@@ -214,8 +214,8 @@ export function useRealtimeNotifications(options: UseRealtimeNotificationsOption
         .eq('user_id', user.id);
 
       setNotifications([]);
-    } catch (error) {
-      console.error('Error clearing notifications:', error);
+    } catch {
+      // Silent fail
     }
   }, [user?.id]);
 

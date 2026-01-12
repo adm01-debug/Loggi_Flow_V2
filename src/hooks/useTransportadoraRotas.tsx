@@ -213,8 +213,7 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
       queryClient.invalidateQueries({ queryKey: ['transportadora-rotas'] });
       toast.success('Rota atualizada com sucesso!');
     },
-    onError: (error) => {
-      console.error('Error updating route:', error);
+    onError: () => {
       toast.error('Erro ao atualizar rota');
     },
   });
@@ -233,8 +232,7 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
       queryClient.invalidateQueries({ queryKey: ['transportadora-rotas'] });
       toast.success('Rota removida com sucesso!');
     },
-    onError: (error) => {
-      console.error('Error deleting route:', error);
+    onError: () => {
       toast.error('Erro ao remover rota');
     },
   });

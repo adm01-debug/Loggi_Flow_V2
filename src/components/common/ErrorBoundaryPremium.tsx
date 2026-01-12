@@ -328,9 +328,6 @@ export class ErrorBoundaryPremium extends Component<ErrorBoundaryProps, ErrorBou
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ errorInfo });
     
-    // Log to console
-    console.error("Error caught by ErrorBoundaryPremium:", error, errorInfo);
-    
     // Call external error handler
     this.props.onError?.(error, errorInfo);
   }

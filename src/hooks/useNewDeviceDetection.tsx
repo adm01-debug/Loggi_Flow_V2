@@ -86,7 +86,6 @@ export function useNewDeviceDetection() {
         .maybeSingle();
 
       if (checkError) {
-        console.error('Error checking device:', checkError);
         return;
       }
 
@@ -126,7 +125,6 @@ export function useNewDeviceDetection() {
         });
 
       if (insertError) {
-        console.error('Error registering device:', insertError);
         return;
       }
 
@@ -146,16 +144,14 @@ export function useNewDeviceDetection() {
           },
         });
 
-        if (emailError) {
-          console.error('Error sending alert email:', emailError);
-        } else {
+        if (!emailError) {
           toast.info('Novo dispositivo detectado', {
             description: 'Um email de alerta foi enviado para sua conta.',
           });
         }
       }
-    } catch (error) {
-      console.error('Error in device detection:', error);
+    } catch {
+      // Silent fail - device detection is non-critical
     }
   }, [user?.id, user?.email]);
 

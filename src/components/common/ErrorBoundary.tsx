@@ -26,9 +26,6 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ error, errorInfo });
     
-    // Log to console in development
-    console.error("Error caught by ErrorBoundary:", error, errorInfo);
-    
     // Here you could send to an error tracking service like Sentry
     // logErrorToService(error, errorInfo);
   }
@@ -98,7 +95,6 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-// Hook version for functional components
 import { useCallback, useState } from "react";
 
 export function useErrorHandler() {
@@ -106,7 +102,6 @@ export function useErrorHandler() {
 
   const handleError = useCallback((error: Error) => {
     setError(error);
-    console.error("Error handled:", error);
   }, []);
 
   const resetError = useCallback(() => {

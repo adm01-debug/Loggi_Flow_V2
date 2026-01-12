@@ -197,10 +197,10 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
       });
 
       if (error) {
-        console.error('Error saving alert to database:', error);
+        // Silent fail - alert database logging is non-critical
       }
-    } catch (err) {
-      console.error('Error saving alert:', err);
+    } catch {
+      // Silent fail
     }
   };
 
@@ -253,8 +253,8 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
       if (error) throw error;
 
       setSavedHistory(data || []);
-    } catch (err) {
-      console.error('Error fetching saved history:', err);
+    } catch {
+      // Silent fail
     }
   }, [orderId]);
 
@@ -290,7 +290,6 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
       setOrderDetails(orderInfo);
       return orderInfo;
     } catch (err) {
-      console.error('Error fetching order details:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
       return null;
@@ -398,7 +397,6 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
       setDriverLocation(location);
       setError(null);
     } catch (err) {
-      console.error('Error fetching driver location:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       if (!errorMessage.includes('403')) {
         setError(errorMessage);
@@ -440,7 +438,6 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
       // Initial fetch
       fetchDriverLocation();
     } catch (err) {
-      console.error('Error starting tracking:', err);
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
       toast.error('Erro ao iniciar rastreamento');

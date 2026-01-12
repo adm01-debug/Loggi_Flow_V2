@@ -69,7 +69,6 @@ export function useBitrix24(options: UseBitrix24Options = {}) {
 
       return result.data;
     } catch (error) {
-      console.error('Bitrix24 error:', error);
       toast.error(`Erro Bitrix24: ${(error as Error).message}`);
       return null;
     } finally {

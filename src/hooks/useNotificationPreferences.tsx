@@ -54,8 +54,8 @@ export function useNotificationPreferences() {
         try {
           const parsed = JSON.parse(saved);
           setPreferences({ ...defaultPreferences, ...parsed });
-        } catch (e) {
-          console.error('Error parsing notification preferences:', e);
+        } catch {
+          // Invalid JSON - use defaults
         }
       }
       setIsLoaded(true);

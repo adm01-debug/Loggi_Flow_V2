@@ -137,8 +137,8 @@ const TrackingHeatmap = () => {
 
       setStats({ stops: stopCount, alerts: alertCount, hotspots });
       setHeatmapData(points);
-    } catch (error) {
-      console.error('Error fetching heatmap data:', error);
+    } catch {
+      // Silent fail - heatmap data is non-critical
     } finally {
       setIsLoading(false);
     }
