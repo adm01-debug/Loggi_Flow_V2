@@ -57,8 +57,9 @@ export function useImageUpload(bucket: string = "ocorrencias-fotos") {
         url: urlData.publicUrl,
         path: filePath,
       };
-    } catch (error: any) {
-      toast.error(`Erro no upload: ${error.message}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      toast.error(`Erro no upload: ${errorMessage}`);
       return null;
     } finally {
       setUploading(false);
@@ -85,8 +86,9 @@ export function useImageUpload(bucket: string = "ocorrencias-fotos") {
 
       if (error) throw error;
       return true;
-    } catch (error: any) {
-      toast.error(`Erro ao excluir: ${error.message}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      toast.error(`Erro ao excluir: ${errorMessage}`);
       return false;
     }
   };

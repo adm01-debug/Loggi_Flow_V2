@@ -276,7 +276,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
         shareLink: order.shareLink,
         status: order.status,
         distance: order.distance,
-        stops: order.stops.map((stop: any) => ({
+        stops: order.stops.map((stop: { coordinates: { lat: string; lng: string }; address: string; name: string; phone: string }) => ({
           coordinates: {
             lat: parseFloat(stop.coordinates.lat),
             lng: parseFloat(stop.coordinates.lng),
@@ -289,9 +289,10 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
 
       setOrderDetails(orderInfo);
       return orderInfo;
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching order details:', err);
-      setError(err.message);
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      setError(errorMessage);
       return null;
     }
   }, [orderId, useSandbox]);
@@ -396,10 +397,11 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
       lastLocationRef.current = { lat: currentLat, lng: currentLng, timestamp: new Date() };
       setDriverLocation(location);
       setError(null);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching driver location:', err);
-      if (!err.message?.includes('403')) {
-        setError(err.message);
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      if (!errorMessage.includes('403')) {
+        setError(errorMessage);
       }
     }
   }, [orderId, orderDetails, useSandbox, coletaId]);
@@ -437,9 +439,10 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
 
       // Initial fetch
       fetchDriverLocation();
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error starting tracking:', err);
-      setError(err.message);
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      setError(errorMessage);
       toast.error('Erro ao iniciar rastreamento');
     } finally {
       setIsLoading(false);

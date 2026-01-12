@@ -92,6 +92,14 @@ export function useConciliacao() {
     queryFn: async (): Promise<ItemSistema[]> => {
       if (!selectedConciliacao) return [];
       
+      interface EntregaRaw {
+        id: string;
+        numero_entrega: string;
+        created_at: string;
+        valor_frete: number | null;
+        transportadora: { nome_fantasia: string } | null;
+      }
+
       let query = supabase
         .from("entregas")
         .select("id, numero_entrega, created_at, valor_frete, transportadora:transportadoras(nome_fantasia)")
@@ -107,7 +115,7 @@ export function useConciliacao() {
       const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
 
-      return (data || []).map((e: any) => ({
+      return (data || []).map((e: EntregaRaw) => ({
         id: e.id,
         numero: e.numero_entrega,
         data: e.created_at,

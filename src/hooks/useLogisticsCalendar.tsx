@@ -60,8 +60,19 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
 
         const { data: coletas } = await coletasQuery;
 
+        interface ColetaRaw {
+          id: string;
+          numero_coleta: string;
+          endereco_coleta: string;
+          data_prevista_coleta: string;
+          status: string;
+          transportadora_id: string | null;
+          transportadoras: { nome_fantasia: string } | null;
+          fornecedores: { razao_social: string } | null;
+        }
+
         if (coletas) {
-          coletas.forEach((coleta: any) => {
+          (coletas as ColetaRaw[]).forEach((coleta) => {
             events.push({
               id: coleta.id,
               title: coleta.numero_coleta,
@@ -111,8 +122,19 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
 
         const { data: entregas } = await entregasQuery;
 
+        interface EntregaRaw {
+          id: string;
+          numero_entrega: string;
+          endereco_entrega: string;
+          previsao_entrega: string;
+          status: string;
+          transportadora_id: string | null;
+          transportadoras: { nome_fantasia: string } | null;
+          clientes: { razao_social: string } | null;
+        }
+
         if (entregas) {
-          entregas.forEach((entrega: any) => {
+          (entregas as EntregaRaw[]).forEach((entrega) => {
             events.push({
               id: entrega.id,
               title: entrega.numero_entrega,
