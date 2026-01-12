@@ -55,9 +55,15 @@ const GRADIENT_COLORS = [
 // ============================================
 // CUSTOM TOOLTIP
 // ============================================
+interface TooltipPayloadEntry {
+  name: string;
+  value: number;
+  color: string;
+}
+
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: TooltipPayloadEntry[];
   label?: string;
   formatter?: (value: number) => string;
 }
@@ -78,7 +84,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     >
       <p className="text-sm font-medium text-foreground mb-2">{label}</p>
       <div className="space-y-1">
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry: TooltipPayloadEntry, index: number) => (
           <div key={index} className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <div 
@@ -237,7 +243,7 @@ interface InteractiveBarChartProps {
   horizontal?: boolean;
   showLegend?: boolean;
   formatter?: (value: number) => string;
-  onBarClick?: (data: any) => void;
+  onBarClick?: (data: BarChartData) => void;
 }
 
 export const InteractiveBarChart: React.FC<InteractiveBarChartProps> = ({
@@ -333,7 +339,7 @@ interface InteractiveLineChartProps {
   showDots?: boolean;
   curved?: boolean;
   formatter?: (value: number) => string;
-  onPointClick?: (data: any) => void;
+  onPointClick?: () => void;
 }
 
 export const InteractiveLineChart: React.FC<InteractiveLineChartProps> = ({
@@ -437,7 +443,7 @@ interface InteractivePieChartProps {
   showLabels?: boolean;
   showLegend?: boolean;
   formatter?: (value: number) => string;
-  onSliceClick?: (data: any) => void;
+  onSliceClick?: (data: PieChartData) => void;
 }
 
 export const InteractivePieChart: React.FC<InteractivePieChartProps> = ({
@@ -502,11 +508,14 @@ export const InteractivePieChart: React.FC<InteractivePieChartProps> = ({
               layout="vertical"
               align="right"
               verticalAlign="middle"
-              formatter={(value, entry: any) => (
-                <span className="text-sm">
-                  {value} ({((entry.payload.value / total) * 100).toFixed(1)}%)
-                </span>
-              )}
+              formatter={(value, entry) => {
+                const payload = entry.payload as unknown as PieChartData | undefined;
+                return (
+                  <span className="text-sm">
+                    {value} ({payload ? ((payload.value / total) * 100).toFixed(1) : 0}%)
+                  </span>
+                );
+              }}
             />
           )}
           

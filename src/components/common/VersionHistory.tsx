@@ -9,7 +9,7 @@ import { ptBR } from 'date-fns/locale';
 interface VersionHistoryProps {
   entityType: string;
   entityId: string | null;
-  onRestore?: (data: Record<string, any>) => void;
+  onRestore?: (data: Record<string, unknown>) => void;
 }
 
 export function VersionHistory({ entityType, entityId, onRestore }: VersionHistoryProps) {

@@ -72,7 +72,19 @@ const CHART_TYPES: { type: ChartType; icon: React.ReactNode; label: string }[] =
   { type: "pie", icon: <PieChartIcon className="w-4 h-4" />, label: "Pizza" },
 ];
 
-function CustomTooltip({ active, payload, label }: any) {
+interface TooltipPayloadEntry {
+  name: string;
+  value: number | string;
+  color: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
   return (
@@ -83,7 +95,7 @@ function CustomTooltip({ active, payload, label }: any) {
     >
       <p className="font-medium text-sm mb-2 text-foreground">{label}</p>
       <div className="space-y-1.5">
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry: TooltipPayloadEntry, index: number) => (
           <div key={index} className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <div
@@ -182,7 +194,7 @@ export function InteractiveChart({
                   key={`cell-${index}`}
                   fill={entry.color}
                   className="cursor-pointer transition-opacity hover:opacity-80"
-                  onClick={() => onDataPointClick?.(entry as any, entry.name)}
+                  onClick={() => onDataPointClick?.(entry as DataPoint, entry.name)}
                 />
               ))}
             </Pie>

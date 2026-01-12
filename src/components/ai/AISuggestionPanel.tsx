@@ -28,7 +28,7 @@ export interface AISuggestion {
   actionLabel?: string;
   onAction?: () => void;
   dismissible?: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface AISuggestionPanelProps {

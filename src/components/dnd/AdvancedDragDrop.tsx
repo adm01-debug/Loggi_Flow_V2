@@ -144,7 +144,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
 // ============================================
 interface SortableListItem {
   id: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface SortableListProps<T extends SortableListItem> {
@@ -282,7 +282,7 @@ interface KanbanCard {
   title: string;
   description?: string;
   labels?: { text: string; color: string }[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface KanbanColumn {
@@ -529,7 +529,7 @@ interface TreeNode {
   label: string;
   icon?: React.ReactNode;
   children?: TreeNode[];
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 interface TreeViewProps {
