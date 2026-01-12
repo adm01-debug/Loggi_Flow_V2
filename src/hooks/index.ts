@@ -90,3 +90,8 @@ export { useN8nWorkflows, useN8nTrigger, useN8nLogs } from './useN8nReal';
 export { useTimezone } from './useTimezone';
 export { usePushNotifications } from './usePushNotifications';
 export { useNotifications } from './useNotifications';
+
+// ============================================
+// Form & Auto-Save
+// ============================================
+export { useAutoSave } from './useAutoSave';
