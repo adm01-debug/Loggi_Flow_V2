@@ -1,3 +1,7 @@
+// ============================================
+// I18N - INTERNATIONALIZATION SYSTEM
+// ============================================
+
 import ptBR from './locales/pt-BR.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -42,7 +46,7 @@ export function t(key: string, locale?: Locale): string {
     if (value && typeof value === 'object' && k in value) {
       value = (value as Record<string, unknown>)[k];
     } else {
-      console.warn(`Translation not found: ${key}`);
+      // Return key if translation not found (silent fail in production)
       return key;
     }
   }

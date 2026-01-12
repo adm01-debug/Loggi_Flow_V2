@@ -24,17 +24,16 @@ export interface FilterConfig<T> {
   };
 }
 
+// Type for filter values - supports string, DateRange, or undefined
+type FilterValue = string | DateRange | undefined;
+
 export interface FilterState {
   search: string;
   dateRange: DateRange | undefined;
   status: string;
-  // Dynamic keys for custom select filters - using any to support index signature
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  // Dynamic keys for custom select filters
+  [key: string]: FilterValue;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FilterValue = any;
 
 // Using a generic constraint that allows any object type
 export function useFilters<T extends object>(
