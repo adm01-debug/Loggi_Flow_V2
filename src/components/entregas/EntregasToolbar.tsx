@@ -1,11 +1,11 @@
 import { memo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Download, Upload, RefreshCw, Truck, MapPin } from 'lucide-react';
-import { SearchInput } from '@/components/SearchInput';
-import { SavedFiltersDropdown } from '@/components/SavedFiltersDropdown';
+import { SearchInput } from '@/components/common/SearchInput';
+import { SavedFiltersDropdown } from '@/components/common/SavedFiltersDropdown';
 import { AdvancedFilter, FilterValue, FilterConfig } from '@/components/common/AdvancedFilter';
-import { DataImporter } from '@/components/DataImporter';
-import { BulkActionsBar } from '@/components/BulkActionsBar';
+import { DataImporter } from '@/components/common/DataImporter';
+import { BulkActionsBar } from '@/components/common/BulkActionsBar';
 import { entregaSchema, loggiFilterConfigs } from '@/lib/loggiSchemas';
 import { exportToExcel } from '@/lib/excelImporter';
 import { supabase } from '@/integrations/supabase/client';
