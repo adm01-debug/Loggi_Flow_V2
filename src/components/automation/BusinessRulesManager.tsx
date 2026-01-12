@@ -55,6 +55,7 @@ import {
   CONDITION_OPERATORS,
   ACTION_TYPES,
   CreateRuleInput,
+  BusinessRule,
 } from "@/hooks/useBusinessRules";
 import { cn } from "@/lib/utils";
 
@@ -396,9 +397,9 @@ function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
 export function BusinessRulesManager() {
   const { rules, isLoading, deleteRule, toggleRule } = useBusinessRules();
   const [editorOpen, setEditorOpen] = useState(false);
-  const [editingRule, setEditingRule] = useState<any>(null);
+  const [editingRule, setEditingRule] = useState<BusinessRule | null>(null);
 
-  const handleEdit = (rule: any) => {
+  const handleEdit = (rule: BusinessRule) => {
     setEditingRule(rule);
     setEditorOpen(true);
   };
