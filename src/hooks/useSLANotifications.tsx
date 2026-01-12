@@ -172,9 +172,9 @@ export function useSLANotifications() {
   }, [toast]);
 
   // Check if an entrega has critical SLA issues
-  const checkEntregaSLA = useCallback((entrega: any) => {
+  const checkEntregaSLA = useCallback((entrega: { previsao_entrega?: string; status?: string; numero_entrega?: string }) => {
     if (!entrega.previsao_entrega) return null;
-    if (["entregue", "cancelada"].includes(entrega.status)) return null;
+    if (entrega.status && ["entregue", "cancelada"].includes(entrega.status)) return null;
 
     const prazo = parseISO(entrega.previsao_entrega);
     const now = new Date();
@@ -184,13 +184,13 @@ export function useSLANotifications() {
       return {
         type: "critical" as const,
         message: `Entrega ${entrega.numero_entrega} está atrasada há ${Math.floor(horasAtraso / 24)} dias e ${horasAtraso % 24} horas`,
-        numero: entrega.numero_entrega,
+        numero: entrega.numero_entrega || '',
       };
     } else if (horasAtraso > -24) {
       return {
         type: "warning" as const,
         message: `Entrega ${entrega.numero_entrega} vence em ${Math.abs(horasAtraso)} horas`,
-        numero: entrega.numero_entrega,
+        numero: entrega.numero_entrega || '',
       };
     }
 
@@ -198,9 +198,9 @@ export function useSLANotifications() {
   }, []);
 
   // Check if a coleta has critical SLA issues
-  const checkColetaSLA = useCallback((coleta: any) => {
+  const checkColetaSLA = useCallback((coleta: { data_prevista_coleta?: string; status?: string; numero_coleta?: string }) => {
     if (!coleta.data_prevista_coleta) return null;
-    if (["finalizada", "cancelada"].includes(coleta.status)) return null;
+    if (coleta.status && ["finalizada", "cancelada"].includes(coleta.status)) return null;
 
     const prazo = parseISO(coleta.data_prevista_coleta);
     const now = new Date();
@@ -210,13 +210,13 @@ export function useSLANotifications() {
       return {
         type: "critical" as const,
         message: `Coleta ${coleta.numero_coleta} está atrasada há ${Math.floor(horasAtraso / 24)} dias`,
-        numero: coleta.numero_coleta,
+        numero: coleta.numero_coleta || '',
       };
     } else if (horasAtraso > -12) {
       return {
         type: "warning" as const,
         message: `Coleta ${coleta.numero_coleta} vence em ${Math.abs(horasAtraso)} horas`,
-        numero: coleta.numero_coleta,
+        numero: coleta.numero_coleta || '',
       };
     }
 

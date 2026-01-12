@@ -17,7 +17,7 @@ interface UseRealtimeOptions<T> {
   enabled?: boolean;
 }
 
-export function useRealtime<T = any>({
+export function useRealtime<T = Record<string, unknown>>({
   table,
   schema = "public",
   event = "*",
@@ -32,13 +32,11 @@ export function useRealtime<T = any>({
   const channelRef = useRef<RealtimeChannel | null>(null);
 
   const handleChange = useCallback(
-    (payload: RealtimePostgresChangesPayload<T>) => {
-      // Invalidar query se especificada
+    (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
       if (queryKey) {
         queryClient.invalidateQueries({ queryKey });
       }
 
-      // Callbacks específicos
       switch (payload.eventType) {
         case "INSERT":
           onInsert?.(payload.new as T);
@@ -57,23 +55,17 @@ export function useRealtime<T = any>({
   useEffect(() => {
     if (!enabled) return;
 
-    const channelConfig: any = {
+    // Supabase Realtime API requires literal types - using type assertion for dynamic config
+    const channelConfig = {
       event,
       schema,
       table,
-    };
-
-    if (filter) {
-      channelConfig.filter = filter;
-    }
+      ...(filter && { filter }),
+    } as { event: "*"; schema: "public"; table: string; filter?: string };
 
     const channel = supabase
       .channel(`realtime:${table}`)
-      .on(
-        "postgres_changes",
-        channelConfig,
-        handleChange as any
-      )
+      .on("postgres_changes", channelConfig, handleChange)
       .subscribe();
 
     channelRef.current = channel;
@@ -94,7 +86,7 @@ export function useRealtime<T = any>({
 // Hook para múltiplas tabelas
 interface RealtimeTableConfig<T> extends Omit<UseRealtimeOptions<T>, "enabled"> {}
 
-export function useMultiTableRealtime<T = any>(
+export function useMultiTableRealtime<T = Record<string, unknown>>(
   tables: RealtimeTableConfig<T>[],
   enabled = true
 ) {
@@ -104,24 +96,20 @@ export function useMultiTableRealtime<T = any>(
   useEffect(() => {
     if (!enabled) return;
 
-    // Criar canais para cada tabela
     tables.forEach((config) => {
-      const channelConfig: any = {
+      const channelConfig = {
         event: config.event || "*",
         schema: config.schema || "public",
         table: config.table,
-      };
-
-      if (config.filter) {
-        channelConfig.filter = config.filter;
-      }
+        ...(config.filter && { filter: config.filter }),
+      } as { event: "*"; schema: "public"; table: string; filter?: string };
 
       const channel = supabase
         .channel(`realtime:${config.table}`)
         .on(
           "postgres_changes",
           channelConfig,
-          (payload: any) => {
+          (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
             if (config.queryKey) {
               queryClient.invalidateQueries({ queryKey: config.queryKey });
             }

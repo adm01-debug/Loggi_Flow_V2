@@ -132,6 +132,20 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
   const query = useQuery({
     queryKey: ['delivery-routes'],
     queryFn: async (): Promise<DeliveryRoute[]> => {
+      interface EntregaRaw {
+        id: string;
+        numero_entrega: string;
+        status: string;
+        endereco_entrega: string;
+        previsao_entrega: string | null;
+        data_entrega_efetiva: string | null;
+        latitude: number | null;
+        longitude: number | null;
+        geocoded_at: string | null;
+        transportadora: { id: string; nome_fantasia: string } | null;
+        cliente: { id: string; nome_fantasia: string | null; razao_social: string; cidade: string | null; estado: string | null } | null;
+      }
+
       const { data, error } = await supabase
         .from('entregas')
         .select(`
@@ -153,7 +167,7 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
       if (error) throw error;
 
       // Map deliveries with coordinates from DB or fallback
-      return (data || []).map((entrega: any) => {
+      return (data || []).map((entrega: EntregaRaw) => {
         // Check if we have persisted coordinates
         if (entrega.latitude && entrega.longitude) {
           return {

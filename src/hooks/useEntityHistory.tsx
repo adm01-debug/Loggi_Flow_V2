@@ -8,7 +8,7 @@ interface HistoryEvent {
   timestamp: string;
   status?: "completed" | "current" | "pending" | "error";
   user?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface UseEntityHistoryOptions {
@@ -43,8 +43,8 @@ export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptio
           case "UPDATE":
             title = "Registro atualizado";
             // Detectar mudanças específicas
-            if (log.old_data && log.new_data) {
-              const changes = getChanges(log.old_data, log.new_data);
+            if (log.old_data && log.new_data && typeof log.old_data === 'object' && typeof log.new_data === 'object' && !Array.isArray(log.old_data) && !Array.isArray(log.new_data)) {
+              const changes = getChanges(log.old_data as Record<string, unknown>, log.new_data as Record<string, unknown>);
               if (changes.length > 0) {
                 description = changes.join(", ");
               }
@@ -64,7 +64,7 @@ export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptio
           timestamp: log.created_at,
           status: log.action === "DELETE" ? "error" : "completed",
           metadata: typeof log.new_data === 'object' && log.new_data !== null 
-            ? log.new_data as Record<string, any> 
+            ? log.new_data as Record<string, unknown> 
             : undefined,
         };
       });
@@ -76,7 +76,7 @@ export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptio
 }
 
 // Helper para detectar mudanças
-function getChanges(oldData: any, newData: any): string[] {
+function getChanges(oldData: Record<string, unknown>, newData: Record<string, unknown>): string[] {
   const changes: string[] = [];
   const fieldLabels: Record<string, string> = {
     status: "Status",
