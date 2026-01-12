@@ -28,10 +28,16 @@ export interface FilterState {
   search: string;
   dateRange: DateRange | undefined;
   status: string;
+  // Dynamic keys for custom select filters - using any to support index signature
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
-export function useFilters<T extends Record<string, any>>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FilterValue = any;
+
+// Using a generic constraint that allows any object type
+export function useFilters<T extends object>(
   data: T[],
   config: FilterConfig<T>
 ) {
@@ -53,7 +59,7 @@ export function useFilters<T extends Record<string, any>>(
     setFilters((prev) => ({ ...prev, status: value }));
   }, []);
 
-  const setFilter = useCallback((key: string, value: any) => {
+  const setFilter = useCallback((key: string, value: FilterValue) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   }, []);
 
@@ -65,7 +71,7 @@ export function useFilters<T extends Record<string, any>>(
     });
   }, []);
 
-  const filteredData = useMemo(() => {
+  const filteredData = useMemo((): T[] => {
     let result = [...data];
 
     // Filtro de busca
@@ -73,7 +79,7 @@ export function useFilters<T extends Record<string, any>>(
       const searchLower = filters.search.toLowerCase();
       result = result.filter((item) =>
         config.search!.fields.some((field) => {
-          const value = item[field];
+          const value = (item as Record<string, unknown>)[field as string];
           return value && String(value).toLowerCase().includes(searchLower);
         })
       );
@@ -83,7 +89,7 @@ export function useFilters<T extends Record<string, any>>(
     if (filters.dateRange?.from && config.dateRange) {
       const { from, to } = filters.dateRange;
       result = result.filter((item) => {
-        const itemDate = new Date(item[config.dateRange!.field] as string);
+        const itemDate = new Date((item as Record<string, unknown>)[config.dateRange!.field as string] as string);
         if (to) {
           return itemDate >= from && itemDate <= to;
         }
@@ -94,7 +100,7 @@ export function useFilters<T extends Record<string, any>>(
     // Filtro de status
     if (filters.status && filters.status !== "all" && config.status) {
       result = result.filter(
-        (item) => item[config.status!.field] === filters.status
+        (item) => (item as Record<string, unknown>)[config.status!.field as string] === filters.status
       );
     }
 
@@ -104,7 +110,7 @@ export function useFilters<T extends Record<string, any>>(
         const filterValue = filters[key];
         if (filterValue && filterValue !== "all") {
           result = result.filter(
-            (item) => item[selectConfig.field] === filterValue
+            (item) => (item as Record<string, unknown>)[selectConfig.field as string] === filterValue
           );
         }
       });
