@@ -1,7 +1,12 @@
 import { useEffect, useCallback, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+type ColetaRow = Database['public']['Tables']['coletas']['Row'];
+type EntregaRow = Database['public']['Tables']['entregas']['Row'];
+type OcorrenciaRow = Database['public']['Tables']['ocorrencias']['Row'];
 
 export interface SystemAlert {
   id: string;
@@ -149,9 +154,9 @@ export function useSmartAlerts() {
           schema: 'public',
           table: 'coletas',
         },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          const newRecord = payload.new as any;
-          const oldRecord = payload.old as any;
+        (payload: RealtimePostgresChangesPayload<ColetaRow>) => {
+          const newRecord = payload.new as ColetaRow | null;
+          const oldRecord = payload.old as Partial<ColetaRow> | null;
           
           // Check for divergence
           if (newRecord?.divergencia_percentual && newRecord.divergencia_percentual > 5) {
@@ -193,9 +198,9 @@ export function useSmartAlerts() {
           schema: 'public',
           table: 'entregas',
         },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          const newRecord = payload.new as any;
-          const oldRecord = payload.old as any;
+        (payload: RealtimePostgresChangesPayload<EntregaRow>) => {
+          const newRecord = payload.new as EntregaRow | null;
+          const oldRecord = payload.old as Partial<EntregaRow> | null;
           
           // Status change to ocorrencia
           if (oldRecord?.status !== newRecord?.status && newRecord?.status === 'ocorrencia') {
@@ -222,8 +227,8 @@ export function useSmartAlerts() {
           schema: 'public',
           table: 'ocorrencias',
         },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          const newRecord = payload.new as any;
+        (payload: RealtimePostgresChangesPayload<OcorrenciaRow>) => {
+          const newRecord = payload.new as OcorrenciaRow;
           addAlert({
             type: 'ocorrencia',
             title: 'Nova Ocorrência Registrada',

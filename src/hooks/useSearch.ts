@@ -46,8 +46,12 @@ export function useSearch<T extends Record<string, unknown>>(
     queryFn: async () => {
       if (!shouldSearch) return [];
       const orConditions = columns.map((col) => `${col}.ilike.%${debouncedTerm}%`).join(',');
-      let query = supabase.from(tableName).select('*').or(orConditions).limit(limit) as any;
-      if (orderBy) query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
+      
+      const baseQuery = supabase.from(tableName).select('*').or(orConditions).limit(limit);
+      const query = orderBy 
+        ? baseQuery.order(orderBy.column, { ascending: orderBy.ascending ?? true })
+        : baseQuery;
+      
       const { data, error } = await query;
       if (error) throw error;
       return (data || []) as unknown as T[];
@@ -59,10 +63,21 @@ export function useSearch<T extends Record<string, unknown>>(
   const clearSearch = useCallback(() => setSearchTerm(''), []);
   const results = useMemo(() => data ?? [], [data]);
 
-  return { results, isLoading: shouldSearch && isLoading, error: error as Error | null, searchTerm, setSearchTerm, clearSearch, hasResults: results.length > 0 };
+  return { 
+    results, 
+    isLoading: shouldSearch && isLoading, 
+    error: error as Error | null, 
+    searchTerm, 
+    setSearchTerm, 
+    clearSearch, 
+    hasResults: results.length > 0 
+  };
 }
 
-export function useLocalSearch<T extends Record<string, unknown>>(data: T[], options: Omit<SearchOptions, 'orderBy' | 'limit'>): UseSearchResult<T> {
+export function useLocalSearch<T extends Record<string, unknown>>(
+  data: T[], 
+  options: Omit<SearchOptions, 'orderBy' | 'limit'>
+): UseSearchResult<T> {
   const { columns, minChars = 2, debounceMs = 300 } = options;
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedTerm = useDebouncedValue(searchTerm, debounceMs);
@@ -78,7 +93,16 @@ export function useLocalSearch<T extends Record<string, unknown>>(data: T[], opt
   }, [data, debouncedTerm, columns, minChars]);
 
   const clearSearch = useCallback(() => setSearchTerm(''), []);
-  return { results, isLoading: false, error: null, searchTerm, setSearchTerm, clearSearch, hasResults: results.length > 0 && debouncedTerm.length >= minChars };
+  
+  return { 
+    results, 
+    isLoading: false, 
+    error: null, 
+    searchTerm, 
+    setSearchTerm, 
+    clearSearch, 
+    hasResults: results.length > 0 && debouncedTerm.length >= minChars 
+  };
 }
 
 export default useSearch;

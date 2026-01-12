@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableNames = keyof Database['public']['Tables'];
 
 interface DuplicateOptions {
   excludeFields?: string[];
@@ -8,11 +11,16 @@ interface DuplicateOptions {
   onSuccess?: (newId: string) => void;
 }
 
-export function useDuplicate<T extends { id: string }>(table: string, queryKey: string[]) {
+interface DuplicateResult {
+  id: string;
+  [key: string]: unknown;
+}
+
+export function useDuplicate<T extends { id: string }>(table: TableNames, queryKey: string[]) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ original, options }: { original: T; options?: DuplicateOptions }) => {
+    mutationFn: async ({ original, options }: { original: T; options?: DuplicateOptions }): Promise<DuplicateResult> => {
       const { excludeFields = ['id', 'created_at', 'updated_at'], modifyFields = {} } = options || {};
       
       const duplicatedData = Object.entries(original).reduce((acc, [key, value]) => {
@@ -29,9 +37,14 @@ export function useDuplicate<T extends { id: string }>(table: string, queryKey: 
         }
       });
 
-      const { data, error } = await (supabase.from(table as any) as any).insert(duplicatedData).select().single();
+      const { data, error } = await supabase
+        .from(table)
+        .insert(duplicatedData as never)
+        .select()
+        .single();
+      
       if (error) throw error;
-      return data;
+      return data as DuplicateResult;
     },
     onSuccess: (data, { options }) => {
       queryClient.invalidateQueries({ queryKey });
