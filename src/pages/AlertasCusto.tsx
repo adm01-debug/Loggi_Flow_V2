@@ -103,8 +103,14 @@ export default function AlertasCusto() {
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
 
   const handleCreateAlert = async () => {
+    // Map form tipo to API tipo
+    const tipoMap: Record<string, 'transportadora' | 'rota' | 'global'> = {
+      'valor_maximo': 'global',
+      'valor_minimo': 'global', 
+      'variacao': 'global'
+    };
     await createAlerta.mutateAsync({
-      tipo: newAlertForm.tipo as any,
+      tipo: tipoMap[newAlertForm.tipo] || 'global',
       limite_mensal: newAlertForm.valor_limite,
       estado_destino: newAlertForm.estado_destino || null,
       ativo: newAlertForm.ativo,

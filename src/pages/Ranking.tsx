@@ -136,7 +136,7 @@ export default function Ranking() {
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground mt-1">Competição saudável entre operadores</p>
           </div>
-          <Tabs value={period} onValueChange={(v) => setPeriod(v as any)} className="w-full md:w-auto">
+          <Tabs value={period} onValueChange={(v) => setPeriod(v as "weekly" | "monthly" | "all")} className="w-full md:w-auto">
             <TabsList className="grid grid-cols-3 w-full md:w-auto">
               <TabsTrigger value="weekly" className="text-xs sm:text-sm">Semanal</TabsTrigger>
               <TabsTrigger value="monthly" className="text-xs sm:text-sm">Mensal</TabsTrigger>

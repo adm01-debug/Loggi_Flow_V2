@@ -127,7 +127,7 @@ export function GlobalSearch() {
                         <div className="px-2 py-1 mb-1">
                           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                             <Icon className="w-3 h-3" />
-                            {getSearchTypeLabel(type as any)}s ({items.length})
+                            {getSearchTypeLabel(type as keyof typeof typeIcons)}s ({items.length})
                           </span>
                         </div>
                         {items.map((result) => (

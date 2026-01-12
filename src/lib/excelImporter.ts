@@ -20,7 +20,7 @@ export async function importExcel<T>(
         const success: T[] = [];
         const errors: { row: number; field: string; error: string }[] = [];
         
-        jsonData.forEach((row: any, index: number) => {
+        jsonData.forEach((row: unknown, index: number) => {
           try {
             const validated = schema.parse(row);
             success.push(validated);
@@ -44,7 +44,7 @@ export async function importExcel<T>(
   });
 }
 
-export function exportToExcel<T extends Record<string, any>>(data: T[], filename: string, sheetName = 'Sheet1') {
+export function exportToExcel<T extends Record<string, unknown>>(data: T[], filename: string, sheetName = 'Sheet1') {
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
