@@ -149,27 +149,33 @@ interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   gradient?: boolean;
 }
 
-const DialogHeader = ({ className, icon, gradient, children, ...props }: DialogHeaderProps) => (
-  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props}>
-    {icon && (
-      <div className="flex justify-center sm:justify-start mb-2">
-        <div className="p-3 rounded-full bg-primary/10 text-primary">
-          {icon}
+const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
+  ({ className, icon, gradient, children, ...props }, ref) => (
+    <div ref={ref} className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props}>
+      {icon && (
+        <div className="flex justify-center sm:justify-start mb-2">
+          <div className="p-3 rounded-full bg-primary/10 text-primary">
+            {icon}
+          </div>
         </div>
-      </div>
-    )}
-    {gradient ? (
-      <div className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-        {children}
-      </div>
-    ) : children}
-  </div>
+      )}
+      {gradient ? (
+        <div className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+          {children}
+        </div>
+      ) : children}
+    </div>
+  )
 );
 DialogHeader.displayName = "DialogHeader";
 
 // Footer with better button alignment
-const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
   <div 
+    ref={ref}
     className={cn(
       "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:space-x-2",
       "pt-4 border-t border-border/50",
@@ -177,7 +183,7 @@ const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
     )} 
     {...props} 
   />
-);
+));
 DialogFooter.displayName = "DialogFooter";
 
 // Title with optional badge
@@ -217,8 +223,12 @@ const DialogDescription = React.forwardRef<
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 // Dialog body for scrollable content
-const DialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogBody = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
   <div 
+    ref={ref}
     className={cn(
       "flex-1 overflow-y-auto py-4",
       "-mx-6 px-6", // Extend to edges for scrollbar
@@ -226,7 +236,7 @@ const DialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement
     )} 
     {...props} 
   />
-);
+));
 DialogBody.displayName = "DialogBody";
 
 export {
