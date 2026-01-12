@@ -69,7 +69,7 @@ const actionIcons: Record<string, React.ComponentType<{ className?: string }>> =
 interface RuleEditorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editRule?: any;
+  editRule?: BusinessRule;
 }
 
 function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {

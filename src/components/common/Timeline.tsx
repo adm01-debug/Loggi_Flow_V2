@@ -12,7 +12,7 @@ interface TimelineEvent {
   iconColor?: string;
   status?: "completed" | "current" | "pending" | "error";
   user?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface TimelineProps {

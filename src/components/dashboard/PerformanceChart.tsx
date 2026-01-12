@@ -46,12 +46,24 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
     className, 
     colors = defaultColors
   }, ref) => {
-    const CustomTooltip = ({ active, payload, label }: any) => {
+    interface TooltipPayloadEntry {
+      name: string;
+      value: number | string;
+      color?: string;
+    }
+    
+    interface CustomTooltipProps {
+      active?: boolean;
+      payload?: TooltipPayloadEntry[];
+      label?: string;
+    }
+    
+    const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
       if (active && payload && payload.length) {
         return (
           <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
             <p className="text-sm font-medium text-foreground">{label}</p>
-            {payload.map((entry: any, index: number) => (
+            {payload.map((entry: TooltipPayloadEntry, index: number) => (
               <p key={index} className="text-sm text-muted-foreground">
                 {entry.name}: <span className="font-semibold text-foreground">{entry.value}</span>
               </p>

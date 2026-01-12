@@ -131,7 +131,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
               <Label>Urgência</Label>
               <Select 
                 value={formData.urgencia} 
-                onValueChange={(v: any) => setFormData({ ...formData, urgencia: v })}
+                onValueChange={(v: 'baixa' | 'normal' | 'alta' | 'urgente') => setFormData({ ...formData, urgencia: v })}
               >
                 <SelectTrigger>
                   <SelectValue />
