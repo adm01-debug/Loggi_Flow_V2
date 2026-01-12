@@ -21,6 +21,8 @@ interface ToastOptions {
   title: string;
   description?: string;
   duration?: number;
+  persistent?: boolean; // Toast que não some automaticamente
+  dismissible?: boolean; // Permite fechar manualmente
   action?: {
     label: string;
     onClick: () => void;
@@ -117,7 +119,8 @@ export const premiumToast = {
     const opts = typeof options === "string" ? { title: options } : options;
     return sonnerToast.success(opts.title, {
       description: opts.description,
-      duration: opts.duration || 4000,
+      duration: opts.persistent ? Infinity : (opts.duration || 4000),
+      dismissible: opts.dismissible !== false,
       icon: <SuccessIcon />,
       className: toastContainerStyles.success,
       action: opts.action ? {
@@ -131,7 +134,8 @@ export const premiumToast = {
     const opts = typeof options === "string" ? { title: options } : options;
     return sonnerToast.error(opts.title, {
       description: opts.description,
-      duration: opts.duration || 6000,
+      duration: opts.persistent ? Infinity : (opts.duration || 6000),
+      dismissible: opts.dismissible !== false,
       icon: <ErrorIcon />,
       className: toastContainerStyles.error,
       action: opts.action ? {
@@ -145,7 +149,8 @@ export const premiumToast = {
     const opts = typeof options === "string" ? { title: options } : options;
     return sonnerToast.warning(opts.title, {
       description: opts.description,
-      duration: opts.duration || 5000,
+      duration: opts.persistent ? Infinity : (opts.duration || 5000),
+      dismissible: opts.dismissible !== false,
       icon: <WarningIcon />,
       className: toastContainerStyles.warning,
       action: opts.action ? {
@@ -159,7 +164,8 @@ export const premiumToast = {
     const opts = typeof options === "string" ? { title: options } : options;
     return sonnerToast.info(opts.title, {
       description: opts.description,
-      duration: opts.duration || 4000,
+      duration: opts.persistent ? Infinity : (opts.duration || 4000),
+      dismissible: opts.dismissible !== false,
       icon: <InfoIcon />,
       className: toastContainerStyles.info,
       action: opts.action ? {
@@ -192,6 +198,21 @@ export const premiumToast = {
 
   dismiss: (id?: string | number) => {
     sonnerToast.dismiss(id);
+  },
+
+  // Toast persistente para erros críticos
+  criticalError: (title: string, description?: string) => {
+    return sonnerToast.error(title, {
+      description: description || "Um erro crítico ocorreu. Por favor, verifique.",
+      duration: Infinity,
+      dismissible: true,
+      icon: <ErrorIcon />,
+      className: `${toastContainerStyles.error} ring-2 ring-red-500/50`,
+      action: {
+        label: "Recarregar",
+        onClick: () => window.location.reload(),
+      },
+    });
   },
 
   // Gamification toasts
@@ -310,6 +331,7 @@ export const premiumToast = {
     premiumToast.error({
       title: "Erro",
       description: message,
+      persistent: true,
       action: {
         label: "Tentar novamente",
         onClick: () => window.location.reload(),
@@ -321,7 +343,7 @@ export const premiumToast = {
     premiumToast.warning({
       title: "Sem conexão",
       description: "Você está offline. Algumas funcionalidades podem não funcionar.",
-      duration: 10000,
+      persistent: true,
     });
   },
 
@@ -336,7 +358,8 @@ export const premiumToast = {
   custom: (options: ToastOptions & { icon?: React.ReactNode; type?: keyof typeof toastContainerStyles }) => {
     const toastOptions: ExternalToast = {
       description: options.description,
-      duration: options.duration || 4000,
+      duration: options.persistent ? Infinity : (options.duration || 4000),
+      dismissible: options.dismissible !== false,
       icon: options.icon || <Bell className="h-5 w-5 text-primary" />,
       className: options.type ? toastContainerStyles[options.type] : undefined,
       action: options.action ? {
