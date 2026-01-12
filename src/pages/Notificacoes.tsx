@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Check, Trash2, CheckCheck, Loader2, AlertCircle, Package, Truck, AlertTriangle, Info } from "lucide-react";
+import { Bell, Check, Trash2, CheckCheck, Loader2, AlertCircle, Package, Truck, AlertTriangle, Info, LucideIcon } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,7 @@ import { useRealtime } from "@/hooks/useRealtime";
 
 interface Notification { id: string; title: string; message: string; type: string; read: boolean; created_at: string; user_id: string; }
 
-const typeConfig: Record<string, { icon: any; color: string }> = {
+const typeConfig: Record<string, { icon: LucideIcon; color: string }> = {
   info: { icon: Info, color: "text-blue-500" },
   success: { icon: Check, color: "text-green-500" },
   warning: { icon: AlertTriangle, color: "text-yellow-500" },

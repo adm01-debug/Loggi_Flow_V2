@@ -60,7 +60,22 @@ export default function AlertasCusto() {
     ativo: true 
   });
 
-  const alertasList = useMemo(() => (alertas || []).map((a: any) => ({ 
+  interface AlertaRaw {
+    id: string;
+    nome?: string;
+    name?: string;
+    tipo?: string;
+    type?: string;
+    valor_limite?: number;
+    limite_mensal?: number;
+    threshold?: number;
+    estado_origem?: string;
+    estado_destino?: string;
+    ativo?: boolean;
+    created_at: string;
+  }
+
+  const alertasList = useMemo(() => (alertas || []).map((a: AlertaRaw) => ({ 
     id: a.id, 
     nome: a.nome || a.name || 'Alerta', 
     tipo: a.tipo || a.type || 'valor_maximo', 

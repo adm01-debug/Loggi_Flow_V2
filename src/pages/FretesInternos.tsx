@@ -108,7 +108,7 @@ export default function FretesInternos() {
 
   const updateStatusMut = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: FreteStatus }) => {
-      const update: any = { status };
+      const update: { status: FreteStatus; data_entrega_efetiva?: string } = { status };
       if (status === "entregue") update.data_entrega_efetiva = new Date().toISOString();
       const { error } = await supabase.from("fretes_internos").update(update).eq("id", id);
       if (error) throw error;

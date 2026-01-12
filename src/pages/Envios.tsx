@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine } from "lucide-react";
+import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon } from "lucide-react";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
 import { ScanResult } from "@/hooks/useQRScanner";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -42,7 +42,7 @@ interface Entrega {
   transportadora: { id: string; nome_fantasia: string } | null;
 }
 
-const statusConfig: Record<EntregaStatus, { label: string; color: string; icon: any }> = {
+const statusConfig: Record<EntregaStatus, { label: string; color: string; icon: LucideIcon }> = {
   aguardando_producao: { label: "Aguard. Produção", color: "bg-gray-100 text-gray-700", icon: Clock },
   pronto_despacho: { label: "Pronto Despacho", color: "bg-blue-100 text-blue-700", icon: Package },
   cotacao_frete: { label: "Cotação Frete", color: "bg-purple-100 text-purple-700", icon: DollarSign },
@@ -110,7 +110,7 @@ export default function Envios() {
 
   const updateStatusMut = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: EntregaStatus }) => {
-      const update: any = { status };
+      const update: { status: EntregaStatus; data_entrega_efetiva?: string } = { status };
       if (status === "entregue") update.data_entrega_efetiva = new Date().toISOString();
       const { error } = await supabase.from("entregas").update(update).eq("id", id);
       if (error) throw error;

@@ -30,7 +30,17 @@ export default function MapaRotas() {
 
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const points: DeliveryPoint[] = useMemo(() => (routes || []).map((r: any, i: number) => ({ 
+  interface RouteRaw {
+    id: string;
+    endereco_entrega?: string;
+    address?: string;
+    status: string;
+    latitude?: number;
+    longitude?: number;
+    coordinates?: { lat?: number; lng?: number };
+  }
+
+  const points: DeliveryPoint[] = useMemo(() => (routes || []).map((r: RouteRaw, i: number) => ({ 
     id: r.id, 
     address: r.endereco_entrega || r.address || "", 
     status: r.status, 

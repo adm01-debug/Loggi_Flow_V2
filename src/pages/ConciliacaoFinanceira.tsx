@@ -14,7 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { 
   FileSpreadsheet, Plus, Upload, Wand2, CheckCircle2, AlertTriangle, 
   Clock, XCircle, MoreVertical, ArrowLeftRight, Trash2, Check, X,
-  FileText, TrendingUp, TrendingDown, Minus, Eye, Download, Loader2, RefreshCw, FileCheck
+  FileText, TrendingUp, TrendingDown, Minus, Eye, Download, Loader2, RefreshCw, FileCheck, LucideIcon
 } from "lucide-react";
 import { useConciliacao, Conciliacao, ItemImportado } from "@/hooks/useConciliacao";
 import { formatCurrency, formatDate } from "@/lib/formatters";
@@ -32,7 +32,7 @@ const TIPOS_CONCILIACAO = [
   { value: "pagamentos_notas", label: "Pagamentos x Notas Fiscais", description: "Concilie pagamentos com NFs emitidas" },
 ];
 
-const STATUS_COLORS: Record<string, { bg: string; text: string; icon: any }> = {
+const STATUS_COLORS: Record<string, { bg: string; text: string; icon: LucideIcon }> = {
   pendente: { bg: "bg-muted", text: "text-muted-foreground", icon: Clock },
   conciliado: { bg: "bg-success/10", text: "text-success", icon: CheckCircle2 },
   divergencia: { bg: "bg-warning/10", text: "text-warning", icon: AlertTriangle },
