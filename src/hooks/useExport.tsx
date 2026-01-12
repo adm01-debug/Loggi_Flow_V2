@@ -127,7 +127,6 @@ export function useExport() {
       
       toast.success('Exportado para Excel com sucesso!');
     } catch (error) {
-      console.error('Excel export error:', error);
       toast.error('Erro ao exportar: ' + (error as Error).message);
     }
   }, []);
@@ -217,7 +216,6 @@ export function useExport() {
       doc.save(`${filename}_${new Date().toISOString().split('T')[0]}.pdf`);
       toast.success('Exportado para PDF com sucesso!');
     } catch (error) {
-      console.error('PDF export error:', error);
       toast.error('Erro ao exportar: ' + (error as Error).message);
     }
   }, []);

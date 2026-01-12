@@ -53,7 +53,6 @@ export function useN8n(options: UseN8nOptions = {}) {
       toast.success('Workflow n8n disparado!');
       return result;
     } catch (error) {
-      console.error('n8n error:', error);
       toast.error(`Erro n8n: ${(error as Error).message}`);
       return null;
     } finally {

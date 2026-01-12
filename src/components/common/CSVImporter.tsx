@@ -30,8 +30,8 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
       const importResult = await importCSV(selectedFile, schema);
       setResult(importResult);
       setProgress(50);
-    } catch (error) {
-      console.error('Erro ao ler CSV:', error);
+    } catch {
+      // Silent fail on CSV read error
     } finally {
       setIsImporting(false);
     }
@@ -45,8 +45,8 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
       await onImport(result.success);
       setProgress(100);
       setTimeout(() => { setFile(null); setResult(null); setProgress(0); }, 2000);
-    } catch (error) {
-      console.error('Erro ao importar:', error);
+    } catch {
+      // Silent fail on import error
     } finally {
       setIsImporting(false);
     }

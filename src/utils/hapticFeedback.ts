@@ -84,8 +84,7 @@ export const triggerHaptic = (pattern: HapticPattern = 'light', options?: Haptic
     
     navigator.vibrate(vibrationPattern);
     return true;
-  } catch (error) {
-    console.warn('Haptic feedback failed:', error);
+  } catch {
     return false;
   }
 };
@@ -99,8 +98,7 @@ export const customHaptic = (duration: number): boolean => {
   try {
     navigator.vibrate(Math.min(duration, 500)); // Max 500ms for safety
     return true;
-  } catch (error) {
-    console.warn('Custom haptic failed:', error);
+  } catch {
     return false;
   }
 };
@@ -114,8 +112,7 @@ export const patternHaptic = (pattern: number[]): boolean => {
   try {
     navigator.vibrate(pattern);
     return true;
-  } catch (error) {
-    console.warn('Pattern haptic failed:', error);
+  } catch {
     return false;
   }
 };

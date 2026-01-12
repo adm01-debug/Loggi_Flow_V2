@@ -71,8 +71,8 @@ export function TwoFactorSetup({ onStatusChange }: TwoFactorSetupProps) {
       if (verifiedFactor) {
         setFactorId(verifiedFactor.id);
       }
-    } catch (error) {
-      console.error("Error checking MFA status:", error);
+    } catch {
+      // Error handled by MFA hook
     }
   };
 

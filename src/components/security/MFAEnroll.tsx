@@ -27,8 +27,8 @@ export function MFAEnroll({ onComplete, onCancel }: MFAEnrollProps) {
   const handleStartEnrollment = async () => {
     try {
       await startEnrollment("LogiFlow Authenticator");
-    } catch (error) {
-      console.error("Error starting enrollment:", error);
+    } catch {
+      // Error handled by useMFA hook
     }
   };
 
@@ -41,8 +41,8 @@ export function MFAEnroll({ onComplete, onCancel }: MFAEnrollProps) {
     try {
       await verifyEnrollment(enrollmentData.id, verificationCode);
       onComplete?.();
-    } catch (error) {
-      console.error("Error verifying:", error);
+    } catch {
+      // Error handled by useMFA hook
     }
   };
 

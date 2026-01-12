@@ -27,15 +27,13 @@ const isNotificationSupported = () => {
 // Request notification permission
 export async function requestNotificationPermission(): Promise<NotificationPermissionState> {
   if (!isNotificationSupported()) {
-    console.warn("Notifications not supported in this browser");
     return "denied";
   }
 
   try {
     const permission = await Notification.requestPermission();
     return permission as NotificationPermissionState;
-  } catch (error) {
-    console.error("Error requesting notification permission:", error);
+  } catch {
     return "denied";
   }
 }
@@ -68,8 +66,7 @@ function showBrowserNotification(
     setTimeout(() => notification.close(), 30000);
 
     return notification;
-  } catch (error) {
-    console.error("Error showing notification:", error);
+  } catch {
     return null;
   }
 }
@@ -120,8 +117,8 @@ function playAlertSound(type: "critical" | "warning") {
         audioContext.close();
       }, 200);
     }
-  } catch (error) {
-    console.error("Error playing sound:", error);
+  } catch {
+    // Silent fail on sound playback error
   }
 }
 

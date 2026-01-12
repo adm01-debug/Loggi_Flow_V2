@@ -28,7 +28,6 @@ export function useSessionTimeout() {
     try {
       const { data, error } = await supabase.auth.refreshSession();
       if (error) {
-        console.error("Error refreshing session:", error);
         return false;
       }
       
@@ -37,8 +36,7 @@ export function useSessionTimeout() {
         return true;
       }
       return false;
-    } catch (error) {
-      console.error("Error refreshing session:", error);
+    } catch {
       return false;
     }
   }, []);
@@ -46,8 +44,8 @@ export function useSessionTimeout() {
   const signOut = useCallback(async () => {
     try {
       await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Error signing out:", error);
+    } catch {
+      // Silent fail on sign out error
     }
   }, []);
 

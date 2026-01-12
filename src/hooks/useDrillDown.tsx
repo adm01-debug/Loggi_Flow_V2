@@ -103,8 +103,7 @@ export function useDrillDown() {
         value: params.value,
         items: mappedItems,
       });
-    } catch (error) {
-      console.error("Drill-down error:", error);
+    } catch {
       setData({
         title: params.title,
         category: params.category,

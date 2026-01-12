@@ -58,8 +58,8 @@ export const usePushNotifications = () => {
           }
         }
       }
-    } catch (error) {
-      console.error('[usePushNotifications] Error checking subscription:', error);
+    } catch {
+      // Silent fail on subscription check
     }
   };
 
@@ -84,8 +84,7 @@ export const usePushNotifications = () => {
         toast.info('Permissão pendente');
         return false;
       }
-    } catch (error) {
-      console.error('[usePushNotifications] Error requesting permission:', error);
+    } catch {
       toast.error('Erro ao solicitar permissão');
       return false;
     } finally {
@@ -137,8 +136,7 @@ export const usePushNotifications = () => {
       setIsSubscribed(true);
       toast.success('Inscrito para notificações push!');
       return true;
-    } catch (error) {
-      console.error('[usePushNotifications] Error subscribing:', error);
+    } catch {
       toast.error('Erro ao ativar notificações push');
       return false;
     } finally {
@@ -168,8 +166,7 @@ export const usePushNotifications = () => {
       }
 
       return false;
-    } catch (error) {
-      console.error('[usePushNotifications] Error unsubscribing:', error);
+    } catch {
       toast.error('Erro ao desativar notificações push');
       return false;
     } finally {
@@ -179,7 +176,6 @@ export const usePushNotifications = () => {
 
   const sendLocalNotification = useCallback((title: string, options?: NotificationOptions) => {
     if (!isSupported || permission !== 'granted') {
-      console.warn('[usePushNotifications] Cannot send notification - not permitted');
       return;
     }
 

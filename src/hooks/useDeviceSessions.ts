@@ -79,8 +79,8 @@ export function useDeviceSessions() {
         const response = await fetch("https://api.ipify.org?format=json");
         const data = await response.json();
         ipAddress = data.ip;
-      } catch (error) {
-        console.error("Error fetching IP:", error);
+      } catch {
+        // Silent fail on IP fetch - non-critical
       }
 
       // Check if session already exists for this device

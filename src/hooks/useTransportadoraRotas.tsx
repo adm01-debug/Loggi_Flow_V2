@@ -166,7 +166,6 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error searching routes:', error);
       throw error;
     }
 
@@ -192,8 +191,7 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
       queryClient.invalidateQueries({ queryKey: ['transportadora-rotas'] });
       toast.success('Rota adicionada com sucesso!');
     },
-    onError: (error) => {
-      console.error('Error adding route:', error);
+    onError: () => {
       toast.error('Erro ao adicionar rota');
     },
   });

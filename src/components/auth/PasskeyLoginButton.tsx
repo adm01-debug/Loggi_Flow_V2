@@ -45,8 +45,8 @@ export function PasskeyLoginButton({ email, onSuccess, className }: PasskeyLogin
           onSuccess?.();
         }
       }
-    } catch (error) {
-      console.error("[PasskeyLogin] Error:", error);
+    } catch {
+      // Error handled by useWebAuthn hook
     } finally {
       setIsLoading(false);
     }
