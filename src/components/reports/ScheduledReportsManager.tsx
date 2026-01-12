@@ -92,10 +92,9 @@ export function ScheduledReportsManager() {
   const handleGenerateNow = async (reportType: string) => {
     toast.loading('Gerando relatório...');
     try {
-      const result = await generateReport.mutateAsync({ report_type: reportType });
+      await generateReport.mutateAsync({ report_type: reportType });
       toast.dismiss();
-      toast.success('Relatório gerado! Verifique o console.');
-      console.log('Report data:', result);
+      toast.success('Relatório gerado com sucesso!');
     } catch {
       toast.dismiss();
       toast.error('Erro ao gerar relatório');
