@@ -95,3 +95,8 @@ export { useNotifications } from './useNotifications';
 // Form & Auto-Save
 // ============================================
 export { useAutoSave } from './useAutoSave';
+export { 
+  useNotificationSounds, 
+  SoundSettingsProvider, 
+  useSoundSettings 
+} from './useNotificationSounds';

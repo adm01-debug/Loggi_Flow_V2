@@ -61,3 +61,12 @@ export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 
 // Bulk Actions
 export { BulkActions, useSelection } from './BulkActions';
+
+// Premium Components
+export { AutoSaveIndicator } from './AutoSaveIndicator';
+export { SearchInputWithHistory } from './SearchInputWithHistory';
+export { ChartExportButton } from './ChartExportButton';
+export { StepProgressPremium } from './StepProgressPremium';
+export { ErrorBoundaryPremium } from './ErrorBoundaryPremium';
+export { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
+export { EmptyStatePremium } from './EmptyStatePremium';
