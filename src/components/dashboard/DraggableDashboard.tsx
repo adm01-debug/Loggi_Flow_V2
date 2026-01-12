@@ -1,4 +1,4 @@
-import { ReactNode, useState, useCallback } from "react";
+import React, { ReactNode, useState, useCallback, forwardRef } from "react";
 import {
   DndContext,
   closestCenter,
@@ -42,87 +42,100 @@ interface SortableWidgetProps {
   isDragging?: boolean;
 }
 
-function SortableWidget({ id, children, isEditMode, onRemove, size = "medium", isDragging }: SortableWidgetProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: isSorting,
-  } = useSortable({ id, disabled: !isEditMode });
+const SortableWidget = React.forwardRef<HTMLDivElement, SortableWidgetProps>(
+  ({ id, children, isEditMode, onRemove, size = "medium", isDragging }, ref) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging: isSorting,
+    } = useSortable({ id, disabled: !isEditMode });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
 
-  const sizeClasses = {
-    small: "col-span-1",
-    medium: "col-span-1 sm:col-span-2 md:col-span-1",
-    large: "col-span-2",
-    full: "col-span-2 md:col-span-4",
-  };
+    const sizeClasses = {
+      small: "col-span-1",
+      medium: "col-span-1 sm:col-span-2 md:col-span-1",
+      large: "col-span-2",
+      full: "col-span-2 md:col-span-4",
+    };
 
-  return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: isSorting ? 0.5 : 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.2 }}
-      className={cn(
-        sizeClasses[size],
-        isSorting && "z-50",
-        "transition-all duration-200"
-      )}
-    >
-      <Card
+    // Merge refs
+    const mergedRef = (node: HTMLDivElement | null) => {
+      setNodeRef(node);
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    };
+
+    return (
+      <motion.div
+        ref={mergedRef}
+        style={style}
+        layout
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: isSorting ? 0.5 : 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.2 }}
         className={cn(
-          "h-full overflow-hidden relative group",
-          isEditMode && "ring-2 ring-primary/20 ring-dashed hover:ring-primary/40",
-          isSorting && "shadow-2xl ring-primary/50"
+          sizeClasses[size],
+          isSorting && "z-50",
+          "transition-all duration-200"
         )}
       >
-        <AnimatePresence>
-          {isEditMode && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 z-10 bg-background/50 backdrop-blur-[1px] flex items-center justify-center"
-            >
-              <div className="flex items-center gap-2">
-                <motion.div
-                  {...attributes}
-                  {...listeners}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="cursor-grab active:cursor-grabbing p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
-                >
-                  <GripVertical className="w-5 h-5 text-primary" />
-                </motion.div>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-lg bg-destructive/10 hover:bg-destructive/20 text-destructive transition-colors"
-                  onClick={() => onRemove(id)}
-                >
-                  <X className="w-5 h-5" />
-                </motion.button>
-              </div>
-            </motion.div>
+        <Card
+          className={cn(
+            "h-full overflow-hidden relative group",
+            isEditMode && "ring-2 ring-primary/20 ring-dashed hover:ring-primary/40",
+            isSorting && "shadow-2xl ring-primary/50"
           )}
-        </AnimatePresence>
-        <div className={cn("h-full", isEditMode && "pointer-events-none")}>
-          {children}
-        </div>
-      </Card>
-    </motion.div>
-  );
-}
+        >
+          <AnimatePresence>
+            {isEditMode && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-10 bg-background/50 backdrop-blur-[1px] flex items-center justify-center"
+              >
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    {...attributes}
+                    {...listeners}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="cursor-grab active:cursor-grabbing p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+                  >
+                    <GripVertical className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-2 rounded-lg bg-destructive/10 hover:bg-destructive/20 text-destructive transition-colors"
+                    onClick={() => onRemove(id)}
+                  >
+                    <X className="w-5 h-5" />
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div className={cn("h-full", isEditMode && "pointer-events-none")}>
+            {children}
+          </div>
+        </Card>
+      </motion.div>
+    );
+  }
+);
+SortableWidget.displayName = "SortableWidget";
 
 export interface DashboardWidget {
   id: string;
