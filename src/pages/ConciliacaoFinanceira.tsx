@@ -145,7 +145,7 @@ export default function ConciliacaoFinanceira() {
     // Divergences section
     const divergencias = itensImportados.filter(i => i.status === "divergencia");
     if (divergencias.length > 0) {
-      const finalY = (doc as any).lastAutoTable.finalY || 106;
+      const finalY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable?.finalY || 106;
       
       doc.addPage();
       doc.setFontSize(14);
@@ -556,7 +556,7 @@ export default function ConciliacaoFinanceira() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Tipo *</Label>
-              <Select value={form.tipo} onValueChange={(v) => setForm({ ...form, tipo: v as any })}>
+              <Select value={form.tipo} onValueChange={(v) => setForm({ ...form, tipo: v as Conciliacao["tipo"] })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

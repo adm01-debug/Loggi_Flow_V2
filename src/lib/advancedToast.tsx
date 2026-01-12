@@ -75,7 +75,7 @@ export const advancedToast = {
     options: {
       loading: string;
       success: string | ((data: T) => string);
-      error: string | ((error: any) => string);
+      error: string | ((error: Error) => string);
     }
   ) => {
     return sonnerToast.promise(promise, {
@@ -118,8 +118,8 @@ export const advancedToast = {
     });
   },
 
-  apiError: (error: any) => {
-    const message = error?.message || "Ocorreu um erro inesperado";
+  apiError: (error: unknown) => {
+    const message = error instanceof Error ? error.message : "Ocorreu um erro inesperado";
     advancedToast.error({
       title: "Erro",
       description: message,

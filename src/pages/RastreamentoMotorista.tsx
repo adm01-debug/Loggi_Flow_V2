@@ -78,7 +78,7 @@ export default function RastreamentoMotorista() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400/20 to-blue-600/10"><Navigation className="w-6 h-6 text-blue-500" /></div>Rastreamento Motorista</h1><p className="text-muted-foreground mt-1">Acompanhe entregas em tempo real via Lalamove</p></div>
           <div className="flex gap-2">
-            <Select value={selectedOrder} onValueChange={setSelectedOrder}><SelectTrigger className="w-56"><SelectValue placeholder="Selecione pedido" /></SelectTrigger><SelectContent>{(orders || []).map((o: any) => <SelectItem key={o.id} value={o.id}>#{o.id.slice(0, 8)} - {o.cliente}</SelectItem>)}</SelectContent></Select>
+            <Select value={selectedOrder} onValueChange={setSelectedOrder}><SelectTrigger className="w-56"><SelectValue placeholder="Selecione pedido" /></SelectTrigger><SelectContent>{(orders || []).map((o) => <SelectItem key={o.id} value={o.id}>#{o.id.slice(0, 8)} - {o.cliente}</SelectItem>)}</SelectContent></Select>
             <Button variant={isLive ? "destructive" : "default"} onClick={() => setIsLive(!isLive)}><Radio className={cn("w-4 h-4 mr-2", isLive && "animate-pulse")} />{isLive ? "Parar" : "Ao Vivo"}</Button>
             <Button variant="outline" onClick={() => refetchDriverLocation?.()}><RefreshCw className="w-4 h-4" /></Button>
           </div>
@@ -101,7 +101,7 @@ export default function RastreamentoMotorista() {
               </div>
               <div className="card-base p-4">
                 <h3 className="font-semibold mb-3">Timeline</h3>
-                <div className="space-y-3">{(orderDetails?.stops || []).map((stop: any, i: number) => (
+                <div className="space-y-3">{(orderDetails?.stops || []).map((stop, i: number) => (
                   <div key={i} className="flex gap-3">
                     <div className="flex flex-col items-center"><div className={cn("w-3 h-3 rounded-full", i === 0 ? "bg-primary" : "bg-muted")} />{i < (orderDetails?.stops?.length || 0) - 1 && <div className="w-0.5 h-full bg-muted" />}</div>
                     <div><p className="text-sm font-medium">{stop.name || `Parada ${i + 1}`}</p><p className="text-xs text-muted-foreground">{stop.address}</p></div>

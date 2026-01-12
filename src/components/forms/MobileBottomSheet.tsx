@@ -261,7 +261,7 @@ export const BottomSheetForm: React.FC<BottomSheetFormProps> = ({
               type="submit"
               className="w-full"
               disabled={disabled || loading}
-              onClick={handleSubmit as any}
+              onClick={handleSubmit}
             >
               <AnimatePresence mode="wait">
                 {loading ? (
