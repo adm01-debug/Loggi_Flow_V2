@@ -160,8 +160,7 @@ export function useUndoManager(options: { maxActions?: number; timeout?: number 
       await action.undo();
       setLastAction(actionsRef.current[actionsRef.current.length - 1] || null);
       return true;
-    } catch (error) {
-      console.error('Undo failed:', error);
+    } catch {
       return false;
     }
   }, []);
@@ -176,8 +175,7 @@ export function useUndoManager(options: { maxActions?: number; timeout?: number 
       actionsRef.current = actionsRef.current.filter(a => a.id !== id);
       setLastAction(actionsRef.current[actionsRef.current.length - 1] || null);
       return true;
-    } catch (error) {
-      console.error('Undo failed:', error);
+    } catch {
       return false;
     }
   }, []);

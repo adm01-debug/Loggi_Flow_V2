@@ -28,7 +28,7 @@ export function useActivityLog(entityType: string, entityId?: string) {
       
       if (entityId) query = query.eq('record_id', entityId);
       const { data, error } = await query;
-      if (error) { console.warn('Activity logs query failed:', error.message); return []; }
+      if (error) { return []; }
       
       return (data || []).map(item => ({
         id: item.id, entity_type: item.table_name, entity_id: item.record_id, action: item.action,
@@ -66,7 +66,7 @@ export function useRecentActivity(limit = 20) {
       const { data, error } = await supabase.from('audit_logs')
         .select('id, table_name, record_id, action, old_data, new_data, user_id, created_at')
         .order('created_at', { ascending: false }).limit(limit);
-      if (error) { console.warn('Recent activity query failed:', error.message); return []; }
+      if (error) { return []; }
       return (data || []).map(item => ({
         id: item.id, entity_type: item.table_name, entity_id: item.record_id, action: item.action,
         description: `${item.action} em ${item.table_name}`,

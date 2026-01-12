@@ -147,12 +147,14 @@ class AudioContextManager {
     
     if (!this.audioContext) {
       try {
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        if (!AudioContextClass) return null;
+        this.audioContext = new AudioContextClass();
         this.masterGain = this.audioContext.createGain();
         this.masterGain.connect(this.audioContext.destination);
         this.masterGain.gain.value = 0.5;
-      } catch (e) {
-        console.warn('Web Audio API not supported');
+      } catch {
+        // Web Audio API not supported - fail silently
         return null;
       }
     }
@@ -191,8 +193,8 @@ class AudioContextManager {
 
       oscillator.start(ctx.currentTime);
       oscillator.stop(ctx.currentTime + duration / 1000);
-    } catch (e) {
-      console.warn('Error playing tone:', e);
+    } catch {
+      // Error playing tone - fail silently
     }
   }
 

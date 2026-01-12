@@ -194,8 +194,8 @@ export function SecurityOverviewPanel() {
       });
 
       setAlerts(newAlerts);
-    } catch (error) {
-      console.error('Error fetching security stats:', error);
+    } catch {
+      // Silent fail on security stats fetch
     } finally {
       setIsLoading(false);
     }

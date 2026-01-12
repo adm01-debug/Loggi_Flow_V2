@@ -118,7 +118,6 @@ export const useCostAlerts = () => {
       .not('valor_frete', 'is', null);
 
     if (error) {
-      console.error('Error fetching deliveries for cost check:', error);
       return;
     }
 

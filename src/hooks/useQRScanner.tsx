@@ -41,8 +41,8 @@ export function useQRScanner(options: UseQRScannerOptions = {}) {
         );
         setSelectedCamera(backCamera?.deviceId || cameras[0].deviceId);
       }
-    } catch (err) {
-      console.error("Error getting cameras:", err);
+    } catch {
+      // Silent fail on camera enumeration
     }
   }, [selectedCamera]);
 
@@ -90,8 +90,8 @@ export function useQRScanner(options: UseQRScannerOptions = {}) {
             format: barcodes[0].format,
           };
         }
-      } catch (err) {
-        console.error("Barcode detection error:", err);
+      } catch {
+        // Silent fail on barcode detection
       }
     }
     return null;

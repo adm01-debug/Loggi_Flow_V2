@@ -59,8 +59,7 @@ export function useReauth() {
         toast.error(result.error || "Senha incorreta");
         return false;
       }
-    } catch (error) {
-      console.error("Reauth error:", error);
+    } catch {
       toast.error("Erro ao verificar credenciais");
       return false;
     } finally {

@@ -125,8 +125,7 @@ export function PermissionMatrix() {
       setPendingChanges(new Map());
       toast.success("Permissões atualizadas com sucesso!");
     },
-    onError: (error) => {
-      console.error("Error saving permissions:", error);
+    onError: () => {
       toast.error("Erro ao salvar permissões");
     },
   });

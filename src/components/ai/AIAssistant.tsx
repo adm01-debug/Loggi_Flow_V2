@@ -144,7 +144,6 @@ export function AIAssistant() {
     try {
       await streamChat(userMessage, messages);
     } catch (err) {
-      console.error('AI error:', err);
       toast.error(err instanceof Error ? err.message : 'Erro ao processar mensagem');
       setMessages(prev => [...prev, { 
         role: 'assistant', 

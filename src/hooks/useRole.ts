@@ -72,8 +72,7 @@ export function useRole() {
       queryClient.invalidateQueries({ queryKey: ["all-user-roles"] });
       toast.success("Role atribuída com sucesso!");
     },
-    onError: (error) => {
-      console.error("Error assigning role:", error);
+    onError: () => {
       toast.error("Erro ao atribuir role");
     },
   });
@@ -94,8 +93,7 @@ export function useRole() {
       queryClient.invalidateQueries({ queryKey: ["all-user-roles"] });
       toast.success("Role removida com sucesso!");
     },
-    onError: (error) => {
-      console.error("Error removing role:", error);
+    onError: () => {
       toast.error("Erro ao remover role");
     },
   });

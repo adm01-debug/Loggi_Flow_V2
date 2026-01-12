@@ -28,7 +28,7 @@ export function ExcelImporter<T>({ schema, onImport, templateName = 'template' }
       const sheetNames = await getSheetNames(selectedFile);
       setSheets(sheetNames);
       if (sheetNames.length === 1) { setSelectedSheet(sheetNames[0]); await processSheet(selectedFile, sheetNames[0]); }
-    } catch (error) { console.error('Erro ao ler Excel:', error); }
+    } catch { /* Silent fail on Excel read error */ }
   };
 
   const processSheet = async (f: File, sheet: string) => {
@@ -36,7 +36,7 @@ export function ExcelImporter<T>({ schema, onImport, templateName = 'template' }
     try {
       const importResult = await importExcel(f, schema, sheet);
       setResult(importResult); setProgress(50);
-    } catch (error) { console.error('Erro:', error); }
+    } catch { /* Silent fail on processing error */ }
     finally { setIsImporting(false); }
   };
 
@@ -46,7 +46,7 @@ export function ExcelImporter<T>({ schema, onImport, templateName = 'template' }
     if (!result || result.success.length === 0) return;
     setIsImporting(true); setProgress(60);
     try { await onImport(result.success); setProgress(100); setTimeout(() => { setFile(null); setResult(null); setSheets([]); setProgress(0); }, 2000); }
-    catch (error) { console.error('Erro:', error); }
+    catch { /* Silent fail on import error */ }
     finally { setIsImporting(false); }
   };
 

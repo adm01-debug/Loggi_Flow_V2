@@ -47,7 +47,6 @@ export const useSmartCarrierSelection = () => {
       });
 
       if (error) {
-        console.error('[useSmartCarrierSelection] Error:', error);
         toast.error('Erro ao analisar transportadoras');
         setResult({ success: false, recommendations: [], error: error.message });
         return null;
@@ -65,8 +64,7 @@ export const useSmartCarrierSelection = () => {
 
       setResult(data);
       return data;
-    } catch (err) {
-      console.error('[useSmartCarrierSelection] Exception:', err);
+    } catch {
       toast.error('Erro ao processar seleção inteligente');
       const errorResult = { success: false, recommendations: [], error: 'Erro inesperado' };
       setResult(errorResult);
