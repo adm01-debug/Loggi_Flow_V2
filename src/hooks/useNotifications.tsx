@@ -40,6 +40,7 @@ export function useNotifications() {
       return data as Notification[];
     },
     enabled: !!user?.id,
+    staleTime: 30 * 1000, // 30s - dynamic data
   });
 
   // Subscribe to realtime notifications
