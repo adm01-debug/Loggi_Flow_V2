@@ -205,10 +205,10 @@ export default function Coletas() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <div className="stat-card text-center p-3 sm:p-4"><Package className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><Clock className="w-5 h-5 text-gray-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.aguardando}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Aguardando</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.finalizadas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Finalizadas</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-primary/40 transition-colors"><Package className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-warning/40 transition-colors"><Clock className="w-5 h-5 text-muted-foreground mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.aguardando}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Aguardando</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-warning/40 transition-colors"><Truck className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-success/40 transition-colors"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.finalizadas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Finalizadas</p></div>
         </div>
 
         <FilterBar 
