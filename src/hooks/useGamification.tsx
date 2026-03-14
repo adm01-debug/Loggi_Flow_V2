@@ -178,17 +178,14 @@ export function useGamification() {
     mutationFn: async ({ amount }: { amount: number }) => {
       if (!user?.id || !userLevel) throw new Error("User not logged in");
       
-      const { data, error } = await supabase
-        .from("user_levels")
-        .update({
-          coins: userLevel.coins + amount,
-        })
-        .eq("user_id", user.id)
-        .select()
-        .single();
+      const { error } = await supabase.rpc("add_user_xp", {
+        p_user_id: user.id,
+        p_xp_amount: 0,
+        p_coins_amount: amount,
+      });
       
       if (error) throw error;
-      return { data, amount };
+      return { amount };
     },
     onSuccess: ({ amount }) => {
       queryClient.invalidateQueries({ queryKey: ["userLevel"] });
