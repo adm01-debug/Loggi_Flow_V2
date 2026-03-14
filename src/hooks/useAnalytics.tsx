@@ -181,6 +181,7 @@ export function useAnalytics(dateRange?: DateRange) {
       
       return forecast;
     },
+    enabled: !!user?.id,
   });
 
   // Heatmap data (peak hours by region/state)
