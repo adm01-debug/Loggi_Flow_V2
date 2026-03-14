@@ -31,10 +31,10 @@ const TOTAL_BOXES = 16;
 
 export function useBoxManagement() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-  // Fetch all deliveries with box allocation
   const { data: deliveries = [], isLoading } = useQuery({
-    queryKey: ["box-deliveries"],
+    queryKey: ["box-deliveries", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("entregas")
