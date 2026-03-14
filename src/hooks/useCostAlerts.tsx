@@ -63,6 +63,7 @@ export const useCostAlerts = () => {
       return data as AlertaCusto[];
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Fetch unread notifications
