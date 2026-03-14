@@ -88,6 +88,7 @@ export default function Clientes() {
   const [dlgDel, setDlgDel] = useState(false);
   const [sel, setSel] = useState<Cliente | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [dlgImport, setDlgImport] = useState(false);
 
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["clientes"],
