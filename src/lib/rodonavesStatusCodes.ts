@@ -7,7 +7,7 @@ export interface RodonavesStatusInfo {
   code: number;
   description: string;
   /** Maps to our entrega_status enum */
-  systemStatus: 'pendente' | 'coletado' | 'despachado' | 'em_transito' | 'saiu_entrega' | 'entregue' | 'devolvido' | 'cancelado';
+  systemStatus: 'aguardando_producao' | 'pronto_despacho' | 'cotacao_frete' | 'nf_emitida' | 'despachado' | 'em_transito' | 'saiu_entrega' | 'entregue' | 'ocorrencia' | 'finalizado';
   /** Whether this code represents an ocorrencia that should be logged */
   isOcorrencia: boolean;
   severity: 'info' | 'success' | 'warning' | 'error';
@@ -39,7 +39,7 @@ export const RODONAVES_CODES: Record<number, RodonavesStatusInfo> = {
   22: { code: 22, description: 'Reentrega sem Cobrança', systemStatus: 'em_transito', isOcorrencia: true, severity: 'info' },
   23: { code: 23, description: 'Extravio de Mercadoria em Trânsito', systemStatus: 'em_transito', isOcorrencia: true, severity: 'error' },
   24: { code: 24, description: 'Mercadoria Reentregue ao Destino', systemStatus: 'entregue', isOcorrencia: false, severity: 'success' },
-  25: { code: 25, description: 'Mercadoria Devolvida à Origem', systemStatus: 'devolvido', isOcorrencia: true, severity: 'warning' },
+  25: { code: 25, description: 'Mercadoria Devolvida à Origem', systemStatus: 'ocorrencia', isOcorrencia: true, severity: 'warning' },
   26: { code: 26, description: 'NF Retida pela Fiscalização', systemStatus: 'em_transito', isOcorrencia: true, severity: 'error' },
   27: { code: 27, description: 'Roubo de Carga', systemStatus: 'em_transito', isOcorrencia: true, severity: 'error' },
   28: { code: 28, description: 'Mercadoria Retida até Segunda Ordem', systemStatus: 'em_transito', isOcorrencia: true, severity: 'warning' },
@@ -53,7 +53,7 @@ export const RODONAVES_CODES: Record<number, RodonavesStatusInfo> = {
   44: { code: 44, description: 'Recebida na Filial Destino', systemStatus: 'despachado', isOcorrencia: false, severity: 'info' },
   45: { code: 45, description: 'Em Transferência', systemStatus: 'despachado', isOcorrencia: false, severity: 'info' },
   46: { code: 46, description: 'Mercadoria Despachada', systemStatus: 'despachado', isOcorrencia: false, severity: 'info' },
-  47: { code: 47, description: 'Mercadoria Coletada', systemStatus: 'coletado', isOcorrencia: false, severity: 'info' },
+  47: { code: 47, description: 'Mercadoria Coletada', systemStatus: 'em_transito', isOcorrencia: false, severity: 'info' },
   58: { code: 58, description: 'CT-e Emitido', systemStatus: 'em_transito', isOcorrencia: false, severity: 'info' },
 };
 
