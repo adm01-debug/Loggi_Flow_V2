@@ -1,8 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useBitrix24 } from '@/hooks/useBitrix24';
-import { useN8n } from '@/hooks/useN8n';
 
 interface IntegrationStatus {
   name: string;
@@ -16,16 +14,11 @@ export function useIntegrationValidation() {
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([
     { name: 'Lalamove', status: 'not_configured' },
     { name: 'Mapbox', status: 'not_configured' },
-    { name: 'Bitrix24', status: 'not_configured' },
-    { name: 'n8n', status: 'not_configured' },
   ]);
-
-  const { isConfigured: bitrix24Configured, testConnection: testBitrix24 } = useBitrix24();
-  const { isConfigured: n8nConfigured, testConnection: testN8n } = useN8n();
 
   const validateLalamove = useCallback(async (): Promise<IntegrationStatus> => {
     try {
-      const { data, error } = await supabase.functions.invoke('lalamove-tracking', {
+      const { error } = await supabase.functions.invoke('lalamove-tracking', {
         body: { action: 'test' },
       });
       
@@ -47,7 +40,6 @@ export function useIntegrationValidation() {
         return { name: 'Mapbox', status: 'not_configured', message: 'Token não encontrado' };
       }
       
-      // Test token validity
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/test.json?access_token=${data.token}&limit=1`
       );
@@ -62,42 +54,6 @@ export function useIntegrationValidation() {
     }
   }, []);
 
-  const validateBitrix24 = useCallback(async (): Promise<IntegrationStatus> => {
-    if (!bitrix24Configured) {
-      return { name: 'Bitrix24', status: 'not_configured' };
-    }
-
-    try {
-      const success = await testBitrix24();
-      return {
-        name: 'Bitrix24',
-        status: success ? 'connected' : 'error',
-        lastCheck: new Date(),
-        message: success ? undefined : 'Falha ao conectar',
-      };
-    } catch (e) {
-      return { name: 'Bitrix24', status: 'error', message: (e as Error).message };
-    }
-  }, [bitrix24Configured, testBitrix24]);
-
-  const validateN8n = useCallback(async (): Promise<IntegrationStatus> => {
-    if (!n8nConfigured) {
-      return { name: 'n8n', status: 'not_configured' };
-    }
-
-    try {
-      const success = await testN8n();
-      return {
-        name: 'n8n',
-        status: success ? 'connected' : 'configured', // configured but can't verify
-        lastCheck: new Date(),
-        message: success ? undefined : 'Webhook configurado, aguardando resposta',
-      };
-    } catch (e) {
-      return { name: 'n8n', status: 'error', message: (e as Error).message };
-    }
-  }, [n8nConfigured, testN8n]);
-
   const validateAll = useCallback(async () => {
     setIsValidating(true);
     
@@ -105,8 +61,6 @@ export function useIntegrationValidation() {
       const results = await Promise.all([
         validateLalamove(),
         validateMapbox(),
-        validateBitrix24(),
-        validateN8n(),
       ]);
       
       setIntegrations(results);
@@ -124,7 +78,7 @@ export function useIntegrationValidation() {
     } finally {
       setIsValidating(false);
     }
-  }, [validateLalamove, validateMapbox, validateBitrix24, validateN8n]);
+  }, [validateLalamove, validateMapbox]);
 
   const validateSingle = useCallback(async (name: string) => {
     setIsValidating(true);
@@ -138,12 +92,6 @@ export function useIntegrationValidation() {
           break;
         case 'mapbox':
           result = await validateMapbox();
-          break;
-        case 'bitrix24':
-          result = await validateBitrix24();
-          break;
-        case 'n8n':
-          result = await validateN8n();
           break;
         default:
           throw new Error(`Unknown integration: ${name}`);
@@ -163,7 +111,7 @@ export function useIntegrationValidation() {
     } finally {
       setIsValidating(false);
     }
-  }, [validateLalamove, validateMapbox, validateBitrix24, validateN8n]);
+  }, [validateLalamove, validateMapbox]);
 
   return {
     integrations,
