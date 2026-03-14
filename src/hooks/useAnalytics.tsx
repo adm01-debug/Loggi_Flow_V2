@@ -374,6 +374,7 @@ export function useAnalytics(dateRange?: DateRange) {
       // Sort by entregas count descending
       return stats.sort((a, b) => b.entregas - a.entregas);
     },
+    enabled: !!user?.id,
   });
 
   return {
