@@ -2129,6 +2129,21 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_public_tracking: {
+        Args: { p_code: string }
+        Returns: {
+          codigo_rastreamento: string
+          created_at: string
+          data_despacho: string
+          data_entrega_efetiva: string
+          nf_remessa: string
+          numero_entrega: string
+          previsao_entrega: string
+          recebedor: string
+          status: Database["public"]["Enums"]["entrega_status"]
+          updated_at: string
+        }[]
+      }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
