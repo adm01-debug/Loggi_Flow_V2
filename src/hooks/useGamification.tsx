@@ -214,20 +214,13 @@ export function useGamification() {
       
       if (achievementError) throw achievementError;
       
-      // Add rewards
+      // Add rewards via RPC
       if (userLevel) {
-        const newTotalXP = userLevel.total_xp + achievement.xp_reward;
-        const newLevel = calculateLevel(newTotalXP);
-        
-        await supabase
-          .from("user_levels")
-          .update({
-            total_xp: newTotalXP,
-            current_xp: userLevel.current_xp + achievement.xp_reward,
-            coins: userLevel.coins + achievement.coins_reward,
-            level: newLevel,
-          })
-          .eq("user_id", user.id);
+        await supabase.rpc("add_user_xp", {
+          p_user_id: user.id,
+          p_xp_amount: achievement.xp_reward,
+          p_coins_amount: achievement.coins_reward,
+        });
       }
       
       return achievement;
