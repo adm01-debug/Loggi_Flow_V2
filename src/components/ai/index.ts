@@ -2,4 +2,3 @@
 // ============================================
 
 export { AIAssistant } from './AIAssistant';
-export { AISuggestionPanel } from './AISuggestionPanel';
