@@ -118,11 +118,6 @@ export { useIntegrationValidation } from './useIntegrationValidation';
 // ============================================
 export { useAutoSave } from './useAutoSave';
 export { useForm } from './useForm';
-export { 
-  useNotificationSounds, 
-  SoundSettingsProvider, 
-  useSoundSettings 
-} from './useNotificationSounds';
 
 // ============================================
 // Logistics & Business
