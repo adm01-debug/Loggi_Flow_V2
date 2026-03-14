@@ -62,6 +62,7 @@ export function useBoxManagement() {
       }));
     },
     staleTime: 30000,
+    enabled: !!user?.id,
   });
 
   // Build box data

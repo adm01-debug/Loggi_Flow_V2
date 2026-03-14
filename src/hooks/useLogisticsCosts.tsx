@@ -60,6 +60,7 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
       return data;
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Calculate costs by carrier
