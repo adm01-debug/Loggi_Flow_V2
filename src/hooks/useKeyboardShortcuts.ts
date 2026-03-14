@@ -60,6 +60,10 @@ export function useGlobalShortcuts() {
   useKeyboardShortcut("e", () => navigate("/envios"), { alt: true });
   useKeyboardShortcut("r", () => navigate("/relatorios"), { alt: true });
   useKeyboardShortcut("s", () => navigate("/configuracoes"), { alt: true });
+  useKeyboardShortcut("t", () => navigate("/transportadoras"), { alt: true });
+  useKeyboardShortcut("a", () => navigate("/analytics"), { alt: true });
+  useKeyboardShortcut("n", () => navigate("/notificacoes"), { alt: true });
+  useKeyboardShortcut("f", () => navigate("/cotacao-frete"), { alt: true });
 
   useKeyboardShortcut("Escape", () => {
     const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
