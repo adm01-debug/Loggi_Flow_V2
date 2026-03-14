@@ -127,7 +127,7 @@ export { useSLANotifications } from './useSLANotifications';
 export { useLogisticsCosts } from './useLogisticsCosts';
 export { useLogisticsCalendar } from './useLogisticsCalendar';
 export { useCostAlerts } from './useCostAlerts';
-export { useDelayNotifications } from './useDelayNotifications';
+
 export { useDelayPrediction } from './useDelayPrediction';
 export { useDeliveryRoutes } from './useDeliveryRoutes';
 export { useFreightQuotation } from './useFreightQuotation';
