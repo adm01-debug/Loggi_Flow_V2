@@ -36,6 +36,7 @@ const filterConfig: FilterConfig<TabelaFreteLocal> = {
 export default function CotacaoFrete() {
   const freightQuotation = useFreightQuotation();
   const smartCarrier = useSmartCarrierSelection();
+  const rodonaves = useRodonavesTracking();
   
   const tabelasFrete = freightQuotation?.tabelasFrete || [];
   const transportadoras = freightQuotation?.transportadoras || [];
