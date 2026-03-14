@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calculator, TrendingUp, Clock, Plus, Trash2, Search, Package, MapPin, Star, Loader2, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { Calculator, TrendingUp, Clock, Plus, Trash2, Search, Package, MapPin, Star, Loader2, ArrowUpDown, ChevronUp, ChevronDown, Truck } from 'lucide-react';
 import { useFreightQuotation, QuotationResult } from '@/hooks/useFreightQuotation';
 import { useSmartCarrierSelection } from '@/hooks/useSmartCarrierSelection';
+import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
 import { SmartCarrierSelector } from '@/components/freight/SmartCarrierSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
