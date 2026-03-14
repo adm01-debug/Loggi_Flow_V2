@@ -173,7 +173,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
               {sparklineData && sparklineData.length > 1 && (
                 <Sparkline data={sparklineData} color={config.sparkColor} />
               )}
-              {(trend || changePercent) && (
+              {(trendValue || changePercent !== null) && (
                 <div className={cn(
                   "flex items-center gap-1 text-sm font-bold px-2 py-0.5 rounded-full",
                   trend === 'up' ? 'bg-success/10 text-success' : 

@@ -46,16 +46,16 @@ interface Entrega {
 }
 
 const statusConfig: Record<EntregaStatus, { label: string; color: string; icon: LucideIcon }> = {
-  aguardando_producao: { label: "Aguard. Produção", color: "bg-gray-100 text-gray-700", icon: Clock },
-  pronto_despacho: { label: "Pronto Despacho", color: "bg-blue-100 text-blue-700", icon: Package },
-  cotacao_frete: { label: "Cotação Frete", color: "bg-purple-100 text-purple-700", icon: DollarSign },
-  nf_emitida: { label: "NF Emitida", color: "bg-indigo-100 text-indigo-700", icon: FileText },
-  despachado: { label: "Despachado", color: "bg-cyan-100 text-cyan-700", icon: Send },
-  em_transito: { label: "Em Trânsito", color: "bg-yellow-100 text-yellow-700", icon: Truck },
-  saiu_entrega: { label: "Saiu p/ Entrega", color: "bg-orange-100 text-orange-700", icon: Truck },
-  entregue: { label: "Entregue", color: "bg-green-100 text-green-700", icon: CheckCircle2 },
-  ocorrencia: { label: "Ocorrência", color: "bg-red-100 text-red-700", icon: AlertTriangle },
-  finalizado: { label: "Finalizado", color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
+  aguardando_producao: { label: "Aguard. Produção", color: "bg-muted text-muted-foreground", icon: Clock },
+  pronto_despacho: { label: "Pronto Despacho", color: "bg-primary/15 text-primary", icon: Package },
+  cotacao_frete: { label: "Cotação Frete", color: "bg-accent text-accent-foreground", icon: DollarSign },
+  nf_emitida: { label: "NF Emitida", color: "bg-primary/20 text-primary", icon: FileText },
+  despachado: { label: "Despachado", color: "bg-primary/10 text-primary", icon: Send },
+  em_transito: { label: "Em Trânsito", color: "bg-warning/15 text-warning", icon: Truck },
+  saiu_entrega: { label: "Saiu p/ Entrega", color: "bg-warning/20 text-warning", icon: Truck },
+  entregue: { label: "Entregue", color: "bg-success/15 text-success", icon: CheckCircle2 },
+  ocorrencia: { label: "Ocorrência", color: "bg-destructive/15 text-destructive", icon: AlertTriangle },
+  finalizado: { label: "Finalizado", color: "bg-success/20 text-success", icon: CheckCircle2 },
 };
 
 // Rodonaves integration actions for entrega detail

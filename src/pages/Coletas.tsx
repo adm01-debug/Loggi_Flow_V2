@@ -43,13 +43,13 @@ interface Fornecedor { id: string; razao_social: string; nome_fantasia: string |
 interface Transportadora { id: string; nome_fantasia: string; }
 
 const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: LucideIcon }> = {
-  aguardando_liberacao: { label: "Aguardando", color: "bg-gray-100 text-gray-800", icon: Clock },
-  solicitada: { label: "Solicitada", color: "bg-blue-100 text-blue-800", icon: Package },
-  em_transito: { label: "Em Trânsito", color: "bg-yellow-100 text-yellow-800", icon: Truck },
-  chegou_expedicao: { label: "Na Expedição", color: "bg-purple-100 text-purple-800", icon: Building2 },
-  conferencia_ok: { label: "Conferida", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
-  divergencia: { label: "Divergência", color: "bg-red-100 text-red-800", icon: AlertTriangle },
-  finalizada: { label: "Finalizada", color: "bg-emerald-100 text-emerald-800", icon: CheckCircle2 },
+  aguardando_liberacao: { label: "Aguardando", color: "bg-muted text-muted-foreground", icon: Clock },
+  solicitada: { label: "Solicitada", color: "bg-primary/15 text-primary", icon: Package },
+  em_transito: { label: "Em Trânsito", color: "bg-warning/15 text-warning", icon: Truck },
+  chegou_expedicao: { label: "Na Expedição", color: "bg-accent text-accent-foreground", icon: Building2 },
+  conferencia_ok: { label: "Conferida", color: "bg-success/15 text-success", icon: CheckCircle2 },
+  divergencia: { label: "Divergência", color: "bg-destructive/15 text-destructive", icon: AlertTriangle },
+  finalizada: { label: "Finalizada", color: "bg-success/20 text-success", icon: CheckCircle2 },
 };
 
 const filterConfig: FilterConfig<Coleta> = {
@@ -159,8 +159,8 @@ export default function Coletas() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/10">
-                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
               <span className="truncate">Coletas</span>
             </h1>
@@ -205,10 +205,10 @@ export default function Coletas() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <div className="stat-card text-center p-3 sm:p-4"><Package className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><Clock className="w-5 h-5 text-gray-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.aguardando}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Aguardando</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.finalizadas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Finalizadas</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-primary/40 transition-colors"><Package className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-warning/40 transition-colors"><Clock className="w-5 h-5 text-muted-foreground mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.aguardando}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Aguardando</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-warning/40 transition-colors"><Truck className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
+          <div className="stat-card text-center p-3 sm:p-4 hover:border-success/40 transition-colors"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.finalizadas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Finalizadas</p></div>
         </div>
 
         <FilterBar 

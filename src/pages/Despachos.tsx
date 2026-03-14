@@ -29,10 +29,10 @@ const filterConfig: FilterConfig<Despacho> = {
 };
 
 const statusConfig: Record<string, { color: string; icon: LucideIcon }> = {
-  aguardando: { color: "bg-gray-100 text-gray-700", icon: Clock },
-  em_separacao: { color: "bg-amber-100 text-amber-700", icon: Package },
-  pronto: { color: "bg-green-100 text-green-700", icon: CheckCircle2 },
-  despachado: { color: "bg-blue-100 text-blue-700", icon: Truck },
+  aguardando: { color: "bg-muted text-muted-foreground", icon: Clock },
+  em_separacao: { color: "bg-warning/15 text-warning", icon: Package },
+  pronto: { color: "bg-success/15 text-success", icon: CheckCircle2 },
+  despachado: { color: "bg-primary/15 text-primary", icon: Truck },
 };
 
 export default function Despachos() {
