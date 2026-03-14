@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw } from "lucide-react";
+import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
@@ -12,6 +13,7 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { DelayPredictionPanel } from "@/components/predictions/DelayPredictionPanel";
 import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/DraggableDashboard";
 import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
+import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
 import { Button } from "@/components/ui/button";
 import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } from "@/hooks/useDashboardMetrics";
@@ -52,6 +54,7 @@ export default function Index() {
       ]);
       return { coletas: coletas || [], entregas: entregas || [] };
     },
+    staleTime: QUERY_STALE_TIME.DASHBOARD,
   });
 
   const { data: statusData } = useQuery({
@@ -64,6 +67,7 @@ export default function Index() {
       ]);
       return { coletas: coletas || [], entregas: entregas || [] };
     },
+    staleTime: QUERY_STALE_TIME.DASHBOARD,
   });
 
   const chartData = useMemo(() => {
@@ -94,16 +98,16 @@ export default function Index() {
   const handleDateRangeChange = (range: DateRange | undefined) => { if (range) setDateRange(range); };
 
   const widgetDefinitions: Record<string, { size: DashboardWidget["size"]; render: () => React.ReactNode }> = {
-    "xp-progress": { size: "full", render: () => userLevel ? <XPProgressBar currentXP={userLevel.current_xp} nextLevelXP={userLevel.level * 1000} level={userLevel.level} /> : null },
-    "kpi-pendentes": { size: "small", render: () => <KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" /> },
-    "kpi-transito": { size: "small", render: () => <KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" /> },
-    "kpi-finalizadas": { size: "small", render: () => <KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" /> },
-    "kpi-problemas": { size: "small", render: () => <KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" /> },
-    "chart-performance": { size: "large", render: () => <PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas" data={chartData} dataKey="total" /> },
-    "alerts-panel": { size: "large", render: () => <AlertsPanel alerts={alerts} isLoading={alertsLoading} /> },
-    "quick-actions": { size: "full", render: () => <QuickActions /> },
-    "transportadora-ranking": { size: "large", render: () => <TransportadoraRanking transportadoras={transportadoras} isLoading={transportadorasLoading} /> },
-    "delay-prediction": { size: "full", render: () => <DelayPredictionPanel /> },
+    "xp-progress": { size: "full", render: () => <WidgetErrorBoundary widgetName="XP Progress">{userLevel ? <XPProgressBar currentXP={userLevel.current_xp} nextLevelXP={userLevel.level * 1000} level={userLevel.level} /> : null}</WidgetErrorBoundary> },
+    "kpi-pendentes": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Pendentes"><KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" /></WidgetErrorBoundary> },
+    "kpi-transito": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Trânsito"><KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" /></WidgetErrorBoundary> },
+    "kpi-finalizadas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Finalizadas"><KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" /></WidgetErrorBoundary> },
+    "kpi-problemas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Problemas"><KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" /></WidgetErrorBoundary> },
+    "chart-performance": { size: "large", render: () => <WidgetErrorBoundary widgetName="Gráfico Performance"><PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas" data={chartData} dataKey="total" /></WidgetErrorBoundary> },
+    "alerts-panel": { size: "large", render: () => <WidgetErrorBoundary widgetName="Alertas"><AlertsPanel alerts={alerts} isLoading={alertsLoading} /></WidgetErrorBoundary> },
+    "quick-actions": { size: "full", render: () => <WidgetErrorBoundary widgetName="Ações Rápidas"><QuickActions /></WidgetErrorBoundary> },
+    "transportadora-ranking": { size: "large", render: () => <WidgetErrorBoundary widgetName="Ranking Transportadoras"><TransportadoraRanking transportadoras={transportadoras} isLoading={transportadorasLoading} /></WidgetErrorBoundary> },
+    "delay-prediction": { size: "full", render: () => <WidgetErrorBoundary widgetName="Predição Atrasos"><DelayPredictionPanel /></WidgetErrorBoundary> },
   };
 
   const widgets: DashboardWidget[] = widgetOrder.filter(id => widgetDefinitions[id]).map(id => ({ id, ...widgetDefinitions[id] }));

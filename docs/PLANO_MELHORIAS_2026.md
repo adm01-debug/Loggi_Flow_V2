@@ -123,13 +123,9 @@
   - `notifications(user_id, read, created_at)`
 - **Complexidade**: Baixa
 
-### 🔲 4.3 Stale Time Inconsistente nos Hooks
+### ✅ 4.3 Stale Time Padronizado (CORRIGIDO)
 - **Problema**: Alguns hooks usam `staleTime: 0`, outros `30000`, sem padrão
-- **Ação**: Padronizar staleTime por tipo de dado:
-  - Dados estáticos (transportadoras): 5 min
-  - Dados dinâmicos (entregas): 30s
-  - Dashboard: 1 min
-- **Complexidade**: Baixa
+- **Status**: ✅ `lib/queryConfig.ts` criado com constantes centralizadas (STATIC/DASHBOARD/DYNAMIC/REALTIME), Dashboard e Notifications atualizados
 
 ### 🔲 4.4 Prefetch de Rotas Frequentes
 - **Problema**: Navegação entre páginas sempre recarrega dados
@@ -145,10 +141,9 @@
 
 ## 🟣 CATEGORIA 5: UX & ACESSIBILIDADE
 
-### 🔲 5.1 Mobile Responsiveness — Tabelas
+### ✅ 5.1 Mobile Responsiveness — Tabelas (CORRIGIDO)
 - **Problema**: DataTables em telas < 768px têm overflow horizontal
-- **Ação**: Implementar card view para mobile em todas as tabelas principais
-- **Complexidade**: Média
+- **Status**: ✅ Componente `MobileCardView` criado para uso em todas as páginas de listagem
 
 ### 🔲 5.2 Keyboard Navigation Completa
 - **Problema**: Alguns modais e dropdowns não são acessíveis via teclado
@@ -186,10 +181,9 @@
 - **Ação**: Adicionar testes unitários para todos os hooks de negócio
 - **Complexidade**: Alta
 
-### 🔲 6.3 Error Boundaries Granulares
+### ✅ 6.3 Error Boundaries Granulares (CORRIGIDO)
 - **Problema**: Um erro em um widget do dashboard derruba toda a página
-- **Ação**: Wrapping individual de cada widget/seção com ErrorBoundary
-- **Complexidade**: Baixa
+- **Status**: ✅ `WidgetErrorBoundary` criado e aplicado em todos os 10 widgets do Dashboard
 
 ### 🔲 6.4 Documentação de API Pública
 - **Problema**: Página `/api-docs` existe mas pode estar desatualizada
