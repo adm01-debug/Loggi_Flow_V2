@@ -180,6 +180,36 @@ export default function CotacaoFrete() {
             )) : <div className="text-center py-8 text-muted-foreground">Nenhuma cotação encontrada</div>}</div>}
           </TabsContent>
 
+          <TabsContent value="rodonaves" className="space-y-4">
+            <div className="card-base p-4">
+              <div className="flex items-center gap-2 mb-4"><Truck className="w-5 h-5 text-primary" /><span className="font-semibold">Cotação via API Rodonaves</span></div>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div><Label>CEP Origem</Label><Input value={rteForm.cepOrigem} onChange={(e) => setRteForm({ ...rteForm, cepOrigem: e.target.value })} placeholder="00000-000" /></div>
+                <div><Label>CEP Destino</Label><Input value={rteForm.cepDestino} onChange={(e) => setRteForm({ ...rteForm, cepDestino: e.target.value })} placeholder="00000-000" /></div>
+                <div><Label>Peso (kg)</Label><Input type="number" value={rteForm.peso} onChange={(e) => setRteForm({ ...rteForm, peso: e.target.value })} placeholder="10" /></div>
+                <div><Label>Volumes</Label><Input type="number" value={rteForm.volumes} onChange={(e) => setRteForm({ ...rteForm, volumes: e.target.value })} placeholder="1" /></div>
+                <div><Label>Valor Mercadoria</Label><Input type="number" value={rteForm.valorMercadoria} onChange={(e) => setRteForm({ ...rteForm, valorMercadoria: e.target.value })} placeholder="1000" /></div>
+              </div>
+              <Button className="mt-4" onClick={() => {
+                if (!rteForm.cepOrigem || !rteForm.cepDestino || !rteForm.peso) { toast.error("Preencha CEP origem, destino e peso"); return; }
+                rodonaves.getQuotation({ cepOrigem: rteForm.cepOrigem.replace(/\D/g, ""), cepDestino: rteForm.cepDestino.replace(/\D/g, ""), peso: parseFloat(rteForm.peso), volumes: parseInt(rteForm.volumes) || 1, valorMercadoria: parseFloat(rteForm.valorMercadoria) || 0, cnpjRemetente: "" });
+              }} disabled={rodonaves.isQuoting}>
+                {rodonaves.isQuoting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Search className="w-4 h-4 mr-2" />}
+                Consultar Rodonaves
+              </Button>
+            </div>
+            {rodonaves.quotationResult?.data && (
+              <div className="card-interactive flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-amber-100"><Star className="w-5 h-5 text-amber-500" /></div>
+                <div className="flex-1"><p className="font-semibold">Rodonaves RTE</p><p className="text-sm text-muted-foreground"><Clock className="w-3 h-3 inline mr-1" />{rodonaves.quotationResult.data.PrazoEntrega} dias</p></div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-primary">R$ {rodonaves.quotationResult.data.Valor?.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Frete: R$ {rodonaves.quotationResult.data.ValorFrete?.toFixed(2)} | Pedágio: R$ {rodonaves.quotationResult.data.ValorPedagio?.toFixed(2)}</p>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="tabelas" className="space-y-4">
             <div className="flex justify-end"><Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova Tabela</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Nova Tabela de Frete</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div><Label>Transportadora</Label><Select value={newTableForm.transportadora_id} onValueChange={(v) => setNewTableForm({ ...newTableForm, transportadora_id: v })}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{(transportadoras || []).map((t) => <SelectItem key={t.id} value={t.id}>{t.nome_fantasia}</SelectItem>)}</SelectContent></Select></div><div><Label>Estado Destino</Label><Select value={newTableForm.estado_destino} onValueChange={(v) => setNewTableForm({ ...newTableForm, estado_destino: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent></Select></div><div className="grid grid-cols-2 gap-2"><div><Label>Peso Mín</Label><Input type="number" value={newTableForm.peso_min} onChange={(e) => setNewTableForm({ ...newTableForm, peso_min: Number(e.target.value) })} /></div><div><Label>Peso Máx</Label><Input type="number" value={newTableForm.peso_max} onChange={(e) => setNewTableForm({ ...newTableForm, peso_max: Number(e.target.value) })} /></div></div><div className="grid grid-cols-2 gap-2"><div><Label>Valor/kg</Label><Input type="number" step="0.01" value={newTableForm.valor_kg} onChange={(e) => setNewTableForm({ ...newTableForm, valor_kg: Number(e.target.value) })} /></div><div><Label>Prazo (dias)</Label><Input type="number" value={newTableForm.prazo_dias} onChange={(e) => setNewTableForm({ ...newTableForm, prazo_dias: Number(e.target.value) })} /></div></div></div><DialogFooter><Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancelar</Button><Button onClick={handleAddTable}>Criar</Button></DialogFooter></DialogContent></Dialog></div>
             
