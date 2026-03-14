@@ -20,7 +20,6 @@ export { Timeline } from './Timeline';
 
 // Navigation & Pagination
 export { Pagination } from './Pagination';
-export { InfiniteList } from './InfiniteList';
 
 // Forms & Inputs
 export { FilterBar } from './FilterBar';
