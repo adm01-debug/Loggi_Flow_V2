@@ -17,14 +17,12 @@
 - **Impacto**: TypeScript build errors, dados inconsistentes
 - **Status**: ✅ Corrigido nesta sessão
 
-### 🔲 1.3 `rodonaves-api` Ausente no config.toml
-- **Problema**: Edge function existe mas não tem entrada no `supabase/config.toml` com `verify_jwt`
-- **Impacto**: Deploy pode falhar ou função não ser acessível
-- **Ação**: Adicionar `[functions.rodonaves-api]` com `verify_jwt = false`
+### ✅ 1.3 Edge Functions Ausentes no config.toml (CORRIGIDO)
+- **Problema**: `rodonaves-api`, `check-password-breach` e `lalamove-api` sem entrada no `config.toml`
+- **Status**: ✅ Corrigido — adicionadas 3 entradas
 
-### 🔲 1.4 `check-password-breach` Ausente no config.toml
-- **Problema**: Edge function existe em `supabase/functions/` mas sem configuração no `config.toml`
-- **Ação**: Adicionar ao config.toml
+### ~~🔲~~ 1.4 `check-password-breach` Ausente no config.toml
+- **Status**: ✅ Corrigido junto com 1.3
 
 ### 🔲 1.5 RLS Policies Excessivamente Permissivas
 - **Problema**: Tabelas `alertas_custo`, `tabelas_frete`, `cotacoes_frete`, `transportadora_rotas` usam `USING (true)` sem verificar autenticação
