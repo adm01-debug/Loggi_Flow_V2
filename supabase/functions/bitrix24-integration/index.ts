@@ -1,21 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 
 interface Bitrix24Config {
   webhookUrl: string;
-  action: 'create_lead' | 'create_deal' | 'create_task' | 'add_comment' | 'get_contacts';
+  action: 'create_lead' | 'create_deal' | 'create_task' | 'add_comment' | 'get_contacts' | 'sync_deals' | 'update_deal' | 'get_deals';
   data?: Record<string, unknown>;
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return corsResponse(req);
+
+  const headers = { ...getCorsHeaders(req), 'Content-Type': 'application/json' };
 
   try {
     const { webhookUrl, action, data } = await req.json() as Bitrix24Config;
@@ -98,10 +93,45 @@ serve(async (req) => {
         };
         break;
 
+      case 'get_deals':
+        endpoint = 'crm.deal.list';
+        payload = {
+          filter: data?.filter || {},
+          select: ['ID', 'TITLE', 'OPPORTUNITY', 'STAGE_ID', 'CURRENCY_ID', 'DATE_MODIFY', 'CONTACT_ID', 'COMPANY_ID'],
+          order: { DATE_MODIFY: 'DESC' },
+          start: data?.start || 0,
+        };
+        break;
+
+      case 'update_deal':
+        endpoint = 'crm.deal.update';
+        payload = {
+          id: data?.dealId,
+          fields: {
+            STAGE_ID: data?.stage,
+            OPPORTUNITY: data?.value,
+            COMMENTS: data?.comments,
+            ...(data?.customFields as Record<string, unknown> || {}),
+          },
+        };
+        break;
+
+      case 'sync_deals':
+        // Fetch recent deals from Bitrix24 for synchronization
+        endpoint = 'crm.deal.list';
+        payload = {
+          filter: {
+            '>DATE_MODIFY': data?.lastSyncDate || new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          },
+          select: ['ID', 'TITLE', 'OPPORTUNITY', 'STAGE_ID', 'CURRENCY_ID', 'DATE_MODIFY', 'COMMENTS'],
+          order: { DATE_MODIFY: 'ASC' },
+        };
+        break;
+
       default:
         return new Response(
           JSON.stringify({ error: `Unknown action: ${action}` }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers }
         );
     }
 
@@ -121,7 +151,7 @@ serve(async (req) => {
           error: result.error_description || result.error,
           details: result 
         }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers }
       );
     }
 
@@ -131,14 +161,14 @@ serve(async (req) => {
         data: result.result,
         total: result.total,
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers }
     );
 
   } catch (error) {
     console.error('Bitrix24 integration error:', error);
     return new Response(
       JSON.stringify({ error: (error as Error).message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

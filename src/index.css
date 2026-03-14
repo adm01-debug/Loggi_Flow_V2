@@ -153,122 +153,122 @@
     --z-max: 9999;
   }
 
-  /* Light mode - optional, keeping dark as default */
+  /* Light mode - proper high-contrast light theme */
   .light {
     /* ===== BASE ===== */
-    --background: 225 35% 8%;
-    --foreground: 210 40% 96%;
+    --background: 0 0% 98%;
+    --foreground: 220 20% 12%;
 
     /* ===== CARDS ===== */
-    --card: 225 30% 12%;
-    --card-foreground: 210 40% 96%;
-    --card-elevated: 225 28% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 12%;
+    --card-elevated: 220 15% 97%;
 
     /* ===== POPOVER/DIALOG ===== */
-    --popover: 225 30% 12%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 12%;
 
-    /* ===== CORES PRIMÁRIAS ===== */
-    --primary: 252 87% 64%;
+    /* ===== CORES PRIMÁRIAS - Orange/Amber (same brand) ===== */
+    --primary: 25 95% 48%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 252 100% 75%;
+    --primary-glow: 25 100% 55%;
 
     /* ===== CORES SECUNDÁRIAS ===== */
-    --secondary: 225 25% 18%;
-    --secondary-foreground: 210 40% 90%;
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 20% 25%;
 
     /* ===== MUTED ===== */
-    --muted: 225 20% 20%;
-    --muted-foreground: 215 20% 70%;
-    
+    --muted: 220 15% 94%;
+    --muted-foreground: 215 15% 45%;
+
     /* ===== HIGH CONTRAST MODE ===== */
-    --high-contrast-muted-foreground: 215 20% 85%;
+    --high-contrast-muted-foreground: 215 20% 30%;
 
     /* ===== ACCENT ===== */
-    --accent: 225 25% 20%;
-    --accent-foreground: 210 40% 96%;
+    --accent: 220 15% 93%;
+    --accent-foreground: 220 20% 12%;
 
     /* ===== DESTRUCTIVE ===== */
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     /* ===== BORDAS E INPUTS ===== */
-    --border: 225 20% 22%;
-    --input: 225 25% 18%;
-    --ring: 252 87% 64%;
+    --border: 220 13% 87%;
+    --input: 220 13% 91%;
+    --ring: 25 95% 48%;
 
     /* ===== ESTADOS ===== */
-    --success: 142 71% 45%;
+    --success: 142 71% 38%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 38 92% 45%;
     --warning-foreground: 0 0% 100%;
-    --info: 199 89% 48%;
+    --info: 199 89% 42%;
     --info-foreground: 0 0% 100%;
 
     /* ===== GAMIFICAÇÃO ===== */
-    --xp: 280 85% 65%;
+    --xp: 25 95% 48%;
     --xp-foreground: 0 0% 100%;
-    --coins: 45 93% 55%;
-    --coins-foreground: 0 0% 10%;
-    --streak: 25 95% 58%;
+    --coins: 45 93% 45%;
+    --coins-foreground: 0 0% 100%;
+    --streak: 25 95% 50%;
     --streak-foreground: 0 0% 100%;
 
     /* ===== LOGÍSTICA ===== */
-    --freight-internal: 199 89% 55%;
-    --freight-supplier: 142 71% 50%;
-    --freight-customer: 252 87% 70%;
-    --freight-pending: 38 92% 55%;
+    --freight-internal: 199 89% 45%;
+    --freight-supplier: 142 71% 40%;
+    --freight-customer: 25 95% 48%;
+    --freight-pending: 38 92% 45%;
 
     /* ===== RANKS ===== */
-    --rank-gold: 45 93% 55%;
-    --rank-gold-foreground: 45 100% 95%;
-    --rank-silver: 220 15% 75%;
-    --rank-silver-foreground: 220 20% 95%;
-    --rank-bronze: 30 55% 55%;
-    --rank-bronze-foreground: 30 60% 95%;
+    --rank-gold: 45 93% 45%;
+    --rank-gold-foreground: 45 100% 15%;
+    --rank-silver: 220 10% 55%;
+    --rank-silver-foreground: 220 20% 15%;
+    --rank-bronze: 30 55% 45%;
+    --rank-bronze-foreground: 30 60% 15%;
 
     /* ===== ELEVAÇÃO ===== */
-    --elevated: 225 28% 15%;
-    --elevated-hover: 225 28% 18%;
+    --elevated: 220 15% 97%;
+    --elevated-hover: 220 15% 94%;
 
     /* ===== GLASS ===== */
-    --glass-bg: 225 30% 15% / 0.8;
-    --glass-border: 225 30% 30% / 0.3;
+    --glass-bg: 0 0% 100% / 0.85;
+    --glass-border: 220 13% 87% / 0.5;
 
     /* ===== SHADOWS ===== */
-    --shadow-xs: 0 1px 2px hsl(225 50% 5% / 0.4);
-    --shadow-sm: 0 1px 3px hsl(225 50% 5% / 0.5), 0 1px 2px hsl(225 50% 5% / 0.4);
-    --shadow-md: 0 4px 6px -1px hsl(225 50% 5% / 0.5), 0 2px 4px -2px hsl(225 50% 5% / 0.4);
-    --shadow-lg: 0 10px 15px -3px hsl(225 50% 5% / 0.5), 0 4px 6px -4px hsl(225 50% 5% / 0.4);
-    --shadow-xl: 0 20px 25px -5px hsl(225 50% 5% / 0.6), 0 8px 10px -6px hsl(225 50% 5% / 0.5);
-    --shadow-glow-primary: 0 0 30px hsl(252 87% 64% / 0.35);
-    --shadow-glow-success: 0 0 25px hsl(142 71% 45% / 0.3);
-    --shadow-header: 0 1px 3px hsl(225 50% 5% / 0.5), inset 0 1px 0 hsl(225 20% 25% / 0.3);
+    --shadow-xs: 0 1px 2px hsl(220 15% 50% / 0.06);
+    --shadow-sm: 0 1px 3px hsl(220 15% 50% / 0.1), 0 1px 2px hsl(220 15% 50% / 0.06);
+    --shadow-md: 0 4px 6px -1px hsl(220 15% 50% / 0.1), 0 2px 4px -2px hsl(220 15% 50% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(220 15% 50% / 0.1), 0 4px 6px -4px hsl(220 15% 50% / 0.06);
+    --shadow-xl: 0 20px 25px -5px hsl(220 15% 50% / 0.12), 0 8px 10px -6px hsl(220 15% 50% / 0.08);
+    --shadow-glow-primary: 0 0 30px hsl(25 95% 48% / 0.2);
+    --shadow-glow-success: 0 0 25px hsl(142 71% 38% / 0.15);
+    --shadow-header: 0 1px 3px hsl(220 15% 50% / 0.1), inset 0 1px 0 hsl(0 0% 100% / 0.8);
 
     /* ===== GRADIENTS ===== */
-    --gradient-primary: linear-gradient(135deg, hsl(252 87% 64%), hsl(280 85% 65%));
-    --gradient-secondary: linear-gradient(135deg, hsl(225 25% 18%), hsl(225 30% 12%));
-    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 71% 55%));
-    --gradient-xp: linear-gradient(90deg, hsl(280 85% 65%), hsl(252 87% 70%));
-    --gradient-gold: linear-gradient(135deg, hsl(45 93% 55%), hsl(38 92% 50%));
-    --gradient-surface: linear-gradient(180deg, hsl(225 30% 12%), hsl(225 35% 8%));
+    --gradient-primary: linear-gradient(135deg, hsl(25 95% 48%), hsl(38 92% 50%));
+    --gradient-secondary: linear-gradient(135deg, hsl(220 15% 95%), hsl(220 15% 90%));
+    --gradient-success: linear-gradient(135deg, hsl(142 71% 38%), hsl(142 71% 48%));
+    --gradient-xp: linear-gradient(90deg, hsl(25 95% 48%), hsl(38 92% 50%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 93% 50%), hsl(38 92% 45%));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
 
     /* ===== CHART ===== */
-    --chart-1: 252 87% 70%;
-    --chart-2: 142 71% 55%;
-    --chart-3: 45 93% 60%;
-    --chart-4: 280 85% 70%;
+    --chart-1: 25 95% 48%;
+    --chart-2: 142 71% 40%;
+    --chart-3: 45 93% 50%;
+    --chart-4: 199 89% 45%;
     --chart-5: 25 95% 63%;
 
     /* ===== SIDEBAR ===== */
-    --sidebar-background: 225 30% 10%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 252 87% 64%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 20% 12%;
+    --sidebar-primary: 25 95% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 25% 18%;
-    --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 225 20% 18%;
-    --sidebar-ring: 252 87% 64%;
+    --sidebar-accent: 220 15% 94%;
+    --sidebar-accent-foreground: 220 20% 12%;
+    --sidebar-border: 220 13% 90%;
+    --sidebar-ring: 25 95% 48%;
   }
 }
 

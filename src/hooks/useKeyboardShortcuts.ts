@@ -60,6 +60,10 @@ export function useGlobalShortcuts() {
   useKeyboardShortcut("e", () => navigate("/envios"), { alt: true });
   useKeyboardShortcut("r", () => navigate("/relatorios"), { alt: true });
   useKeyboardShortcut("s", () => navigate("/configuracoes"), { alt: true });
+  useKeyboardShortcut("t", () => navigate("/transportadoras"), { alt: true });
+  useKeyboardShortcut("a", () => navigate("/analytics"), { alt: true });
+  useKeyboardShortcut("n", () => navigate("/notificacoes"), { alt: true });
+  useKeyboardShortcut("f", () => navigate("/cotacao-frete"), { alt: true });
 
   useKeyboardShortcut("Escape", () => {
     const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
@@ -74,6 +78,11 @@ export const shortcutsList: ShortcutConfig[] = [
   { key: "e", alt: true, description: "Ir para Entregas" },
   { key: "r", alt: true, description: "Ir para Relatórios" },
   { key: "s", alt: true, description: "Ir para Configurações" },
+  { key: "t", alt: true, description: "Ir para Transportadoras" },
+  { key: "a", alt: true, description: "Ir para Analytics" },
+  { key: "n", alt: true, description: "Ir para Notificações" },
+  { key: "f", alt: true, description: "Ir para Cotação de Frete" },
+  { key: "?", shift: true, description: "Mostrar atalhos de teclado" },
   { key: "Escape", description: "Fechar modal/popup" },
 ];
 
