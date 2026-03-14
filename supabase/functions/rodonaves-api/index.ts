@@ -1,13 +1,13 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { requireString, requireNumber, ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 
-// Rodonaves API Gateways (v3)
+// Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
 const QUOTATION_GATEWAY = "https://quotation-apigateway.rte.com.br";
 const DEADLINE_GATEWAY = "https://01wapi.rte.com.br";
+const PICKUP_GATEWAY = "https://pickup-apigateway.rte.com.br";
 
 // Token cache (in-memory per isolate)
 const tokenCache: Record<string, { token: string; expiresAt: number }> = {};
@@ -26,7 +26,10 @@ async function getToken(gateway: string): Promise<string> {
     body: new URLSearchParams({ auth_type: "DEV", grant_type: "password", username, password }).toString(),
   });
 
-  if (!response.ok) throw new Error(`Auth failed [${response.status}]: ${await response.text()}`);
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Auth failed [${response.status}]: ${text}`);
+  }
   const data = await response.json();
   tokenCache[gateway] = { token: data.access_token, expiresAt: Date.now() + 25 * 60_000 };
   return data.access_token;
@@ -48,39 +51,186 @@ function mapTrackingCodeToStatus(code: number): string {
   }
 }
 
-async function trackShipment(nfNumero: string, nfSerie: string, cnpjRemetente: string) {
+// ===== TRACKING (GET) =====
+async function trackShipment(params: {
+  taxIdRegistration?: string;
+  invoiceNumber?: string;
+  invoiceKey?: string;
+  protocolNumber?: string;
+  cTeNumber?: number;
+  isCustomerPortal?: boolean;
+}) {
   const token = await getToken(TRACKING_GATEWAY);
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/tracking`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ nfNumero, nfSerie, cnpjRemetente }),
+  const qs = new URLSearchParams();
+  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
+  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
+  if (params.invoiceKey) qs.set("InvoiceKey", params.invoiceKey);
+  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
+  if (params.cTeNumber) qs.set("CTeNumber", String(params.cTeNumber));
+  if (params.isCustomerPortal) qs.set("IsCustomerPortal", "true");
+
+  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/tracking?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(`Tracking failed [${res.status}]: ${await res.text()}`);
   return res.json();
 }
 
-async function getDeliveryProof(nfNumero: string, nfSerie: string, cnpjRemetente: string) {
+// ===== BATCH TRACKING (GET) =====
+async function trackBatch(params: {
+  taxIdRegistration: string;
+  startDate: string;
+  endDate: string;
+  page?: number;
+  amountByPage?: number;
+  operationType?: number;
+}) {
   const token = await getToken(TRACKING_GATEWAY);
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/delivery-receipt`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ nfNumero, nfSerie, cnpjRemetente }),
+  const qs = new URLSearchParams({
+    TaxIdRegistration: params.taxIdRegistration,
+    StartDate: params.startDate,
+    EndDate: params.endDate,
+  });
+  if (params.page) qs.set("Page", String(params.page));
+  if (params.amountByPage) qs.set("AmountByPage", String(params.amountByPage));
+  if (params.operationType !== undefined) qs.set("OperationType", String(params.operationType));
+
+  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/tracking/batch?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Batch tracking failed [${res.status}]: ${await res.text()}`);
+  return res.json();
+}
+
+// ===== TRACKING STEPS (GET) =====
+async function trackingSteps(params: {
+  taxIdRegistration?: string;
+  invoiceNumber?: string;
+  invoiceKey?: string;
+  protocolNumber?: string;
+}) {
+  const token = await getToken(TRACKING_GATEWAY);
+  const qs = new URLSearchParams();
+  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
+  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
+  if (params.invoiceKey) qs.set("InvoiceKey", params.invoiceKey);
+  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
+
+  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/tracking/trackingSteps?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Tracking steps failed [${res.status}]: ${await res.text()}`);
+  return res.json();
+}
+
+// ===== DELIVERY RECEIPT (GET) =====
+async function getDeliveryProof(params: {
+  taxIdRegistration?: string;
+  invoiceNumber?: string;
+  invoiceKey?: string;
+  protocolNumber?: string;
+}) {
+  const token = await getToken(TRACKING_GATEWAY);
+  const qs = new URLSearchParams();
+  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
+  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
+  if (params.invoiceKey) qs.set("InvoiceKey", params.invoiceKey);
+  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
+
+  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(`Delivery proof failed [${res.status}]: ${await res.text()}`);
   return res.json();
 }
 
-async function simulateQuotation(params: { cepOrigem: string; cepDestino: string; peso: number; volumes: number; valorMercadoria: number; cnpjRemetente: string }) {
+// ===== DELIVERY INFO (GET) =====
+async function getDeliveryInfo(params: {
+  taxIdRegistration?: string;
+  invoiceNumber?: string;
+  protocolNumber?: string;
+}) {
+  const token = await getToken(TRACKING_GATEWAY);
+  const qs = new URLSearchParams();
+  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
+  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
+  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
+
+  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt/deliveryInformation?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Delivery info failed [${res.status}]: ${await res.text()}`);
+  return res.json();
+}
+
+// ===== ORDERS PAGINATED (GET) =====
+async function getOrders(params: {
+  taxIdRegistration: string;
+  customerType: number;
+  startDate: string;
+  endDate: string;
+  page?: number;
+  amountByPage?: number;
+  invoiceNumber?: string;
+}) {
+  const token = await getToken(TRACKING_GATEWAY);
+  const qs = new URLSearchParams({
+    TaxIdRegistration: params.taxIdRegistration,
+    CustomerType: String(params.customerType),
+    StartDate: params.startDate,
+    EndDate: params.endDate,
+  });
+  if (params.page) qs.set("Page", String(params.page));
+  if (params.amountByPage) qs.set("AmountByPage", String(params.amountByPage));
+  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
+
+  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/orders/ordersbydaterangepagination?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Orders failed [${res.status}]: ${await res.text()}`);
+  return res.json();
+}
+
+// ===== QUOTATION (POST) =====
+async function simulateQuotation(params: {
+  cepOrigem: string;
+  cepDestino: string;
+  peso: number;
+  volumes: number;
+  valorMercadoria: number;
+  cnpjRemetente: string;
+}) {
   const token = await getToken(QUOTATION_GATEWAY);
   const res = await fetch(`${QUOTATION_GATEWAY}/api/v1/simula-cotacao`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ CepOrigem: params.cepOrigem, CepDestino: params.cepDestino, Peso: params.peso, Volumes: params.volumes, ValorMercadoria: params.valorMercadoria, CnpjRemetente: params.cnpjRemetente }),
+    body: JSON.stringify({
+      CepOrigem: params.cepOrigem,
+      CepDestino: params.cepDestino,
+      Peso: params.peso,
+      Volumes: params.volumes,
+      ValorMercadoria: params.valorMercadoria,
+      CnpjRemetente: params.cnpjRemetente,
+    }),
   });
   if (!res.ok) throw new Error(`Quotation failed [${res.status}]: ${await res.text()}`);
   return res.json();
 }
 
+// ===== CUBAGE FACTOR (GET) =====
+async function getCubageFactor(taxIdRegistration: string, companyId?: string) {
+  const token = await getToken(QUOTATION_GATEWAY);
+  const qs = new URLSearchParams({ taxIdRegistration });
+  if (companyId) qs.set("companyId", companyId);
+
+  const res = await fetch(`${QUOTATION_GATEWAY}/api/v1/peso-cubado?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Cubage failed [${res.status}]: ${await res.text()}`);
+  return res.json();
+}
+
+// ===== DEADLINE (POST) =====
 async function getDeadline(cepOrigem: string, cepDestino: string) {
   const token = await getToken(DEADLINE_GATEWAY);
   const res = await fetch(`${DEADLINE_GATEWAY}/api/v1/busca-prazo`, {
@@ -92,7 +242,8 @@ async function getDeadline(cepOrigem: string, cepDestino: string) {
   return res.json();
 }
 
-serve(async (req) => {
+// ===== MAIN HANDLER =====
+Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
   if (req.method === "OPTIONS") {
@@ -100,7 +251,6 @@ serve(async (req) => {
   }
 
   try {
-    // --- Rate Limiting (20 req/min) ---
     const rl = await checkRateLimit(req, "rodonaves-api", { maxRequests: 20 });
     if (!rl.allowed) {
       return new Response(
@@ -120,21 +270,76 @@ serve(async (req) => {
     }
 
     let result: unknown;
+    const cnpjDefault = Deno.env.get("RODONAVES_CNPJ_REMETENTE") || "";
 
     switch (action) {
       case "track": {
-        const nfNumero = requireString(params, "nfNumero", { minLength: 1, maxLength: 50 });
-        const nfSerie = requireString(params, "nfSerie", { minLength: 1, maxLength: 10 });
-        const cnpjRemetente = requireString(params, "cnpjRemetente", { minLength: 11, maxLength: 18 });
-        result = await trackShipment(nfNumero, nfSerie, cnpjRemetente);
+        result = await trackShipment({
+          taxIdRegistration: params.cnpjRemetente || cnpjDefault,
+          invoiceNumber: params.nfNumero,
+          invoiceKey: params.invoiceKey,
+          protocolNumber: params.protocolNumber,
+          isCustomerPortal: params.isCustomerPortal,
+        });
+        break;
+      }
+
+      case "track-batch": {
+        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const startDate = requireString(params, "startDate");
+        const endDate = requireString(params, "endDate");
+        result = await trackBatch({
+          taxIdRegistration: taxId || cnpjDefault,
+          startDate,
+          endDate,
+          page: params.page,
+          amountByPage: params.amountByPage || 50,
+        });
+        break;
+      }
+
+      case "tracking-steps": {
+        result = await trackingSteps({
+          taxIdRegistration: params.cnpjRemetente || cnpjDefault,
+          invoiceNumber: params.nfNumero,
+          invoiceKey: params.invoiceKey,
+          protocolNumber: params.protocolNumber,
+        });
         break;
       }
 
       case "delivery-proof": {
-        const nfNumero = requireString(params, "nfNumero", { minLength: 1, maxLength: 50 });
-        const nfSerie = requireString(params, "nfSerie", { minLength: 1, maxLength: 10 });
-        const cnpjRemetente = requireString(params, "cnpjRemetente", { minLength: 11, maxLength: 18 });
-        result = await getDeliveryProof(nfNumero, nfSerie, cnpjRemetente);
+        result = await getDeliveryProof({
+          taxIdRegistration: params.cnpjRemetente || cnpjDefault,
+          invoiceNumber: params.nfNumero,
+          invoiceKey: params.invoiceKey,
+          protocolNumber: params.protocolNumber,
+        });
+        break;
+      }
+
+      case "delivery-info": {
+        result = await getDeliveryInfo({
+          taxIdRegistration: params.cnpjRemetente || cnpjDefault,
+          invoiceNumber: params.nfNumero,
+          protocolNumber: params.protocolNumber,
+        });
+        break;
+      }
+
+      case "orders": {
+        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const startDate = requireString(params, "startDate");
+        const endDate = requireString(params, "endDate");
+        result = await getOrders({
+          taxIdRegistration: taxId || cnpjDefault,
+          customerType: params.customerType ?? 1, // default: Remetente
+          startDate,
+          endDate,
+          page: params.page,
+          amountByPage: params.amountByPage || 20,
+          invoiceNumber: params.invoiceNumber,
+        });
         break;
       }
 
@@ -144,8 +349,14 @@ serve(async (req) => {
         const peso = requireNumber(params, "peso", { min: 0.01, max: 100000 });
         const volumes = requireNumber(params, "volumes", { min: 1, max: 10000 });
         const valorMercadoria = requireNumber(params, "valorMercadoria", { min: 0 });
-        const cnpjRemetente = requireString(params, "cnpjRemetente", { minLength: 11, maxLength: 18 });
+        const cnpjRemetente = params.cnpjRemetente || cnpjDefault;
         result = await simulateQuotation({ cepOrigem, cepDestino, peso, volumes, valorMercadoria, cnpjRemetente });
+        break;
+      }
+
+      case "cubage-factor": {
+        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        result = await getCubageFactor(taxId || cnpjDefault, params.companyId);
         break;
       }
 
@@ -170,12 +381,16 @@ serve(async (req) => {
 
         if (fetchError) throw fetchError;
 
-        const cnpjRemetente = params.cnpjRemetente || Deno.env.get("RODONAVES_CNPJ_REMETENTE") || "";
+        const cnpjRemetente = params.cnpjRemetente || cnpjDefault;
         const updates: Array<{ id: string; status: string; lastEvent: string }> = [];
 
         for (const entrega of entregas || []) {
           try {
-            const trackingData = await trackShipment(entrega.nf_remessa || "", "1", cnpjRemetente);
+            const trackingData = await trackShipment({
+              taxIdRegistration: cnpjRemetente,
+              invoiceNumber: entrega.nf_remessa || "",
+            });
+
             if (trackingData?.Tracking?.length > 0) {
               const latestEvent = trackingData.Tracking[0];
               const newStatus = mapTrackingCodeToStatus(latestEvent.CodigoOcorrencia);

@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -29,7 +29,7 @@ interface QuotationParams {
   peso: number;
   volumes: number;
   valorMercadoria: number;
-  cnpjRemetente: string;
+  cnpjRemetente?: string;
 }
 
 interface QuotationResult {
@@ -56,7 +56,6 @@ interface DeadlineResult {
 
 /**
  * Rodonaves tracking status code descriptions.
- * Maps numeric codes to human-readable PT-BR descriptions.
  */
 export const RODONAVES_STATUS_MAP: Record<number, { label: string; severity: 'info' | 'success' | 'warning' | 'error' }> = {
   0: { label: 'Transporte Iniciado', severity: 'info' },
@@ -96,52 +95,107 @@ async function invokeRodonaves(action: string, params: object) {
 export function useRodonavesTracking() {
   const [trackingResult, setTrackingResult] = useState<TrackingResult | null>(null);
 
-  // Track a single shipment
+  // Track a single shipment (GET /api/v1/tracking)
   const trackMutation = useMutation({
-    mutationFn: async (params: { nfNumero: string; nfSerie: string; cnpjRemetente: string }) => {
-      return invokeRodonaves('track', params);
-    },
+    mutationFn: async (params: {
+      nfNumero?: string;
+      cnpjRemetente?: string;
+      invoiceKey?: string;
+      protocolNumber?: string;
+    }) => invokeRodonaves('track', params),
     onSuccess: (data) => {
       setTrackingResult(data);
       toast.success('Rastreamento atualizado!');
     },
-    onError: (err: Error) => {
-      toast.error(`Erro no rastreamento: ${err.message}`);
-    },
+    onError: (err: Error) => toast.error(`Erro no rastreamento: ${err.message}`),
   });
 
-  // Get delivery proof
+  // Batch tracking (GET /api/v1/tracking/batch)
+  const trackBatchMutation = useMutation({
+    mutationFn: async (params: {
+      cnpjRemetente: string;
+      startDate: string;
+      endDate: string;
+      page?: number;
+      amountByPage?: number;
+    }) => invokeRodonaves('track-batch', params),
+    onSuccess: () => toast.success('Rastreamento em lote recebido!'),
+    onError: (err: Error) => toast.error(`Erro no lote: ${err.message}`),
+  });
+
+  // Tracking steps (GET /api/v1/tracking/trackingSteps)
+  const trackingStepsMutation = useMutation({
+    mutationFn: async (params: {
+      nfNumero?: string;
+      cnpjRemetente?: string;
+      invoiceKey?: string;
+      protocolNumber?: string;
+    }) => invokeRodonaves('tracking-steps', params),
+    onError: (err: Error) => toast.error(`Erro: ${err.message}`),
+  });
+
+  // Delivery proof (GET /api/v1/deliveryreceipt)
   const deliveryProofMutation = useMutation({
-    mutationFn: async (params: { nfNumero: string; nfSerie: string; cnpjRemetente: string }) => {
-      return invokeRodonaves('delivery-proof', params);
-    },
+    mutationFn: async (params: {
+      nfNumero?: string;
+      cnpjRemetente?: string;
+      invoiceKey?: string;
+      protocolNumber?: string;
+    }) => invokeRodonaves('delivery-proof', params),
     onSuccess: () => toast.success('Comprovante obtido!'),
     onError: (err: Error) => toast.error(`Erro: ${err.message}`),
   });
 
-  // Simulate quotation
+  // Delivery info (GET /api/v1/deliveryreceipt/deliveryInformation)
+  const deliveryInfoMutation = useMutation({
+    mutationFn: async (params: {
+      nfNumero?: string;
+      cnpjRemetente?: string;
+      protocolNumber?: string;
+    }) => invokeRodonaves('delivery-info', params),
+    onError: (err: Error) => toast.error(`Erro: ${err.message}`),
+  });
+
+  // Orders paginated (GET /api/v1/orders/ordersbydaterangepagination)
+  const ordersMutation = useMutation({
+    mutationFn: async (params: {
+      cnpjRemetente: string;
+      startDate: string;
+      endDate: string;
+      customerType?: number;
+      page?: number;
+      amountByPage?: number;
+      invoiceNumber?: string;
+    }) => invokeRodonaves('orders', params),
+    onError: (err: Error) => toast.error(`Erro nos pedidos: ${err.message}`),
+  });
+
+  // Quotation (POST /api/v1/simula-cotacao)
   const quotationMutation = useMutation({
-    mutationFn: async (params: QuotationParams) => {
-      return invokeRodonaves('quotation', params);
-    },
+    mutationFn: async (params: QuotationParams) => invokeRodonaves('quotation', params),
     onSuccess: () => toast.success('Cotação Rodonaves recebida!'),
     onError: (err: Error) => toast.error(`Erro na cotação: ${err.message}`),
   });
 
-  // Get delivery deadline
+  // Cubage factor (GET /api/v1/peso-cubado)
+  const cubageMutation = useMutation({
+    mutationFn: async (params: { cnpjRemetente: string; companyId?: string }) =>
+      invokeRodonaves('cubage-factor', params),
+    onError: (err: Error) => toast.error(`Erro: ${err.message}`),
+  });
+
+  // Deadline (POST /api/v1/busca-prazo)
   const deadlineMutation = useMutation({
-    mutationFn: async (params: { cepOrigem: string; cepDestino: string }) => {
-      return invokeRodonaves('deadline', params);
-    },
+    mutationFn: async (params: { cepOrigem: string; cepDestino: string }) =>
+      invokeRodonaves('deadline', params),
     onSuccess: () => toast.success('Prazo calculado!'),
     onError: (err: Error) => toast.error(`Erro no prazo: ${err.message}`),
   });
 
   // Sync all Rodonaves shipments
   const syncMutation = useMutation({
-    mutationFn: async (cnpjRemetente?: string) => {
-      return invokeRodonaves('sync-tracking', { cnpjRemetente });
-    },
+    mutationFn: async (cnpjRemetente?: string) =>
+      invokeRodonaves('sync-tracking', { cnpjRemetente }),
     onSuccess: (data) => {
       const synced = data?.data?.synced || 0;
       toast.success(`${synced} entrega(s) atualizada(s) via Rodonaves`);
@@ -156,16 +210,42 @@ export function useRodonavesTracking() {
     isTracking: trackMutation.isPending,
     trackingResult,
 
+    // Batch tracking
+    trackBatch: trackBatchMutation.mutate,
+    trackBatchAsync: trackBatchMutation.mutateAsync,
+    isTrackingBatch: trackBatchMutation.isPending,
+    batchResult: trackBatchMutation.data,
+
+    // Tracking steps
+    getTrackingSteps: trackingStepsMutation.mutate,
+    trackingSteps: trackingStepsMutation.data,
+    isLoadingSteps: trackingStepsMutation.isPending,
+
     // Delivery proof
     getDeliveryProof: deliveryProofMutation.mutate,
     deliveryProof: deliveryProofMutation.data,
     isLoadingProof: deliveryProofMutation.isPending,
+
+    // Delivery info
+    getDeliveryInfo: deliveryInfoMutation.mutate,
+    deliveryInfo: deliveryInfoMutation.data,
+    isLoadingDeliveryInfo: deliveryInfoMutation.isPending,
+
+    // Orders
+    getOrders: ordersMutation.mutate,
+    getOrdersAsync: ordersMutation.mutateAsync,
+    ordersResult: ordersMutation.data,
+    isLoadingOrders: ordersMutation.isPending,
 
     // Quotation
     getQuotation: quotationMutation.mutate,
     getQuotationAsync: quotationMutation.mutateAsync,
     quotationResult: quotationMutation.data as QuotationResult | undefined,
     isQuoting: quotationMutation.isPending,
+
+    // Cubage factor
+    getCubageFactor: cubageMutation.mutate,
+    cubageResult: cubageMutation.data,
 
     // Deadline
     getDeadline: deadlineMutation.mutate,
