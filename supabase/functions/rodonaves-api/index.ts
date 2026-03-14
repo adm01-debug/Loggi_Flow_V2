@@ -64,12 +64,15 @@ async function getToken(gateway: string): Promise<string> {
  * Map Rodonaves tracking codes to our entrega_status enum.
  */
 function mapTrackingCodeToStatus(code: number): string {
+  // IMPORTANT: Only use values from entrega_status enum:
+  // aguardando_producao, pronto_despacho, cotacao_frete, nf_emitida,
+  // despachado, em_transito, saiu_entrega, entregue, ocorrencia, finalizado
   switch (code) {
     case 0: return "em_transito";       // Processo de Transporte já Iniciado
     case 1: return "entregue";          // Entrega Realizada Normalmente
     case 2: return "entregue";          // Entrega Fora da Data Programada (still delivered)
     case 24: return "entregue";         // Mercadoria Reentregue ao Cliente Destino
-    case 25: return "devolvido";        // Mercadoria Devolvida ao Cliente de Origem
+    case 25: return "ocorrencia";       // Mercadoria Devolvida ao Cliente de Origem (treat as ocorrencia)
     case 29: return "entregue";         // Cliente Retira Mercadoria na Transportadora
     case 31: return "entregue";         // Entrega com Indenização Efetuada
     case 37: return "saiu_entrega";     // Mercadoria em Trânsito para Redespacho
@@ -79,9 +82,9 @@ function mapTrackingCodeToStatus(code: number): string {
     case 44: return "despachado";       // Mercadoria Recebida na Filial Destino
     case 45: return "despachado";       // Mercadoria em Transferência
     case 46: return "despachado";       // Mercadoria Despachada
-    case 47: return "coletado";         // Mercadoria Coletada
+    case 47: return "em_transito";      // Mercadoria Coletada (maps to em_transito since coletado doesn't exist)
     case 58: return "em_transito";      // CT-e Emitido
-    // Refused/issues → keep current status or mark as issue
+    // Refused/issues → mark as ocorrencia
     case 3: case 4: case 5: case 6: case 7: case 8: case 9:
     case 10: case 11: case 12: case 13: case 14: case 15:
     case 16: case 17: case 18: case 19: case 20: case 21:
