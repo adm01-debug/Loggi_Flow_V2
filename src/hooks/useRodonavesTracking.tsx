@@ -83,7 +83,7 @@ export const RODONAVES_STATUS_MAP: Record<number, { label: string; severity: 'in
   58: { label: 'CT-e Emitido', severity: 'info' },
 };
 
-async function invokeRodonaves(action: string, params: Record<string, unknown>) {
+async function invokeRodonaves(action: string, params: object) {
   const { data, error } = await supabase.functions.invoke('rodonaves-api', {
     body: { action, ...params },
   });
