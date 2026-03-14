@@ -44,6 +44,7 @@ export interface CostCheckResult {
 
 export const useCostAlerts = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [costCheckResults, setCostCheckResults] = useState<CostCheckResult[]>([]);
 
   // Fetch all cost alerts
