@@ -47,7 +47,7 @@ export function useAnalytics(dateRange?: DateRange) {
 
   // Monthly comparison data
   const { data: monthlyData = [], isLoading: isLoadingMonthly } = useQuery({
-    queryKey: ['analytics-monthly', startDate.toISOString(), endDate.toISOString()],
+    queryKey: ['analytics-monthly', user?.id, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
       const months: MonthlyData[] = [];
       const monthsInRange = eachMonthOfInterval({ start: startDate, end: endDate });
