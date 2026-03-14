@@ -234,14 +234,16 @@ export function useRecentAlerts() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }).slice(0, 10);
     },
-    staleTime: 1000 * 60 * 1, // 1 minuto
+    staleTime: 1000 * 60 * 1,
     refetchInterval: 1000 * 60 * 1,
+    enabled: !!user?.id,
   });
 }
 
 export function useTransportadoraPerformance() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['transportadora-performance'],
+    queryKey: ['transportadora-performance', user?.id],
     queryFn: async () => {
       const { data: transportadoras, error } = await supabase
         .from('transportadoras')
