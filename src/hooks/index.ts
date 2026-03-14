@@ -17,7 +17,6 @@ export { useSearch } from './useSearch';
 // ============================================
 export { useRealtime } from './useRealtime';
 export { useOnlineStatus } from './useOnlineStatus';
-export { useRealtimeNotifications } from './useRealtimeNotifications';
 
 // ============================================
 // Authentication & Security
@@ -51,7 +50,6 @@ export { useComments } from './useComments';
 export { useImageUpload } from './useImageUpload';
 export { useEntityHistory } from './useEntityHistory';
 export { useExport } from './useExport';
-export { useExportData } from './useExportData';
 export { useImportData } from './useImportData';
 export { useAuditLogs } from './useAuditLogs';
 
@@ -59,8 +57,6 @@ export { useAuditLogs } from './useAuditLogs';
 // Premium UX Hooks
 // ============================================
 export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsList, formatShortcut } from './useKeyboardShortcuts';
-export { useUndoRedo, useUndoManager } from './useUndoRedo';
-export { useOptimisticMutation, createOptimisticListHelpers, useOptimisticCounter } from './useOptimisticUpdates';
 
 // ============================================
 // Dashboard & Analytics
@@ -98,11 +94,6 @@ export { useNotifications } from './useNotifications';
 export { useNotificationPreferences } from './useNotificationPreferences';
 export { useIntegrationValidation } from './useIntegrationValidation';
 
-// ============================================
-// Form & Auto-Save
-// ============================================
-export { useAutoSave } from './useAutoSave';
-export { useForm } from './useForm';
 
 // ============================================
 // Logistics & Business
