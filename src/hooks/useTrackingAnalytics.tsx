@@ -113,8 +113,9 @@ const analyzeTrackingData = (points: TrackingPoint[]): TrackingMetrics | null =>
 };
 
 export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['tracking-analytics', dateFrom?.toISOString(), dateTo?.toISOString()],
+    queryKey: ['tracking-analytics', user?.id, dateFrom?.toISOString(), dateTo?.toISOString()],
     queryFn: async (): Promise<AnalyticsSummary> => {
       let query = supabase
         .from('rastreamento_historico')
