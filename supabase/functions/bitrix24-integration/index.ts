@@ -151,7 +151,7 @@ serve(async (req) => {
           error: result.error_description || result.error,
           details: result 
         }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers }
       );
     }
 
@@ -161,14 +161,14 @@ serve(async (req) => {
         data: result.result,
         total: result.total,
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers }
     );
 
   } catch (error) {
     console.error('Bitrix24 integration error:', error);
     return new Response(
       JSON.stringify({ error: (error as Error).message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });
