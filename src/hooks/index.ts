@@ -24,7 +24,6 @@ export { useOnlineStatus } from './useOnlineStatus';
 export { useAuth } from './useAuth';
 export { useNewDeviceDetection } from './useNewDeviceDetection';
 export { useMFA } from './useMFA';
-
 export { useSessionTimeout } from './useSessionTimeout';
 export { usePermissions } from './usePermissions';
 export { useRole } from './useRole';
@@ -37,17 +36,15 @@ export { useRateLimitLogs } from './useRateLimitLogs';
 // ============================================
 // CRUD Operations
 // ============================================
-export { useSavedFilters } from './useSavedFilters';
-export { useDuplicate } from './useDuplicate';
 export { useGlobalSearch } from './useGlobalSearch';
 export { useBulkActions } from './useBulkActions';
-export { useActivityLog, useRecentActivity } from './useActivityLog';
 export { useComments } from './useComments';
 export { useImageUpload } from './useImageUpload';
 export { useEntityHistory } from './useEntityHistory';
 export { useExport } from './useExport';
 export { useImportData } from './useImportData';
 export { useAuditLogs } from './useAuditLogs';
+export { useDocumentUpload } from './useDocumentUpload';
 
 // ============================================
 // Premium UX Hooks
@@ -88,7 +85,6 @@ export { useNotifications } from './useNotifications';
 export { useNotificationPreferences } from './useNotificationPreferences';
 export { useIntegrationValidation } from './useIntegrationValidation';
 
-
 // ============================================
 // Logistics & Business
 // ============================================
@@ -97,7 +93,6 @@ export { useSLANotifications } from './useSLANotifications';
 export { useLogisticsCosts } from './useLogisticsCosts';
 export { useLogisticsCalendar } from './useLogisticsCalendar';
 export { useCostAlerts } from './useCostAlerts';
-
 export { useDelayPrediction } from './useDelayPrediction';
 export { useDeliveryRoutes } from './useDeliveryRoutes';
 export { useFreightQuotation } from './useFreightQuotation';
@@ -115,9 +110,9 @@ export { useGeocoding } from './useGeocoding';
 export { useQRScanner } from './useQRScanner';
 
 // ============================================
-// Mentions
+// Prefetch
 // ============================================
-export { useMentions } from './useMentions';
+export { usePrefetch } from './usePrefetch';
 
 // ============================================
 // Re-exports for compatibility
