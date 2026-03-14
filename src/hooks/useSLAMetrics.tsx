@@ -111,8 +111,9 @@ function getFornecedor(item: { fornecedor: unknown }): FornecedorJoin | null {
 }
 
 export function useSLAMetrics() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["sla-metrics"],
+    queryKey: ["sla-metrics", user?.id],
     queryFn: async (): Promise<SLAMetrics> => {
       const now = new Date();
       const thirtyDaysAgo = subDays(now, 30);
