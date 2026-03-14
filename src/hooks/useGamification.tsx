@@ -150,20 +150,14 @@ export function useGamification() {
       const newLevel = calculateLevel(newTotalXP);
       const leveledUp = newLevel > userLevel.level;
       
-      const { data, error } = await supabase
-        .from("user_levels")
-        .update({
-          total_xp: newTotalXP,
-          current_xp: userLevel.current_xp + amount,
-          level: newLevel,
-          last_activity_date: new Date().toISOString().split("T")[0],
-        })
-        .eq("user_id", user.id)
-        .select()
-        .single();
+      const { error } = await supabase.rpc("add_user_xp", {
+        p_user_id: user.id,
+        p_xp_amount: amount,
+        p_coins_amount: 0,
+      });
       
       if (error) throw error;
-      return { data, leveledUp, newLevel, amount };
+      return { leveledUp, newLevel, amount };
     },
     onSuccess: ({ leveledUp, newLevel, amount }) => {
       queryClient.invalidateQueries({ queryKey: ["userLevel"] });
