@@ -198,7 +198,10 @@ export default function Clientes() {
             description="Clique aqui para adicionar um novo cliente. Você ganhará XP ao completar o cadastro!"
             position="left"
           >
-            <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setDlgImport(true)} className="gap-2"><Upload className="w-4 h-4" />Importar CSV</Button>
+              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+            </div>
           </OnboardingTooltip>
         </div>
 
