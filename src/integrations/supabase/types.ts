@@ -2114,6 +2114,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_user_xp: {
+        Args: {
+          p_coins_amount?: number
+          p_user_id: string
+          p_xp_amount: number
+        }
+        Returns: undefined
+      }
       calculate_level: { Args: { xp: number }; Returns: number }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
@@ -2167,6 +2175,7 @@ export type Database = {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json
       }
+      update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       xp_for_level: { Args: { lvl: number }; Returns: number }
     }
     Enums: {

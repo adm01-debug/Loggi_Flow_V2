@@ -150,20 +150,14 @@ export function useGamification() {
       const newLevel = calculateLevel(newTotalXP);
       const leveledUp = newLevel > userLevel.level;
       
-      const { data, error } = await supabase
-        .from("user_levels")
-        .update({
-          total_xp: newTotalXP,
-          current_xp: userLevel.current_xp + amount,
-          level: newLevel,
-          last_activity_date: new Date().toISOString().split("T")[0],
-        })
-        .eq("user_id", user.id)
-        .select()
-        .single();
+      const { error } = await supabase.rpc("add_user_xp", {
+        p_user_id: user.id,
+        p_xp_amount: amount,
+        p_coins_amount: 0,
+      });
       
       if (error) throw error;
-      return { data, leveledUp, newLevel, amount };
+      return { leveledUp, newLevel, amount };
     },
     onSuccess: ({ leveledUp, newLevel, amount }) => {
       queryClient.invalidateQueries({ queryKey: ["userLevel"] });
@@ -184,17 +178,14 @@ export function useGamification() {
     mutationFn: async ({ amount }: { amount: number }) => {
       if (!user?.id || !userLevel) throw new Error("User not logged in");
       
-      const { data, error } = await supabase
-        .from("user_levels")
-        .update({
-          coins: userLevel.coins + amount,
-        })
-        .eq("user_id", user.id)
-        .select()
-        .single();
+      const { error } = await supabase.rpc("add_user_xp", {
+        p_user_id: user.id,
+        p_xp_amount: 0,
+        p_coins_amount: amount,
+      });
       
       if (error) throw error;
-      return { data, amount };
+      return { amount };
     },
     onSuccess: ({ amount }) => {
       queryClient.invalidateQueries({ queryKey: ["userLevel"] });
@@ -223,20 +214,13 @@ export function useGamification() {
       
       if (achievementError) throw achievementError;
       
-      // Add rewards
+      // Add rewards via RPC
       if (userLevel) {
-        const newTotalXP = userLevel.total_xp + achievement.xp_reward;
-        const newLevel = calculateLevel(newTotalXP);
-        
-        await supabase
-          .from("user_levels")
-          .update({
-            total_xp: newTotalXP,
-            current_xp: userLevel.current_xp + achievement.xp_reward,
-            coins: userLevel.coins + achievement.coins_reward,
-            level: newLevel,
-          })
-          .eq("user_id", user.id);
+        await supabase.rpc("add_user_xp", {
+          p_user_id: user.id,
+          p_xp_amount: achievement.xp_reward,
+          p_coins_amount: achievement.coins_reward,
+        });
       }
       
       return achievement;
@@ -259,39 +243,13 @@ export function useGamification() {
   // Update streak
   const updateStreakMutation = useMutation({
     mutationFn: async () => {
-      if (!user?.id || !userLevel) throw new Error("User not logged in");
+      if (!user?.id) throw new Error("User not logged in");
       
-      const today = new Date().toISOString().split("T")[0];
-      const lastActivity = userLevel.last_activity_date;
-      
-      let newStreak = userLevel.streak_days;
-      
-      if (!lastActivity) {
-        newStreak = 1;
-      } else {
-        const lastDate = new Date(lastActivity);
-        const todayDate = new Date(today);
-        const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) {
-          newStreak = userLevel.streak_days + 1;
-        } else if (diffDays > 1) {
-          newStreak = 1;
-        }
-      }
-      
-      const { data, error } = await supabase
-        .from("user_levels")
-        .update({
-          streak_days: newStreak,
-          last_activity_date: today,
-        })
-        .eq("user_id", user.id)
-        .select()
-        .single();
+      const { error } = await supabase.rpc("update_user_streak", {
+        p_user_id: user.id,
+      });
       
       if (error) throw error;
-      return { data, newStreak };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userLevel"] });
