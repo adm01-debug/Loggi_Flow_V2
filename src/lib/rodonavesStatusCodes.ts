@@ -7,7 +7,7 @@ export interface RodonavesStatusInfo {
   code: number;
   description: string;
   /** Maps to our entrega_status enum */
-  systemStatus: 'pendente' | 'coletado' | 'despachado' | 'em_transito' | 'saiu_entrega' | 'entregue' | 'devolvido' | 'cancelado';
+  systemStatus: 'aguardando_producao' | 'pronto_despacho' | 'cotacao_frete' | 'nf_emitida' | 'despachado' | 'em_transito' | 'saiu_entrega' | 'entregue' | 'ocorrencia' | 'finalizado';
   /** Whether this code represents an ocorrencia that should be logged */
   isOcorrencia: boolean;
   severity: 'info' | 'success' | 'warning' | 'error';
