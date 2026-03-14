@@ -38,21 +38,15 @@ export function useExternalProducts(options: UseExternalProductsOptions = {}) {
       });
       if (search) params.set('search', search);
 
-      const { data, error } = await supabase.functions.invoke('external-products', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: null,
-      });
+      const { data, error } = await supabase.functions.invoke(
+        'external-products?' + params.toString()
+      );
 
-      // supabase.functions.invoke doesn't support query params well,
-      // so we'll use POST with body instead
-      const response = await supabase.functions.invoke('external-products?' + params.toString());
-
-      if (response.error) throw response.error;
-      return response.data as ExternalProductsResult;
+      if (error) throw error;
+      return data as ExternalProductsResult;
     },
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
   return {
