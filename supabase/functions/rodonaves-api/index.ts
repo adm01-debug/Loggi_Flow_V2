@@ -270,7 +270,7 @@ serve(async (req) => {
           .from("entregas")
           .select("id, nf_remessa, codigo_rastreamento, status, transportadora_id, transportadoras!inner(nome_fantasia)")
           .or("nome_fantasia.ilike.%rodonaves%,nome_fantasia.ilike.%rte%", { referencedTable: "transportadoras" })
-          .not("status", "in", '("entregue","cancelado","devolvido")')
+          .not("status", "in", '("entregue","finalizado")')
           .not("nf_remessa", "is", null);
 
         if (fetchError) throw fetchError;
