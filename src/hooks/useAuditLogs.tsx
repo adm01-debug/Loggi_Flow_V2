@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface AuditLog {
   id: string;
@@ -28,8 +29,9 @@ export interface AuditLogFilters {
 }
 
 export function useAuditLogs(filters: AuditLogFilters = {}) {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['audit-logs', filters],
+    queryKey: ['audit-logs', user?.id, filters],
     queryFn: async (): Promise<AuditLog[]> => {
       let query = supabase
         .from('audit_logs')
@@ -68,7 +70,8 @@ export function useAuditLogs(filters: AuditLogFilters = {}) {
 
       return (data as AuditLog[]) || [];
     },
-    staleTime: 1000 * 60 * 1, // 1 minute
+    staleTime: 1000 * 60 * 1,
+    enabled: !!user?.id,
   });
 }
 

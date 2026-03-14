@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TrackingPoint {
   id: string;
@@ -112,8 +113,9 @@ const analyzeTrackingData = (points: TrackingPoint[]): TrackingMetrics | null =>
 };
 
 export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['tracking-analytics', dateFrom?.toISOString(), dateTo?.toISOString()],
+    queryKey: ['tracking-analytics', user?.id, dateFrom?.toISOString(), dateTo?.toISOString()],
     queryFn: async (): Promise<AnalyticsSummary> => {
       let query = supabase
         .from('rastreamento_historico')
@@ -169,5 +171,6 @@ export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
       };
     },
     staleTime: 1000 * 60 * 2,
+    enabled: !!user?.id,
   });
 };

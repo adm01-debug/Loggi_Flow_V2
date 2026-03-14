@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface HistoryEvent {
   id: string;
@@ -17,6 +18,7 @@ interface UseEntityHistoryOptions {
 }
 
 export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptions) {
+  const { user } = useAuth();
   const queryKey = ["entity-history", entityType, entityId];
 
   const { data: history = [], isLoading } = useQuery({
@@ -69,7 +71,7 @@ export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptio
         };
       });
     },
-    enabled: !!entityId,
+    enabled: !!entityId && !!user?.id,
   });
 
   return { history, isLoading };

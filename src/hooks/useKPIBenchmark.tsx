@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { startOfMonth, endOfMonth, subMonths, format, parseISO } from 'date-fns';
 
 export interface PeriodKPIs {
@@ -30,8 +31,9 @@ export interface KPIComparison {
 }
 
 export const useKPIBenchmark = (periodsBack: number = 6) => {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['kpi-benchmark', periodsBack],
+    queryKey: ['kpi-benchmark', user?.id, periodsBack],
     queryFn: async () => {
       const periods: PeriodKPIs[] = [];
       
@@ -159,5 +161,6 @@ export const useKPIBenchmark = (periodsBack: number = 6) => {
       return { periods, comparison };
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 };

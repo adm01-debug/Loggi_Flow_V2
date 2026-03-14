@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Json } from "@/integrations/supabase/types";
 
@@ -97,9 +98,10 @@ export const ACTION_TYPES: { value: ActionType; label: string; icon: string }[] 
 
 export function useBusinessRules() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: rules = [], isLoading, error } = useQuery({
-    queryKey: ["business-rules"],
+    queryKey: ["business-rules", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("business_rules")
@@ -115,6 +117,7 @@ export function useBusinessRules() {
         trigger_event: rule.trigger_event as TriggerEvent,
       })) as BusinessRule[];
     },
+    enabled: !!user?.id,
   });
 
   const createRule = useMutation({
