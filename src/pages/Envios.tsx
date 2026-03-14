@@ -75,7 +75,7 @@ function RodonavesActions({ entrega }: { entrega: Entrega }) {
       <div className="flex flex-wrap gap-2">
         <Button 
           size="sm" variant="outline" 
-          onClick={() => track({ nfNumero: entrega.nf_remessa!, nfSerie: "1", cnpjRemetente })} 
+          onClick={() => track({ nfNumero: entrega.nf_remessa!, cnpjRemetente })} 
           disabled={isTracking}
         >
           {isTracking ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
