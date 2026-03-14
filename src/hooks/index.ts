@@ -17,7 +17,6 @@ export { useSearch } from './useSearch';
 // ============================================
 export { useRealtime } from './useRealtime';
 export { useOnlineStatus } from './useOnlineStatus';
-export { useRealtimeNotifications } from './useRealtimeNotifications';
 
 // ============================================
 // Authentication & Security
