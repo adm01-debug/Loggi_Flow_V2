@@ -159,8 +159,8 @@ export default function Coletas() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/10">
-                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
               <span className="truncate">Coletas</span>
             </h1>
