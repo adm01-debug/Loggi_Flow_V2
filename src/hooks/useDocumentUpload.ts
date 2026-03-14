@@ -63,8 +63,7 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
         setProgress(100);
         toast.success("Arquivo enviado com sucesso!");
         return urlData.publicUrl;
-      } catch (err) {
-        console.error("Upload error:", err);
+      } catch {
         toast.error("Erro ao enviar arquivo.");
         return null;
       } finally {
