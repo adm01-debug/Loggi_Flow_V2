@@ -77,33 +77,18 @@ export { useTrackingAnalytics } from './useTrackingAnalytics';
 // Gamification
 // ============================================
 export { useGamification } from './useGamification';
-export { useGamificationReal } from './useGamificationReal';
 export { useOnboarding } from './useOnboarding';
 export { useAchievementNotifications } from './useAchievementNotifications';
 
 // ============================================
-// Real Data Hooks (Production)
+// Core Entity Hooks
 // ============================================
-export { useAnalyticsReal } from './useAnalyticsReal';
-export { useDashboardMetricsReal } from './useDashboardMetricsReal';
-export { useSLAMetricsReal } from './useSLAMetricsReal';
-export { useLogisticsCostsReal } from './useLogisticsCostsReal';
-export { useLalamoveTrackingReal, useLalamoveOrders } from './useLalamoveTrackingReal';
-export { useBitrix24SPA, useBitrix24Lalamove, useBitrix24Expedicao, useBitrix24Sync } from './useBitrix24Real';
-export { useRodonavesTracking, RODONAVES_STATUS_MAP } from './useRodonavesTracking';
-
-// ============================================
-// Core Entity Hooks (Real)
-// ============================================
-export { useEntregasReal } from './useEntregasReal';
-export { useColetasReal } from './useColetasReal';
-export { useTransportadorasReal } from './useTransportadorasReal';
 export { useTransportadoraRotas } from './useTransportadoraRotas';
+export { useRodonavesTracking, RODONAVES_STATUS_MAP } from './useRodonavesTracking';
 
 // ============================================
 // Integration Hooks
 // ============================================
-export { useN8nWorkflows, useN8nTrigger, useN8nLogs } from './useN8nReal';
 export { useN8n } from './useN8n';
 export { useBitrix24 } from './useBitrix24';
 export { useLalamoveTracking } from './useLalamoveTracking';
