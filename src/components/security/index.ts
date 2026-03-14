@@ -12,7 +12,6 @@ export { PasskeyManager } from './PasskeyManager';
 export { PermissionGate } from './PermissionGate';
 export { PermissionMatrix } from './PermissionMatrix';
 export { RateLimitDashboardPanel } from './RateLimitDashboardPanel';
-export { ReauthDialog } from './ReauthDialog';
 export { SecurityEventsPanel } from './SecurityEventsPanel';
 export { SecurityNotificationSettings } from './SecurityNotificationSettings';
 export { SecurityOverviewPanel } from './SecurityOverviewPanel';
