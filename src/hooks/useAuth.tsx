@@ -28,48 +28,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Auto-update streak when user logs in
+// Auto-update streak when user logs in via SECURITY DEFINER RPC
 async function updateUserStreak(userId: string) {
   try {
-    const { data: userLevel } = await supabase
-      .from("user_levels")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (!userLevel) return;
-
-    const today = new Date().toISOString().split("T")[0];
-    const lastActivity = userLevel.last_activity_date;
-
-    // Already updated today
-    if (lastActivity === today) return;
-
-    let newStreak = userLevel.streak_days;
-
-    if (!lastActivity) {
-      newStreak = 1;
-    } else {
-      const lastDate = new Date(lastActivity);
-      const todayDate = new Date(today);
-      const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 1) {
-        newStreak = userLevel.streak_days + 1;
-      } else if (diffDays > 1) {
-        newStreak = 1;
-      }
-    }
-
-    await supabase
-      .from("user_levels")
-      .update({
-        streak_days: newStreak,
-        last_activity_date: today,
-      })
-      .eq("user_id", userId);
-
-    // Streak updated successfully
+    await supabase.rpc("update_user_streak", { p_user_id: userId });
   } catch {
     // Error updating streak - silent fail
   }

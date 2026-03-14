@@ -243,39 +243,13 @@ export function useGamification() {
   // Update streak
   const updateStreakMutation = useMutation({
     mutationFn: async () => {
-      if (!user?.id || !userLevel) throw new Error("User not logged in");
+      if (!user?.id) throw new Error("User not logged in");
       
-      const today = new Date().toISOString().split("T")[0];
-      const lastActivity = userLevel.last_activity_date;
-      
-      let newStreak = userLevel.streak_days;
-      
-      if (!lastActivity) {
-        newStreak = 1;
-      } else {
-        const lastDate = new Date(lastActivity);
-        const todayDate = new Date(today);
-        const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) {
-          newStreak = userLevel.streak_days + 1;
-        } else if (diffDays > 1) {
-          newStreak = 1;
-        }
-      }
-      
-      const { data, error } = await supabase
-        .from("user_levels")
-        .update({
-          streak_days: newStreak,
-          last_activity_date: today,
-        })
-        .eq("user_id", user.id)
-        .select()
-        .single();
+      const { error } = await supabase.rpc("update_user_streak", {
+        p_user_id: user.id,
+      });
       
       if (error) throw error;
-      return { data, newStreak };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userLevel"] });
