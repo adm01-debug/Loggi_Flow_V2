@@ -123,13 +123,9 @@
   - `notifications(user_id, read, created_at)`
 - **Complexidade**: Baixa
 
-### 🔲 4.3 Stale Time Inconsistente nos Hooks
+### ✅ 4.3 Stale Time Padronizado (CORRIGIDO)
 - **Problema**: Alguns hooks usam `staleTime: 0`, outros `30000`, sem padrão
-- **Ação**: Padronizar staleTime por tipo de dado:
-  - Dados estáticos (transportadoras): 5 min
-  - Dados dinâmicos (entregas): 30s
-  - Dashboard: 1 min
-- **Complexidade**: Baixa
+- **Status**: ✅ `lib/queryConfig.ts` criado com constantes centralizadas (STATIC/DASHBOARD/DYNAMIC/REALTIME), Dashboard e Notifications atualizados
 
 ### 🔲 4.4 Prefetch de Rotas Frequentes
 - **Problema**: Navegação entre páginas sempre recarrega dados
