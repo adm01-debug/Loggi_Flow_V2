@@ -8,10 +8,9 @@ interface Bitrix24Config {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return corsResponse(req);
+
+  const headers = { ...getCorsHeaders(req), 'Content-Type': 'application/json' };
 
   try {
     const { webhookUrl, action, data } = await req.json() as Bitrix24Config;
