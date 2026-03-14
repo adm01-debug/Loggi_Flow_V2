@@ -13,6 +13,7 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { DelayPredictionPanel } from "@/components/predictions/DelayPredictionPanel";
 import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/DraggableDashboard";
 import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
+import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
 import { Button } from "@/components/ui/button";
 import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } from "@/hooks/useDashboardMetrics";
