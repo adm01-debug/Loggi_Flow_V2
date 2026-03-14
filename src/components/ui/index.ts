@@ -82,11 +82,8 @@ export {
   Shake, 
   Typewriter, 
   Reveal,
-} from './micro-interactions';
 
 
-// Confetti
-export { ConfettiExplosion, useConfetti, StarBurst, SuccessCheck } from './confetti';
 
 // Chart (recharts wrapper)
 export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartStyle } from './chart';
