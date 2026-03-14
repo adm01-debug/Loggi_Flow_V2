@@ -50,7 +50,6 @@ export { useComments } from './useComments';
 export { useImageUpload } from './useImageUpload';
 export { useEntityHistory } from './useEntityHistory';
 export { useExport } from './useExport';
-export { useExportData } from './useExportData';
 export { useImportData } from './useImportData';
 export { useAuditLogs } from './useAuditLogs';
 
