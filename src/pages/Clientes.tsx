@@ -328,6 +328,36 @@ export default function Clientes() {
       <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Razão Social</p><p className="font-medium">{sel.razao_social}</p></div>{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}</div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="font-medium">{sel.cidade} - {sel.estado} {sel.cep}</p>}</div>{sel.contato_nome && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Contato</p><p>{sel.contato_nome}</p>{sel.contato_email && <p className="text-muted-foreground">{sel.contato_email}</p>}{sel.contato_telefone && <p className="text-muted-foreground">{sel.contato_telefone}</p>}</div>}{(sel.horario_entrega || sel.restricoes_entrega) && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Preferências de Entrega</p>{sel.horario_entrega && <p>Horário: {sel.horario_entrega}</p>}{sel.restricoes_entrega && <p className="text-muted-foreground">{sel.restricoes_entrega}</p>}</div>}<div className="flex gap-4 text-sm text-muted-foreground"><span>Entregas: {sel.total_entregas || 0}</span>{(sel.entregas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{sel.entregas_pendentes} pendentes</Badge>}</div></div>}</DialogContent></Dialog>
 
       <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir cliente?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita. O cliente "{sel?.nome_fantasia || sel?.razao_social}" será excluído permanentemente.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{deleteMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+
+      <ImportDialog open={dlgImport} onOpenChange={setDlgImport}>
+        <ImportDialogContent className="max-w-lg">
+          <ImportDialogHeader><ImportDialogTitle>Importar Clientes via CSV</ImportDialogTitle></ImportDialogHeader>
+          <CSVImporter
+            schema={clienteCSVSchema}
+            columns={clienteCSVColumns}
+            templateName="clientes_template"
+            onImport={async (data) => {
+              const rows = data.map((d: z.infer<typeof clienteCSVSchema>) => ({
+                razao_social: d.razao_social,
+                nome_fantasia: d.nome_fantasia || null,
+                cnpj: d.cnpj || null,
+                endereco_completo: d.endereco_completo,
+                cidade: d.cidade || null,
+                estado: d.estado || null,
+                cep: d.cep || null,
+                contato_nome: d.contato_nome || null,
+                contato_email: d.contato_email || null,
+                contato_telefone: d.contato_telefone || null,
+              }));
+              const { error } = await supabase.from("clientes").insert(rows);
+              if (error) throw error;
+              qc.invalidateQueries({ queryKey: ["clientes"] });
+              toast.success(`${rows.length} clientes importados!`);
+              setDlgImport(false);
+            }}
+          />
+        </ImportDialogContent>
+      </ImportDialog>
     </MainLayout>
   );
 }
