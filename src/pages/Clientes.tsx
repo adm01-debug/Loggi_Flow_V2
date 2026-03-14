@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+import { Users, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar, ArrowUpDown, ChevronUp, ChevronDown, Upload } from "lucide-react";
+import { z } from "zod";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
