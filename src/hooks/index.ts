@@ -95,6 +95,7 @@ export { useSLAMetricsReal } from './useSLAMetricsReal';
 export { useLogisticsCostsReal } from './useLogisticsCostsReal';
 export { useLalamoveTrackingReal, useLalamoveOrders } from './useLalamoveTrackingReal';
 export { useBitrix24SPA, useBitrix24Lalamove, useBitrix24Expedicao, useBitrix24Sync } from './useBitrix24Real';
+export { useRodonavesTracking, RODONAVES_STATUS_MAP } from './useRodonavesTracking';
 
 // ============================================
 // Core Entity Hooks (Real)
