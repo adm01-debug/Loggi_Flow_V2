@@ -36,10 +36,9 @@
 
 ## 🟠 CATEGORIA 2: INTEGRAÇÕES INCOMPLETAS
 
-### 🔲 2.1 Rodonaves — Webhook de Notificação Automática
+### ✅ 2.1 Rodonaves — Webhook de Notificação Automática (CORRIGIDO)
 - **Problema**: Sincronização é manual (pull), não há webhook para receber atualizações em tempo real
-- **Ação**: Criar edge function `rodonaves-webhook` que recebe POSTs da RTE e atualiza entregas automaticamente
-- **Complexidade**: Alta
+- **Status**: ✅ Edge function `rodonaves-webhook` criada no Sprint 3
 
 ### 🔲 2.2 Rodonaves — Cotação Integrada ao Fluxo de Despacho
 - **Problema**: Hook `useRodonavesTracking` tem cotação, mas não está integrado à página `CotacaoFrete`
