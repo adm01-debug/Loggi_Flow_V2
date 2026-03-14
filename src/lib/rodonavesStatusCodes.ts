@@ -39,7 +39,7 @@ export const RODONAVES_CODES: Record<number, RodonavesStatusInfo> = {
   22: { code: 22, description: 'Reentrega sem Cobrança', systemStatus: 'em_transito', isOcorrencia: true, severity: 'info' },
   23: { code: 23, description: 'Extravio de Mercadoria em Trânsito', systemStatus: 'em_transito', isOcorrencia: true, severity: 'error' },
   24: { code: 24, description: 'Mercadoria Reentregue ao Destino', systemStatus: 'entregue', isOcorrencia: false, severity: 'success' },
-  25: { code: 25, description: 'Mercadoria Devolvida à Origem', systemStatus: 'devolvido', isOcorrencia: true, severity: 'warning' },
+  25: { code: 25, description: 'Mercadoria Devolvida à Origem', systemStatus: 'ocorrencia', isOcorrencia: true, severity: 'warning' },
   26: { code: 26, description: 'NF Retida pela Fiscalização', systemStatus: 'em_transito', isOcorrencia: true, severity: 'error' },
   27: { code: 27, description: 'Roubo de Carga', systemStatus: 'em_transito', isOcorrencia: true, severity: 'error' },
   28: { code: 28, description: 'Mercadoria Retida até Segunda Ordem', systemStatus: 'em_transito', isOcorrencia: true, severity: 'warning' },
