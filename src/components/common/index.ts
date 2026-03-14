@@ -63,7 +63,7 @@ export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 export { BulkActions, useSelection } from './BulkActions';
 
 // Premium Components
-export { AutoSaveIndicator } from './AutoSaveIndicator';
+
 export { SearchInputWithHistory } from './SearchInputWithHistory';
 export { ChartExportButton } from './ChartExportButton';
 export { StepProgressPremium } from './StepProgressPremium';
