@@ -2148,6 +2148,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      purchase_reward: {
+        Args: { p_reward_item_id: string; p_user_id: string }
+        Returns: Json
+      }
       xp_for_level: { Args: { lvl: number }; Returns: number }
     }
     Enums: {

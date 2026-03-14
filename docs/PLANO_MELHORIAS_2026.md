@@ -36,10 +36,9 @@
 
 ## 🟠 CATEGORIA 2: INTEGRAÇÕES INCOMPLETAS
 
-### 🔲 2.1 Rodonaves — Webhook de Notificação Automática
+### ✅ 2.1 Rodonaves — Webhook de Notificação Automática (CORRIGIDO)
 - **Problema**: Sincronização é manual (pull), não há webhook para receber atualizações em tempo real
-- **Ação**: Criar edge function `rodonaves-webhook` que recebe POSTs da RTE e atualiza entregas automaticamente
-- **Complexidade**: Alta
+- **Status**: ✅ Edge function `rodonaves-webhook` criada no Sprint 3
 
 ### 🔲 2.2 Rodonaves — Cotação Integrada ao Fluxo de Despacho
 - **Problema**: Hook `useRodonavesTracking` tem cotação, mas não está integrado à página `CotacaoFrete`
@@ -75,33 +74,26 @@
 
 ## 🟡 CATEGORIA 3: FUNCIONALIDADES PENDENTES
 
-### 🔲 3.1 E-mail Transacional com Resend
+### ✅ 3.1 E-mail Transacional com Resend (CORRIGIDO)
 - **Problema**: Resend API key existe nos secrets mas nenhuma função de envio está implementada
-- **Ação**: Criar edge function genérica de envio de e-mails e integrar com:
-  - Notificações de entrega
-  - Relatórios agendados
-  - Alertas de custo
-- **Complexidade**: Média
+- **Status**: ✅ Edge function `send-email` criada no Sprint 2
 
-### 🔲 3.2 Import CSV/Excel Real
-- **Problema**: Importadores existem no frontend (`csvImporter.ts`, `excelImporter.ts`) mas não estão conectados às tabelas
-- **Ação**: Conectar importadores às páginas de Clientes, Fornecedores e Entregas
-- **Complexidade**: Baixa
+### ✅ 3.2 Import CSV/Excel Real (CORRIGIDO)
+- **Problema**: Importadores existem no frontend mas não estão conectados às tabelas
+- **Status**: ✅ CSVImporter conectado à página de Clientes com schema validado
 
 ### 🔲 3.3 Upload de Comprovantes/NFs
 - **Problema**: Campos `comprovante_entrega_url` e `nf_remessa_url` existem na tabela mas upload não está implementado
 - **Ação**: Configurar Supabase Storage bucket e implementar upload nas telas de entrega/coleta
 - **Complexidade**: Média
 
-### 🔲 3.4 Loja de Recompensas Funcional
+### ✅ 3.4 Loja de Recompensas Funcional (CORRIGIDO)
 - **Problema**: Tabelas `reward_items` e `reward_purchases` existem, página existe, mas compra não debita coins
-- **Ação**: Implementar transação atômica: debitar coins → registrar compra → atualizar stock
-- **Complexidade**: Média
+- **Status**: ✅ Função `purchase_reward` criada (transação atômica), página conectada a dados reais
 
-### 🔲 3.5 Relatórios Agendados — Envio Real
+### ✅ 3.5 Relatórios Agendados — Envio Real (CORRIGIDO)
 - **Problema**: Agendamento salva no banco mas não há cron/scheduler para enviar
-- **Ação**: Usar pg_cron ou edge function com cron para processar `scheduled_reports`
-- **Complexidade**: Alta
+- **Status**: ✅ Edge function `scheduled-reports` reescrita com geração de dados e envio via email
 
 ### 🔲 3.6 Rastreamento Público Funcional
 - **Problema**: Página `/rastrear` existe mas não consulta dados reais

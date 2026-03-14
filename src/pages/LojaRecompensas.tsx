@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -17,19 +17,10 @@ import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 
-interface RewardItem { id: string; name: string; description: string; coins_cost: number; category: string; icon: string; rarity: string; available: boolean; }
+interface RewardItem { id: string; name: string; description: string; coins_cost: number; category: string; icon: string; rarity: string; available: boolean; stock: number | null; }
 
 const iconMap: Record<string, LucideIcon> = { Gift, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Sparkles };
 const rarityColors: Record<string, string> = { common: "from-gray-400 to-gray-500", rare: "from-blue-400 to-blue-600", epic: "from-purple-400 to-purple-600", legendary: "from-amber-400 to-amber-600" };
-
-const mockRewards: RewardItem[] = [
-  { id: "1", name: "Vale Café", description: "Um café grátis no refeitório", coins_cost: 50, category: "alimentacao", icon: "Coffee", rarity: "common", available: true },
-  { id: "2", name: "Camiseta", description: "Camiseta exclusiva da empresa", coins_cost: 200, category: "vestuario", icon: "Shirt", rarity: "rare", available: true },
-  { id: "3", name: "Mouse Gamer", description: "Mouse ergonômico premium", coins_cost: 500, category: "tecnologia", icon: "Mouse", rarity: "epic", available: true },
-  { id: "4", name: "Vale Combustível", description: "R$ 100 em combustível", coins_cost: 800, category: "vale", icon: "Fuel", rarity: "epic", available: true },
-  { id: "5", name: "Almoço VIP", description: "Almoço com a diretoria", coins_cost: 1000, category: "experiencia", icon: "Crown", rarity: "legendary", available: true },
-  { id: "6", name: "Day Off", description: "Um dia de folga extra", coins_cost: 1500, category: "experiencia", icon: "Sparkles", rarity: "legendary", available: false },
-];
 
 const filterConfig: FilterConfig<RewardItem> = {
   search: {
@@ -56,12 +47,25 @@ export default function LojaRecompensas() {
 
   const coins = userLevel?.coins || 0;
 
+  // Fetch real reward items from database
+  const { data: rewardItems = [], isLoading } = useQuery({
+    queryKey: ["reward-items"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reward_items")
+        .select("*")
+        .order("coins_cost", { ascending: true });
+      if (error) throw error;
+      return data as RewardItem[];
+    },
+  });
+
   const tabFiltered = useMemo(() => {
-    let result = tab === "all" ? mockRewards : mockRewards.filter(r => r.category === tab);
+    let result = tab === "all" ? rewardItems : rewardItems.filter(r => r.category === tab);
     if (availabilityFilter === "yes") result = result.filter(r => r.available);
     if (availabilityFilter === "no") result = result.filter(r => !r.available);
     return result;
-  }, [tab, availabilityFilter]);
+  }, [tab, availabilityFilter, rewardItems]);
   
   const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters } = useFilters(tabFiltered, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "coins_cost", defaultDirection: "asc" });
@@ -69,12 +73,24 @@ export default function LojaRecompensas() {
 
   const redeemMutation = useMutation({
     mutationFn: async (reward: RewardItem) => {
-      if (coins < reward.coins_cost) throw new Error("Moedas insuficientes");
-      const { error } = await supabase.from("user_levels").update({ coins: coins - reward.coins_cost }).eq("user_id", user?.id);
+      if (!user?.id) throw new Error("Não autenticado");
+      const { data, error } = await supabase.rpc("purchase_reward", {
+        p_user_id: user.id,
+        p_reward_item_id: reward.id,
+      });
       if (error) throw error;
-      return reward;
+      const result = data as unknown as { success: boolean; error?: string; coins_spent?: number; remaining_coins?: number };
+      if (!result.success) throw new Error(result.error || "Erro ao resgatar");
+      return { reward, result };
     },
-    onSuccess: (reward) => { qc.invalidateQueries({ queryKey: ["user-level"] }); toast.success(`${reward.name} resgatado!`); setConfirmDialog(false); setSelectedReward(null); },
+    onSuccess: ({ reward, result }) => {
+      qc.invalidateQueries({ queryKey: ["user-level"] });
+      qc.invalidateQueries({ queryKey: ["gamification-user"] });
+      qc.invalidateQueries({ queryKey: ["reward-items"] });
+      toast.success(`${reward.name} resgatado! -${result.coins_spent} moedas`);
+      setConfirmDialog(false);
+      setSelectedReward(null);
+    },
     onError: (e) => toast.error(e.message),
   });
 
@@ -112,31 +128,39 @@ export default function LojaRecompensas() {
 
         <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("coins_cost")} className="gap-1">Preço <SortIcon field="coins_cost" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("rarity")} className="gap-1">Raridade <SortIcon field="rarity" /></Button></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {pagination.paginatedData.map((r, i) => {
-            const Icon = iconMap[r.icon] || Gift;
-            const canAfford = coins >= r.coins_cost;
-            return (
-              <div key={r.id} className={cn("card-interactive relative overflow-hidden", !r.available && "opacity-50")} style={{ animationDelay: `${i * 50}ms` }}>
-                <div className={cn("absolute inset-0 bg-gradient-to-br opacity-10", rarityColors[r.rarity])} />
-                <div className="relative p-4">
-                  <div className="flex items-start gap-3">
-                    <div className={cn("p-3 rounded-xl bg-gradient-to-br text-white", rarityColors[r.rarity])}><Icon className="w-6 h-6" /></div>
-                    <div className="flex-1"><h3 className="font-semibold">{r.name}</h3><p className="text-sm text-muted-foreground">{r.description}</p></div>
-                  </div>
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center gap-1 text-amber-600"><Coins className="w-4 h-4" /><span className="font-bold">{r.coins_cost}</span></div>
-                    <Button size="sm" disabled={!r.available || !canAfford || redeemMutation.isPending} onClick={() => handleRedeem(r)}>
-                      {!canAfford ? "Sem moedas" : !r.available ? "Indisponível" : "Resgatar"}
-                    </Button>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pagination.paginatedData.map((r, i) => {
+              const Icon = iconMap[r.icon] || Gift;
+              const canAfford = coins >= r.coins_cost;
+              return (
+                <div key={r.id} className={cn("card-interactive relative overflow-hidden", !r.available && "opacity-50")} style={{ animationDelay: `${i * 50}ms` }}>
+                  <div className={cn("absolute inset-0 bg-gradient-to-br opacity-10", rarityColors[r.rarity])} />
+                  <div className="relative p-4">
+                    <div className="flex items-start gap-3">
+                      <div className={cn("p-3 rounded-xl bg-gradient-to-br text-white", rarityColors[r.rarity])}><Icon className="w-6 h-6" /></div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{r.name}</h3>
+                        <p className="text-sm text-muted-foreground">{r.description}</p>
+                        {r.stock !== null && <p className="text-xs text-muted-foreground mt-1">Estoque: {r.stock}</p>}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center gap-1 text-amber-600"><Coins className="w-4 h-4" /><span className="font-bold">{r.coins_cost}</span></div>
+                      <Button size="sm" disabled={!r.available || !canAfford || redeemMutation.isPending} onClick={() => handleRedeem(r)}>
+                        {!canAfford ? "Sem moedas" : !r.available ? "Indisponível" : "Resgatar"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
-        {sortedData.length === 0 && <div className="flex flex-col items-center py-12"><ShoppingCart className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma recompensa encontrada</p></div>}
+        {!isLoading && sortedData.length === 0 && <div className="flex flex-col items-center py-12"><ShoppingCart className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma recompensa encontrada</p></div>}
         {sortedData.length > 0 && (
           <Pagination
             currentPage={pagination.currentPage}

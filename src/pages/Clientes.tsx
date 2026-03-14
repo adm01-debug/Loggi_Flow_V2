@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar, ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
+import { Users, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar, ArrowUpDown, ChevronUp, ChevronDown, Upload } from "lucide-react";
+import { z } from "zod";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,34 @@ import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
+import { CSVImporter } from "@/components/common/CSVImporter";
+import { Dialog as ImportDialog, DialogContent as ImportDialogContent, DialogHeader as ImportDialogHeader, DialogTitle as ImportDialogTitle } from "@/components/ui/dialog";
+
+const clienteCSVSchema = z.object({
+  razao_social: z.string().min(1),
+  nome_fantasia: z.string().optional().default(""),
+  cnpj: z.string().optional().default(""),
+  endereco_completo: z.string().min(1),
+  cidade: z.string().optional().default(""),
+  estado: z.string().optional().default(""),
+  cep: z.string().optional().default(""),
+  contato_nome: z.string().optional().default(""),
+  contato_email: z.string().optional().default(""),
+  contato_telefone: z.string().optional().default(""),
+});
+
+const clienteCSVColumns = [
+  { key: "razao_social", label: "Razão Social", example: "Empresa LTDA" },
+  { key: "nome_fantasia", label: "Nome Fantasia", example: "Empresa" },
+  { key: "cnpj", label: "CNPJ", example: "12345678000199" },
+  { key: "endereco_completo", label: "Endereço", example: "Rua ABC, 123" },
+  { key: "cidade", label: "Cidade", example: "São Paulo" },
+  { key: "estado", label: "UF", example: "SP" },
+  { key: "cep", label: "CEP", example: "01234567" },
+  { key: "contato_nome", label: "Contato", example: "João" },
+  { key: "contato_email", label: "Email", example: "joao@empresa.com" },
+  { key: "contato_telefone", label: "Telefone", example: "11999999999" },
+];
 
 interface Cliente {
   id: string; razao_social: string; nome_fantasia: string | null; cnpj: string | null;
@@ -59,6 +88,7 @@ export default function Clientes() {
   const [dlgDel, setDlgDel] = useState(false);
   const [sel, setSel] = useState<Cliente | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [dlgImport, setDlgImport] = useState(false);
 
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["clientes"],
@@ -168,7 +198,10 @@ export default function Clientes() {
             description="Clique aqui para adicionar um novo cliente. Você ganhará XP ao completar o cadastro!"
             position="left"
           >
-            <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setDlgImport(true)} className="gap-2"><Upload className="w-4 h-4" />Importar CSV</Button>
+              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+            </div>
           </OnboardingTooltip>
         </div>
 
@@ -295,6 +328,36 @@ export default function Clientes() {
       <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>{sel?.nome_fantasia || sel?.razao_social}</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Razão Social</p><p className="font-medium">{sel.razao_social}</p></div>{sel.cnpj && <div><p className="text-sm text-muted-foreground">CNPJ</p><p className="font-mono">{fmtCNPJ(sel.cnpj)}</p></div>}</div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p>{sel.cidade && <p className="font-medium">{sel.cidade} - {sel.estado} {sel.cep}</p>}</div>{sel.contato_nome && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Contato</p><p>{sel.contato_nome}</p>{sel.contato_email && <p className="text-muted-foreground">{sel.contato_email}</p>}{sel.contato_telefone && <p className="text-muted-foreground">{sel.contato_telefone}</p>}</div>}{(sel.horario_entrega || sel.restricoes_entrega) && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Preferências de Entrega</p>{sel.horario_entrega && <p>Horário: {sel.horario_entrega}</p>}{sel.restricoes_entrega && <p className="text-muted-foreground">{sel.restricoes_entrega}</p>}</div>}<div className="flex gap-4 text-sm text-muted-foreground"><span>Entregas: {sel.total_entregas || 0}</span>{(sel.entregas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{sel.entregas_pendentes} pendentes</Badge>}</div></div>}</DialogContent></Dialog>
 
       <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir cliente?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita. O cliente "{sel?.nome_fantasia || sel?.razao_social}" será excluído permanentemente.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{deleteMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+
+      <ImportDialog open={dlgImport} onOpenChange={setDlgImport}>
+        <ImportDialogContent className="max-w-lg">
+          <ImportDialogHeader><ImportDialogTitle>Importar Clientes via CSV</ImportDialogTitle></ImportDialogHeader>
+          <CSVImporter
+            schema={clienteCSVSchema}
+            columns={clienteCSVColumns}
+            templateName="clientes_template"
+            onImport={async (data) => {
+              const rows = data.map((d: z.infer<typeof clienteCSVSchema>) => ({
+                razao_social: d.razao_social,
+                nome_fantasia: d.nome_fantasia || null,
+                cnpj: d.cnpj || null,
+                endereco_completo: d.endereco_completo,
+                cidade: d.cidade || null,
+                estado: d.estado || null,
+                cep: d.cep || null,
+                contato_nome: d.contato_nome || null,
+                contato_email: d.contato_email || null,
+                contato_telefone: d.contato_telefone || null,
+              }));
+              const { error } = await supabase.from("clientes").insert(rows);
+              if (error) throw error;
+              qc.invalidateQueries({ queryKey: ["clientes"] });
+              toast.success(`${rows.length} clientes importados!`);
+              setDlgImport(false);
+            }}
+          />
+        </ImportDialogContent>
+      </ImportDialog>
     </MainLayout>
   );
 }

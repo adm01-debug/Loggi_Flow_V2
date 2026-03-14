@@ -68,3 +68,6 @@ verify_jwt = false
 
 [functions.send-email]
 verify_jwt = true
+
+[functions.rodonaves-webhook]
+verify_jwt = false
