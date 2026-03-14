@@ -62,6 +62,7 @@ export interface RotaFormData {
 
 export const useTransportadoraRotas = (filters?: RotaFilter) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch routes with optional filters
   const { data: rotas, isLoading, error, refetch } = useQuery({

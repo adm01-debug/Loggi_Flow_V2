@@ -45,6 +45,7 @@ export interface QuotationResult {
 
 export const useFreightQuotation = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch all freight tables
   const { data: tabelasFrete, isLoading: isLoadingTabelas } = useQuery({
