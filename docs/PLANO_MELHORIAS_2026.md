@@ -24,15 +24,13 @@
 ### ~~🔲~~ 1.4 `check-password-breach` Ausente no config.toml
 - **Status**: ✅ Corrigido junto com 1.3
 
-### 🔲 1.5 RLS Policies Excessivamente Permissivas
-- **Problema**: Tabelas `alertas_custo`, `tabelas_frete`, `cotacoes_frete`, `transportadora_rotas` usam `USING (true)` sem verificar autenticação
-- **Impacto**: Dados acessíveis sem login (risco de segurança)
-- **Ação**: Restringir para `authenticated` role
+### ✅ 1.5 RLS Policies Excessivamente Permissivas (CORRIGIDO)
+- **Problema**: `alertas_custo`, `tabelas_frete`, `cotacoes_frete`, `transportadora_rotas` usavam `USING (true)` sem `TO authenticated`
+- **Status**: ✅ Corrigido via migration — todas restritas para `authenticated`
 
-### 🔲 1.6 `geo_blocked_attempts` Sem INSERT Policy
-- **Problema**: Tabela não permite INSERT, mas precisa registrar tentativas bloqueadas
-- **Impacto**: Tentativas de geo-blocking não são logadas
-- **Ação**: Adicionar policy de INSERT para service_role ou system
+### ✅ 1.6 `geo_blocked_attempts` Sem INSERT Policy (CORRIGIDO)
+- **Problema**: Tabela não permitia INSERT
+- **Status**: ✅ Corrigido via migration
 
 ---
 
