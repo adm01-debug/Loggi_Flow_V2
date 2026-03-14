@@ -84,7 +84,7 @@ function RodonavesActions({ entrega }: { entrega: Entrega }) {
         {(entrega.status === "entregue" || entrega.status === "finalizado") && (
           <Button 
             size="sm" variant="outline"
-            onClick={() => getDeliveryProof({ nfNumero: entrega.nf_remessa!, nfSerie: "1", cnpjRemetente })}
+            onClick={() => getDeliveryProof({ nfNumero: entrega.nf_remessa!, cnpjRemetente })}
             disabled={isLoadingProof}
           >
             {isLoadingProof ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <FileDown className="w-4 h-4 mr-1" />}
