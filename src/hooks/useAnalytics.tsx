@@ -258,6 +258,7 @@ export function useAnalytics(dateRange?: DateRange) {
       
       return heatmap;
     },
+    enabled: !!user?.id,
   });
 
   // Summary metrics
