@@ -1,6 +1,4 @@
 // Gamification Components - barrel export
 // ============================================
-
-export { LevelBadge } from './LevelBadge';
-export { default as LevelUpCelebration } from './LevelUpCelebration';
-export { XPProgressCard } from './XPProgressCard';
+// Note: All gamification components were orphaned and removed.
+// This barrel is kept for future additions.
