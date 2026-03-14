@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { useCallback, useEffect, useState } from 'react';
 
 export interface DeliveryRoute {
@@ -121,13 +122,14 @@ const saveCoordinatesToDB = async (
 };
 
 export const useDeliveryRoutes = (enableGeocoding = true) => {
+  const { user } = useAuth();
   const [geocodedDeliveries, setGeocodedDeliveries] = useState<DeliveryRoute[]>([]);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
   const [reGeocodingId, setReGeocodingId] = useState<string | null>(null);
 
   const query = useQuery({
-    queryKey: ['delivery-routes'],
+    queryKey: ['delivery-routes', user?.id],
     queryFn: async (): Promise<DeliveryRoute[]> => {
       interface EntregaRaw {
         id: string;
@@ -185,7 +187,8 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
         };
       });
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2,
+    enabled: !!user?.id,
   });
 
   // Geocode addresses that don't have persisted coordinates

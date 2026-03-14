@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { subMonths, startOfMonth, endOfMonth, format, getHours, eachMonthOfInterval } from 'date-fns';
 
 export interface MonthlyData {
@@ -40,12 +41,13 @@ export interface DateRange {
 }
 
 export function useAnalytics(dateRange?: DateRange) {
+  const { user } = useAuth();
   const startDate = dateRange?.from || subMonths(new Date(), 6);
   const endDate = dateRange?.to || new Date();
 
   // Monthly comparison data
   const { data: monthlyData = [], isLoading: isLoadingMonthly } = useQuery({
-    queryKey: ['analytics-monthly', startDate.toISOString(), endDate.toISOString()],
+    queryKey: ['analytics-monthly', user?.id, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
       const months: MonthlyData[] = [];
       const monthsInRange = eachMonthOfInterval({ start: startDate, end: endDate });
@@ -113,6 +115,7 @@ export function useAnalytics(dateRange?: DateRange) {
       
       return months;
     },
+    enabled: !!user?.id,
   });
 
   // Demand forecast (next 30 days based on historical patterns)
@@ -178,6 +181,7 @@ export function useAnalytics(dateRange?: DateRange) {
       
       return forecast;
     },
+    enabled: !!user?.id,
   });
 
   // Heatmap data (peak hours by region/state)
@@ -254,6 +258,7 @@ export function useAnalytics(dateRange?: DateRange) {
       
       return heatmap;
     },
+    enabled: !!user?.id,
   });
 
   // Summary metrics
@@ -305,7 +310,7 @@ export function useAnalytics(dateRange?: DateRange) {
         peakRegion: peakHourData?.region || 'SP',
       };
     },
-    enabled: heatmapData.length > 0,
+    enabled: !!user?.id && heatmapData.length > 0,
   });
 
   // Transportadora comparison
@@ -369,6 +374,7 @@ export function useAnalytics(dateRange?: DateRange) {
       // Sort by entregas count descending
       return stats.sort((a, b) => b.entregas - a.entregas);
     },
+    enabled: !!user?.id,
   });
 
   return {

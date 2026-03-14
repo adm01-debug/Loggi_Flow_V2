@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 export interface TransportadoraRota {
@@ -61,6 +62,7 @@ export interface RotaFormData {
 
 export const useTransportadoraRotas = (filters?: RotaFilter) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch routes with optional filters
   const { data: rotas, isLoading, error, refetch } = useQuery({
@@ -129,6 +131,7 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
 
       return result;
     },
+    enabled: !!user?.id,
   });
 
   // Search routes by origin-destination

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 export interface TabelaFrete {
@@ -44,6 +45,7 @@ export interface QuotationResult {
 
 export const useFreightQuotation = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch all freight tables
   const { data: tabelasFrete, isLoading: isLoadingTabelas } = useQuery({
@@ -63,6 +65,7 @@ export const useFreightQuotation = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Fetch transportadoras for dropdown
@@ -79,6 +82,7 @@ export const useFreightQuotation = () => {
       return data;
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Calculate quotations

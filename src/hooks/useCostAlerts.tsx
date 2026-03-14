@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useEffect, useState, useCallback } from 'react';
 import { startOfMonth, endOfMonth } from 'date-fns';
@@ -43,6 +44,7 @@ export interface CostCheckResult {
 
 export const useCostAlerts = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [costCheckResults, setCostCheckResults] = useState<CostCheckResult[]>([]);
 
   // Fetch all cost alerts
@@ -61,6 +63,7 @@ export const useCostAlerts = () => {
       return data as AlertaCusto[];
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Fetch unread notifications
@@ -78,6 +81,7 @@ export const useCostAlerts = () => {
       return data as NotificacaoCusto[];
     },
     staleTime: 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Fetch transportadoras for dropdown
