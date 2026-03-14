@@ -58,8 +58,6 @@ export { useAuditLogs } from './useAuditLogs';
 // Premium UX Hooks
 // ============================================
 export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsList, formatShortcut } from './useKeyboardShortcuts';
-export { useUndoRedo, useUndoManager } from './useUndoRedo';
-export { useOptimisticMutation, createOptimisticListHelpers, useOptimisticCounter } from './useOptimisticUpdates';
 
 // ============================================
 // Dashboard & Analytics
