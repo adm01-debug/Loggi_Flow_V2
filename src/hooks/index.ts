@@ -24,7 +24,7 @@ export { useOnlineStatus } from './useOnlineStatus';
 export { useAuth } from './useAuth';
 export { useNewDeviceDetection } from './useNewDeviceDetection';
 export { useMFA } from './useMFA';
-export { useReauth } from './useReauth';
+
 export { useSessionTimeout } from './useSessionTimeout';
 export { usePermissions } from './usePermissions';
 export { useRole } from './useRole';
