@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { subMonths, startOfMonth, endOfMonth, format, getHours, eachMonthOfInterval } from 'date-fns';
 
 export interface MonthlyData {
