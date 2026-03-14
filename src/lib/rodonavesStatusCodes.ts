@@ -53,7 +53,7 @@ export const RODONAVES_CODES: Record<number, RodonavesStatusInfo> = {
   44: { code: 44, description: 'Recebida na Filial Destino', systemStatus: 'despachado', isOcorrencia: false, severity: 'info' },
   45: { code: 45, description: 'Em Transferência', systemStatus: 'despachado', isOcorrencia: false, severity: 'info' },
   46: { code: 46, description: 'Mercadoria Despachada', systemStatus: 'despachado', isOcorrencia: false, severity: 'info' },
-  47: { code: 47, description: 'Mercadoria Coletada', systemStatus: 'coletado', isOcorrencia: false, severity: 'info' },
+  47: { code: 47, description: 'Mercadoria Coletada', systemStatus: 'em_transito', isOcorrencia: false, severity: 'info' },
   58: { code: 58, description: 'CT-e Emitido', systemStatus: 'em_transito', isOcorrencia: false, severity: 'info' },
 };
 
