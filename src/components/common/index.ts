@@ -13,14 +13,12 @@ export { EmptyState, EmptyStatePresets } from './EmptyState';
 export { ErrorBoundary } from './ErrorBoundary';
 
 // Data Display
-export { DataTable } from './DataTable';
 export { StatusBadge } from './StatusBadge';
 export { StatsCard, StatsCardCompact } from './StatsCard';
 export { Timeline } from './Timeline';
 
 // Navigation & Pagination
 export { Pagination } from './Pagination';
-export { InfiniteList } from './InfiniteList';
 
 // Forms & Inputs
 export { FilterBar } from './FilterBar';
@@ -47,15 +45,12 @@ export { CommentSectionWithMentions } from './CommentSectionWithMentions';
 // Filters & Search
 export { AdvancedFilter } from './AdvancedFilter';
 
-// History & Versioning
-export { VersionHistory } from './VersionHistory';
-export { TrashBin } from './TrashBin';
+// Activity
 export { ActivityTimeline } from './ActivityTimeline';
 
 // Premium UX Components
 export { ActionTooltip, IconWithTooltip, QuickAction } from './ActionTooltip';
 export { TooltipWrapper } from './TooltipWrapper';
-export { PullToRefresh } from './PullToRefresh';
 export { StepProgress, LinearProgress } from './StepProgress';
 export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 
@@ -63,7 +58,6 @@ export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 export { BulkActions, useSelection } from './BulkActions';
 
 // Premium Components
-
 export { SearchInputWithHistory } from './SearchInputWithHistory';
 export { ChartExportButton } from './ChartExportButton';
 export { StepProgressPremium } from './StepProgressPremium';
@@ -83,9 +77,6 @@ export {
   RetryState, 
   SkeletonPulse 
 } from './LoadingStates';
-
-// Gestures & Mobile
-export { SwipeActions, swipeActionPresets } from './SwipeActions';
 
 // Moved from root components folder
 export { SearchInput } from './SearchInput';

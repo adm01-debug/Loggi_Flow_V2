@@ -37,13 +37,9 @@ export { useRateLimitLogs } from './useRateLimitLogs';
 // ============================================
 // CRUD Operations
 // ============================================
-export { useCRUD } from './useCRUD';
 export { useSavedFilters } from './useSavedFilters';
-export { useVersions } from './useVersions';
 export { useDuplicate } from './useDuplicate';
-export { useInfiniteScroll } from './useInfiniteScroll';
-export { useFulltextSearch, useGlobalSearch } from './useFulltextSearch';
-export { useSoftDelete } from './useSoftDelete';
+export { useGlobalSearch } from './useGlobalSearch';
 export { useBulkActions } from './useBulkActions';
 export { useActivityLog, useRecentActivity } from './useActivityLog';
 export { useComments } from './useComments';
