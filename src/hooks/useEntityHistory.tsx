@@ -71,7 +71,7 @@ export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptio
         };
       });
     },
-    enabled: !!entityId,
+    enabled: !!entityId && !!user?.id,
   });
 
   return { history, isLoading };
