@@ -82,6 +82,7 @@ export const useFreightQuotation = () => {
       return data;
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Calculate quotations

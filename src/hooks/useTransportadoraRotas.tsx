@@ -131,6 +131,7 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
 
       return result;
     },
+    enabled: !!user?.id,
   });
 
   // Search routes by origin-destination
