@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { differenceInHours, differenceInDays, parseISO, isAfter, isBefore, startOfDay, subDays } from "date-fns";
 
 // Type definitions for joined data
@@ -110,8 +111,9 @@ function getFornecedor(item: { fornecedor: unknown }): FornecedorJoin | null {
 }
 
 export function useSLAMetrics() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["sla-metrics"],
+    queryKey: ["sla-metrics", user?.id],
     queryFn: async (): Promise<SLAMetrics> => {
       const now = new Date();
       const thirtyDaysAgo = subDays(now, 30);
@@ -391,7 +393,8 @@ export function useSLAMetrics() {
         tendenciaMensal,
       };
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 60 * 5,
+    enabled: !!user?.id,
   });
 }

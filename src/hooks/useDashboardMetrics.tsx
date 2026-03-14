@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface DashboardMetrics {
   // Coletas
@@ -39,8 +40,9 @@ export interface RecentAlert {
 }
 
 export function useDashboardMetrics() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['dashboard-metrics'],
+    queryKey: ['dashboard-metrics', user?.id],
     queryFn: async (): Promise<DashboardMetrics> => {
       // Buscar coletas
       const { data: coletas, error: coletasError } = await supabase
@@ -147,14 +149,16 @@ export function useDashboardMetrics() {
         divergenciasAltas,
       };
     },
-    staleTime: 1000 * 60 * 2, // 2 minutos
-    refetchInterval: 1000 * 60 * 2, // Atualiza a cada 2 minutos
+    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 60 * 2,
+    enabled: !!user?.id,
   });
 }
 
 export function useRecentAlerts() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['recent-alerts'],
+    queryKey: ['recent-alerts', user?.id],
     queryFn: async (): Promise<RecentAlert[]> => {
       const alerts: RecentAlert[] = [];
       const now = new Date();
@@ -231,14 +235,16 @@ export function useRecentAlerts() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }).slice(0, 10);
     },
-    staleTime: 1000 * 60 * 1, // 1 minuto
+    staleTime: 1000 * 60 * 1,
     refetchInterval: 1000 * 60 * 1,
+    enabled: !!user?.id,
   });
 }
 
 export function useTransportadoraPerformance() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['transportadora-performance'],
+    queryKey: ['transportadora-performance', user?.id],
     queryFn: async () => {
       const { data: transportadoras, error } = await supabase
         .from('transportadoras')
@@ -252,5 +258,6 @@ export function useTransportadoraPerformance() {
       return transportadoras || [];
     },
     staleTime: 1000 * 60 * 5,
+    enabled: !!user?.id,
   });
 }

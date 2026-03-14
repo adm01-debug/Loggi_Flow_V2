@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
 
@@ -30,10 +31,10 @@ const TOTAL_BOXES = 16;
 
 export function useBoxManagement() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-  // Fetch all deliveries with box allocation
   const { data: deliveries = [], isLoading } = useQuery({
-    queryKey: ["box-deliveries"],
+    queryKey: ["box-deliveries", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("entregas")
@@ -61,6 +62,7 @@ export function useBoxManagement() {
       }));
     },
     staleTime: 30000,
+    enabled: !!user?.id,
   });
 
   // Build box data

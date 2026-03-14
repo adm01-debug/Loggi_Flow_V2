@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { startOfMonth, endOfMonth, subMonths, format, parseISO } from 'date-fns';
 
 export interface CostByCarrier {
@@ -34,9 +35,9 @@ export interface CostSummary {
 }
 
 export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
-  // Fetch all deliveries with freight costs
+  const { user } = useAuth();
   const { data: entregas, isLoading } = useQuery({
-    queryKey: ['logistics-costs', startDate.toISOString(), endDate.toISOString()],
+    queryKey: ['logistics-costs', user?.id, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('entregas')
@@ -59,6 +60,7 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
       return data;
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Calculate costs by carrier
