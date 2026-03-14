@@ -84,8 +84,6 @@ export {
   Reveal,
 } from './micro-interactions';
 
-// Floating Input
-export { FloatingInput, FloatingTextarea } from './floating-input';
 
 // Confetti
 export { ConfettiExplosion, useConfetti, StarBurst, SuccessCheck } from './confetti';

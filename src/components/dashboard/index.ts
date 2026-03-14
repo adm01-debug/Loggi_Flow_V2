@@ -15,12 +15,3 @@ export { StatCard } from './StatCard';
 export { TransportadoraRanking } from './TransportadoraRanking';
 export { WidgetPicker } from './WidgetPicker';
 export { XPProgressBar } from './XPProgressBar';
-
-// Premium Widgets
-export { 
-  Widget,
-  MetricWidget,
-  StatusWidget,
-  QuickActionsWidget,
-  ListWidget,
-} from './PremiumWidgets';

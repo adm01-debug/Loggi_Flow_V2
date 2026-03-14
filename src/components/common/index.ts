@@ -60,10 +60,7 @@ export { BulkActions, useSelection } from './BulkActions';
 // Premium Components
 export { SearchInputWithHistory } from './SearchInputWithHistory';
 export { ChartExportButton } from './ChartExportButton';
-export { StepProgressPremium } from './StepProgressPremium';
-export { ErrorBoundaryPremium } from './ErrorBoundaryPremium';
 export { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
-export { EmptyStatePremium, NoResultsFound, NoDataYet, ConnectionError, NoNotifications } from './EmptyStatePremium';
 
 // Loading States
 export { 
