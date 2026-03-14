@@ -63,8 +63,7 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
         setProgress(100);
         toast.success("Arquivo enviado com sucesso!");
         return urlData.publicUrl;
-      } catch (err) {
-        console.error("Upload error:", err);
+      } catch {
         toast.error("Erro ao enviar arquivo.");
         return null;
       } finally {
@@ -86,8 +85,7 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
         if (error) throw error;
         toast.success("Arquivo removido.");
         return true;
-      } catch (err) {
-        console.error("Remove error:", err);
+      } catch {
         toast.error("Erro ao remover arquivo.");
         return false;
       }

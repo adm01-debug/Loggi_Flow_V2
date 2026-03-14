@@ -31,18 +31,3 @@ export {
   soundEffects,
   type SoundEffectName,
 } from './celebrationSounds';
-
-// Haptic Feedback System
-export {
-  triggerHaptic,
-  customHaptic,
-  patternHaptic,
-  stopHaptic,
-  rhythmicHaptic,
-  intensityHaptic,
-  hapticFeedback,
-  contextualHaptic,
-  isVibrationSupported,
-  type HapticPattern,
-  type HapticOptions,
-} from './hapticFeedback';

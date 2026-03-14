@@ -59,13 +59,8 @@ export { useAuditLogs } from './useAuditLogs';
 // Premium UX Hooks
 // ============================================
 export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsList, formatShortcut } from './useKeyboardShortcuts';
-export { useHapticFeedback } from './useHapticFeedback';
 export { useUndoRedo, useUndoManager } from './useUndoRedo';
 export { useOptimisticMutation, createOptimisticListHelpers, useOptimisticCounter } from './useOptimisticUpdates';
-export { useLongPress, useDoubleTap, useTripleTap, usePinchZoom } from './useGestureHandlers';
-export { useClipboard } from './useClipboard';
-export { useSwipe, usePullToRefresh, useSwipeToDismiss, useLongPressGesture, useDragToReorder } from './useMobileGestures';
-export { useSoundEffects } from './useSoundEffects';
 
 // ============================================
 // Dashboard & Analytics
@@ -123,11 +118,6 @@ export { useIntegrationValidation } from './useIntegrationValidation';
 // ============================================
 export { useAutoSave } from './useAutoSave';
 export { useForm } from './useForm';
-export { 
-  useNotificationSounds, 
-  SoundSettingsProvider, 
-  useSoundSettings 
-} from './useNotificationSounds';
 
 // ============================================
 // Logistics & Business
