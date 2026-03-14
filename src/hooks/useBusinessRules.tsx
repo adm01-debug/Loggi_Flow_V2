@@ -98,9 +98,10 @@ export const ACTION_TYPES: { value: ActionType; label: string; icon: string }[] 
 
 export function useBusinessRules() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: rules = [], isLoading, error } = useQuery({
-    queryKey: ["business-rules"],
+    queryKey: ["business-rules", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("business_rules")
