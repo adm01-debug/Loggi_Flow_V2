@@ -85,8 +85,7 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
         if (error) throw error;
         toast.success("Arquivo removido.");
         return true;
-      } catch (err) {
-        console.error("Remove error:", err);
+      } catch {
         toast.error("Erro ao remover arquivo.");
         return false;
       }
