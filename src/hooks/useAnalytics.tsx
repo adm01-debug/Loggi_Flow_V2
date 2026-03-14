@@ -310,7 +310,7 @@ export function useAnalytics(dateRange?: DateRange) {
         peakRegion: peakHourData?.region || 'SP',
       };
     },
-    enabled: heatmapData.length > 0,
+    enabled: !!user?.id && heatmapData.length > 0,
   });
 
   // Transportadora comparison
