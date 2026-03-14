@@ -101,6 +101,7 @@ export function AppSidebar() {
   const [openSections, setOpenSections] = useState<string[]>(["overview", "operations"]);
   const location = useLocation();
   const { isAdmin } = useAuth();
+  const { prefetch } = usePrefetch();
 
   const isActive = (path: string) => location.pathname === path;
   const isSectionActive = (section: MenuSection) => section.items.some(item => isActive(item.url));

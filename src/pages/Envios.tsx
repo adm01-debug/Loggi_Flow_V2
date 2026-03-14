@@ -39,7 +39,8 @@ interface Entrega {
   id: string; numero_entrega: string; endereco_entrega: string; contato_cliente: string | null;
   status: EntregaStatus; codigo_rastreamento: string | null; previsao_entrega: string | null;
   data_entrega_efetiva: string | null; tipo_frete: FreteType | null; valor_frete: number | null;
-  nf_remessa: string | null; observacoes: string | null; created_at: string;
+  nf_remessa: string | null; nf_remessa_url: string | null; comprovante_entrega_url: string | null;
+  observacoes: string | null; created_at: string;
   cliente: { id: string; razao_social: string; nome_fantasia: string | null } | null;
   transportadora: { id: string; nome_fantasia: string } | null;
 }
