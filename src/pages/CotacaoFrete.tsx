@@ -56,6 +56,7 @@ export default function CotacaoFrete() {
   const [newTableForm, setNewTableForm] = useState({ transportadora_id: '', estado_destino: '', peso_min: 0, peso_max: 100, valor_kg: 0, prazo_dias: 5 });
   const [tab, setTab] = useState("cotacao");
   const [estadoFilter, setEstadoFilter] = useState("all");
+  const [rteForm, setRteForm] = useState({ cepOrigem: "", cepDestino: "", peso: "", volumes: "1", valorMercadoria: "" });
 
   interface TabelaFreteRaw {
     id: string;
