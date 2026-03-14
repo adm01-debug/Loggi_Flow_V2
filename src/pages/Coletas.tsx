@@ -43,13 +43,13 @@ interface Fornecedor { id: string; razao_social: string; nome_fantasia: string |
 interface Transportadora { id: string; nome_fantasia: string; }
 
 const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: LucideIcon }> = {
-  aguardando_liberacao: { label: "Aguardando", color: "bg-gray-100 text-gray-800", icon: Clock },
-  solicitada: { label: "Solicitada", color: "bg-blue-100 text-blue-800", icon: Package },
-  em_transito: { label: "Em Trânsito", color: "bg-yellow-100 text-yellow-800", icon: Truck },
-  chegou_expedicao: { label: "Na Expedição", color: "bg-purple-100 text-purple-800", icon: Building2 },
-  conferencia_ok: { label: "Conferida", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
-  divergencia: { label: "Divergência", color: "bg-red-100 text-red-800", icon: AlertTriangle },
-  finalizada: { label: "Finalizada", color: "bg-emerald-100 text-emerald-800", icon: CheckCircle2 },
+  aguardando_liberacao: { label: "Aguardando", color: "bg-muted text-muted-foreground", icon: Clock },
+  solicitada: { label: "Solicitada", color: "bg-primary/15 text-primary", icon: Package },
+  em_transito: { label: "Em Trânsito", color: "bg-warning/15 text-warning", icon: Truck },
+  chegou_expedicao: { label: "Na Expedição", color: "bg-accent text-accent-foreground", icon: Building2 },
+  conferencia_ok: { label: "Conferida", color: "bg-success/15 text-success", icon: CheckCircle2 },
+  divergencia: { label: "Divergência", color: "bg-destructive/15 text-destructive", icon: AlertTriangle },
+  finalizada: { label: "Finalizada", color: "bg-success/20 text-success", icon: CheckCircle2 },
 };
 
 const filterConfig: FilterConfig<Coleta> = {
