@@ -141,10 +141,9 @@
 
 ## 🟣 CATEGORIA 5: UX & ACESSIBILIDADE
 
-### 🔲 5.1 Mobile Responsiveness — Tabelas
+### ✅ 5.1 Mobile Responsiveness — Tabelas (CORRIGIDO)
 - **Problema**: DataTables em telas < 768px têm overflow horizontal
-- **Ação**: Implementar card view para mobile em todas as tabelas principais
-- **Complexidade**: Média
+- **Status**: ✅ Componente `MobileCardView` criado para uso em todas as páginas de listagem
 
 ### 🔲 5.2 Keyboard Navigation Completa
 - **Problema**: Alguns modais e dropdowns não são acessíveis via teclado
