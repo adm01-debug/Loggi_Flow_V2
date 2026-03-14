@@ -41,6 +41,7 @@ export interface DateRange {
 }
 
 export function useAnalytics(dateRange?: DateRange) {
+  const { user } = useAuth();
   const startDate = dateRange?.from || subMonths(new Date(), 6);
   const endDate = dateRange?.to || new Date();
 

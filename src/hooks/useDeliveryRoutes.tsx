@@ -122,13 +122,14 @@ const saveCoordinatesToDB = async (
 };
 
 export const useDeliveryRoutes = (enableGeocoding = true) => {
+  const { user } = useAuth();
   const [geocodedDeliveries, setGeocodedDeliveries] = useState<DeliveryRoute[]>([]);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
   const [reGeocodingId, setReGeocodingId] = useState<string | null>(null);
 
   const query = useQuery({
-    queryKey: ['delivery-routes'],
+    queryKey: ['delivery-routes', user?.id],
     queryFn: async (): Promise<DeliveryRoute[]> => {
       interface EntregaRaw {
         id: string;

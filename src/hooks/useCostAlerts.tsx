@@ -81,6 +81,7 @@ export const useCostAlerts = () => {
       return data as NotificacaoCusto[];
     },
     staleTime: 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Fetch transportadoras for dropdown
