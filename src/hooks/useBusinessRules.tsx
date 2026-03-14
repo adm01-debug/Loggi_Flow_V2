@@ -117,6 +117,7 @@ export function useBusinessRules() {
         trigger_event: rule.trigger_event as TriggerEvent,
       })) as BusinessRule[];
     },
+    enabled: !!user?.id,
   });
 
   const createRule = useMutation({

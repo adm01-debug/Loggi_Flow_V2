@@ -18,6 +18,7 @@ interface UseEntityHistoryOptions {
 }
 
 export function useEntityHistory({ entityType, entityId }: UseEntityHistoryOptions) {
+  const { user } = useAuth();
   const queryKey = ["entity-history", entityType, entityId];
 
   const { data: history = [], isLoading } = useQuery({
