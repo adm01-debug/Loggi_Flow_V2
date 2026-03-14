@@ -1,7 +1,8 @@
-const CACHE_NAME = 'logiflow-v1';
+const CACHE_NAME = 'logiflow-v2';
+const API_CACHE_NAME = 'logiflow-api-v1';
 const OFFLINE_URL = '/offline.html';
 
-// Resources to cache immediately
+// Static assets - cache first
 const STATIC_ASSETS = [
   '/',
   '/offline.html',
@@ -9,11 +10,11 @@ const STATIC_ASSETS = [
   '/favicon.ico',
 ];
 
-// Install event - cache static assets
+// Install event - precache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[ServiceWorker] Caching static assets');
+      console.log('[SW] Precaching static assets');
       return cache.addAll(STATIC_ASSETS);
     })
   );
@@ -22,13 +23,14 @@ self.addEventListener('install', (event) => {
 
 // Activate event - cleanup old caches
 self.addEventListener('activate', (event) => {
+  const validCaches = [CACHE_NAME, API_CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME)
+          .filter((name) => !validCaches.includes(name))
           .map((name) => {
-            console.log('[ServiceWorker] Deleting old cache:', name);
+            console.log('[SW] Deleting old cache:', name);
             return caches.delete(name);
           })
       );
@@ -37,69 +39,112 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - network first, fallback to cache
+/**
+ * Determine caching strategy based on request type.
+ */
+function getStrategy(url) {
+  const { pathname, hostname } = new URL(url);
+
+  // Skip: Supabase auth, realtime, edge functions
+  if (hostname.includes('supabase') && (
+    pathname.includes('/auth/') ||
+    pathname.includes('/realtime/') ||
+    pathname.includes('/functions/')
+  )) {
+    return 'network-only';
+  }
+
+  // Supabase REST API (data queries) → stale-while-revalidate
+  if (hostname.includes('supabase') && pathname.includes('/rest/')) {
+    return 'stale-while-revalidate';
+  }
+
+  // External APIs (Mapbox tiles, etc.) → cache-first with 1h expiry
+  if (hostname.includes('mapbox') || hostname.includes('tile')) {
+    return 'cache-first';
+  }
+
+  // JS, CSS, images, fonts → cache-first (hashed filenames = immutable)
+  if (pathname.match(/\.(js|css|woff2?|ttf|png|jpg|jpeg|svg|webp|ico)$/)) {
+    return 'cache-first';
+  }
+
+  // HTML pages → network-first
+  return 'network-first';
+}
+
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
-  // Skip API and Supabase requests
-  const url = new URL(event.request.url);
-  if (
-    url.pathname.startsWith('/api') ||
-    url.hostname.includes('supabase') ||
-    url.hostname.includes('mapbox')
-  ) {
+  const strategy = getStrategy(event.request.url);
+
+  if (strategy === 'network-only') return;
+
+  if (strategy === 'cache-first') {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        });
+      })
+    );
     return;
   }
 
+  if (strategy === 'stale-while-revalidate') {
+    event.respondWith(
+      caches.open(API_CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(event.request);
+        const fetchPromise = fetch(event.request)
+          .then((response) => {
+            if (response.status === 200) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          })
+          .catch(() => cached || new Response('Offline', { status: 503 }));
+
+        return cached || fetchPromise;
+      })
+    );
+    return;
+  }
+
+  // network-first (default for HTML)
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response before caching
-        const responseClone = response.clone();
-        
-        // Cache successful responses
         if (response.status === 200) {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
-        
         return response;
       })
       .catch(async () => {
-        // Try to get from cache
-        const cachedResponse = await caches.match(event.request);
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        
-        // For navigation requests, show offline page
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
         if (event.request.mode === 'navigate') {
-          const offlineResponse = await caches.match(OFFLINE_URL);
-          if (offlineResponse) {
-            return offlineResponse;
-          }
+          const offline = await caches.match(OFFLINE_URL);
+          if (offline) return offline;
         }
-        
-        // Return a simple offline response
-        return new Response('Offline', {
-          status: 503,
-          statusText: 'Service Unavailable',
-        });
+        return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
       })
   );
 });
 
-// Handle background sync for offline actions
+// Background sync
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-data') {
-    console.log('[ServiceWorker] Syncing data...');
-    // Handle background sync
+    console.log('[SW] Syncing data...');
   }
 });
 
-// Handle push notifications
+// Push notifications
 self.addEventListener('push', (event) => {
   if (event.data) {
     const data = event.data.json();
@@ -108,35 +153,24 @@ self.addEventListener('push', (event) => {
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',
       vibrate: [100, 50, 100],
-      data: {
-        url: data.url || '/',
-      },
+      data: { url: data.url || '/' },
     };
-    
     event.waitUntil(
       self.registration.showNotification(data.title || 'LogiFlow', options)
     );
   }
 });
 
-// Handle notification click
+// Notification click
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
   const url = event.notification.data?.url || '/';
-  
   event.waitUntil(
     self.clients.matchAll({ type: 'window' }).then((clientList) => {
-      // Focus existing window if available
       for (const client of clientList) {
-        if (client.url === url && 'focus' in client) {
-          return client.focus();
-        }
+        if (client.url === url && 'focus' in client) return client.focus();
       }
-      // Open new window
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(url);
-      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
     })
   );
 });

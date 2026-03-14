@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AIAssistant } from "@/components/ai/AIAssistant";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePrefetch } from "@/hooks/usePrefetch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface MenuSection {
@@ -100,6 +101,7 @@ export function AppSidebar() {
   const [openSections, setOpenSections] = useState<string[]>(["overview", "operations"]);
   const location = useLocation();
   const { isAdmin } = useAuth();
+  const { prefetch } = usePrefetch();
 
   const isActive = (path: string) => location.pathname === path;
   const isSectionActive = (section: MenuSection) => section.items.some(item => isActive(item.url));
@@ -192,6 +194,7 @@ export function AppSidebar() {
                 >
                   <NavLink
                     to={item.url}
+                    onMouseEnter={() => prefetch(item.url)}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group/item",
                       collapsed ? "justify-center" : "ml-2",
