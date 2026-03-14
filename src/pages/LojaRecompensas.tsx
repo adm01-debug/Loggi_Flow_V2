@@ -87,7 +87,7 @@ export default function LojaRecompensas() {
       qc.invalidateQueries({ queryKey: ["user-level"] });
       qc.invalidateQueries({ queryKey: ["gamification-user"] });
       qc.invalidateQueries({ queryKey: ["reward-items"] });
-      toast.success(`${reward.name} resgatado! -${result.result.coins_spent} moedas`);
+      toast.success(`${reward.name} resgatado! -${result.coins_spent} moedas`);
       setConfirmDialog(false);
       setSelectedReward(null);
     },
