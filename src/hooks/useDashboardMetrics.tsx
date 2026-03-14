@@ -148,14 +148,16 @@ export function useDashboardMetrics() {
         divergenciasAltas,
       };
     },
-    staleTime: 1000 * 60 * 2, // 2 minutos
-    refetchInterval: 1000 * 60 * 2, // Atualiza a cada 2 minutos
+    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 60 * 2,
+    enabled: !!user?.id,
   });
 }
 
 export function useRecentAlerts() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['recent-alerts'],
+    queryKey: ['recent-alerts', user?.id],
     queryFn: async (): Promise<RecentAlert[]> => {
       const alerts: RecentAlert[] = [];
       const now = new Date();
