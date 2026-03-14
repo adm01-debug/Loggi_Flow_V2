@@ -181,10 +181,9 @@
 - **Ação**: Adicionar testes unitários para todos os hooks de negócio
 - **Complexidade**: Alta
 
-### 🔲 6.3 Error Boundaries Granulares
+### ✅ 6.3 Error Boundaries Granulares (CORRIGIDO)
 - **Problema**: Um erro em um widget do dashboard derruba toda a página
-- **Ação**: Wrapping individual de cada widget/seção com ErrorBoundary
-- **Complexidade**: Baixa
+- **Status**: ✅ `WidgetErrorBoundary` criado e aplicado em todos os 10 widgets do Dashboard
 
 ### 🔲 6.4 Documentação de API Pública
 - **Problema**: Página `/api-docs` existe mas pode estar desatualizada
