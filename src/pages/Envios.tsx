@@ -56,6 +56,64 @@ const statusConfig: Record<EntregaStatus, { label: string; color: string; icon: 
   finalizado: { label: "Finalizado", color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
 };
 
+// Rodonaves integration actions for entrega detail
+function RodonavesActions({ entrega }: { entrega: Entrega }) {
+  const { track, isTracking, trackingResult, getDeliveryProof, isLoadingProof, deliveryProof } = useRodonavesTracking();
+  
+  const isRodonaves = entrega.transportadora?.nome_fantasia?.toLowerCase().includes('rodonaves') || 
+                       entrega.transportadora?.nome_fantasia?.toLowerCase().includes('rte');
+
+  if (!isRodonaves || !entrega.nf_remessa) return null;
+
+  const cnpjRemetente = ""; // Will use env var in edge function
+
+  return (
+    <div className="border-t pt-4 space-y-3">
+      <p className="text-sm font-semibold flex items-center gap-2"><Truck className="w-4 h-4 text-primary" />Rodonaves RTE</p>
+      <div className="flex flex-wrap gap-2">
+        <Button 
+          size="sm" variant="outline" 
+          onClick={() => track({ nfNumero: entrega.nf_remessa!, nfSerie: "1", cnpjRemetente })} 
+          disabled={isTracking}
+        >
+          {isTracking ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+          Atualizar Rastreio
+        </Button>
+        {(entrega.status === "entregue" || entrega.status === "finalizado") && (
+          <Button 
+            size="sm" variant="outline"
+            onClick={() => getDeliveryProof({ nfNumero: entrega.nf_remessa!, nfSerie: "1", cnpjRemetente })}
+            disabled={isLoadingProof}
+          >
+            {isLoadingProof ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <FileDown className="w-4 h-4 mr-1" />}
+            Comprovante
+          </Button>
+        )}
+      </div>
+      {trackingResult?.data?.Tracking && trackingResult.data.Tracking.length > 0 && (
+        <div className="text-xs space-y-1 max-h-40 overflow-y-auto bg-muted/50 rounded-lg p-3">
+          {trackingResult.data.Tracking.map((evt: { DataOcorrencia: string; HoraOcorrencia: string; DescricaoOcorrencia: string; Cidade: string; UF: string }, i: number) => (
+            <div key={i} className="flex items-start gap-2">
+              <span className="text-muted-foreground shrink-0">{evt.DataOcorrencia} {evt.HoraOcorrencia}</span>
+              <span>{evt.DescricaoOcorrencia} — {evt.Cidade}/{evt.UF}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {deliveryProof?.data && (
+        <div className="text-xs bg-muted/50 rounded-lg p-3">
+          <p className="font-medium mb-1">Comprovante disponível</p>
+          {deliveryProof.data.ImagemComprovante && (
+            <a href={`data:image/png;base64,${deliveryProof.data.ImagemComprovante}`} download="comprovante.png" className="text-primary underline">
+              Baixar comprovante
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const filterConfig: FilterConfig<Entrega> = {
   search: {
     fields: ["numero_entrega", "endereco_entrega", "nf_remessa", "codigo_rastreamento"],

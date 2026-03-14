@@ -65,3 +65,6 @@ verify_jwt = false
 
 [functions.lalamove-api]
 verify_jwt = false
+
+[functions.send-email]
+verify_jwt = true
