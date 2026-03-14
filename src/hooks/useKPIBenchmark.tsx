@@ -31,8 +31,9 @@ export interface KPIComparison {
 }
 
 export const useKPIBenchmark = (periodsBack: number = 6) => {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['kpi-benchmark', periodsBack],
+    queryKey: ['kpi-benchmark', user?.id, periodsBack],
     queryFn: async () => {
       const periods: PeriodKPIs[] = [];
       
