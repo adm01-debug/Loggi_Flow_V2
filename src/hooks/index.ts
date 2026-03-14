@@ -38,7 +38,6 @@ export { useRateLimitLogs } from './useRateLimitLogs';
 // CRUD Operations
 // ============================================
 export { useSavedFilters } from './useSavedFilters';
-export { useVersions } from './useVersions';
 export { useDuplicate } from './useDuplicate';
 export { useGlobalSearch } from './useGlobalSearch';
 export { useBulkActions } from './useBulkActions';
