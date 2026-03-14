@@ -56,7 +56,16 @@ const Seguranca = lazy(() => import("./pages/Seguranca"));
 const RateLimitDashboard = lazy(() => import("./pages/RateLimitDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Premium loading component with animation
 const PageLoader = () => (
