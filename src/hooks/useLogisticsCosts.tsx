@@ -35,9 +35,9 @@ export interface CostSummary {
 }
 
 export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
-  // Fetch all deliveries with freight costs
+  const { user } = useAuth();
   const { data: entregas, isLoading } = useQuery({
-    queryKey: ['logistics-costs', startDate.toISOString(), endDate.toISOString()],
+    queryKey: ['logistics-costs', user?.id, startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('entregas')
