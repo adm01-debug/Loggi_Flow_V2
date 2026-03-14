@@ -1,6 +1,10 @@
-const CACHE_NAME = 'logiflow-v2';
-const API_CACHE_NAME = 'logiflow-api-v1';
+const CACHE_NAME = 'logiflow-v3';
+const API_CACHE_NAME = 'logiflow-api-v2';
 const OFFLINE_URL = '/offline.html';
+
+// Disable aggressive SW caching in Lovable preview to avoid stale bundles / infinite loading.
+const PREVIEW_HOST_PATTERNS = ['lovableproject.com', 'id-preview--'];
+const IS_PREVIEW = PREVIEW_HOST_PATTERNS.some((pattern) => self.location.hostname.includes(pattern));
 
 // Static assets - cache first
 const STATIC_ASSETS = [
@@ -12,6 +16,11 @@ const STATIC_ASSETS = [
 
 // Install event - precache static assets
 self.addEventListener('install', (event) => {
+  if (IS_PREVIEW) {
+    self.skipWaiting();
+    return;
+  }
+
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Precaching static assets');
@@ -23,6 +32,14 @@ self.addEventListener('install', (event) => {
 
 // Activate event - cleanup old caches
 self.addEventListener('activate', (event) => {
+  if (IS_PREVIEW) {
+    event.waitUntil(
+      caches.keys().then((cacheNames) => Promise.all(cacheNames.map((name) => caches.delete(name))))
+    );
+    self.clients.claim();
+    return;
+  }
+
   const validCaches = [CACHE_NAME, API_CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -76,6 +93,9 @@ function getStrategy(url) {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
+  // In preview, always use network to prevent stale app shell/chunks.
+  if (IS_PREVIEW) return;
+
   const strategy = getStrategy(event.request.url);
 
   if (strategy === 'network-only') return;
@@ -119,7 +139,10 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.status === 200) {
+        const requestUrl = new URL(event.request.url);
+        const hasPreviewToken = requestUrl.searchParams.has('__lovable_token');
+
+        if (response.status === 200 && !hasPreviewToken) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
