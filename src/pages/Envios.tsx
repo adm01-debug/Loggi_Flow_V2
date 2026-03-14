@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon } from "lucide-react";
+import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw } from "lucide-react";
+import { useRodonavesTracking } from "@/hooks/useRodonavesTracking";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
 import { ScanResult } from "@/hooks/useQRScanner";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -54,6 +55,64 @@ const statusConfig: Record<EntregaStatus, { label: string; color: string; icon: 
   ocorrencia: { label: "Ocorrência", color: "bg-red-100 text-red-700", icon: AlertTriangle },
   finalizado: { label: "Finalizado", color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
 };
+
+// Rodonaves integration actions for entrega detail
+function RodonavesActions({ entrega }: { entrega: Entrega }) {
+  const { track, isTracking, trackingResult, getDeliveryProof, isLoadingProof, deliveryProof } = useRodonavesTracking();
+  
+  const isRodonaves = entrega.transportadora?.nome_fantasia?.toLowerCase().includes('rodonaves') || 
+                       entrega.transportadora?.nome_fantasia?.toLowerCase().includes('rte');
+
+  if (!isRodonaves || !entrega.nf_remessa) return null;
+
+  const cnpjRemetente = ""; // Will use env var in edge function
+
+  return (
+    <div className="border-t pt-4 space-y-3">
+      <p className="text-sm font-semibold flex items-center gap-2"><Truck className="w-4 h-4 text-primary" />Rodonaves RTE</p>
+      <div className="flex flex-wrap gap-2">
+        <Button 
+          size="sm" variant="outline" 
+          onClick={() => track({ nfNumero: entrega.nf_remessa!, nfSerie: "1", cnpjRemetente })} 
+          disabled={isTracking}
+        >
+          {isTracking ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+          Atualizar Rastreio
+        </Button>
+        {(entrega.status === "entregue" || entrega.status === "finalizado") && (
+          <Button 
+            size="sm" variant="outline"
+            onClick={() => getDeliveryProof({ nfNumero: entrega.nf_remessa!, nfSerie: "1", cnpjRemetente })}
+            disabled={isLoadingProof}
+          >
+            {isLoadingProof ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <FileDown className="w-4 h-4 mr-1" />}
+            Comprovante
+          </Button>
+        )}
+      </div>
+      {trackingResult?.data?.Tracking && trackingResult.data.Tracking.length > 0 && (
+        <div className="text-xs space-y-1 max-h-40 overflow-y-auto bg-muted/50 rounded-lg p-3">
+          {trackingResult.data.Tracking.map((evt: { DataOcorrencia: string; HoraOcorrencia: string; DescricaoOcorrencia: string; Cidade: string; UF: string }, i: number) => (
+            <div key={i} className="flex items-start gap-2">
+              <span className="text-muted-foreground shrink-0">{evt.DataOcorrencia} {evt.HoraOcorrencia}</span>
+              <span>{evt.DescricaoOcorrencia} — {evt.Cidade}/{evt.UF}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {deliveryProof?.data && (
+        <div className="text-xs bg-muted/50 rounded-lg p-3">
+          <p className="font-medium mb-1">Comprovante disponível</p>
+          {deliveryProof.data.ImagemComprovante && (
+            <a href={`data:image/png;base64,${deliveryProof.data.ImagemComprovante}`} download="comprovante.png" className="text-primary underline">
+              Baixar comprovante
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const filterConfig: FilterConfig<Entrega> = {
   search: {
@@ -251,7 +310,7 @@ export default function Envios() {
 
         <Dialog open={dlgCreate} onOpenChange={setDlgCreate}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Entrega</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div className="grid gap-2"><Label>Cliente</Label><Select value={form.cliente_id} onValueChange={handleClienteChange}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{clientes.map(c => <SelectItem key={c.id} value={c.id}>{c.nome_fantasia || c.razao_social}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Endereço *</Label><Textarea value={form.endereco_entrega} onChange={(e) => setForm({ ...form, endereco_entrega: e.target.value })} /></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Contato</Label><Input value={form.contato_cliente} onChange={(e) => setForm({ ...form, contato_cliente: e.target.value })} /></div><div className="grid gap-2"><Label>Tipo Frete</Label><Select value={form.tipo_frete} onValueChange={(v: FreteType) => setForm({ ...form, tipo_frete: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="cif">CIF</SelectItem><SelectItem value="fob">FOB</SelectItem><SelectItem value="cortesia">Cortesia</SelectItem></SelectContent></Select></div></div><div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Transportadora</Label><Select value={form.transportadora_id} onValueChange={(v) => setForm({ ...form, transportadora_id: v })}><SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger><SelectContent>{transportadoras.map(t => <SelectItem key={t.id} value={t.id}>{t.nome_fantasia}</SelectItem>)}</SelectContent></Select></div><div className="grid gap-2"><Label>Previsão</Label><Input type="date" value={form.previsao_entrega} onChange={(e) => setForm({ ...form, previsao_entrega: e.target.value })} /></div></div><div className="grid gap-2"><Label>Observações</Label><Textarea value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} /></div></div><DialogFooter><Button variant="outline" onClick={() => setDlgCreate(false)}>Cancelar</Button><Button onClick={() => createMut.mutate(form)} disabled={!form.endereco_entrega || createMut.isPending}>{createMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Criar</Button></DialogFooter></DialogContent></Dialog>
 
-        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.numero_entrega}</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="flex items-center gap-2"><Badge className={statusConfig[sel.status].color}>{statusConfig[sel.status].label}</Badge></div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Cliente</p><p>{sel.cliente?.nome_fantasia || sel.cliente?.razao_social || "-"}</p></div><div><p className="text-sm text-muted-foreground">Transportadora</p><p>{sel.transportadora?.nome_fantasia || "-"}</p></div></div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_entrega}</p></div>{sel.observacoes && <div><p className="text-sm text-muted-foreground">Observações</p><p>{sel.observacoes}</p></div>}</div>}</DialogContent></Dialog>
+        <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.numero_entrega}</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="flex items-center gap-2"><Badge className={statusConfig[sel.status].color}>{statusConfig[sel.status].label}</Badge></div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Cliente</p><p>{sel.cliente?.nome_fantasia || sel.cliente?.razao_social || "-"}</p></div><div><p className="text-sm text-muted-foreground">Transportadora</p><p>{sel.transportadora?.nome_fantasia || "-"}</p></div></div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_entrega}</p></div>{sel.observacoes && <div><p className="text-sm text-muted-foreground">Observações</p><p>{sel.observacoes}</p></div>}<RodonavesActions entrega={sel} /></div>}</DialogContent></Dialog>
 
         <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir entrega?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>

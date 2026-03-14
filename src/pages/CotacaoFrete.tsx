@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calculator, TrendingUp, Clock, Plus, Trash2, Search, Package, MapPin, Star, Loader2, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { Calculator, TrendingUp, Clock, Plus, Trash2, Search, Package, MapPin, Star, Loader2, ArrowUpDown, ChevronUp, ChevronDown, Truck } from 'lucide-react';
 import { useFreightQuotation, QuotationResult } from '@/hooks/useFreightQuotation';
 import { useSmartCarrierSelection } from '@/hooks/useSmartCarrierSelection';
+import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
 import { SmartCarrierSelector } from '@/components/freight/SmartCarrierSelector';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -35,6 +36,7 @@ const filterConfig: FilterConfig<TabelaFreteLocal> = {
 export default function CotacaoFrete() {
   const freightQuotation = useFreightQuotation();
   const smartCarrier = useSmartCarrierSelection();
+  const rodonaves = useRodonavesTracking();
   
   const tabelasFrete = freightQuotation?.tabelasFrete || [];
   const transportadoras = freightQuotation?.transportadoras || [];
@@ -54,6 +56,7 @@ export default function CotacaoFrete() {
   const [newTableForm, setNewTableForm] = useState({ transportadora_id: '', estado_destino: '', peso_min: 0, peso_max: 100, valor_kg: 0, prazo_dias: 5 });
   const [tab, setTab] = useState("cotacao");
   const [estadoFilter, setEstadoFilter] = useState("all");
+  const [rteForm, setRteForm] = useState({ cepOrigem: "", cepDestino: "", peso: "", volumes: "1", valorMercadoria: "" });
 
   interface TabelaFreteRaw {
     id: string;
@@ -157,7 +160,7 @@ export default function CotacaoFrete() {
           <div className="stat-card text-center"><MapPin className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.estados}</p><p className="text-xs text-muted-foreground">Estados</p></div>
         </div>
 
-        <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="cotacao">Cotação</TabsTrigger><TabsTrigger value="tabelas">Tabelas de Frete</TabsTrigger><TabsTrigger value="ia">IA Recomendação</TabsTrigger></TabsList>
+        <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="cotacao">Cotação</TabsTrigger><TabsTrigger value="rodonaves">Rodonaves RTE</TabsTrigger><TabsTrigger value="tabelas">Tabelas de Frete</TabsTrigger><TabsTrigger value="ia">IA Recomendação</TabsTrigger></TabsList>
 
           <TabsContent value="cotacao" className="space-y-4">
             <div className="card-base p-4">
@@ -175,6 +178,36 @@ export default function CotacaoFrete() {
                 <Button>Selecionar</Button>
               </div>
             )) : <div className="text-center py-8 text-muted-foreground">Nenhuma cotação encontrada</div>}</div>}
+          </TabsContent>
+
+          <TabsContent value="rodonaves" className="space-y-4">
+            <div className="card-base p-4">
+              <div className="flex items-center gap-2 mb-4"><Truck className="w-5 h-5 text-primary" /><span className="font-semibold">Cotação via API Rodonaves</span></div>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div><Label>CEP Origem</Label><Input value={rteForm.cepOrigem} onChange={(e) => setRteForm({ ...rteForm, cepOrigem: e.target.value })} placeholder="00000-000" /></div>
+                <div><Label>CEP Destino</Label><Input value={rteForm.cepDestino} onChange={(e) => setRteForm({ ...rteForm, cepDestino: e.target.value })} placeholder="00000-000" /></div>
+                <div><Label>Peso (kg)</Label><Input type="number" value={rteForm.peso} onChange={(e) => setRteForm({ ...rteForm, peso: e.target.value })} placeholder="10" /></div>
+                <div><Label>Volumes</Label><Input type="number" value={rteForm.volumes} onChange={(e) => setRteForm({ ...rteForm, volumes: e.target.value })} placeholder="1" /></div>
+                <div><Label>Valor Mercadoria</Label><Input type="number" value={rteForm.valorMercadoria} onChange={(e) => setRteForm({ ...rteForm, valorMercadoria: e.target.value })} placeholder="1000" /></div>
+              </div>
+              <Button className="mt-4" onClick={() => {
+                if (!rteForm.cepOrigem || !rteForm.cepDestino || !rteForm.peso) { toast.error("Preencha CEP origem, destino e peso"); return; }
+                rodonaves.getQuotation({ cepOrigem: rteForm.cepOrigem.replace(/\D/g, ""), cepDestino: rteForm.cepDestino.replace(/\D/g, ""), peso: parseFloat(rteForm.peso), volumes: parseInt(rteForm.volumes) || 1, valorMercadoria: parseFloat(rteForm.valorMercadoria) || 0, cnpjRemetente: "" });
+              }} disabled={rodonaves.isQuoting}>
+                {rodonaves.isQuoting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Search className="w-4 h-4 mr-2" />}
+                Consultar Rodonaves
+              </Button>
+            </div>
+            {rodonaves.quotationResult?.data && (
+              <div className="card-interactive flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-amber-100"><Star className="w-5 h-5 text-amber-500" /></div>
+                <div className="flex-1"><p className="font-semibold">Rodonaves RTE</p><p className="text-sm text-muted-foreground"><Clock className="w-3 h-3 inline mr-1" />{rodonaves.quotationResult.data.PrazoEntrega} dias</p></div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-primary">R$ {rodonaves.quotationResult.data.Valor?.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Frete: R$ {rodonaves.quotationResult.data.ValorFrete?.toFixed(2)} | Pedágio: R$ {rodonaves.quotationResult.data.ValorPedagio?.toFixed(2)}</p>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="tabelas" className="space-y-4">

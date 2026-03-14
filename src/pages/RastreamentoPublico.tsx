@@ -12,11 +12,16 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
-  coletado: { label: "Coletado", color: "text-blue-500", icon: Package },
+  aguardando_producao: { label: "Em Preparação", color: "text-muted-foreground", icon: Clock },
+  pronto_despacho: { label: "Pronto para Envio", color: "text-blue-500", icon: Package },
+  cotacao_frete: { label: "Cotando Frete", color: "text-purple-500", icon: Package },
+  nf_emitida: { label: "NF Emitida", color: "text-indigo-500", icon: Package },
+  despachado: { label: "Despachado", color: "text-cyan-500", icon: Truck },
   em_transito: { label: "Em Trânsito", color: "text-amber-500", icon: Truck },
-  saiu_entrega: { label: "Saiu para Entrega", color: "text-purple-500", icon: Truck },
+  saiu_entrega: { label: "Saiu para Entrega", color: "text-orange-500", icon: Truck },
   entregue: { label: "Entregue", color: "text-green-500", icon: CheckCircle2 },
-  problema: { label: "Problema", color: "text-red-500", icon: AlertTriangle },
+  ocorrencia: { label: "Ocorrência", color: "text-red-500", icon: AlertTriangle },
+  finalizado: { label: "Finalizado", color: "text-green-600", icon: CheckCircle2 },
 };
 
 export default function RastreamentoPublico() {
