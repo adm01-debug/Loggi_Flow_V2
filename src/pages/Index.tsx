@@ -67,6 +67,7 @@ export default function Index() {
       ]);
       return { coletas: coletas || [], entregas: entregas || [] };
     },
+    staleTime: QUERY_STALE_TIME.DASHBOARD,
   });
 
   const chartData = useMemo(() => {
