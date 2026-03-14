@@ -115,6 +115,7 @@ export function useAnalytics(dateRange?: DateRange) {
       
       return months;
     },
+    enabled: !!user?.id,
   });
 
   // Demand forecast (next 30 days based on historical patterns)

@@ -187,7 +187,8 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
         };
       });
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2,
+    enabled: !!user?.id,
   });
 
   // Geocode addresses that don't have persisted coordinates
