@@ -25,6 +25,34 @@ import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
+import { CSVImporter } from "@/components/common/CSVImporter";
+import { Dialog as ImportDialog, DialogContent as ImportDialogContent, DialogHeader as ImportDialogHeader, DialogTitle as ImportDialogTitle } from "@/components/ui/dialog";
+
+const clienteCSVSchema = z.object({
+  razao_social: z.string().min(1),
+  nome_fantasia: z.string().optional().default(""),
+  cnpj: z.string().optional().default(""),
+  endereco_completo: z.string().min(1),
+  cidade: z.string().optional().default(""),
+  estado: z.string().optional().default(""),
+  cep: z.string().optional().default(""),
+  contato_nome: z.string().optional().default(""),
+  contato_email: z.string().optional().default(""),
+  contato_telefone: z.string().optional().default(""),
+});
+
+const clienteCSVColumns = [
+  { key: "razao_social", label: "Razão Social", example: "Empresa LTDA" },
+  { key: "nome_fantasia", label: "Nome Fantasia", example: "Empresa" },
+  { key: "cnpj", label: "CNPJ", example: "12345678000199" },
+  { key: "endereco_completo", label: "Endereço", example: "Rua ABC, 123" },
+  { key: "cidade", label: "Cidade", example: "São Paulo" },
+  { key: "estado", label: "UF", example: "SP" },
+  { key: "cep", label: "CEP", example: "01234567" },
+  { key: "contato_nome", label: "Contato", example: "João" },
+  { key: "contato_email", label: "Email", example: "joao@empresa.com" },
+  { key: "contato_telefone", label: "Telefone", example: "11999999999" },
+];
 
 interface Cliente {
   id: string; razao_social: string; nome_fantasia: string | null; cnpj: string | null;
