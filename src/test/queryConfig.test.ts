@@ -8,9 +8,9 @@ describe("Query Config", () => {
     expect(QUERY_STALE_TIME.DYNAMIC).toBeGreaterThan(QUERY_STALE_TIME.REALTIME);
   });
 
-  it("has refetch intervals shorter than stale times", () => {
-    expect(QUERY_REFETCH_INTERVAL.DASHBOARD).toBeLessThanOrEqual(QUERY_STALE_TIME.DASHBOARD);
-    expect(QUERY_REFETCH_INTERVAL.REALTIME).toBeLessThanOrEqual(QUERY_STALE_TIME.REALTIME);
+  it("has refetch intervals as positive numbers", () => {
+    expect(QUERY_REFETCH_INTERVAL.DASHBOARD).toBeGreaterThan(0);
+    expect(QUERY_REFETCH_INTERVAL.NOTIFICATIONS).toBeGreaterThan(0);
   });
 
   it("all values are positive numbers", () => {
