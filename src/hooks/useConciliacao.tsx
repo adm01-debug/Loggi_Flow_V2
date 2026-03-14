@@ -59,7 +59,7 @@ export function useConciliacao() {
 
   // Fetch all conciliacoes
   const { data: conciliacoes = [], isLoading: isLoadingConciliacoes } = useQuery({
-    queryKey: ["conciliacoes"],
+    queryKey: ["conciliacoes", user?.id],
     queryFn: async (): Promise<Conciliacao[]> => {
       const { data, error } = await supabase
         .from("conciliacoes")
@@ -68,6 +68,7 @@ export function useConciliacao() {
       if (error) throw error;
       return data as Conciliacao[];
     },
+    enabled: !!user?.id,
   });
 
   // Fetch items for selected conciliacao

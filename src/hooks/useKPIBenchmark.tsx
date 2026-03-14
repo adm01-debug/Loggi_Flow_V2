@@ -161,5 +161,6 @@ export const useKPIBenchmark = (periodsBack: number = 6) => {
       return { periods, comparison };
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 };

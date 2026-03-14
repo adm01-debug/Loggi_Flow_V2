@@ -171,5 +171,6 @@ export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
       };
     },
     staleTime: 1000 * 60 * 2,
+    enabled: !!user?.id,
   });
 };

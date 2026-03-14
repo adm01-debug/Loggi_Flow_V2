@@ -38,7 +38,7 @@ export default function RastreamentoPublico() {
         .from("entregas")
         .select("*")
         .or(`codigo_rastreamento.eq.${searchCode},nf_remessa.eq.${searchCode}`)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },

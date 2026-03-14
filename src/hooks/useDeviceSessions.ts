@@ -91,7 +91,7 @@ export function useDeviceSessions() {
         .eq("browser", browser)
         .eq("os", os)
         .eq("ip_address", ipAddress)
-        .single();
+        .maybeSingle();
 
       if (existingSession) {
         // Update existing session

@@ -70,7 +70,8 @@ export function useAuditLogs(filters: AuditLogFilters = {}) {
 
       return (data as AuditLog[]) || [];
     },
-    staleTime: 1000 * 60 * 1, // 1 minute
+    staleTime: 1000 * 60 * 1,
+    enabled: !!user?.id,
   });
 }
 
