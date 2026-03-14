@@ -82,8 +82,7 @@ export {
   Shake, 
   Typewriter, 
   Reveal,
-
-
+} from './micro-interactions';
 
 // Chart (recharts wrapper)
 export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartStyle } from './chart';
