@@ -393,7 +393,8 @@ export function useSLAMetrics() {
         tendenciaMensal,
       };
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 60 * 5,
+    enabled: !!user?.id,
   });
 }
