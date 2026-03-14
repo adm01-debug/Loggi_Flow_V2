@@ -72,3 +72,7 @@ export {
   CHART_COLORS,
   KEYBOARD_SHORTCUTS,
 } from './constants';
+
+// Rodonaves Status Codes
+export { RODONAVES_CODES, getSystemStatusFromCode } from './rodonavesStatusCodes';
+export type { RodonavesStatusInfo } from './rodonavesStatusCodes';
