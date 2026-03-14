@@ -29,8 +29,9 @@ export interface AuditLogFilters {
 }
 
 export function useAuditLogs(filters: AuditLogFilters = {}) {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['audit-logs', filters],
+    queryKey: ['audit-logs', user?.id, filters],
     queryFn: async (): Promise<AuditLog[]> => {
       let query = supabase
         .from('audit_logs')
