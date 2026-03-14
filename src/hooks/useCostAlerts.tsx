@@ -98,6 +98,7 @@ export const useCostAlerts = () => {
       return data;
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !!user?.id,
   });
 
   // Check costs against limits
