@@ -56,3 +56,12 @@ verify_jwt = true
 
 [functions.new-device-alert]
 verify_jwt = true
+
+[functions.rodonaves-api]
+verify_jwt = false
+
+[functions.check-password-breach]
+verify_jwt = false
+
+[functions.lalamove-api]
+verify_jwt = false
