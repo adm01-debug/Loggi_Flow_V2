@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AIAssistant } from "@/components/ai/AIAssistant";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePrefetch } from "@/hooks/usePrefetch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface MenuSection {
