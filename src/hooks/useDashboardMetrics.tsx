@@ -257,5 +257,6 @@ export function useTransportadoraPerformance() {
       return transportadoras || [];
     },
     staleTime: 1000 * 60 * 5,
+    enabled: !!user?.id,
   });
 }
