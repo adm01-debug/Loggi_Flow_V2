@@ -3,13 +3,26 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, CheckCircle2, Clock, MapPin, Search, Loader2, AlertTriangle, Phone, Calendar, LucideIcon } from "lucide-react";
+import { Package, Truck, CheckCircle2, Clock, Search, Loader2, AlertTriangle, Phone, LucideIcon } from "lucide-react";
 import { Timeline } from "@/components/common/Timeline";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+interface PublicTracking {
+  numero_entrega: string;
+  status: string;
+  codigo_rastreamento: string | null;
+  nf_remessa: string | null;
+  previsao_entrega: string | null;
+  data_despacho: string | null;
+  data_entrega_efetiva: string | null;
+  recebedor: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
   aguardando_producao: { label: "Em Preparação", color: "text-muted-foreground", icon: Clock },
@@ -30,29 +43,58 @@ export default function RastreamentoPublico() {
   const [code, setCode] = useState(trackingCode || searchParams.get("code") || "");
   const [searchCode, setSearchCode] = useState(code);
 
-  const { data: tracking, isLoading, error, refetch } = useQuery({
+  const { data: tracking, isLoading, error } = useQuery({
     queryKey: ["tracking-public", searchCode],
     queryFn: async () => {
       if (!searchCode) return null;
+
       const { data, error } = await supabase
-        .from("entregas")
-        .select("*")
-        .or(`codigo_rastreamento.eq.${searchCode},nf_remessa.eq.${searchCode}`)
+        .rpc("get_public_tracking", { p_code: searchCode })
         .maybeSingle();
+
       if (error) throw error;
-      return data;
+      return (data as PublicTracking | null) ?? null;
     },
     enabled: !!searchCode,
   });
 
-  const handleSearch = () => { if (code.trim()) setSearchCode(code.trim()); };
+  const handleSearch = () => {
+    if (code.trim()) setSearchCode(code.trim());
+  };
 
-  // Create timeline events from status history
-  const timelineEvents = tracking ? [
-    { id: "1", title: "Pedido criado", description: "Entrega registrada no sistema", timestamp: tracking.created_at, status: "completed" as const },
-    ...(tracking.data_despacho ? [{ id: "2", title: "Despachado", description: "Enviado para transportadora", timestamp: tracking.data_despacho, status: "completed" as const }] : []),
-    ...(tracking.data_entrega_efetiva ? [{ id: "3", title: "Entregue", description: `Recebido por ${tracking.recebedor || 'destinatário'}`, timestamp: tracking.data_entrega_efetiva, status: "completed" as const }] : []),
-  ] : [];
+  const timelineEvents = tracking
+    ? [
+        {
+          id: "1",
+          title: "Pedido criado",
+          description: "Entrega registrada no sistema",
+          timestamp: tracking.created_at,
+          status: "completed" as const,
+        },
+        ...(tracking.data_despacho
+          ? [
+              {
+                id: "2",
+                title: "Despachado",
+                description: "Enviado para transportadora",
+                timestamp: tracking.data_despacho,
+                status: "completed" as const,
+              },
+            ]
+          : []),
+        ...(tracking.data_entrega_efetiva
+          ? [
+              {
+                id: "3",
+                title: "Entregue",
+                description: `Recebido por ${tracking.recebedor || "destinatário"}`,
+                timestamp: tracking.data_entrega_efetiva,
+                status: "completed" as const,
+              },
+            ]
+          : []),
+      ]
+    : [];
 
   const currentStatus = tracking?.status || "pendente";
   const StatusIcon = statusConfig[currentStatus]?.icon || Clock;
@@ -60,22 +102,96 @@ export default function RastreamentoPublico() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="text-center mb-8"><div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4"><Package className="w-8 h-8 text-primary" /></div><h1 className="text-2xl font-bold">Rastreamento de Entrega</h1><p className="text-muted-foreground">Digite o código para acompanhar</p></div>
-        <div className="flex gap-2 mb-8"><Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Código de rastreamento ou NF" onKeyDown={(e) => e.key === "Enter" && handleSearch()} /><Button onClick={handleSearch}><Search className="w-4 h-4" /></Button></div>
-        {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
-        {error && <div className="card-base p-8 text-center"><AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" /><p className="font-semibold">Código não encontrado</p><p className="text-sm text-muted-foreground">Verifique o código e tente novamente</p></div>}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <Package className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold">Rastreamento de Entrega</h1>
+          <p className="text-muted-foreground">Digite o código para acompanhar</p>
+        </div>
+
+        <div className="flex gap-2 mb-8">
+          <Input
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="Código de rastreamento ou NF"
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+          <Button onClick={handleSearch}>
+            <Search className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        )}
+
+        {error && (
+          <div className="card-base p-8 text-center">
+            <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
+            <p className="font-semibold">Código não encontrado</p>
+            <p className="text-sm text-muted-foreground">Verifique o código e tente novamente</p>
+          </div>
+        )}
+
         {tracking && !isLoading && (
           <div className="space-y-6">
             <div className="card-base p-6">
-              <div className="flex items-center gap-4 mb-4"><div className={cn("p-3 rounded-xl", statusConfig[currentStatus]?.color.replace("text-", "bg-").replace("500", "100"))}><StatusIcon className={cn("w-6 h-6", statusConfig[currentStatus]?.color)} /></div><div><Badge className={cn(statusConfig[currentStatus]?.color.replace("text-", "bg-").replace("500", "500"), "text-white")}>{statusConfig[currentStatus]?.label || currentStatus}</Badge><p className="text-sm text-muted-foreground mt-1">Última atualização: {format(new Date(tracking.updated_at || tracking.created_at), "dd/MM HH:mm", { locale: ptBR })}</p></div></div>
-              <div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Código</p><p className="font-mono font-semibold">{tracking.codigo_rastreamento || tracking.nf_remessa}</p></div><div><p className="text-muted-foreground">Previsão</p><p className="font-semibold">{tracking.previsao_entrega ? format(new Date(tracking.previsao_entrega), "dd/MM/yyyy") : "A definir"}</p></div></div>
+              <div className="flex items-center gap-4 mb-4">
+                <div className={cn("p-3 rounded-xl", statusConfig[currentStatus]?.color.replace("text-", "bg-").replace("500", "100"))}>
+                  <StatusIcon className={cn("w-6 h-6", statusConfig[currentStatus]?.color)} />
+                </div>
+                <div>
+                  <Badge className={cn(statusConfig[currentStatus]?.color.replace("text-", "bg-").replace("500", "500"), "text-white")}>
+                    {statusConfig[currentStatus]?.label || currentStatus}
+                  </Badge>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Última atualização: {format(new Date(tracking.updated_at || tracking.created_at), "dd/MM HH:mm", { locale: ptBR })}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Código</p>
+                  <p className="font-mono font-semibold">{tracking.codigo_rastreamento || tracking.nf_remessa}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Previsão</p>
+                  <p className="font-semibold">
+                    {tracking.previsao_entrega ? format(new Date(tracking.previsao_entrega), "dd/MM/yyyy") : "A definir"}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="card-base p-6"><div className="flex items-center gap-2 mb-4"><MapPin className="w-5 h-5 text-muted-foreground" /><span className="font-semibold">Destino</span></div><p className="text-sm">{tracking.endereco_entrega || "Endereço não informado"}</p></div>
-            {timelineEvents.length > 0 && <div className="card-base p-6"><h3 className="font-semibold mb-4 flex items-center gap-2"><Clock className="w-5 h-5" />Histórico</h3><Timeline events={timelineEvents} /></div>}
-            <div className="card-base p-4 text-center text-sm text-muted-foreground"><p>Dúvidas? Entre em contato</p><div className="flex items-center justify-center gap-2 mt-2"><Phone className="w-4 h-4" /><span>(11) 99999-9999</span></div></div>
+
+            {timelineEvents.length > 0 && (
+              <div className="card-base p-6">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <Clock className="w-5 h-5" />Histórico
+                </h3>
+                <Timeline events={timelineEvents} />
+              </div>
+            )}
+
+            <div className="card-base p-4 text-center text-sm text-muted-foreground">
+              <p>Dúvidas? Entre em contato</p>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <Phone className="w-4 h-4" />
+                <span>(11) 99999-9999</span>
+              </div>
+            </div>
           </div>
         )}
-        {!tracking && !isLoading && !error && searchCode && <div className="card-base p-8 text-center"><Package className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" /><p className="text-muted-foreground">Digite um código para buscar</p></div>}
+
+        {!tracking && !isLoading && !error && searchCode && (
+          <div className="card-base p-8 text-center">
+            <Package className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-muted-foreground">Código não encontrado</p>
+          </div>
+        )}
       </div>
     </div>
   );
