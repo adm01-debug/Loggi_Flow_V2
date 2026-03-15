@@ -54,6 +54,7 @@ const GerenciamentoUsuarios = lazy(() => import("./pages/GerenciamentoUsuarios")
 const AprovacaoResetSenha = lazy(() => import("./pages/AprovacaoResetSenha"));
 const Seguranca = lazy(() => import("./pages/Seguranca"));
 const RateLimitDashboard = lazy(() => import("./pages/RateLimitDashboard"));
+const GestaoRodonaves = lazy(() => import("./pages/GestaoRodonaves"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
