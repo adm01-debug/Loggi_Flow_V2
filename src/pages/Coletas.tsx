@@ -290,6 +290,28 @@ export default function Coletas() {
               <div><span className="text-muted-foreground">Tipo:</span> {sel.tipo_coleta === "lalamove" ? "Lalamove" : "Transportadora"}</div>
               <div><span className="text-muted-foreground">Endereço:</span> {sel.endereco_coleta}</div>
               {sel.fornecedores && <div><span className="text-muted-foreground">Fornecedor:</span> {sel.fornecedores.nome_fantasia || sel.fornecedores.razao_social}</div>}
+              {sel.data_prevista_coleta && <div><span className="text-muted-foreground">Previsão:</span> {new Date(sel.data_prevista_coleta).toLocaleDateString('pt-BR')}</div>}
+              {sel.data_efetiva_coleta && <div><span className="text-muted-foreground">Coleta Efetiva:</span> {new Date(sel.data_efetiva_coleta).toLocaleDateString('pt-BR')}</div>}
+              {sel.qtd_volumes && <div><span className="text-muted-foreground">Volumes:</span> {sel.qtd_volumes}</div>}
+              {sel.peso_estimado_kg && <div><span className="text-muted-foreground">Peso:</span> {sel.peso_estimado_kg} kg</div>}
+              {sel.codigo_rastreamento && <div><span className="text-muted-foreground">Rastreamento:</span> {sel.codigo_rastreamento}</div>}
+              {sel.observacoes && <div><span className="text-muted-foreground">Obs:</span> {sel.observacoes}</div>}
+            </div>
+
+            {/* Rodonaves RTE Pickup Actions */}
+            {sel.tipo_coleta === "transportadora" && (
+              <div className="border-t pt-4">
+                <RTEPickupActions coletaId={sel.id} onActionComplete={fetchData} />
+              </div>
+            )}
+
+            {history && history.length > 0 && <Timeline events={history.map(h => ({ date: h.created_at, title: h.action, description: h.changed_fields?.join(', ') || '' }))} />}
+          </div>}
+        </DialogContent>
+      </Dialog>
+    </MainLayout>
+  );
+}
               {sel.data_prevista_coleta && <div><span className="text-muted-foreground">Data Prevista:</span> {new Date(sel.data_prevista_coleta).toLocaleDateString()}</div>}
               {sel.qtd_volumes && <div><span className="text-muted-foreground">Volumes:</span> {sel.qtd_volumes}</div>}
               {sel.peso_estimado_kg && <div><span className="text-muted-foreground">Peso:</span> {sel.peso_estimado_kg} kg</div>}
