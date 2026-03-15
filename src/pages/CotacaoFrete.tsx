@@ -210,7 +210,56 @@ export default function CotacaoFrete() {
             )}
           </TabsContent>
 
-          <TabsContent value="tabelas" className="space-y-4">
+          <TabsContent value="prazo" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Prazo de Entrega */}
+              <div className="card-base p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-2"><Clock className="w-5 h-5 text-primary" /><span className="font-semibold">Prazo de Entrega RTE</span></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>CEP Origem</Label><Input value={rteForm.cepOrigem} onChange={(e) => setRteForm({ ...rteForm, cepOrigem: e.target.value })} placeholder="00000-000" /></div>
+                  <div><Label>CEP Destino</Label><Input value={rteForm.cepDestino} onChange={(e) => setRteForm({ ...rteForm, cepDestino: e.target.value })} placeholder="00000-000" /></div>
+                </div>
+                <Button className="w-full" size="sm" onClick={() => {
+                  if (!rteForm.cepOrigem || !rteForm.cepDestino) { toast.error("Preencha os CEPs"); return; }
+                  rodonaves.getDeadline({ cepOrigem: rteForm.cepOrigem.replace(/\D/g, ''), cepDestino: rteForm.cepDestino.replace(/\D/g, '') });
+                }} disabled={rodonaves.isLoadingDeadline}>
+                  {rodonaves.isLoadingDeadline ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Clock className="w-4 h-4 mr-2" />}
+                  Calcular Prazo
+                </Button>
+                {rodonaves.deadlineResult?.data && (
+                  <div className="p-3 rounded-lg bg-muted/30 border text-sm space-y-1">
+                    <div className="text-2xl font-bold text-primary">{rodonaves.deadlineResult.data.Prazo} dias úteis</div>
+                    {rodonaves.deadlineResult.data.DataPrevistaEntrega && (
+                      <div className="text-muted-foreground">Previsão: {new Date(rodonaves.deadlineResult.data.DataPrevistaEntrega).toLocaleDateString('pt-BR')}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Fator de Cubagem */}
+              <div className="card-base p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-2"><Package className="w-5 h-5 text-primary" /><span className="font-semibold">Fator de Cubagem</span></div>
+                <div>
+                  <Label>CNPJ do Cliente</Label>
+                  <Input placeholder="00.000.000/0000-00" id="cubage-cnpj" />
+                </div>
+                <Button className="w-full" size="sm" onClick={() => {
+                  const cnpj = (document.getElementById('cubage-cnpj') as HTMLInputElement)?.value;
+                  if (!cnpj) { toast.error("Informe o CNPJ"); return; }
+                  rodonaves.getCubageFactor({ cnpjRemetente: cnpj.replace(/\D/g, '') });
+                }}>
+                  <Search className="w-4 h-4 mr-2" />Consultar Cubagem
+                </Button>
+                {rodonaves.cubageResult?.data && (
+                  <div className="p-3 rounded-lg bg-muted/30 border text-sm">
+                    <div className="text-xl font-bold text-primary">Fator: {rodonaves.cubageResult.data.CubingFactor || rodonaves.cubageResult.data.cubingFactor || 'N/A'}</div>
+                    <p className="text-muted-foreground mt-1">Use este fator para calcular peso cubado: (C × L × A) ÷ fator</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
             <div className="flex justify-end"><Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova Tabela</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Nova Tabela de Frete</DialogTitle></DialogHeader><div className="grid gap-4 py-4"><div><Label>Transportadora</Label><Select value={newTableForm.transportadora_id} onValueChange={(v) => setNewTableForm({ ...newTableForm, transportadora_id: v })}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{(transportadoras || []).map((t) => <SelectItem key={t.id} value={t.id}>{t.nome_fantasia}</SelectItem>)}</SelectContent></Select></div><div><Label>Estado Destino</Label><Select value={newTableForm.estado_destino} onValueChange={(v) => setNewTableForm({ ...newTableForm, estado_destino: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent></Select></div><div className="grid grid-cols-2 gap-2"><div><Label>Peso Mín</Label><Input type="number" value={newTableForm.peso_min} onChange={(e) => setNewTableForm({ ...newTableForm, peso_min: Number(e.target.value) })} /></div><div><Label>Peso Máx</Label><Input type="number" value={newTableForm.peso_max} onChange={(e) => setNewTableForm({ ...newTableForm, peso_max: Number(e.target.value) })} /></div></div><div className="grid grid-cols-2 gap-2"><div><Label>Valor/kg</Label><Input type="number" step="0.01" value={newTableForm.valor_kg} onChange={(e) => setNewTableForm({ ...newTableForm, valor_kg: Number(e.target.value) })} /></div><div><Label>Prazo (dias)</Label><Input type="number" value={newTableForm.prazo_dias} onChange={(e) => setNewTableForm({ ...newTableForm, prazo_dias: Number(e.target.value) })} /></div></div></div><DialogFooter><Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancelar</Button><Button onClick={handleAddTable}>Criar</Button></DialogFooter></DialogContent></Dialog></div>
             
             <FilterBar 
