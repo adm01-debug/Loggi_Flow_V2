@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { Tag, Printer, Eye, XCircle, Search, Loader2, RefreshCw, FileText } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export function MEEtiquetasPanel() {
   const { listarEtiquetas, gerarEtiquetas, imprimirEtiquetas, preVisualizarEtiquetas, verificarCancelamento, cancelarEtiquetas, pesquisarEtiqueta } = useMelhorEnvio();

@@ -174,7 +174,7 @@ export function MECotacaoPanel() {
                     {r.discount && (
                       <div className="col-span-2">
                         <span className="text-muted-foreground">Desconto:</span>
-                        <span className="ml-1 text-green-600">R$ {r.discount}</span>
+                        <span className="ml-1 text-emerald-600 dark:text-emerald-400">R$ {r.discount}</span>
                       </div>
                     )}
                   </div>
