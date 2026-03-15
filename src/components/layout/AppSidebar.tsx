@@ -68,6 +68,7 @@ const menuSections: MenuSection[] = [
       { title: "Cotação Frete", url: "/cotacao-frete", icon: Calculator },
       { title: "Mapa de Rotas", url: "/mapa-rotas", icon: Map },
       { title: "Rastreamento", url: "/rastreamento-motorista", icon: Navigation },
+      { title: "Rodonaves RTE", url: "/gestao-rodonaves", icon: Truck },
     ],
   },
   {
