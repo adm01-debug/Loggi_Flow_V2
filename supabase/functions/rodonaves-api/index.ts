@@ -8,6 +8,8 @@ const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
 const QUOTATION_GATEWAY = "https://quotation-apigateway.rte.com.br";
 const DEADLINE_GATEWAY = "https://01wapi.rte.com.br";
 const PICKUP_GATEWAY = "https://pickup-apigateway.rte.com.br";
+const CUSTOMER_GATEWAY = "https://customer-apigateway.rte.com.br";
+const SELFATTENDANCE_GATEWAY = "https://01wapi.rte.com.br";
 
 // Token cache (in-memory per isolate)
 const tokenCache: Record<string, { token: string; expiresAt: number }> = {};
@@ -51,198 +53,439 @@ function mapTrackingCodeToStatus(code: number): string {
   }
 }
 
-// ===== TRACKING (GET) =====
-async function trackShipment(params: {
-  taxIdRegistration?: string;
-  invoiceNumber?: string;
-  invoiceKey?: string;
-  protocolNumber?: string;
-  cTeNumber?: number;
-  isCustomerPortal?: boolean;
-}) {
-  const token = await getToken(TRACKING_GATEWAY);
+// Helper: build query string from params object
+function buildQS(params: Record<string, string | number | boolean | undefined>): URLSearchParams {
   const qs = new URLSearchParams();
-  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
-  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
-  if (params.invoiceKey) qs.set("InvoiceKey", params.invoiceKey);
-  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
-  if (params.cTeNumber) qs.set("CTeNumber", String(params.cTeNumber));
-  if (params.isCustomerPortal) qs.set("IsCustomerPortal", "true");
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null && v !== "") qs.set(k, String(v));
+  }
+  return qs;
+}
 
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/tracking?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(`Tracking failed [${res.status}]: ${await res.text()}`);
+// Helper: authenticated GET
+async function apiGet(gateway: string, path: string, params: Record<string, string | number | boolean | undefined> = {}) {
+  const token = await getToken(gateway);
+  const qs = buildQS(params);
+  const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
   return res.json();
 }
 
-// ===== BATCH TRACKING (GET) =====
-async function trackBatch(params: {
-  taxIdRegistration: string;
-  startDate: string;
-  endDate: string;
-  page?: number;
-  amountByPage?: number;
-  operationType?: number;
-}) {
-  const token = await getToken(TRACKING_GATEWAY);
-  const qs = new URLSearchParams({
-    TaxIdRegistration: params.taxIdRegistration,
-    StartDate: params.startDate,
-    EndDate: params.endDate,
-  });
-  if (params.page) qs.set("Page", String(params.page));
-  if (params.amountByPage) qs.set("AmountByPage", String(params.amountByPage));
-  if (params.operationType !== undefined) qs.set("OperationType", String(params.operationType));
-
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/tracking/batch?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(`Batch tracking failed [${res.status}]: ${await res.text()}`);
-  return res.json();
+// Helper: authenticated POST/PUT/DELETE
+async function apiMutate(gateway: string, method: string, path: string, body?: unknown, queryParams?: Record<string, string | number | boolean | undefined>) {
+  const token = await getToken(gateway);
+  const qs = queryParams ? buildQS(queryParams) : new URLSearchParams();
+  const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
+  const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+  const opts: RequestInit = { method, headers };
+  if (body) {
+    headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(url, opts);
+  if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return { raw: text }; }
 }
 
-// ===== TRACKING STEPS (GET) =====
-async function trackingSteps(params: {
-  taxIdRegistration?: string;
-  invoiceNumber?: string;
-  invoiceKey?: string;
-  protocolNumber?: string;
-}) {
-  const token = await getToken(TRACKING_GATEWAY);
+// ==========================================
+// TRACKING GATEWAY ACTIONS
+// ==========================================
+
+async function trackShipment(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/tracking", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    InvoiceNumber: p.invoiceNumber as string,
+    InvoiceKey: p.invoiceKey as string,
+    ProtocolNumber: p.protocolNumber as string,
+    CTeNumber: p.cTeNumber as number,
+    IsCustomerPortal: p.isCustomerPortal as boolean,
+  });
+}
+
+async function trackBatch(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/tracking/batch", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    StartDate: p.startDate as string,
+    EndDate: p.endDate as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+    OperationType: p.operationType as number,
+  });
+}
+
+// NEW: Batch with pagination metadata (amountPages, totalRegisters)
+async function trackBatchPagination(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/tracking/batchPagination", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    StartDate: p.startDate as string,
+    EndDate: p.endDate as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+    OperationType: p.operationType as number,
+    CTeNumber: p.cTeNumber as number,
+  });
+}
+
+// NEW: Batch by params (no date required)
+async function trackBatchByParams(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/tracking/batchpaginationbyparms", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    CTeNumber: p.cTeNumber as number,
+    InvoiceNumber: p.invoiceNumber as string,
+    ProtocolNumber: p.protocolNumber as string,
+    Page: p.page as number,
+  });
+}
+
+async function trackingSteps(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/tracking/trackingSteps", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    InvoiceNumber: p.invoiceNumber as string,
+    InvoiceKey: p.invoiceKey as string,
+    ProtocolNumber: p.protocolNumber as string,
+    CTeNumber: p.cTeNumber as number,
+    IsCustomerPortal: p.isCustomerPortal as boolean,
+  });
+}
+
+// NEW: Batch by occurrence date
+async function trackBatchByOccurrenceDate(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/tracking/batchByOccurrenceDate", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    StartDate: p.startDate as string,
+    EndDate: p.endDate as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+    OperationType: p.operationType as number,
+    CTeNumber: p.cTeNumber as number,
+  });
+}
+
+// DELIVERY RECEIPTS
+async function getDeliveryProof(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/deliveryreceipt", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    InvoiceNumber: p.invoiceNumber as string,
+    InvoiceKey: p.invoiceKey as string,
+    ProtocolNumber: p.protocolNumber as string,
+    CTeNumber: p.cTeNumber as number,
+  });
+}
+
+// NEW: High-quality delivery receipt (without image compression)
+async function getDeliveryProofHQ(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/deliveryreceipt/withoutImageCompression", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    InvoiceNumber: p.invoiceNumber as string,
+    InvoiceKey: p.invoiceKey as string,
+    ProtocolNumber: p.protocolNumber as string,
+    CTeNumber: p.cTeNumber as number,
+  });
+}
+
+async function getDeliveryInfo(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/deliveryreceipt/deliveryInformation", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    InvoiceNumber: p.invoiceNumber as string,
+    InvoiceKey: p.invoiceKey as string,
+    ProtocolNumber: p.protocolNumber as string,
+    CTeNumber: p.cTeNumber as number,
+  });
+}
+
+// NEW: Batch delivery receipts → returns S3 zip URL
+async function getDeliveryReceiptBatch(p: Record<string, unknown>) {
+  return apiMutate(TRACKING_GATEWAY, "POST", "/api/v1/deliveryreceipt/receipt-key-list", p.body);
+}
+
+// NEW: Batch delivery receipts by protocols array
+async function getDeliveryReceiptByProtocols(p: Record<string, unknown>) {
+  const protocols = p.protocols as string[];
   const qs = new URLSearchParams();
-  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
-  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
-  if (params.invoiceKey) qs.set("InvoiceKey", params.invoiceKey);
-  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
-
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/tracking/trackingSteps?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(`Tracking steps failed [${res.status}]: ${await res.text()}`);
-  return res.json();
-}
-
-// ===== DELIVERY RECEIPT (GET) =====
-async function getDeliveryProof(params: {
-  taxIdRegistration?: string;
-  invoiceNumber?: string;
-  invoiceKey?: string;
-  protocolNumber?: string;
-}) {
+  protocols?.forEach(proto => qs.append("requestProtocols", proto));
   const token = await getToken(TRACKING_GATEWAY);
-  const qs = new URLSearchParams();
-  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
-  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
-  if (params.invoiceKey) qs.set("InvoiceKey", params.invoiceKey);
-  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
-
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt?${qs}`, {
+  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols?${qs}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(`Delivery proof failed [${res.status}]: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Batch receipts by protocols failed [${res.status}]: ${await res.text()}`);
   return res.json();
 }
 
-// ===== DELIVERY INFO (GET) =====
-async function getDeliveryInfo(params: {
-  taxIdRegistration?: string;
-  invoiceNumber?: string;
-  protocolNumber?: string;
-}) {
-  const token = await getToken(TRACKING_GATEWAY);
-  const qs = new URLSearchParams();
-  if (params.taxIdRegistration) qs.set("TaxIdRegistration", params.taxIdRegistration);
-  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
-  if (params.protocolNumber) qs.set("ProtocolNumber", params.protocolNumber);
-
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt/deliveryInformation?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
+// NEW: OCCURRENCE RECEIPTS (3 endpoints)
+async function getOccurrenceReceipt(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt", {
+    BillOfLadingId: p.billOfLadingId as number,
+    OccurenceCode: p.occurrenceCode as string,
+    LoadImageContent: p.loadImageContent as boolean,
   });
-  if (!res.ok) throw new Error(`Delivery info failed [${res.status}]: ${await res.text()}`);
-  return res.json();
 }
 
-// ===== ORDERS PAGINATED (GET) =====
-async function getOrders(params: {
-  taxIdRegistration: string;
-  customerType: number;
-  startDate: string;
-  endDate: string;
-  page?: number;
-  amountByPage?: number;
-  invoiceNumber?: string;
-}) {
-  const token = await getToken(TRACKING_GATEWAY);
-  const qs = new URLSearchParams({
-    TaxIdRegistration: params.taxIdRegistration,
-    CustomerType: String(params.customerType),
-    StartDate: params.startDate,
-    EndDate: params.endDate,
+async function getOccurrenceReceiptList(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt/list", {
+    BillOfLadingId: p.billOfLadingId as number,
+    OccurenceCode: p.occurrenceCode as string,
+    LoadImageContent: p.loadImageContent as boolean,
   });
-  if (params.page) qs.set("Page", String(params.page));
-  if (params.amountByPage) qs.set("AmountByPage", String(params.amountByPage));
-  if (params.invoiceNumber) qs.set("InvoiceNumber", params.invoiceNumber);
-
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/orders/ordersbydaterangepagination?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(`Orders failed [${res.status}]: ${await res.text()}`);
-  return res.json();
 }
 
-// ===== QUOTATION (POST) =====
-async function simulateQuotation(params: {
-  cepOrigem: string;
-  cepDestino: string;
-  peso: number;
-  volumes: number;
-  valorMercadoria: number;
-  cnpjRemetente: string;
-}) {
-  const token = await getToken(QUOTATION_GATEWAY);
-  const res = await fetch(`${QUOTATION_GATEWAY}/api/v1/simula-cotacao`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      CepOrigem: params.cepOrigem,
-      CepDestino: params.cepDestino,
-      Peso: params.peso,
-      Volumes: params.volumes,
-      ValorMercadoria: params.valorMercadoria,
-      CnpjRemetente: params.cnpjRemetente,
-    }),
+async function getOccurrenceReceiptImageUrl(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt/imageurl", {
+    BillOfLadingId: p.billOfLadingId as number,
+    OccurenceCode: p.occurrenceCode as string,
+    RemoveImageUrlExpire: p.removeImageUrlExpire as boolean,
   });
-  if (!res.ok) throw new Error(`Quotation failed [${res.status}]: ${await res.text()}`);
-  return res.json();
 }
 
-// ===== CUBAGE FACTOR (GET) =====
-async function getCubageFactor(taxIdRegistration: string, companyId?: string) {
-  const token = await getToken(QUOTATION_GATEWAY);
-  const qs = new URLSearchParams({ taxIdRegistration });
-  if (companyId) qs.set("companyId", companyId);
-
-  const res = await fetch(`${QUOTATION_GATEWAY}/api/v1/peso-cubado?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
+// ORDERS
+async function getOrders(p: Record<string, unknown>) {
+  return apiGet(TRACKING_GATEWAY, "/api/v1/orders/ordersbydaterangepagination", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    CustomerType: p.customerType as number,
+    StartDate: p.startDate as string,
+    EndDate: p.endDate as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+    InvoiceNumber: p.invoiceNumber as string,
+    CTeNumber: p.cTeNumber as number,
   });
-  if (!res.ok) throw new Error(`Cubage failed [${res.status}]: ${await res.text()}`);
-  return res.json();
 }
 
-// ===== DEADLINE (POST) =====
+// ==========================================
+// QUOTATION GATEWAY ACTIONS
+// ==========================================
+
+async function simulateQuotation(p: Record<string, unknown>) {
+  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/simula-cotacao", {
+    CepOrigem: p.cepOrigem, CepDestino: p.cepDestino, Peso: p.peso,
+    Volumes: p.volumes, ValorMercadoria: p.valorMercadoria, CnpjRemetente: p.cnpjRemetente,
+  });
+}
+
+// NEW: Generate actual quotation (creates in TMS)
+async function generateQuotation(p: Record<string, unknown>) {
+  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/gera-cotacao", p.body);
+}
+
+// NEW: Generate first quotation
+async function generateFirstQuotation(p: Record<string, unknown>) {
+  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/gera-primeira-cotacao", p.body);
+}
+
+// NEW: Update quotation contact after creation
+async function updateQuotationContact(p: Record<string, unknown>) {
+  return apiMutate(QUOTATION_GATEWAY, "PUT", "/api/v1/atualiza-contato-cotacao", p.body);
+}
+
+// NEW: Digital carrier quotation
+async function generateDigitalCarrierQuotation(p: Record<string, unknown>) {
+  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/gera-cotacao-transp-digital", p.body);
+}
+
+// NEW: Update NF-e key for quotation
+async function updateQuotationInvoiceKey(p: Record<string, unknown>) {
+  return apiMutate(QUOTATION_GATEWAY, "PUT", "/api/v1/atualiza-nfe-cotacao", p.body);
+}
+
+async function getCubageFactor(taxId: string, companyId?: string) {
+  return apiGet(QUOTATION_GATEWAY, "/api/v1/peso-cubado", { taxIdRegistration: taxId, companyId: companyId as string });
+}
+
 async function getDeadline(cepOrigem: string, cepDestino: string) {
-  const token = await getToken(DEADLINE_GATEWAY);
-  const res = await fetch(`${DEADLINE_GATEWAY}/api/v1/busca-prazo`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ CepOrigem: cepOrigem, CepDestino: cepDestino }),
-  });
-  if (!res.ok) throw new Error(`Deadline failed [${res.status}]: ${await res.text()}`);
-  return res.json();
+  return apiMutate(DEADLINE_GATEWAY, "POST", "/api/v1/busca-prazo", { CepOrigem: cepOrigem, CepDestino: cepDestino });
 }
 
-// ===== MAIN HANDLER =====
+// ==========================================
+// CUSTOMER GATEWAY ACTIONS (ALL NEW)
+// ==========================================
+
+async function saveCustomer(p: Record<string, unknown>) {
+  return apiMutate(CUSTOMER_GATEWAY, "POST", "/api/v1/customer/savecustomer", p.body);
+}
+
+async function getCustomerById(id: number) {
+  return apiGet(CUSTOMER_GATEWAY, `/api/v1/customer/${id}`, {});
+}
+
+async function getCustomersByDate(p: Record<string, unknown>) {
+  return apiGet(CUSTOMER_GATEWAY, "/api/v1/customer", {
+    LastChangedDate: p.lastChangedDate as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+  });
+}
+
+async function getCustomerByTaxId(p: Record<string, unknown>) {
+  return apiGet(CUSTOMER_GATEWAY, "/api/v1/customer/getbytaxidregistration", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+  });
+}
+
+async function getCustomerByDescription(p: Record<string, unknown>) {
+  return apiGet(CUSTOMER_GATEWAY, "/api/v1/customer/getbydescription", {
+    Key: p.key as string,
+    Description: p.description as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+  });
+}
+
+async function getCustomerFullByDescription(p: Record<string, unknown>) {
+  return apiGet(CUSTOMER_GATEWAY, "/api/v1/customer/getfullbydescription", {
+    Key: p.key as string,
+    Description: p.description as string,
+    Page: p.page as number,
+    AmountByPage: p.amountByPage as number,
+  });
+}
+
+async function getAddressesByTaxId(taxId: string) {
+  return apiGet(CUSTOMER_GATEWAY, `/api/v1/address/getbytaxidregistration/${taxId}`, {});
+}
+
+async function createAddress(p: Record<string, unknown>) {
+  return apiMutate(CUSTOMER_GATEWAY, "POST", "/api/v1/address", p.body);
+}
+
+async function updateAddress(p: Record<string, unknown>) {
+  return apiMutate(CUSTOMER_GATEWAY, "PUT", "/api/v1/address", p.body);
+}
+
+async function deleteAddress(id: number) {
+  return apiMutate(CUSTOMER_GATEWAY, "DELETE", `/api/v1/address/${id}`);
+}
+
+async function updatePerson(p: Record<string, unknown>) {
+  return apiMutate(CUSTOMER_GATEWAY, "PUT", "/api/v1/person", p.body);
+}
+
+// ==========================================
+// PICKUP GATEWAY ACTIONS (ALL NEW)
+// ==========================================
+
+async function getPickupById(id: number) {
+  return apiGet(PICKUP_GATEWAY, `/api/v1/pickup/${id}`, {});
+}
+
+async function createPickup(p: Record<string, unknown>) {
+  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup", p.body);
+}
+
+async function createPickupByQuotation(p: Record<string, unknown>) {
+  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/pickupbyquotationprotocol", p.body);
+}
+
+async function getAvailablePickupDates(protocol: number) {
+  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getavaliablepickupdate", { protocol });
+}
+
+async function getAvailablePickupDatesByParams(p: Record<string, unknown>) {
+  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getavaliablepickupdatebyparms", {
+    OriginUnit: p.originUnit as number,
+    PersonId: p.personId as number,
+    Cep: p.cep as string,
+    Address: p.address as string,
+    Number: p.number as string,
+    Supplement: p.supplement as string,
+    District: p.district as string,
+    City: p.city as string,
+    UnitFederationCode: p.unitFederationCode as string,
+  });
+}
+
+async function getPickupByProtocol(protocol: number) {
+  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getpickupbyprotocol", { protocol });
+}
+
+async function reschedulePickup(protocol: number, pickupDate: string) {
+  return apiMutate(PICKUP_GATEWAY, "PUT", "/api/v1/pickup/updatepickupdatebyprotocol", undefined, { protocol, pickupDate });
+}
+
+async function cancelPickup(protocol: number) {
+  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/cancelpickupbyprotocol", undefined, { protocol });
+}
+
+async function resendExpressPickup(id: number) {
+  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/resendrodonavesexpresspickup", undefined, { id });
+}
+
+async function pickupRescheduleOrFinalize(p: Record<string, unknown>) {
+  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/pickupreschedulingorfinalizingoccurrence", undefined, {
+    pickupId: p.pickupId as number,
+    writeoffId: p.writeoffId as number,
+    writeoffObservation: p.writeoffObservation as string,
+    finalizingOccurrence: p.finalizingOccurrence as boolean,
+  });
+}
+
+async function generateAutomaticPickup(p: Record<string, unknown>) {
+  return apiMutate(PICKUP_GATEWAY, "POST", "/webapi/automaticpickup/generateautomaticpickup", p.body);
+}
+
+// ==========================================
+// SELFATTENDANCE GATEWAY ACTIONS (ALL NEW)
+// ==========================================
+
+async function searchCityByDescription(description: string, uf?: string) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/description", { description, uf: uf as string });
+}
+
+async function searchCityByZipCode(zipCode: string) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/zipcode", { zipCode });
+}
+
+async function getAddressByZipCode(zipCode: string) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/zipcodeaddress", { zipCode });
+}
+
+async function trackingStepsBot(p: Record<string, unknown>) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/tracking/v1/tracking-steps-bot", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    InvoiceNumber: p.invoiceNumber as string,
+    InvoiceKey: p.invoiceKey as string,
+    ProtocolNumber: p.protocolNumber as string,
+  });
+}
+
+async function trackingLastStepsBot(p: Record<string, unknown>) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/tracking/v1/tracking-last-steps-bot", {
+    TaxIdRegistration: p.taxIdRegistration as string,
+    InvoiceNumber: p.invoiceNumber as string,
+    InvoiceKey: p.invoiceKey as string,
+    ProtocolNumber: p.protocolNumber as string,
+  });
+}
+
+async function getUnitData(unitId?: number) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/unit/v1", { unitId: unitId as number });
+}
+
+async function getUnitCalendarByProtocol(protocol: number) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/unit/v1/calenderunitbyprotocol", { protocol });
+}
+
+async function selfAttendanceQuotation(p: Record<string, unknown>) {
+  return apiMutate(SELFATTENDANCE_GATEWAY, "POST", "/webapi/quotation", p.body);
+}
+
+async function selfAttendanceDeliveryTime(p: Record<string, unknown>) {
+  return apiMutate(SELFATTENDANCE_GATEWAY, "POST", "/webapi/deliverytime", p.body);
+}
+
+async function validateCustomerForQuotation(p: Record<string, unknown>) {
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/customer/byvalidquotation", {
+    TaxId: p.taxId as string,
+    Origin: p.origin as string,
+  });
+}
+
+// ==========================================
+// MAIN HANDLER
+// ==========================================
+
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -251,7 +494,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const rl = await checkRateLimit(req, "rodonaves-api", { maxRequests: 20 });
+    const rl = await checkRateLimit(req, "rodonaves-api", { maxRequests: 30 });
     if (!rl.allowed) {
       return new Response(
         JSON.stringify({ error: "Too many requests", retry_after: 900 }),
@@ -273,6 +516,7 @@ Deno.serve(async (req) => {
     const cnpjDefault = Deno.env.get("RODONAVES_CNPJ_REMETENTE") || "";
 
     switch (action) {
+      // ===== TRACKING =====
       case "track": {
         result = await trackShipment({
           taxIdRegistration: params.cnpjRemetente || cnpjDefault,
@@ -290,10 +534,33 @@ Deno.serve(async (req) => {
         const endDate = requireString(params, "endDate");
         result = await trackBatch({
           taxIdRegistration: taxId || cnpjDefault,
-          startDate,
-          endDate,
+          startDate, endDate,
+          page: params.page, amountByPage: params.amountByPage || 50,
+        });
+        break;
+      }
+
+      case "track-batch-paginated": {
+        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const startDate = requireString(params, "startDate");
+        const endDate = requireString(params, "endDate");
+        result = await trackBatchPagination({
+          taxIdRegistration: taxId || cnpjDefault,
+          startDate, endDate,
+          page: params.page, amountByPage: params.amountByPage || 50,
+          operationType: params.operationType, cTeNumber: params.cTeNumber,
+        });
+        break;
+      }
+
+      case "track-batch-by-params": {
+        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        result = await trackBatchByParams({
+          taxIdRegistration: taxId || cnpjDefault,
+          cTeNumber: params.cTeNumber,
+          invoiceNumber: params.nfNumero,
+          protocolNumber: params.protocolNumber,
           page: params.page,
-          amountByPage: params.amountByPage || 50,
         });
         break;
       }
@@ -308,8 +575,32 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "track-batch-by-occurrence": {
+        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const startDate = requireString(params, "startDate");
+        const endDate = requireString(params, "endDate");
+        result = await trackBatchByOccurrenceDate({
+          taxIdRegistration: taxId || cnpjDefault,
+          startDate, endDate,
+          page: params.page, amountByPage: params.amountByPage || 50,
+          operationType: params.operationType, cTeNumber: params.cTeNumber,
+        });
+        break;
+      }
+
+      // ===== DELIVERY RECEIPTS =====
       case "delivery-proof": {
         result = await getDeliveryProof({
+          taxIdRegistration: params.cnpjRemetente || cnpjDefault,
+          invoiceNumber: params.nfNumero,
+          invoiceKey: params.invoiceKey,
+          protocolNumber: params.protocolNumber,
+        });
+        break;
+      }
+
+      case "delivery-proof-hq": {
+        result = await getDeliveryProofHQ({
           taxIdRegistration: params.cnpjRemetente || cnpjDefault,
           invoiceNumber: params.nfNumero,
           invoiceKey: params.invoiceKey,
@@ -327,30 +618,89 @@ Deno.serve(async (req) => {
         break;
       }
 
+      case "delivery-receipt-batch": {
+        result = await getDeliveryReceiptBatch({ body: params.body });
+        break;
+      }
+
+      case "delivery-receipt-by-protocols": {
+        result = await getDeliveryReceiptByProtocols({ protocols: params.protocols });
+        break;
+      }
+
+      // ===== OCCURRENCE RECEIPTS =====
+      case "occurrence-receipt": {
+        const billId = requireNumber(params, "billOfLadingId", { min: 1 });
+        const code = requireString(params, "occurrenceCode");
+        result = await getOccurrenceReceipt({ billOfLadingId: billId, occurrenceCode: code, loadImageContent: params.loadImageContent });
+        break;
+      }
+
+      case "occurrence-receipt-list": {
+        const billId = requireNumber(params, "billOfLadingId", { min: 1 });
+        const code = requireString(params, "occurrenceCode");
+        result = await getOccurrenceReceiptList({ billOfLadingId: billId, occurrenceCode: code, loadImageContent: params.loadImageContent });
+        break;
+      }
+
+      case "occurrence-receipt-image": {
+        const billId = requireNumber(params, "billOfLadingId", { min: 1 });
+        const code = requireString(params, "occurrenceCode");
+        result = await getOccurrenceReceiptImageUrl({ billOfLadingId: billId, occurrenceCode: code, removeImageUrlExpire: params.removeImageUrlExpire });
+        break;
+      }
+
+      // ===== ORDERS =====
       case "orders": {
         const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
         const startDate = requireString(params, "startDate");
         const endDate = requireString(params, "endDate");
         result = await getOrders({
           taxIdRegistration: taxId || cnpjDefault,
-          customerType: params.customerType ?? 1, // default: Remetente
-          startDate,
-          endDate,
-          page: params.page,
-          amountByPage: params.amountByPage || 20,
-          invoiceNumber: params.invoiceNumber,
+          customerType: params.customerType ?? 1,
+          startDate, endDate,
+          page: params.page, amountByPage: params.amountByPage || 20,
+          invoiceNumber: params.invoiceNumber, cTeNumber: params.cTeNumber,
         });
         break;
       }
 
+      // ===== QUOTATION =====
       case "quotation": {
         const cepOrigem = requireString(params, "cepOrigem", { pattern: /^\d{5}-?\d{3}$/ });
         const cepDestino = requireString(params, "cepDestino", { pattern: /^\d{5}-?\d{3}$/ });
         const peso = requireNumber(params, "peso", { min: 0.01, max: 100000 });
         const volumes = requireNumber(params, "volumes", { min: 1, max: 10000 });
         const valorMercadoria = requireNumber(params, "valorMercadoria", { min: 0 });
-        const cnpjRemetente = params.cnpjRemetente || cnpjDefault;
-        result = await simulateQuotation({ cepOrigem, cepDestino, peso, volumes, valorMercadoria, cnpjRemetente });
+        result = await simulateQuotation({
+          cepOrigem, cepDestino, peso, volumes, valorMercadoria,
+          cnpjRemetente: params.cnpjRemetente || cnpjDefault,
+        });
+        break;
+      }
+
+      case "generate-quotation": {
+        result = await generateQuotation({ body: params.body });
+        break;
+      }
+
+      case "generate-first-quotation": {
+        result = await generateFirstQuotation({ body: params.body });
+        break;
+      }
+
+      case "update-quotation-contact": {
+        result = await updateQuotationContact({ body: params.body });
+        break;
+      }
+
+      case "digital-carrier-quotation": {
+        result = await generateDigitalCarrierQuotation({ body: params.body });
+        break;
+      }
+
+      case "update-quotation-invoice-key": {
+        result = await updateQuotationInvoiceKey({ body: params.body });
         break;
       }
 
@@ -367,6 +717,196 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ===== CUSTOMER =====
+      case "customer-save": {
+        result = await saveCustomer({ body: params.body });
+        break;
+      }
+
+      case "customer-get-by-id": {
+        const id = requireNumber(params, "id", { min: 1 });
+        result = await getCustomerById(id);
+        break;
+      }
+
+      case "customer-list": {
+        const lastDate = requireString(params, "lastChangedDate");
+        result = await getCustomersByDate({ lastChangedDate: lastDate, page: params.page, amountByPage: params.amountByPage || 20 });
+        break;
+      }
+
+      case "customer-get-by-taxid": {
+        const taxId = requireString(params, "taxIdRegistration", { minLength: 11 });
+        result = await getCustomerByTaxId({ taxIdRegistration: taxId, page: params.page, amountByPage: params.amountByPage || 20 });
+        break;
+      }
+
+      case "customer-search": {
+        result = await getCustomerByDescription({ key: params.key, description: params.description, page: params.page, amountByPage: params.amountByPage || 20 });
+        break;
+      }
+
+      case "customer-search-full": {
+        result = await getCustomerFullByDescription({ key: params.key, description: params.description, page: params.page, amountByPage: params.amountByPage || 20 });
+        break;
+      }
+
+      case "address-list": {
+        const taxId = requireString(params, "taxIdRegistration", { minLength: 11 });
+        result = await getAddressesByTaxId(taxId);
+        break;
+      }
+
+      case "address-create": {
+        result = await createAddress({ body: params.body });
+        break;
+      }
+
+      case "address-update": {
+        result = await updateAddress({ body: params.body });
+        break;
+      }
+
+      case "address-delete": {
+        const id = requireNumber(params, "id", { min: 1 });
+        result = await deleteAddress(id);
+        break;
+      }
+
+      case "person-update": {
+        result = await updatePerson({ body: params.body });
+        break;
+      }
+
+      // ===== PICKUP =====
+      case "pickup-get": {
+        const id = requireNumber(params, "id", { min: 1 });
+        result = await getPickupById(id);
+        break;
+      }
+
+      case "pickup-create": {
+        result = await createPickup({ body: params.body });
+        break;
+      }
+
+      case "pickup-create-by-quotation": {
+        result = await createPickupByQuotation({ body: params.body });
+        break;
+      }
+
+      case "pickup-available-dates": {
+        const protocol = requireNumber(params, "protocol", { min: 1 });
+        result = await getAvailablePickupDates(protocol);
+        break;
+      }
+
+      case "pickup-available-dates-by-params": {
+        result = await getAvailablePickupDatesByParams(params);
+        break;
+      }
+
+      case "pickup-get-by-protocol": {
+        const protocol = requireNumber(params, "protocol", { min: 1 });
+        result = await getPickupByProtocol(protocol);
+        break;
+      }
+
+      case "pickup-reschedule": {
+        const protocol = requireNumber(params, "protocol", { min: 1 });
+        const pickupDate = requireString(params, "pickupDate");
+        result = await reschedulePickup(protocol, pickupDate);
+        break;
+      }
+
+      case "pickup-cancel": {
+        const protocol = requireNumber(params, "protocol", { min: 1 });
+        result = await cancelPickup(protocol);
+        break;
+      }
+
+      case "pickup-resend-express": {
+        const id = requireNumber(params, "id", { min: 1 });
+        result = await resendExpressPickup(id);
+        break;
+      }
+
+      case "pickup-reschedule-or-finalize": {
+        result = await pickupRescheduleOrFinalize(params);
+        break;
+      }
+
+      case "pickup-automatic": {
+        result = await generateAutomaticPickup({ body: params.body });
+        break;
+      }
+
+      // ===== SELFATTENDANCE =====
+      case "city-search": {
+        const description = requireString(params, "description");
+        result = await searchCityByDescription(description, params.uf);
+        break;
+      }
+
+      case "city-by-zipcode": {
+        const zipCode = requireString(params, "zipCode");
+        result = await searchCityByZipCode(zipCode);
+        break;
+      }
+
+      case "address-by-zipcode": {
+        const zipCode = requireString(params, "zipCode");
+        result = await getAddressByZipCode(zipCode);
+        break;
+      }
+
+      case "tracking-steps-bot": {
+        result = await trackingStepsBot({
+          taxIdRegistration: params.cnpjRemetente || cnpjDefault,
+          invoiceNumber: params.nfNumero,
+          invoiceKey: params.invoiceKey,
+          protocolNumber: params.protocolNumber,
+        });
+        break;
+      }
+
+      case "tracking-last-steps-bot": {
+        result = await trackingLastStepsBot({
+          taxIdRegistration: params.cnpjRemetente || cnpjDefault,
+          invoiceNumber: params.nfNumero,
+          invoiceKey: params.invoiceKey,
+          protocolNumber: params.protocolNumber,
+        });
+        break;
+      }
+
+      case "unit-data": {
+        result = await getUnitData(params.unitId);
+        break;
+      }
+
+      case "unit-calendar": {
+        const protocol = requireNumber(params, "protocol", { min: 1 });
+        result = await getUnitCalendarByProtocol(protocol);
+        break;
+      }
+
+      case "self-attendance-quotation": {
+        result = await selfAttendanceQuotation({ body: params.body });
+        break;
+      }
+
+      case "self-attendance-delivery-time": {
+        result = await selfAttendanceDeliveryTime({ body: params.body });
+        break;
+      }
+
+      case "validate-customer-quotation": {
+        result = await validateCustomerForQuotation({ taxId: params.taxId, origin: params.origin });
+        break;
+      }
+
+      // ===== SYNC =====
       case "sync-tracking": {
         const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
         const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

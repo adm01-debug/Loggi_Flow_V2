@@ -3,6 +3,10 @@ import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// ==========================================
+// TYPES
+// ==========================================
+
 interface TrackingEvent {
   CodigoOcorrencia: number;
   DescricaoOcorrencia: string;
@@ -92,10 +96,23 @@ async function invokeRodonaves(action: string, params: object) {
   return data;
 }
 
+// Helper to create a standard mutation
+function useRodonavesMutation<TParams>(
+  action: string,
+  successMsg?: string,
+  errorPrefix = 'Erro',
+) {
+  return useMutation({
+    mutationFn: async (params: TParams) => invokeRodonaves(action, params as object),
+    onSuccess: successMsg ? () => toast.success(successMsg) : undefined,
+    onError: (err: Error) => toast.error(`${errorPrefix}: ${err.message}`),
+  });
+}
+
 export function useRodonavesTracking() {
   const [trackingResult, setTrackingResult] = useState<TrackingResult | null>(null);
 
-  // Track a single shipment (GET /api/v1/tracking)
+  // ===== TRACKING =====
   const trackMutation = useMutation({
     mutationFn: async (params: {
       nfNumero?: string;
@@ -110,89 +127,120 @@ export function useRodonavesTracking() {
     onError: (err: Error) => toast.error(`Erro no rastreamento: ${err.message}`),
   });
 
-  // Batch tracking (GET /api/v1/tracking/batch)
-  const trackBatchMutation = useMutation({
-    mutationFn: async (params: {
-      cnpjRemetente: string;
-      startDate: string;
-      endDate: string;
-      page?: number;
-      amountByPage?: number;
-    }) => invokeRodonaves('track-batch', params),
-    onSuccess: () => toast.success('Rastreamento em lote recebido!'),
-    onError: (err: Error) => toast.error(`Erro no lote: ${err.message}`),
-  });
+  const trackBatchMutation = useRodonavesMutation<{
+    cnpjRemetente: string; startDate: string; endDate: string;
+    page?: number; amountByPage?: number;
+  }>('track-batch', 'Rastreamento em lote recebido!', 'Erro no lote');
 
-  // Tracking steps (GET /api/v1/tracking/trackingSteps)
-  const trackingStepsMutation = useMutation({
-    mutationFn: async (params: {
-      nfNumero?: string;
-      cnpjRemetente?: string;
-      invoiceKey?: string;
-      protocolNumber?: string;
-    }) => invokeRodonaves('tracking-steps', params),
-    onError: (err: Error) => toast.error(`Erro: ${err.message}`),
-  });
+  const trackBatchPaginatedMutation = useRodonavesMutation<{
+    cnpjRemetente: string; startDate: string; endDate: string;
+    page?: number; amountByPage?: number; operationType?: number;
+  }>('track-batch-paginated', 'Rastreamento paginado recebido!');
 
-  // Delivery proof (GET /api/v1/deliveryreceipt)
-  const deliveryProofMutation = useMutation({
-    mutationFn: async (params: {
-      nfNumero?: string;
-      cnpjRemetente?: string;
-      invoiceKey?: string;
-      protocolNumber?: string;
-    }) => invokeRodonaves('delivery-proof', params),
-    onSuccess: () => toast.success('Comprovante obtido!'),
-    onError: (err: Error) => toast.error(`Erro: ${err.message}`),
-  });
+  const trackBatchByParamsMutation = useRodonavesMutation<{
+    cnpjRemetente: string; cTeNumber?: number; nfNumero?: string; protocolNumber?: string; page?: number;
+  }>('track-batch-by-params');
 
-  // Delivery info (GET /api/v1/deliveryreceipt/deliveryInformation)
-  const deliveryInfoMutation = useMutation({
-    mutationFn: async (params: {
-      nfNumero?: string;
-      cnpjRemetente?: string;
-      protocolNumber?: string;
-    }) => invokeRodonaves('delivery-info', params),
-    onError: (err: Error) => toast.error(`Erro: ${err.message}`),
-  });
+  const trackingStepsMutation = useRodonavesMutation<{
+    nfNumero?: string; cnpjRemetente?: string; invoiceKey?: string; protocolNumber?: string;
+  }>('tracking-steps');
 
-  // Orders paginated (GET /api/v1/orders/ordersbydaterangepagination)
-  const ordersMutation = useMutation({
-    mutationFn: async (params: {
-      cnpjRemetente: string;
-      startDate: string;
-      endDate: string;
-      customerType?: number;
-      page?: number;
-      amountByPage?: number;
-      invoiceNumber?: string;
-    }) => invokeRodonaves('orders', params),
-    onError: (err: Error) => toast.error(`Erro nos pedidos: ${err.message}`),
-  });
+  const trackBatchByOccurrenceMutation = useRodonavesMutation<{
+    cnpjRemetente: string; startDate: string; endDate: string;
+    page?: number; amountByPage?: number;
+  }>('track-batch-by-occurrence');
 
-  // Quotation (POST /api/v1/simula-cotacao)
-  const quotationMutation = useMutation({
-    mutationFn: async (params: QuotationParams) => invokeRodonaves('quotation', params),
-    onSuccess: () => toast.success('Cotação Rodonaves recebida!'),
-    onError: (err: Error) => toast.error(`Erro na cotação: ${err.message}`),
-  });
+  // ===== DELIVERY RECEIPTS =====
+  const deliveryProofMutation = useRodonavesMutation<{
+    nfNumero?: string; cnpjRemetente?: string; invoiceKey?: string; protocolNumber?: string;
+  }>('delivery-proof', 'Comprovante obtido!');
 
-  // Cubage factor (GET /api/v1/peso-cubado)
-  const cubageMutation = useMutation({
-    mutationFn: async (params: { cnpjRemetente: string; companyId?: string }) =>
-      invokeRodonaves('cubage-factor', params),
-    onError: (err: Error) => toast.error(`Erro: ${err.message}`),
-  });
+  const deliveryProofHQMutation = useRodonavesMutation<{
+    nfNumero?: string; cnpjRemetente?: string; invoiceKey?: string; protocolNumber?: string;
+  }>('delivery-proof-hq', 'Comprovante HD obtido!');
 
-  // Deadline (POST /api/v1/busca-prazo)
-  const deadlineMutation = useMutation({
-    mutationFn: async (params: { cepOrigem: string; cepDestino: string }) =>
-      invokeRodonaves('deadline', params),
-    onSuccess: () => toast.success('Prazo calculado!'),
-    onError: (err: Error) => toast.error(`Erro no prazo: ${err.message}`),
-  });
+  const deliveryInfoMutation = useRodonavesMutation<{
+    nfNumero?: string; cnpjRemetente?: string; protocolNumber?: string;
+  }>('delivery-info');
 
-  // Sync all Rodonaves shipments
+  const deliveryReceiptBatchMutation = useRodonavesMutation<{
+    body: { taxIdRegistration?: string; invoiceNumber?: string[]; invoiceKey?: string[]; protocolNumber?: string[]; cTeNumber?: number[] };
+  }>('delivery-receipt-batch', 'Download em lote iniciado!');
+
+  const deliveryReceiptByProtocolsMutation = useRodonavesMutation<{
+    protocols: string[];
+  }>('delivery-receipt-by-protocols');
+
+  // ===== OCCURRENCE RECEIPTS (NEW) =====
+  const occurrenceReceiptMutation = useRodonavesMutation<{
+    billOfLadingId: number; occurrenceCode: string; loadImageContent?: boolean;
+  }>('occurrence-receipt', 'Comprovante de ocorrência obtido!');
+
+  const occurrenceReceiptListMutation = useRodonavesMutation<{
+    billOfLadingId: number; occurrenceCode: string; loadImageContent?: boolean;
+  }>('occurrence-receipt-list');
+
+  const occurrenceReceiptImageMutation = useRodonavesMutation<{
+    billOfLadingId: number; occurrenceCode: string; removeImageUrlExpire?: boolean;
+  }>('occurrence-receipt-image');
+
+  // ===== ORDERS =====
+  const ordersMutation = useRodonavesMutation<{
+    cnpjRemetente: string; startDate: string; endDate: string;
+    customerType?: number; page?: number; amountByPage?: number; invoiceNumber?: string;
+  }>('orders');
+
+  // ===== QUOTATION =====
+  const quotationMutation = useRodonavesMutation<QuotationParams>('quotation', 'Cotação Rodonaves recebida!', 'Erro na cotação');
+
+  const generateQuotationMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('generate-quotation', 'Cotação gerada no TMS!');
+  const generateFirstQuotationMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('generate-first-quotation', 'Primeira cotação gerada!');
+  const updateQuotationContactMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('update-quotation-contact', 'Contato atualizado!');
+  const digitalCarrierQuotationMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('digital-carrier-quotation', 'Cotação digital gerada!');
+  const updateQuotationInvoiceKeyMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('update-quotation-invoice-key', 'Chave NF-e atualizada!');
+
+  const cubageMutation = useRodonavesMutation<{ cnpjRemetente: string; companyId?: string }>('cubage-factor');
+  const deadlineMutation = useRodonavesMutation<{ cepOrigem: string; cepDestino: string }>('deadline', 'Prazo calculado!', 'Erro no prazo');
+
+  // ===== CUSTOMER (ALL NEW) =====
+  const saveCustomerMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('customer-save', 'Cliente cadastrado na RTE!');
+  const getCustomerByIdMutation = useRodonavesMutation<{ id: number }>('customer-get-by-id');
+  const listCustomersMutation = useRodonavesMutation<{ lastChangedDate: string; page?: number; amountByPage?: number }>('customer-list');
+  const getCustomerByTaxIdMutation = useRodonavesMutation<{ taxIdRegistration: string; page?: number }>('customer-get-by-taxid');
+  const searchCustomerMutation = useRodonavesMutation<{ key?: string; description?: string; page?: number }>('customer-search');
+  const searchCustomerFullMutation = useRodonavesMutation<{ key?: string; description?: string; page?: number }>('customer-search-full');
+  const listAddressesMutation = useRodonavesMutation<{ taxIdRegistration: string }>('address-list');
+  const createAddressMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('address-create', 'Endereço criado!');
+  const updateAddressMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('address-update', 'Endereço atualizado!');
+  const deleteAddressMutation = useRodonavesMutation<{ id: number }>('address-delete', 'Endereço removido!');
+  const updatePersonMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('person-update', 'Pessoa atualizada!');
+
+  // ===== PICKUP (ALL NEW) =====
+  const getPickupMutation = useRodonavesMutation<{ id: number }>('pickup-get');
+  const createPickupMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('pickup-create', 'Coleta criada na RTE!');
+  const createPickupByQuotationMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('pickup-create-by-quotation', 'Coleta criada por cotação!');
+  const availableDatesMutation = useRodonavesMutation<{ protocol: number }>('pickup-available-dates');
+  const availableDatesByParamsMutation = useRodonavesMutation<Record<string, unknown>>('pickup-available-dates-by-params');
+  const getPickupByProtocolMutation = useRodonavesMutation<{ protocol: number }>('pickup-get-by-protocol');
+  const reschedulePickupMutation = useRodonavesMutation<{ protocol: number; pickupDate: string }>('pickup-reschedule', 'Coleta reagendada!');
+  const cancelPickupMutation = useRodonavesMutation<{ protocol: number }>('pickup-cancel', 'Coleta cancelada!');
+  const resendExpressMutation = useRodonavesMutation<{ id: number }>('pickup-resend-express', 'Coleta Express reenviada!');
+  const pickupRescheduleOrFinalizeMutation = useRodonavesMutation<Record<string, unknown>>('pickup-reschedule-or-finalize');
+  const automaticPickupMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('pickup-automatic', 'Coleta automática gerada!');
+
+  // ===== SELFATTENDANCE (ALL NEW) =====
+  const citySearchMutation = useRodonavesMutation<{ description: string; uf?: string }>('city-search');
+  const cityByZipCodeMutation = useRodonavesMutation<{ zipCode: string }>('city-by-zipcode');
+  const addressByZipCodeMutation = useRodonavesMutation<{ zipCode: string }>('address-by-zipcode');
+  const trackingStepsBotMutation = useRodonavesMutation<Record<string, unknown>>('tracking-steps-bot');
+  const trackingLastStepsBotMutation = useRodonavesMutation<Record<string, unknown>>('tracking-last-steps-bot');
+  const unitDataMutation = useRodonavesMutation<{ unitId?: number }>('unit-data');
+  const unitCalendarMutation = useRodonavesMutation<{ protocol: number }>('unit-calendar');
+  const selfAttendanceQuotationMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('self-attendance-quotation');
+  const selfAttendanceDeliveryTimeMutation = useRodonavesMutation<{ body: Record<string, unknown> }>('self-attendance-delivery-time');
+  const validateCustomerQuotationMutation = useRodonavesMutation<{ taxId: string; origin?: string }>('validate-customer-quotation');
+
+  // ===== SYNC =====
   const syncMutation = useMutation({
     mutationFn: async (cnpjRemetente?: string) =>
       invokeRodonaves('sync-tracking', { cnpjRemetente }),
@@ -204,55 +252,154 @@ export function useRodonavesTracking() {
   });
 
   return {
-    // Tracking
+    // ===== TRACKING =====
     track: trackMutation.mutate,
     trackAsync: trackMutation.mutateAsync,
     isTracking: trackMutation.isPending,
     trackingResult,
 
-    // Batch tracking
     trackBatch: trackBatchMutation.mutate,
     trackBatchAsync: trackBatchMutation.mutateAsync,
     isTrackingBatch: trackBatchMutation.isPending,
     batchResult: trackBatchMutation.data,
 
-    // Tracking steps
+    trackBatchPaginated: trackBatchPaginatedMutation.mutate,
+    trackBatchPaginatedResult: trackBatchPaginatedMutation.data,
+
+    trackBatchByParams: trackBatchByParamsMutation.mutate,
+    trackBatchByParamsResult: trackBatchByParamsMutation.data,
+
     getTrackingSteps: trackingStepsMutation.mutate,
     trackingSteps: trackingStepsMutation.data,
     isLoadingSteps: trackingStepsMutation.isPending,
 
-    // Delivery proof
+    trackBatchByOccurrence: trackBatchByOccurrenceMutation.mutate,
+    batchByOccurrenceResult: trackBatchByOccurrenceMutation.data,
+
+    // ===== DELIVERY RECEIPTS =====
     getDeliveryProof: deliveryProofMutation.mutate,
     deliveryProof: deliveryProofMutation.data,
     isLoadingProof: deliveryProofMutation.isPending,
 
-    // Delivery info
+    getDeliveryProofHQ: deliveryProofHQMutation.mutate,
+    deliveryProofHQ: deliveryProofHQMutation.data,
+
     getDeliveryInfo: deliveryInfoMutation.mutate,
     deliveryInfo: deliveryInfoMutation.data,
     isLoadingDeliveryInfo: deliveryInfoMutation.isPending,
 
-    // Orders
+    getDeliveryReceiptBatch: deliveryReceiptBatchMutation.mutate,
+    deliveryReceiptBatchResult: deliveryReceiptBatchMutation.data,
+
+    getDeliveryReceiptByProtocols: deliveryReceiptByProtocolsMutation.mutate,
+
+    // ===== OCCURRENCE RECEIPTS =====
+    getOccurrenceReceipt: occurrenceReceiptMutation.mutate,
+    occurrenceReceipt: occurrenceReceiptMutation.data,
+
+    getOccurrenceReceiptList: occurrenceReceiptListMutation.mutate,
+    occurrenceReceiptList: occurrenceReceiptListMutation.data,
+
+    getOccurrenceReceiptImage: occurrenceReceiptImageMutation.mutate,
+    occurrenceReceiptImage: occurrenceReceiptImageMutation.data,
+
+    // ===== ORDERS =====
     getOrders: ordersMutation.mutate,
     getOrdersAsync: ordersMutation.mutateAsync,
     ordersResult: ordersMutation.data,
     isLoadingOrders: ordersMutation.isPending,
 
-    // Quotation
+    // ===== QUOTATION =====
     getQuotation: quotationMutation.mutate,
     getQuotationAsync: quotationMutation.mutateAsync,
     quotationResult: quotationMutation.data as QuotationResult | undefined,
     isQuoting: quotationMutation.isPending,
 
-    // Cubage factor
+    generateQuotation: generateQuotationMutation.mutate,
+    generateFirstQuotation: generateFirstQuotationMutation.mutate,
+    updateQuotationContact: updateQuotationContactMutation.mutate,
+    digitalCarrierQuotation: digitalCarrierQuotationMutation.mutate,
+    updateQuotationInvoiceKey: updateQuotationInvoiceKeyMutation.mutate,
+
     getCubageFactor: cubageMutation.mutate,
     cubageResult: cubageMutation.data,
 
-    // Deadline
     getDeadline: deadlineMutation.mutate,
     deadlineResult: deadlineMutation.data as DeadlineResult | undefined,
     isLoadingDeadline: deadlineMutation.isPending,
 
-    // Sync
+    // ===== CUSTOMER =====
+    saveCustomer: saveCustomerMutation.mutate,
+    getCustomerById: getCustomerByIdMutation.mutate,
+    listCustomers: listCustomersMutation.mutate,
+    getCustomerByTaxId: getCustomerByTaxIdMutation.mutate,
+    searchCustomer: searchCustomerMutation.mutate,
+    searchCustomerFull: searchCustomerFullMutation.mutate,
+    customerResult: getCustomerByIdMutation.data,
+    customerSearchResult: searchCustomerMutation.data,
+
+    listAddresses: listAddressesMutation.mutate,
+    createAddress: createAddressMutation.mutate,
+    updateAddress: updateAddressMutation.mutate,
+    deleteAddress: deleteAddressMutation.mutate,
+    addressesResult: listAddressesMutation.data,
+
+    updatePerson: updatePersonMutation.mutate,
+
+    // ===== PICKUP =====
+    getPickup: getPickupMutation.mutate,
+    pickupResult: getPickupMutation.data,
+
+    createPickup: createPickupMutation.mutate,
+    isCreatingPickup: createPickupMutation.isPending,
+
+    createPickupByQuotation: createPickupByQuotationMutation.mutate,
+
+    getAvailablePickupDates: availableDatesMutation.mutate,
+    availableDatesResult: availableDatesMutation.data,
+
+    getAvailableDatesByParams: availableDatesByParamsMutation.mutate,
+
+    getPickupByProtocol: getPickupByProtocolMutation.mutate,
+
+    reschedulePickup: reschedulePickupMutation.mutate,
+    isRescheduling: reschedulePickupMutation.isPending,
+
+    cancelPickup: cancelPickupMutation.mutate,
+    isCanceling: cancelPickupMutation.isPending,
+
+    resendExpressPickup: resendExpressMutation.mutate,
+
+    pickupRescheduleOrFinalize: pickupRescheduleOrFinalizeMutation.mutate,
+
+    generateAutomaticPickup: automaticPickupMutation.mutate,
+
+    // ===== SELFATTENDANCE =====
+    searchCity: citySearchMutation.mutate,
+    citySearchResult: citySearchMutation.data,
+
+    getCityByZipCode: cityByZipCodeMutation.mutate,
+    cityByZipCodeResult: cityByZipCodeMutation.data,
+
+    getAddressByZipCode: addressByZipCodeMutation.mutate,
+    addressByZipCodeResult: addressByZipCodeMutation.data,
+
+    getTrackingStepsBot: trackingStepsBotMutation.mutate,
+    trackingStepsBotResult: trackingStepsBotMutation.data,
+
+    getTrackingLastStepsBot: trackingLastStepsBotMutation.mutate,
+
+    getUnitData: unitDataMutation.mutate,
+    unitDataResult: unitDataMutation.data,
+
+    getUnitCalendar: unitCalendarMutation.mutate,
+    unitCalendarResult: unitCalendarMutation.data,
+
+    selfAttendanceQuotation: selfAttendanceQuotationMutation.mutate,
+    selfAttendanceDeliveryTime: selfAttendanceDeliveryTimeMutation.mutate,
+    validateCustomerForQuotation: validateCustomerQuotationMutation.mutate,
+
+    // ===== SYNC =====
     syncAll: syncMutation.mutate,
     isSyncing: syncMutation.isPending,
     syncResult: syncMutation.data,
