@@ -1,0 +1,207 @@
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
+import { Store, Loader2, Plus, MapPin, Phone, Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+export function MELojasPanel() {
+  const { listarLojas, cadastrarLoja, visualizarLoja, cadastrarEnderecoLoja, listarEnderecosLoja, cadastrarTelefonesLoja, listarTelefonesLoja } = useMelhorEnvio();
+  const [showNewStore, setShowNewStore] = useState(false);
+  const [newStore, setNewStore] = useState({ name: '', document: '', email: '', description: '' });
+  const [storeDetail, setStoreDetail] = useState<any>(null);
+  const [storeAddresses, setStoreAddresses] = useState<any[]>([]);
+  const [storePhones, setStorePhones] = useState<any[]>([]);
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [showAddPhone, setShowAddPhone] = useState(false);
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('');
+  const [newAddress, setNewAddress] = useState({ postal_code: '', address: '', number: '', district: '', city: '', state_abbr: '', complement: '' });
+  const [newPhone, setNewPhone] = useState({ phone: '', type: 'mobile' });
+
+  const stores = Array.isArray(listarLojas.data?.data) ? listarLojas.data.data : 
+                 Array.isArray(listarLojas.data) ? listarLojas.data : [];
+
+  const handleCreate = () => {
+    cadastrarLoja.mutate(newStore as Record<string, unknown>, {
+      onSuccess: () => {
+        setShowNewStore(false);
+        setNewStore({ name: '', document: '', email: '', description: '' });
+      },
+    });
+  };
+
+  const viewStore = (id: string) => {
+    setSelectedStoreId(id);
+    visualizarLoja.mutate(id, { onSuccess: (d) => setStoreDetail(d) });
+    listarEnderecosLoja.mutate(id, { onSuccess: (d) => setStoreAddresses(Array.isArray(d?.data) ? d.data : Array.isArray(d) ? d : []) });
+    listarTelefonesLoja.mutate(id, { onSuccess: (d) => setStorePhones(Array.isArray(d?.data) ? d.data : Array.isArray(d) ? d : []) });
+  };
+
+  const handleAddAddress = () => {
+    cadastrarEnderecoLoja.mutate({ company_id: selectedStoreId, address: newAddress }, {
+      onSuccess: () => {
+        setShowAddAddress(false);
+        setNewAddress({ postal_code: '', address: '', number: '', district: '', city: '', state_abbr: '', complement: '' });
+        listarEnderecosLoja.mutate(selectedStoreId, { onSuccess: (d) => setStoreAddresses(Array.isArray(d?.data) ? d.data : []) });
+      },
+    });
+  };
+
+  const handleAddPhone = () => {
+    cadastrarTelefonesLoja.mutate({ company_id: selectedStoreId, phones: newPhone }, {
+      onSuccess: () => {
+        setShowAddPhone(false);
+        setNewPhone({ phone: '', type: 'mobile' });
+        listarTelefonesLoja.mutate(selectedStoreId, { onSuccess: (d) => setStorePhones(Array.isArray(d?.data) ? d.data : []) });
+      },
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Store className="w-5 h-5 text-primary" />
+            Minhas Lojas
+          </CardTitle>
+          <Button size="sm" onClick={() => setShowNewStore(true)}>
+            <Plus className="w-4 h-4 mr-1" /> Nova Loja
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {listarLojas.isLoading ? (
+            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin" /></div>
+          ) : stores.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">Nenhuma loja cadastrada</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Documento</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead className="w-10" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {stores.map((s: any) => (
+                  <TableRow key={s.id}>
+                    <TableCell className="font-medium">{s.name}</TableCell>
+                    <TableCell className="font-mono text-xs">{s.document || s.company_document || '-'}</TableCell>
+                    <TableCell>{s.email || '-'}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" onClick={() => viewStore(s.id)}>
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Nova Loja Dialog */}
+      <Dialog open={showNewStore} onOpenChange={setShowNewStore}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Cadastrar Nova Loja</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Nome</Label><Input value={newStore.name} onChange={(e) => setNewStore({ ...newStore, name: e.target.value })} /></div>
+            <div><Label>CNPJ / CPF</Label><Input value={newStore.document} onChange={(e) => setNewStore({ ...newStore, document: e.target.value })} /></div>
+            <div><Label>Email</Label><Input type="email" value={newStore.email} onChange={(e) => setNewStore({ ...newStore, email: e.target.value })} /></div>
+            <div><Label>Descrição</Label><Input value={newStore.description} onChange={(e) => setNewStore({ ...newStore, description: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleCreate} disabled={cadastrarLoja.isPending || !newStore.name}>
+              {cadastrarLoja.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
+              Cadastrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Detalhe da Loja */}
+      {storeDetail && (
+        <Dialog open={!!storeDetail} onOpenChange={() => setStoreDetail(null)}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
+            <DialogHeader><DialogTitle>Loja: {storeDetail.name}</DialogTitle></DialogHeader>
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div><span className="text-muted-foreground">Documento:</span> {storeDetail.document || '-'}</div>
+                <div><span className="text-muted-foreground">Email:</span> {storeDetail.email || '-'}</div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold flex items-center gap-1"><MapPin className="w-4 h-4" /> Endereços</h4>
+                  <Button size="sm" variant="outline" onClick={() => setShowAddAddress(true)}>
+                    <Plus className="w-3 h-3 mr-1" /> Adicionar
+                  </Button>
+                </div>
+                {storeAddresses.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhum endereço</p>
+                ) : storeAddresses.map((a: any, i: number) => (
+                  <div key={i} className="p-3 bg-muted/50 rounded mb-2 text-sm">
+                    {a.address}, {a.number} - {a.district}, {a.city}/{a.state_abbr} - {a.postal_code}
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold flex items-center gap-1"><Phone className="w-4 h-4" /> Telefones</h4>
+                  <Button size="sm" variant="outline" onClick={() => setShowAddPhone(true)}>
+                    <Plus className="w-3 h-3 mr-1" /> Adicionar
+                  </Button>
+                </div>
+                {storePhones.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhum telefone</p>
+                ) : storePhones.map((p: any, i: number) => (
+                  <Badge key={i} variant="outline" className="mr-2 mb-1">{p.phone || p.number}</Badge>
+                ))}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Add Address Dialog */}
+      <Dialog open={showAddAddress} onOpenChange={setShowAddAddress}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Novo Endereço</DialogTitle></DialogHeader>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>CEP</Label><Input value={newAddress.postal_code} onChange={(e) => setNewAddress({ ...newAddress, postal_code: e.target.value })} /></div>
+            <div><Label>UF</Label><Input value={newAddress.state_abbr} onChange={(e) => setNewAddress({ ...newAddress, state_abbr: e.target.value })} maxLength={2} /></div>
+            <div className="col-span-2"><Label>Endereço</Label><Input value={newAddress.address} onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })} /></div>
+            <div><Label>Número</Label><Input value={newAddress.number} onChange={(e) => setNewAddress({ ...newAddress, number: e.target.value })} /></div>
+            <div><Label>Complemento</Label><Input value={newAddress.complement} onChange={(e) => setNewAddress({ ...newAddress, complement: e.target.value })} /></div>
+            <div><Label>Bairro</Label><Input value={newAddress.district} onChange={(e) => setNewAddress({ ...newAddress, district: e.target.value })} /></div>
+            <div><Label>Cidade</Label><Input value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleAddAddress} disabled={cadastrarEnderecoLoja.isPending}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Phone Dialog */}
+      <Dialog open={showAddPhone} onOpenChange={setShowAddPhone}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Novo Telefone</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Telefone</Label><Input placeholder="11999999999" value={newPhone.phone} onChange={(e) => setNewPhone({ ...newPhone, phone: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleAddPhone} disabled={cadastrarTelefonesLoja.isPending}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
