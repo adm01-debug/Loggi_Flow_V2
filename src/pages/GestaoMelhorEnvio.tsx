@@ -12,7 +12,6 @@ export default function GestaoMelhorEnvio() {
         <PageHeader
           title="Melhor Envio"
           description="Integração completa com a plataforma Melhor Envio — Cotação, Etiquetas, Rastreamento e mais"
-          icon={<Package2 className="w-6 h-6" />}
         />
 
         <div className="flex items-center gap-2 mb-2">
