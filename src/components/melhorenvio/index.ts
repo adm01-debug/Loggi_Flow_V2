@@ -5,3 +5,4 @@ export { MERastreamentoPanel } from './MERastreamentoPanel';
 export { METransportadorasPanel } from './METransportadorasPanel';
 export { MEUsuarioPanel } from './MEUsuarioPanel';
 export { MELojasPanel } from './MELojasPanel';
+export type * from './types';

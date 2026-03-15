@@ -6,11 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { MapPin, Loader2, Search, Package, Plus, Trash2 } from 'lucide-react';
+import type { METrackingInfo, METrackingEvent } from './types';
 
 export function MERastreamentoPanel() {
   const { rastrearEnvios } = useMelhorEnvio();
   const [orderIds, setOrderIds] = useState<string[]>(['']);
-  const [results, setResults] = useState<Record<string, any>>({});
+  const [results, setResults] = useState<Record<string, METrackingInfo>>({});
 
   const addField = () => setOrderIds([...orderIds, '']);
   const removeField = (i: number) => setOrderIds(orderIds.filter((_, idx) => idx !== i));
@@ -24,7 +25,7 @@ export function MERastreamentoPanel() {
     const validIds = orderIds.filter(id => id.trim());
     if (validIds.length === 0) return;
     rastrearEnvios.mutate(validIds, {
-      onSuccess: (data) => setResults(data || {}),
+      onSuccess: (data) => setResults((data || {}) as Record<string, METrackingInfo>),
     });
   };
 
@@ -63,7 +64,7 @@ export function MERastreamentoPanel() {
 
       {Object.keys(results).length > 0 && (
         <div className="space-y-4">
-          {Object.entries(results).map(([orderId, info]: [string, any]) => (
+          {Object.entries(results).map(([orderId, info]) => (
             <Card key={orderId}>
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
@@ -80,7 +81,7 @@ export function MERastreamentoPanel() {
                     </div>
                     {info.melhorenvio_tracking && (
                       <div className="space-y-2">
-                        {(Array.isArray(info.melhorenvio_tracking) ? info.melhorenvio_tracking : []).map((event: any, idx: number) => (
+                        {(Array.isArray(info.melhorenvio_tracking) ? info.melhorenvio_tracking : []).map((event: METrackingEvent, idx: number) => (
                           <div key={idx} className="flex gap-3 items-start">
                             <div className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0" />
                             <div>

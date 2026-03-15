@@ -7,18 +7,23 @@ import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { Tag, Printer, Eye, XCircle, Search, Loader2, RefreshCw, FileText, Info, CheckCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import type { MEOrder } from './types';
 
 export function MEEtiquetasPanel() {
   const { listarEtiquetas, gerarEtiquetas, imprimirEtiquetas, preVisualizarEtiquetas, verificarCancelamento, cancelarEtiquetas, pesquisarEtiqueta, infoEtiqueta, imprimirEtiquetasArquivo } = useMelhorEnvio();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<MEOrder[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [labelDetail, setLabelDetail] = useState<any>(null);
-  const [cancellableInfo, setCancellableInfo] = useState<any>(null);
+  const [labelDetail, setLabelDetail] = useState<Record<string, unknown> | null>(null);
+  const [cancellableInfo, setCancellableInfo] = useState<Record<string, unknown> | null>(null);
 
-  const orders = Array.isArray(listarEtiquetas.data?.data) ? listarEtiquetas.data.data : 
-                 Array.isArray(listarEtiquetas.data) ? listarEtiquetas.data : [];
+  const rawData = listarEtiquetas.data;
+  const orders: MEOrder[] = Array.isArray((rawData as Record<string, unknown>)?.data)
+    ? (rawData as Record<string, unknown>).data as MEOrder[]
+    : Array.isArray(rawData)
+      ? rawData as MEOrder[]
+      : [];
 
   const displayOrders = searchResults.length > 0 ? searchResults : orders;
 
@@ -29,7 +34,10 @@ export function MEEtiquetasPanel() {
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
     pesquisarEtiqueta.mutate({ q: searchQuery }, {
-      onSuccess: (data) => setSearchResults(Array.isArray(data?.data) ? data.data : []),
+      onSuccess: (data) => {
+        const d = data as Record<string, unknown>;
+        setSearchResults(Array.isArray(d?.data) ? d.data as MEOrder[] : []);
+      },
     });
   };
 
@@ -42,7 +50,8 @@ export function MEEtiquetasPanel() {
     if (selectedIds.length === 0) return;
     imprimirEtiquetas.mutate({ orders: selectedIds }, {
       onSuccess: (data) => {
-        if (data?.url) window.open(data.url, '_blank');
+        const d = data as Record<string, unknown>;
+        if (d?.url) window.open(d.url as string, '_blank');
       },
     });
   };
@@ -50,7 +59,8 @@ export function MEEtiquetasPanel() {
   const handlePrintFile = (id: string) => {
     imprimirEtiquetasArquivo.mutate(id, {
       onSuccess: (data) => {
-        if (data?.url) window.open(data.url, '_blank');
+        const d = data as Record<string, unknown>;
+        if (d?.url) window.open(d.url as string, '_blank');
       },
     });
   };
@@ -59,7 +69,8 @@ export function MEEtiquetasPanel() {
     if (selectedIds.length === 0) return;
     preVisualizarEtiquetas.mutate(selectedIds, {
       onSuccess: (data) => {
-        if (data?.url) setPreviewUrl(data.url);
+        const d = data as Record<string, unknown>;
+        if (d?.url) setPreviewUrl(d.url as string);
       },
     });
   };
@@ -67,7 +78,7 @@ export function MEEtiquetasPanel() {
   const handleCheckCancellable = () => {
     if (selectedIds.length === 0) return;
     verificarCancelamento.mutate(selectedIds, {
-      onSuccess: (data) => setCancellableInfo(data),
+      onSuccess: (data) => setCancellableInfo(data as Record<string, unknown>),
     });
   };
 
@@ -79,7 +90,7 @@ export function MEEtiquetasPanel() {
 
   const handleViewDetail = (id: string) => {
     infoEtiqueta.mutate(id, {
-      onSuccess: (data) => setLabelDetail(data),
+      onSuccess: (data) => setLabelDetail(data as Record<string, unknown>),
     });
   };
 
@@ -144,7 +155,7 @@ export function MEEtiquetasPanel() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-10">
-                    <input type="checkbox" checked={selectedIds.length === displayOrders.length && displayOrders.length > 0} onChange={() => setSelectedIds(selectedIds.length === displayOrders.length ? [] : displayOrders.map((o: any) => o.id))} />
+                    <input type="checkbox" checked={selectedIds.length === displayOrders.length && displayOrders.length > 0} onChange={() => setSelectedIds(selectedIds.length === displayOrders.length ? [] : displayOrders.map((o) => o.id))} />
                   </TableHead>
                   <TableHead>ID</TableHead>
                   <TableHead>Serviço</TableHead>
@@ -156,7 +167,7 @@ export function MEEtiquetasPanel() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {displayOrders.map((order: any) => (
+                {displayOrders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell>
                       <input type="checkbox" checked={selectedIds.includes(order.id)} onChange={() => toggleSelect(order.id)} />
@@ -164,7 +175,7 @@ export function MEEtiquetasPanel() {
                     <TableCell className="font-mono text-xs">{order.id?.substring(0, 8)}...</TableCell>
                     <TableCell>{order.service || '-'}</TableCell>
                     <TableCell className="text-xs">{order.to?.postal_code || '-'}</TableCell>
-                    <TableCell><Badge variant={statusColor(order.status)}>{order.status || '-'}</Badge></TableCell>
+                    <TableCell><Badge variant={statusColor(order.status || '')}>{order.status || '-'}</Badge></TableCell>
                     <TableCell className="font-semibold">R$ {order.price || '-'}</TableCell>
                     <TableCell className="font-mono text-xs">{order.tracking || '-'}</TableCell>
                     <TableCell>
@@ -185,17 +196,15 @@ export function MEEtiquetasPanel() {
         </CardContent>
       </Card>
 
-      {/* Preview Dialog */}
       {previewUrl && (
         <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
           <DialogContent className="max-w-4xl max-h-[80vh]">
             <DialogHeader><DialogTitle>Pré-visualização da Etiqueta</DialogTitle></DialogHeader>
-            <iframe src={previewUrl} className="w-full h-[60vh] border rounded" />
+            <iframe src={previewUrl} className="w-full h-[60vh] border rounded" title="Pré-visualização" />
           </DialogContent>
         </Dialog>
       )}
 
-      {/* Label Detail Dialog */}
       {labelDetail && (
         <Dialog open={!!labelDetail} onOpenChange={() => setLabelDetail(null)}>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-auto">
@@ -205,7 +214,6 @@ export function MEEtiquetasPanel() {
         </Dialog>
       )}
 
-      {/* Cancellable Check Dialog */}
       {cancellableInfo && (
         <Dialog open={!!cancellableInfo} onOpenChange={() => setCancellableInfo(null)}>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-auto">

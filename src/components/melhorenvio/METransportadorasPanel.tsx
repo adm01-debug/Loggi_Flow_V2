@@ -10,18 +10,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { MECompany, MEService, MEAgency } from './types';
 
 export function METransportadorasPanel() {
   const { listarTransportadoras, listarServicos, listarAgencias, infoTransportadora, infoServico, infoAgencia } = useMelhorEnvio();
   const [agencyState, setAgencyState] = useState('');
   const [agencyCity, setAgencyCity] = useState('');
   const [agencyCompany, setAgencyCompany] = useState('');
-  const [agencies, setAgencies] = useState<any[]>([]);
-  const [detail, setDetail] = useState<any>(null);
+  const [agencies, setAgencies] = useState<MEAgency[]>([]);
+  const [detail, setDetail] = useState<Record<string, unknown> | null>(null);
   const [detailType, setDetailType] = useState<'transportadora' | 'servico' | 'agencia'>('transportadora');
 
-  const companies = Array.isArray(listarTransportadoras.data) ? listarTransportadoras.data : [];
-  const services = Array.isArray(listarServicos.data) ? listarServicos.data : [];
+  const companies: MECompany[] = Array.isArray(listarTransportadoras.data) ? listarTransportadoras.data as MECompany[] : [];
+  const services: MEService[] = Array.isArray(listarServicos.data) ? listarServicos.data as MEService[] : [];
 
   const handleSearchAgencies = () => {
     const params: Record<string, string> = {};
@@ -29,14 +30,20 @@ export function METransportadorasPanel() {
     if (agencyState) params.state = agencyState;
     if (agencyCity) params.city = agencyCity;
     listarAgencias.mutate(params, {
-      onSuccess: (data) => setAgencies(Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []),
+      onSuccess: (data) => {
+        const d = data as Record<string, unknown>;
+        setAgencies(
+          Array.isArray(d?.data) ? d.data as MEAgency[] :
+          Array.isArray(data) ? data as MEAgency[] : []
+        );
+      },
     });
   };
 
   const showDetail = (id: string, type: 'transportadora' | 'servico' | 'agencia') => {
     setDetailType(type);
     const fn = type === 'transportadora' ? infoTransportadora : type === 'servico' ? infoServico : infoAgencia;
-    fn.mutate(id, { onSuccess: (data) => setDetail(data) });
+    fn.mutate(id, { onSuccess: (data) => setDetail(data as Record<string, unknown>) });
   };
 
   const UF_LIST = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
@@ -66,13 +73,13 @@ export function METransportadorasPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {companies.map((c: any) => (
+                  {companies.map((c) => (
                     <TableRow key={c.id}>
                       <TableCell>{c.id}</TableCell>
                       <TableCell className="font-medium">{c.name}</TableCell>
                       <TableCell>{c.picture ? <img src={c.picture} alt={c.name} className="h-8" /> : '-'}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => showDetail(c.id, 'transportadora')}>
+                        <Button variant="ghost" size="icon" onClick={() => showDetail(String(c.id), 'transportadora')}>
                           <Info className="w-4 h-4" />
                         </Button>
                       </TableCell>
@@ -103,14 +110,14 @@ export function METransportadorasPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {services.map((s: any) => (
+                  {services.map((s) => (
                     <TableRow key={s.id}>
                       <TableCell>{s.id}</TableCell>
                       <TableCell className="font-medium">{s.name}</TableCell>
                       <TableCell>{s.company?.name || '-'}</TableCell>
                       <TableCell><Badge variant="outline">{s.type || '-'}</Badge></TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => showDetail(s.id, 'servico')}>
+                        <Button variant="ghost" size="icon" onClick={() => showDetail(String(s.id), 'servico')}>
                           <Info className="w-4 h-4" />
                         </Button>
                       </TableCell>
@@ -163,14 +170,14 @@ export function METransportadorasPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {agencies.map((a: any) => (
+                  {agencies.map((a) => (
                     <TableRow key={a.id}>
                       <TableCell>{a.id}</TableCell>
                       <TableCell className="font-medium">{a.name}</TableCell>
                       <TableCell className="text-xs">{a.address || '-'}</TableCell>
                       <TableCell>{a.city || '-'}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => showDetail(a.id, 'agencia')}>
+                        <Button variant="ghost" size="icon" onClick={() => showDetail(String(a.id), 'agencia')}>
                           <Info className="w-4 h-4" />
                         </Button>
                       </TableCell>

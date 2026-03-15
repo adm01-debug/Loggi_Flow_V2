@@ -8,22 +8,32 @@ import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { Store, Loader2, Plus, MapPin, Phone, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import type { MEStore, MEAddress } from './types';
+
+interface StorePhone {
+  phone?: string;
+  number?: string;
+}
 
 export function MELojasPanel() {
   const { listarLojas, cadastrarLoja, visualizarLoja, cadastrarEnderecoLoja, listarEnderecosLoja, cadastrarTelefonesLoja, listarTelefonesLoja } = useMelhorEnvio();
   const [showNewStore, setShowNewStore] = useState(false);
   const [newStore, setNewStore] = useState({ name: '', document: '', email: '', description: '' });
-  const [storeDetail, setStoreDetail] = useState<any>(null);
-  const [storeAddresses, setStoreAddresses] = useState<any[]>([]);
-  const [storePhones, setStorePhones] = useState<any[]>([]);
+  const [storeDetail, setStoreDetail] = useState<MEStore | null>(null);
+  const [storeAddresses, setStoreAddresses] = useState<MEAddress[]>([]);
+  const [storePhones, setStorePhones] = useState<StorePhone[]>([]);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [showAddPhone, setShowAddPhone] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<string>('');
   const [newAddress, setNewAddress] = useState({ postal_code: '', address: '', number: '', district: '', city: '', state_abbr: '', complement: '' });
   const [newPhone, setNewPhone] = useState({ phone: '', type: 'mobile' });
 
-  const stores = Array.isArray(listarLojas.data?.data) ? listarLojas.data.data : 
-                 Array.isArray(listarLojas.data) ? listarLojas.data : [];
+  const rawData = listarLojas.data;
+  const stores: MEStore[] = Array.isArray((rawData as Record<string, unknown>)?.data)
+    ? (rawData as Record<string, unknown>).data as MEStore[]
+    : Array.isArray(rawData)
+      ? rawData as MEStore[]
+      : [];
 
   const handleCreate = () => {
     cadastrarLoja.mutate(newStore as Record<string, unknown>, {
@@ -34,11 +44,16 @@ export function MELojasPanel() {
     });
   };
 
+  const parseArrayResponse = <T,>(data: unknown): T[] => {
+    const d = data as Record<string, unknown>;
+    return Array.isArray(d?.data) ? d.data as T[] : Array.isArray(data) ? data as T[] : [];
+  };
+
   const viewStore = (id: string) => {
     setSelectedStoreId(id);
-    visualizarLoja.mutate(id, { onSuccess: (d) => setStoreDetail(d) });
-    listarEnderecosLoja.mutate(id, { onSuccess: (d) => setStoreAddresses(Array.isArray(d?.data) ? d.data : Array.isArray(d) ? d : []) });
-    listarTelefonesLoja.mutate(id, { onSuccess: (d) => setStorePhones(Array.isArray(d?.data) ? d.data : Array.isArray(d) ? d : []) });
+    visualizarLoja.mutate(id, { onSuccess: (d) => setStoreDetail(d as MEStore) });
+    listarEnderecosLoja.mutate(id, { onSuccess: (d) => setStoreAddresses(parseArrayResponse<MEAddress>(d)) });
+    listarTelefonesLoja.mutate(id, { onSuccess: (d) => setStorePhones(parseArrayResponse<StorePhone>(d)) });
   };
 
   const handleAddAddress = () => {
@@ -46,7 +61,7 @@ export function MELojasPanel() {
       onSuccess: () => {
         setShowAddAddress(false);
         setNewAddress({ postal_code: '', address: '', number: '', district: '', city: '', state_abbr: '', complement: '' });
-        listarEnderecosLoja.mutate(selectedStoreId, { onSuccess: (d) => setStoreAddresses(Array.isArray(d?.data) ? d.data : []) });
+        listarEnderecosLoja.mutate(selectedStoreId, { onSuccess: (d) => setStoreAddresses(parseArrayResponse<MEAddress>(d)) });
       },
     });
   };
@@ -56,7 +71,7 @@ export function MELojasPanel() {
       onSuccess: () => {
         setShowAddPhone(false);
         setNewPhone({ phone: '', type: 'mobile' });
-        listarTelefonesLoja.mutate(selectedStoreId, { onSuccess: (d) => setStorePhones(Array.isArray(d?.data) ? d.data : []) });
+        listarTelefonesLoja.mutate(selectedStoreId, { onSuccess: (d) => setStorePhones(parseArrayResponse<StorePhone>(d)) });
       },
     });
   };
@@ -89,7 +104,7 @@ export function MELojasPanel() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {stores.map((s: any) => (
+                {stores.map((s) => (
                   <TableRow key={s.id}>
                     <TableCell className="font-medium">{s.name}</TableCell>
                     <TableCell className="font-mono text-xs">{s.document || s.company_document || '-'}</TableCell>
@@ -107,7 +122,6 @@ export function MELojasPanel() {
         </CardContent>
       </Card>
 
-      {/* Nova Loja Dialog */}
       <Dialog open={showNewStore} onOpenChange={setShowNewStore}>
         <DialogContent>
           <DialogHeader><DialogTitle>Cadastrar Nova Loja</DialogTitle></DialogHeader>
@@ -126,7 +140,6 @@ export function MELojasPanel() {
         </DialogContent>
       </Dialog>
 
-      {/* Detalhe da Loja */}
       {storeDetail && (
         <Dialog open={!!storeDetail} onOpenChange={() => setStoreDetail(null)}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
@@ -146,7 +159,7 @@ export function MELojasPanel() {
                 </div>
                 {storeAddresses.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nenhum endereço</p>
-                ) : storeAddresses.map((a: any, i: number) => (
+                ) : storeAddresses.map((a, i) => (
                   <div key={i} className="p-3 bg-muted/50 rounded mb-2 text-sm">
                     {a.address}, {a.number} - {a.district}, {a.city}/{a.state_abbr} - {a.postal_code}
                   </div>
@@ -162,7 +175,7 @@ export function MELojasPanel() {
                 </div>
                 {storePhones.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nenhum telefone</p>
-                ) : storePhones.map((p: any, i: number) => (
+                ) : storePhones.map((p, i) => (
                   <Badge key={i} variant="outline" className="mr-2 mb-1">{p.phone || p.number}</Badge>
                 ))}
               </div>
@@ -171,7 +184,6 @@ export function MELojasPanel() {
         </Dialog>
       )}
 
-      {/* Add Address Dialog */}
       <Dialog open={showAddAddress} onOpenChange={setShowAddAddress}>
         <DialogContent>
           <DialogHeader><DialogTitle>Novo Endereço</DialogTitle></DialogHeader>
@@ -190,7 +202,6 @@ export function MELojasPanel() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Phone Dialog */}
       <Dialog open={showAddPhone} onOpenChange={setShowAddPhone}>
         <DialogContent>
           <DialogHeader><DialogTitle>Novo Telefone</DialogTitle></DialogHeader>

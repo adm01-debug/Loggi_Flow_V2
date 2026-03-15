@@ -8,14 +8,14 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { MECartItem } from './types';
 
 export function MECarrinhoPanel() {
   const { listarCarrinho, removerItemCarrinho, comprarFretes, inserirLogisticaReversa, exibirItemCarrinho } = useMelhorEnvio();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showReverse, setShowReverse] = useState(false);
-  const [itemDetail, setItemDetail] = useState<any>(null);
+  const [itemDetail, setItemDetail] = useState<Record<string, unknown> | null>(null);
 
-  // Reverse logistics form
   const [reverseForm, setReverseForm] = useState({
     service: '',
     from_name: '',
@@ -39,8 +39,12 @@ export function MECarrinhoPanel() {
     insurance_value: '100',
   });
 
-  const items = Array.isArray(listarCarrinho.data?.data) ? listarCarrinho.data.data : 
-                Array.isArray(listarCarrinho.data) ? listarCarrinho.data : [];
+  const rawData = listarCarrinho.data;
+  const items: MECartItem[] = Array.isArray((rawData as Record<string, unknown>)?.data)
+    ? (rawData as Record<string, unknown>).data as MECartItem[]
+    : Array.isArray(rawData)
+      ? rawData as MECartItem[]
+      : [];
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -50,7 +54,7 @@ export function MECarrinhoPanel() {
     if (selectedIds.length === items.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(items.map((item: any) => item.id));
+      setSelectedIds(items.map((item) => item.id));
     }
   };
 
@@ -61,14 +65,13 @@ export function MECarrinhoPanel() {
 
   const handleViewItem = (id: string) => {
     exibirItemCarrinho.mutate(id, {
-      onSuccess: (data) => setItemDetail(data),
+      onSuccess: (data) => setItemDetail(data as Record<string, unknown>),
     });
   };
 
   const handleReverseSubmit = () => {
     inserirLogisticaReversa.mutate({
       service: parseInt(reverseForm.service),
-      reverse: true,
       from: {
         name: reverseForm.from_name,
         postal_code: reverseForm.from_postal_code,
@@ -145,7 +148,7 @@ export function MECarrinhoPanel() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {items.map((item: any) => (
+                {items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
                       <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => toggleSelect(item.id)} />
@@ -173,7 +176,6 @@ export function MECarrinhoPanel() {
         </CardContent>
       </Card>
 
-      {/* Item Detail Dialog */}
       {itemDetail && (
         <Dialog open={!!itemDetail} onOpenChange={() => setItemDetail(null)}>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-auto">
@@ -183,7 +185,6 @@ export function MECarrinhoPanel() {
         </Dialog>
       )}
 
-      {/* Logística Reversa Dialog */}
       <Dialog open={showReverse} onOpenChange={setShowReverse}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-auto">
           <DialogHeader>
