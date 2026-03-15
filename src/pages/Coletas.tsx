@@ -312,15 +312,3 @@ export default function Coletas() {
     </MainLayout>
   );
 }
-              {sel.data_prevista_coleta && <div><span className="text-muted-foreground">Data Prevista:</span> {new Date(sel.data_prevista_coleta).toLocaleDateString()}</div>}
-              {sel.qtd_volumes && <div><span className="text-muted-foreground">Volumes:</span> {sel.qtd_volumes}</div>}
-              {sel.peso_estimado_kg && <div><span className="text-muted-foreground">Peso:</span> {sel.peso_estimado_kg} kg</div>}
-              {sel.observacoes && <div><span className="text-muted-foreground">Observações:</span> {sel.observacoes}</div>}
-            </div>
-            {history.length > 0 && <div className="border-t pt-4"><p className="text-sm font-medium mb-2">Histórico</p><Timeline events={history} /></div>}
-          </div>}
-        </DialogContent>
-      </Dialog>
-    </MainLayout>
-  );
-}
