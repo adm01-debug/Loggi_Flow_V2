@@ -84,6 +84,7 @@ export { usePushNotifications } from './usePushNotifications';
 export { useNotifications } from './useNotifications';
 export { useNotificationPreferences } from './useNotificationPreferences';
 export { useIntegrationValidation } from './useIntegrationValidation';
+export { useWhatsAppNotification } from './useWhatsAppNotification';
 
 // ============================================
 // Logistics & Business
