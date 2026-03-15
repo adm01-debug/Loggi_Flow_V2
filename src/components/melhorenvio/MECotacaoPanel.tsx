@@ -118,8 +118,18 @@ export function MECotacaoPanel() {
     inserirCarrinho.mutate({
       service: cartDialog.service,
       from: {
-        name: 'Remetente',
+        name: senderForm.name,
+        document: senderForm.document,
+        phone: senderForm.phone,
+        email: senderForm.email,
+        address: senderForm.address,
+        number: senderForm.number,
+        complement: senderForm.complement,
+        district: senderForm.district,
+        city: senderForm.city,
+        state_abbr: senderForm.state_abbr,
         postal_code: cepOrigem.replace(/\D/g, ''),
+        note: senderForm.note,
       },
       to: {
         name: cartForm.name,
