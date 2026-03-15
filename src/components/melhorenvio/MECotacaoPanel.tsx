@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
-import { Calculator, Loader2, Star, Clock, DollarSign, Plus, Trash2 } from 'lucide-react';
+import { Calculator, Loader2, Clock, DollarSign, Plus, Trash2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
 interface Volume {
@@ -174,7 +174,7 @@ export function MECotacaoPanel() {
                     {r.discount && (
                       <div className="col-span-2">
                         <span className="text-muted-foreground">Desconto:</span>
-                        <span className="ml-1 text-green-600">R$ {r.discount}</span>
+                        <span className="ml-1 text-emerald-600 dark:text-emerald-400">R$ {r.discount}</span>
                       </div>
                     )}
                   </div>
