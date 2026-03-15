@@ -27,6 +27,7 @@ import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 import { CSVImporter } from "@/components/common/CSVImporter";
 import { Dialog as ImportDialog, DialogContent as ImportDialogContent, DialogHeader as ImportDialogHeader, DialogTitle as ImportDialogTitle } from "@/components/ui/dialog";
+import { RTECustomerSync } from "@/components/rodonaves/RTECustomerSync";
 
 const clienteCSVSchema = z.object({
   razao_social: z.string().min(1),
