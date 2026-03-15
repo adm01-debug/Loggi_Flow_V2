@@ -160,7 +160,7 @@ export default function CotacaoFrete() {
           <div className="stat-card text-center"><MapPin className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.estados}</p><p className="text-xs text-muted-foreground">Estados</p></div>
         </div>
 
-        <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="cotacao">Cotação</TabsTrigger><TabsTrigger value="rodonaves">Rodonaves RTE</TabsTrigger><TabsTrigger value="tabelas">Tabelas de Frete</TabsTrigger><TabsTrigger value="ia">IA Recomendação</TabsTrigger></TabsList>
+        <Tabs value={tab} onValueChange={setTab}><TabsList className="flex-wrap"><TabsTrigger value="cotacao">Cotação</TabsTrigger><TabsTrigger value="rodonaves">Rodonaves RTE</TabsTrigger><TabsTrigger value="prazo">Prazo & Cubagem</TabsTrigger><TabsTrigger value="tabelas">Tabelas de Frete</TabsTrigger><TabsTrigger value="ia">IA Recomendação</TabsTrigger></TabsList>
 
           <TabsContent value="cotacao" className="space-y-4">
             <div className="card-base p-4">
@@ -208,6 +208,56 @@ export default function CotacaoFrete() {
                 </div>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="prazo" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Prazo de Entrega */}
+              <div className="card-base p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-2"><Clock className="w-5 h-5 text-primary" /><span className="font-semibold">Prazo de Entrega RTE</span></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>CEP Origem</Label><Input value={rteForm.cepOrigem} onChange={(e) => setRteForm({ ...rteForm, cepOrigem: e.target.value })} placeholder="00000-000" /></div>
+                  <div><Label>CEP Destino</Label><Input value={rteForm.cepDestino} onChange={(e) => setRteForm({ ...rteForm, cepDestino: e.target.value })} placeholder="00000-000" /></div>
+                </div>
+                <Button className="w-full" size="sm" onClick={() => {
+                  if (!rteForm.cepOrigem || !rteForm.cepDestino) { toast.error("Preencha os CEPs"); return; }
+                  rodonaves.getDeadline({ cepOrigem: rteForm.cepOrigem.replace(/\D/g, ''), cepDestino: rteForm.cepDestino.replace(/\D/g, '') });
+                }} disabled={rodonaves.isLoadingDeadline}>
+                  {rodonaves.isLoadingDeadline ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Clock className="w-4 h-4 mr-2" />}
+                  Calcular Prazo
+                </Button>
+                {rodonaves.deadlineResult?.data && (
+                  <div className="p-3 rounded-lg bg-muted/30 border text-sm space-y-1">
+                    <div className="text-2xl font-bold text-primary">{rodonaves.deadlineResult.data.Prazo} dias úteis</div>
+                    {rodonaves.deadlineResult.data.DataPrevistaEntrega && (
+                      <div className="text-muted-foreground">Previsão: {new Date(rodonaves.deadlineResult.data.DataPrevistaEntrega).toLocaleDateString('pt-BR')}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Fator de Cubagem */}
+              <div className="card-base p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-2"><Package className="w-5 h-5 text-primary" /><span className="font-semibold">Fator de Cubagem</span></div>
+                <div>
+                  <Label>CNPJ do Cliente</Label>
+                  <Input placeholder="00.000.000/0000-00" id="cubage-cnpj" />
+                </div>
+                <Button className="w-full" size="sm" onClick={() => {
+                  const cnpj = (document.getElementById('cubage-cnpj') as HTMLInputElement)?.value;
+                  if (!cnpj) { toast.error("Informe o CNPJ"); return; }
+                  rodonaves.getCubageFactor({ cnpjRemetente: cnpj.replace(/\D/g, '') });
+                }}>
+                  <Search className="w-4 h-4 mr-2" />Consultar Cubagem
+                </Button>
+                {rodonaves.cubageResult?.data && (
+                  <div className="p-3 rounded-lg bg-muted/30 border text-sm">
+                    <div className="text-xl font-bold text-primary">Fator: {rodonaves.cubageResult.data.CubingFactor || rodonaves.cubageResult.data.cubingFactor || 'N/A'}</div>
+                    <p className="text-muted-foreground mt-1">Use este fator para calcular peso cubado: (C × L × A) ÷ fator</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="tabelas" className="space-y-4">
