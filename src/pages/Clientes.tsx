@@ -200,6 +200,16 @@ export default function Clientes() {
             position="left"
           >
             <div className="flex gap-2">
+              <RTECustomerSync onCustomerFound={(data) => {
+                setForm({
+                  ...emptyForm,
+                  razao_social: (data.Name as string) || '',
+                  nome_fantasia: (data.TradeName as string) || '',
+                  cnpj: (data.TaxIdRegistration as string) || '',
+                  endereco_completo: (data.Address as string) || '',
+                });
+                setDlgCreate(true);
+              }} />
               <Button variant="outline" onClick={() => setDlgImport(true)} className="gap-2"><Upload className="w-4 h-4" />Importar CSV</Button>
               <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
             </div>
