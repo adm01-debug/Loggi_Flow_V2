@@ -229,7 +229,6 @@ Deno.serve(async (req) => {
         );
     }
 
-    
 
     const response = await fetch(url, {
       method,
