@@ -240,7 +240,7 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error(`[ME API] Error ${response.status}:`, JSON.stringify(data));
+      
       return new Response(
         JSON.stringify({ error: data.message || data.error || "API error", details: data }),
         { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
