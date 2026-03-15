@@ -305,7 +305,7 @@ export default function Coletas() {
               </div>
             )}
 
-            {history && history.length > 0 && <Timeline events={history.map(h => ({ date: h.created_at, title: h.action, description: h.changed_fields?.join(', ') || '' }))} />}
+            {history && history.length > 0 && <Timeline events={history} />}
           </div>}
         </DialogContent>
       </Dialog>
