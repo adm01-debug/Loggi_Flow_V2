@@ -297,9 +297,9 @@ export function MECotacaoPanel() {
         </div>
       )}
 
-      {/* Dialog para preencher dados do destinatário antes de inserir no carrinho */}
+      {/* Dialog para preencher dados do remetente e destinatário antes de inserir no carrinho */}
       <Dialog open={!!cartDialog} onOpenChange={() => setCartDialog(null)}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-5" />
@@ -312,23 +312,47 @@ export function MECotacaoPanel() {
               <p><span className="text-muted-foreground">Valor:</span> <span className="font-bold text-primary">R$ {cartDialog.price}</span></p>
             </div>
           )}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2"><Label>Nome Destinatário *</Label><Input value={cartForm.name} onChange={(e) => setCartForm(p => ({ ...p, name: e.target.value }))} /></div>
-            <div><Label>CPF/CNPJ *</Label><Input value={cartForm.document} onChange={(e) => setCartForm(p => ({ ...p, document: e.target.value }))} /></div>
-            <div><Label>Telefone</Label><Input value={cartForm.phone} onChange={(e) => setCartForm(p => ({ ...p, phone: e.target.value }))} /></div>
-            <div className="col-span-2"><Label>Email</Label><Input type="email" value={cartForm.email} onChange={(e) => setCartForm(p => ({ ...p, email: e.target.value }))} /></div>
-            <div><Label>CEP *</Label><Input value={cartForm.postal_code} onChange={(e) => setCartForm(p => ({ ...p, postal_code: e.target.value }))} /></div>
-            <div><Label>UF *</Label><Input value={cartForm.state_abbr} onChange={(e) => setCartForm(p => ({ ...p, state_abbr: e.target.value }))} maxLength={2} /></div>
-            <div className="col-span-2"><Label>Endereço *</Label><Input value={cartForm.address} onChange={(e) => setCartForm(p => ({ ...p, address: e.target.value }))} /></div>
-            <div><Label>Número *</Label><Input value={cartForm.number} onChange={(e) => setCartForm(p => ({ ...p, number: e.target.value }))} /></div>
-            <div><Label>Complemento</Label><Input value={cartForm.complement} onChange={(e) => setCartForm(p => ({ ...p, complement: e.target.value }))} /></div>
-            <div><Label>Bairro *</Label><Input value={cartForm.district} onChange={(e) => setCartForm(p => ({ ...p, district: e.target.value }))} /></div>
-            <div><Label>Cidade *</Label><Input value={cartForm.city} onChange={(e) => setCartForm(p => ({ ...p, city: e.target.value }))} /></div>
-            <div className="col-span-2"><Label>Observações</Label><Input value={cartForm.note} onChange={(e) => setCartForm(p => ({ ...p, note: e.target.value }))} /></div>
+
+          {/* Remetente */}
+          <div className="space-y-2">
+            <p className="font-semibold text-sm border-b pb-1">📦 Remetente (Origem)</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2"><Label>Nome *</Label><Input value={senderForm.name} onChange={(e) => setSenderForm(p => ({ ...p, name: e.target.value }))} /></div>
+              <div><Label>CPF/CNPJ *</Label><Input value={senderForm.document} onChange={(e) => setSenderForm(p => ({ ...p, document: e.target.value }))} /></div>
+              <div><Label>Telefone</Label><Input value={senderForm.phone} onChange={(e) => setSenderForm(p => ({ ...p, phone: e.target.value }))} /></div>
+              <div className="col-span-2"><Label>Email</Label><Input type="email" value={senderForm.email} onChange={(e) => setSenderForm(p => ({ ...p, email: e.target.value }))} /></div>
+              <div><Label>UF *</Label><Input value={senderForm.state_abbr} onChange={(e) => setSenderForm(p => ({ ...p, state_abbr: e.target.value }))} maxLength={2} /></div>
+              <div><Label>CEP</Label><Input value={cepOrigem} disabled className="bg-muted" /></div>
+              <div className="col-span-2"><Label>Endereço *</Label><Input value={senderForm.address} onChange={(e) => setSenderForm(p => ({ ...p, address: e.target.value }))} /></div>
+              <div><Label>Número *</Label><Input value={senderForm.number} onChange={(e) => setSenderForm(p => ({ ...p, number: e.target.value }))} /></div>
+              <div><Label>Complemento</Label><Input value={senderForm.complement} onChange={(e) => setSenderForm(p => ({ ...p, complement: e.target.value }))} /></div>
+              <div><Label>Bairro *</Label><Input value={senderForm.district} onChange={(e) => setSenderForm(p => ({ ...p, district: e.target.value }))} /></div>
+              <div><Label>Cidade *</Label><Input value={senderForm.city} onChange={(e) => setSenderForm(p => ({ ...p, city: e.target.value }))} /></div>
+            </div>
           </div>
+
+          {/* Destinatário */}
+          <div className="space-y-2">
+            <p className="font-semibold text-sm border-b pb-1">📍 Destinatário</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2"><Label>Nome *</Label><Input value={cartForm.name} onChange={(e) => setCartForm(p => ({ ...p, name: e.target.value }))} /></div>
+              <div><Label>CPF/CNPJ *</Label><Input value={cartForm.document} onChange={(e) => setCartForm(p => ({ ...p, document: e.target.value }))} /></div>
+              <div><Label>Telefone</Label><Input value={cartForm.phone} onChange={(e) => setCartForm(p => ({ ...p, phone: e.target.value }))} /></div>
+              <div className="col-span-2"><Label>Email</Label><Input type="email" value={cartForm.email} onChange={(e) => setCartForm(p => ({ ...p, email: e.target.value }))} /></div>
+              <div><Label>CEP *</Label><Input value={cartForm.postal_code} onChange={(e) => setCartForm(p => ({ ...p, postal_code: e.target.value }))} /></div>
+              <div><Label>UF *</Label><Input value={cartForm.state_abbr} onChange={(e) => setCartForm(p => ({ ...p, state_abbr: e.target.value }))} maxLength={2} /></div>
+              <div className="col-span-2"><Label>Endereço *</Label><Input value={cartForm.address} onChange={(e) => setCartForm(p => ({ ...p, address: e.target.value }))} /></div>
+              <div><Label>Número *</Label><Input value={cartForm.number} onChange={(e) => setCartForm(p => ({ ...p, number: e.target.value }))} /></div>
+              <div><Label>Complemento</Label><Input value={cartForm.complement} onChange={(e) => setCartForm(p => ({ ...p, complement: e.target.value }))} /></div>
+              <div><Label>Bairro *</Label><Input value={cartForm.district} onChange={(e) => setCartForm(p => ({ ...p, district: e.target.value }))} /></div>
+              <div><Label>Cidade *</Label><Input value={cartForm.city} onChange={(e) => setCartForm(p => ({ ...p, city: e.target.value }))} /></div>
+              <div className="col-span-2"><Label>Observações</Label><Input value={cartForm.note} onChange={(e) => setCartForm(p => ({ ...p, note: e.target.value }))} /></div>
+            </div>
+          </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setCartDialog(null)}>Cancelar</Button>
-            <Button onClick={handleAddToCart} disabled={inserirCarrinho.isPending || !cartForm.name || !cartForm.postal_code}>
+            <Button onClick={handleAddToCart} disabled={inserirCarrinho.isPending || !cartForm.name || !cartForm.postal_code || !senderForm.name}>
               {inserirCarrinho.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <ShoppingCart className="w-4 h-4 mr-1" />}
               Inserir no Carrinho
             </Button>
