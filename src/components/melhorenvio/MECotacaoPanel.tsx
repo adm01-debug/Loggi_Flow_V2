@@ -8,7 +8,7 @@ import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { Calculator, Loader2, Clock, DollarSign, Plus, Trash2, ShoppingCart } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-
+import type { MEQuotationResult } from './types';
 
 interface Volume {
   width: number;
@@ -35,10 +35,9 @@ export function MECotacaoPanel() {
   const [volumes, setVolumes] = useState<Volume[]>([
     { width: 20, height: 10, length: 30, weight: 1, insurance_value: 100, quantity: 1 },
   ]);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<MEQuotationResult[]>([]);
   const [cartDialog, setCartDialog] = useState<CartDialogData | null>(null);
 
-  // Sender form fields
   const [senderForm, setSenderForm] = useState({
     name: '',
     document: '',
@@ -53,7 +52,6 @@ export function MECotacaoPanel() {
     note: '',
   });
 
-  // Recipient form fields
   const [cartForm, setCartForm] = useState({
     name: '',
     document: '',
@@ -94,16 +92,16 @@ export function MECotacaoPanel() {
       {
         onSuccess: (data) => {
           const arr = Array.isArray(data) ? data : [];
-          setResults(arr.filter((r: any) => !r.error));
+          setResults(arr.filter((r: MEQuotationResult) => !r.error));
         },
       }
     );
   };
 
-  const handleOpenCartDialog = (result: any) => {
+  const handleOpenCartDialog = (result: MEQuotationResult) => {
     setCartDialog({
       service: result.id,
-      company: result.company,
+      company: result.company ?? { id: 0, name: 'N/A' },
       name: result.name,
       price: result.custom_price || result.price,
     });
@@ -248,7 +246,7 @@ export function MECotacaoPanel() {
 
       {results.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {results.map((r: any, i: number) => {
+          {results.map((r, i) => {
             const price = parseFloat(r.custom_price || r.price || '0');
             const isBestPrice = price === bestPrice;
             const isBestDeadline = r.delivery_time === bestDeadline;
@@ -297,7 +295,6 @@ export function MECotacaoPanel() {
         </div>
       )}
 
-      {/* Dialog para preencher dados do remetente e destinatário antes de inserir no carrinho */}
       <Dialog open={!!cartDialog} onOpenChange={() => setCartDialog(null)}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-auto">
           <DialogHeader>
@@ -313,7 +310,6 @@ export function MECotacaoPanel() {
             </div>
           )}
 
-          {/* Remetente */}
           <div className="space-y-2">
             <p className="font-semibold text-sm border-b pb-1">📦 Remetente (Origem)</p>
             <div className="grid grid-cols-2 gap-3">
@@ -331,7 +327,6 @@ export function MECotacaoPanel() {
             </div>
           </div>
 
-          {/* Destinatário */}
           <div className="space-y-2">
             <p className="font-semibold text-sm border-b pb-1">📍 Destinatário</p>
             <div className="grid grid-cols-2 gap-3">

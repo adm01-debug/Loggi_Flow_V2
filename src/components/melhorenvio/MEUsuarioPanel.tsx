@@ -7,16 +7,21 @@ import { Label } from '@/components/ui/label';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { User, Wallet, MapPin, Loader2, PlusCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import type { MEUserInfo, MEBalance, MEAddress } from './types';
 
 export function MEUsuarioPanel() {
   const { infoUsuario, enderecosUsuario, saldoUsuario, inserirSaldo } = useMelhorEnvio();
   const [showAddBalance, setShowAddBalance] = useState(false);
   const [balanceAmount, setBalanceAmount] = useState('');
 
-  const usuario = infoUsuario.data;
-  const enderecos = Array.isArray(enderecosUsuario.data?.data) ? enderecosUsuario.data.data : 
-                    Array.isArray(enderecosUsuario.data) ? enderecosUsuario.data : [];
-  const saldo = saldoUsuario.data;
+  const usuario = infoUsuario.data as MEUserInfo | undefined;
+  const rawEnderecos = enderecosUsuario.data;
+  const enderecos: MEAddress[] = Array.isArray((rawEnderecos as Record<string, unknown>)?.data)
+    ? (rawEnderecos as Record<string, unknown>).data as MEAddress[]
+    : Array.isArray(rawEnderecos)
+      ? rawEnderecos as MEAddress[]
+      : [];
+  const saldo = saldoUsuario.data as MEBalance | undefined;
 
   const isLoading = infoUsuario.isLoading || enderecosUsuario.isLoading || saldoUsuario.isLoading;
 
@@ -37,7 +42,6 @@ export function MEUsuarioPanel() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Info do Usuário */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -71,7 +75,6 @@ export function MEUsuarioPanel() {
         </CardContent>
       </Card>
 
-      {/* Saldo */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
@@ -96,7 +99,6 @@ export function MEUsuarioPanel() {
         </CardContent>
       </Card>
 
-      {/* Endereços */}
       <Card className="md:col-span-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -109,7 +111,7 @@ export function MEUsuarioPanel() {
             <p className="text-muted-foreground text-center py-4">Nenhum endereço cadastrado</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {enderecos.map((end: any, i: number) => (
+              {enderecos.map((end, i) => (
                 <div key={i} className="p-4 rounded-lg bg-muted/50 space-y-1">
                   <p className="font-medium">{end.label || `Endereço ${i + 1}`}</p>
                   <p className="text-sm">{end.address}, {end.number}</p>
@@ -123,7 +125,6 @@ export function MEUsuarioPanel() {
         </CardContent>
       </Card>
 
-      {/* Dialog Adicionar Crédito */}
       <Dialog open={showAddBalance} onOpenChange={setShowAddBalance}>
         <DialogContent>
           <DialogHeader>
