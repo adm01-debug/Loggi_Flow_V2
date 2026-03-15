@@ -19,15 +19,19 @@ export function RTECepAutoFill({ onAddressFound, label = 'CEP' }: RTECepAutoFill
     if (cleanCep.length !== 8) return;
     setLoading(true);
     try {
-      const result = await rte.addressByZipCodeAsync?.({ zipCode: cleanCep });
-      if (result?.data) {
+      // Use ViaCEP as primary (no async variant on RTE mutation)
+      const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+      const data = await res.json();
+      if (!data.erro) {
         onAddressFound({
-          rua: result.data.Street || result.data.street,
-          bairro: result.data.District || result.data.district,
-          cidade: result.data.City || result.data.city,
-          uf: result.data.State || result.data.state,
+          rua: data.logradouro,
+          bairro: data.bairro,
+          cidade: data.localidade,
+          uf: data.uf,
           cep: cleanCep,
         });
+        // Also trigger RTE lookup in background for enrichment
+        rte.getAddressByZipCode({ zipCode: cleanCep });
       }
     } catch {
       // Fallback to ViaCEP
