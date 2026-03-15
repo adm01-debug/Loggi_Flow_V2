@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
-import { Calculator, Loader2, Star, Clock, DollarSign, Plus, Trash2 } from 'lucide-react';
+import { Calculator, Loader2, Clock, DollarSign, Plus, Trash2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
 interface Volume {
