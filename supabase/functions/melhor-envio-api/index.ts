@@ -229,7 +229,7 @@ Deno.serve(async (req) => {
         );
     }
 
-    console.log(`[ME API] ${method} ${url}`);
+    
 
     const response = await fetch(url, {
       method,
