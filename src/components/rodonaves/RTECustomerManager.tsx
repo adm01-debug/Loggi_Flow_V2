@@ -16,6 +16,7 @@ export function RTECustomerManager() {
   // Search
   const [searchKey, setSearchKey] = useState('');
   const [searchTaxId, setSearchTaxId] = useState('');
+  const [searchById, setSearchById] = useState('');
 
   // New customer
   const [showNewCustomer, setShowNewCustomer] = useState(false);
@@ -105,9 +106,13 @@ export function RTECustomerManager() {
             <div><Label>Nome/Razão Social</Label><Input value={searchKey} onChange={e => setSearchKey(e.target.value)} placeholder="Buscar por nome..." /></div>
             <div><Label>CNPJ/CPF</Label><Input value={searchTaxId} onChange={e => setSearchTaxId(e.target.value)} placeholder="00.000.000/0000-00" /></div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button onClick={handleSearch}><Search className="w-4 h-4 mr-2" />Buscar</Button>
             <Button variant="outline" onClick={handleSearchFull}><Users className="w-4 h-4 mr-2" />Busca Completa</Button>
+          </div>
+          <div className="flex gap-2 items-end border-t pt-3">
+            <div className="w-40"><Label>ID do Cliente</Label><Input value={searchById} onChange={e => setSearchById(e.target.value)} type="number" placeholder="Ex: 12345" /></div>
+            <Button variant="outline" size="sm" onClick={() => { if (searchById) rte.getCustomerById({ id: parseInt(searchById) }); }}><Search className="w-3 h-3 mr-1" />Buscar por ID</Button>
           </div>
           {customers.length > 0 && (
             <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -148,6 +153,7 @@ export function RTECustomerManager() {
                     <p className="text-xs text-muted-foreground">{String(addr.City || addr.city || '')} / {String(addr.State || addr.state || '')} - {String(addr.ZipCode || addr.zipCode || '')}</p>
                   </div>
                   <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => rte.updateAddress({ body: { Id: Number(addr.Id || addr.id), Street: String(addr.Street || addr.street || ''), Number: String(addr.Number || addr.number || ''), City: String(addr.City || addr.city || ''), State: String(addr.State || addr.state || ''), ZipCode: String(addr.ZipCode || addr.zipCode || '') } })}><Edit className="w-3 h-3" /></Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => rte.deleteAddress({ id: Number(addr.Id || addr.id) })}><Trash2 className="w-3 h-3" /></Button>
                   </div>
                 </div>
