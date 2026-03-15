@@ -106,9 +106,13 @@ export function RTECustomerManager() {
             <div><Label>Nome/Razão Social</Label><Input value={searchKey} onChange={e => setSearchKey(e.target.value)} placeholder="Buscar por nome..." /></div>
             <div><Label>CNPJ/CPF</Label><Input value={searchTaxId} onChange={e => setSearchTaxId(e.target.value)} placeholder="00.000.000/0000-00" /></div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button onClick={handleSearch}><Search className="w-4 h-4 mr-2" />Buscar</Button>
             <Button variant="outline" onClick={handleSearchFull}><Users className="w-4 h-4 mr-2" />Busca Completa</Button>
+          </div>
+          <div className="flex gap-2 items-end border-t pt-3">
+            <div className="w-40"><Label>ID do Cliente</Label><Input value={searchById} onChange={e => setSearchById(e.target.value)} type="number" placeholder="Ex: 12345" /></div>
+            <Button variant="outline" size="sm" onClick={() => { if (searchById) rte.getCustomerById({ id: parseInt(searchById) }); }}><Search className="w-3 h-3 mr-1" />Buscar por ID</Button>
           </div>
           {customers.length > 0 && (
             <div className="space-y-2 max-h-64 overflow-y-auto">
