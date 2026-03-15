@@ -1,10 +1,17 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
-import { User, Wallet, MapPin, Loader2 } from 'lucide-react';
+import { User, Wallet, MapPin, Loader2, PlusCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 export function MEUsuarioPanel() {
-  const { infoUsuario, enderecosUsuario, saldoUsuario } = useMelhorEnvio();
+  const { infoUsuario, enderecosUsuario, saldoUsuario, inserirSaldo } = useMelhorEnvio();
+  const [showAddBalance, setShowAddBalance] = useState(false);
+  const [balanceAmount, setBalanceAmount] = useState('');
 
   const usuario = infoUsuario.data;
   const enderecos = Array.isArray(enderecosUsuario.data?.data) ? enderecosUsuario.data.data : 
@@ -12,6 +19,17 @@ export function MEUsuarioPanel() {
   const saldo = saldoUsuario.data;
 
   const isLoading = infoUsuario.isLoading || enderecosUsuario.isLoading || saldoUsuario.isLoading;
+
+  const handleInsertBalance = () => {
+    const value = parseFloat(balanceAmount);
+    if (isNaN(value) || value <= 0) return;
+    inserirSaldo.mutate({ value } as Record<string, unknown>, {
+      onSuccess: () => {
+        setShowAddBalance(false);
+        setBalanceAmount('');
+      },
+    });
+  };
 
   if (isLoading) {
     return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin" /></div>;
@@ -55,11 +73,14 @@ export function MEUsuarioPanel() {
 
       {/* Saldo */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Wallet className="w-5 h-5 text-primary" />
             Saldo na Carteira
           </CardTitle>
+          <Button size="sm" variant="outline" onClick={() => setShowAddBalance(true)}>
+            <PlusCircle className="w-4 h-4 mr-1" /> Adicionar Crédito
+          </Button>
         </CardHeader>
         <CardContent>
           {saldo ? (
@@ -101,6 +122,43 @@ export function MEUsuarioPanel() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog Adicionar Crédito */}
+      <Dialog open={showAddBalance} onOpenChange={setShowAddBalance}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wallet className="w-5 h-5" /> Adicionar Crédito à Carteira
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Valor (R$)</Label>
+              <Input
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="50.00"
+                value={balanceAmount}
+                onChange={(e) => setBalanceAmount(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                O valor será adicionado à sua carteira Melhor Envio via gateway de pagamento.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddBalance(false)}>Cancelar</Button>
+            <Button
+              onClick={handleInsertBalance}
+              disabled={inserirSaldo.isPending || !balanceAmount || parseFloat(balanceAmount) <= 0}
+            >
+              {inserirSaldo.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <PlusCircle className="w-4 h-4 mr-1" />}
+              Adicionar R$ {balanceAmount || '0,00'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

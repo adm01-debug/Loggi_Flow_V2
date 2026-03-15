@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
-import { Calculator, Loader2, Clock, DollarSign, Plus, Trash2 } from 'lucide-react';
+import { Calculator, Loader2, Clock, DollarSign, Plus, Trash2, ShoppingCart } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Volume {
   width: number;
@@ -17,8 +19,15 @@ interface Volume {
   quantity: number;
 }
 
+interface CartDialogData {
+  service: number;
+  company: { id: number; name: string };
+  name: string;
+  price: string;
+}
+
 export function MECotacaoPanel() {
-  const { calcularFrete } = useMelhorEnvio();
+  const { calcularFrete, inserirCarrinho } = useMelhorEnvio();
   const [cepOrigem, setCepOrigem] = useState('');
   const [cepDestino, setCepDestino] = useState('');
   const [receipt, setReceipt] = useState(false);
@@ -27,6 +36,23 @@ export function MECotacaoPanel() {
     { width: 20, height: 10, length: 30, weight: 1, insurance_value: 100, quantity: 1 },
   ]);
   const [results, setResults] = useState<any[]>([]);
+  const [cartDialog, setCartDialog] = useState<CartDialogData | null>(null);
+
+  // Cart form fields
+  const [cartForm, setCartForm] = useState({
+    name: '',
+    document: '',
+    phone: '',
+    email: '',
+    address: '',
+    number: '',
+    complement: '',
+    district: '',
+    city: '',
+    state_abbr: '',
+    postal_code: '',
+    note: '',
+  });
 
   const addVolume = () => {
     setVolumes([...volumes, { width: 20, height: 10, length: 30, weight: 1, insurance_value: 100, quantity: 1 }]);
@@ -57,6 +83,59 @@ export function MECotacaoPanel() {
         },
       }
     );
+  };
+
+  const handleOpenCartDialog = (result: any) => {
+    setCartDialog({
+      service: result.id,
+      company: result.company,
+      name: result.name,
+      price: result.custom_price || result.price,
+    });
+    setCartForm(prev => ({
+      ...prev,
+      postal_code: cepDestino.replace(/\D/g, ''),
+    }));
+  };
+
+  const handleAddToCart = () => {
+    if (!cartDialog) return;
+    inserirCarrinho.mutate({
+      service: cartDialog.service,
+      from: {
+        name: 'Remetente',
+        postal_code: cepOrigem.replace(/\D/g, ''),
+      },
+      to: {
+        name: cartForm.name,
+        document: cartForm.document,
+        phone: cartForm.phone,
+        email: cartForm.email,
+        address: cartForm.address,
+        number: cartForm.number,
+        complement: cartForm.complement,
+        district: cartForm.district,
+        city: cartForm.city,
+        state_abbr: cartForm.state_abbr,
+        postal_code: cartForm.postal_code,
+        note: cartForm.note,
+      },
+      products: volumes.map(v => ({
+        width: v.width,
+        height: v.height,
+        length: v.length,
+        weight: v.weight,
+        insurance_value: v.insurance_value,
+        quantity: v.quantity,
+      })),
+      options: {
+        receipt,
+        own_hand: ownHand,
+        insurance_value: volumes.reduce((sum, v) => sum + v.insurance_value * v.quantity, 0),
+      },
+    }, {
+      onSuccess: () => setCartDialog(null),
+    });
   };
 
   const bestPrice = results.length > 0 ? Math.min(...results.map((r) => parseFloat(r.custom_price || r.price || '999999'))) : null;
@@ -174,16 +253,63 @@ export function MECotacaoPanel() {
                     {r.discount && (
                       <div className="col-span-2">
                         <span className="text-muted-foreground">Desconto:</span>
-                        <span className="ml-1 text-emerald-600 dark:text-emerald-400">R$ {r.discount}</span>
+                        <span className="ml-1 text-accent-foreground">R$ {r.discount}</span>
                       </div>
                     )}
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => handleOpenCartDialog(r)}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-1" /> Adicionar ao Carrinho
+                  </Button>
                 </CardContent>
               </Card>
             );
           })}
         </div>
       )}
+
+      {/* Dialog para preencher dados do destinatário antes de inserir no carrinho */}
+      <Dialog open={!!cartDialog} onOpenChange={() => setCartDialog(null)}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5" />
+              Adicionar ao Carrinho
+            </DialogTitle>
+          </DialogHeader>
+          {cartDialog && (
+            <div className="space-y-1 text-sm mb-2">
+              <p><span className="text-muted-foreground">Serviço:</span> {cartDialog.company?.name} — {cartDialog.name}</p>
+              <p><span className="text-muted-foreground">Valor:</span> <span className="font-bold text-primary">R$ {cartDialog.price}</span></p>
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2"><Label>Nome Destinatário *</Label><Input value={cartForm.name} onChange={(e) => setCartForm(p => ({ ...p, name: e.target.value }))} /></div>
+            <div><Label>CPF/CNPJ *</Label><Input value={cartForm.document} onChange={(e) => setCartForm(p => ({ ...p, document: e.target.value }))} /></div>
+            <div><Label>Telefone</Label><Input value={cartForm.phone} onChange={(e) => setCartForm(p => ({ ...p, phone: e.target.value }))} /></div>
+            <div className="col-span-2"><Label>Email</Label><Input type="email" value={cartForm.email} onChange={(e) => setCartForm(p => ({ ...p, email: e.target.value }))} /></div>
+            <div><Label>CEP *</Label><Input value={cartForm.postal_code} onChange={(e) => setCartForm(p => ({ ...p, postal_code: e.target.value }))} /></div>
+            <div><Label>UF *</Label><Input value={cartForm.state_abbr} onChange={(e) => setCartForm(p => ({ ...p, state_abbr: e.target.value }))} maxLength={2} /></div>
+            <div className="col-span-2"><Label>Endereço *</Label><Input value={cartForm.address} onChange={(e) => setCartForm(p => ({ ...p, address: e.target.value }))} /></div>
+            <div><Label>Número *</Label><Input value={cartForm.number} onChange={(e) => setCartForm(p => ({ ...p, number: e.target.value }))} /></div>
+            <div><Label>Complemento</Label><Input value={cartForm.complement} onChange={(e) => setCartForm(p => ({ ...p, complement: e.target.value }))} /></div>
+            <div><Label>Bairro *</Label><Input value={cartForm.district} onChange={(e) => setCartForm(p => ({ ...p, district: e.target.value }))} /></div>
+            <div><Label>Cidade *</Label><Input value={cartForm.city} onChange={(e) => setCartForm(p => ({ ...p, city: e.target.value }))} /></div>
+            <div className="col-span-2"><Label>Observações</Label><Input value={cartForm.note} onChange={(e) => setCartForm(p => ({ ...p, note: e.target.value }))} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCartDialog(null)}>Cancelar</Button>
+            <Button onClick={handleAddToCart} disabled={inserirCarrinho.isPending || !cartForm.name || !cartForm.postal_code}>
+              {inserirCarrinho.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <ShoppingCart className="w-4 h-4 mr-1" />}
+              Inserir no Carrinho
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
