@@ -16,6 +16,7 @@ export function RTECustomerManager() {
   // Search
   const [searchKey, setSearchKey] = useState('');
   const [searchTaxId, setSearchTaxId] = useState('');
+  const [searchById, setSearchById] = useState('');
 
   // New customer
   const [showNewCustomer, setShowNewCustomer] = useState(false);
