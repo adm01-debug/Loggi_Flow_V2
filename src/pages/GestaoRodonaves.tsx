@@ -33,7 +33,7 @@ export default function GestaoRodonaves() {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">API v1.27.3</Badge>
-            <Button variant="outline" onClick={() => rte.syncAll()} disabled={rte.isSyncing}>
+            <Button variant="outline" onClick={() => rte.syncAll(undefined)} disabled={rte.isSyncing}>
               {rte.isSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
               Sincronizar Tudo
             </Button>
