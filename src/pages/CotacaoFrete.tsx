@@ -160,7 +160,7 @@ export default function CotacaoFrete() {
           <div className="stat-card text-center"><MapPin className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.estados}</p><p className="text-xs text-muted-foreground">Estados</p></div>
         </div>
 
-        <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="cotacao">Cotação</TabsTrigger><TabsTrigger value="rodonaves">Rodonaves RTE</TabsTrigger><TabsTrigger value="tabelas">Tabelas de Frete</TabsTrigger><TabsTrigger value="ia">IA Recomendação</TabsTrigger></TabsList>
+        <Tabs value={tab} onValueChange={setTab}><TabsList className="flex-wrap"><TabsTrigger value="cotacao">Cotação</TabsTrigger><TabsTrigger value="rodonaves">Rodonaves RTE</TabsTrigger><TabsTrigger value="prazo">Prazo & Cubagem</TabsTrigger><TabsTrigger value="tabelas">Tabelas de Frete</TabsTrigger><TabsTrigger value="ia">IA Recomendação</TabsTrigger></TabsList>
 
           <TabsContent value="cotacao" className="space-y-4">
             <div className="card-base p-4">
