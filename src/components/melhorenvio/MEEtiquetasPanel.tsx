@@ -4,16 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
-import { Tag, Printer, Eye, XCircle, Search, Loader2, RefreshCw, FileText } from 'lucide-react';
+import { Tag, Printer, Eye, XCircle, Search, Loader2, RefreshCw, FileText, Info, CheckCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export function MEEtiquetasPanel() {
-  const { listarEtiquetas, gerarEtiquetas, imprimirEtiquetas, preVisualizarEtiquetas, verificarCancelamento, cancelarEtiquetas, pesquisarEtiqueta } = useMelhorEnvio();
+  const { listarEtiquetas, gerarEtiquetas, imprimirEtiquetas, preVisualizarEtiquetas, verificarCancelamento, cancelarEtiquetas, pesquisarEtiqueta, infoEtiqueta, imprimirEtiquetasArquivo } = useMelhorEnvio();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [labelDetail, setLabelDetail] = useState<any>(null);
+  const [cancellableInfo, setCancellableInfo] = useState<any>(null);
 
   const orders = Array.isArray(listarEtiquetas.data?.data) ? listarEtiquetas.data.data : 
                  Array.isArray(listarEtiquetas.data) ? listarEtiquetas.data : [];
@@ -45,6 +47,14 @@ export function MEEtiquetasPanel() {
     });
   };
 
+  const handlePrintFile = (id: string) => {
+    imprimirEtiquetasArquivo.mutate(id, {
+      onSuccess: (data) => {
+        if (data?.url) window.open(data.url, '_blank');
+      },
+    });
+  };
+
   const handlePreview = () => {
     if (selectedIds.length === 0) return;
     preVisualizarEtiquetas.mutate(selectedIds, {
@@ -54,12 +64,26 @@ export function MEEtiquetasPanel() {
     });
   };
 
+  const handleCheckCancellable = () => {
+    if (selectedIds.length === 0) return;
+    verificarCancelamento.mutate(selectedIds, {
+      onSuccess: (data) => setCancellableInfo(data),
+    });
+  };
+
   const handleCancel = () => {
     if (selectedIds.length === 0) return;
     cancelarEtiquetas.mutate({ orders: selectedIds });
+    setCancellableInfo(null);
   };
 
-  const statusColor = (status: string) => {
+  const handleViewDetail = (id: string) => {
+    infoEtiqueta.mutate(id, {
+      onSuccess: (data) => setLabelDetail(data),
+    });
+  };
+
+  const statusColor = (status: string): "default" | "secondary" | "outline" | "destructive" => {
     switch (status) {
       case 'released': return 'default';
       case 'posted': return 'secondary';
@@ -102,6 +126,9 @@ export function MEEtiquetasPanel() {
               <Button size="sm" variant="outline" onClick={handlePreview}>
                 <Eye className="w-4 h-4 mr-1" /> Pré-visualizar
               </Button>
+              <Button size="sm" variant="outline" onClick={handleCheckCancellable} disabled={verificarCancelamento.isPending}>
+                <CheckCircle className="w-4 h-4 mr-1" /> Verificar Cancelamento
+              </Button>
               <Button size="sm" variant="destructive" onClick={handleCancel} disabled={cancelarEtiquetas.isPending}>
                 <XCircle className="w-4 h-4 mr-1" /> Cancelar
               </Button>
@@ -125,6 +152,7 @@ export function MEEtiquetasPanel() {
                   <TableHead>Status</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead>Rastreio</TableHead>
+                  <TableHead className="w-20" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -139,6 +167,16 @@ export function MEEtiquetasPanel() {
                     <TableCell><Badge variant={statusColor(order.status)}>{order.status || '-'}</Badge></TableCell>
                     <TableCell className="font-semibold">R$ {order.price || '-'}</TableCell>
                     <TableCell className="font-mono text-xs">{order.tracking || '-'}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleViewDetail(order.id)} disabled={infoEtiqueta.isPending}>
+                          <Info className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handlePrintFile(order.id)} disabled={imprimirEtiquetasArquivo.isPending}>
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -147,11 +185,38 @@ export function MEEtiquetasPanel() {
         </CardContent>
       </Card>
 
+      {/* Preview Dialog */}
       {previewUrl && (
         <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
           <DialogContent className="max-w-4xl max-h-[80vh]">
             <DialogHeader><DialogTitle>Pré-visualização da Etiqueta</DialogTitle></DialogHeader>
             <iframe src={previewUrl} className="w-full h-[60vh] border rounded" />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Label Detail Dialog */}
+      {labelDetail && (
+        <Dialog open={!!labelDetail} onOpenChange={() => setLabelDetail(null)}>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-auto">
+            <DialogHeader><DialogTitle>Detalhes da Etiqueta</DialogTitle></DialogHeader>
+            <pre className="bg-muted p-3 rounded text-xs overflow-auto">{JSON.stringify(labelDetail, null, 2)}</pre>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Cancellable Check Dialog */}
+      {cancellableInfo && (
+        <Dialog open={!!cancellableInfo} onOpenChange={() => setCancellableInfo(null)}>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-auto">
+            <DialogHeader><DialogTitle>Verificação de Cancelamento</DialogTitle></DialogHeader>
+            <pre className="bg-muted p-3 rounded text-xs overflow-auto">{JSON.stringify(cancellableInfo, null, 2)}</pre>
+            <div className="flex justify-end gap-2 mt-2">
+              <Button variant="outline" onClick={() => setCancellableInfo(null)}>Fechar</Button>
+              <Button variant="destructive" onClick={handleCancel} disabled={cancelarEtiquetas.isPending}>
+                <XCircle className="w-4 h-4 mr-1" /> Confirmar Cancelamento
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       )}
