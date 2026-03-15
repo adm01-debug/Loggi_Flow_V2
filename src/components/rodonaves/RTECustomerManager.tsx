@@ -153,6 +153,7 @@ export function RTECustomerManager() {
                     <p className="text-xs text-muted-foreground">{String(addr.City || addr.city || '')} / {String(addr.State || addr.state || '')} - {String(addr.ZipCode || addr.zipCode || '')}</p>
                   </div>
                   <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => rte.updateAddress({ body: { Id: Number(addr.Id || addr.id), Street: String(addr.Street || addr.street || ''), Number: String(addr.Number || addr.number || ''), City: String(addr.City || addr.city || ''), State: String(addr.State || addr.state || ''), ZipCode: String(addr.ZipCode || addr.zipCode || '') } })}><Edit className="w-3 h-3" /></Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => rte.deleteAddress({ id: Number(addr.Id || addr.id) })}><Trash2 className="w-3 h-3" /></Button>
                   </div>
                 </div>
