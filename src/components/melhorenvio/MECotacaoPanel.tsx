@@ -38,7 +38,22 @@ export function MECotacaoPanel() {
   const [results, setResults] = useState<any[]>([]);
   const [cartDialog, setCartDialog] = useState<CartDialogData | null>(null);
 
-  // Cart form fields
+  // Sender form fields
+  const [senderForm, setSenderForm] = useState({
+    name: '',
+    document: '',
+    phone: '',
+    email: '',
+    address: '',
+    number: '',
+    complement: '',
+    district: '',
+    city: '',
+    state_abbr: '',
+    note: '',
+  });
+
+  // Recipient form fields
   const [cartForm, setCartForm] = useState({
     name: '',
     document: '',
