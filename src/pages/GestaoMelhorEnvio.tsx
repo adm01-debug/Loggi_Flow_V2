@@ -3,15 +3,14 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MECotacaoPanel, MECarrinhoPanel, MEEtiquetasPanel, MERastreamentoPanel, METransportadorasPanel, MEUsuarioPanel, MELojasPanel } from '@/components/melhorenvio';
-import { Calculator, ShoppingCart, Tag, MapPin, Truck, User, Store, Package2 } from 'lucide-react';
+import { MEWebhookPanel } from '@/components/melhorenvio/MEWebhookPanel';
+import { Calculator, ShoppingCart, Tag, MapPin, Truck, User, Store, Package2, Webhook } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { useState, useCallback } from 'react';
-
-
 
 export default function GestaoMelhorEnvio() {
   const [useSandbox, setUseSandbox] = useLocalStorage('me-sandbox-mode', true);
@@ -25,6 +24,7 @@ export default function GestaoMelhorEnvio() {
   useKeyboardShortcut('5', useCallback(() => setActiveTab('transportadoras'), []), { alt: true });
   useKeyboardShortcut('6', useCallback(() => setActiveTab('usuario'), []), { alt: true });
   useKeyboardShortcut('7', useCallback(() => setActiveTab('lojas'), []), { alt: true });
+  useKeyboardShortcut('8', useCallback(() => setActiveTab('webhooks'), []), { alt: true });
 
   return (
     <MainLayout>
@@ -55,7 +55,7 @@ export default function GestaoMelhorEnvio() {
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground">💡 Dica: Use Alt+1 a Alt+7 para alternar abas rapidamente</p>
+        <p className="text-xs text-muted-foreground">💡 Dica: Use Alt+1 a Alt+8 para alternar abas rapidamente</p>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="flex-wrap h-auto gap-1">
@@ -66,6 +66,7 @@ export default function GestaoMelhorEnvio() {
             <TabsTrigger value="transportadoras"><Truck className="w-4 h-4 mr-1" />Transportadoras</TabsTrigger>
             <TabsTrigger value="usuario"><User className="w-4 h-4 mr-1" />Minha Conta</TabsTrigger>
             <TabsTrigger value="lojas"><Store className="w-4 h-4 mr-1" />Lojas</TabsTrigger>
+            <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-1" />Webhooks</TabsTrigger>
           </TabsList>
 
           <TabsContent value="cotacao"><MECotacaoPanel /></TabsContent>
@@ -75,6 +76,7 @@ export default function GestaoMelhorEnvio() {
           <TabsContent value="transportadoras"><METransportadorasPanel /></TabsContent>
           <TabsContent value="usuario"><MEUsuarioPanel /></TabsContent>
           <TabsContent value="lojas"><MELojasPanel /></TabsContent>
+          <TabsContent value="webhooks"><MEWebhookPanel /></TabsContent>
         </Tabs>
       </div>
     </MainLayout>

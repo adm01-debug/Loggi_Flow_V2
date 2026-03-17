@@ -22,6 +22,7 @@ interface PerformanceChartProps {
   type?: 'area' | 'bar' | 'pie';
   data: Array<Record<string, unknown>>;
   dataKey: string;
+  secondaryDataKey?: string;
   xAxisKey?: string;
   colors?: string[];
   className?: string;
@@ -42,6 +43,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
     type = 'area', 
     data, 
     dataKey, 
+    secondaryDataKey,
     xAxisKey = 'name', 
     className, 
     colors = defaultColors
@@ -139,6 +141,10 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
                     <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                   </linearGradient>
+                  <linearGradient id="colorSecondary" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
+                  </linearGradient>
                 </defs>
                 <CartesianGrid 
                   strokeDasharray="3 3" 
@@ -158,11 +164,23 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
                 <Area
                   type="monotone"
                   dataKey={dataKey}
+                  name={dataKey.charAt(0).toUpperCase() + dataKey.slice(1)}
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#colorPrimary)"
                 />
+                {secondaryDataKey && (
+                  <Area
+                    type="monotone"
+                    dataKey={secondaryDataKey}
+                    name={secondaryDataKey.charAt(0).toUpperCase() + secondaryDataKey.slice(1)}
+                    stroke="hsl(var(--success))"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorSecondary)"
+                  />
+                )}
               </AreaChart>
             </ResponsiveContainer>
           );

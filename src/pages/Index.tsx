@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw } from "lucide-react";
+import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity } from "lucide-react";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
@@ -15,6 +15,7 @@ import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/Drag
 import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
 import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
+import { LiveStatusBar } from "@/components/dashboard/LiveStatusBar";
 import { Button } from "@/components/ui/button";
 import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } from "@/hooks/useDashboardMetrics";
 import { useRealtime } from "@/hooks/useRealtime";
@@ -94,8 +95,33 @@ export default function Index() {
     return { pendentes: coletasPendentes + entregasPendentes, transito: coletasTransito + entregasTransito, finalizadas: coletasOk + entregasOk, problemas: coletasProblema + entregasProblema };
   }, [statusData]);
 
-  const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); };
+  // Auto-refresh timer
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [secondsAgo, setSecondsAgo] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsAgo(Math.floor((Date.now() - lastRefresh.getTime()) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastRefresh]);
+
+  // Auto-refresh every 2 minutes
+  useEffect(() => {
+    const autoRefresh = setInterval(() => {
+      refetchMetrics(); refetchAlerts(); refetchChart();
+      setLastRefresh(new Date());
+    }, 120000);
+    return () => clearInterval(autoRefresh);
+  }, [refetchMetrics, refetchAlerts, refetchChart]);
+
+  const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); setLastRefresh(new Date()); };
   const handleDateRangeChange = (range: DateRange | undefined) => { if (range) setDateRange(range); };
+
+  const formatTimeSince = (secs: number) => {
+    if (secs < 60) return `${secs}s atrás`;
+    return `${Math.floor(secs / 60)}m atrás`;
+  };
 
   const widgetDefinitions: Record<string, { size: DashboardWidget["size"]; render: () => React.ReactNode }> = {
     "xp-progress": { size: "full", render: () => <WidgetErrorBoundary widgetName="XP Progress">{userLevel ? <XPProgressBar currentXP={userLevel.current_xp} nextLevelXP={userLevel.level * 1000} level={userLevel.level} /> : null}</WidgetErrorBoundary> },
@@ -103,7 +129,7 @@ export default function Index() {
     "kpi-transito": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Trânsito"><KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" /></WidgetErrorBoundary> },
     "kpi-finalizadas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Finalizadas"><KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" /></WidgetErrorBoundary> },
     "kpi-problemas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Problemas"><KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" /></WidgetErrorBoundary> },
-    "chart-performance": { size: "large", render: () => <WidgetErrorBoundary widgetName="Gráfico Performance"><PerformanceChart title="Movimentação Semanal" subtitle="Coletas e entregas" data={chartData} dataKey="total" /></WidgetErrorBoundary> },
+    "chart-performance": { size: "large", render: () => <WidgetErrorBoundary widgetName="Gráfico Performance"><PerformanceChart title="Movimentação" subtitle="Coletas vs Entregas" data={chartData} dataKey="coletas" secondaryDataKey="entregas" /></WidgetErrorBoundary> },
     "alerts-panel": { size: "large", render: () => <WidgetErrorBoundary widgetName="Alertas"><AlertsPanel alerts={alerts} isLoading={alertsLoading} /></WidgetErrorBoundary> },
     "quick-actions": { size: "full", render: () => <WidgetErrorBoundary widgetName="Ações Rápidas"><QuickActions /></WidgetErrorBoundary> },
     "transportadora-ranking": { size: "large", render: () => <WidgetErrorBoundary widgetName="Ranking Transportadoras"><TransportadoraRanking transportadoras={transportadoras} isLoading={transportadorasLoading} /></WidgetErrorBoundary> },
@@ -133,7 +159,13 @@ export default function Index() {
           {/* Actions - Scrollable on mobile */}
           <StaggerContainer className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none" staggerDelay={0.05}>
             <StaggerItem className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></StaggerItem>
-            <StaggerItem className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10"><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
+            <StaggerItem className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10" title="Atualizar dados"><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
+            <StaggerItem className="shrink-0">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
+                <Activity className="w-3 h-3 animate-pulse" />
+                <span className="hidden sm:inline">{formatTimeSince(secondsAgo)}</span>
+              </div>
+            </StaggerItem>
             <StaggerItem className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></StaggerItem>
             {isEditMode && (
               <>
@@ -150,6 +182,10 @@ export default function Index() {
         </div>
         
         <FadeIn delay={0.1}>
+          <LiveStatusBar />
+        </FadeIn>
+
+        <FadeIn delay={0.15}>
           <FavoriteMetricsBar />
         </FadeIn>
         
