@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity } from "lucide-react";
@@ -22,11 +22,36 @@ import { useRealtime } from "@/hooks/useRealtime";
 import { useGamification } from "@/hooks/useGamification";
 import { useDashboardWidgets } from "@/hooks/useDashboardWidgets";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
-import { StaggerContainer, StaggerItem, FadeIn } from "@/components/ui/micro-interactions";
 import { format, subDays, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+
+// Isolated timer component to prevent full-page re-renders
+const RefreshTimer = memo(({ lastRefresh }: { lastRefresh: Date }) => {
+  const [secondsAgo, setSecondsAgo] = useState(0);
+
+  useEffect(() => {
+    setSecondsAgo(0);
+    const interval = setInterval(() => {
+      setSecondsAgo(Math.floor((Date.now() - lastRefresh.getTime()) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastRefresh]);
+
+  const formatTimeSince = (secs: number) => {
+    if (secs < 60) return `${secs}s atrás`;
+    return `${Math.floor(secs / 60)}m atrás`;
+  };
+
+  return (
+    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
+      <Activity className="w-3 h-3 animate-pulse" />
+      <span className="hidden sm:inline">{formatTimeSince(secondsAgo)}</span>
+    </div>
+  );
+});
+RefreshTimer.displayName = "RefreshTimer";
 
 export default function Index() {
   const { data: metrics, refetch: refetchMetrics } = useDashboardMetrics();
@@ -95,16 +120,7 @@ export default function Index() {
     return { pendentes: coletasPendentes + entregasPendentes, transito: coletasTransito + entregasTransito, finalizadas: coletasOk + entregasOk, problemas: coletasProblema + entregasProblema };
   }, [statusData]);
 
-  // Auto-refresh timer
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
-  const [secondsAgo, setSecondsAgo] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSecondsAgo(Math.floor((Date.now() - lastRefresh.getTime()) / 1000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [lastRefresh]);
 
   // Auto-refresh every 2 minutes
   useEffect(() => {
@@ -117,11 +133,6 @@ export default function Index() {
 
   const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); setLastRefresh(new Date()); };
   const handleDateRangeChange = (range: DateRange | undefined) => { if (range) setDateRange(range); };
-
-  const formatTimeSince = (secs: number) => {
-    if (secs < 60) return `${secs}s atrás`;
-    return `${Math.floor(secs / 60)}m atrás`;
-  };
 
   const widgetDefinitions: Record<string, { size: DashboardWidget["size"]; render: () => React.ReactNode }> = {
     "xp-progress": { size: "full", render: () => <WidgetErrorBoundary widgetName="XP Progress">{userLevel ? <XPProgressBar currentXP={userLevel.current_xp} nextLevelXP={userLevel.level * 1000} level={userLevel.level} /> : null}</WidgetErrorBoundary> },
@@ -146,7 +157,7 @@ export default function Index() {
       <div className="space-y-4 md:space-y-6">
         {/* Header with responsive layout */}
         <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
-          <FadeIn direction="left">
+          <div className="animate-in slide-in-from-left-4 duration-500">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
               <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
                 <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
@@ -154,44 +165,39 @@ export default function Index() {
               <span className="truncate">Dashboard</span>
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground mt-1">Visão geral das operações logísticas</p>
-          </FadeIn>
+          </div>
           
           {/* Actions - Scrollable on mobile */}
-          <StaggerContainer className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none" staggerDelay={0.05}>
-            <StaggerItem className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></StaggerItem>
-            <StaggerItem className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10" title="Atualizar dados"><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
-            <StaggerItem className="shrink-0">
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
-                <Activity className="w-3 h-3 animate-pulse" />
-                <span className="hidden sm:inline">{formatTimeSince(secondsAgo)}</span>
-              </div>
-            </StaggerItem>
-            <StaggerItem className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></StaggerItem>
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none animate-in fade-in duration-500 delay-100">
+            <div className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></div>
+            <div className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10" title="Atualizar dados"><RefreshCw className="w-4 h-4" /></Button></div>
+            <div className="shrink-0"><RefreshTimer lastRefresh={lastRefresh} /></div>
+            <div className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></div>
             {isEditMode && (
               <>
-                <StaggerItem className="shrink-0"><WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} /></StaggerItem>
-                <StaggerItem className="shrink-0"><Button variant="outline" size="sm" onClick={resetLayout} className="whitespace-nowrap"><RotateCcw className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Resetar</span></Button></StaggerItem>
+                <div className="shrink-0"><WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} /></div>
+                <div className="shrink-0"><Button variant="outline" size="sm" onClick={resetLayout} className="whitespace-nowrap"><RotateCcw className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Resetar</span></Button></div>
               </>
             )}
-            <StaggerItem className="shrink-0">
+            <div className="shrink-0">
               <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode} className="whitespace-nowrap">
                 <Settings2 className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">{isEditMode ? "Salvar" : "Personalizar"}</span>
               </Button>
-            </StaggerItem>
-          </StaggerContainer>
+            </div>
+          </div>
         </div>
         
-        <FadeIn delay={0.1}>
+        <div className="animate-in fade-in duration-500 delay-150">
           <LiveStatusBar />
-        </FadeIn>
+        </div>
 
-        <FadeIn delay={0.15}>
+        <div className="animate-in fade-in duration-500 delay-200">
           <FavoriteMetricsBar />
-        </FadeIn>
+        </div>
         
-        <FadeIn delay={0.2}>
+        <div className="animate-in fade-in duration-500 delay-300">
           <DraggableDashboard widgets={widgets} isEditMode={isEditMode} onReorder={handleReorder} onRemove={handleRemove} />
-        </FadeIn>
+        </div>
       </div>
     </MainLayout>
   );
