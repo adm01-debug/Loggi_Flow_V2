@@ -319,7 +319,9 @@ export function AppSidebar() {
               </SheetTitle>
             </SheetHeader>
             <div className="p-4 h-[calc(100vh-80px)]">
-              <AIAssistant />
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-muted-foreground text-sm">Carregando assistente...</div>}>
+                <AIAssistant />
+              </Suspense>
             </div>
           </SheetContent>
         </Sheet>
