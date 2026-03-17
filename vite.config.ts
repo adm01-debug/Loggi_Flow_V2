@@ -62,6 +62,26 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('date-fns')) {
             return 'vendor-dates';
           }
+          // Embla carousel - used by few pages
+          if (id.includes('embla-carousel')) {
+            return 'vendor-carousel';
+          }
+          // DnD kit - used by dashboard
+          if (id.includes('@dnd-kit')) {
+            return 'vendor-dnd';
+          }
+          // React markdown - used by AI assistant
+          if (id.includes('react-markdown') || id.includes('remark') || id.includes('rehype') || id.includes('unified') || id.includes('mdast') || id.includes('hast') || id.includes('micromark')) {
+            return 'vendor-markdown';
+          }
+          // cmdk - command palette
+          if (id.includes('cmdk')) {
+            return 'vendor-cmdk';
+          }
+          // Zod + react-hook-form
+          if (id.includes('zod') || id.includes('react-hook-form') || id.includes('@hookform')) {
+            return 'vendor-forms';
+          }
         },
       },
     },
@@ -69,7 +89,8 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     cssMinify: true,
     reportCompressedSize: true,
-    chunkSizeWarningLimit: 500,
+    // Vendor chunks like mapbox are large but lazy-loaded; suppress warnings
+    chunkSizeWarningLimit: 700,
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],

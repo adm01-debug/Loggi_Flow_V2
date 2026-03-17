@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Truck, Package, Building2, Send, BarChart3, Settings,
@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { AIAssistant } from "@/components/ai/AIAssistant";
-// CSS transitions instead of framer-motion to avoid pulling 40KB gzip into MainLayout
+// Lazy-load AIAssistant - only needed when user opens the sheet
+const AIAssistant = lazy(() => import("@/components/ai/AIAssistant").then(m => ({ default: m.AIAssistant })));
 import { usePrefetch } from "@/hooks/usePrefetch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -319,7 +319,9 @@ export function AppSidebar() {
               </SheetTitle>
             </SheetHeader>
             <div className="p-4 h-[calc(100vh-80px)]">
-              <AIAssistant />
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-muted-foreground text-sm">Carregando assistente...</div>}>
+                <AIAssistant />
+              </Suspense>
             </div>
           </SheetContent>
         </Sheet>

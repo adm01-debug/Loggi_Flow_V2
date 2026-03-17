@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,11 +12,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
-import { NotificationCenter } from "@/components/notifications/NotificationCenter";
-import { UserNotificationCenter } from "@/components/notifications/UserNotificationCenter";
-import { SLANotificationSettings } from "@/components/notifications/SLANotificationSettings";
 import { useGamification } from "@/hooks/useGamification";
-import { GlobalSearch } from "@/components/search/GlobalSearch";
+
+// Lazy-load heavy notification components
+const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
+const UserNotificationCenter = lazy(() => import("@/components/notifications/UserNotificationCenter").then(m => ({ default: m.UserNotificationCenter })));
+const SLANotificationSettings = lazy(() => import("@/components/notifications/SLANotificationSettings").then(m => ({ default: m.SLANotificationSettings })));
+const GlobalSearch = lazy(() => import("@/components/search/GlobalSearch").then(m => ({ default: m.GlobalSearch })));
 
 function RealtimeIndicator() {
   return (
@@ -53,7 +56,9 @@ export function Header() {
     <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header gap-2 sm:gap-4">
       {/* Global Search */}
       <div className="flex-1 max-w-xs sm:max-w-sm md:max-w-md">
-        <GlobalSearch />
+        <Suspense fallback={<div className="h-9 w-full rounded-md bg-muted animate-pulse" />}>
+          <GlobalSearch />
+        </Suspense>
       </div>
 
       {/* Center - Realtime Indicator */}
@@ -88,16 +93,18 @@ export function Header() {
 
       {/* Right Side */}
       <div className="flex items-center gap-1 sm:gap-2">
-        {/* SLA Notification Settings - Hidden on mobile */}
-        <div className="hidden sm:block">
-          <SLANotificationSettings />
-        </div>
-        
-        {/* System Alerts */}
-        <NotificationCenter />
-        
-        {/* User Notifications */}
-        <UserNotificationCenter />
+        <Suspense fallback={null}>
+          {/* SLA Notification Settings - Hidden on mobile */}
+          <div className="hidden sm:block">
+            <SLANotificationSettings />
+          </div>
+          
+          {/* System Alerts */}
+          <NotificationCenter />
+          
+          {/* User Notifications */}
+          <UserNotificationCenter />
+        </Suspense>
 
         {/* User Menu */}
         <DropdownMenu>
