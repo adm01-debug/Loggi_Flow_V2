@@ -51,6 +51,7 @@ export default function CotacaoMultiCanal() {
   const queryClient = useQueryClient();
   const { searchRoutes } = useTransportadoraRotas();
   const rodonaves = useRodonavesTracking();
+  const { createCotacao } = useCotacoesMulticanal();
   
   const [origemEstado, setOrigemEstado] = useState('');
   const [destinoEstado, setDestinoEstado] = useState('');
