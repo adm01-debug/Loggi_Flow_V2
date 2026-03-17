@@ -158,7 +158,13 @@ export default function Index() {
           {/* Actions - Scrollable on mobile */}
           <StaggerContainer className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none" staggerDelay={0.05}>
             <StaggerItem className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></StaggerItem>
-            <StaggerItem className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10"><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
+            <StaggerItem className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10" title="Atualizar dados"><RefreshCw className="w-4 h-4" /></Button></StaggerItem>
+            <StaggerItem className="shrink-0">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
+                <Activity className="w-3 h-3 animate-pulse" />
+                <span className="hidden sm:inline">{formatTimeSince(secondsAgo)}</span>
+              </div>
+            </StaggerItem>
             <StaggerItem className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></StaggerItem>
             {isEditMode && (
               <>
