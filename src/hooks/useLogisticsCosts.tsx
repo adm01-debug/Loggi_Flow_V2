@@ -45,6 +45,7 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
           id,
           numero_entrega,
           valor_frete,
+          created_at,
           data_despacho,
           data_entrega_efetiva,
           endereco_entrega,
