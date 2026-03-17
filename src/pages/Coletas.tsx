@@ -113,6 +113,18 @@ export default function Coletas() {
   };
 
   const handleSubmit = async () => {
+    if (!formData.endereco_coleta.trim()) {
+      toast({ title: "Campo obrigatório", description: "Informe o endereço da coleta", variant: "destructive" });
+      return;
+    }
+    if (formData.tipo_coleta === "transportadora" && !formData.transportadora_id) {
+      toast({ title: "Campo obrigatório", description: "Selecione uma transportadora", variant: "destructive" });
+      return;
+    }
+    if (formData.qtd_volumes && parseInt(formData.qtd_volumes) <= 0) {
+      toast({ title: "Valor inválido", description: "Quantidade de volumes deve ser maior que zero", variant: "destructive" });
+      return;
+    }
     const numero = `COL-${Date.now().toString().slice(-8)}`;
     const { error } = await supabase.from("coletas").insert({
       numero_coleta: numero, fornecedor_id: formData.fornecedor_id || null, tipo_coleta: formData.tipo_coleta,
@@ -125,6 +137,19 @@ export default function Coletas() {
     toast({ title: "Sucesso", description: "Coleta registrada!" }); setDialogOpen(false); fetchData();
     setFormData({ fornecedor_id: "", tipo_coleta: "lalamove", transportadora_id: "", endereco_coleta: "", contato_coleta: "", data_prevista_coleta: "", qtd_volumes: "", peso_estimado_kg: "", observacoes: "" });
   };
+
+  // Status transition guards
+  const validTransitions: Record<ColetaStatus, ColetaStatus[]> = {
+    aguardando_liberacao: ["solicitada"],
+    solicitada: ["em_transito", "aguardando_liberacao"],
+    em_transito: ["chegou_expedicao"],
+    chegou_expedicao: ["conferencia_ok", "divergencia"],
+    conferencia_ok: ["finalizada"],
+    divergencia: ["conferencia_ok", "finalizada"],
+    finalizada: [],
+  };
+
+  const getNextStatuses = (current: ColetaStatus): ColetaStatus[] => validTransitions[current] || [];
 
   const updateStatus = async (id: string, status: ColetaStatus) => {
     const update: { status: ColetaStatus; data_efetiva_coleta?: string } = { status };

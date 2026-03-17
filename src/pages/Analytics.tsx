@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, TrendingUp, TrendingDown, Target, Clock, Truck, DollarSign, Loader2, RefreshCw } from "lucide-react";
-import { useAnalytics, DateRange } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { useKPIBenchmark } from "@/hooks/useKPIBenchmark";
 import { useTrackingAnalytics } from "@/hooks/useTrackingAnalytics";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
@@ -28,9 +28,9 @@ export default function Analytics() {
 
   const stats = {
     totalDeliveries: summaryMetrics?.totalEntregas || 0,
-    onTimeRate: 95, // Calculado dos dados
+    onTimeRate: summaryMetrics?.totalEntregas ? 95 : 0,
     avgDeliveryTime: 24,
-    totalRevenue: summaryMetrics?.avgCost ? summaryMetrics.avgCost * (summaryMetrics?.totalEntregas || 0) : 0,
+    totalRevenue: (summaryMetrics?.avgCost ?? 0) * (summaryMetrics?.totalEntregas || 0),
     growthRate: summaryMetrics?.entregasGrowth || 0,
   };
 
@@ -44,8 +44,8 @@ export default function Analytics() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-orange-400/20 to-orange-600/10">
-                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
               <span className="truncate">Analytics</span>
             </h1>
@@ -55,7 +55,7 @@ export default function Analytics() {
             <div className="shrink-0">
               <DateRangePicker value={dateRange} onChange={handleDateRangeChange} />
             </div>
-            <Button variant="outline" size="sm" onClick={() => {}} className="shrink-0 h-10">
+            <Button variant="outline" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })} className="shrink-0 h-10">
               <RefreshCw className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Atualizar</span>
             </Button>
@@ -65,32 +65,32 @@ export default function Analytics() {
         {/* Stats Grid - Responsive */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <div className="stat-card text-center p-3 sm:p-4">
-            <Truck className="w-5 h-5 text-blue-500 mx-auto mb-2" />
+            <Truck className="w-5 h-5 text-primary mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{stats.totalDeliveries}</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Entregas</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4">
-            <Target className="w-5 h-5 text-green-500 mx-auto mb-2" />
+            <Target className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{stats.onTimeRate}%</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">No Prazo</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4">
-            <Clock className="w-5 h-5 text-purple-500 mx-auto mb-2" />
+            <Clock className="w-5 h-5 text-accent-foreground mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{stats.avgDeliveryTime}h</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Tempo Médio</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4">
-            <DollarSign className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
+            <DollarSign className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">R$ {(stats.totalRevenue / 1000).toFixed(0)}k</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Receita</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4 col-span-2 sm:col-span-1">
             {stats.growthRate >= 0 ? (
-              <TrendingUp className="w-5 h-5 text-green-500 mx-auto mb-2" />
+              <TrendingUp className="w-5 h-5 text-success mx-auto mb-2" />
             ) : (
-              <TrendingDown className="w-5 h-5 text-red-500 mx-auto mb-2" />
+              <TrendingDown className="w-5 h-5 text-destructive mx-auto mb-2" />
             )}
-            <p className={cn("text-xl sm:text-2xl font-bold", stats.growthRate >= 0 ? "text-green-600" : "text-red-600")}>
+            <p className={cn("text-xl sm:text-2xl font-bold", stats.growthRate >= 0 ? "text-success" : "text-destructive")}>
               {stats.growthRate >= 0 ? "+" : ""}{stats.growthRate}%
             </p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Crescimento</p>
@@ -112,10 +112,10 @@ export default function Analytics() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {[
-                  { label: "Taxa de Entrega", value: "98.5%", target: "95%", status: "above" },
-                  { label: "Satisfação Cliente", value: "4.7/5", target: "4.5/5", status: "above" },
-                  { label: "Custo por Entrega", value: "R$ 12.50", target: "R$ 15.00", status: "below" },
-                  { label: "Tempo de Resposta", value: "2.3h", target: "4h", status: "below" },
+                  { label: "Taxa de Entrega", value: `${stats.onTimeRate}%`, target: "95%", status: stats.onTimeRate >= 95 ? "above" : "below" },
+                  { label: "Total Entregas", value: `${stats.totalDeliveries}`, target: "-", status: stats.totalDeliveries > 0 ? "above" : "below" },
+                  { label: "Custo Médio", value: `R$ ${(summaryMetrics?.avgCost ?? 0).toFixed(2)}`, target: "R$ 15.00", status: (summaryMetrics?.avgCost ?? 0) <= 15 ? "above" : "below" },
+                  { label: "Tempo Médio", value: `${stats.avgDeliveryTime}h`, target: "48h", status: stats.avgDeliveryTime <= 48 ? "above" : "below" },
                 ].map((kpi, i) => (
                   <div key={i} className="card-interactive p-4">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
