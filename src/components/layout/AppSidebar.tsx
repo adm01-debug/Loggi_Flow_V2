@@ -42,6 +42,7 @@ const menuSections: MenuSection[] = [
     icon: DollarSign,
     items: [
       { title: "Custos Logísticos", url: "/custos", icon: DollarSign },
+      { title: "Inteligência Frete", url: "/inteligencia-frete", icon: TrendingUp },
       { title: "Conciliação", url: "/conciliacao", icon: FileCheck },
       { title: "Alertas Custo", url: "/alertas-custo", icon: AlertTriangle },
     ],
