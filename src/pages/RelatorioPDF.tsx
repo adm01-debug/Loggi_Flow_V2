@@ -14,8 +14,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// Lazy import heavy PDF libs - only loaded when user generates a report
+const loadPdfLibs = () => Promise.all([
+  import('jspdf'),
+  import('jspdf-autotable'),
+]).then(([jspdfMod, autoTableMod]) => ({
+  jsPDF: jspdfMod.default,
+  autoTable: autoTableMod.default,
+}));
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
