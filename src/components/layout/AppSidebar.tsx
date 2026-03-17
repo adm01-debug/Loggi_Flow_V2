@@ -5,7 +5,7 @@ import {
   Trophy, Zap, ChevronLeft, ChevronRight, Box, PackageSearch, History,
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
-  Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award,
+  Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award, Upload, Zap as ZapIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -88,6 +88,8 @@ const menuSections: MenuSection[] = [
       { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
       { title: "Relatório PDF", url: "/relatorio-pdf", icon: FileCheck },
       { title: "Conciliação Auto", url: "/conciliacao-automatica", icon: Cog },
+      { title: "Importação Massa", url: "/importacao-massa", icon: Upload },
+      { title: "Automação Regras", url: "/automacao-regras", icon: ZapIcon },
     ],
   },
 ];
