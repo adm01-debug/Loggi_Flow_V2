@@ -17,18 +17,59 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-supabase': ['@supabase/supabase-js'],
-          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-tooltip', '@radix-ui/react-dropdown-menu'],
-          'vendor-charts': ['recharts'],
-          'vendor-motion': ['framer-motion'],
+        manualChunks(id) {
+          // Core React runtime
+          if (id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-router'))) {
+            return 'vendor-react';
+          }
+          if (id.includes('react-router')) {
+            return 'vendor-router';
+          }
+          // Query layer
+          if (id.includes('@tanstack/react-query')) {
+            return 'vendor-query';
+          }
+          // Supabase
+          if (id.includes('@supabase')) {
+            return 'vendor-supabase';
+          }
+          // Radix UI components
+          if (id.includes('@radix-ui')) {
+            return 'vendor-ui';
+          }
+          // Heavy libs - lazy loaded
+          if (id.includes('recharts') || id.includes('d3-')) {
+            return 'vendor-charts';
+          }
+          if (id.includes('framer-motion')) {
+            return 'vendor-motion';
+          }
+          if (id.includes('mapbox-gl')) {
+            return 'vendor-mapbox';
+          }
+          if (id.includes('jspdf') || id.includes('jspdf-autotable')) {
+            return 'vendor-pdf';
+          }
+          if (id.includes('html2canvas')) {
+            return 'vendor-html2canvas';
+          }
+          if (id.includes('xlsx')) {
+            return 'vendor-xlsx';
+          }
+          if (id.includes('dompurify') || id.includes('purify')) {
+            return 'vendor-purify';
+          }
+          if (id.includes('date-fns')) {
+            return 'vendor-dates';
+          }
         },
       },
     },
     target: 'esnext',
     minify: 'esbuild',
+    cssMinify: true,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],

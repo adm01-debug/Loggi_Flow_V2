@@ -14,8 +14,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// Lazy import heavy PDF libs - only loaded when user generates a report
+const loadPdfLibs = () => Promise.all([
+  import('jspdf'),
+  import('jspdf-autotable'),
+]).then(([jspdfMod, autoTableMod]) => ({
+  jsPDF: jspdfMod.default,
+  autoTable: autoTableMod.default,
+}));
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -66,7 +72,8 @@ export default function RelatorioPDF() {
   const generatePDF = async () => {
     setGenerating(true);
     try {
-      const doc = new jsPDF();
+      const { jsPDF: JsPDF, autoTable: autoTableFn } = await loadPdfLibs();
+      const doc = new JsPDF();
       const { start, end } = getDateRange();
       const periodoLabel = `${format(start, 'dd/MM/yyyy')} a ${format(end, 'dd/MM/yyyy')}`;
 
@@ -84,13 +91,13 @@ export default function RelatorioPDF() {
       doc.line(14, 40, 196, 40);
 
       if (reportType === 'entregas' && entregas) {
-        generateEntregasReport(doc, entregas);
+        generateEntregasReport(doc, entregas, autoTableFn);
       } else if (reportType === 'transportadoras' && entregas) {
-        generateTransportadorasReport(doc, entregas);
+        generateTransportadorasReport(doc, entregas, autoTableFn);
       } else if (reportType === 'custos' && entregas) {
-        generateCustosReport(doc, entregas);
+        generateCustosReport(doc, entregas, autoTableFn);
       } else if (reportType === 'sla' && entregas) {
-        generateSLAReport(doc, entregas);
+        generateSLAReport(doc, entregas, autoTableFn);
       }
 
       // Footer
@@ -106,17 +113,16 @@ export default function RelatorioPDF() {
       toast.success('PDF gerado com sucesso!');
     } catch (err) {
       toast.error('Erro ao gerar PDF');
-      console.error(err);
     } finally {
       setGenerating(false);
     }
   };
 
-  const generateEntregasReport = (doc: jsPDF, data: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const generateEntregasReport = (doc: any, data: any[], autoTableFn: any) => {
     doc.setFontSize(14);
     doc.text('Relatório de Entregas', 14, 50);
 
-    // KPIs
     const total = data.length;
     const entregues = data.filter(e => e.status === 'entregue' || e.status === 'finalizado').length;
     const emTransito = data.filter(e => ['despachado', 'em_transito', 'saiu_entrega'].includes(e.status)).length;
@@ -125,7 +131,7 @@ export default function RelatorioPDF() {
     doc.setFontSize(10);
     doc.text(`Total: ${total}  |  Entregues: ${entregues}  |  Em Trânsito: ${emTransito}  |  Custo Total: R$ ${custoTotal.toFixed(2)}`, 14, 58);
 
-    autoTable(doc, {
+    autoTableFn(doc, {
       startY: 65,
       head: [['Nº Entrega', 'Cliente', 'Status', 'Transportadora', 'Valor Frete', 'Previsão']],
       body: data.slice(0, 100).map(e => [
@@ -141,7 +147,8 @@ export default function RelatorioPDF() {
     });
   };
 
-  const generateTransportadorasReport = (doc: jsPDF, data: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const generateTransportadorasReport = (doc: any, data: any[], autoTableFn: any) => {
     doc.setFontSize(14);
     doc.text('Performance de Transportadoras', 14, 50);
 
@@ -154,7 +161,7 @@ export default function RelatorioPDF() {
       byTransp[name].custo += e.valor_frete || 0;
     });
 
-    autoTable(doc, {
+    autoTableFn(doc, {
       startY: 58,
       head: [['Transportadora', 'Total Entregas', 'Entregues', 'Taxa Conclusão', 'Custo Total', 'Custo Médio']],
       body: Object.values(byTransp).sort((a, b) => b.total - a.total).map(t => [
@@ -170,7 +177,8 @@ export default function RelatorioPDF() {
     });
   };
 
-  const generateCustosReport = (doc: jsPDF, data: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const generateCustosReport = (doc: any, data: any[], autoTableFn: any) => {
     doc.setFontSize(14);
     doc.text('Relatório de Custos Logísticos', 14, 50);
 
@@ -182,7 +190,7 @@ export default function RelatorioPDF() {
     doc.setFontSize(10);
     doc.text(`Custo Total: R$ ${custoTotal.toFixed(2)}  |  Médio: R$ ${custoMedio.toFixed(2)}  |  Maior: R$ ${maiorFrete.toFixed(2)}`, 14, 58);
 
-    autoTable(doc, {
+    autoTableFn(doc, {
       startY: 65,
       head: [['Nº Entrega', 'Transportadora', 'Destino', 'Valor Frete', 'Tipo Frete']],
       body: comFrete.sort((a, b) => (b.valor_frete || 0) - (a.valor_frete || 0)).slice(0, 80).map(e => [
@@ -197,7 +205,8 @@ export default function RelatorioPDF() {
     });
   };
 
-  const generateSLAReport = (doc: jsPDF, data: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const generateSLAReport = (doc: any, data: any[], autoTableFn: any) => {
     doc.setFontSize(14);
     doc.text('Relatório SLA / OTIF', 14, 50);
 
@@ -211,7 +220,7 @@ export default function RelatorioPDF() {
     doc.setFontSize(10);
     doc.text(`OTIF: ${otif.toFixed(1)}%  |  No Prazo: ${noPrazo.length}  |  Total Entregues: ${entregues.length}`, 14, 58);
 
-    autoTable(doc, {
+    autoTableFn(doc, {
       startY: 65,
       head: [['Nº Entrega', 'Transportadora', 'Previsão', 'Entregue em', 'No Prazo?']],
       body: entregues.slice(0, 80).map(e => [
