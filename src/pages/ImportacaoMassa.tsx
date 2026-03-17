@@ -98,19 +98,37 @@ interface ImportStats {
 export default function ImportacaoMassa() {
   const [history, setHistory] = useState<ImportStats[]>([]);
 
-  const handleImport = async (entity: ImportEntity, data: any[]) => {
-    const { error } = await supabase.from(entity).insert(data);
-    if (error) throw error;
-    
+  const handleImport = async (entity: ImportEntity, data: Record<string, unknown>[]) => {
+    let successCount = 0;
+    let errorCount = 0;
+    const batchSize = 50;
+
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const { error } = await supabase.from(entity).insert(batch);
+      if (error) {
+        errorCount += batch.length;
+      } else {
+        successCount += batch.length;
+      }
+    }
+
     const stat: ImportStats = {
       entity,
       total: data.length,
-      success: data.length,
-      errors: 0,
+      success: successCount,
+      errors: errorCount,
       timestamp: new Date(),
     };
     setHistory((h) => [stat, ...h]);
-    toast.success(`${data.length} registros importados com sucesso!`);
+
+    if (errorCount === 0) {
+      toast.success(`${successCount} registros importados com sucesso!`);
+    } else if (successCount > 0) {
+      toast.warning(`${successCount} importados, ${errorCount} falharam`);
+    } else {
+      toast.error(`Falha ao importar ${errorCount} registros`);
+    }
   };
 
   const entities: { id: ImportEntity; label: string; icon: React.ElementType }[] = [

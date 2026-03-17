@@ -28,15 +28,15 @@ interface PublicTracking {
 
 const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
   aguardando_producao: { label: "Em Preparação", color: "text-muted-foreground", icon: Clock },
-  pronto_despacho: { label: "Pronto para Envio", color: "text-blue-500", icon: Package },
-  cotacao_frete: { label: "Cotando Frete", color: "text-purple-500", icon: Package },
-  nf_emitida: { label: "NF Emitida", color: "text-indigo-500", icon: Package },
-  despachado: { label: "Despachado", color: "text-cyan-500", icon: Truck },
-  em_transito: { label: "Em Trânsito", color: "text-amber-500", icon: Truck },
-  saiu_entrega: { label: "Saiu para Entrega", color: "text-orange-500", icon: Truck },
-  entregue: { label: "Entregue", color: "text-green-500", icon: CheckCircle2 },
-  ocorrencia: { label: "Ocorrência", color: "text-red-500", icon: AlertTriangle },
-  finalizado: { label: "Finalizado", color: "text-green-600", icon: CheckCircle2 },
+  pronto_despacho: { label: "Pronto para Envio", color: "text-accent-foreground", icon: Package },
+  cotacao_frete: { label: "Cotando Frete", color: "text-secondary-foreground", icon: Package },
+  nf_emitida: { label: "NF Emitida", color: "text-primary", icon: Package },
+  despachado: { label: "Despachado", color: "text-primary", icon: Truck },
+  em_transito: { label: "Em Trânsito", color: "text-warning", icon: Truck },
+  saiu_entrega: { label: "Saiu para Entrega", color: "text-warning", icon: Truck },
+  entregue: { label: "Entregue", color: "text-primary", icon: CheckCircle2 },
+  ocorrencia: { label: "Ocorrência", color: "text-destructive", icon: AlertTriangle },
+  finalizado: { label: "Finalizado", color: "text-primary", icon: CheckCircle2 },
 };
 
 const statusOrder = ["aguardando_producao", "pronto_despacho", "nf_emitida", "despachado", "em_transito", "saiu_entrega", "entregue"];
