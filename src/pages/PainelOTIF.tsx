@@ -127,15 +127,15 @@ export default function PainelOTIF() {
   }));
 
   const getOTIFColor = (rate: number) => {
-    if (rate >= 95) return 'text-green-500';
-    if (rate >= 85) return 'text-amber-500';
-    return 'text-red-500';
+    if (rate >= 95) return 'text-primary';
+    if (rate >= 85) return 'text-warning';
+    return 'text-destructive';
   };
 
   const getOTIFBadge = (rate: number) => {
-    if (rate >= 95) return <Badge className="bg-green-500/10 text-green-600 border-green-200">Excelente</Badge>;
-    if (rate >= 85) return <Badge className="bg-amber-500/10 text-amber-600 border-amber-200">Bom</Badge>;
-    if (rate >= 70) return <Badge className="bg-orange-500/10 text-orange-600 border-orange-200">Regular</Badge>;
+    if (rate >= 95) return <Badge className="bg-primary/10 text-primary border-primary/20">Excelente</Badge>;
+    if (rate >= 85) return <Badge className="bg-warning/10 text-warning border-warning/20">Bom</Badge>;
+    if (rate >= 70) return <Badge variant="secondary">Regular</Badge>;
     return <Badge variant="destructive">Crítico</Badge>;
   };
 

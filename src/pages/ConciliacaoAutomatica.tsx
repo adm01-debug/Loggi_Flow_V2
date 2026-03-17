@@ -100,11 +100,13 @@ export default function ConciliacaoAutomatica() {
 
         // Try to match by value + transportadora
         if (!matchedEntrega) {
+          const transportadoraNome = (item.transportadora_nome || '').toLowerCase().substring(0, 5);
           matchedEntrega = entregas.find(
-            e => e.valor_frete && Math.abs(e.valor_frete - item.valor) < 0.01 &&
-                 (e as any).transportadora?.nome_fantasia?.toLowerCase().includes(
-                   (item.transportadora_nome || '').toLowerCase().substring(0, 5)
-                 )
+            e => {
+              const entregaTransp = e.transportadora as { nome_fantasia: string } | null;
+              return e.valor_frete && Math.abs(e.valor_frete - item.valor) < 0.01 &&
+                entregaTransp?.nome_fantasia?.toLowerCase().includes(transportadoraNome);
+            }
           );
         }
 
