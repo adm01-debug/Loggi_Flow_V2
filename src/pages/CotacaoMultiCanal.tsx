@@ -135,23 +135,40 @@ export default function CotacaoMultiCanal() {
     
     toast.info(`Cotando via API para ${carrier.transportadora?.nome_fantasia}...`);
     
-    // Use Rodonaves API as example
     try {
-      // For now, add a simulated API quotation result
+      const valorCalculado = carrier.taxa_fixa + (carrier.preco_por_kg * parseFloat(pesoKg));
+      
+      // Persist to DB
+      await createCotacao.mutateAsync({
+        transportadora_id: carrier.transportadora_id,
+        canal: 'api',
+        origem_estado: origemEstado,
+        origem_cidade: origemCidade || undefined,
+        destino_estado: destinoEstado,
+        destino_cidade: destinoCidade || undefined,
+        peso_kg: parseFloat(pesoKg),
+        volumes: parseInt(volumes),
+        valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined,
+        valor_cotado: valorCalculado,
+        prazo_dias: carrier.prazo_dias,
+        observacoes: 'Cotação via tabela de frete cadastrada',
+        status: 'respondido',
+      });
+      
+      // Also add to local state for immediate UI
       const newCotacao: CotacaoManual = {
         id: crypto.randomUUID(),
         transportadora_id: carrier.transportadora_id,
         transportadora_nome: carrier.transportadora?.nome_fantasia || 'N/A',
         canal: 'api',
-        valor: carrier.taxa_fixa + (carrier.preco_por_kg * parseFloat(pesoKg)),
+        valor: valorCalculado,
         prazo_dias: carrier.prazo_dias,
         status: 'respondido',
         observacoes: 'Cotação via tabela de frete cadastrada',
         created_at: new Date().toISOString(),
       };
-      
       setCotacoes(prev => [...prev, newCotacao]);
-      toast.success(`Cotação API recebida: R$ ${newCotacao.valor?.toFixed(2)}`);
+      toast.success(`Cotação API recebida: R$ ${valorCalculado.toFixed(2)}`);
     } catch {
       toast.error('Erro na cotação via API');
     }
