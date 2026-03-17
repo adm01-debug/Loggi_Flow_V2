@@ -88,6 +88,8 @@ const menuSections: MenuSection[] = [
       { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
       { title: "Relatório PDF", url: "/relatorio-pdf", icon: FileCheck },
       { title: "Conciliação Auto", url: "/conciliacao-automatica", icon: Cog },
+      { title: "Importação Massa", url: "/importacao-massa", icon: Upload },
+      { title: "Automação Regras", url: "/automacao-regras", icon: ZapIcon },
     ],
   },
 ];
