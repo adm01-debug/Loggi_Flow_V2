@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 import { useRealtime } from '@/hooks/useRealtime';
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -9,22 +11,28 @@ vi.mock('@/integrations/supabase/client', () => ({
   },
 }));
 
+const createWrapper = () => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryClientProvider, { client: queryClient }, children);
+};
+
 describe('useRealtime', () => {
   it('should subscribe to table changes', () => {
     const onInsert = vi.fn();
-    renderHook(() => useRealtime({ table: 'entregas', onInsert }));
+    renderHook(() => useRealtime({ table: 'entregas', onInsert }), { wrapper: createWrapper() });
     expect(true).toBe(true);
   });
 
   it('should handle onUpdate callback', () => {
     const onUpdate = vi.fn();
-    renderHook(() => useRealtime({ table: 'entregas', onUpdate }));
+    renderHook(() => useRealtime({ table: 'entregas', onUpdate }), { wrapper: createWrapper() });
     expect(true).toBe(true);
   });
 
   it('should handle onDelete callback', () => {
     const onDelete = vi.fn();
-    renderHook(() => useRealtime({ table: 'entregas', onDelete }));
+    renderHook(() => useRealtime({ table: 'entregas', onDelete }), { wrapper: createWrapper() });
     expect(true).toBe(true);
   });
 });
