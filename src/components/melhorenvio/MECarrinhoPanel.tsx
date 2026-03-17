@@ -65,7 +65,30 @@ export function MECarrinhoPanel() {
     });
   };
 
+  const validateReverseForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!reverseForm.service.trim()) errors['service'] = 'ID do serviço é obrigatório';
+    if (!reverseForm.from_name.trim()) errors['from_name'] = 'Nome é obrigatório';
+    if (!reverseForm.from_postal_code.replace(/\D/g, '').trim()) errors['from_postal_code'] = 'CEP é obrigatório';
+    if (!reverseForm.from_address.trim()) errors['from_address'] = 'Endereço é obrigatório';
+    if (!reverseForm.from_number.trim()) errors['from_number'] = 'Número é obrigatório';
+    if (!reverseForm.from_district.trim()) errors['from_district'] = 'Bairro é obrigatório';
+    if (!reverseForm.from_city.trim()) errors['from_city'] = 'Cidade é obrigatória';
+    if (!reverseForm.from_state_abbr.trim()) errors['from_state'] = 'UF é obrigatória';
+    if (!reverseForm.to_name.trim()) errors['to_name'] = 'Nome é obrigatório';
+    if (!reverseForm.to_postal_code.replace(/\D/g, '').trim()) errors['to_postal_code'] = 'CEP é obrigatório';
+    if (!reverseForm.to_address.trim()) errors['to_address'] = 'Endereço é obrigatório';
+    if (!reverseForm.to_number.trim()) errors['to_number'] = 'Número é obrigatório';
+    if (!reverseForm.to_district.trim()) errors['to_district'] = 'Bairro é obrigatório';
+    if (!reverseForm.to_city.trim()) errors['to_city'] = 'Cidade é obrigatória';
+    if (!reverseForm.to_state_abbr.trim()) errors['to_state'] = 'UF é obrigatória';
+    setReverseErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleReverseSubmit = () => {
+    setReverseSubmitted(true);
+    if (!validateReverseForm()) return;
     inserirLogisticaReversa.mutate({
       service: parseInt(reverseForm.service),
       from: {
@@ -95,7 +118,7 @@ export function MECarrinhoPanel() {
         quantity: 1,
       }],
     } as Record<string, unknown>, {
-      onSuccess: () => setShowReverse(false),
+      onSuccess: () => { setShowReverse(false); setReverseSubmitted(false); },
     });
   };
 
