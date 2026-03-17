@@ -149,6 +149,7 @@ function AnimatedRoutes() {
           <Route path="/dashboard-executivo" element={<ProtectedRoute><DashboardExecutivo /></ProtectedRoute>} />
           <Route path="/inteligencia-frete" element={<ProtectedRoute><InteligenciaFrete /></ProtectedRoute>} />
           <Route path="/cotacao-multicanal" element={<ProtectedRoute><CotacaoMultiCanal /></ProtectedRoute>} />
+          <Route path="/dashboard-cotacoes" element={<ProtectedRoute><DashboardCotacoes /></ProtectedRoute>} />
           <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
           <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
