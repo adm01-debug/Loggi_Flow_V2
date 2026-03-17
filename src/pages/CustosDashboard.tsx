@@ -9,7 +9,7 @@ import { useLogisticsCosts } from "@/hooks/useLogisticsCosts";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { useRealtime } from "@/hooks/useRealtime";
 import { cn } from "@/lib/utils";
-import { subDays, format, startOfMonth, eachMonthOfInterval, isSameMonth } from "date-fns";
+import { subDays, format, eachMonthOfInterval, isSameMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import {
