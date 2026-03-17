@@ -246,9 +246,9 @@ export default function Envios() {
         >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="stat-card text-center p-3 sm:p-4"><Send className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregues}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregues</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ocorrencias}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ocorrências</p></div>
+            <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
+            <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregues}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregues</p></div>
+            <div className="stat-card text-center p-3 sm:p-4"><AlertTriangle className="w-5 h-5 text-destructive mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ocorrencias}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ocorrências</p></div>
           </div>
         </OnboardingTooltip>
 
