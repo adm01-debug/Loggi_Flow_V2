@@ -1,23 +1,13 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, memo } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AchievementProvider } from "@/hooks/useAchievementNotifications";
-import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import { TimezoneProvider } from "@/hooks/useTimezone";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { SessionTimeoutWarning } from "@/components/security/SessionTimeoutWarning";
-import { NewDeviceDetector } from "@/components/security/NewDeviceDetector";
-import { SecurityPushNotificationProvider } from "@/components/security/SecurityPushNotificationProvider";
-import { LiveRegionProvider } from "@/components/accessibility/LiveRegion";
-import { ReducedMotionProvider } from "@/components/accessibility/ReducedMotion";
-import { Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
-// Lazy load all pages for better initial performance
+// Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const FretesInternos = lazy(() => import("./pages/FretesInternos"));
@@ -68,6 +58,9 @@ const ImportacaoMassa = lazy(() => import("./pages/ImportacaoMassa"));
 const AutomacaoRegras = lazy(() => import("./pages/AutomacaoRegras"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+// Lazy load non-critical providers
+const LazyProviders = lazy(() => import("./components/LazyProviders"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -79,129 +72,94 @@ const queryClient = new QueryClient({
   },
 });
 
-// Premium loading component with animation
-const PageLoader = () => (
+// Lightweight loader — no framer-motion dependency
+const PageLoader = memo(() => (
   <div className="min-h-screen flex items-center justify-center bg-background">
-    <motion.div 
-      className="flex flex-col items-center gap-4"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="flex flex-col items-center gap-4 animate-in fade-in duration-300">
       <div className="relative">
-        <motion.div
-          className="absolute inset-0 rounded-full bg-primary/20 blur-xl"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-        <Loader2 className="w-12 h-12 animate-spin text-primary relative z-10" />
+        <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+        <svg className="w-12 h-12 animate-spin text-primary relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
       </div>
-      <motion.p 
-        className="text-muted-foreground text-sm font-medium"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        Carregando...
-      </motion.p>
-    </motion.div>
+      <p className="text-muted-foreground text-sm font-medium">Carregando...</p>
+    </div>
   </div>
-);
+));
+PageLoader.displayName = "PageLoader";
 
-// Animated routes wrapper
-function AnimatedRoutes() {
-  const location = useLocation();
-  
+function AppRoutes() {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-      >
-        <Routes location={location}>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="/fretes-internos" element={<ProtectedRoute><FretesInternos /></ProtectedRoute>} />
-          <Route path="/fornecedores" element={<ProtectedRoute><Fornecedores /></ProtectedRoute>} />
-          <Route path="/clientes" element={<ProtectedRoute><Clientes /></ProtectedRoute>} />
-          <Route path="/ocorrencias" element={<ProtectedRoute><Ocorrencias /></ProtectedRoute>} />
-          <Route path="/envios" element={<ProtectedRoute><Envios /></ProtectedRoute>} />
-          <Route path="/coletas" element={<ProtectedRoute><Coletas /></ProtectedRoute>} />
-          <Route path="/transportadoras" element={<ProtectedRoute><Transportadoras /></ProtectedRoute>} />
-          <Route path="/despachos" element={<ProtectedRoute><Despachos /></ProtectedRoute>} />
-          <Route path="/relatorios" element={<ProtectedRoute><Relatorios /></ProtectedRoute>} />
-          <Route path="/conquistas" element={<ProtectedRoute><Conquistas /></ProtectedRoute>} />
-          <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
-          <Route path="/configuracoes" element={<ProtectedRoute><Configuracoes /></ProtectedRoute>} />
-          <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/gestao-box" element={<ProtectedRoute><GestaoBox /></ProtectedRoute>} />
-          <Route path="/sla-dashboard" element={<ProtectedRoute><SLADashboard /></ProtectedRoute>} />
-          <Route path="/calendario" element={<ProtectedRoute><CalendarioLogistico /></ProtectedRoute>} />
-          <Route path="/cotacao-frete" element={<ProtectedRoute><CotacaoFrete /></ProtectedRoute>} />
-          <Route path="/custos" element={<ProtectedRoute><CustosDashboard /></ProtectedRoute>} />
-          <Route path="/alertas-custo" element={<ProtectedRoute><AlertasCusto /></ProtectedRoute>} />
-          <Route path="/mapa-rotas" element={<ProtectedRoute><MapaRotas /></ProtectedRoute>} />
-          <Route path="/rastreamento-motorista" element={<ProtectedRoute><RastreamentoMotorista /></ProtectedRoute>} />
-          <Route path="/notificacoes" element={<ProtectedRoute><Notificacoes /></ProtectedRoute>} />
-          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-          <Route path="/loja" element={<ProtectedRoute><LojaRecompensas /></ProtectedRoute>} />
-          <Route path="/conciliacao" element={<ProtectedRoute><ConciliacaoFinanceira /></ProtectedRoute>} />
-          <Route path="/rotas-transportadoras" element={<ProtectedRoute><RotasTransportadoras /></ProtectedRoute>} />
-          <Route path="/gestao-rodonaves" element={<ProtectedRoute><GestaoRodonaves /></ProtectedRoute>} />
-          <Route path="/melhor-envio" element={<ProtectedRoute><GestaoMelhorEnvio /></ProtectedRoute>} />
-          <Route path="/dashboard-executivo" element={<ProtectedRoute><DashboardExecutivo /></ProtectedRoute>} />
-          <Route path="/inteligencia-frete" element={<ProtectedRoute><InteligenciaFrete /></ProtectedRoute>} />
-          <Route path="/cotacao-multicanal" element={<ProtectedRoute><CotacaoMultiCanal /></ProtectedRoute>} />
-          <Route path="/dashboard-cotacoes" element={<ProtectedRoute><DashboardCotacoes /></ProtectedRoute>} />
-          <Route path="/painel-otif" element={<ProtectedRoute><PainelOTIF /></ProtectedRoute>} />
-          <Route path="/kanban-entregas" element={<ProtectedRoute><KanbanEntregas /></ProtectedRoute>} />
-          <Route path="/relatorio-pdf" element={<ProtectedRoute><RelatorioPDF /></ProtectedRoute>} />
-          <Route path="/conciliacao-automatica" element={<ProtectedRoute><ConciliacaoAutomatica /></ProtectedRoute>} />
-          <Route path="/importacao-massa" element={<ProtectedRoute><ImportacaoMassa /></ProtectedRoute>} />
-          <Route path="/automacao-regras" element={<ProtectedRoute><AutomacaoRegras /></ProtectedRoute>} />
-          <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
-          <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
-          <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
-          <Route path="/aprovacao-reset-senha" element={<ProtectedRoute requiredRole="admin"><AprovacaoResetSenha /></ProtectedRoute>} />
-          <Route path="/seguranca" element={<ProtectedRoute requiredRole="admin"><Seguranca /></ProtectedRoute>} />
-          <Route path="/rate-limit" element={<ProtectedRoute requiredRole="admin"><RateLimitDashboard /></ProtectedRoute>} />
-          <Route path="/rastrear" element={<RastreamentoPublico />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+    <Routes>
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+      <Route path="/fretes-internos" element={<ProtectedRoute><FretesInternos /></ProtectedRoute>} />
+      <Route path="/fornecedores" element={<ProtectedRoute><Fornecedores /></ProtectedRoute>} />
+      <Route path="/clientes" element={<ProtectedRoute><Clientes /></ProtectedRoute>} />
+      <Route path="/ocorrencias" element={<ProtectedRoute><Ocorrencias /></ProtectedRoute>} />
+      <Route path="/envios" element={<ProtectedRoute><Envios /></ProtectedRoute>} />
+      <Route path="/coletas" element={<ProtectedRoute><Coletas /></ProtectedRoute>} />
+      <Route path="/transportadoras" element={<ProtectedRoute><Transportadoras /></ProtectedRoute>} />
+      <Route path="/despachos" element={<ProtectedRoute><Despachos /></ProtectedRoute>} />
+      <Route path="/relatorios" element={<ProtectedRoute><Relatorios /></ProtectedRoute>} />
+      <Route path="/conquistas" element={<ProtectedRoute><Conquistas /></ProtectedRoute>} />
+      <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
+      <Route path="/configuracoes" element={<ProtectedRoute><Configuracoes /></ProtectedRoute>} />
+      <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/gestao-box" element={<ProtectedRoute><GestaoBox /></ProtectedRoute>} />
+      <Route path="/sla-dashboard" element={<ProtectedRoute><SLADashboard /></ProtectedRoute>} />
+      <Route path="/calendario" element={<ProtectedRoute><CalendarioLogistico /></ProtectedRoute>} />
+      <Route path="/cotacao-frete" element={<ProtectedRoute><CotacaoFrete /></ProtectedRoute>} />
+      <Route path="/custos" element={<ProtectedRoute><CustosDashboard /></ProtectedRoute>} />
+      <Route path="/alertas-custo" element={<ProtectedRoute><AlertasCusto /></ProtectedRoute>} />
+      <Route path="/mapa-rotas" element={<ProtectedRoute><MapaRotas /></ProtectedRoute>} />
+      <Route path="/rastreamento-motorista" element={<ProtectedRoute><RastreamentoMotorista /></ProtectedRoute>} />
+      <Route path="/notificacoes" element={<ProtectedRoute><Notificacoes /></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+      <Route path="/loja" element={<ProtectedRoute><LojaRecompensas /></ProtectedRoute>} />
+      <Route path="/conciliacao" element={<ProtectedRoute><ConciliacaoFinanceira /></ProtectedRoute>} />
+      <Route path="/rotas-transportadoras" element={<ProtectedRoute><RotasTransportadoras /></ProtectedRoute>} />
+      <Route path="/gestao-rodonaves" element={<ProtectedRoute><GestaoRodonaves /></ProtectedRoute>} />
+      <Route path="/melhor-envio" element={<ProtectedRoute><GestaoMelhorEnvio /></ProtectedRoute>} />
+      <Route path="/dashboard-executivo" element={<ProtectedRoute><DashboardExecutivo /></ProtectedRoute>} />
+      <Route path="/inteligencia-frete" element={<ProtectedRoute><InteligenciaFrete /></ProtectedRoute>} />
+      <Route path="/cotacao-multicanal" element={<ProtectedRoute><CotacaoMultiCanal /></ProtectedRoute>} />
+      <Route path="/dashboard-cotacoes" element={<ProtectedRoute><DashboardCotacoes /></ProtectedRoute>} />
+      <Route path="/painel-otif" element={<ProtectedRoute><PainelOTIF /></ProtectedRoute>} />
+      <Route path="/kanban-entregas" element={<ProtectedRoute><KanbanEntregas /></ProtectedRoute>} />
+      <Route path="/relatorio-pdf" element={<ProtectedRoute><RelatorioPDF /></ProtectedRoute>} />
+      <Route path="/conciliacao-automatica" element={<ProtectedRoute><ConciliacaoAutomatica /></ProtectedRoute>} />
+      <Route path="/importacao-massa" element={<ProtectedRoute><ImportacaoMassa /></ProtectedRoute>} />
+      <Route path="/automacao-regras" element={<ProtectedRoute><AutomacaoRegras /></ProtectedRoute>} />
+      <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
+      <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
+      <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
+      <Route path="/aprovacao-reset-senha" element={<ProtectedRoute requiredRole="admin"><AprovacaoResetSenha /></ProtectedRoute>} />
+      <Route path="/seguranca" element={<ProtectedRoute requiredRole="admin"><Seguranca /></ProtectedRoute>} />
+      <Route path="/rate-limit" element={<ProtectedRoute requiredRole="admin"><RateLimitDashboard /></ProtectedRoute>} />
+      <Route path="/rastrear" element={<RastreamentoPublico />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ReducedMotionProvider>
-      <LiveRegionProvider>
-        <AuthProvider>
-          <TimezoneProvider>
-            <AchievementProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <AchievementNotificationContainer />
-                <SessionTimeoutWarning />
-                <NewDeviceDetector />
-                <SecurityPushNotificationProvider />
-                <BrowserRouter>
-                  <Suspense fallback={<PageLoader />}>
-                    <AnimatedRoutes />
-                  </Suspense>
-                </BrowserRouter>
-              </TooltipProvider>
-            </AchievementProvider>
-          </TimezoneProvider>
-        </AuthProvider>
-      </LiveRegionProvider>
-    </ReducedMotionProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
+            <LazyProviders>
+              <AppRoutes />
+            </LazyProviders>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
