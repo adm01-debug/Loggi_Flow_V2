@@ -8,4 +8,5 @@ export { MELojasPanel } from './MELojasPanel';
 export { MECepAutoFill } from './MECepAutoFill';
 export { MEDetailDialog } from './MEDetailDialog';
 export { MEErrorState } from './MEErrorState';
+export { MEFormField } from './MEFormField';
 export type * from './types';
