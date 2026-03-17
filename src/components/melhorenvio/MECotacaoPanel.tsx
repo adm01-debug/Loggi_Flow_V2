@@ -301,8 +301,12 @@ export function MECotacaoPanel() {
 
       {results.length > 0 && (
         <>
-          <div className="flex justify-end">
-            <DataExporter data={exportData} filename="cotacoes-melhor-envio" columns={exportColumns} />
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-muted-foreground">{results.length} resultado(s) — histórico salvo localmente</p>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setResults([])}>Limpar histórico</Button>
+              <DataExporter data={exportData} filename="cotacoes-melhor-envio" columns={exportColumns} />
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {results.map((r, i) => {
