@@ -155,6 +155,9 @@ function AnimatedRoutes() {
           <Route path="/cotacao-multicanal" element={<ProtectedRoute><CotacaoMultiCanal /></ProtectedRoute>} />
           <Route path="/dashboard-cotacoes" element={<ProtectedRoute><DashboardCotacoes /></ProtectedRoute>} />
           <Route path="/painel-otif" element={<ProtectedRoute><PainelOTIF /></ProtectedRoute>} />
+          <Route path="/kanban-entregas" element={<ProtectedRoute><KanbanEntregas /></ProtectedRoute>} />
+          <Route path="/relatorio-pdf" element={<ProtectedRoute><RelatorioPDF /></ProtectedRoute>} />
+          <Route path="/conciliacao-automatica" element={<ProtectedRoute><ConciliacaoAutomatica /></ProtectedRoute>} />
           <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
           <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
