@@ -94,8 +94,33 @@ export default function Index() {
     return { pendentes: coletasPendentes + entregasPendentes, transito: coletasTransito + entregasTransito, finalizadas: coletasOk + entregasOk, problemas: coletasProblema + entregasProblema };
   }, [statusData]);
 
-  const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); };
+  // Auto-refresh timer
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [secondsAgo, setSecondsAgo] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsAgo(Math.floor((Date.now() - lastRefresh.getTime()) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastRefresh]);
+
+  // Auto-refresh every 2 minutes
+  useEffect(() => {
+    const autoRefresh = setInterval(() => {
+      refetchMetrics(); refetchAlerts(); refetchChart();
+      setLastRefresh(new Date());
+    }, 120000);
+    return () => clearInterval(autoRefresh);
+  }, [refetchMetrics, refetchAlerts, refetchChart]);
+
+  const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); setLastRefresh(new Date()); };
   const handleDateRangeChange = (range: DateRange | undefined) => { if (range) setDateRange(range); };
+
+  const formatTimeSince = (secs: number) => {
+    if (secs < 60) return `${secs}s atrás`;
+    return `${Math.floor(secs / 60)}m atrás`;
+  };
 
   const widgetDefinitions: Record<string, { size: DashboardWidget["size"]; render: () => React.ReactNode }> = {
     "xp-progress": { size: "full", render: () => <WidgetErrorBoundary widgetName="XP Progress">{userLevel ? <XPProgressBar currentXP={userLevel.current_xp} nextLevelXP={userLevel.level * 1000} level={userLevel.level} /> : null}</WidgetErrorBoundary> },
