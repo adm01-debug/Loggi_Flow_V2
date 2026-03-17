@@ -58,6 +58,7 @@ const GestaoRodonaves = lazy(() => import("./pages/GestaoRodonaves"));
 const GestaoMelhorEnvio = lazy(() => import("./pages/GestaoMelhorEnvio"));
 const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
 const InteligenciaFrete = lazy(() => import("./pages/InteligenciaFrete"));
+const CotacaoMultiCanal = lazy(() => import("./pages/CotacaoMultiCanal"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
