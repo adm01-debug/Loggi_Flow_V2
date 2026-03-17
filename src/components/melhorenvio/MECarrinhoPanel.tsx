@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
@@ -15,9 +14,11 @@ import { TableSkeleton } from '@/components/ui/skeletons';
 import { MEDetailDialog } from './MEDetailDialog';
 import { MEErrorState } from './MEErrorState';
 import { MECepAutoFill } from './MECepAutoFill';
+import { MEFormField } from './MEFormField';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/common/Pagination';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { formatPhone, formatCPFCNPJ } from '@/lib/validations';
 import type { MECartItem } from './types';
 
 export function MECarrinhoPanel() {
