@@ -56,6 +56,7 @@ const menuSections: MenuSection[] = [
       { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
       { title: "Cotação e Despacho", url: "/despachos", icon: Send },
       { title: "Envios Clientes", url: "/envios", icon: Package },
+      { title: "Kanban Entregas", url: "/kanban-entregas", icon: Sparkles },
       { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
       { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
       { title: "Ocorrências", url: "/ocorrencias", icon: AlertTriangle },
@@ -85,6 +86,8 @@ const menuSections: MenuSection[] = [
       { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
       { title: "Clientes", url: "/clientes", icon: Users },
       { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
+      { title: "Relatório PDF", url: "/relatorio-pdf", icon: FileCheck },
+      { title: "Conciliação Auto", url: "/conciliacao-automatica", icon: Cog },
     ],
   },
 ];
