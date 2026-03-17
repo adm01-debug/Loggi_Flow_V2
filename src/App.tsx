@@ -64,6 +64,8 @@ const PainelOTIF = lazy(() => import("./pages/PainelOTIF"));
 const KanbanEntregas = lazy(() => import("./pages/KanbanEntregas"));
 const RelatorioPDF = lazy(() => import("./pages/RelatorioPDF"));
 const ConciliacaoAutomatica = lazy(() => import("./pages/ConciliacaoAutomatica"));
+const ImportacaoMassa = lazy(() => import("./pages/ImportacaoMassa"));
+const AutomacaoRegras = lazy(() => import("./pages/AutomacaoRegras"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
