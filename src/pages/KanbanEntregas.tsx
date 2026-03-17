@@ -160,8 +160,9 @@ export default function KanbanEntregas() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  useRealtime('entregas', () => {
-    queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] });
+  useRealtime({
+    table: 'entregas',
+    queryKey: ['kanban-entregas'],
   });
 
   const { data: entregas, isLoading } = useQuery({
