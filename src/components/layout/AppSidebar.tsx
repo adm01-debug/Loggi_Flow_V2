@@ -86,6 +86,8 @@ const menuSections: MenuSection[] = [
       { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
       { title: "Clientes", url: "/clientes", icon: Users },
       { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
+      { title: "Relatório PDF", url: "/relatorio-pdf", icon: FileCheck },
+      { title: "Conciliação Auto", url: "/conciliacao-automatica", icon: Cog },
     ],
   },
 ];
