@@ -112,10 +112,10 @@ export default function Analytics() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {[
-                  { label: "Taxa de Entrega", value: "98.5%", target: "95%", status: "above" },
-                  { label: "Satisfação Cliente", value: "4.7/5", target: "4.5/5", status: "above" },
-                  { label: "Custo por Entrega", value: "R$ 12.50", target: "R$ 15.00", status: "below" },
-                  { label: "Tempo de Resposta", value: "2.3h", target: "4h", status: "below" },
+                  { label: "Taxa de Entrega", value: `${stats.onTimeRate.toFixed(1)}%`, target: "95%", status: stats.onTimeRate >= 95 ? "above" : "below" },
+                  { label: "Total Entregas", value: `${stats.totalDeliveries}`, target: "-", status: stats.totalDeliveries > 0 ? "above" : "below" },
+                  { label: "Custo Médio", value: `R$ ${(summaryMetrics?.avgCost ?? 0).toFixed(2)}`, target: "R$ 15.00", status: (summaryMetrics?.avgCost ?? 0) <= 15 ? "above" : "below" },
+                  { label: "Tempo Médio", value: `${stats.avgDeliveryTime.toFixed(1)}h`, target: "48h", status: stats.avgDeliveryTime <= 48 ? "above" : "below" },
                 ].map((kpi, i) => (
                   <div key={i} className="card-interactive p-4">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
