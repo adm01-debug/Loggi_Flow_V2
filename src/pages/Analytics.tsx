@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, TrendingUp, TrendingDown, Target, Clock, Truck, DollarSign, Loader2, RefreshCw } from "lucide-react";
-import { useAnalytics, DateRange } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { useKPIBenchmark } from "@/hooks/useKPIBenchmark";
 import { useTrackingAnalytics } from "@/hooks/useTrackingAnalytics";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
