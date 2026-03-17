@@ -2,58 +2,85 @@ import { useState, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, Clock, CheckCircle2, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon } from "lucide-react";
+import { Package, Truck, Clock, CheckCircle2, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText } from "lucide-react";
 import { useRealtime } from "@/hooks/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 
-interface Despacho { id: string; numero: string; cliente: string; destino: string; status: string; transportadora?: string; created_at: string; }
+interface Despacho {
+  id: string;
+  numero: string;
+  numero_entrega: string;
+  cliente: string;
+  destino: string;
+  status: string;
+  transportadora?: string;
+  nf_remessa?: string | null;
+  box_alocado?: string | null;
+  created_at: string;
+}
 
 const filterConfig: FilterConfig<Despacho> = {
   search: {
-    fields: ["numero", "cliente", "destino"],
+    fields: ["numero", "numero_entrega", "cliente", "destino"],
     placeholder: "Buscar despacho..."
   },
   status: {
     field: "status",
     options: [
-      { value: "aguardando", label: "Aguardando" },
-      { value: "em_separacao", label: "Em Separação" },
-      { value: "pronto", label: "Pronto" },
-      { value: "despachado", label: "Despachado" }
+      { value: "pronto_despacho", label: "Pronto Despacho" },
+      { value: "cotacao_frete", label: "Cotação Frete" },
+      { value: "nf_emitida", label: "NF Emitida" },
+      { value: "despachado", label: "Despachado" },
     ]
   }
 };
 
-const statusConfig: Record<string, { color: string; icon: LucideIcon }> = {
-  aguardando: { color: "bg-muted text-muted-foreground", icon: Clock },
-  em_separacao: { color: "bg-warning/15 text-warning", icon: Package },
-  pronto: { color: "bg-success/15 text-success", icon: CheckCircle2 },
-  despachado: { color: "bg-primary/15 text-primary", icon: Truck },
+const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
+  pronto_despacho: { label: "Pronto Despacho", color: "bg-primary/15 text-primary", icon: Package },
+  cotacao_frete: { label: "Cotação Frete", color: "bg-warning/15 text-warning", icon: Clock },
+  nf_emitida: { label: "NF Emitida", color: "bg-success/15 text-success", icon: FileText },
+  despachado: { label: "Despachado", color: "bg-primary/10 text-primary", icon: Truck },
+};
+
+// Valid flow: pronto_despacho → cotacao_frete → nf_emitida → despachado
+const validTransitions: Record<string, string> = {
+  pronto_despacho: "cotacao_frete",
+  cotacao_frete: "nf_emitida",
+  nf_emitida: "despachado",
 };
 
 export default function Despachos() {
   const qc = useQueryClient();
-  const [activeColumn, setActiveColumn] = useState<string | null>(null);
+  const [confirmItem, setConfirmItem] = useState<Despacho | null>(null);
 
   const { data: despachos = [], isLoading, refetch } = useQuery({
     queryKey: ["despachos"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("entregas").select("*").order("created_at", { ascending: false }).limit(100);
+      const { data, error } = await supabase
+        .from("entregas")
+        .select("id, numero_entrega, status, nf_remessa, box_alocado, endereco_entrega, created_at, cliente:clientes(razao_social, nome_fantasia), transportadora:transportadoras(nome_fantasia)")
+        .in("status", ["pronto_despacho", "cotacao_frete", "nf_emitida", "despachado"])
+        .order("created_at", { ascending: false })
+        .limit(200);
       if (error) throw error;
-      interface EntregaRow {
-        id: string;
-        numero_nf?: string;
-        cliente_nome?: string;
-        endereco_destino?: string;
-        status?: string;
-        transportadora_nome?: string;
-        created_at: string;
-      }
-      return (data || []).map((d: EntregaRow) => ({ id: d.id, numero: d.numero_nf || d.id.slice(0, 8), cliente: d.cliente_nome || "Cliente", destino: d.endereco_destino || "Endereço", status: d.status || "aguardando", transportadora: d.transportadora_nome, created_at: d.created_at }));
+      return (data || []).map((d: any) => ({
+        id: d.id,
+        numero: d.numero_entrega?.slice(-8) || d.id.slice(0, 8),
+        numero_entrega: d.numero_entrega || "",
+        cliente: d.cliente?.nome_fantasia || d.cliente?.razao_social || "Cliente",
+        destino: d.endereco_entrega || "Endereço",
+        status: d.status || "pronto_despacho",
+        transportadora: d.transportadora?.nome_fantasia,
+        nf_remessa: d.nf_remessa,
+        box_alocado: d.box_alocado,
+        created_at: d.created_at,
+      })) as Despacho[];
     },
   });
 
@@ -61,33 +88,70 @@ export default function Despachos() {
 
   const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(despachos, filterConfig);
 
-  const columns = ["aguardando", "em_separacao", "pronto", "despachado"];
+  const columns = ["pronto_despacho", "cotacao_frete", "nf_emitida", "despachado"];
   const getColumnItems = (status: string) => filteredData.filter(d => d.status === status);
-  const stats = { total: despachos.length, aguardando: getColumnItems("aguardando").length, pronto: getColumnItems("pronto").length, despachado: getColumnItems("despachado").length };
+  const stats = {
+    total: despachos.length,
+    prontos: getColumnItems("pronto_despacho").length,
+    cotacao: getColumnItems("cotacao_frete").length,
+    nfEmitida: getColumnItems("nf_emitida").length,
+    despachados: getColumnItems("despachado").length,
+  };
 
   const moveToNext = async (item: Despacho) => {
-    const idx = columns.indexOf(item.status);
-    if (idx >= 0 && idx < columns.length - 1) {
-      const nextStatus = columns[idx + 1] as "aguardando_producao" | "pronto_despacho" | "cotacao_frete" | "nf_emitida" | "despachado" | "em_transito" | "saiu_entrega" | "entregue" | "ocorrencia" | "finalizado";
-      await supabase.from("entregas").update({ status: nextStatus }).eq("id", item.id);
-      refetch();
+    const nextStatus = validTransitions[item.status];
+    if (!nextStatus) return;
+
+    // CRITICAL RULE: NF must be present before dispatch
+    if (nextStatus === "despachado" && !item.nf_remessa) {
+      toast.error("NF de Simples Remessa obrigatória antes do despacho. Emita a NF primeiro.");
+      return;
     }
+
+    // Confirm dispatch action
+    if (nextStatus === "despachado") {
+      setConfirmItem(item);
+      return;
+    }
+
+    await supabase.from("entregas").update({ status: nextStatus as any }).eq("id", item.id);
+    toast.success(`Movido para ${statusConfig[nextStatus]?.label || nextStatus}`);
+    refetch();
+  };
+
+  const confirmDispatch = async () => {
+    if (!confirmItem) return;
+    await supabase.from("entregas").update({ status: "despachado" as any, data_despacho: new Date().toISOString() }).eq("id", confirmItem.id);
+    toast.success("Entrega despachada com sucesso!");
+    setConfirmItem(null);
+    refetch();
   };
 
   return (
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400/20 to-teal-600/10"><Package className="w-6 h-6 text-teal-500" /></div>Despachos</h1><p className="text-muted-foreground mt-1">Kanban de expedição</p></div>
-          <div className="flex gap-2"><Button variant="outline" onClick={() => refetch()}><RefreshCw className="w-4 h-4 mr-2" />Atualizar</Button><Button><Plus className="w-4 h-4 mr-2" />Novo</Button></div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <Package className="w-6 h-6 text-primary" />
+              </div>
+              Despachos
+            </h1>
+            <p className="text-muted-foreground mt-1">Kanban de expedição — fluxo BOX → NF → Despacho</p>
+          </div>
+          <Button variant="outline" onClick={() => refetch()}><RefreshCw className="w-4 h-4 mr-2" />Atualizar</Button>
         </div>
-        <div className="grid grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Package className="w-5 h-5 text-teal-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-gray-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.aguardando}</p><p className="text-xs text-muted-foreground">Aguardando</p></div>
-          <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pronto}</p><p className="text-xs text-muted-foreground">Prontos</p></div>
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-blue-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.despachado}</p><p className="text-xs text-muted-foreground">Despachados</p></div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="stat-card text-center p-3"><Package className="w-5 h-5 text-primary mx-auto mb-1" /><p className="text-xl font-bold">{stats.prontos}</p><p className="text-[10px] text-muted-foreground">Prontos</p></div>
+          <div className="stat-card text-center p-3"><Clock className="w-5 h-5 text-warning mx-auto mb-1" /><p className="text-xl font-bold">{stats.cotacao}</p><p className="text-[10px] text-muted-foreground">Cotação</p></div>
+          <div className="stat-card text-center p-3"><FileText className="w-5 h-5 text-success mx-auto mb-1" /><p className="text-xl font-bold">{stats.nfEmitida}</p><p className="text-[10px] text-muted-foreground">NF Emitida</p></div>
+          <div className="stat-card text-center p-3"><Truck className="w-5 h-5 text-primary mx-auto mb-1" /><p className="text-xl font-bold">{stats.despachados}</p><p className="text-[10px] text-muted-foreground">Despachados</p></div>
         </div>
-        <FilterBar 
+
+        <FilterBar
           search={filters.search}
           onSearchChange={setSearch}
           searchPlaceholder="Buscar despacho..."
@@ -99,28 +163,67 @@ export default function Despachos() {
           totalFiltered={totalFiltered}
           totalOriginal={totalOriginal}
         />
-        {isLoading ? <Loader2 className="w-8 h-8 animate-spin mx-auto" /> : (
-          <div className="grid grid-cols-4 gap-4">
+
+        {/* NF Warning */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-warning/10 border border-warning/20 text-sm">
+          <AlertTriangle className="w-4 h-4 text-warning shrink-0" />
+          <span className="text-warning">Regra: NF de Simples Remessa deve ser emitida <strong>antes</strong> do despacho</span>
+        </div>
+
+        {isLoading ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /> : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {columns.map((col) => {
-              const config = statusConfig[col];
+              const config = statusConfig[col] || { label: col, color: "bg-muted text-muted-foreground", icon: Package };
               const Icon = config.icon;
               const items = getColumnItems(col);
               return (
                 <div key={col} className="space-y-3">
-                  <div className={cn("p-3 rounded-lg flex items-center justify-between", config.color)}><div className="flex items-center gap-2"><Icon className="w-4 h-4" /><span className="font-semibold capitalize">{col.replace("_", " ")}</span></div><Badge variant="secondary">{items.length}</Badge></div>
-                  <div className="space-y-2 min-h-[200px]">{items.map((item) => (
-                    <div key={item.id} className="card-interactive p-3">
-                      <div className="flex items-center justify-between mb-2"><span className="font-mono text-sm">#{item.numero}</span>{col !== "despachado" && <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveToNext(item)}><ArrowRight className="w-4 h-4" /></Button>}</div>
-                      <p className="font-medium text-sm">{item.cliente}</p>
-                      <p className="text-xs text-muted-foreground truncate">{item.destino}</p>
-                      {item.transportadora && <Badge variant="outline" className="mt-2 text-xs">{item.transportadora}</Badge>}
-                    </div>
-                  ))}</div>
+                  <div className={cn("p-3 rounded-lg flex items-center justify-between", config.color)}>
+                    <div className="flex items-center gap-2"><Icon className="w-4 h-4" /><span className="font-semibold text-sm">{config.label}</span></div>
+                    <Badge variant="secondary">{items.length}</Badge>
+                  </div>
+                  <div className="space-y-2 min-h-[150px]">
+                    {items.length === 0 && (
+                      <p className="text-xs text-muted-foreground text-center py-6">Nenhum item</p>
+                    )}
+                    {items.map((item) => (
+                      <div key={item.id} className="card-interactive p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-mono text-xs text-muted-foreground">{item.numero_entrega}</span>
+                          {validTransitions[col] && (
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveToNext(item)}>
+                              <ArrowRight className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                        <p className="font-medium text-sm truncate">{item.cliente}</p>
+                        <p className="text-xs text-muted-foreground truncate">{item.destino}</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {item.transportadora && <Badge variant="outline" className="text-xs">{item.transportadora}</Badge>}
+                          {item.box_alocado && <Badge variant="secondary" className="text-xs">📦 {item.box_alocado}</Badge>}
+                          {item.nf_remessa ? (
+                            <Badge variant="secondary" className="text-xs bg-success/20 text-success">NF ✓</Badge>
+                          ) : col !== "pronto_despacho" && (
+                            <Badge variant="secondary" className="text-xs bg-destructive/20 text-destructive">Sem NF</Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
+
+        <ConfirmDialog
+          open={!!confirmItem}
+          onOpenChange={(open) => !open && setConfirmItem(null)}
+          title="Confirmar Despacho"
+          description={`Deseja despachar a entrega ${confirmItem?.numero_entrega}? Esta ação registrará a data de despacho.`}
+          confirmLabel="Despachar"
+          onConfirm={confirmDispatch}
+        />
       </div>
     </MainLayout>
   );
