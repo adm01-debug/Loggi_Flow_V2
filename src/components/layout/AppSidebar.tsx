@@ -56,6 +56,7 @@ const menuSections: MenuSection[] = [
       { title: "Coletas Compras", url: "/coletas", icon: PackageSearch },
       { title: "Cotação e Despacho", url: "/despachos", icon: Send },
       { title: "Envios Clientes", url: "/envios", icon: Package },
+      { title: "Kanban Entregas", url: "/kanban-entregas", icon: Sparkles },
       { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
       { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
       { title: "Ocorrências", url: "/ocorrencias", icon: AlertTriangle },
