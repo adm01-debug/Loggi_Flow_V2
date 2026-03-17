@@ -15,7 +15,6 @@ import { TableSkeleton } from '@/components/ui/skeletons';
 import { MEDetailDialog } from './MEDetailDialog';
 import { MEErrorState } from './MEErrorState';
 import { MECepAutoFill } from './MECepAutoFill';
-import { formatCEP } from '@/lib/validations';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/common/Pagination';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
