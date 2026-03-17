@@ -9,7 +9,7 @@ import { useLogisticsCosts } from "@/hooks/useLogisticsCosts";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { useRealtime } from "@/hooks/useRealtime";
 import { cn } from "@/lib/utils";
-import { subDays, format, startOfMonth, eachMonthOfInterval, isSameMonth } from "date-fns";
+import { subDays, format, eachMonthOfInterval, isSameMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import {
@@ -18,8 +18,9 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "hsl(var(--primary))", "hsl(var(--accent))", "#10b981", "#f59e0b",
-  "#8b5cf6", "#ec4899", "#06b6d4", "#f97316",
+  "hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--muted-foreground))",
+  "hsl(var(--secondary))", "hsl(var(--destructive))", "hsl(var(--chart-1, 220 70% 50%))",
+  "hsl(var(--chart-2, 160 60% 45%))", "hsl(var(--chart-3, 30 80% 55%))",
 ];
 
 export default function CustosDashboard() {
@@ -42,8 +43,8 @@ export default function CustosDashboard() {
     if (!entregas?.length) return [];
     const months = eachMonthOfInterval({ start: startDate, end: endDate });
     return months.map((month) => {
-      const monthEntregas = entregas.filter((e: any) => isSameMonth(new Date(e.created_at), month));
-      const total = monthEntregas.reduce((sum: number, e: any) => sum + (e.valor_frete || 0), 0);
+      const monthEntregas = (entregas || []).filter((e) => isSameMonth(new Date(e.created_at), month));
+      const total = monthEntregas.reduce((sum, e) => sum + (e.valor_frete || 0), 0);
       const count = monthEntregas.length;
       return {
         name: format(month, "MMM/yy", { locale: ptBR }),

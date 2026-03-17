@@ -100,11 +100,13 @@ export default function ConciliacaoAutomatica() {
 
         // Try to match by value + transportadora
         if (!matchedEntrega) {
+          const transportadoraNome = (item.transportadora_nome || '').toLowerCase().substring(0, 5);
           matchedEntrega = entregas.find(
-            e => e.valor_frete && Math.abs(e.valor_frete - item.valor) < 0.01 &&
-                 (e as any).transportadora?.nome_fantasia?.toLowerCase().includes(
-                   (item.transportadora_nome || '').toLowerCase().substring(0, 5)
-                 )
+            e => {
+              const entregaTransp = e.transportadora as { nome_fantasia: string } | null;
+              return e.valor_frete && Math.abs(e.valor_frete - item.valor) < 0.01 &&
+                entregaTransp?.nome_fantasia?.toLowerCase().includes(transportadoraNome);
+            }
           );
         }
 
@@ -202,8 +204,8 @@ export default function ConciliacaoAutomatica() {
           </Card>
           <Card>
             <CardContent className="pt-6 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-amber-500/10">
-                <FileSpreadsheet className="w-6 h-6 text-amber-500" />
+              <div className="p-3 rounded-lg bg-warning/10">
+                <FileSpreadsheet className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{itensImportados?.length || 0}</p>
@@ -240,8 +242,8 @@ export default function ConciliacaoAutomatica() {
                     {matchResults.map((r, i) => (
                       <TableRow key={i}>
                         <TableCell>
-                          {r.status === 'conciliado' && <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><CheckCircle2 className="w-3 h-3" />OK</Badge>}
-                          {r.status === 'divergencia' && <Badge className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1"><AlertTriangle className="w-3 h-3" />Diverg.</Badge>}
+                          {r.status === 'conciliado' && <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><CheckCircle2 className="w-3 h-3" />OK</Badge>}
+                          {r.status === 'divergencia' && <Badge className="bg-warning/10 text-warning border-warning/20 gap-1"><AlertTriangle className="w-3 h-3" />Diverg.</Badge>}
                           {r.status === 'sem_match' && <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" />Sem Match</Badge>}
                         </TableCell>
                         <TableCell className="font-medium">{r.fatura.transportadora_nome || '—'}</TableCell>
@@ -249,7 +251,7 @@ export default function ConciliacaoAutomatica() {
                         <TableCell className="text-right">R$ {r.fatura.valor_fatura.toFixed(2)}</TableCell>
                         <TableCell className="font-mono text-xs">{r.numero_entrega || '—'}</TableCell>
                         <TableCell className="text-right">{r.valor_sistema ? `R$ ${r.valor_sistema.toFixed(2)}` : '—'}</TableCell>
-                        <TableCell className={cn("text-right font-medium", r.diferenca > 0.01 ? 'text-destructive' : 'text-green-600')}>
+                        <TableCell className={cn("text-right font-medium", r.diferenca > 0.01 ? 'text-destructive' : 'text-primary')}>
                           R$ {r.diferenca.toFixed(2)}
                         </TableCell>
                       </TableRow>

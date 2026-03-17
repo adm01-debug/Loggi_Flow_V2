@@ -45,7 +45,9 @@ export const useSLAAlerts = () => {
   const alerts = useMemo((): SLAAlertItem[] => {
     if (!entregas) return [];
 
-    return entregas.map((e: any) => {
+    return entregas.map((e) => {
+      const transportadora = e.transportadora as { nome_fantasia: string } | null;
+      const cliente = e.cliente as { razao_social: string } | null;
       const previsao = parseISO(e.previsao_entrega);
       const now = new Date();
       const horasRestantes = differenceInHours(previsao, now);
@@ -62,8 +64,8 @@ export const useSLAAlerts = () => {
         numero_entrega: e.numero_entrega,
         status: e.status,
         previsao_entrega: e.previsao_entrega,
-        transportadora_nome: e.transportadora?.nome_fantasia || null,
-        cliente_nome: e.cliente?.razao_social || null,
+        transportadora_nome: transportadora?.nome_fantasia || null,
+        cliente_nome: cliente?.razao_social || null,
         horas_restantes: horasRestantes,
         risco,
         previsao_atraso: atrasado,
