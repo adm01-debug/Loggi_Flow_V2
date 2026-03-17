@@ -49,6 +49,7 @@ const routeLabels: Record<string, string> = {
   "/configuracoes": "Configurações",
   "/perfil": "Perfil",
   "/auth": "Autenticação",
+  "/gestao-melhor-envio": "Melhor Envio",
 };
 
 // Mapeamento de categorias
