@@ -174,7 +174,7 @@ export default function CotacaoMultiCanal() {
     }
   };
 
-  const handleCotarWhatsApp = (carrier: TransportadoraComCanal) => {
+  const handleCotarWhatsApp = async (carrier: TransportadoraComCanal) => {
     const peso = pesoKg || '(não informado)';
     const msg = encodeURIComponent(
       `Olá! Gostaria de cotar um frete:\n\n` +
@@ -189,7 +189,20 @@ export default function CotacaoMultiCanal() {
     const phone = carrier.whatsapp?.replace(/\D/g, '');
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
     
-    // Register as pending
+    // Persist to DB
+    createCotacao.mutate({
+      transportadora_id: carrier.transportadora_id,
+      canal: 'whatsapp',
+      origem_estado: origemEstado,
+      origem_cidade: origemCidade || undefined,
+      destino_estado: destinoEstado,
+      destino_cidade: destinoCidade || undefined,
+      peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
+      volumes: parseInt(volumes),
+      valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined,
+      observacoes: 'Mensagem enviada via WhatsApp',
+    });
+
     const newCotacao: CotacaoManual = {
       id: crypto.randomUUID(),
       transportadora_id: carrier.transportadora_id,
@@ -205,7 +218,7 @@ export default function CotacaoMultiCanal() {
     toast.success('Mensagem WhatsApp aberta! Registre a resposta quando receber.');
   };
 
-  const handleCotarEmail = (carrier: TransportadoraComCanal) => {
+  const handleCotarEmail = async (carrier: TransportadoraComCanal) => {
     const peso = pesoKg || '(não informado)';
     const subject = encodeURIComponent(`Cotação de Frete - ${origemEstado} → ${destinoEstado}`);
     const body = encodeURIComponent(
@@ -222,6 +235,20 @@ export default function CotacaoMultiCanal() {
     
     window.open(`mailto:${carrier.email}?subject=${subject}&body=${body}`, '_blank');
     
+    // Persist to DB
+    createCotacao.mutate({
+      transportadora_id: carrier.transportadora_id,
+      canal: 'email',
+      origem_estado: origemEstado,
+      origem_cidade: origemCidade || undefined,
+      destino_estado: destinoEstado,
+      destino_cidade: destinoCidade || undefined,
+      peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
+      volumes: parseInt(volumes),
+      valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined,
+      observacoes: 'Email enviado',
+    });
+
     const newCotacao: CotacaoManual = {
       id: crypto.randomUUID(),
       transportadora_id: carrier.transportadora_id,
