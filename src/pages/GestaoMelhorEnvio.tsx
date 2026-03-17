@@ -12,8 +12,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { useState, useCallback } from 'react';
 
-
-
+  useKeyboardShortcut('8', useCallback(() => setActiveTab('webhooks'), []), { alt: true });
 export default function GestaoMelhorEnvio() {
   const [useSandbox, setUseSandbox] = useLocalStorage('me-sandbox-mode', true);
   const [activeTab, setActiveTab] = useState<string>('cotacao');
