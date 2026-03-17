@@ -15,6 +15,7 @@ import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/Drag
 import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
 import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
+import { LiveStatusBar } from "@/components/dashboard/LiveStatusBar";
 import { Button } from "@/components/ui/button";
 import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance } from "@/hooks/useDashboardMetrics";
 import { useRealtime } from "@/hooks/useRealtime";
