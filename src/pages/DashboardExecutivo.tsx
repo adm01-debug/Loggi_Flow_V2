@@ -3,16 +3,19 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
-import { BarChart3, TrendingUp, TrendingDown, Target, Truck, DollarSign, Clock, AlertTriangle, CheckCircle2, Package, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { BarChart3, Target, Truck, DollarSign, Clock, AlertTriangle, CheckCircle2, Package, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { format, subDays, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Area, AreaChart } from "recharts";
 import { formatCurrency } from "@/lib/formatters";
+import { useExecutiveMetrics } from "@/hooks/useExecutiveMetrics";
 
 export default function DashboardExecutivo() {
-  // Fetch all core metrics
+  const { trends, carrierOtif, avgCollectionTime } = useExecutiveMetrics();
+
+  // Core monthly metrics (current vs previous)
   const { data: entregasData } = useQuery({
     queryKey: ["exec-entregas"],
     queryFn: async () => {
@@ -20,7 +23,6 @@ export default function DashboardExecutivo() {
       const thisMonth = startOfMonth(now);
       const lastMonth = startOfMonth(subMonths(now, 1));
       const endLastMonth = endOfMonth(subMonths(now, 1));
-
       const [current, previous] = await Promise.all([
         supabase.from("entregas").select("status, valor_frete, previsao_entrega, data_entrega_efetiva, created_at, transportadora_id").gte("created_at", thisMonth.toISOString()),
         supabase.from("entregas").select("status, valor_frete, previsao_entrega, data_entrega_efetiva, created_at").gte("created_at", lastMonth.toISOString()).lte("created_at", endLastMonth.toISOString()),
@@ -50,16 +52,7 @@ export default function DashboardExecutivo() {
     staleTime: QUERY_STALE_TIME.DASHBOARD,
   });
 
-  const { data: transportadoras = [] } = useQuery({
-    queryKey: ["exec-transportadoras"],
-    queryFn: async () => {
-      const { data } = await supabase.from("transportadoras").select("id, nome_fantasia, score_performance").order("score_performance", { ascending: false }).limit(10);
-      return data || [];
-    },
-    staleTime: QUERY_STALE_TIME.DASHBOARD,
-  });
-
-  // Calculate KPIs
+  // KPI calculation
   const kpis = useMemo(() => {
     const curr = entregasData?.current || [];
     const prev = entregasData?.previous || [];
@@ -69,26 +62,21 @@ export default function DashboardExecutivo() {
     const totalEntregas = curr.length;
     const prevTotal = prev.length;
     const entregues = curr.filter(e => e.status === "entregue" || e.status === "finalizado");
-    
-    // OTIF: On Time In Full
+
     const onTime = entregues.filter(e => {
       if (!e.previsao_entrega || !e.data_entrega_efetiva) return true;
       return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega);
     });
     const otifRate = entregues.length > 0 ? (onTime.length / entregues.length) * 100 : 0;
 
-    // Custo total frete
     const totalFrete = curr.reduce((acc, e) => acc + (e.valor_frete || 0), 0);
     const prevFrete = prev.reduce((acc, e) => acc + (e.valor_frete || 0), 0);
 
-    // Taxa de incidentes
     const incidentRate = totalEntregas > 0 ? (ocorrencias.length / totalEntregas) * 100 : 0;
 
-    // Divergência média coletas
     const coletasComDiv = coletas.filter(c => c.divergencia_percentual != null && c.divergencia_percentual > 0);
     const avgDivergencia = coletasComDiv.length > 0 ? coletasComDiv.reduce((acc, c) => acc + (c.divergencia_percentual || 0), 0) / coletasComDiv.length : 0;
 
-    // Growth
     const entregasGrowth = prevTotal > 0 ? ((totalEntregas - prevTotal) / prevTotal) * 100 : 0;
     const freteGrowth = prevFrete > 0 ? ((totalFrete - prevFrete) / prevFrete) * 100 : 0;
 
@@ -115,14 +103,6 @@ export default function DashboardExecutivo() {
 
   const pieColors = ["hsl(var(--primary))", "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--accent))", "hsl(var(--muted))"];
 
-  // Transportadora ranking chart
-  const rankingData = useMemo(() => {
-    return transportadoras.slice(0, 6).map(t => ({
-      name: (t.nome_fantasia || "").substring(0, 12),
-      score: t.score_performance || 0,
-    }));
-  }, [transportadoras]);
-
   const GrowthIndicator = ({ value, suffix = "%" }: { value: number; suffix?: string }) => {
     if (value === 0) return <span className="text-muted-foreground flex items-center gap-1 text-xs"><Minus className="w-3 h-3" />0{suffix}</span>;
     if (value > 0) return <span className="text-success flex items-center gap-1 text-xs"><ArrowUpRight className="w-3 h-3" />+{value.toFixed(1)}{suffix}</span>;
@@ -137,6 +117,10 @@ export default function DashboardExecutivo() {
       </Badge>
     );
   };
+
+  const trendData = trends.data || [];
+  const carrierData = carrierOtif.data || [];
+  const avgColTime = avgCollectionTime.data || 0;
 
   return (
     <MainLayout>
@@ -153,8 +137,7 @@ export default function DashboardExecutivo() {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* OTIF */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="card-base p-4 space-y-2">
             <div className="flex items-center justify-between">
               <Target className="w-5 h-5 text-primary" />
@@ -165,7 +148,6 @@ export default function DashboardExecutivo() {
             <p className="text-xs text-muted-foreground">Meta: ≥{kpis.targetOtif}%</p>
           </div>
 
-          {/* Custo Frete */}
           <div className="card-base p-4 space-y-2">
             <div className="flex items-center justify-between">
               <DollarSign className="w-5 h-5 text-success" />
@@ -173,10 +155,9 @@ export default function DashboardExecutivo() {
             </div>
             <p className="text-2xl font-bold">{formatCurrency(kpis.totalFrete)}</p>
             <p className="text-xs text-muted-foreground">Custo Frete Mensal</p>
-            <p className="text-xs text-muted-foreground">Mês anterior: {formatCurrency(kpis.prevFrete)}</p>
+            <p className="text-xs text-muted-foreground">Anterior: {formatCurrency(kpis.prevFrete)}</p>
           </div>
 
-          {/* Taxa de Incidentes */}
           <div className="card-base p-4 space-y-2">
             <div className="flex items-center justify-between">
               <AlertTriangle className="w-5 h-5 text-warning" />
@@ -187,15 +168,26 @@ export default function DashboardExecutivo() {
             <p className="text-xs text-muted-foreground">Meta: ≤{kpis.targetIncident}%</p>
           </div>
 
-          {/* Divergência Coletas */}
           <div className="card-base p-4 space-y-2">
             <div className="flex items-center justify-between">
               <Package className="w-5 h-5 text-accent-foreground" />
               <KPIStatus value={kpis.avgDivergencia} target={kpis.targetDivergencia} inverted />
             </div>
             <p className="text-2xl font-bold">{kpis.avgDivergencia.toFixed(1)}%</p>
-            <p className="text-xs text-muted-foreground">Divergência Média Coletas</p>
+            <p className="text-xs text-muted-foreground">Diverg. Média Coletas</p>
             <p className="text-xs text-muted-foreground">Meta: ≤{kpis.targetDivergencia}%</p>
+          </div>
+
+          <div className="card-base p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <Clock className="w-5 h-5 text-primary" />
+              <Badge variant="secondary" className={cn("text-xs", avgColTime <= 48 ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive")}>
+                {avgColTime <= 48 ? "✓ Na meta" : "✗ Acima"}
+              </Badge>
+            </div>
+            <p className="text-2xl font-bold">{avgColTime > 0 ? `${avgColTime}h` : "-"}</p>
+            <p className="text-xs text-muted-foreground">Tempo Médio Coleta</p>
+            <p className="text-xs text-muted-foreground">Meta: ≤48h</p>
           </div>
         </div>
 
@@ -224,9 +216,94 @@ export default function DashboardExecutivo() {
           </div>
         </div>
 
-        {/* Charts Grid */}
+        {/* Trend Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Status Distribution */}
+          {/* OTIF Evolution (6 months) */}
+          <div className="card-base p-4">
+            <h3 className="font-semibold mb-4">Evolução OTIF — Últimos 6 meses</h3>
+            {trendData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={trendData}>
+                  <defs>
+                    <linearGradient id="otifGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
+                  <YAxis domain={[0, 100]} className="text-xs fill-muted-foreground" tickFormatter={v => `${v}%`} />
+                  <Tooltip formatter={(value: number) => [`${value}%`, "OTIF"]} />
+                  <Area type="monotone" dataKey="otif" stroke="hsl(var(--primary))" fill="url(#otifGradient)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">Carregando tendências...</p>
+            )}
+          </div>
+
+          {/* Freight Cost Evolution */}
+          <div className="card-base p-4">
+            <h3 className="font-semibold mb-4">Custo de Frete Mensal</h3>
+            {trendData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
+                  <YAxis className="text-xs fill-muted-foreground" tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip formatter={(value: number) => [formatCurrency(value), "Custo Frete"]} />
+                  <Bar dataKey="custoFrete" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">Carregando tendências...</p>
+            )}
+          </div>
+        </div>
+
+        {/* Volume Trend + Carrier OTIF */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Volume Trend */}
+          <div className="card-base p-4">
+            <h3 className="font-semibold mb-4">Volume Operacional — 6 meses</h3>
+            {trendData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
+                  <YAxis className="text-xs fill-muted-foreground" />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="entregas" name="Entregas" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="coletas" name="Coletas" stroke="hsl(var(--warning))" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="ocorrencias" name="Ocorrências" stroke="hsl(var(--destructive))" strokeWidth={2} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">Carregando tendências...</p>
+            )}
+          </div>
+
+          {/* Carrier OTIF Breakdown */}
+          <div className="card-base p-4">
+            <h3 className="font-semibold mb-4">OTIF por Transportadora</h3>
+            {carrierData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={carrierData.slice(0, 8)} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis type="number" domain={[0, 100]} className="text-xs fill-muted-foreground" tickFormatter={v => `${v}%`} />
+                  <YAxis type="category" dataKey="name" width={100} className="text-xs fill-muted-foreground" tickFormatter={v => v.substring(0, 12)} />
+                  <Tooltip formatter={(value: number) => [`${value}%`, "OTIF"]} />
+                  <Bar dataKey="otifRate" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">Sem dados de transportadoras</p>
+            )}
+          </div>
+        </div>
+
+        {/* Status Distribution + Carrier Cost */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card-base p-4">
             <h3 className="font-semibold mb-4">Distribuição de Status</h3>
             {statusDistribution.length > 0 ? (
@@ -245,26 +322,31 @@ export default function DashboardExecutivo() {
             )}
           </div>
 
-          {/* Transportadora Ranking */}
+          {/* Carrier avg cost ranking */}
           <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">Ranking Transportadoras (Score)</h3>
-            {rankingData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={rankingData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis type="number" domain={[0, 100]} className="text-xs fill-muted-foreground" />
-                  <YAxis type="category" dataKey="name" width={100} className="text-xs fill-muted-foreground" />
-                  <Tooltip />
-                  <Bar dataKey="score" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <h3 className="font-semibold mb-4">Custo Médio por Transportadora</h3>
+            {carrierData.length > 0 ? (
+              <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                {carrierData.slice(0, 10).map((c, i) => (
+                  <div key={c.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-muted-foreground w-5">{i + 1}.</span>
+                      <span className="text-sm font-medium truncate max-w-[140px]">{c.name}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge variant="outline" className="text-xs">{c.total} entregas</Badge>
+                      <span className="text-sm font-semibold text-success">{formatCurrency(c.avgCost)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
               <p className="text-muted-foreground text-center py-8">Sem dados</p>
             )}
           </div>
         </div>
 
-        {/* Metas Summary Table */}
+        {/* Goals Summary */}
         <div className="card-base p-4">
           <h3 className="font-semibold mb-4">Resumo de Metas</h3>
           <div className="overflow-x-auto">
@@ -282,6 +364,7 @@ export default function DashboardExecutivo() {
                   { name: "OTIF", current: `${kpis.otifRate.toFixed(1)}%`, target: "≥95%", ok: kpis.otifRate >= 95 },
                   { name: "Taxa de Incidentes", current: `${kpis.incidentRate.toFixed(1)}%`, target: "≤1%", ok: kpis.incidentRate <= 1 },
                   { name: "Divergência Coletas", current: `${kpis.avgDivergencia.toFixed(1)}%`, target: "≤5%", ok: kpis.avgDivergencia <= 5 },
+                  { name: "Tempo Médio Coleta", current: avgColTime > 0 ? `${avgColTime}h` : "-", target: "≤48h", ok: avgColTime <= 48 },
                   { name: "Entregas no Prazo", current: `${kpis.otifRate.toFixed(1)}%`, target: "≥98%", ok: kpis.otifRate >= 98 },
                   { name: "Ocorrências Resolvidas", current: `${kpis.ocorrencias > 0 ? ((kpis.ocorrenciasResolvidas / kpis.ocorrencias) * 100).toFixed(0) : 100}%`, target: "≥90%", ok: kpis.ocorrencias === 0 || (kpis.ocorrenciasResolvidas / kpis.ocorrencias) >= 0.9 },
                 ].map((row, i) => (
