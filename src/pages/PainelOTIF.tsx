@@ -57,8 +57,8 @@ export default function PainelOTIF() {
 
     const map: Record<string, TransportadoraOTIF> = {};
 
-    entregas.forEach((e: any) => {
-      const t = e.transportadora;
+    entregas.forEach((e) => {
+      const t = e.transportadora as { id: string; nome_fantasia: string; score_performance: number | null } | null;
       if (!t) return;
 
       if (!map[t.id]) {
