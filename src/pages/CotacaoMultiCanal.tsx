@@ -18,6 +18,7 @@ import {
 import { useTransportadoraRotas, type TransportadoraRota } from '@/hooks/useTransportadoraRotas';
 import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
+import { useCotacoesMulticanal } from '@/hooks/useCotacoesMulticanal';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
