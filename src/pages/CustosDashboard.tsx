@@ -43,8 +43,8 @@ export default function CustosDashboard() {
     if (!entregas?.length) return [];
     const months = eachMonthOfInterval({ start: startDate, end: endDate });
     return months.map((month) => {
-      const monthEntregas = entregas.filter((e: any) => isSameMonth(new Date(e.created_at), month));
-      const total = monthEntregas.reduce((sum: number, e: any) => sum + (e.valor_frete || 0), 0);
+      const monthEntregas = (entregas as { created_at: string; valor_frete: number | null }[]).filter((e) => isSameMonth(new Date(e.created_at), month));
+      const total = monthEntregas.reduce((sum, e) => sum + (e.valor_frete || 0), 0);
       const count = monthEntregas.length;
       return {
         name: format(month, "MMM/yy", { locale: ptBR }),
