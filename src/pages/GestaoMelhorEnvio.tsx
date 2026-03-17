@@ -4,8 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MECotacaoPanel, MECarrinhoPanel, MEEtiquetasPanel, MERastreamentoPanel, METransportadorasPanel, MEUsuarioPanel, MELojasPanel } from '@/components/melhorenvio';
 import { Calculator, ShoppingCart, Tag, MapPin, Truck, User, Store, Package2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export default function GestaoMelhorEnvio() {
+  const [useSandbox, setUseSandbox] = useLocalStorage('me-sandbox-mode', true);
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -15,9 +20,17 @@ export default function GestaoMelhorEnvio() {
           icon={Package2}
         />
 
-        <div className="flex items-center gap-2 mb-2">
-          <Badge variant="outline" className="text-xs">Sandbox</Badge>
-          <span className="text-xs text-muted-foreground">Ambiente de testes ativo</span>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-2">
+            <Switch checked={useSandbox} onCheckedChange={setUseSandbox} />
+            <Label className="text-sm cursor-pointer">Sandbox</Label>
+          </div>
+          <Badge variant={useSandbox ? 'outline' : 'default'} className="text-xs">
+            {useSandbox ? '🧪 Ambiente de Testes' : '🚀 Produção'}
+          </Badge>
+          {!useSandbox && (
+            <span className="text-xs text-destructive font-medium">Ações terão efeito real!</span>
+          )}
         </div>
 
         <Tabs defaultValue="cotacao" className="space-y-4">

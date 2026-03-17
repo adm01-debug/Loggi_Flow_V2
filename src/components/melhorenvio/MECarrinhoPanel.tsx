@@ -8,6 +8,16 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { EmptyState } from '@/components/common/EmptyState';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { TableSkeleton } from '@/components/ui/skeletons';
+import { MEDetailDialog } from './MEDetailDialog';
+import { MEErrorState } from './MEErrorState';
+import { MECepAutoFill } from './MECepAutoFill';
+import { formatCEP } from '@/lib/validations';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination } from '@/components/common/Pagination';
 import type { MECartItem } from './types';
 
 export function MECarrinhoPanel() {
@@ -15,47 +25,30 @@ export function MECarrinhoPanel() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showReverse, setShowReverse] = useState(false);
   const [itemDetail, setItemDetail] = useState<Record<string, unknown> | null>(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   const [reverseForm, setReverseForm] = useState({
     service: '',
-    from_name: '',
-    from_postal_code: '',
-    from_address: '',
-    from_number: '',
-    from_district: '',
-    from_city: '',
-    from_state_abbr: '',
-    to_name: '',
-    to_postal_code: '',
-    to_address: '',
-    to_number: '',
-    to_district: '',
-    to_city: '',
-    to_state_abbr: '',
-    width: '20',
-    height: '10',
-    length: '30',
-    weight: '1',
-    insurance_value: '100',
+    from_name: '', from_postal_code: '', from_address: '', from_number: '',
+    from_district: '', from_city: '', from_state_abbr: '',
+    to_name: '', to_postal_code: '', to_address: '', to_number: '',
+    to_district: '', to_city: '', to_state_abbr: '',
+    width: '20', height: '10', length: '30', weight: '1', insurance_value: '100',
   });
 
   const rawData = listarCarrinho.data;
   const items: MECartItem[] = Array.isArray((rawData as Record<string, unknown>)?.data)
     ? (rawData as Record<string, unknown>).data as MECartItem[]
-    : Array.isArray(rawData)
-      ? rawData as MECartItem[]
-      : [];
+    : Array.isArray(rawData) ? rawData as MECartItem[] : [];
+
+  const pagination = usePagination(items, { initialPageSize: 10 });
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
   const selectAll = () => {
-    if (selectedIds.length === items.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(items.map((item) => item.id));
-    }
+    setSelectedIds(selectedIds.length === items.length ? [] : items.map((item) => item.id));
   };
 
   const handleCheckout = () => {
@@ -74,7 +67,7 @@ export function MECarrinhoPanel() {
       service: parseInt(reverseForm.service),
       from: {
         name: reverseForm.from_name,
-        postal_code: reverseForm.from_postal_code,
+        postal_code: reverseForm.from_postal_code.replace(/\D/g, ''),
         address: reverseForm.from_address,
         number: reverseForm.from_number,
         district: reverseForm.from_district,
@@ -83,7 +76,7 @@ export function MECarrinhoPanel() {
       },
       to: {
         name: reverseForm.to_name,
-        postal_code: reverseForm.to_postal_code,
+        postal_code: reverseForm.to_postal_code.replace(/\D/g, ''),
         address: reverseForm.to_address,
         number: reverseForm.to_number,
         district: reverseForm.to_district,
@@ -129,61 +122,100 @@ export function MECarrinhoPanel() {
         </CardHeader>
         <CardContent>
           {listarCarrinho.isLoading ? (
-            <div className="flex items-center justify-center py-8"><Loader2 className="w-6 h-6 animate-spin" /></div>
+            <TableSkeleton rows={3} columns={7} />
+          ) : listarCarrinho.isError ? (
+            <MEErrorState message="Erro ao carregar o carrinho." onRetry={() => listarCarrinho.refetch()} />
           ) : items.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">Carrinho vazio</p>
+            <EmptyState
+              variant="inbox"
+              title="Carrinho vazio"
+              description="Faça uma cotação e adicione fretes ao carrinho para começar."
+              size="sm"
+            />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">
-                    <input type="checkbox" checked={selectedIds.length === items.length && items.length > 0} onChange={selectAll} />
-                  </TableHead>
-                  <TableHead>Serviço</TableHead>
-                  <TableHead>Transportadora</TableHead>
-                  <TableHead>Destino</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Prazo</TableHead>
-                  <TableHead className="w-20" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => toggleSelect(item.id)} />
-                    </TableCell>
-                    <TableCell className="font-medium">{item.service || '-'}</TableCell>
-                    <TableCell>{item.company?.name || '-'}</TableCell>
-                    <TableCell className="text-xs">{item.to?.postal_code || '-'}</TableCell>
-                    <TableCell className="font-semibold text-primary">R$ {item.price || '-'}</TableCell>
-                    <TableCell>{item.delivery_time || '-'} dias</TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleViewItem(item.id)} disabled={exibirItemCarrinho.isPending}>
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => removerItemCarrinho.mutate(item.id)} disabled={removerItemCarrinho.isPending}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10">
+                      <Checkbox checked={selectedIds.length === items.length && items.length > 0} onCheckedChange={selectAll} />
+                    </TableHead>
+                    <TableHead>Serviço</TableHead>
+                    <TableHead>Transportadora</TableHead>
+                    <TableHead>Destino</TableHead>
+                    <TableHead>Valor</TableHead>
+                    <TableHead>Prazo</TableHead>
+                    <TableHead className="w-20" />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {pagination.paginatedData.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
+                      </TableCell>
+                      <TableCell className="font-medium">{item.service || '-'}</TableCell>
+                      <TableCell>{item.company?.name || '-'}</TableCell>
+                      <TableCell className="text-xs">{item.to?.postal_code || '-'}</TableCell>
+                      <TableCell className="font-semibold text-primary">R$ {item.price || '-'}</TableCell>
+                      <TableCell>{item.delivery_time || '-'} dias</TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => handleViewItem(item.id)} disabled={exibirItemCarrinho.isPending}>
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => setConfirmRemoveId(item.id)} disabled={removerItemCarrinho.isPending}>
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.totalItems}
+                pageSize={pagination.pageSize}
+                startIndex={pagination.startIndex}
+                endIndex={pagination.endIndex}
+                hasNextPage={pagination.hasNextPage}
+                hasPrevPage={pagination.hasPrevPage}
+                pageSizeOptions={pagination.pageSizeOptions}
+                onPageChange={pagination.setPage}
+                onPageSizeChange={pagination.setPageSize}
+                onNextPage={pagination.nextPage}
+                onPrevPage={pagination.prevPage}
+                onFirstPage={pagination.firstPage}
+                onLastPage={pagination.lastPage}
+              />
+            </>
           )}
         </CardContent>
       </Card>
 
-      {itemDetail && (
-        <Dialog open={!!itemDetail} onOpenChange={() => setItemDetail(null)}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-auto">
-            <DialogHeader><DialogTitle>Detalhes do Item</DialogTitle></DialogHeader>
-            <pre className="bg-muted p-3 rounded text-xs overflow-auto">{JSON.stringify(itemDetail, null, 2)}</pre>
-          </DialogContent>
-        </Dialog>
-      )}
+      <ConfirmDialog
+        open={!!confirmRemoveId}
+        onOpenChange={(open) => { if (!open) setConfirmRemoveId(null); }}
+        title="Remover item do carrinho"
+        description="Tem certeza que deseja remover este item do carrinho? Esta ação não pode ser desfeita."
+        confirmText="Remover"
+        type="danger"
+        onConfirm={() => {
+          if (confirmRemoveId) {
+            removerItemCarrinho.mutate(confirmRemoveId);
+            setConfirmRemoveId(null);
+          }
+        }}
+      />
+
+      <MEDetailDialog
+        open={!!itemDetail}
+        onOpenChange={() => setItemDetail(null)}
+        title="Detalhes do Item"
+        data={itemDetail}
+      />
 
       <Dialog open={showReverse} onOpenChange={setShowReverse}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-auto">
@@ -202,12 +234,25 @@ export function MECarrinhoPanel() {
               <p className="font-semibold text-sm">Origem (quem envia de volta)</p>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Nome</Label><Input value={reverseForm.from_name} onChange={(e) => setReverseForm(p => ({ ...p, from_name: e.target.value }))} /></div>
-                <div><Label>CEP</Label><Input value={reverseForm.from_postal_code} onChange={(e) => setReverseForm(p => ({ ...p, from_postal_code: e.target.value }))} /></div>
+                <MECepAutoFill
+                  value={reverseForm.from_postal_code}
+                  onChange={(v) => setReverseForm(p => ({ ...p, from_postal_code: v }))}
+                  label="CEP"
+                  onAddressFound={(addr) => {
+                    setReverseForm(p => ({
+                      ...p,
+                      from_address: addr.rua || p.from_address,
+                      from_district: addr.bairro || p.from_district,
+                      from_city: addr.cidade || p.from_city,
+                      from_state_abbr: addr.uf || p.from_state_abbr,
+                    }));
+                  }}
+                />
                 <div className="col-span-2"><Label>Endereço</Label><Input value={reverseForm.from_address} onChange={(e) => setReverseForm(p => ({ ...p, from_address: e.target.value }))} /></div>
                 <div><Label>Número</Label><Input value={reverseForm.from_number} onChange={(e) => setReverseForm(p => ({ ...p, from_number: e.target.value }))} /></div>
                 <div><Label>Bairro</Label><Input value={reverseForm.from_district} onChange={(e) => setReverseForm(p => ({ ...p, from_district: e.target.value }))} /></div>
                 <div><Label>Cidade</Label><Input value={reverseForm.from_city} onChange={(e) => setReverseForm(p => ({ ...p, from_city: e.target.value }))} /></div>
-                <div><Label>UF</Label><Input value={reverseForm.from_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, from_state_abbr: e.target.value }))} maxLength={2} /></div>
+                <div><Label>UF</Label><Input value={reverseForm.from_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, from_state_abbr: e.target.value.toUpperCase() }))} maxLength={2} /></div>
               </div>
             </div>
 
@@ -215,12 +260,25 @@ export function MECarrinhoPanel() {
               <p className="font-semibold text-sm">Destino (quem recebe de volta)</p>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Nome</Label><Input value={reverseForm.to_name} onChange={(e) => setReverseForm(p => ({ ...p, to_name: e.target.value }))} /></div>
-                <div><Label>CEP</Label><Input value={reverseForm.to_postal_code} onChange={(e) => setReverseForm(p => ({ ...p, to_postal_code: e.target.value }))} /></div>
+                <MECepAutoFill
+                  value={reverseForm.to_postal_code}
+                  onChange={(v) => setReverseForm(p => ({ ...p, to_postal_code: v }))}
+                  label="CEP"
+                  onAddressFound={(addr) => {
+                    setReverseForm(p => ({
+                      ...p,
+                      to_address: addr.rua || p.to_address,
+                      to_district: addr.bairro || p.to_district,
+                      to_city: addr.cidade || p.to_city,
+                      to_state_abbr: addr.uf || p.to_state_abbr,
+                    }));
+                  }}
+                />
                 <div className="col-span-2"><Label>Endereço</Label><Input value={reverseForm.to_address} onChange={(e) => setReverseForm(p => ({ ...p, to_address: e.target.value }))} /></div>
                 <div><Label>Número</Label><Input value={reverseForm.to_number} onChange={(e) => setReverseForm(p => ({ ...p, to_number: e.target.value }))} /></div>
                 <div><Label>Bairro</Label><Input value={reverseForm.to_district} onChange={(e) => setReverseForm(p => ({ ...p, to_district: e.target.value }))} /></div>
                 <div><Label>Cidade</Label><Input value={reverseForm.to_city} onChange={(e) => setReverseForm(p => ({ ...p, to_city: e.target.value }))} /></div>
-                <div><Label>UF</Label><Input value={reverseForm.to_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, to_state_abbr: e.target.value }))} maxLength={2} /></div>
+                <div><Label>UF</Label><Input value={reverseForm.to_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, to_state_abbr: e.target.value.toUpperCase() }))} maxLength={2} /></div>
               </div>
             </div>
 

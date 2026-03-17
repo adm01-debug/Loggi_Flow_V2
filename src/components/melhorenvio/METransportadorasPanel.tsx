@@ -8,8 +8,11 @@ import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { Truck, Loader2, MapPin, Building2, Info } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { TableSkeleton } from '@/components/ui/skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
+import { MEErrorState } from './MEErrorState';
+import { MEDetailDialog } from './MEDetailDialog';
 import type { MECompany, MEService, MEAgency } from './types';
 
 export function METransportadorasPanel() {
@@ -19,7 +22,7 @@ export function METransportadorasPanel() {
   const [agencyCompany, setAgencyCompany] = useState('');
   const [agencies, setAgencies] = useState<MEAgency[]>([]);
   const [detail, setDetail] = useState<Record<string, unknown> | null>(null);
-  const [detailType, setDetailType] = useState<'transportadora' | 'servico' | 'agencia'>('transportadora');
+  const [detailTitle, setDetailTitle] = useState('Detalhes');
 
   const companies: MECompany[] = Array.isArray(listarTransportadoras.data) ? listarTransportadoras.data as MECompany[] : [];
   const services: MEService[] = Array.isArray(listarServicos.data) ? listarServicos.data as MEService[] : [];
@@ -41,7 +44,8 @@ export function METransportadorasPanel() {
   };
 
   const showDetail = (id: string, type: 'transportadora' | 'servico' | 'agencia') => {
-    setDetailType(type);
+    const titleMap = { transportadora: 'Transportadora', servico: 'Serviço', agencia: 'Agência' };
+    setDetailTitle(`Detalhes - ${titleMap[type]}`);
     const fn = type === 'transportadora' ? infoTransportadora : type === 'servico' ? infoServico : infoAgencia;
     fn.mutate(id, { onSuccess: (data) => setDetail(data as Record<string, unknown>) });
   };
@@ -61,7 +65,11 @@ export function METransportadorasPanel() {
           <CardHeader><CardTitle>Transportadoras Disponíveis</CardTitle></CardHeader>
           <CardContent>
             {listarTransportadoras.isLoading ? (
-              <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin" /></div>
+              <TableSkeleton rows={5} columns={4} />
+            ) : listarTransportadoras.isError ? (
+              <MEErrorState onRetry={() => listarTransportadoras.refetch()} />
+            ) : companies.length === 0 ? (
+              <EmptyState variant="delivery" title="Nenhuma transportadora" size="sm" />
             ) : (
               <Table>
                 <TableHeader>
@@ -97,7 +105,11 @@ export function METransportadorasPanel() {
           <CardHeader><CardTitle>Serviços de Envio</CardTitle></CardHeader>
           <CardContent>
             {listarServicos.isLoading ? (
-              <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin" /></div>
+              <TableSkeleton rows={5} columns={5} />
+            ) : listarServicos.isError ? (
+              <MEErrorState onRetry={() => listarServicos.refetch()} />
+            ) : services.length === 0 ? (
+              <EmptyState variant="default" title="Nenhum serviço" size="sm" />
             ) : (
               <Table>
                 <TableHeader>
@@ -190,16 +202,12 @@ export function METransportadorasPanel() {
         </Card>
       </TabsContent>
 
-      {detail && (
-        <Dialog open={!!detail} onOpenChange={() => setDetail(null)}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-auto">
-            <DialogHeader>
-              <DialogTitle>Detalhes - {detailType === 'transportadora' ? 'Transportadora' : detailType === 'servico' ? 'Serviço' : 'Agência'}</DialogTitle>
-            </DialogHeader>
-            <pre className="bg-muted p-3 rounded text-xs overflow-auto">{JSON.stringify(detail, null, 2)}</pre>
-          </DialogContent>
-        </Dialog>
-      )}
+      <MEDetailDialog
+        open={!!detail}
+        onOpenChange={() => setDetail(null)}
+        title={detailTitle}
+        data={detail}
+      />
     </Tabs>
   );
 }
