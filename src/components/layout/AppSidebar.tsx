@@ -5,7 +5,7 @@ import {
   Trophy, Zap, ChevronLeft, ChevronRight, Box, PackageSearch, History,
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
-  Sparkles, TrendingUp, Gamepad2, Cog, KeyRound,
+  Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,7 @@ const menuSections: MenuSection[] = [
       { title: "Analytics", url: "/analytics", icon: BarChart3 },
       { title: "Executivo", url: "/dashboard-executivo", icon: TrendingUp },
       { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
+      { title: "Painel OTIF", url: "/painel-otif", icon: Award },
       { title: "Calendário", url: "/calendario", icon: CalendarDays },
     ],
   },
