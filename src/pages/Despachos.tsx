@@ -221,7 +221,6 @@ export default function Despachos() {
           onOpenChange={(open) => !open && setConfirmItem(null)}
           title="Confirmar Despacho"
           description={`Deseja despachar a entrega ${confirmItem?.numero_entrega}? Esta ação registrará a data de despacho.`}
-          confirmLabel="Despachar"
           onConfirm={confirmDispatch}
         />
       </div>
