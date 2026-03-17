@@ -191,11 +191,10 @@ export function AppSidebar() {
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-1 mt-1">
               {section.items.map((item, idx) => (
-                <motion.div
+                <div
                   key={item.url}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.03 }}
+                  className="animate-in fade-in slide-in-from-left-2 duration-150"
+                  style={{ animationDelay: `${idx * 30}ms` }}
                 >
                   <NavLink
                     to={item.url}
@@ -216,7 +215,7 @@ export function AppSidebar() {
                       <span className="text-sm font-medium">{item.title}</span>
                     )}
                   </NavLink>
-                </motion.div>
+                </div>
               ))}
             </CollapsibleContent>
           </Collapsible>

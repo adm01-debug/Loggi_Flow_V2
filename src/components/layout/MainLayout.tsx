@@ -1,17 +1,20 @@
-import { ReactNode, Suspense } from "react";
+import { ReactNode, Suspense, lazy } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
-import { BrowserNotificationPrompt } from "@/components/notifications/BrowserNotificationPrompt";
-import { KeyboardShortcutsHelp } from "@/components/common/KeyboardShortcutsHelp";
-import { SearchCommand } from "@/components/common/SearchCommand";
-import { OnboardingWizard, OnboardingProgress } from "@/components/onboarding";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
-import { InstallPrompt } from "@/components/pwa/InstallPrompt";
-import { UpdatePrompt } from "@/components/pwa/UpdatePrompt";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
+
+// Lazy-load non-critical overlays to reduce MainLayout chunk size
+const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));
+const OnboardingProgress = lazy(() => import("@/components/onboarding/OnboardingProgress").then(m => ({ default: m.OnboardingProgress })));
+const BrowserNotificationPrompt = lazy(() => import("@/components/notifications/BrowserNotificationPrompt").then(m => ({ default: m.BrowserNotificationPrompt })));
+const KeyboardShortcutsHelp = lazy(() => import("@/components/common/KeyboardShortcutsHelp").then(m => ({ default: m.KeyboardShortcutsHelp })));
+const SearchCommand = lazy(() => import("@/components/common/SearchCommand").then(m => ({ default: m.SearchCommand })));
+const InstallPrompt = lazy(() => import("@/components/pwa/InstallPrompt").then(m => ({ default: m.InstallPrompt })));
+const UpdatePrompt = lazy(() => import("@/components/pwa/UpdatePrompt").then(m => ({ default: m.UpdatePrompt })));
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -46,7 +49,9 @@ export function MainLayout({ children }: MainLayoutProps) {
           </nav>
           
           {/* Onboarding progress bar for new users */}
-          <OnboardingProgress variant="full" className="mb-6" />
+          <Suspense fallback={null}>
+            <OnboardingProgress variant="full" className="mb-6" />
+          </Suspense>
           
           {/* Main content with Suspense for lazy loading */}
           <Suspense fallback={<PageSkeleton />}>
@@ -58,21 +63,15 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
       
-      {/* PWA Prompts */}
-      <InstallPrompt />
-      <UpdatePrompt />
-      
-      {/* Browser notification permission prompt */}
-      <BrowserNotificationPrompt />
-      
-      {/* Global keyboard shortcuts help (Ctrl+/) */}
-      <KeyboardShortcutsHelp />
-      
-      {/* Global search command (Ctrl+K) */}
-      <SearchCommand />
-      
-      {/* Onboarding wizard modal */}
-      <OnboardingWizard />
+      {/* Non-critical overlays - lazy loaded */}
+      <Suspense fallback={null}>
+        <InstallPrompt />
+        <UpdatePrompt />
+        <BrowserNotificationPrompt />
+        <KeyboardShortcutsHelp />
+        <SearchCommand />
+        <OnboardingWizard />
+      </Suspense>
     </div>
   );
 }
