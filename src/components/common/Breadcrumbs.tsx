@@ -82,6 +82,7 @@ const routeCategories: Record<string, string> = {
   "/seguranca": "Administração",
   "/aprovacao-reset-senha": "Administração",
   "/audit-trail": "Administração",
+  "/gestao-melhor-envio": "Integrações",
 };
 
 export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
