@@ -11,7 +11,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { useState, useCallback } from 'react';
 
-const TAB_KEYS = ['cotacao', 'carrinho', 'etiquetas', 'rastreamento', 'transportadoras', 'usuario', 'lojas'] as const;
+
 
 export default function GestaoMelhorEnvio() {
   const [useSandbox, setUseSandbox] = useLocalStorage('me-sandbox-mode', true);
