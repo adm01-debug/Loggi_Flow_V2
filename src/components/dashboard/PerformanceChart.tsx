@@ -43,6 +43,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
     type = 'area', 
     data, 
     dataKey, 
+    secondaryDataKey,
     xAxisKey = 'name', 
     className, 
     colors = defaultColors
