@@ -204,8 +204,8 @@ export default function ConciliacaoAutomatica() {
           </Card>
           <Card>
             <CardContent className="pt-6 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-amber-500/10">
-                <FileSpreadsheet className="w-6 h-6 text-amber-500" />
+              <div className="p-3 rounded-lg bg-warning/10">
+                <FileSpreadsheet className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{itensImportados?.length || 0}</p>
