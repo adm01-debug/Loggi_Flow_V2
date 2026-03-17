@@ -55,7 +55,7 @@ export default function Analytics() {
             <div className="shrink-0">
               <DateRangePicker value={dateRange} onChange={handleDateRangeChange} />
             </div>
-            <Button variant="outline" size="sm" onClick={() => { analyticsResult; }} className="shrink-0 h-10">
+            <Button variant="outline" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })} className="shrink-0 h-10">
               <RefreshCw className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Atualizar</span>
             </Button>
