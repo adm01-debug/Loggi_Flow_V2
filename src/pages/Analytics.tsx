@@ -28,9 +28,9 @@ export default function Analytics() {
 
   const stats = {
     totalDeliveries: summaryMetrics?.totalEntregas || 0,
-    onTimeRate: 95, // Calculado dos dados
-    avgDeliveryTime: 24,
-    totalRevenue: summaryMetrics?.avgCost ? summaryMetrics.avgCost * (summaryMetrics?.totalEntregas || 0) : 0,
+    onTimeRate: summaryMetrics?.slaRate ?? 0,
+    avgDeliveryTime: summaryMetrics?.avgDeliveryTimeHours ?? 0,
+    totalRevenue: summaryMetrics?.totalCost ?? 0,
     growthRate: summaryMetrics?.entregasGrowth || 0,
   };
 
