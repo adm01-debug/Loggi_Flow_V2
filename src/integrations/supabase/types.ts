@@ -642,6 +642,80 @@ export type Database = {
           },
         ]
       }
+      cotacoes_multicanal: {
+        Row: {
+          canal: string
+          created_at: string
+          destino_cidade: string | null
+          destino_estado: string
+          expires_at: string
+          id: string
+          observacoes: string | null
+          origem_cidade: string | null
+          origem_estado: string
+          peso_kg: number | null
+          prazo_dias: number | null
+          responded_at: string | null
+          status: string
+          transportadora_id: string
+          updated_at: string
+          user_id: string
+          valor_cotado: number | null
+          valor_mercadoria: number | null
+          volumes: number | null
+        }
+        Insert: {
+          canal: string
+          created_at?: string
+          destino_cidade?: string | null
+          destino_estado: string
+          expires_at?: string
+          id?: string
+          observacoes?: string | null
+          origem_cidade?: string | null
+          origem_estado: string
+          peso_kg?: number | null
+          prazo_dias?: number | null
+          responded_at?: string | null
+          status?: string
+          transportadora_id: string
+          updated_at?: string
+          user_id: string
+          valor_cotado?: number | null
+          valor_mercadoria?: number | null
+          volumes?: number | null
+        }
+        Update: {
+          canal?: string
+          created_at?: string
+          destino_cidade?: string | null
+          destino_estado?: string
+          expires_at?: string
+          id?: string
+          observacoes?: string | null
+          origem_cidade?: string | null
+          origem_estado?: string
+          peso_kg?: number | null
+          prazo_dias?: number | null
+          responded_at?: string | null
+          status?: string
+          transportadora_id?: string
+          updated_at?: string
+          user_id?: string
+          valor_cotado?: number | null
+          valor_mercadoria?: number | null
+          volumes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cotacoes_multicanal_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_verification_tokens: {
         Row: {
           created_at: string

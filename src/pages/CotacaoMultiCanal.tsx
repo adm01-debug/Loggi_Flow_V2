@@ -18,6 +18,7 @@ import {
 import { useTransportadoraRotas, type TransportadoraRota } from '@/hooks/useTransportadoraRotas';
 import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
+import { useCotacoesMulticanal } from '@/hooks/useCotacoesMulticanal';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -50,6 +51,7 @@ export default function CotacaoMultiCanal() {
   const queryClient = useQueryClient();
   const { searchRoutes } = useTransportadoraRotas();
   const rodonaves = useRodonavesTracking();
+  const { createCotacao } = useCotacoesMulticanal();
   
   const [origemEstado, setOrigemEstado] = useState('');
   const [destinoEstado, setDestinoEstado] = useState('');
@@ -133,29 +135,46 @@ export default function CotacaoMultiCanal() {
     
     toast.info(`Cotando via API para ${carrier.transportadora?.nome_fantasia}...`);
     
-    // Use Rodonaves API as example
     try {
-      // For now, add a simulated API quotation result
+      const valorCalculado = carrier.taxa_fixa + (carrier.preco_por_kg * parseFloat(pesoKg));
+      
+      // Persist to DB
+      await createCotacao.mutateAsync({
+        transportadora_id: carrier.transportadora_id,
+        canal: 'api',
+        origem_estado: origemEstado,
+        origem_cidade: origemCidade || undefined,
+        destino_estado: destinoEstado,
+        destino_cidade: destinoCidade || undefined,
+        peso_kg: parseFloat(pesoKg),
+        volumes: parseInt(volumes),
+        valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined,
+        valor_cotado: valorCalculado,
+        prazo_dias: carrier.prazo_dias,
+        observacoes: 'Cotação via tabela de frete cadastrada',
+        status: 'respondido',
+      });
+      
+      // Also add to local state for immediate UI
       const newCotacao: CotacaoManual = {
         id: crypto.randomUUID(),
         transportadora_id: carrier.transportadora_id,
         transportadora_nome: carrier.transportadora?.nome_fantasia || 'N/A',
         canal: 'api',
-        valor: carrier.taxa_fixa + (carrier.preco_por_kg * parseFloat(pesoKg)),
+        valor: valorCalculado,
         prazo_dias: carrier.prazo_dias,
         status: 'respondido',
         observacoes: 'Cotação via tabela de frete cadastrada',
         created_at: new Date().toISOString(),
       };
-      
       setCotacoes(prev => [...prev, newCotacao]);
-      toast.success(`Cotação API recebida: R$ ${newCotacao.valor?.toFixed(2)}`);
+      toast.success(`Cotação API recebida: R$ ${valorCalculado.toFixed(2)}`);
     } catch {
       toast.error('Erro na cotação via API');
     }
   };
 
-  const handleCotarWhatsApp = (carrier: TransportadoraComCanal) => {
+  const handleCotarWhatsApp = async (carrier: TransportadoraComCanal) => {
     const peso = pesoKg || '(não informado)';
     const msg = encodeURIComponent(
       `Olá! Gostaria de cotar um frete:\n\n` +
@@ -170,7 +189,20 @@ export default function CotacaoMultiCanal() {
     const phone = carrier.whatsapp?.replace(/\D/g, '');
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
     
-    // Register as pending
+    // Persist to DB
+    createCotacao.mutate({
+      transportadora_id: carrier.transportadora_id,
+      canal: 'whatsapp',
+      origem_estado: origemEstado,
+      origem_cidade: origemCidade || undefined,
+      destino_estado: destinoEstado,
+      destino_cidade: destinoCidade || undefined,
+      peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
+      volumes: parseInt(volumes),
+      valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined,
+      observacoes: 'Mensagem enviada via WhatsApp',
+    });
+
     const newCotacao: CotacaoManual = {
       id: crypto.randomUUID(),
       transportadora_id: carrier.transportadora_id,
@@ -186,7 +218,7 @@ export default function CotacaoMultiCanal() {
     toast.success('Mensagem WhatsApp aberta! Registre a resposta quando receber.');
   };
 
-  const handleCotarEmail = (carrier: TransportadoraComCanal) => {
+  const handleCotarEmail = async (carrier: TransportadoraComCanal) => {
     const peso = pesoKg || '(não informado)';
     const subject = encodeURIComponent(`Cotação de Frete - ${origemEstado} → ${destinoEstado}`);
     const body = encodeURIComponent(
@@ -203,6 +235,20 @@ export default function CotacaoMultiCanal() {
     
     window.open(`mailto:${carrier.email}?subject=${subject}&body=${body}`, '_blank');
     
+    // Persist to DB
+    createCotacao.mutate({
+      transportadora_id: carrier.transportadora_id,
+      canal: 'email',
+      origem_estado: origemEstado,
+      origem_cidade: origemCidade || undefined,
+      destino_estado: destinoEstado,
+      destino_cidade: destinoCidade || undefined,
+      peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
+      volumes: parseInt(volumes),
+      valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined,
+      observacoes: 'Email enviado',
+    });
+
     const newCotacao: CotacaoManual = {
       id: crypto.randomUUID(),
       transportadora_id: carrier.transportadora_id,
