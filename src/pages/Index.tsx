@@ -181,6 +181,10 @@ export default function Index() {
         </div>
         
         <FadeIn delay={0.1}>
+          <LiveStatusBar />
+        </FadeIn>
+
+        <FadeIn delay={0.15}>
           <FavoriteMetricsBar />
         </FadeIn>
         
