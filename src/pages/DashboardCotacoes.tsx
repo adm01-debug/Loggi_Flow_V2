@@ -274,7 +274,7 @@ export default function DashboardCotacoes() {
           <CardContent>
             {filtered.length === 0 ? (
               <EmptyState
-                icon={<FileText className="w-12 h-12" />}
+                icon={FileText}
                 title="Nenhuma cotação encontrada"
                 description="Crie cotações na página Cotação Multi-Canal"
               />
