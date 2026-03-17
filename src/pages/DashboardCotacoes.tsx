@@ -173,33 +173,11 @@ export default function DashboardCotacoes() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <StatsCard
-            title="Ativas"
-            value={ativas.length}
-            icon={<Zap className="w-5 h-5 text-primary" />}
-          />
-          <StatsCard
-            title="Pendentes"
-            value={pendentes.length}
-            icon={<Clock className="w-5 h-5 text-amber-500" />}
-            description={pendentes.length > 0 ? 'Aguardando resposta' : undefined}
-          />
-          <StatsCard
-            title="Respondidas"
-            value={respondidas.length}
-            icon={<CheckCircle2 className="w-5 h-5 text-green-500" />}
-          />
-          <StatsCard
-            title="Expiradas"
-            value={expiradas.length}
-            icon={<AlertTriangle className="w-5 h-5 text-destructive" />}
-          />
-          <StatsCard
-            title="Economia Estimada"
-            value={`R$ ${savings.toFixed(0)}`}
-            icon={<TrendingDown className="w-5 h-5 text-green-500" />}
-            description="Diferença entre maior e menor cotação"
-          />
+          <StatsCard title="Ativas" value={ativas.length} icon={Zap} color="primary" />
+          <StatsCard title="Pendentes" value={pendentes.length} icon={Clock} color="warning" />
+          <StatsCard title="Respondidas" value={respondidas.length} icon={CheckCircle2} color="success" />
+          <StatsCard title="Expiradas" value={expiradas.length} icon={AlertTriangle} color="destructive" />
+          <StatsCard title="Economia" value={`R$ ${savings.toFixed(0)}`} icon={TrendingDown} color="success" />
         </div>
 
         {/* Comparativo por Trecho */}
