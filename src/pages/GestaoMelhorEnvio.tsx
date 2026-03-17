@@ -55,7 +55,7 @@ export default function GestaoMelhorEnvio() {
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground">💡 Dica: Use Alt+1 a Alt+7 para alternar abas rapidamente</p>
+        <p className="text-xs text-muted-foreground">💡 Dica: Use Alt+1 a Alt+8 para alternar abas rapidamente</p>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="flex-wrap h-auto gap-1">
