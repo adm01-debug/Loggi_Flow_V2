@@ -61,6 +61,9 @@ const InteligenciaFrete = lazy(() => import("./pages/InteligenciaFrete"));
 const CotacaoMultiCanal = lazy(() => import("./pages/CotacaoMultiCanal"));
 const DashboardCotacoes = lazy(() => import("./pages/DashboardCotacoes"));
 const PainelOTIF = lazy(() => import("./pages/PainelOTIF"));
+const KanbanEntregas = lazy(() => import("./pages/KanbanEntregas"));
+const RelatorioPDF = lazy(() => import("./pages/RelatorioPDF"));
+const ConciliacaoAutomatica = lazy(() => import("./pages/ConciliacaoAutomatica"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
