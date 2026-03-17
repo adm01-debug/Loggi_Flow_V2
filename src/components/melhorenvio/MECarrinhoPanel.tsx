@@ -18,6 +18,7 @@ import { MECepAutoFill } from './MECepAutoFill';
 import { formatCEP } from '@/lib/validations';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/common/Pagination';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import type { MECartItem } from './types';
 
 export function MECarrinhoPanel() {
@@ -134,45 +135,48 @@ export function MECarrinhoPanel() {
             />
           ) : (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">
-                      <Checkbox checked={selectedIds.length === items.length && items.length > 0} onCheckedChange={selectAll} />
-                    </TableHead>
-                    <TableHead>Serviço</TableHead>
-                    <TableHead>Transportadora</TableHead>
-                    <TableHead>Destino</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Prazo</TableHead>
-                    <TableHead className="w-20" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pagination.paginatedData.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
-                      </TableCell>
-                      <TableCell className="font-medium">{item.service || '-'}</TableCell>
-                      <TableCell>{item.company?.name || '-'}</TableCell>
-                      <TableCell className="text-xs">{item.to?.postal_code || '-'}</TableCell>
-                      <TableCell className="font-semibold text-primary">R$ {item.price || '-'}</TableCell>
-                      <TableCell>{item.delivery_time || '-'} dias</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleViewItem(item.id)} disabled={exibirItemCarrinho.isPending}>
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setConfirmRemoveId(item.id)} disabled={removerItemCarrinho.isPending}>
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              <ScrollArea className="w-full">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-10">
+                        <Checkbox checked={selectedIds.length === items.length && items.length > 0} onCheckedChange={selectAll} />
+                      </TableHead>
+                      <TableHead>Serviço</TableHead>
+                      <TableHead>Transportadora</TableHead>
+                      <TableHead>Destino</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Prazo</TableHead>
+                      <TableHead className="w-20" />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {pagination.paginatedData.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
+                        </TableCell>
+                        <TableCell className="font-medium">{item.service || '-'}</TableCell>
+                        <TableCell>{item.company?.name || '-'}</TableCell>
+                        <TableCell className="text-xs">{item.to?.postal_code || '-'}</TableCell>
+                        <TableCell className="font-semibold text-primary">R$ {item.price || '-'}</TableCell>
+                        <TableCell>{item.delivery_time || '-'} dias</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleViewItem(item.id)} disabled={exibirItemCarrinho.isPending}>
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => setConfirmRemoveId(item.id)} disabled={removerItemCarrinho.isPending}>
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
               <Pagination
                 currentPage={pagination.currentPage}
                 totalPages={pagination.totalPages}

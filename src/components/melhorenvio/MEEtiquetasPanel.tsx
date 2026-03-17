@@ -17,6 +17,7 @@ import { MEErrorState } from './MEErrorState';
 import { DataExporter } from '@/components/common/DataExporter';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/common/Pagination';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import type { MEOrder } from './types';
 
 const STATUS_OPTIONS = [
@@ -176,16 +177,20 @@ export function MEEtiquetasPanel() {
                 Gerar ({selectedIds.length})
               </Button>
               <Button size="sm" variant="outline" onClick={handlePrint} disabled={imprimirEtiquetas.isPending}>
-                <Printer className="w-4 h-4 mr-1" /> Imprimir
+                {imprimirEtiquetas.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Printer className="w-4 h-4 mr-1" />}
+                Imprimir
               </Button>
-              <Button size="sm" variant="outline" onClick={handlePreview}>
-                <Eye className="w-4 h-4 mr-1" /> Pré-visualizar
+              <Button size="sm" variant="outline" onClick={handlePreview} disabled={preVisualizarEtiquetas.isPending}>
+                {preVisualizarEtiquetas.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Eye className="w-4 h-4 mr-1" />}
+                Pré-visualizar
               </Button>
               <Button size="sm" variant="outline" onClick={handleCheckCancellable} disabled={verificarCancelamento.isPending}>
-                <CheckCircle className="w-4 h-4 mr-1" /> Verificar Cancelamento
+                {verificarCancelamento.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}
+                Verificar Cancelamento
               </Button>
               <Button size="sm" variant="destructive" onClick={() => setShowCancelConfirm(true)} disabled={cancelarEtiquetas.isPending}>
-                <XCircle className="w-4 h-4 mr-1" /> Cancelar
+                {cancelarEtiquetas.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <XCircle className="w-4 h-4 mr-1" />}
+                Cancelar
               </Button>
             </div>
           )}
@@ -203,50 +208,53 @@ export function MEEtiquetasPanel() {
             />
           ) : (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">
-                      <Checkbox
-                        checked={selectedIds.length === filteredOrders.length && filteredOrders.length > 0}
-                        onCheckedChange={() => setSelectedIds(selectedIds.length === filteredOrders.length ? [] : filteredOrders.map((o) => o.id))}
-                      />
-                    </TableHead>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Serviço</TableHead>
-                    <TableHead>Destino</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Rastreio</TableHead>
-                    <TableHead className="w-20" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pagination.paginatedData.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell>
-                        <Checkbox checked={selectedIds.includes(order.id)} onCheckedChange={() => toggleSelect(order.id)} />
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">{order.id?.substring(0, 8)}...</TableCell>
-                      <TableCell>{order.service || '-'}</TableCell>
-                      <TableCell className="text-xs">{order.to?.postal_code || '-'}</TableCell>
-                      <TableCell><Badge variant={statusColor(order.status || '')}>{order.status || '-'}</Badge></TableCell>
-                      <TableCell className="font-semibold">R$ {order.price || '-'}</TableCell>
-                      <TableCell className="font-mono text-xs">{order.tracking || '-'}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleViewDetail(order.id)} disabled={infoEtiqueta.isPending}>
-                            <Info className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handlePrintFile(order.id)} disabled={imprimirEtiquetasArquivo.isPending}>
-                            <Printer className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              <ScrollArea className="w-full">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-10">
+                        <Checkbox
+                          checked={selectedIds.length === filteredOrders.length && filteredOrders.length > 0}
+                          onCheckedChange={() => setSelectedIds(selectedIds.length === filteredOrders.length ? [] : filteredOrders.map((o) => o.id))}
+                        />
+                      </TableHead>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Serviço</TableHead>
+                      <TableHead>Destino</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Rastreio</TableHead>
+                      <TableHead className="w-20" />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {pagination.paginatedData.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell>
+                          <Checkbox checked={selectedIds.includes(order.id)} onCheckedChange={() => toggleSelect(order.id)} />
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">{order.id?.substring(0, 8)}...</TableCell>
+                        <TableCell>{order.service || '-'}</TableCell>
+                        <TableCell className="text-xs">{order.to?.postal_code || '-'}</TableCell>
+                        <TableCell><Badge variant={statusColor(order.status || '')}>{order.status || '-'}</Badge></TableCell>
+                        <TableCell className="font-semibold">R$ {order.price || '-'}</TableCell>
+                        <TableCell className="font-mono text-xs">{order.tracking || '-'}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleViewDetail(order.id)} disabled={infoEtiqueta.isPending}>
+                              <Info className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handlePrintFile(order.id)} disabled={imprimirEtiquetasArquivo.isPending}>
+                              <Printer className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
               <Pagination
                 currentPage={pagination.currentPage}
                 totalPages={pagination.totalPages}

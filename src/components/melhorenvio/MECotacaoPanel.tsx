@@ -9,8 +9,9 @@ import { Calculator, Loader2, Clock, DollarSign, Plus, Trash2, ShoppingCart } fr
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { formatCEP, formatCNPJ } from '@/lib/validations';
+import { formatCEP, formatCPFCNPJ, formatPhone, isValidEmail, isValidPhone } from '@/lib/validations';
 import { MECepAutoFill } from './MECepAutoFill';
+import { MEFormField } from './MEFormField';
 import { DataExporter } from '@/components/common/DataExporter';
 import type { MEQuotationResult } from './types';
 
@@ -45,8 +46,10 @@ export function MECotacaoPanel() {
   const [volumes, setVolumes] = useState<Volume[]>([
     { width: 20, height: 10, length: 30, weight: 1, insurance_value: 100, quantity: 1 },
   ]);
-  const [results, setResults] = useState<MEQuotationResult[]>([]);
+  const [results, setResults] = useLocalStorage<MEQuotationResult[]>('me-quote-history', []);
   const [cartDialog, setCartDialog] = useState<CartDialogData | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
 
   const [senderForm, setSenderForm] = useLocalStorage('me-sender-form', SENDER_INITIAL);
 
@@ -102,16 +105,46 @@ export function MECotacaoPanel() {
       ...prev,
       postal_code: formatCEP(cepDestino.replace(/\D/g, '')),
     }));
+    setFormErrors({});
+    setSubmitted(false);
+  };
+
+  const validateCartForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!senderForm.name.trim()) errors['sender_name'] = 'Nome do remetente é obrigatório';
+    if (!senderForm.document.trim()) errors['sender_document'] = 'CPF/CNPJ é obrigatório';
+    if (!senderForm.address.trim()) errors['sender_address'] = 'Endereço é obrigatório';
+    if (!senderForm.number.trim()) errors['sender_number'] = 'Número é obrigatório';
+    if (!senderForm.district.trim()) errors['sender_district'] = 'Bairro é obrigatório';
+    if (!senderForm.city.trim()) errors['sender_city'] = 'Cidade é obrigatória';
+    if (!senderForm.state_abbr.trim()) errors['sender_state'] = 'UF é obrigatória';
+    if (senderForm.email && !isValidEmail(senderForm.email)) errors['sender_email'] = 'Email inválido';
+    if (senderForm.phone && !isValidPhone(senderForm.phone)) errors['sender_phone'] = 'Telefone inválido';
+
+    if (!cartForm.name.trim()) errors['to_name'] = 'Nome do destinatário é obrigatório';
+    if (!cartForm.document.trim()) errors['to_document'] = 'CPF/CNPJ é obrigatório';
+    if (!cartForm.postal_code.trim()) errors['to_postal_code'] = 'CEP é obrigatório';
+    if (!cartForm.address.trim()) errors['to_address'] = 'Endereço é obrigatório';
+    if (!cartForm.number.trim()) errors['to_number'] = 'Número é obrigatório';
+    if (!cartForm.district.trim()) errors['to_district'] = 'Bairro é obrigatório';
+    if (!cartForm.city.trim()) errors['to_city'] = 'Cidade é obrigatória';
+    if (!cartForm.state_abbr.trim()) errors['to_state'] = 'UF é obrigatória';
+    if (cartForm.email && !isValidEmail(cartForm.email)) errors['to_email'] = 'Email inválido';
+    if (cartForm.phone && !isValidPhone(cartForm.phone)) errors['to_phone'] = 'Telefone inválido';
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleAddToCart = () => {
-    if (!cartDialog) return;
+    setSubmitted(true);
+    if (!cartDialog || !validateCartForm()) return;
     inserirCarrinho.mutate({
       service: cartDialog.service,
       from: {
         name: senderForm.name,
         document: senderForm.document.replace(/\D/g, ''),
-        phone: senderForm.phone,
+        phone: senderForm.phone.replace(/\D/g, ''),
         email: senderForm.email,
         address: senderForm.address,
         number: senderForm.number,
@@ -125,7 +158,7 @@ export function MECotacaoPanel() {
       to: {
         name: cartForm.name,
         document: cartForm.document.replace(/\D/g, ''),
-        phone: cartForm.phone,
+        phone: cartForm.phone.replace(/\D/g, ''),
         email: cartForm.email,
         address: cartForm.address,
         number: cartForm.number,
@@ -335,27 +368,57 @@ export function MECotacaoPanel() {
           <div className="space-y-2">
             <p className="font-semibold text-sm border-b pb-1">📦 Remetente (Origem)</p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2"><Label>Nome *</Label><Input value={senderForm.name} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, name: e.target.value }))} /></div>
-              <div><Label>CPF/CNPJ *</Label><Input value={senderForm.document} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, document: formatCNPJ(e.target.value) }))} placeholder="00.000.000/0000-00" /></div>
-              <div><Label>Telefone</Label><Input value={senderForm.phone} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, phone: e.target.value }))} /></div>
-              <div className="col-span-2"><Label>Email</Label><Input type="email" value={senderForm.email} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, email: e.target.value }))} /></div>
-              <div><Label>UF *</Label><Input value={senderForm.state_abbr} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, state_abbr: e.target.value.toUpperCase() }))} maxLength={2} /></div>
-              <div><Label>CEP</Label><Input value={cepOrigem} disabled className="bg-muted" /></div>
-              <div className="col-span-2"><Label>Endereço *</Label><Input value={senderForm.address} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, address: e.target.value }))} /></div>
-              <div><Label>Número *</Label><Input value={senderForm.number} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, number: e.target.value }))} /></div>
-              <div><Label>Complemento</Label><Input value={senderForm.complement} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, complement: e.target.value }))} /></div>
-              <div><Label>Bairro *</Label><Input value={senderForm.district} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, district: e.target.value }))} /></div>
-              <div><Label>Cidade *</Label><Input value={senderForm.city} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, city: e.target.value }))} /></div>
+              <MEFormField label="Nome" required error={submitted ? formErrors['sender_name'] : undefined} className="col-span-2">
+                <Input value={senderForm.name} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, name: e.target.value }))} className={submitted && formErrors['sender_name'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="CPF/CNPJ" required error={submitted ? formErrors['sender_document'] : undefined}>
+                <Input value={senderForm.document} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, document: formatCPFCNPJ(e.target.value) }))} placeholder="000.000.000-00" className={submitted && formErrors['sender_document'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Telefone" error={submitted ? formErrors['sender_phone'] : undefined}>
+                <Input value={senderForm.phone} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, phone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" className={submitted && formErrors['sender_phone'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Email" error={submitted ? formErrors['sender_email'] : undefined} className="col-span-2">
+                <Input type="email" value={senderForm.email} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, email: e.target.value }))} placeholder="email@exemplo.com" className={submitted && formErrors['sender_email'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="UF" required error={submitted ? formErrors['sender_state'] : undefined}>
+                <Input value={senderForm.state_abbr} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, state_abbr: e.target.value.toUpperCase() }))} maxLength={2} className={submitted && formErrors['sender_state'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="CEP">
+                <Input value={cepOrigem} disabled className="bg-muted" />
+              </MEFormField>
+              <MEFormField label="Endereço" required error={submitted ? formErrors['sender_address'] : undefined} className="col-span-2">
+                <Input value={senderForm.address} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, address: e.target.value }))} className={submitted && formErrors['sender_address'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Número" required error={submitted ? formErrors['sender_number'] : undefined}>
+                <Input value={senderForm.number} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, number: e.target.value }))} className={submitted && formErrors['sender_number'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Complemento">
+                <Input value={senderForm.complement} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, complement: e.target.value }))} />
+              </MEFormField>
+              <MEFormField label="Bairro" required error={submitted ? formErrors['sender_district'] : undefined}>
+                <Input value={senderForm.district} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, district: e.target.value }))} className={submitted && formErrors['sender_district'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Cidade" required error={submitted ? formErrors['sender_city'] : undefined}>
+                <Input value={senderForm.city} onChange={(e) => setSenderForm((p: typeof SENDER_INITIAL) => ({ ...p, city: e.target.value }))} className={submitted && formErrors['sender_city'] ? 'border-destructive' : ''} />
+              </MEFormField>
             </div>
           </div>
 
           <div className="space-y-2">
             <p className="font-semibold text-sm border-b pb-1">📍 Destinatário</p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2"><Label>Nome *</Label><Input value={cartForm.name} onChange={(e) => setCartForm(p => ({ ...p, name: e.target.value }))} /></div>
-              <div><Label>CPF/CNPJ *</Label><Input value={cartForm.document} onChange={(e) => setCartForm(p => ({ ...p, document: formatCNPJ(e.target.value) }))} placeholder="00.000.000/0000-00" /></div>
-              <div><Label>Telefone</Label><Input value={cartForm.phone} onChange={(e) => setCartForm(p => ({ ...p, phone: e.target.value }))} /></div>
-              <div className="col-span-2"><Label>Email</Label><Input type="email" value={cartForm.email} onChange={(e) => setCartForm(p => ({ ...p, email: e.target.value }))} /></div>
+              <MEFormField label="Nome" required error={submitted ? formErrors['to_name'] : undefined} className="col-span-2">
+                <Input value={cartForm.name} onChange={(e) => setCartForm(p => ({ ...p, name: e.target.value }))} className={submitted && formErrors['to_name'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="CPF/CNPJ" required error={submitted ? formErrors['to_document'] : undefined}>
+                <Input value={cartForm.document} onChange={(e) => setCartForm(p => ({ ...p, document: formatCPFCNPJ(e.target.value) }))} placeholder="000.000.000-00" className={submitted && formErrors['to_document'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Telefone" error={submitted ? formErrors['to_phone'] : undefined}>
+                <Input value={cartForm.phone} onChange={(e) => setCartForm(p => ({ ...p, phone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" className={submitted && formErrors['to_phone'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Email" error={submitted ? formErrors['to_email'] : undefined} className="col-span-2">
+                <Input type="email" value={cartForm.email} onChange={(e) => setCartForm(p => ({ ...p, email: e.target.value }))} placeholder="email@exemplo.com" className={submitted && formErrors['to_email'] ? 'border-destructive' : ''} />
+              </MEFormField>
               <div>
                 <MECepAutoFill
                   value={cartForm.postal_code}
@@ -371,20 +434,35 @@ export function MECotacaoPanel() {
                     }));
                   }}
                 />
+                {submitted && formErrors['to_postal_code'] && <p className="text-xs text-destructive mt-1">{formErrors['to_postal_code']}</p>}
               </div>
-              <div><Label>UF *</Label><Input value={cartForm.state_abbr} onChange={(e) => setCartForm(p => ({ ...p, state_abbr: e.target.value.toUpperCase() }))} maxLength={2} /></div>
-              <div className="col-span-2"><Label>Endereço *</Label><Input value={cartForm.address} onChange={(e) => setCartForm(p => ({ ...p, address: e.target.value }))} /></div>
-              <div><Label>Número *</Label><Input value={cartForm.number} onChange={(e) => setCartForm(p => ({ ...p, number: e.target.value }))} /></div>
-              <div><Label>Complemento</Label><Input value={cartForm.complement} onChange={(e) => setCartForm(p => ({ ...p, complement: e.target.value }))} /></div>
-              <div><Label>Bairro *</Label><Input value={cartForm.district} onChange={(e) => setCartForm(p => ({ ...p, district: e.target.value }))} /></div>
-              <div><Label>Cidade *</Label><Input value={cartForm.city} onChange={(e) => setCartForm(p => ({ ...p, city: e.target.value }))} /></div>
-              <div className="col-span-2"><Label>Observações</Label><Input value={cartForm.note} onChange={(e) => setCartForm(p => ({ ...p, note: e.target.value }))} /></div>
+              <MEFormField label="UF" required error={submitted ? formErrors['to_state'] : undefined}>
+                <Input value={cartForm.state_abbr} onChange={(e) => setCartForm(p => ({ ...p, state_abbr: e.target.value.toUpperCase() }))} maxLength={2} className={submitted && formErrors['to_state'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Endereço" required error={submitted ? formErrors['to_address'] : undefined} className="col-span-2">
+                <Input value={cartForm.address} onChange={(e) => setCartForm(p => ({ ...p, address: e.target.value }))} className={submitted && formErrors['to_address'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Número" required error={submitted ? formErrors['to_number'] : undefined}>
+                <Input value={cartForm.number} onChange={(e) => setCartForm(p => ({ ...p, number: e.target.value }))} className={submitted && formErrors['to_number'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Complemento">
+                <Input value={cartForm.complement} onChange={(e) => setCartForm(p => ({ ...p, complement: e.target.value }))} />
+              </MEFormField>
+              <MEFormField label="Bairro" required error={submitted ? formErrors['to_district'] : undefined}>
+                <Input value={cartForm.district} onChange={(e) => setCartForm(p => ({ ...p, district: e.target.value }))} className={submitted && formErrors['to_district'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Cidade" required error={submitted ? formErrors['to_city'] : undefined}>
+                <Input value={cartForm.city} onChange={(e) => setCartForm(p => ({ ...p, city: e.target.value }))} className={submitted && formErrors['to_city'] ? 'border-destructive' : ''} />
+              </MEFormField>
+              <MEFormField label="Observações" className="col-span-2">
+                <Input value={cartForm.note} onChange={(e) => setCartForm(p => ({ ...p, note: e.target.value }))} />
+              </MEFormField>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setCartDialog(null)}>Cancelar</Button>
-            <Button onClick={handleAddToCart} disabled={inserirCarrinho.isPending || !cartForm.name || !cartForm.postal_code || !senderForm.name}>
+            <Button onClick={handleAddToCart} disabled={inserirCarrinho.isPending}>
               {inserirCarrinho.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <ShoppingCart className="w-4 h-4 mr-1" />}
               Inserir no Carrinho
             </Button>

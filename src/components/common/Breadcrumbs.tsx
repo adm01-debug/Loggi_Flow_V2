@@ -49,6 +49,7 @@ const routeLabels: Record<string, string> = {
   "/configuracoes": "Configurações",
   "/perfil": "Perfil",
   "/auth": "Autenticação",
+  "/gestao-melhor-envio": "Melhor Envio",
 };
 
 // Mapeamento de categorias
@@ -81,6 +82,7 @@ const routeCategories: Record<string, string> = {
   "/seguranca": "Administração",
   "/aprovacao-reset-senha": "Administração",
   "/audit-trail": "Administração",
+  "/gestao-melhor-envio": "Integrações",
 };
 
 export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {

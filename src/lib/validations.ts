@@ -169,10 +169,26 @@ export function formatCNPJ(value: string): string {
   return `${numbers.slice(0, 2)}.${numbers.slice(2, 5)}.${numbers.slice(5, 8)}/${numbers.slice(8, 12)}-${numbers.slice(12, 14)}`;
 }
 
+// Helper para formatar CPF
+export function formatCPF(value: string): string {
+  const numbers = value.replace(/\D/g, "");
+  if (numbers.length <= 3) return numbers;
+  if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+  if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+}
+
+// Helper para formatar CPF ou CNPJ baseado no tamanho
+export function formatCPFCNPJ(value: string): string {
+  const numbers = value.replace(/\D/g, "");
+  if (numbers.length <= 11) return formatCPF(numbers);
+  return formatCNPJ(numbers);
+}
+
 // Helper para formatar telefone
 export function formatPhone(value: string): string {
   const numbers = value.replace(/\D/g, "");
-  if (numbers.length <= 2) return `(${numbers}`;
+  if (numbers.length <= 2) return numbers.length > 0 ? `(${numbers}` : '';
   if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
   if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
   return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
@@ -183,4 +199,17 @@ export function formatCEP(value: string): string {
   const numbers = value.replace(/\D/g, "");
   if (numbers.length <= 5) return numbers;
   return `${numbers.slice(0, 5)}-${numbers.slice(5, 8)}`;
+}
+
+// Helper para validar email
+export function isValidEmail(email: string): boolean {
+  if (!email || email.trim() === '') return true; // empty is ok (optional)
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+// Helper para validar telefone
+export function isValidPhone(phone: string): boolean {
+  if (!phone || phone.trim() === '') return true;
+  const numbers = phone.replace(/\D/g, '');
+  return numbers.length >= 10 && numbers.length <= 11;
 }
