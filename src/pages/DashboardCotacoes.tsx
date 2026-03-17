@@ -1,0 +1,430 @@
+import { useState, useEffect, useMemo } from 'react';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { EmptyState } from '@/components/common/EmptyState';
+import { StatsCard } from '@/components/common/StatsCard';
+import {
+  Clock, CheckCircle2, AlertTriangle, DollarSign, Truck, MessageCircle,
+  Mail, Globe, Timer, Star, ArrowRight, Send, FileText, TrendingDown,
+  RefreshCw, Filter, Zap, AlertCircle, Award
+} from 'lucide-react';
+import { useCotacoesMulticanal, type CotacaoMulticanal } from '@/hooks/useCotacoesMulticanal';
+import { motion, AnimatePresence } from 'framer-motion';
+import { formatDistanceToNow, differenceInMinutes, differenceInHours, isPast } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+function TimeRemaining({ expiresAt }: { expiresAt: string }) {
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const expDate = new Date(expiresAt);
+  const expired = isPast(expDate);
+  const hoursLeft = differenceInHours(expDate, now);
+  const minutesLeft = differenceInMinutes(expDate, now) % 60;
+
+  if (expired) {
+    return <Badge variant="destructive" className="gap-1"><AlertCircle className="w-3 h-3" />Expirado</Badge>;
+  }
+
+  const isUrgent = hoursLeft < 2;
+  return (
+    <Badge variant={isUrgent ? 'destructive' : 'secondary'} className="gap-1 font-mono">
+      <Timer className="w-3 h-3" />
+      {hoursLeft}h {minutesLeft}m
+    </Badge>
+  );
+}
+
+function CanalIcon({ canal }: { canal: string }) {
+  switch (canal) {
+    case 'api': return <Globe className="w-4 h-4 text-green-500" />;
+    case 'whatsapp': return <MessageCircle className="w-4 h-4 text-emerald-500" />;
+    case 'email': return <Mail className="w-4 h-4 text-blue-500" />;
+    default: return null;
+  }
+}
+
+function CanalBadge({ canal }: { canal: string }) {
+  switch (canal) {
+    case 'api': return <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><Globe className="w-3 h-3" />API</Badge>;
+    case 'whatsapp': return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200 gap-1"><MessageCircle className="w-3 h-3" />WhatsApp</Badge>;
+    case 'email': return <Badge className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1"><Mail className="w-3 h-3" />Email</Badge>;
+    default: return null;
+  }
+}
+
+function StatusBadge({ status }: { status: string }) {
+  switch (status) {
+    case 'respondido': return <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><CheckCircle2 className="w-3 h-3" />Respondido</Badge>;
+    case 'pendente': return <Badge variant="secondary" className="gap-1"><Clock className="w-3 h-3" />Pendente</Badge>;
+    case 'expirado': return <Badge variant="destructive" className="gap-1"><AlertCircle className="w-3 h-3" />Expirado</Badge>;
+    case 'selecionado': return <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><Award className="w-3 h-3" />Selecionado</Badge>;
+    default: return null;
+  }
+}
+
+export default function DashboardCotacoes() {
+  const {
+    cotacoes, ativas, pendentes, respondidas, expiradas, selecionadas,
+    isLoading, refetch, updateCotacao, selectCotacao,
+  } = useCotacoesMulticanal();
+
+  const [tab, setTab] = useState('ativas');
+  const [filterCanal, setFilterCanal] = useState<string>('all');
+  const [respondDialog, setRespondDialog] = useState(false);
+  const [selectedCotacao, setSelectedCotacao] = useState<CotacaoMulticanal | null>(null);
+  const [respValor, setRespValor] = useState('');
+  const [respPrazo, setRespPrazo] = useState('');
+  const [respObs, setRespObs] = useState('');
+
+  const filtered = useMemo(() => {
+    let list: CotacaoMulticanal[] = [];
+    switch (tab) {
+      case 'ativas': list = ativas; break;
+      case 'pendentes': list = pendentes; break;
+      case 'respondidas': list = respondidas; break;
+      case 'todas': list = cotacoes; break;
+      default: list = ativas;
+    }
+    if (filterCanal !== 'all') {
+      list = list.filter(c => c.canal === filterCanal);
+    }
+    return list;
+  }, [tab, filterCanal, ativas, pendentes, respondidas, cotacoes]);
+
+  // Group by trecho for comparison
+  const trechoGroups = useMemo(() => {
+    const groups: Record<string, CotacaoMulticanal[]> = {};
+    respondidas.forEach(c => {
+      const key = `${c.origem_estado}-${c.destino_estado}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(c);
+    });
+    return groups;
+  }, [respondidas]);
+
+  const handleRespond = () => {
+    if (!selectedCotacao || !respValor) return;
+    updateCotacao.mutate({
+      id: selectedCotacao.id,
+      valor_cotado: parseFloat(respValor),
+      prazo_dias: respPrazo ? parseInt(respPrazo) : undefined,
+      observacoes: respObs || undefined,
+      status: 'respondido',
+    });
+    setRespondDialog(false);
+    setSelectedCotacao(null);
+    setRespValor('');
+    setRespPrazo('');
+    setRespObs('');
+  };
+
+  const handleSelect = (id: string) => {
+    selectCotacao.mutate(id);
+  };
+
+  // Calculate savings
+  const savings = useMemo(() => {
+    let totalSaved = 0;
+    Object.values(trechoGroups).forEach(group => {
+      if (group.length < 2) return;
+      const values = group.filter(c => c.valor_cotado).map(c => c.valor_cotado!);
+      if (values.length < 2) return;
+      const max = Math.max(...values);
+      const min = Math.min(...values);
+      totalSaved += max - min;
+    });
+    return totalSaved;
+  }, [trechoGroups]);
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-display flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
+                <FileText className="w-6 h-6 text-primary" />
+              </div>
+              Dashboard de Cotações
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Acompanhe todas as cotações em andamento e compare preços
+            </p>
+          </div>
+          <Button onClick={() => refetch()} variant="outline" size="sm" className="gap-2">
+            <RefreshCw className="w-4 h-4" /> Atualizar
+          </Button>
+        </div>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <StatsCard
+            title="Ativas"
+            value={ativas.length}
+            icon={<Zap className="w-5 h-5 text-primary" />}
+          />
+          <StatsCard
+            title="Pendentes"
+            value={pendentes.length}
+            icon={<Clock className="w-5 h-5 text-amber-500" />}
+            description={pendentes.length > 0 ? 'Aguardando resposta' : undefined}
+          />
+          <StatsCard
+            title="Respondidas"
+            value={respondidas.length}
+            icon={<CheckCircle2 className="w-5 h-5 text-green-500" />}
+          />
+          <StatsCard
+            title="Expiradas"
+            value={expiradas.length}
+            icon={<AlertTriangle className="w-5 h-5 text-destructive" />}
+          />
+          <StatsCard
+            title="Economia Estimada"
+            value={`R$ ${savings.toFixed(0)}`}
+            icon={<TrendingDown className="w-5 h-5 text-green-500" />}
+            description="Diferença entre maior e menor cotação"
+          />
+        </div>
+
+        {/* Comparativo por Trecho */}
+        {Object.keys(trechoGroups).length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Star className="w-5 h-5 text-amber-500" />
+                Comparativo por Trecho
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {Object.entries(trechoGroups).map(([trecho, group]) => {
+                const sorted = [...group].sort((a, b) => (a.valor_cotado || Infinity) - (b.valor_cotado || Infinity));
+                const best = sorted[0];
+
+                return (
+                  <div key={trecho} className="p-4 rounded-lg border bg-muted/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge variant="outline" className="font-mono">{trecho.replace('-', ' → ')}</Badge>
+                      <span className="text-xs text-muted-foreground">{group.length} cotação(ões)</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {sorted.map((c, i) => (
+                        <motion.div
+                          key={c.id}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className={`p-3 rounded-lg border ${i === 0 ? 'border-green-300 bg-green-50/50 dark:bg-green-950/20' : 'bg-card'}`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-sm truncate">{c.transportadora?.nome_fantasia}</span>
+                            {i === 0 && <Badge className="bg-green-500 text-xs">Melhor</Badge>}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold">R$ {c.valor_cotado?.toFixed(2)}</span>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="w-3 h-3" />{c.prazo_dias || '?'}d
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between mt-2">
+                            <CanalBadge canal={c.canal} />
+                            {c.status !== 'selecionado' && i === 0 && (
+                              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleSelect(c.id)}>
+                                Selecionar
+                              </Button>
+                            )}
+                            {c.status === 'selecionado' && (
+                              <Badge className="bg-primary/10 text-primary gap-1"><Award className="w-3 h-3" />Selecionado</Badge>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Tabela de Cotações */}
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Truck className="w-5 h-5" />
+                Cotações
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Select value={filterCanal} onValueChange={setFilterCanal}>
+                  <SelectTrigger className="w-32 h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos canais</SelectItem>
+                    <SelectItem value="api">API</SelectItem>
+                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Tabs value={tab} onValueChange={setTab}>
+              <TabsList className="grid grid-cols-4 w-full max-w-md">
+                <TabsTrigger value="ativas">Ativas ({ativas.length})</TabsTrigger>
+                <TabsTrigger value="pendentes">Pendentes ({pendentes.length})</TabsTrigger>
+                <TabsTrigger value="respondidas">Respondidas ({respondidas.length})</TabsTrigger>
+                <TabsTrigger value="todas">Todas ({cotacoes.length})</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </CardHeader>
+          <CardContent>
+            {filtered.length === 0 ? (
+              <EmptyState
+                icon={<FileText className="w-12 h-12" />}
+                title="Nenhuma cotação encontrada"
+                description="Crie cotações na página Cotação Multi-Canal"
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Transportadora</TableHead>
+                      <TableHead>Trecho</TableHead>
+                      <TableHead>Canal</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Prazo</TableHead>
+                      <TableHead>Expira em</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((cotacao) => (
+                      <TableRow key={cotacao.id} className="group">
+                        <TableCell className="font-medium">
+                          {cotacao.transportadora?.nome_fantasia || 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-mono text-xs">
+                            {cotacao.origem_estado} → {cotacao.destino_estado}
+                          </span>
+                        </TableCell>
+                        <TableCell><CanalBadge canal={cotacao.canal} /></TableCell>
+                        <TableCell><StatusBadge status={cotacao.status} /></TableCell>
+                        <TableCell>
+                          {cotacao.valor_cotado ? (
+                            <span className="font-semibold">R$ {cotacao.valor_cotado.toFixed(2)}</span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {cotacao.prazo_dias ? `${cotacao.prazo_dias}d` : '—'}
+                        </TableCell>
+                        <TableCell>
+                          <TimeRemaining expiresAt={cotacao.expires_at} />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {cotacao.status === 'pendente' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 text-xs gap-1"
+                                onClick={() => {
+                                  setSelectedCotacao(cotacao);
+                                  setRespondDialog(true);
+                                }}
+                              >
+                                <Send className="w-3 h-3" /> Registrar
+                              </Button>
+                            )}
+                            {cotacao.status === 'respondido' && (
+                              <Button
+                                size="sm"
+                                className="h-7 text-xs gap-1"
+                                onClick={() => handleSelect(cotacao.id)}
+                              >
+                                <Award className="w-3 h-3" /> Selecionar
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Dialog Registrar Resposta */}
+        <Dialog open={respondDialog} onOpenChange={setRespondDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Registrar Resposta da Cotação</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                <strong>{selectedCotacao?.transportadora?.nome_fantasia}</strong>
+                <span className="ml-2 text-muted-foreground">
+                  {selectedCotacao?.origem_estado} → {selectedCotacao?.destino_estado}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Valor (R$) *</Label>
+                  <Input
+                    type="number"
+                    value={respValor}
+                    onChange={e => setRespValor(e.target.value)}
+                    placeholder="150.00"
+                  />
+                </div>
+                <div>
+                  <Label>Prazo (dias)</Label>
+                  <Input
+                    type="number"
+                    value={respPrazo}
+                    onChange={e => setRespPrazo(e.target.value)}
+                    placeholder="5"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>Observações</Label>
+                <Textarea
+                  value={respObs}
+                  onChange={e => setRespObs(e.target.value)}
+                  placeholder="Detalhes adicionais..."
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRespondDialog(false)}>Cancelar</Button>
+              <Button onClick={handleRespond} disabled={!respValor}>Registrar Resposta</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </MainLayout>
+  );
+}
