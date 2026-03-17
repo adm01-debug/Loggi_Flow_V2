@@ -152,7 +152,9 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
           score_performance,
           homologada,
           email_comercial,
-          contato_comercial
+          contato_comercial,
+          whatsapp_operacional,
+          api_disponivel
         )
       `)
       .eq('origem_estado', origemEstado)

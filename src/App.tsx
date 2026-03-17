@@ -58,6 +58,7 @@ const GestaoRodonaves = lazy(() => import("./pages/GestaoRodonaves"));
 const GestaoMelhorEnvio = lazy(() => import("./pages/GestaoMelhorEnvio"));
 const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
 const InteligenciaFrete = lazy(() => import("./pages/InteligenciaFrete"));
+const CotacaoMultiCanal = lazy(() => import("./pages/CotacaoMultiCanal"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -146,6 +147,7 @@ function AnimatedRoutes() {
           <Route path="/melhor-envio" element={<ProtectedRoute><GestaoMelhorEnvio /></ProtectedRoute>} />
           <Route path="/dashboard-executivo" element={<ProtectedRoute><DashboardExecutivo /></ProtectedRoute>} />
           <Route path="/inteligencia-frete" element={<ProtectedRoute><InteligenciaFrete /></ProtectedRoute>} />
+          <Route path="/cotacao-multicanal" element={<ProtectedRoute><CotacaoMultiCanal /></ProtectedRoute>} />
           <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
           <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />
