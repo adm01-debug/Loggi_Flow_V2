@@ -252,8 +252,8 @@ export function FavoriteMetricsBar() {
                             <div
                               className={cn(
                                 "flex items-center text-xs",
-                                data.changeType === "positive" && "text-green-500",
-                                data.changeType === "negative" && "text-red-500",
+                              data.changeType === "positive" && "text-success",
+                                data.changeType === "negative" && "text-destructive",
                                 data.changeType === "neutral" && "text-muted-foreground"
                               )}
                             >
