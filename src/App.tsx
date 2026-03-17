@@ -60,6 +60,7 @@ const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
 const InteligenciaFrete = lazy(() => import("./pages/InteligenciaFrete"));
 const CotacaoMultiCanal = lazy(() => import("./pages/CotacaoMultiCanal"));
 const DashboardCotacoes = lazy(() => import("./pages/DashboardCotacoes"));
+const PainelOTIF = lazy(() => import("./pages/PainelOTIF"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
