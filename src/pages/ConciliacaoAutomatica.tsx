@@ -251,7 +251,7 @@ export default function ConciliacaoAutomatica() {
                         <TableCell className="text-right">R$ {r.fatura.valor_fatura.toFixed(2)}</TableCell>
                         <TableCell className="font-mono text-xs">{r.numero_entrega || '—'}</TableCell>
                         <TableCell className="text-right">{r.valor_sistema ? `R$ ${r.valor_sistema.toFixed(2)}` : '—'}</TableCell>
-                        <TableCell className={cn("text-right font-medium", r.diferenca > 0.01 ? 'text-destructive' : 'text-green-600')}>
+                        <TableCell className={cn("text-right font-medium", r.diferenca > 0.01 ? 'text-destructive' : 'text-primary')}>
                           R$ {r.diferenca.toFixed(2)}
                         </TableCell>
                       </TableRow>
