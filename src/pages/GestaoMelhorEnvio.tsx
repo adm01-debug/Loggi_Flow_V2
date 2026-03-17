@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { useState, useCallback } from 'react';
+  useKeyboardShortcut('8', useCallback(() => setActiveTab('webhooks'), []), { alt: true });
 
 
 export default function GestaoMelhorEnvio() {
