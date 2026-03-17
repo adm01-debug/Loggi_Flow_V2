@@ -18,8 +18,9 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "hsl(var(--primary))", "hsl(var(--accent))", "#10b981", "#f59e0b",
-  "#8b5cf6", "#ec4899", "#06b6d4", "#f97316",
+  "hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--muted-foreground))",
+  "hsl(var(--secondary))", "hsl(var(--destructive))", "hsl(var(--chart-1, 220 70% 50%))",
+  "hsl(var(--chart-2, 160 60% 45%))", "hsl(var(--chart-3, 30 80% 55%))",
 ];
 
 export default function CustosDashboard() {
