@@ -113,6 +113,18 @@ export default function Coletas() {
   };
 
   const handleSubmit = async () => {
+    if (!formData.endereco_coleta.trim()) {
+      toast({ title: "Campo obrigatório", description: "Informe o endereço da coleta", variant: "destructive" });
+      return;
+    }
+    if (formData.tipo_coleta === "transportadora" && !formData.transportadora_id) {
+      toast({ title: "Campo obrigatório", description: "Selecione uma transportadora", variant: "destructive" });
+      return;
+    }
+    if (formData.qtd_volumes && parseInt(formData.qtd_volumes) <= 0) {
+      toast({ title: "Valor inválido", description: "Quantidade de volumes deve ser maior que zero", variant: "destructive" });
+      return;
+    }
     const numero = `COL-${Date.now().toString().slice(-8)}`;
     const { error } = await supabase.from("coletas").insert({
       numero_coleta: numero, fornecedor_id: formData.fornecedor_id || null, tipo_coleta: formData.tipo_coleta,
