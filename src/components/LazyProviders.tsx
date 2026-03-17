@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, forwardRef } from "react";
 import { AchievementProvider } from "@/hooks/useAchievementNotifications";
 import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
 import { TimezoneProvider } from "@/hooks/useTimezone";
