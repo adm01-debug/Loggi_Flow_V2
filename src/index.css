@@ -713,3 +713,10 @@
 :root {
   --accessibility-font-scale: 1;
 }
+
+/* Sidebar logo animation (replaces framer-motion) */
+@keyframes sidebar-logo {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+}

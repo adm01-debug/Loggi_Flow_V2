@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AIAssistant } from "@/components/ai/AIAssistant";
-import { motion, AnimatePresence } from "framer-motion";
+// CSS transitions instead of framer-motion to avoid pulling 40KB gzip into MainLayout
 import { usePrefetch } from "@/hooks/usePrefetch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -133,30 +133,23 @@ export function AppSidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
-        <motion.div 
-          animate={{ rotate: [0, 5, -5, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30"
+        <div 
+          className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30 animate-[sidebar-logo_4s_ease-in-out_infinite]"
         >
           <Box className="w-6 h-6 text-primary-foreground" />
-        </motion.div>
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.div 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              className="flex flex-col"
-            >
-              <span className="font-display font-bold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                LogiFlow
-              </span>
-              <span className="text-[10px] text-muted-foreground font-medium tracking-wide uppercase">
-                Logística Gamificada
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        </div>
+        {!collapsed && (
+          <div 
+            className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-200"
+          >
+            <span className="font-display font-bold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              LogiFlow
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium tracking-wide uppercase">
+              Logística Gamificada
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Scroll indicator top */}
@@ -198,11 +191,10 @@ export function AppSidebar() {
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-1 mt-1">
               {section.items.map((item, idx) => (
-                <motion.div
+                <div
                   key={item.url}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.03 }}
+                  className="animate-in fade-in slide-in-from-left-2 duration-150"
+                  style={{ animationDelay: `${idx * 30}ms` }}
                 >
                   <NavLink
                     to={item.url}
@@ -223,7 +215,7 @@ export function AppSidebar() {
                       <span className="text-sm font-medium">{item.title}</span>
                     )}
                   </NavLink>
-                </motion.div>
+                </div>
               ))}
             </CollapsibleContent>
           </Collapsible>
