@@ -22,6 +22,7 @@ interface PerformanceChartProps {
   type?: 'area' | 'bar' | 'pie';
   data: Array<Record<string, unknown>>;
   dataKey: string;
+  secondaryDataKey?: string;
   xAxisKey?: string;
   colors?: string[];
   className?: string;
