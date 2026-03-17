@@ -126,6 +126,19 @@ export default function Coletas() {
     setFormData({ fornecedor_id: "", tipo_coleta: "lalamove", transportadora_id: "", endereco_coleta: "", contato_coleta: "", data_prevista_coleta: "", qtd_volumes: "", peso_estimado_kg: "", observacoes: "" });
   };
 
+  // Status transition guards
+  const validTransitions: Record<ColetaStatus, ColetaStatus[]> = {
+    aguardando_liberacao: ["solicitada"],
+    solicitada: ["em_transito", "aguardando_liberacao"],
+    em_transito: ["chegou_expedicao"],
+    chegou_expedicao: ["conferencia_ok", "divergencia"],
+    conferencia_ok: ["finalizada"],
+    divergencia: ["conferencia_ok", "finalizada"],
+    finalizada: [],
+  };
+
+  const getNextStatuses = (current: ColetaStatus): ColetaStatus[] => validTransitions[current] || [];
+
   const updateStatus = async (id: string, status: ColetaStatus) => {
     const update: { status: ColetaStatus; data_efetiva_coleta?: string } = { status };
     if (status === "em_transito") update.data_efetiva_coleta = new Date().toISOString();
