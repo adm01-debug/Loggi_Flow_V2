@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
@@ -15,9 +14,11 @@ import { TableSkeleton } from '@/components/ui/skeletons';
 import { MEDetailDialog } from './MEDetailDialog';
 import { MEErrorState } from './MEErrorState';
 import { MECepAutoFill } from './MECepAutoFill';
+import { MEFormField } from './MEFormField';
 import { usePagination } from '@/hooks/usePagination';
 import { Pagination } from '@/components/common/Pagination';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { formatPhone, formatCPFCNPJ } from '@/lib/validations';
 import type { MECartItem } from './types';
 
 export function MECarrinhoPanel() {
@@ -26,12 +27,14 @@ export function MECarrinhoPanel() {
   const [showReverse, setShowReverse] = useState(false);
   const [itemDetail, setItemDetail] = useState<Record<string, unknown> | null>(null);
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+  const [reverseSubmitted, setReverseSubmitted] = useState(false);
+  const [reverseErrors, setReverseErrors] = useState<Record<string, string>>({});
 
   const [reverseForm, setReverseForm] = useState({
     service: '',
-    from_name: '', from_postal_code: '', from_address: '', from_number: '',
+    from_name: '', from_phone: '', from_document: '', from_postal_code: '', from_address: '', from_number: '',
     from_district: '', from_city: '', from_state_abbr: '',
-    to_name: '', to_postal_code: '', to_address: '', to_number: '',
+    to_name: '', to_phone: '', to_document: '', to_postal_code: '', to_address: '', to_number: '',
     to_district: '', to_city: '', to_state_abbr: '',
     width: '20', height: '10', length: '30', weight: '1', insurance_value: '100',
   });
@@ -62,7 +65,30 @@ export function MECarrinhoPanel() {
     });
   };
 
+  const validateReverseForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!reverseForm.service.trim()) errors['service'] = 'ID do serviço é obrigatório';
+    if (!reverseForm.from_name.trim()) errors['from_name'] = 'Nome é obrigatório';
+    if (!reverseForm.from_postal_code.replace(/\D/g, '').trim()) errors['from_postal_code'] = 'CEP é obrigatório';
+    if (!reverseForm.from_address.trim()) errors['from_address'] = 'Endereço é obrigatório';
+    if (!reverseForm.from_number.trim()) errors['from_number'] = 'Número é obrigatório';
+    if (!reverseForm.from_district.trim()) errors['from_district'] = 'Bairro é obrigatório';
+    if (!reverseForm.from_city.trim()) errors['from_city'] = 'Cidade é obrigatória';
+    if (!reverseForm.from_state_abbr.trim()) errors['from_state'] = 'UF é obrigatória';
+    if (!reverseForm.to_name.trim()) errors['to_name'] = 'Nome é obrigatório';
+    if (!reverseForm.to_postal_code.replace(/\D/g, '').trim()) errors['to_postal_code'] = 'CEP é obrigatório';
+    if (!reverseForm.to_address.trim()) errors['to_address'] = 'Endereço é obrigatório';
+    if (!reverseForm.to_number.trim()) errors['to_number'] = 'Número é obrigatório';
+    if (!reverseForm.to_district.trim()) errors['to_district'] = 'Bairro é obrigatório';
+    if (!reverseForm.to_city.trim()) errors['to_city'] = 'Cidade é obrigatória';
+    if (!reverseForm.to_state_abbr.trim()) errors['to_state'] = 'UF é obrigatória';
+    setReverseErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleReverseSubmit = () => {
+    setReverseSubmitted(true);
+    if (!validateReverseForm()) return;
     inserirLogisticaReversa.mutate({
       service: parseInt(reverseForm.service),
       from: {
@@ -92,7 +118,7 @@ export function MECarrinhoPanel() {
         quantity: 1,
       }],
     } as Record<string, unknown>, {
-      onSuccess: () => setShowReverse(false),
+      onSuccess: () => { setShowReverse(false); setReverseSubmitted(false); },
     });
   };
 
@@ -220,7 +246,7 @@ export function MECarrinhoPanel() {
         data={itemDetail}
       />
 
-      <Dialog open={showReverse} onOpenChange={setShowReverse}>
+      <Dialog open={showReverse} onOpenChange={(open) => { setShowReverse(open); if (!open) setReverseSubmitted(false); }}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -228,19 +254,23 @@ export function MECarrinhoPanel() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>ID do Serviço *</Label>
-              <Input placeholder="Ex: 2 (SEDEX)" value={reverseForm.service} onChange={(e) => setReverseForm(p => ({ ...p, service: e.target.value }))} />
-            </div>
+            <MEFormField label="ID do Serviço" required error={reverseSubmitted ? reverseErrors['service'] : undefined}>
+              <Input placeholder="Ex: 2 (SEDEX)" value={reverseForm.service} onChange={(e) => setReverseForm(p => ({ ...p, service: e.target.value }))} className={reverseSubmitted && reverseErrors['service'] ? 'border-destructive' : ''} />
+            </MEFormField>
 
             <div className="space-y-2">
-              <p className="font-semibold text-sm">Origem (quem envia de volta)</p>
+              <p className="font-semibold text-sm border-b pb-1">📦 Origem (quem envia de volta)</p>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>Nome</Label><Input value={reverseForm.from_name} onChange={(e) => setReverseForm(p => ({ ...p, from_name: e.target.value }))} /></div>
+                <MEFormField label="Nome" required error={reverseSubmitted ? reverseErrors['from_name'] : undefined}>
+                  <Input value={reverseForm.from_name} onChange={(e) => setReverseForm(p => ({ ...p, from_name: e.target.value }))} className={reverseSubmitted && reverseErrors['from_name'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Telefone">
+                  <Input value={reverseForm.from_phone} onChange={(e) => setReverseForm(p => ({ ...p, from_phone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" />
+                </MEFormField>
                 <MECepAutoFill
                   value={reverseForm.from_postal_code}
                   onChange={(v) => setReverseForm(p => ({ ...p, from_postal_code: v }))}
-                  label="CEP"
+                  label="CEP *"
                   onAddressFound={(addr) => {
                     setReverseForm(p => ({
                       ...p,
@@ -251,22 +281,38 @@ export function MECarrinhoPanel() {
                     }));
                   }}
                 />
-                <div className="col-span-2"><Label>Endereço</Label><Input value={reverseForm.from_address} onChange={(e) => setReverseForm(p => ({ ...p, from_address: e.target.value }))} /></div>
-                <div><Label>Número</Label><Input value={reverseForm.from_number} onChange={(e) => setReverseForm(p => ({ ...p, from_number: e.target.value }))} /></div>
-                <div><Label>Bairro</Label><Input value={reverseForm.from_district} onChange={(e) => setReverseForm(p => ({ ...p, from_district: e.target.value }))} /></div>
-                <div><Label>Cidade</Label><Input value={reverseForm.from_city} onChange={(e) => setReverseForm(p => ({ ...p, from_city: e.target.value }))} /></div>
-                <div><Label>UF</Label><Input value={reverseForm.from_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, from_state_abbr: e.target.value.toUpperCase() }))} maxLength={2} /></div>
+                {reverseSubmitted && reverseErrors['from_postal_code'] && <p className="text-xs text-destructive -mt-2">{reverseErrors['from_postal_code']}</p>}
+                <MEFormField label="UF" required error={reverseSubmitted ? reverseErrors['from_state'] : undefined}>
+                  <Input value={reverseForm.from_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, from_state_abbr: e.target.value.toUpperCase() }))} maxLength={2} className={reverseSubmitted && reverseErrors['from_state'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Endereço" required error={reverseSubmitted ? reverseErrors['from_address'] : undefined} className="col-span-2">
+                  <Input value={reverseForm.from_address} onChange={(e) => setReverseForm(p => ({ ...p, from_address: e.target.value }))} className={reverseSubmitted && reverseErrors['from_address'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Número" required error={reverseSubmitted ? reverseErrors['from_number'] : undefined}>
+                  <Input value={reverseForm.from_number} onChange={(e) => setReverseForm(p => ({ ...p, from_number: e.target.value }))} className={reverseSubmitted && reverseErrors['from_number'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Bairro" required error={reverseSubmitted ? reverseErrors['from_district'] : undefined}>
+                  <Input value={reverseForm.from_district} onChange={(e) => setReverseForm(p => ({ ...p, from_district: e.target.value }))} className={reverseSubmitted && reverseErrors['from_district'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Cidade" required error={reverseSubmitted ? reverseErrors['from_city'] : undefined}>
+                  <Input value={reverseForm.from_city} onChange={(e) => setReverseForm(p => ({ ...p, from_city: e.target.value }))} className={reverseSubmitted && reverseErrors['from_city'] ? 'border-destructive' : ''} />
+                </MEFormField>
               </div>
             </div>
 
             <div className="space-y-2">
-              <p className="font-semibold text-sm">Destino (quem recebe de volta)</p>
+              <p className="font-semibold text-sm border-b pb-1">📍 Destino (quem recebe de volta)</p>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>Nome</Label><Input value={reverseForm.to_name} onChange={(e) => setReverseForm(p => ({ ...p, to_name: e.target.value }))} /></div>
+                <MEFormField label="Nome" required error={reverseSubmitted ? reverseErrors['to_name'] : undefined}>
+                  <Input value={reverseForm.to_name} onChange={(e) => setReverseForm(p => ({ ...p, to_name: e.target.value }))} className={reverseSubmitted && reverseErrors['to_name'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Telefone">
+                  <Input value={reverseForm.to_phone} onChange={(e) => setReverseForm(p => ({ ...p, to_phone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" />
+                </MEFormField>
                 <MECepAutoFill
                   value={reverseForm.to_postal_code}
                   onChange={(v) => setReverseForm(p => ({ ...p, to_postal_code: v }))}
-                  label="CEP"
+                  label="CEP *"
                   onAddressFound={(addr) => {
                     setReverseForm(p => ({
                       ...p,
@@ -277,28 +323,39 @@ export function MECarrinhoPanel() {
                     }));
                   }}
                 />
-                <div className="col-span-2"><Label>Endereço</Label><Input value={reverseForm.to_address} onChange={(e) => setReverseForm(p => ({ ...p, to_address: e.target.value }))} /></div>
-                <div><Label>Número</Label><Input value={reverseForm.to_number} onChange={(e) => setReverseForm(p => ({ ...p, to_number: e.target.value }))} /></div>
-                <div><Label>Bairro</Label><Input value={reverseForm.to_district} onChange={(e) => setReverseForm(p => ({ ...p, to_district: e.target.value }))} /></div>
-                <div><Label>Cidade</Label><Input value={reverseForm.to_city} onChange={(e) => setReverseForm(p => ({ ...p, to_city: e.target.value }))} /></div>
-                <div><Label>UF</Label><Input value={reverseForm.to_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, to_state_abbr: e.target.value.toUpperCase() }))} maxLength={2} /></div>
+                {reverseSubmitted && reverseErrors['to_postal_code'] && <p className="text-xs text-destructive -mt-2">{reverseErrors['to_postal_code']}</p>}
+                <MEFormField label="UF" required error={reverseSubmitted ? reverseErrors['to_state'] : undefined}>
+                  <Input value={reverseForm.to_state_abbr} onChange={(e) => setReverseForm(p => ({ ...p, to_state_abbr: e.target.value.toUpperCase() }))} maxLength={2} className={reverseSubmitted && reverseErrors['to_state'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Endereço" required error={reverseSubmitted ? reverseErrors['to_address'] : undefined} className="col-span-2">
+                  <Input value={reverseForm.to_address} onChange={(e) => setReverseForm(p => ({ ...p, to_address: e.target.value }))} className={reverseSubmitted && reverseErrors['to_address'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Número" required error={reverseSubmitted ? reverseErrors['to_number'] : undefined}>
+                  <Input value={reverseForm.to_number} onChange={(e) => setReverseForm(p => ({ ...p, to_number: e.target.value }))} className={reverseSubmitted && reverseErrors['to_number'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Bairro" required error={reverseSubmitted ? reverseErrors['to_district'] : undefined}>
+                  <Input value={reverseForm.to_district} onChange={(e) => setReverseForm(p => ({ ...p, to_district: e.target.value }))} className={reverseSubmitted && reverseErrors['to_district'] ? 'border-destructive' : ''} />
+                </MEFormField>
+                <MEFormField label="Cidade" required error={reverseSubmitted ? reverseErrors['to_city'] : undefined}>
+                  <Input value={reverseForm.to_city} onChange={(e) => setReverseForm(p => ({ ...p, to_city: e.target.value }))} className={reverseSubmitted && reverseErrors['to_city'] ? 'border-destructive' : ''} />
+                </MEFormField>
               </div>
             </div>
 
             <div className="space-y-2">
-              <p className="font-semibold text-sm">Volume</p>
+              <p className="font-semibold text-sm border-b pb-1">📦 Volume</p>
               <div className="grid grid-cols-5 gap-2">
-                <div><Label className="text-xs">Larg. (cm)</Label><Input type="number" value={reverseForm.width} onChange={(e) => setReverseForm(p => ({ ...p, width: e.target.value }))} /></div>
-                <div><Label className="text-xs">Alt. (cm)</Label><Input type="number" value={reverseForm.height} onChange={(e) => setReverseForm(p => ({ ...p, height: e.target.value }))} /></div>
-                <div><Label className="text-xs">Comp. (cm)</Label><Input type="number" value={reverseForm.length} onChange={(e) => setReverseForm(p => ({ ...p, length: e.target.value }))} /></div>
-                <div><Label className="text-xs">Peso (kg)</Label><Input type="number" value={reverseForm.weight} onChange={(e) => setReverseForm(p => ({ ...p, weight: e.target.value }))} /></div>
-                <div><Label className="text-xs">Valor (R$)</Label><Input type="number" value={reverseForm.insurance_value} onChange={(e) => setReverseForm(p => ({ ...p, insurance_value: e.target.value }))} /></div>
+                <MEFormField label="Larg. (cm)"><Input type="number" value={reverseForm.width} onChange={(e) => setReverseForm(p => ({ ...p, width: e.target.value }))} /></MEFormField>
+                <MEFormField label="Alt. (cm)"><Input type="number" value={reverseForm.height} onChange={(e) => setReverseForm(p => ({ ...p, height: e.target.value }))} /></MEFormField>
+                <MEFormField label="Comp. (cm)"><Input type="number" value={reverseForm.length} onChange={(e) => setReverseForm(p => ({ ...p, length: e.target.value }))} /></MEFormField>
+                <MEFormField label="Peso (kg)"><Input type="number" value={reverseForm.weight} onChange={(e) => setReverseForm(p => ({ ...p, weight: e.target.value }))} /></MEFormField>
+                <MEFormField label="Valor (R$)"><Input type="number" value={reverseForm.insurance_value} onChange={(e) => setReverseForm(p => ({ ...p, insurance_value: e.target.value }))} /></MEFormField>
               </div>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowReverse(false)}>Cancelar</Button>
-            <Button onClick={handleReverseSubmit} disabled={inserirLogisticaReversa.isPending || !reverseForm.service}>
+            <Button onClick={handleReverseSubmit} disabled={inserirLogisticaReversa.isPending}>
               {inserirLogisticaReversa.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RotateCcw className="w-4 h-4 mr-1" />}
               Inserir Logística Reversa
             </Button>
