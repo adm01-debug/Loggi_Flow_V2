@@ -8,6 +8,11 @@ import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { Store, Loader2, Plus, MapPin, Phone, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableSkeleton } from '@/components/ui/skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
+import { MEErrorState } from './MEErrorState';
+import { MECepAutoFill } from './MECepAutoFill';
+import { formatCNPJ } from '@/lib/validations';
 import type { MEStore, MEAddress } from './types';
 
 interface StorePhone {
@@ -31,12 +36,13 @@ export function MELojasPanel() {
   const rawData = listarLojas.data;
   const stores: MEStore[] = Array.isArray((rawData as Record<string, unknown>)?.data)
     ? (rawData as Record<string, unknown>).data as MEStore[]
-    : Array.isArray(rawData)
-      ? rawData as MEStore[]
-      : [];
+    : Array.isArray(rawData) ? rawData as MEStore[] : [];
 
   const handleCreate = () => {
-    cadastrarLoja.mutate(newStore as Record<string, unknown>, {
+    cadastrarLoja.mutate({
+      ...newStore,
+      document: newStore.document.replace(/\D/g, ''),
+    } as Record<string, unknown>, {
       onSuccess: () => {
         setShowNewStore(false);
         setNewStore({ name: '', document: '', email: '', description: '' });
@@ -57,7 +63,10 @@ export function MELojasPanel() {
   };
 
   const handleAddAddress = () => {
-    cadastrarEnderecoLoja.mutate({ company_id: selectedStoreId, address: newAddress }, {
+    cadastrarEnderecoLoja.mutate({
+      company_id: selectedStoreId,
+      address: { ...newAddress, postal_code: newAddress.postal_code.replace(/\D/g, '') },
+    }, {
       onSuccess: () => {
         setShowAddAddress(false);
         setNewAddress({ postal_code: '', address: '', number: '', district: '', city: '', state_abbr: '', complement: '' });
@@ -90,9 +99,17 @@ export function MELojasPanel() {
         </CardHeader>
         <CardContent>
           {listarLojas.isLoading ? (
-            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin" /></div>
+            <TableSkeleton rows={3} columns={4} />
+          ) : listarLojas.isError ? (
+            <MEErrorState message="Erro ao carregar lojas." onRetry={() => listarLojas.refetch()} />
           ) : stores.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">Nenhuma loja cadastrada</p>
+            <EmptyState
+              variant="default"
+              title="Nenhuma loja cadastrada"
+              description="Crie uma loja para gerenciar endereços e telefones."
+              size="sm"
+              action={{ label: 'Nova Loja', onClick: () => setShowNewStore(true) }}
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -126,8 +143,8 @@ export function MELojasPanel() {
         <DialogContent>
           <DialogHeader><DialogTitle>Cadastrar Nova Loja</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Nome</Label><Input value={newStore.name} onChange={(e) => setNewStore({ ...newStore, name: e.target.value })} /></div>
-            <div><Label>CNPJ / CPF</Label><Input value={newStore.document} onChange={(e) => setNewStore({ ...newStore, document: e.target.value })} /></div>
+            <div><Label>Nome *</Label><Input value={newStore.name} onChange={(e) => setNewStore({ ...newStore, name: e.target.value })} /></div>
+            <div><Label>CNPJ / CPF</Label><Input value={newStore.document} onChange={(e) => setNewStore({ ...newStore, document: formatCNPJ(e.target.value) })} placeholder="00.000.000/0000-00" /></div>
             <div><Label>Email</Label><Input type="email" value={newStore.email} onChange={(e) => setNewStore({ ...newStore, email: e.target.value })} /></div>
             <div><Label>Descrição</Label><Input value={newStore.description} onChange={(e) => setNewStore({ ...newStore, description: e.target.value })} /></div>
           </div>
@@ -188,8 +205,21 @@ export function MELojasPanel() {
         <DialogContent>
           <DialogHeader><DialogTitle>Novo Endereço</DialogTitle></DialogHeader>
           <div className="grid grid-cols-2 gap-3">
-            <div><Label>CEP</Label><Input value={newAddress.postal_code} onChange={(e) => setNewAddress({ ...newAddress, postal_code: e.target.value })} /></div>
-            <div><Label>UF</Label><Input value={newAddress.state_abbr} onChange={(e) => setNewAddress({ ...newAddress, state_abbr: e.target.value })} maxLength={2} /></div>
+            <MECepAutoFill
+              value={newAddress.postal_code}
+              onChange={(v) => setNewAddress({ ...newAddress, postal_code: v })}
+              label="CEP"
+              onAddressFound={(addr) => {
+                setNewAddress(prev => ({
+                  ...prev,
+                  address: addr.rua || prev.address,
+                  district: addr.bairro || prev.district,
+                  city: addr.cidade || prev.city,
+                  state_abbr: addr.uf || prev.state_abbr,
+                }));
+              }}
+            />
+            <div><Label>UF</Label><Input value={newAddress.state_abbr} onChange={(e) => setNewAddress({ ...newAddress, state_abbr: e.target.value.toUpperCase() })} maxLength={2} /></div>
             <div className="col-span-2"><Label>Endereço</Label><Input value={newAddress.address} onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })} /></div>
             <div><Label>Número</Label><Input value={newAddress.number} onChange={(e) => setNewAddress({ ...newAddress, number: e.target.value })} /></div>
             <div><Label>Complemento</Label><Input value={newAddress.complement} onChange={(e) => setNewAddress({ ...newAddress, complement: e.target.value })} /></div>

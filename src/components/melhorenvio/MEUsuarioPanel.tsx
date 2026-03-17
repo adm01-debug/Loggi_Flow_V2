@@ -5,8 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
-import { User, Wallet, MapPin, Loader2, PlusCircle } from 'lucide-react';
+import { User, Wallet, MapPin, PlusCircle, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { CardSkeleton } from '@/components/ui/skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
+import { MEErrorState } from './MEErrorState';
 import type { MEUserInfo, MEBalance, MEAddress } from './types';
 
 export function MEUsuarioPanel() {
@@ -18,12 +21,11 @@ export function MEUsuarioPanel() {
   const rawEnderecos = enderecosUsuario.data;
   const enderecos: MEAddress[] = Array.isArray((rawEnderecos as Record<string, unknown>)?.data)
     ? (rawEnderecos as Record<string, unknown>).data as MEAddress[]
-    : Array.isArray(rawEnderecos)
-      ? rawEnderecos as MEAddress[]
-      : [];
+    : Array.isArray(rawEnderecos) ? rawEnderecos as MEAddress[] : [];
   const saldo = saldoUsuario.data as MEBalance | undefined;
 
   const isLoading = infoUsuario.isLoading || enderecosUsuario.isLoading || saldoUsuario.isLoading;
+  const hasError = infoUsuario.isError || saldoUsuario.isError;
 
   const handleInsertBalance = () => {
     const value = parseFloat(balanceAmount);
@@ -37,7 +39,21 @@ export function MEUsuarioPanel() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CardSkeleton />
+        <CardSkeleton />
+        <div className="md:col-span-2"><CardSkeleton /></div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return <MEErrorState message="Erro ao carregar dados da conta." onRetry={() => {
+      infoUsuario.refetch();
+      saldoUsuario.refetch();
+      enderecosUsuario.refetch();
+    }} />;
   }
 
   return (
@@ -70,7 +86,7 @@ export function MEUsuarioPanel() {
               </div>
             </>
           ) : (
-            <p className="text-muted-foreground">Dados não disponíveis</p>
+            <EmptyState variant="users" title="Dados não disponíveis" size="sm" />
           )}
         </CardContent>
       </Card>
@@ -94,7 +110,7 @@ export function MEUsuarioPanel() {
               <p className="text-sm text-muted-foreground mt-2">Saldo disponível para compras</p>
             </div>
           ) : (
-            <p className="text-muted-foreground text-center py-4">Saldo não disponível</p>
+            <EmptyState variant="data" title="Saldo não disponível" size="sm" />
           )}
         </CardContent>
       </Card>
@@ -108,7 +124,7 @@ export function MEUsuarioPanel() {
         </CardHeader>
         <CardContent>
           {enderecos.length === 0 ? (
-            <p className="text-muted-foreground text-center py-4">Nenhum endereço cadastrado</p>
+            <EmptyState variant="location" title="Nenhum endereço cadastrado" size="sm" />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {enderecos.map((end, i) => (
@@ -135,25 +151,13 @@ export function MEUsuarioPanel() {
           <div className="space-y-3">
             <div>
               <Label>Valor (R$)</Label>
-              <Input
-                type="number"
-                min="1"
-                step="0.01"
-                placeholder="50.00"
-                value={balanceAmount}
-                onChange={(e) => setBalanceAmount(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                O valor será adicionado à sua carteira Melhor Envio via gateway de pagamento.
-              </p>
+              <Input type="number" min="1" step="0.01" placeholder="50.00" value={balanceAmount} onChange={(e) => setBalanceAmount(e.target.value)} />
+              <p className="text-xs text-muted-foreground mt-1">O valor será adicionado à sua carteira Melhor Envio via gateway de pagamento.</p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddBalance(false)}>Cancelar</Button>
-            <Button
-              onClick={handleInsertBalance}
-              disabled={inserirSaldo.isPending || !balanceAmount || parseFloat(balanceAmount) <= 0}
-            >
+            <Button onClick={handleInsertBalance} disabled={inserirSaldo.isPending || !balanceAmount || parseFloat(balanceAmount) <= 0}>
               {inserirSaldo.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <PlusCircle className="w-4 h-4 mr-1" />}
               Adicionar R$ {balanceAmount || '0,00'}
             </Button>
