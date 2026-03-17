@@ -12,7 +12,7 @@ interface Props {
   children: ReactNode;
 }
 
-export default function LazyProviders({ children }: Props) {
+const LazyProviders = forwardRef<HTMLDivElement, Props>(function LazyProviders({ children }, _ref) {
   return (
     <ReducedMotionProvider>
       <LiveRegionProvider>
@@ -28,4 +28,6 @@ export default function LazyProviders({ children }: Props) {
       </LiveRegionProvider>
     </ReducedMotionProvider>
   );
-}
+});
+
+export default LazyProviders;
