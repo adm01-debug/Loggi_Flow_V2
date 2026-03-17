@@ -242,8 +242,8 @@ export default function ConciliacaoAutomatica() {
                     {matchResults.map((r, i) => (
                       <TableRow key={i}>
                         <TableCell>
-                          {r.status === 'conciliado' && <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><CheckCircle2 className="w-3 h-3" />OK</Badge>}
-                          {r.status === 'divergencia' && <Badge className="bg-amber-500/10 text-amber-600 border-amber-200 gap-1"><AlertTriangle className="w-3 h-3" />Diverg.</Badge>}
+                          {r.status === 'conciliado' && <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><CheckCircle2 className="w-3 h-3" />OK</Badge>}
+                          {r.status === 'divergencia' && <Badge className="bg-warning/10 text-warning border-warning/20 gap-1"><AlertTriangle className="w-3 h-3" />Diverg.</Badge>}
                           {r.status === 'sem_match' && <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" />Sem Match</Badge>}
                         </TableCell>
                         <TableCell className="font-medium">{r.fatura.transportadora_nome || '—'}</TableCell>
