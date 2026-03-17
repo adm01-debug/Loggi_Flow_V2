@@ -27,12 +27,14 @@ export function MECarrinhoPanel() {
   const [showReverse, setShowReverse] = useState(false);
   const [itemDetail, setItemDetail] = useState<Record<string, unknown> | null>(null);
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+  const [reverseSubmitted, setReverseSubmitted] = useState(false);
+  const [reverseErrors, setReverseErrors] = useState<Record<string, string>>({});
 
   const [reverseForm, setReverseForm] = useState({
     service: '',
-    from_name: '', from_postal_code: '', from_address: '', from_number: '',
+    from_name: '', from_phone: '', from_document: '', from_postal_code: '', from_address: '', from_number: '',
     from_district: '', from_city: '', from_state_abbr: '',
-    to_name: '', to_postal_code: '', to_address: '', to_number: '',
+    to_name: '', to_phone: '', to_document: '', to_postal_code: '', to_address: '', to_number: '',
     to_district: '', to_city: '', to_state_abbr: '',
     width: '20', height: '10', length: '30', weight: '1', insurance_value: '100',
   });
