@@ -65,32 +65,32 @@ export default function Analytics() {
         {/* Stats Grid - Responsive */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <div className="stat-card text-center p-3 sm:p-4">
-            <Truck className="w-5 h-5 text-blue-500 mx-auto mb-2" />
+            <Truck className="w-5 h-5 text-primary mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{stats.totalDeliveries}</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Entregas</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4">
-            <Target className="w-5 h-5 text-green-500 mx-auto mb-2" />
+            <Target className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{stats.onTimeRate}%</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">No Prazo</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4">
-            <Clock className="w-5 h-5 text-purple-500 mx-auto mb-2" />
+            <Clock className="w-5 h-5 text-accent-foreground mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{stats.avgDeliveryTime}h</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Tempo Médio</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4">
-            <DollarSign className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
+            <DollarSign className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">R$ {(stats.totalRevenue / 1000).toFixed(0)}k</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Receita</p>
           </div>
           <div className="stat-card text-center p-3 sm:p-4 col-span-2 sm:col-span-1">
             {stats.growthRate >= 0 ? (
-              <TrendingUp className="w-5 h-5 text-green-500 mx-auto mb-2" />
+              <TrendingUp className="w-5 h-5 text-success mx-auto mb-2" />
             ) : (
-              <TrendingDown className="w-5 h-5 text-red-500 mx-auto mb-2" />
+              <TrendingDown className="w-5 h-5 text-destructive mx-auto mb-2" />
             )}
-            <p className={cn("text-xl sm:text-2xl font-bold", stats.growthRate >= 0 ? "text-green-600" : "text-red-600")}>
+            <p className={cn("text-xl sm:text-2xl font-bold", stats.growthRate >= 0 ? "text-success" : "text-destructive")}>
               {stats.growthRate >= 0 ? "+" : ""}{stats.growthRate}%
             </p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Crescimento</p>
