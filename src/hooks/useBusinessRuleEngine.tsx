@@ -106,7 +106,7 @@ export function useBusinessRuleEngine() {
       conditions_met: true,
       actions_executed: JSON.parse(JSON.stringify(rule.actions)) as Json,
       execution_time_ms: executionTime,
-    }).then(() => {}).catch(() => {});
+    }).then(() => {}, () => {});
   }, []);
 
   const evaluateRules = useCallback(async (
