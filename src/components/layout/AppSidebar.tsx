@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AIAssistant } from "@/components/ai/AIAssistant";
-import { motion, AnimatePresence } from "framer-motion";
+// CSS transitions instead of framer-motion to avoid pulling 40KB gzip into MainLayout
 import { usePrefetch } from "@/hooks/usePrefetch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
