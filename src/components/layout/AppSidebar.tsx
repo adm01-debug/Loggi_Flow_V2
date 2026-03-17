@@ -33,6 +33,7 @@ const menuSections: MenuSection[] = [
       { title: "Analytics", url: "/analytics", icon: BarChart3 },
       { title: "Executivo", url: "/dashboard-executivo", icon: TrendingUp },
       { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
+      { title: "Painel OTIF", url: "/painel-otif", icon: Award },
       { title: "Calendário", url: "/calendario", icon: CalendarDays },
     ],
   },
