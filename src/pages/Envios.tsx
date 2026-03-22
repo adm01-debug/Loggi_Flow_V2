@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw } from "lucide-react";
+import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw, QrCode } from "lucide-react";
+import { MaterialLabelPrinter } from "@/components/labels";
 import { useRodonavesTracking } from "@/hooks/useRodonavesTracking";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
 import { DocumentUploadField } from "@/components/common/DocumentUploadField";
