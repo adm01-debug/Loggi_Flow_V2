@@ -56,6 +56,7 @@ const RelatorioPDF = lazy(() => import("./pages/RelatorioPDF"));
 const ConciliacaoAutomatica = lazy(() => import("./pages/ConciliacaoAutomatica"));
 const ImportacaoMassa = lazy(() => import("./pages/ImportacaoMassa"));
 const AutomacaoRegras = lazy(() => import("./pages/AutomacaoRegras"));
+const CentralRastreamento = lazy(() => import("./pages/CentralRastreamento"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load non-critical providers
