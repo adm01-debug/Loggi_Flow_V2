@@ -3,6 +3,7 @@ import { AppSidebar } from "./AppSidebar";
 import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { ScrollRestoration } from "@/components/common/ScrollRestoration";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
@@ -28,6 +29,9 @@ export function MainLayout({ children }: MainLayoutProps) {
       
       {/* Offline Banner - PWA */}
       <OfflineBanner />
+
+      {/* Scroll Restoration + Focus Management */}
+      <ScrollRestoration />
       
       {/* Sidebar - hidden on mobile */}
       <aside className="hidden md:block" aria-label="Navegação principal" id="main-navigation">
