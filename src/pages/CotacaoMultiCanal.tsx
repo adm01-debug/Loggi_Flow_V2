@@ -295,9 +295,9 @@ export default function CotacaoMultiCanal() {
 
   const canalBadge = (canal: string) => {
     switch (canal) {
-      case 'api': return <Badge className="bg-green-500/10 text-green-600 border-green-200"><Globe className="w-3 h-3 mr-1" />API</Badge>;
-      case 'whatsapp': return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200"><MessageCircle className="w-3 h-3 mr-1" />WhatsApp</Badge>;
-      case 'email': return <Badge className="bg-blue-500/10 text-blue-600 border-blue-200"><Mail className="w-3 h-3 mr-1" />Email</Badge>;
+      case 'api': return <Badge className="bg-success/10 text-success border-success/20"><Globe className="w-3 h-3 mr-1" />API</Badge>;
+      case 'whatsapp': return <Badge className="bg-success/10 text-success border-success/20"><MessageCircle className="w-3 h-3 mr-1" />WhatsApp</Badge>;
+      case 'email': return <Badge className="bg-primary/10 text-primary border-primary/20"><Mail className="w-3 h-3 mr-1" />Email</Badge>;
       default: return null;
     }
   };
