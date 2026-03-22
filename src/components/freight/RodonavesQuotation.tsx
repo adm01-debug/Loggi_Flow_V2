@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Clock, Star, Search, Loader2, Truck, Package } from 'lucide-react';
 import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
 import { toast } from 'sonner';
-import { formatCEP } from '@/lib/formatters';
+import { formatCEP } from '@/lib/validations';
 
 export function RodonavesQuotation() {
   const rodonaves = useRodonavesTracking();
