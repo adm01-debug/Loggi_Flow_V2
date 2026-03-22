@@ -64,7 +64,7 @@ export default function SLADashboard() {
             {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (stats.performancePorTransportadora || []).map((c: PerformanceTransportadora, i: number) => (
               <div key={i} className="card-interactive flex items-center justify-between">
                 <div><p className="font-semibold">{c.nome}</p><p className="text-sm text-muted-foreground">{c.totalEntregas} entregas</p></div>
-                <div className="text-right"><p className={cn("text-xl font-bold", c.taxaOTIF >= 95 ? "text-green-600" : c.taxaOTIF >= 80 ? "text-yellow-600" : "text-red-600")}>{c.taxaOTIF.toFixed(0)}%</p><Progress value={c.taxaOTIF} className="w-24 h-2" /></div>
+                <div className="text-right"><p className={cn("text-xl font-bold", c.taxaOTIF >= 95 ? "text-success" : c.taxaOTIF >= 80 ? "text-warning" : "text-destructive")}>{c.taxaOTIF.toFixed(0)}%</p><Progress value={c.taxaOTIF} className="w-24 h-2" /></div>
               </div>
             ))}
           </TabsContent>
