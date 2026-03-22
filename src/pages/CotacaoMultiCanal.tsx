@@ -517,7 +517,7 @@ export default function CotacaoMultiCanal() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <DollarSign className="w-5 h-5 text-green-500" />
+                      <DollarSign className="w-5 h-5 text-success" />
                       Cotações Recebidas ({cotacoes.length})
                     </CardTitle>
                     {melhorCotacao && (
