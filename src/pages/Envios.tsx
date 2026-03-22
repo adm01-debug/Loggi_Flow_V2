@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw } from "lucide-react";
+import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw, QrCode } from "lucide-react";
+import { MaterialLabelPrinter } from "@/components/labels";
 import { useRodonavesTracking } from "@/hooks/useRodonavesTracking";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
 import { DocumentUploadField } from "@/components/common/DocumentUploadField";
@@ -132,6 +133,7 @@ const emptyForm = { cliente_id: "", endereco_entrega: "", contato_cliente: "", t
 export default function Envios() {
   const qc = useQueryClient();
   const [dlgCreate, setDlgCreate] = useState(false);
+  const [showLabels, setShowLabels] = useState(false);
   const [dlgEdit, setDlgEdit] = useState(false);
   const [dlgView, setDlgView] = useState(false);
   const [dlgDel, setDlgDel] = useState(false);
@@ -214,6 +216,10 @@ export default function Envios() {
             <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie entregas aos clientes</p>
           </div>
           <div className="flex gap-2">
+            <Button variant={showLabels ? "default" : "outline"} onClick={() => setShowLabels(!showLabels)} className="gap-2">
+              <QrCode className="w-4 h-4" />
+              <span className="hidden sm:inline">Etiquetas</span>
+            </Button>
             <ScannerButton
               onScan={(result: ScanResult) => {
                 const entrega = list.find(e => e.codigo_rastreamento === result.text || e.numero_entrega === result.text);
@@ -236,6 +242,8 @@ export default function Envios() {
             </OnboardingTooltip>
           </div>
         </div>
+
+        {showLabels && <MaterialLabelPrinter />}
 
         <OnboardingTooltip
           id="envios-stats"
