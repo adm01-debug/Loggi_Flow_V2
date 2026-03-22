@@ -227,7 +227,7 @@ export function FreightTableManager({ tabelasList, transportadoras, isLoading, o
         description="Esta ação não pode ser desfeita. A tabela será removida permanentemente."
         confirmText="Excluir"
         onConfirm={() => { if (deleteTarget) { onDelete(deleteTarget); setDeleteTarget(null); } }}
-        variant="destructive"
+        type="danger"
       />
 
       {/* Bulk Delete Confirm */}
@@ -238,7 +238,7 @@ export function FreightTableManager({ tabelasList, transportadoras, isLoading, o
         description="Esta ação não pode ser desfeita. Todas as tabelas selecionadas serão removidas."
         confirmText="Excluir Todas"
         onConfirm={confirmBulkDelete}
-        variant="destructive"
+        type="danger"
       />
     </div>
   );
