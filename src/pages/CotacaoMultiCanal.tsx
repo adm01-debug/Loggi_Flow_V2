@@ -545,7 +545,7 @@ export default function CotacaoMultiCanal() {
                           if (b.valor === null) return -1;
                           return a.valor - b.valor;
                         }).map((cot) => (
-                          <TableRow key={cot.id} className={melhorCotacao?.id === cot.id ? 'bg-green-50/50' : ''}>
+                          <TableRow key={cot.id} className={melhorCotacao?.id === cot.id ? 'bg-success/5' : ''}>
                             <TableCell className="font-medium">
                               {melhorCotacao?.id === cot.id && <Star className="w-4 h-4 text-amber-500 inline mr-1" />}
                               {cot.transportadora_nome}
