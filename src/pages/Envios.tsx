@@ -216,6 +216,10 @@ export default function Envios() {
             <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie entregas aos clientes</p>
           </div>
           <div className="flex gap-2">
+            <Button variant={showLabels ? "default" : "outline"} onClick={() => setShowLabels(!showLabels)} className="gap-2">
+              <QrCode className="w-4 h-4" />
+              <span className="hidden sm:inline">Etiquetas</span>
+            </Button>
             <ScannerButton
               onScan={(result: ScanResult) => {
                 const entrega = list.find(e => e.codigo_rastreamento === result.text || e.numero_entrega === result.text);
