@@ -99,6 +99,7 @@ export { useDelayPrediction } from './useDelayPrediction';
 export { useDeliveryRoutes } from './useDeliveryRoutes';
 export { useFreightQuotation } from './useFreightQuotation';
 export { useSmartCarrierSelection } from './useSmartCarrierSelection';
+export { useQuotationFlow } from './useQuotationFlow';
 export { useSmartAlerts } from './useSmartAlerts';
 export { useBoxManagement } from './useBoxManagement';
 export { useConciliacao } from './useConciliacao';
