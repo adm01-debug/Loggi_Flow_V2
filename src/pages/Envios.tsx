@@ -243,6 +243,8 @@ export default function Envios() {
           </div>
         </div>
 
+        {showLabels && <MaterialLabelPrinter />}
+
         <OnboardingTooltip
           id="envios-stats"
           title="Estatísticas de Envios"
