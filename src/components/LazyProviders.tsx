@@ -1,4 +1,4 @@
-import { ReactNode, forwardRef } from "react";
+import { ReactNode } from "react";
 import { AchievementProvider } from "@/hooks/useAchievementNotifications";
 import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
 import { TimezoneProvider } from "@/hooks/useTimezone";
@@ -12,7 +12,7 @@ interface Props {
   children: ReactNode;
 }
 
-const LazyProviders = forwardRef<HTMLDivElement, Props>(function LazyProviders({ children }, _ref) {
+function LazyProviders({ children }: Props) {
   return (
     <ReducedMotionProvider>
       <LiveRegionProvider>
@@ -28,6 +28,6 @@ const LazyProviders = forwardRef<HTMLDivElement, Props>(function LazyProviders({
       </LiveRegionProvider>
     </ReducedMotionProvider>
   );
-});
+}
 
 export default LazyProviders;
