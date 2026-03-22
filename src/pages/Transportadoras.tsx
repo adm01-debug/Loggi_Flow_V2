@@ -257,15 +257,18 @@ export default function Transportadoras() {
 
         <Dialog open={editDialog} onOpenChange={setEditDialog}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate} disabled={!form.razao_social || !form.nome_fantasia}>Salvar</Button></DialogFooter></DialogContent></Dialog>
 
-        <ConfirmDialog
-          open={!!deleteTarget}
-          onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
-          title="Excluir Transportadora"
-          description="Tem certeza que deseja excluir esta transportadora? Esta ação não pode ser desfeita."
-          confirmLabel="Excluir"
-          variant="destructive"
-          onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
-        />
+        <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir Transportadora</AlertDialogTitle>
+              <AlertDialogDescription>Tem certeza que deseja excluir esta transportadora? Esta ação não pode ser desfeita.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => deleteTarget && handleDelete(deleteTarget)}>Excluir</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </MainLayout>
   );
