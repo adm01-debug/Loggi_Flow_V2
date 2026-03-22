@@ -292,7 +292,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                         <div className="pt-3 border-t">
                           <div className="flex items-start gap-2">
                             {rec.rank === 1 ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                              <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
                             ) : (
                               <AlertCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                             )}
