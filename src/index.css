@@ -720,3 +720,25 @@
   25% { transform: rotate(5deg); }
   75% { transform: rotate(-5deg); }
 }
+
+/* ===== PRINT STYLES - Etiquetas 10x15cm ===== */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .print-labels,
+  .print-labels * {
+    visibility: visible !important;
+  }
+  .print-labels {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 10cm !important;
+    background: white !important;
+  }
+  @page {
+    size: 10cm 15cm;
+    margin: 0;
+  }
+}
