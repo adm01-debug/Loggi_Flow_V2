@@ -343,7 +343,7 @@ export default function CotacaoMultiCanal() {
               {/* Origem */}
               <div className="space-y-3 p-4 rounded-lg border bg-muted/30">
                 <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <MapPin className="w-4 h-4 text-green-500" />
+                  <MapPin className="w-4 h-4 text-success" />
                   ORIGEM
                 </div>
                 <div className="grid grid-cols-2 gap-3">
