@@ -133,6 +133,7 @@ const emptyForm = { cliente_id: "", endereco_entrega: "", contato_cliente: "", t
 export default function Envios() {
   const qc = useQueryClient();
   const [dlgCreate, setDlgCreate] = useState(false);
+  const [showLabels, setShowLabels] = useState(false);
   const [dlgEdit, setDlgEdit] = useState(false);
   const [dlgView, setDlgView] = useState(false);
   const [dlgDel, setDlgDel] = useState(false);
