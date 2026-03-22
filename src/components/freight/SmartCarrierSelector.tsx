@@ -76,9 +76,9 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
   };
 
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return { bg: 'bg-amber-500', text: '🥇 Recomendado' };
-    if (rank === 2) return { bg: 'bg-slate-400', text: '🥈 Alternativa' };
-    return { bg: 'bg-orange-600', text: '🥉 Opção' };
+    if (rank === 1) return { bg: 'bg-warning', text: '🥇 Recomendado' };
+    if (rank === 2) return { bg: 'bg-muted-foreground', text: '🥈 Alternativa' };
+    return { bg: 'bg-accent', text: '🥉 Opção' };
   };
 
   return (
