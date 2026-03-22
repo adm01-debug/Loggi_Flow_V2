@@ -56,6 +56,7 @@ const RelatorioPDF = lazy(() => import("./pages/RelatorioPDF"));
 const ConciliacaoAutomatica = lazy(() => import("./pages/ConciliacaoAutomatica"));
 const ImportacaoMassa = lazy(() => import("./pages/ImportacaoMassa"));
 const AutomacaoRegras = lazy(() => import("./pages/AutomacaoRegras"));
+const CentralRastreamento = lazy(() => import("./pages/CentralRastreamento"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load non-critical providers
@@ -132,6 +133,7 @@ function AppRoutes() {
       <Route path="/conciliacao-automatica" element={<ProtectedRoute><ConciliacaoAutomatica /></ProtectedRoute>} />
       <Route path="/importacao-massa" element={<ProtectedRoute><ImportacaoMassa /></ProtectedRoute>} />
       <Route path="/automacao-regras" element={<ProtectedRoute><AutomacaoRegras /></ProtectedRoute>} />
+      <Route path="/central-rastreamento" element={<ProtectedRoute><CentralRastreamento /></ProtectedRoute>} />
       <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
       <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
       <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />

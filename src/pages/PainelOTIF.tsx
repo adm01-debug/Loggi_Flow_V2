@@ -271,8 +271,8 @@ export default function PainelOTIF() {
                           </div>
                         </TableCell>
                         <TableCell className="text-center">{t.total_entregas}</TableCell>
-                        <TableCell className="text-center text-green-600 font-medium">{t.entregas_no_prazo}</TableCell>
-                        <TableCell className="text-center text-red-500 font-medium">{t.entregas_atrasadas}</TableCell>
+                        <TableCell className="text-center text-success font-medium">{t.entregas_no_prazo}</TableCell>
+                        <TableCell className="text-center text-destructive font-medium">{t.entregas_atrasadas}</TableCell>
                         <TableCell className="text-center">
                           <div className="space-y-1">
                             <span className={`font-bold ${getOTIFColor(t.otif_rate)}`}>
