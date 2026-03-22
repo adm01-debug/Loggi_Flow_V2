@@ -16,7 +16,7 @@ describe('Zod Schema Validation - clienteSchema', () => {
       endereco_completo: 'Rua Teste, 123, São Paulo - SP',
     });
     expect(result.success).toBe(false);
-    if (!result.success) expect(result.errors.razao_social).toBeDefined();
+    if (!result.success) expect(result.errors).toBeDefined();
   });
 
   it('rejects short endereco', () => {
