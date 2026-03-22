@@ -270,7 +270,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Star className="h-4 w-4 text-amber-500" />
+                            <Star className="h-4 w-4 text-warning" />
                             <div>
                               <p className="text-xs text-muted-foreground">Score</p>
                               <p className="font-semibold">{rec.scorePerformance}/100</p>
