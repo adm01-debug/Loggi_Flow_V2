@@ -70,7 +70,7 @@ export default function RastreamentoMotorista() {
   const location = driverLocation?.coordinates || { lat: 0, lng: 0 };
   const status = orderDetails?.status || "unknown";
 
-  const statusColors: Record<string, string> = { "em_rota": "bg-blue-500", "coletando": "bg-amber-500", "entregando": "bg-green-500", "aguardando": "bg-gray-500" };
+  const statusColors: Record<string, string> = { "em_rota": "bg-primary", "coletando": "bg-warning", "entregando": "bg-success", "aguardando": "bg-muted" };
 
   return (
     <MainLayout>

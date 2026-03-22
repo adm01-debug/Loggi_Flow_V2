@@ -133,6 +133,7 @@ function AppRoutes() {
       <Route path="/conciliacao-automatica" element={<ProtectedRoute><ConciliacaoAutomatica /></ProtectedRoute>} />
       <Route path="/importacao-massa" element={<ProtectedRoute><ImportacaoMassa /></ProtectedRoute>} />
       <Route path="/automacao-regras" element={<ProtectedRoute><AutomacaoRegras /></ProtectedRoute>} />
+      <Route path="/central-rastreamento" element={<ProtectedRoute><CentralRastreamento /></ProtectedRoute>} />
       <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
       <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
       <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />

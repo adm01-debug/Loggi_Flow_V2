@@ -72,7 +72,7 @@ export default function SLADashboard() {
             {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (metrics?.tendenciaSemanal || []).map((t: TendenciaSemanal, i: number) => (
               <div key={i} className="card-interactive flex items-center justify-between">
                 <div><p className="font-semibold">{t.data}</p><p className="text-sm text-muted-foreground">{t.total} entregas</p></div>
-                <div className="text-right"><p className={cn("text-xl font-bold", t.taxaOTIF >= 95 ? "text-green-600" : t.taxaOTIF >= 80 ? "text-yellow-600" : "text-red-600")}>{t.taxaOTIF.toFixed(0)}%</p></div>
+                <div className="text-right"><p className={cn("text-xl font-bold", t.taxaOTIF >= 95 ? "text-success" : t.taxaOTIF >= 80 ? "text-warning" : "text-destructive")}>{t.taxaOTIF.toFixed(0)}%</p></div>
               </div>
             ))}
           </TabsContent>
