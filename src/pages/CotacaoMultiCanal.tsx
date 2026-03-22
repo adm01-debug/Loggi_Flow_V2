@@ -457,7 +457,7 @@ export default function CotacaoMultiCanal() {
                               <p className="font-semibold truncate">{carrier.transportadora?.nome_fantasia}</p>
                               {canalBadge(carrier.canal_cotacao)}
                               {carrier.transportadora?.score_performance && carrier.transportadora.score_performance > 80 && (
-                                <Badge variant="outline" className="text-amber-500 border-amber-200">
+                                <Badge variant="outline" className="text-warning border-warning/30">
                                   <Star className="w-3 h-3 mr-1" />{carrier.transportadora.score_performance}
                                 </Badge>
                               )}
