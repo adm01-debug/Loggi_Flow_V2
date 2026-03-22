@@ -116,10 +116,13 @@ export default function Transportadoras() {
     toast({ title: "Sucesso", description: "Atualizado!" }); setEditDialog(false); fetchData();
   };
 
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("transportadoras").delete().eq("id", id);
     if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
     else { toast({ title: "Sucesso", description: "Excluído!" }); fetchData(); }
+    setDeleteTarget(null);
   };
 
   const bulkToggleAtiva = async (ids: string[], homologada: boolean) => {
