@@ -315,6 +315,9 @@ export default function CotacaoMultiCanal() {
     }
   };
 
+  const respondidas = cotacoes.filter(c => c.status === 'respondido' && c.valor !== null);
+  const melhorCotacao = respondidas.length > 0 ? respondidas.reduce((a, b) => (a.valor! < b.valor! ? a : b)) : null;
+
   // Economy feedback
   const savings = useMemo(() => {
     if (respondidas.length < 2) return 0;
@@ -340,6 +343,13 @@ export default function CotacaoMultiCanal() {
     observacoes: c.observacoes,
   })), [cotacoes]);
 
+  const quotationSteps = [
+    { id: 'buscar', title: 'Buscar Transportadoras' },
+    { id: 'cotar', title: 'Enviar Cotações' },
+    { id: 'receber', title: 'Receber Respostas' },
+    { id: 'selecionar', title: 'Selecionar Melhor' },
+  ];
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -351,20 +361,12 @@ export default function CotacaoMultiCanal() {
           icon={Zap}
         >
           {cotacoes.length > 0 && (
-            <DataExporter data={exportData} filename="cotacoes-multicanal" title="Exportar Cotações" />
+            <DataExporter data={exportData} filename="cotacoes-multicanal" />
           )}
         </PageHeader>
 
         {/* Step Progress */}
-        <StepProgress
-          steps={[
-            { label: 'Buscar Transportadoras', completed: hasSearched },
-            { label: 'Enviar Cotações', completed: cotacoes.length > 0 },
-            { label: 'Receber Respostas', completed: cotacoes.some(c => c.status === 'respondido') },
-            { label: 'Selecionar Melhor', completed: false },
-          ]}
-          currentStep={currentStep}
-        />
+        <StepProgress steps={quotationSteps} currentStep={currentStep} />
 
         {/* Economy feedback */}
         {savings > 0 && (
