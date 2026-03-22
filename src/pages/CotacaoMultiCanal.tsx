@@ -315,24 +315,70 @@ export default function CotacaoMultiCanal() {
     }
   };
 
-  const respondidas = cotacoes.filter(c => c.status === 'respondido' && c.valor !== null);
-  const melhorCotacao = respondidas.length > 0 ? respondidas.reduce((a, b) => (a.valor! < b.valor! ? a : b)) : null;
+  // Economy feedback
+  const savings = useMemo(() => {
+    if (respondidas.length < 2) return 0;
+    const values = respondidas.map(c => c.valor!);
+    return Math.max(...values) - Math.min(...values);
+  }, [respondidas]);
+
+  // Step progress
+  const currentStep = useMemo(() => {
+    if (cotacoes.some(c => c.status === 'respondido')) return 3;
+    if (cotacoes.length > 0) return 2;
+    if (hasSearched && carriers.length > 0) return 1;
+    return 0;
+  }, [cotacoes, hasSearched, carriers]);
+
+  // Export data
+  const exportData = useMemo(() => cotacoes.map(c => ({
+    transportadora: c.transportadora_nome,
+    canal: c.canal,
+    valor: c.valor ? `R$ ${c.valor.toFixed(2)}` : '-',
+    prazo: c.prazo_dias ? `${c.prazo_dias} dias` : '-',
+    status: c.status,
+    observacoes: c.observacoes,
+  })), [cotacoes]);
 
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-2">
-          <h1 className="text-display flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
-              <Zap className="w-6 h-6 text-primary" />
-            </div>
-            Cotação Multi-Canal
-          </h1>
-          <p className="text-muted-foreground">
-            Busque transportadoras por trecho e cote via API, WhatsApp ou Email
-          </p>
-        </div>
+        <Breadcrumbs items={[{ label: 'Operações' }, { label: 'Cotação Multi-Canal' }]} />
+
+        <PageHeader
+          title="Cotação Multi-Canal"
+          description="Busque transportadoras por trecho e cote via API, WhatsApp ou Email"
+          icon={Zap}
+        >
+          {cotacoes.length > 0 && (
+            <DataExporter data={exportData} filename="cotacoes-multicanal" title="Exportar Cotações" />
+          )}
+        </PageHeader>
+
+        {/* Step Progress */}
+        <StepProgress
+          steps={[
+            { label: 'Buscar Transportadoras', completed: hasSearched },
+            { label: 'Enviar Cotações', completed: cotacoes.length > 0 },
+            { label: 'Receber Respostas', completed: cotacoes.some(c => c.status === 'respondido') },
+            { label: 'Selecionar Melhor', completed: false },
+          ]}
+          currentStep={currentStep}
+        />
+
+        {/* Economy feedback */}
+        {savings > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20"
+          >
+            <TrendingDown className="w-5 h-5 text-success shrink-0" />
+            <p className="text-sm font-medium">
+              Economia de <span className="text-success font-bold">R$ {savings.toFixed(2)}</span> escolhendo a melhor opção entre {respondidas.length} cotações
+            </p>
+          </motion.div>
+        )}
 
         {/* Search Form */}
         <Card>
