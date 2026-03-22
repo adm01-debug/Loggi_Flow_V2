@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,6 +13,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
+import { RecentlyVisited } from "@/components/common/RecentlyVisited";
 
 // Lazy-load heavy notification components
 const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
@@ -36,10 +38,22 @@ export function Header() {
   const { profile, isAdmin, signOut } = useAuth();
   const { userLevel } = useGamification();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { currentLabel } = useNavigationHistory();
+
+  const isHomePage = location.pathname === "/";
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth");
+  };
+
+  const handleBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
   };
 
   const getInitials = (name: string | null) => {
@@ -54,11 +68,32 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header gap-2 sm:gap-4">
-      {/* Global Search */}
-      <div className="flex-1 max-w-xs sm:max-w-sm md:max-w-md">
-        <Suspense fallback={<div className="h-9 w-full rounded-md bg-muted animate-pulse" />}>
-          <GlobalSearch />
-        </Suspense>
+      {/* Mobile: Back button + Page title | Desktop: Global Search */}
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        {/* Mobile back + title */}
+        <div className="flex items-center gap-1 md:hidden min-w-0">
+          {!isHomePage && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBack}
+              className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
+          <span className="text-sm font-semibold truncate text-foreground">
+            {currentLabel}
+          </span>
+        </div>
+
+        {/* Desktop: Search */}
+        <div className="hidden md:block flex-1 max-w-sm lg:max-w-md">
+          <Suspense fallback={<div className="h-9 w-full rounded-md bg-muted animate-pulse" />}>
+            <GlobalSearch />
+          </Suspense>
+        </div>
       </div>
 
       {/* Center - Realtime Indicator */}
@@ -93,6 +128,11 @@ export function Header() {
 
       {/* Right Side */}
       <div className="flex items-center gap-1 sm:gap-2">
+        {/* Recently Visited */}
+        <div className="hidden sm:block">
+          <RecentlyVisited />
+        </div>
+
         <Suspense fallback={null}>
           {/* SLA Notification Settings - Hidden on mobile */}
           <div className="hidden sm:block">

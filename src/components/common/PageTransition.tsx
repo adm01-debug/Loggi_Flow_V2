@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { ReactNode } from "react";
+import { ReactNode, useRef, useEffect } from "react";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -18,6 +18,11 @@ const variants: Record<string, Variants> = {
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -20 },
   },
+  slideBack: {
+    initial: { opacity: 0, x: -20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 20 },
+  },
   scale: {
     initial: { opacity: 0, scale: 0.95 },
     animate: { opacity: 1, scale: 1 },
@@ -32,6 +37,13 @@ const variants: Record<string, Variants> = {
 
 export function PageTransition({ children, mode = "slideUp" }: PageTransitionProps) {
   const location = useLocation();
+  const historyLengthRef = useRef(window.history.length);
+  
+  // Detect navigation direction
+  useEffect(() => {
+    historyLengthRef.current = window.history.length;
+  }, [location.pathname]);
+
   const variant = variants[mode];
 
   return (

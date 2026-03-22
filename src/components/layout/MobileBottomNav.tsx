@@ -2,16 +2,10 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard,
-  Package,
-  Truck,
-  Trophy,
-  Menu,
-  X,
-  BarChart3,
-  Settings,
-  Bell,
-  Search,
+  LayoutDashboard, Package, Truck, Trophy, Menu, X,
+  BarChart3, Settings, Bell, DollarSign, Calculator,
+  Users, Shield, Map, Send, Box, AlertTriangle,
+  PackageSearch, Target, Building2, FileCheck, Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -23,6 +17,11 @@ interface NavItem {
   badge?: number;
 }
 
+interface NavCategory {
+  title: string;
+  items: NavItem[];
+}
+
 const mainNavItems: NavItem[] = [
   { icon: LayoutDashboard, label: "Início", path: "/" },
   { icon: Package, label: "Envios", path: "/envios" },
@@ -30,10 +29,54 @@ const mainNavItems: NavItem[] = [
   { icon: Trophy, label: "Ranking", path: "/ranking" },
 ];
 
-const moreNavItems: NavItem[] = [
-  { icon: BarChart3, label: "Analytics", path: "/analytics" },
-  { icon: Bell, label: "Notificações", path: "/notificacoes" },
-  { icon: Settings, label: "Configurações", path: "/configuracoes" },
+const moreCategories: NavCategory[] = [
+  {
+    title: "Visão Geral",
+    items: [
+      { icon: BarChart3, label: "Analytics", path: "/analytics" },
+      { icon: Target, label: "SLA", path: "/sla-dashboard" },
+      { icon: Target, label: "OTIF", path: "/painel-otif" },
+    ],
+  },
+  {
+    title: "Operações",
+    items: [
+      { icon: Send, label: "Despachos", path: "/despachos" },
+      { icon: Box, label: "BOX", path: "/gestao-box" },
+      { icon: AlertTriangle, label: "Ocorrências", path: "/ocorrencias" },
+      { icon: PackageSearch, label: "Rastreamento", path: "/central-rastreamento" },
+    ],
+  },
+  {
+    title: "Rede Logística",
+    items: [
+      { icon: Truck, label: "Transportadoras", path: "/transportadoras" },
+      { icon: Calculator, label: "Cotação", path: "/cotacao-frete" },
+      { icon: Map, label: "Mapa", path: "/mapa-rotas" },
+    ],
+  },
+  {
+    title: "Financeiro",
+    items: [
+      { icon: DollarSign, label: "Custos", path: "/custos" },
+      { icon: FileCheck, label: "Conciliação", path: "/conciliacao" },
+    ],
+  },
+  {
+    title: "Cadastros",
+    items: [
+      { icon: Building2, label: "Fornecedores", path: "/fornecedores" },
+      { icon: Users, label: "Clientes", path: "/clientes" },
+    ],
+  },
+  {
+    title: "Sistema",
+    items: [
+      { icon: Bell, label: "Notificações", path: "/notificacoes" },
+      { icon: Shield, label: "Segurança", path: "/seguranca" },
+      { icon: Settings, label: "Configurações", path: "/configuracoes" },
+    ],
+  },
 ];
 
 export function MobileBottomNav() {
@@ -68,7 +111,6 @@ export function MobileBottomNav() {
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                {/* Active indicator */}
                 <AnimatePresence>
                   {active && (
                     <motion.div
@@ -82,7 +124,6 @@ export function MobileBottomNav() {
                   )}
                 </AnimatePresence>
 
-                {/* Icon with animation */}
                 <motion.div
                   animate={{
                     scale: active ? 1.1 : 1,
@@ -98,7 +139,6 @@ export function MobileBottomNav() {
                   />
                 </motion.div>
 
-                {/* Label */}
                 <span
                   className={cn(
                     "text-[10px] mt-1 font-medium transition-colors",
@@ -108,7 +148,6 @@ export function MobileBottomNav() {
                   {item.label}
                 </span>
 
-                {/* Badge */}
                 {item.badge && item.badge > 0 && (
                   <span className="absolute top-1 right-1/4 w-4 h-4 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
                     {item.badge > 9 ? "9+" : item.badge}
@@ -147,22 +186,31 @@ export function MobileBottomNav() {
                 </span>
               </button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-auto rounded-t-2xl">
-              <div className="grid grid-cols-3 gap-4 py-4">
-                {moreNavItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMoreOpen(false)}
-                    className={cn(
-                      "flex flex-col items-center gap-2 p-4 rounded-xl transition-all",
-                      "hover:bg-accent active:scale-95",
-                      isActive(item.path) && "bg-primary/10 text-primary"
-                    )}
-                  >
-                    <item.icon className="w-6 h-6" />
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </NavLink>
+            <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl overflow-y-auto">
+              <div className="py-2 space-y-5">
+                {moreCategories.map((cat) => (
+                  <div key={cat.title}>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+                      {cat.title}
+                    </h3>
+                    <div className="grid grid-cols-3 gap-2">
+                      {cat.items.map((item) => (
+                        <NavLink
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setIsMoreOpen(false)}
+                          className={cn(
+                            "flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
+                            "hover:bg-accent active:scale-95",
+                            isActive(item.path) && "bg-primary/10 text-primary"
+                          )}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </SheetContent>
@@ -170,13 +218,8 @@ export function MobileBottomNav() {
         </div>
       </nav>
 
-      {/* Spacer to prevent content from being hidden behind nav */}
+      {/* Spacer */}
       <div className="h-[calc(4rem+env(safe-area-inset-bottom))] md:hidden" aria-hidden="true" />
     </>
   );
 }
-
-// CSS for safe area (add to index.css if not present)
-// .safe-area-inset-bottom {
-//   padding-bottom: env(safe-area-inset-bottom);
-// }

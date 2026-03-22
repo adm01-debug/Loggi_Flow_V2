@@ -50,39 +50,55 @@ const routeLabels: Record<string, string> = {
   "/perfil": "Perfil",
   "/auth": "Autenticação",
   "/gestao-melhor-envio": "Melhor Envio",
+  "/gestao-rodonaves": "Rodonaves",
+  "/dashboard-executivo": "Dashboard Executivo",
+  "/inteligencia-frete": "Inteligência de Frete",
+  "/central-rastreamento": "Central de Rastreamento",
+  "/painel-otif": "Painel OTIF",
+  "/kanban-entregas": "Kanban Entregas",
+  "/importacao-massa": "Importação em Massa",
+  "/automacao-regras": "Automação de Regras",
 };
 
-// Mapeamento de categorias
-const routeCategories: Record<string, string> = {
-  "/analytics": "Visão Geral",
-  "/sla-dashboard": "Visão Geral",
-  "/calendario": "Visão Geral",
-  "/custos": "Financeiro",
-  "/conciliacao": "Financeiro",
-  "/alertas-custo": "Financeiro",
-  "/coletas": "Operações",
-  "/despachos": "Operações",
-  "/envios": "Operações",
-  "/fretes-internos": "Operações",
-  "/gestao-box": "Operações",
-  "/ocorrencias": "Operações",
-  "/transportadoras": "Rede Logística",
-  "/rotas-transportadoras": "Rede Logística",
-  "/cotacao-frete": "Rede Logística",
-  "/mapa-rotas": "Rede Logística",
-  "/rastreamento-motorista": "Rede Logística",
-  "/fornecedores": "Cadastros",
-  "/clientes": "Cadastros",
-  "/relatorios": "Cadastros",
-  "/ranking": "Gamificação",
-  "/conquistas": "Gamificação",
-  "/loja": "Gamificação",
-  "/notificacoes": "Gamificação",
-  "/gerenciamento-usuarios": "Administração",
-  "/seguranca": "Administração",
-  "/aprovacao-reset-senha": "Administração",
-  "/audit-trail": "Administração",
-  "/gestao-melhor-envio": "Integrações",
+// Mapeamento de categorias com rotas de referência
+const routeCategories: Record<string, { label: string; path: string }> = {
+  "/analytics": { label: "Visão Geral", path: "/" },
+  "/sla-dashboard": { label: "Visão Geral", path: "/" },
+  "/calendario": { label: "Visão Geral", path: "/" },
+  "/dashboard-executivo": { label: "Visão Geral", path: "/" },
+  "/painel-otif": { label: "Visão Geral", path: "/" },
+  "/custos": { label: "Financeiro", path: "/custos" },
+  "/conciliacao": { label: "Financeiro", path: "/custos" },
+  "/alertas-custo": { label: "Financeiro", path: "/custos" },
+  "/inteligencia-frete": { label: "Financeiro", path: "/custos" },
+  "/coletas": { label: "Operações", path: "/envios" },
+  "/despachos": { label: "Operações", path: "/envios" },
+  "/envios": { label: "Operações", path: "/envios" },
+  "/fretes-internos": { label: "Operações", path: "/envios" },
+  "/gestao-box": { label: "Operações", path: "/envios" },
+  "/ocorrencias": { label: "Operações", path: "/envios" },
+  "/kanban-entregas": { label: "Operações", path: "/envios" },
+  "/central-rastreamento": { label: "Operações", path: "/envios" },
+  "/transportadoras": { label: "Rede Logística", path: "/transportadoras" },
+  "/rotas-transportadoras": { label: "Rede Logística", path: "/transportadoras" },
+  "/cotacao-frete": { label: "Rede Logística", path: "/transportadoras" },
+  "/mapa-rotas": { label: "Rede Logística", path: "/transportadoras" },
+  "/rastreamento-motorista": { label: "Rede Logística", path: "/transportadoras" },
+  "/fornecedores": { label: "Cadastros", path: "/fornecedores" },
+  "/clientes": { label: "Cadastros", path: "/clientes" },
+  "/relatorios": { label: "Cadastros", path: "/relatorios" },
+  "/ranking": { label: "Gamificação", path: "/ranking" },
+  "/conquistas": { label: "Gamificação", path: "/ranking" },
+  "/loja": { label: "Gamificação", path: "/ranking" },
+  "/notificacoes": { label: "Gamificação", path: "/ranking" },
+  "/gerenciamento-usuarios": { label: "Administração", path: "/gerenciamento-usuarios" },
+  "/seguranca": { label: "Administração", path: "/seguranca" },
+  "/aprovacao-reset-senha": { label: "Administração", path: "/seguranca" },
+  "/audit-trail": { label: "Administração", path: "/audit-trail" },
+  "/gestao-melhor-envio": { label: "Integrações", path: "/gestao-melhor-envio" },
+  "/gestao-rodonaves": { label: "Integrações", path: "/gestao-rodonaves" },
+  "/importacao-massa": { label: "Administração", path: "/configuracoes" },
+  "/automacao-regras": { label: "Administração", path: "/configuracoes" },
 };
 
 export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
@@ -93,13 +109,13 @@ export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsPr
     const result: BreadcrumbItem[] = [];
     const currentPath = location.pathname;
     
-    // Add category if exists
+    // Add category as clickable link
     const category = routeCategories[currentPath];
-    if (category) {
-      result.push({ label: category });
+    if (category && category.path !== currentPath) {
+      result.push({ label: category.label, path: category.path });
     }
     
-    // Add current page
+    // Add current page (no link — it's the active page)
     const label = routeLabels[currentPath] || currentPath.split("/").pop() || "Página";
     result.push({ label });
     
