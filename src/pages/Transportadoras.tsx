@@ -20,7 +20,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
-import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
