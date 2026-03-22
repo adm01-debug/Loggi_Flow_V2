@@ -70,9 +70,9 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return 'text-green-500';
-    if (confidence >= 60) return 'text-amber-500';
-    return 'text-red-500';
+    if (confidence >= 80) return 'text-success';
+    if (confidence >= 60) return 'text-warning';
+    return 'text-destructive';
   };
 
   const getRankBadge = (rank: number) => {
