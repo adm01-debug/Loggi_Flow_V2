@@ -68,7 +68,7 @@ function CanalBadge({ canal }: { canal: string }) {
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
-    case 'respondido': return <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><CheckCircle2 className="w-3 h-3" />Respondido</Badge>;
+    case 'respondido': return <Badge className="bg-success/10 text-success border-success/20 gap-1"><CheckCircle2 className="w-3 h-3" />Respondido</Badge>;
     case 'pendente': return <Badge variant="secondary" className="gap-1"><Clock className="w-3 h-3" />Pendente</Badge>;
     case 'expirado': return <Badge variant="destructive" className="gap-1"><AlertCircle className="w-3 h-3" />Expirado</Badge>;
     case 'selecionado': return <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><Award className="w-3 h-3" />Selecionado</Badge>;
