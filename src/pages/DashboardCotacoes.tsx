@@ -211,7 +211,7 @@ export default function DashboardCotacoes() {
                         >
                           <div className="flex items-center justify-between mb-2">
                             <span className="font-medium text-sm truncate">{c.transportadora?.nome_fantasia}</span>
-                            {i === 0 && <Badge className="bg-green-500 text-xs">Melhor</Badge>}
+                            {i === 0 && <Badge className="bg-success text-xs">Melhor</Badge>}
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-lg font-bold">R$ {c.valor_cotado?.toFixed(2)}</span>
