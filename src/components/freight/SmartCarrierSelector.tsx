@@ -70,9 +70,9 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return 'text-green-500';
-    if (confidence >= 60) return 'text-amber-500';
-    return 'text-red-500';
+    if (confidence >= 80) return 'text-success';
+    if (confidence >= 60) return 'text-warning';
+    return 'text-destructive';
   };
 
   const getRankBadge = (rank: number) => {
@@ -254,7 +254,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                         {/* Metrics Grid */}
                         <div className="grid grid-cols-2 gap-3">
                           <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-green-500" />
+                            <DollarSign className="h-4 w-4 text-success" />
                             <div>
                               <p className="text-xs text-muted-foreground">Valor Total</p>
                               <p className="font-semibold">{formatCurrency(rec.valorTotal)}</p>
@@ -262,7 +262,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-blue-500" />
+                            <Clock className="h-4 w-4 text-primary" />
                             <div>
                               <p className="text-xs text-muted-foreground">Prazo</p>
                               <p className="font-semibold">{rec.prazoDias} dias</p>
@@ -270,7 +270,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Star className="h-4 w-4 text-amber-500" />
+                            <Star className="h-4 w-4 text-warning" />
                             <div>
                               <p className="text-xs text-muted-foreground">Score</p>
                               <p className="font-semibold">{rec.scorePerformance}/100</p>
@@ -278,7 +278,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Target className="h-4 w-4 text-purple-500" />
+                            <Target className="h-4 w-4 text-primary" />
                             <div>
                               <p className="text-xs text-muted-foreground">On-Time</p>
                               <p className="font-semibold">
@@ -292,7 +292,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                         <div className="pt-3 border-t">
                           <div className="flex items-start gap-2">
                             {rec.rank === 1 ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                              <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
                             ) : (
                               <AlertCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                             )}

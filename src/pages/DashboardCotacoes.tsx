@@ -50,25 +50,25 @@ function TimeRemaining({ expiresAt }: { expiresAt: string }) {
 
 function CanalIcon({ canal }: { canal: string }) {
   switch (canal) {
-    case 'api': return <Globe className="w-4 h-4 text-green-500" />;
-    case 'whatsapp': return <MessageCircle className="w-4 h-4 text-emerald-500" />;
-    case 'email': return <Mail className="w-4 h-4 text-blue-500" />;
+    case 'api': return <Globe className="w-4 h-4 text-success" />;
+    case 'whatsapp': return <MessageCircle className="w-4 h-4 text-success" />;
+    case 'email': return <Mail className="w-4 h-4 text-primary" />;
     default: return null;
   }
 }
 
 function CanalBadge({ canal }: { canal: string }) {
   switch (canal) {
-    case 'api': return <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><Globe className="w-3 h-3" />API</Badge>;
-    case 'whatsapp': return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200 gap-1"><MessageCircle className="w-3 h-3" />WhatsApp</Badge>;
-    case 'email': return <Badge className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1"><Mail className="w-3 h-3" />Email</Badge>;
+    case 'api': return <Badge className="bg-success/10 text-success border-success/20 gap-1"><Globe className="w-3 h-3" />API</Badge>;
+    case 'whatsapp': return <Badge className="bg-success/10 text-success border-success/20 gap-1"><MessageCircle className="w-3 h-3" />WhatsApp</Badge>;
+    case 'email': return <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><Mail className="w-3 h-3" />Email</Badge>;
     default: return null;
   }
 }
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
-    case 'respondido': return <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><CheckCircle2 className="w-3 h-3" />Respondido</Badge>;
+    case 'respondido': return <Badge className="bg-success/10 text-success border-success/20 gap-1"><CheckCircle2 className="w-3 h-3" />Respondido</Badge>;
     case 'pendente': return <Badge variant="secondary" className="gap-1"><Clock className="w-3 h-3" />Pendente</Badge>;
     case 'expirado': return <Badge variant="destructive" className="gap-1"><AlertCircle className="w-3 h-3" />Expirado</Badge>;
     case 'selecionado': return <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><Award className="w-3 h-3" />Selecionado</Badge>;
@@ -185,7 +185,7 @@ export default function DashboardCotacoes() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <Star className="w-5 h-5 text-amber-500" />
+                <Star className="w-5 h-5 text-warning" />
                 Comparativo por Trecho
               </CardTitle>
             </CardHeader>
@@ -207,11 +207,11 @@ export default function DashboardCotacoes() {
                           initial={{ opacity: 0, y: 5 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05 }}
-                          className={`p-3 rounded-lg border ${i === 0 ? 'border-green-300 bg-green-50/50 dark:bg-green-950/20' : 'bg-card'}`}
+                          className={`p-3 rounded-lg border ${i === 0 ? 'border-success/30 bg-success/5' : 'bg-card'}`}
                         >
                           <div className="flex items-center justify-between mb-2">
                             <span className="font-medium text-sm truncate">{c.transportadora?.nome_fantasia}</span>
-                            {i === 0 && <Badge className="bg-green-500 text-xs">Melhor</Badge>}
+                            {i === 0 && <Badge className="bg-success text-xs">Melhor</Badge>}
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-lg font-bold">R$ {c.valor_cotado?.toFixed(2)}</span>

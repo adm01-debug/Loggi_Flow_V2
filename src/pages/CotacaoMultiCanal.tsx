@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EmptyState } from '@/components/common/EmptyState';
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { PageHeader } from '@/components/common/PageHeader';
+import { StepProgress } from '@/components/common/StepProgress';
+import { DataExporter } from '@/components/common/DataExporter';
 import { 
   Search, Truck, MapPin, Loader2, MessageCircle, Mail, Zap, 
   Phone, Globe, CheckCircle2, Clock, DollarSign, Send, Plus,
-  ArrowRight, Star, AlertCircle
+  Star, AlertCircle, TrendingDown
 } from 'lucide-react';
 import { useTransportadoraRotas, type TransportadoraRota } from '@/hooks/useTransportadoraRotas';
 import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
@@ -295,16 +299,16 @@ export default function CotacaoMultiCanal() {
 
   const canalBadge = (canal: string) => {
     switch (canal) {
-      case 'api': return <Badge className="bg-green-500/10 text-green-600 border-green-200"><Globe className="w-3 h-3 mr-1" />API</Badge>;
-      case 'whatsapp': return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200"><MessageCircle className="w-3 h-3 mr-1" />WhatsApp</Badge>;
-      case 'email': return <Badge className="bg-blue-500/10 text-blue-600 border-blue-200"><Mail className="w-3 h-3 mr-1" />Email</Badge>;
+      case 'api': return <Badge className="bg-success/10 text-success border-success/20"><Globe className="w-3 h-3 mr-1" />API</Badge>;
+      case 'whatsapp': return <Badge className="bg-success/10 text-success border-success/20"><MessageCircle className="w-3 h-3 mr-1" />WhatsApp</Badge>;
+      case 'email': return <Badge className="bg-primary/10 text-primary border-primary/20"><Mail className="w-3 h-3 mr-1" />Email</Badge>;
       default: return null;
     }
   };
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case 'respondido': return <Badge variant="default" className="bg-green-500"><CheckCircle2 className="w-3 h-3 mr-1" />Respondido</Badge>;
+      case 'respondido': return <Badge variant="default" className="bg-success"><CheckCircle2 className="w-3 h-3 mr-1" />Respondido</Badge>;
       case 'pendente': return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pendente</Badge>;
       case 'expirado': return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Expirado</Badge>;
       default: return null;
@@ -314,21 +318,69 @@ export default function CotacaoMultiCanal() {
   const respondidas = cotacoes.filter(c => c.status === 'respondido' && c.valor !== null);
   const melhorCotacao = respondidas.length > 0 ? respondidas.reduce((a, b) => (a.valor! < b.valor! ? a : b)) : null;
 
+  // Economy feedback
+  const savings = useMemo(() => {
+    if (respondidas.length < 2) return 0;
+    const values = respondidas.map(c => c.valor!);
+    return Math.max(...values) - Math.min(...values);
+  }, [respondidas]);
+
+  // Step progress
+  const currentStep = useMemo(() => {
+    if (cotacoes.some(c => c.status === 'respondido')) return 3;
+    if (cotacoes.length > 0) return 2;
+    if (hasSearched && carriers.length > 0) return 1;
+    return 0;
+  }, [cotacoes, hasSearched, carriers]);
+
+  // Export data
+  const exportData = useMemo(() => cotacoes.map(c => ({
+    transportadora: c.transportadora_nome,
+    canal: c.canal,
+    valor: c.valor ? `R$ ${c.valor.toFixed(2)}` : '-',
+    prazo: c.prazo_dias ? `${c.prazo_dias} dias` : '-',
+    status: c.status,
+    observacoes: c.observacoes,
+  })), [cotacoes]);
+
+  const quotationSteps = [
+    { id: 'buscar', title: 'Buscar Transportadoras' },
+    { id: 'cotar', title: 'Enviar Cotações' },
+    { id: 'receber', title: 'Receber Respostas' },
+    { id: 'selecionar', title: 'Selecionar Melhor' },
+  ];
+
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-2">
-          <h1 className="text-display flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
-              <Zap className="w-6 h-6 text-primary" />
-            </div>
-            Cotação Multi-Canal
-          </h1>
-          <p className="text-muted-foreground">
-            Busque transportadoras por trecho e cote via API, WhatsApp ou Email
-          </p>
-        </div>
+        <Breadcrumbs items={[{ label: 'Operações' }, { label: 'Cotação Multi-Canal' }]} />
+
+        <PageHeader
+          title="Cotação Multi-Canal"
+          description="Busque transportadoras por trecho e cote via API, WhatsApp ou Email"
+          icon={Zap}
+        >
+          {cotacoes.length > 0 && (
+            <DataExporter data={exportData} filename="cotacoes-multicanal" />
+          )}
+        </PageHeader>
+
+        {/* Step Progress */}
+        <StepProgress steps={quotationSteps} currentStep={currentStep} />
+
+        {/* Economy feedback */}
+        {savings > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20"
+          >
+            <TrendingDown className="w-5 h-5 text-success shrink-0" />
+            <p className="text-sm font-medium">
+              Economia de <span className="text-success font-bold">R$ {savings.toFixed(2)}</span> escolhendo a melhor opção entre {respondidas.length} cotações
+            </p>
+          </motion.div>
+        )}
 
         {/* Search Form */}
         <Card>
@@ -343,7 +395,7 @@ export default function CotacaoMultiCanal() {
               {/* Origem */}
               <div className="space-y-3 p-4 rounded-lg border bg-muted/30">
                 <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <MapPin className="w-4 h-4 text-green-500" />
+                  <MapPin className="w-4 h-4 text-success" />
                   ORIGEM
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -364,7 +416,7 @@ export default function CotacaoMultiCanal() {
               {/* Destino */}
               <div className="space-y-3 p-4 rounded-lg border bg-muted/30">
                 <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <MapPin className="w-4 h-4 text-red-500" />
+                  <MapPin className="w-4 h-4 text-destructive" />
                   DESTINO
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -437,11 +489,11 @@ export default function CotacaoMultiCanal() {
                 </CardHeader>
                 <CardContent>
                   {carriers.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Truck className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
-                      <p className="text-muted-foreground">Nenhuma transportadora cadastrada para este trecho</p>
-                      <p className="text-xs text-muted-foreground mt-1">Cadastre rotas em Rede Logística → Rotas</p>
-                    </div>
+                    <EmptyState
+                      icon={Truck}
+                      title="Nenhuma transportadora para este trecho"
+                      description="Cadastre rotas em Rede Logística → Rotas"
+                    />
                   ) : (
                     <div className="space-y-3">
                       {carriers.map((carrier, idx) => (
@@ -457,7 +509,7 @@ export default function CotacaoMultiCanal() {
                               <p className="font-semibold truncate">{carrier.transportadora?.nome_fantasia}</p>
                               {canalBadge(carrier.canal_cotacao)}
                               {carrier.transportadora?.score_performance && carrier.transportadora.score_performance > 80 && (
-                                <Badge variant="outline" className="text-amber-500 border-amber-200">
+                                <Badge variant="outline" className="text-warning border-warning/30">
                                   <Star className="w-3 h-3 mr-1" />{carrier.transportadora.score_performance}
                                 </Badge>
                               )}
@@ -490,12 +542,12 @@ export default function CotacaoMultiCanal() {
                             ) : (
                               <>
                                 {carrier.whatsapp && (
-                                  <Button size="sm" variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => handleCotarWhatsApp(carrier)}>
+                                  <Button size="sm" variant="outline" className="text-success border-success/20 hover:bg-success/10" onClick={() => handleCotarWhatsApp(carrier)}>
                                     <MessageCircle className="w-4 h-4 mr-1" />WhatsApp
                                   </Button>
                                 )}
                                 {carrier.email && (
-                                  <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => handleCotarEmail(carrier)}>
+                                  <Button size="sm" variant="outline" className="text-primary border-primary/20 hover:bg-primary/10" onClick={() => handleCotarEmail(carrier)}>
                                     <Mail className="w-4 h-4 mr-1" />Email
                                   </Button>
                                 )}
@@ -517,7 +569,7 @@ export default function CotacaoMultiCanal() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <DollarSign className="w-5 h-5 text-green-500" />
+                      <DollarSign className="w-5 h-5 text-success" />
                       Cotações Recebidas ({cotacoes.length})
                     </CardTitle>
                     {melhorCotacao && (
@@ -545,9 +597,9 @@ export default function CotacaoMultiCanal() {
                           if (b.valor === null) return -1;
                           return a.valor - b.valor;
                         }).map((cot) => (
-                          <TableRow key={cot.id} className={melhorCotacao?.id === cot.id ? 'bg-green-50/50' : ''}>
+                          <TableRow key={cot.id} className={melhorCotacao?.id === cot.id ? 'bg-success/5' : ''}>
                             <TableCell className="font-medium">
-                              {melhorCotacao?.id === cot.id && <Star className="w-4 h-4 text-amber-500 inline mr-1" />}
+                              {melhorCotacao?.id === cot.id && <Star className="w-4 h-4 text-warning inline mr-1" />}
                               {cot.transportadora_nome}
                             </TableCell>
                             <TableCell>{canalBadge(cot.canal)}</TableCell>
