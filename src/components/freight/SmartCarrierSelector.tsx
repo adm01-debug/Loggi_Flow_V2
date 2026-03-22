@@ -278,7 +278,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Target className="h-4 w-4 text-purple-500" />
+                            <Target className="h-4 w-4 text-primary" />
                             <div>
                               <p className="text-xs text-muted-foreground">On-Time</p>
                               <p className="font-semibold">
