@@ -50,9 +50,9 @@ function TimeRemaining({ expiresAt }: { expiresAt: string }) {
 
 function CanalIcon({ canal }: { canal: string }) {
   switch (canal) {
-    case 'api': return <Globe className="w-4 h-4 text-green-500" />;
-    case 'whatsapp': return <MessageCircle className="w-4 h-4 text-emerald-500" />;
-    case 'email': return <Mail className="w-4 h-4 text-blue-500" />;
+    case 'api': return <Globe className="w-4 h-4 text-success" />;
+    case 'whatsapp': return <MessageCircle className="w-4 h-4 text-success" />;
+    case 'email': return <Mail className="w-4 h-4 text-primary" />;
     default: return null;
   }
 }
