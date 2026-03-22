@@ -20,6 +20,7 @@ import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions, useSelection } from "@/components/common/BulkActions";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
