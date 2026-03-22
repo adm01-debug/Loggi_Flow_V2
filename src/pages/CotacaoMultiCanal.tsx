@@ -304,7 +304,7 @@ export default function CotacaoMultiCanal() {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case 'respondido': return <Badge variant="default" className="bg-green-500"><CheckCircle2 className="w-3 h-3 mr-1" />Respondido</Badge>;
+      case 'respondido': return <Badge variant="default" className="bg-success"><CheckCircle2 className="w-3 h-3 mr-1" />Respondido</Badge>;
       case 'pendente': return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pendente</Badge>;
       case 'expirado': return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Expirado</Badge>;
       default: return null;
