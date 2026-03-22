@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EmptyState } from '@/components/common/EmptyState';
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { PageHeader } from '@/components/common/PageHeader';
+import { StepProgress } from '@/components/common/StepProgress';
+import { DataExporter } from '@/components/common/DataExporter';
 import { 
   Search, Truck, MapPin, Loader2, MessageCircle, Mail, Zap, 
   Phone, Globe, CheckCircle2, Clock, DollarSign, Send, Plus,
-  ArrowRight, Star, AlertCircle
+  Star, AlertCircle, TrendingDown
 } from 'lucide-react';
 import { useTransportadoraRotas, type TransportadoraRota } from '@/hooks/useTransportadoraRotas';
 import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
