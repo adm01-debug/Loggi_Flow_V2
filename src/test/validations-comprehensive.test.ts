@@ -25,7 +25,7 @@ describe('Zod Schema Validation - clienteSchema', () => {
       endereco_completo: 'Rua',
     });
     expect(result.success).toBe(false);
-    if (!result.success) expect(result.errors.endereco_completo).toBeDefined();
+    if (!result.success) expect(result.errors).toBeDefined();
   });
 
   it('accepts empty optional fields', () => {

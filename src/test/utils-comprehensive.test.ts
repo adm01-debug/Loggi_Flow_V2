@@ -27,8 +27,7 @@ describe('cn utility', () => {
 describe('Query Config', () => {
   it('can import queryConfig without errors', async () => {
     const mod = await import('@/lib/queryConfig');
-    expect(mod.queryConfig).toBeDefined();
-    expect(mod.queryConfig.defaultOptions).toBeDefined();
+    expect(mod.QUERY_STALE_TIME).toBeDefined();
   });
 });
 
