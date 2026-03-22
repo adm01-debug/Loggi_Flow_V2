@@ -59,9 +59,9 @@ function CanalIcon({ canal }: { canal: string }) {
 
 function CanalBadge({ canal }: { canal: string }) {
   switch (canal) {
-    case 'api': return <Badge className="bg-green-500/10 text-green-600 border-green-200 gap-1"><Globe className="w-3 h-3" />API</Badge>;
-    case 'whatsapp': return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200 gap-1"><MessageCircle className="w-3 h-3" />WhatsApp</Badge>;
-    case 'email': return <Badge className="bg-blue-500/10 text-blue-600 border-blue-200 gap-1"><Mail className="w-3 h-3" />Email</Badge>;
+    case 'api': return <Badge className="bg-success/10 text-success border-success/20 gap-1"><Globe className="w-3 h-3" />API</Badge>;
+    case 'whatsapp': return <Badge className="bg-success/10 text-success border-success/20 gap-1"><MessageCircle className="w-3 h-3" />WhatsApp</Badge>;
+    case 'email': return <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><Mail className="w-3 h-3" />Email</Badge>;
     default: return null;
   }
 }
