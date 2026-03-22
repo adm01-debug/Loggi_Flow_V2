@@ -490,12 +490,12 @@ export default function CotacaoMultiCanal() {
                             ) : (
                               <>
                                 {carrier.whatsapp && (
-                                  <Button size="sm" variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => handleCotarWhatsApp(carrier)}>
+                                  <Button size="sm" variant="outline" className="text-success border-success/20 hover:bg-success/10" onClick={() => handleCotarWhatsApp(carrier)}>
                                     <MessageCircle className="w-4 h-4 mr-1" />WhatsApp
                                   </Button>
                                 )}
                                 {carrier.email && (
-                                  <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => handleCotarEmail(carrier)}>
+                                  <Button size="sm" variant="outline" className="text-primary border-primary/20 hover:bg-primary/10" onClick={() => handleCotarEmail(carrier)}>
                                     <Mail className="w-4 h-4 mr-1" />Email
                                   </Button>
                                 )}
