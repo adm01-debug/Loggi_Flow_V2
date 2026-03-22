@@ -489,11 +489,11 @@ export default function CotacaoMultiCanal() {
                 </CardHeader>
                 <CardContent>
                   {carriers.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Truck className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
-                      <p className="text-muted-foreground">Nenhuma transportadora cadastrada para este trecho</p>
-                      <p className="text-xs text-muted-foreground mt-1">Cadastre rotas em Rede Logística → Rotas</p>
-                    </div>
+                    <EmptyState
+                      icon={Truck}
+                      title="Nenhuma transportadora para este trecho"
+                      description="Cadastre rotas em Rede Logística → Rotas"
+                    />
                   ) : (
                     <div className="space-y-3">
                       {carriers.map((carrier, idx) => (
