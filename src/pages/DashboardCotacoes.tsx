@@ -207,7 +207,7 @@ export default function DashboardCotacoes() {
                           initial={{ opacity: 0, y: 5 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05 }}
-                          className={`p-3 rounded-lg border ${i === 0 ? 'border-green-300 bg-green-50/50 dark:bg-green-950/20' : 'bg-card'}`}
+                          className={`p-3 rounded-lg border ${i === 0 ? 'border-success/30 bg-success/5' : 'bg-card'}`}
                         >
                           <div className="flex items-center justify-between mb-2">
                             <span className="font-medium text-sm truncate">{c.transportadora?.nome_fantasia}</span>
