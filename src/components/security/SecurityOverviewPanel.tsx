@@ -440,13 +440,13 @@ export function SecurityOverviewPanel() {
             <div className="flex items-center gap-1 text-xs">
               {stats.criticalEvents > 0 ? (
                 <>
-                  <AlertTriangle className="h-3 w-3 text-red-500" />
-                  <span className="text-red-500">{stats.criticalEvents} crítico(s)</span>
+                  <AlertTriangle className="h-3 w-3 text-destructive" />
+                  <span className="text-destructive">{stats.criticalEvents} crítico(s)</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                  <span className="text-green-500">Nenhum crítico</span>
+                  <CheckCircle2 className="h-3 w-3 text-success" />
+                  <span className="text-success">Nenhum crítico</span>
                 </>
               )}
             </div>
