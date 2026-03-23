@@ -52,7 +52,7 @@ export default function Profile() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400/20 to-violet-600/10"><User className="w-6 h-6 text-violet-500" /></div>Meu Perfil</h1><p className="text-muted-foreground mt-1">Gerencie suas informações</p></div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10"><User className="w-6 h-6 text-primary" /></div>Meu Perfil</h1><p className="text-muted-foreground mt-1">Gerencie suas informações</p></div>
           <Button onClick={handleSave} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
