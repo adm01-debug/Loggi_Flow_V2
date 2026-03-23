@@ -106,8 +106,8 @@ export default function LojaRecompensas() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10"><ShoppingCart className="w-6 h-6 text-amber-500" /></div>Loja de Recompensas</h1><p className="text-muted-foreground mt-1">Troque suas moedas por prêmios</p></div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-700"><Coins className="w-5 h-5" /><span className="font-bold text-lg">{coins}</span><span className="text-sm">moedas</span></div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-coins/10"><ShoppingCart className="w-6 h-6 text-coins" /></div>Loja de Recompensas</h1><p className="text-muted-foreground mt-1">Troque suas moedas por prêmios</p></div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-coins/15 text-coins"><Coins className="w-5 h-5" /><span className="font-bold text-lg">{coins}</span><span className="text-sm">moedas</span></div>
         </div>
 
         <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="all">Todos</TabsTrigger><TabsTrigger value="alimentacao">Alimentação</TabsTrigger><TabsTrigger value="vestuario">Vestuário</TabsTrigger><TabsTrigger value="tecnologia">Tecnologia</TabsTrigger><TabsTrigger value="experiencia">Experiências</TabsTrigger></TabsList></Tabs>
