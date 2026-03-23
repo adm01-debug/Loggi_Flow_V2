@@ -155,8 +155,8 @@ export default function AlertasCusto() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-red-400/20 to-red-600/10">
-                <AlertTriangle className="w-6 h-6 text-red-500" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-destructive/10">
+                <AlertTriangle className="w-6 h-6 text-destructive" />
               </div>
               Alertas de Custo
             </h1>
@@ -224,17 +224,17 @@ export default function AlertasCusto() {
 
         <div className="grid grid-cols-3 gap-4">
           <div className="stat-card text-center">
-            <AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" />
+            <AlertTriangle className="w-5 h-5 text-destructive mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats.total}</p>
             <p className="text-xs text-muted-foreground">Total Alertas</p>
           </div>
           <div className="stat-card text-center">
-            <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" />
+            <CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats.ativos}</p>
             <p className="text-xs text-muted-foreground">Ativos</p>
           </div>
           <div className="stat-card text-center">
-            <Bell className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+            <Bell className="w-5 h-5 text-warning mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats.notificacoes}</p>
             <p className="text-xs text-muted-foreground">Notificações</p>
           </div>
@@ -299,8 +299,8 @@ export default function AlertasCusto() {
               <div key={a.id} className={cn("card-interactive", isSelected(a.id) && "ring-2 ring-primary")} style={{ animationDelay: `${i * 30}ms` }}>
                 <div className="flex items-center gap-3">
                   <Checkbox checked={isSelected(a.id)} onCheckedChange={() => toggle(a.id)} />
-                  <div className={cn("p-2 rounded-lg", a.ativo ? "bg-green-100" : "bg-gray-100")}>
-                    <DollarSign className={cn("w-5 h-5", a.ativo ? "text-green-600" : "text-gray-400")} />
+                  <div className={cn("p-2 rounded-lg", a.ativo ? "bg-success/15" : "bg-muted")}>
+                    <DollarSign className={cn("w-5 h-5", a.ativo ? "text-success" : "text-muted-foreground")} />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold">{a.nome}</p>

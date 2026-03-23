@@ -65,7 +65,7 @@ function OnboardingAchievementCard({ achievement, isUnlocked }: {
       className={cn(
         "relative overflow-hidden rounded-xl border transition-all duration-300",
         isUnlocked 
-          ? "bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border-emerald-500/30 shadow-lg shadow-emerald-500/10" 
+          ? "bg-gradient-to-br from-success/10 to-success/5 border-success/30 shadow-lg shadow-success/10" 
           : "bg-card/50 border-border/50 opacity-60"
       )}
       initial={{ opacity: 0, scale: 0.95 }}

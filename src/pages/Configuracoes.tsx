@@ -78,7 +78,7 @@ export default function Configuracoes() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-gray-400/20 to-gray-600/10"><Settings className="w-6 h-6 text-gray-500" /></div>Configurações</h1><p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p></div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-muted"><Settings className="w-6 h-6 text-muted-foreground" /></div>Configurações</h1><p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p></div>
           <Button onClick={handleSave} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
         </div>
         <OnboardingTooltip
@@ -101,7 +101,7 @@ export default function Configuracoes() {
                 const isConnected = int.status === "connected";
                 return (
                   <div key={int.id} className="card-interactive flex items-center justify-between">
-                    <div className="flex items-center gap-3"><div className={cn("p-2 rounded-lg", isConnected ? "bg-green-100" : "bg-muted")}><Icon className={cn("w-5 h-5", isConnected ? "text-green-600" : "text-muted-foreground")} /></div><div><p className="font-semibold">{int.name}</p><p className="text-sm text-muted-foreground">ID: {int.id}</p></div></div>
+                    <div className="flex items-center gap-3"><div className={cn("p-2 rounded-lg", isConnected ? "bg-success/15" : "bg-muted")}><Icon className={cn("w-5 h-5", isConnected ? "text-success" : "text-muted-foreground")} /></div><div><p className="font-semibold">{int.name}</p><p className="text-sm text-muted-foreground">ID: {int.id}</p></div></div>
                     <div className="flex items-center gap-3">
                       <Badge variant={isConnected ? "default" : int.status === "error" ? "destructive" : "secondary"}>{isConnected ? <><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</> : int.status === "error" ? <><XCircle className="w-3 h-3 mr-1" />Erro</> : "Pendente"}</Badge>
                       <Button variant="outline" size="sm" onClick={() => handleValidateIntegration(int.id)}>Testar</Button>

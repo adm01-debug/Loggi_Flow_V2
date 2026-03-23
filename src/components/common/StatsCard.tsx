@@ -15,10 +15,10 @@ interface StatsCardProps {
 
 const colorClasses = {
   primary: "text-primary bg-primary/10",
-  success: "text-green-500 bg-green-500/10",
-  warning: "text-yellow-500 bg-yellow-500/10",
-  destructive: "text-red-500 bg-red-500/10",
-  info: "text-blue-500 bg-blue-500/10",
+  success: "text-success bg-success/10",
+  warning: "text-warning bg-warning/10",
+  destructive: "text-destructive bg-destructive/10",
+  info: "text-info bg-info/10",
 };
 
 export function StatsCard({
@@ -43,7 +43,7 @@ export function StatsCard({
           <Icon className="w-5 h-5" />
         </div>
         {trend !== undefined && (
-          <div className={cn("flex items-center text-xs font-medium", trend >= 0 ? "text-green-500" : "text-red-500")}>
+          <div className={cn("flex items-center text-xs font-medium", trend >= 0 ? "text-success" : "text-destructive")}>
             <span>{trend >= 0 ? "↑" : "↓"}</span>
             <span className="ml-1">{Math.abs(trend)}%</span>
           </div>

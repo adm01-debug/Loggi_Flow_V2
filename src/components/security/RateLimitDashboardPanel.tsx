@@ -85,8 +85,8 @@ export function RateLimitDashboardPanel() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-amber-500/10">
-                <Globe className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-full bg-warning/10">
+                <Globe className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.uniqueIPs}</p>
@@ -99,8 +99,8 @@ export function RateLimitDashboardPanel() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-blue-500/10">
-                <Gauge className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-full bg-info/10">
+                <Gauge className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.topEndpoints.length}</p>
@@ -116,7 +116,7 @@ export function RateLimitDashboardPanel() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <AlertTriangle className="h-5 w-5 text-warning" />
               IPs Mais Bloqueados
             </CardTitle>
             <CardDescription>

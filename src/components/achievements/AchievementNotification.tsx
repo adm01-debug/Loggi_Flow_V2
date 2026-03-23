@@ -10,15 +10,15 @@ const rarityConfig = {
     label: "Comum",
   },
   rare: {
-    gradient: "from-blue-500/20 to-blue-600/20",
-    border: "border-blue-500/50",
-    glow: "shadow-lg shadow-blue-500/20",
+    gradient: "from-info/20 to-info/20",
+    border: "border-info/50",
+    glow: "shadow-lg shadow-info/20",
     label: "Raro",
   },
   epic: {
-    gradient: "from-purple-500/20 to-purple-600/20",
-    border: "border-purple-500/50",
-    glow: "shadow-lg shadow-purple-500/30",
+    gradient: "from-primary/20 to-primary/20",
+    border: "border-primary/50",
+    glow: "shadow-lg shadow-primary/30",
     label: "Épico",
   },
   legendary: {
@@ -139,8 +139,8 @@ export function AchievementNotificationContainer() {
                     <div className="ml-auto">
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         notification.rarity === "legendary" ? "bg-xp/20 text-xp" :
-                        notification.rarity === "epic" ? "bg-purple-500/20 text-purple-400" :
-                        notification.rarity === "rare" ? "bg-blue-500/20 text-blue-400" :
+                        notification.rarity === "epic" ? "bg-primary/20 text-primary" :
+                        notification.rarity === "rare" ? "bg-info/20 text-info" :
                         "bg-muted text-muted-foreground"
                       }`}>
                         {config.label}

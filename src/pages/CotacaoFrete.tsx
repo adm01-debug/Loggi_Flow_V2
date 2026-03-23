@@ -25,7 +25,7 @@ export default function CotacaoFrete() {
     flow.calculate(data);
   }, [flow]);
 
-  const handleAddTable = useCallback((data: any) => {
+  const handleAddTable = useCallback((data: Omit<import('@/hooks/useFreightQuotation').TabelaFrete, 'id' | 'created_at' | 'updated_at' | 'transportadora'>) => {
     flow.addTabelaFrete?.mutate(data);
   }, [flow.addTabelaFrete]);
 

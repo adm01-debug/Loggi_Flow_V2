@@ -110,9 +110,9 @@ const tableRowVariants = cva(
           "hover:bg-muted/50 data-[state=selected]:bg-primary/10",
           "cursor-pointer hover:shadow-sm"
         ),
-        success: "bg-emerald-500/5 hover:bg-emerald-500/10 border-emerald-500/20",
-        warning: "bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20",
-        danger: "bg-red-500/5 hover:bg-red-500/10 border-red-500/20",
+        success: "bg-success/5 hover:bg-success/10 border-success/20",
+        warning: "bg-warning/5 hover:bg-warning/10 border-warning/20",
+        danger: "bg-destructive/5 hover:bg-destructive/10 border-destructive/20",
         muted: "opacity-60 hover:opacity-100",
       },
       selected: {
@@ -204,9 +204,9 @@ const tableCellVariants = cva(
       },
       highlight: {
         none: "",
-        success: "text-emerald-600 dark:text-emerald-400 font-medium",
-        warning: "text-amber-600 dark:text-amber-400 font-medium",
-        danger: "text-red-600 dark:text-red-400 font-medium",
+        success: "text-success font-medium",
+        warning: "text-warning font-medium",
+        danger: "text-destructive font-medium",
         primary: "text-primary font-medium",
       },
       truncate: {

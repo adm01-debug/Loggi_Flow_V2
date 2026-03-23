@@ -57,7 +57,7 @@ export function SecurityEventsPanel() {
       case "critical":
         return <Badge variant="destructive">Crítico</Badge>;
       case "warning":
-        return <Badge variant="outline" className="border-amber-500 text-amber-500">Aviso</Badge>;
+        return <Badge variant="outline" className="border-warning text-warning">Aviso</Badge>;
       default:
         return <Badge variant="secondary">Info</Badge>;
     }

@@ -45,7 +45,18 @@ export function useQuotationFlow() {
   const addTabelaFrete = freightQuotation?.addTabelaFrete;
   const deleteTabelaFrete = freightQuotation?.deleteTabelaFrete;
 
-  const tabelasList = useMemo(() => (tabelasFrete || []).map((t: any) => ({
+  interface TabelaFreteRaw {
+    id: string;
+    transportadora_id: string;
+    transportadora?: { nome_fantasia?: string };
+    estado_destino: string;
+    peso_min_kg?: number;
+    peso_max_kg?: number;
+    preco_por_kg?: number;
+    prazo_dias?: number;
+  }
+
+  const tabelasList = useMemo(() => (tabelasFrete || []).map((t: TabelaFreteRaw) => ({
     id: t.id,
     transportadora_id: t.transportadora_id,
     transportadora_nome: t.transportadora?.nome_fantasia || 'N/A',

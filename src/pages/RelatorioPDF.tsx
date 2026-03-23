@@ -258,7 +258,7 @@ export default function RelatorioPDF() {
           <StatsCard title="Entregas no Período" value={totalEntregas} icon={Package} color="primary" />
           <StatsCard title="Entregues" value={entregas?.filter(e => e.status === 'entregue').length || 0} icon={CheckCircle2} color="success" />
           <StatsCard title="Em Trânsito" value={entregas?.filter(e => ['em_transito', 'despachado'].includes(e.status)).length || 0} icon={Truck} color="warning" />
-          <StatsCard title="Custo Total" value={`R$ ${(entregas?.reduce((s, e: any) => s + (e.valor_frete || 0), 0) || 0).toFixed(0)}`} icon={DollarSign} color="info" />
+          <StatsCard title="Custo Total" value={`R$ ${(entregas?.reduce((s, e) => s + (e.valor_frete || 0), 0) || 0).toFixed(0)}`} icon={DollarSign} color="info" />
         </div>
 
         <Card>

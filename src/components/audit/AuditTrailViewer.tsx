@@ -70,10 +70,10 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
 
   const getActionColor = (action: string) => {
     switch (action) { 
-      case "INSERT": return "bg-green-100 text-green-700"; 
-      case "UPDATE": return "bg-blue-100 text-blue-700"; 
-      case "DELETE": return "bg-red-100 text-red-700"; 
-      default: return "bg-gray-100 text-gray-700"; 
+      case "INSERT": return "bg-success/15 text-success"; 
+      case "UPDATE": return "bg-info/15 text-info"; 
+      case "DELETE": return "bg-destructive/15 text-destructive"; 
+      default: return "bg-muted text-muted-foreground"; 
     }
   };
 
