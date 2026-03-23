@@ -79,7 +79,7 @@ describe("TelemetryCharts", () => {
 
     it("renders charts when rows are provided", () => {
       render(<TelemetryCharts rows={makeRows(5)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
       expect(screen.getByText("Por Severidade")).toBeInTheDocument();
     });
 
@@ -89,12 +89,12 @@ describe("TelemetryCharts", () => {
         ...makeRows(2, { operation: "INSERT" }),
       ];
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
 
-    it("renders line chart component", () => {
+    it("renders area chart component", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="1h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart").length).toBeGreaterThanOrEqual(1);
     });
 
     it("renders pie chart component", () => {
@@ -104,7 +104,7 @@ describe("TelemetryCharts", () => {
 
     it("renders bar chart when operations data exists", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
     });
   });
 
