@@ -181,8 +181,7 @@ export default function RelatorioPDF() {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateCustosReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateCustosReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Relatório de Custos Logísticos', 14, 50);
 
