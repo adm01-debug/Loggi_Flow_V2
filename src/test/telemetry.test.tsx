@@ -341,9 +341,9 @@ describe("TelemetryCharts", () => {
   // ═══════════════════════════════════════════════════════════
 
   describe("Card titles and structure", () => {
-    it("displays 'Queries ao Longo do Tempo' title", () => {
+    it("displays 'Alertas ao Longo do Tempo' title", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
 
     it("displays 'Por Severidade' title", () => {
@@ -351,15 +351,15 @@ describe("TelemetryCharts", () => {
       expect(screen.getByText("Por Severidade")).toBeInTheDocument();
     });
 
-    it("displays 'Por Tipo de Operação' title", () => {
+    it("displays 'Por Operação' title", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
 
-    it("renders 3 responsive containers (line, pie, bar)", () => {
+    it("renders 5 responsive containers (2 area, pie, 2 bar)", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
       const containers = screen.getAllByTestId("responsive-container");
-      expect(containers.length).toBe(3);
+      expect(containers.length).toBe(5);
     });
   });
 });
