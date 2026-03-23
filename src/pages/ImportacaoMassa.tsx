@@ -105,7 +105,7 @@ export default function ImportacaoMassa() {
 
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
-      const { error } = await supabase.from(entity).insert(batch);
+      const { error } = await supabase.from(entity).insert(batch as never[]);
       if (error) {
         errorCount += batch.length;
       } else {
