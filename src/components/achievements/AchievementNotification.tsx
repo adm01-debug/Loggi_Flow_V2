@@ -10,15 +10,15 @@ const rarityConfig = {
     label: "Comum",
   },
   rare: {
-    gradient: "from-blue-500/20 to-blue-600/20",
-    border: "border-blue-500/50",
-    glow: "shadow-lg shadow-blue-500/20",
+    gradient: "from-info/20 to-info/20",
+    border: "border-info/50",
+    glow: "shadow-lg shadow-info/20",
     label: "Raro",
   },
   epic: {
-    gradient: "from-purple-500/20 to-purple-600/20",
-    border: "border-purple-500/50",
-    glow: "shadow-lg shadow-purple-500/30",
+    gradient: "from-primary/20 to-primary/20",
+    border: "border-primary/50",
+    glow: "shadow-lg shadow-primary/30",
     label: "Épico",
   },
   legendary: {
