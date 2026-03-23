@@ -51,8 +51,8 @@ export function useGlobalShortcuts() {
   const navigate = useNavigate();
 
   useKeyboardShortcut("k", () => {
-    const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
-    searchInput?.focus();
+    // Use a custom event to trigger search focus — avoids document.querySelector
+    window.dispatchEvent(new CustomEvent('logiflow:focus-search'));
   }, { ctrl: true });
 
   useKeyboardShortcut("d", () => navigate("/"), { alt: true });
@@ -66,8 +66,8 @@ export function useGlobalShortcuts() {
   useKeyboardShortcut("f", () => navigate("/cotacao-frete"), { alt: true });
 
   useKeyboardShortcut("Escape", () => {
-    const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
-    closeButton?.click();
+    // Use a custom event to close dialogs — avoids document.querySelector
+    window.dispatchEvent(new CustomEvent('logiflow:close-dialog'));
   });
 }
 

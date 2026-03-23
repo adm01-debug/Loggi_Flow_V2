@@ -150,9 +150,9 @@ export default function Conquistas() {
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          <div className="stat-card text-center"><Trophy className="w-5 h-5 text-amber-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.unlocked}/{stats.total}</p><p className="text-xs text-muted-foreground">Desbloqueadas</p></div>
-          <div className="stat-card text-center"><Sparkles className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.totalXp}</p><p className="text-xs text-muted-foreground">XP Ganho</p></div>
-          <div className="stat-card text-center"><Star className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-2xl font-bold">Nível {userLevel?.level || 1}</p><p className="text-xs text-muted-foreground">Atual</p></div>
+          <div className="stat-card text-center"><Trophy className="w-5 h-5 text-coins mx-auto mb-2" /><p className="text-2xl font-bold">{stats.unlocked}/{stats.total}</p><p className="text-xs text-muted-foreground">Desbloqueadas</p></div>
+          <div className="stat-card text-center"><Sparkles className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.totalXp}</p><p className="text-xs text-muted-foreground">XP Ganho</p></div>
+          <div className="stat-card text-center"><Star className="w-5 h-5 text-coins mx-auto mb-2" /><p className="text-2xl font-bold">Nível {userLevel?.level || 1}</p><p className="text-xs text-muted-foreground">Atual</p></div>
         </div>
 
         {/* Onboarding Achievements Section */}
@@ -246,7 +246,7 @@ export default function Conquistas() {
                   <div className="flex items-start gap-3">
                     <div className={cn("p-3 rounded-xl bg-gradient-to-br", rarityColors[a.rarity], "text-white")}><Icon className="w-6 h-6" /></div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2"><h3 className="font-semibold">{a.name}</h3>{a.unlocked && <CheckCircle2 className="w-4 h-4 text-green-500" />}{!a.unlocked && <Lock className="w-4 h-4 text-muted-foreground" />}</div>
+                      <div className="flex items-center gap-2"><h3 className="font-semibold">{a.name}</h3>{a.unlocked && <CheckCircle2 className="w-4 h-4 text-success" />}{!a.unlocked && <Lock className="w-4 h-4 text-muted-foreground" />}</div>
                       <p className="text-sm text-muted-foreground">{a.description}</p>
                       <div className="flex items-center gap-2 mt-2"><Badge variant="outline" className="text-xs">{rarityLabels[a.rarity]}</Badge><Badge variant="secondary" className="text-xs">+{a.xpReward} XP</Badge></div>
                     </div>

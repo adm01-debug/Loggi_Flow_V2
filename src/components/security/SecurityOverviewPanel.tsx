@@ -202,10 +202,10 @@ export function SecurityOverviewPanel() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-500';
-    if (score >= 60) return 'text-yellow-500';
-    if (score >= 40) return 'text-orange-500';
-    return 'text-red-500';
+    if (score >= 80) return 'text-success';
+    if (score >= 60) return 'text-warning';
+    if (score >= 40) return 'text-warning';
+    return 'text-destructive';
   };
 
   const getScoreLabel = (score: number) => {
@@ -217,9 +217,9 @@ export function SecurityOverviewPanel() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'warning': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      default: return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      case 'critical': return 'bg-destructive/10 text-destructive border-destructive/20';
+      case 'warning': return 'bg-warning/10 text-warning border-warning/20';
+      default: return 'bg-info/10 text-info border-info/20';
     }
   };
 
@@ -289,9 +289,9 @@ export function SecurityOverviewPanel() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   {stats.securityScore >= 60 ? (
-                    <ShieldCheck className="h-5 w-5 text-green-500" />
+                    <ShieldCheck className="h-5 w-5 text-success" />
                   ) : (
-                    <ShieldAlert className="h-5 w-5 text-orange-500" />
+                    <ShieldAlert className="h-5 w-5 text-warning" />
                   )}
                   <span className="font-medium">{getScoreLabel(stats.securityScore)}</span>
                 </div>
@@ -305,21 +305,21 @@ export function SecurityOverviewPanel() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {stats.mfaEnabled ? (
-                  <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                     <Lock className="h-3 w-3 mr-1" />
                     MFA Ativo
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
                     <Unlock className="h-3 w-3 mr-1" />
                     MFA Inativo
                   </Badge>
                 )}
-                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                <Badge variant="outline" className="bg-info/10 text-info border-info/20">
                   <Smartphone className="h-3 w-3 mr-1" />
                   {stats.knownDevices} dispositivo(s)
                 </Badge>
-                <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                   <Users className="h-3 w-3 mr-1" />
                   {stats.activeSessions} sessão(ões) ativa(s)
                 </Badge>
@@ -331,10 +331,10 @@ export function SecurityOverviewPanel() {
 
       {/* Alerts Section */}
       {alerts.length > 0 && (
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="border-warning/20 bg-warning/5">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              <AlertTriangle className="h-5 w-5 text-warning" />
               Alertas de Segurança
             </CardTitle>
           </CardHeader>
@@ -396,7 +396,7 @@ export function SecurityOverviewPanel() {
                 <div
                   key={i}
                   className={`h-2 w-2 rounded-full ${
-                    i < stats.trustedDevices ? 'bg-green-500' : 'bg-muted'
+                    i < stats.trustedDevices ? 'bg-success' : 'bg-muted'
                   }`}
                 />
               ))}
@@ -415,13 +415,13 @@ export function SecurityOverviewPanel() {
             <div className="flex items-center gap-1 text-xs">
               {stats.failedLoginAttempts > 0 ? (
                 <>
-                  <TrendingDown className="h-3 w-3 text-red-500" />
-                  <span className="text-red-500">{stats.failedLoginAttempts} falharam</span>
+                  <TrendingDown className="h-3 w-3 text-destructive" />
+                  <span className="text-destructive">{stats.failedLoginAttempts} falharam</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                  <span className="text-green-500">Todas bem-sucedidas</span>
+                  <CheckCircle2 className="h-3 w-3 text-success" />
+                  <span className="text-success">Todas bem-sucedidas</span>
                 </>
               )}
             </div>
@@ -440,13 +440,13 @@ export function SecurityOverviewPanel() {
             <div className="flex items-center gap-1 text-xs">
               {stats.criticalEvents > 0 ? (
                 <>
-                  <AlertTriangle className="h-3 w-3 text-red-500" />
-                  <span className="text-red-500">{stats.criticalEvents} crítico(s)</span>
+                  <AlertTriangle className="h-3 w-3 text-destructive" />
+                  <span className="text-destructive">{stats.criticalEvents} crítico(s)</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                  <span className="text-green-500">Nenhum crítico</span>
+                  <CheckCircle2 className="h-3 w-3 text-success" />
+                  <span className="text-success">Nenhum crítico</span>
                 </>
               )}
             </div>
@@ -478,13 +478,13 @@ export function SecurityOverviewPanel() {
             <div className="flex items-center gap-2">
               {stats.mfaEnabled ? (
                 <>
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
-                  <span className="text-lg font-semibold text-green-500">Ativo</span>
+                  <CheckCircle2 className="h-6 w-6 text-success" />
+                  <span className="text-lg font-semibold text-success">Ativo</span>
                 </>
               ) : (
                 <>
-                  <XCircle className="h-6 w-6 text-yellow-500" />
-                  <span className="text-lg font-semibold text-yellow-500">Inativo</span>
+                  <XCircle className="h-6 w-6 text-warning" />
+                  <span className="text-lg font-semibold text-warning">Inativo</span>
                 </>
               )}
             </div>

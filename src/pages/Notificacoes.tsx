@@ -21,12 +21,12 @@ import { useRealtime } from "@/hooks/useRealtime";
 interface Notification { id: string; title: string; message: string; type: string; read: boolean; created_at: string; user_id: string; }
 
 const typeConfig: Record<string, { icon: LucideIcon; color: string }> = {
-  info: { icon: Info, color: "text-blue-500" },
-  success: { icon: Check, color: "text-green-500" },
-  warning: { icon: AlertTriangle, color: "text-yellow-500" },
-  error: { icon: AlertCircle, color: "text-red-500" },
-  coleta: { icon: Package, color: "text-purple-500" },
-  entrega: { icon: Truck, color: "text-cyan-500" },
+  info: { icon: Info, color: "text-info" },
+  success: { icon: Check, color: "text-success" },
+  warning: { icon: AlertTriangle, color: "text-warning" },
+  error: { icon: AlertCircle, color: "text-destructive" },
+  coleta: { icon: Package, color: "text-primary" },
+  entrega: { icon: Truck, color: "text-info" },
 };
 
 const filterConfig: FilterConfig<Notification> = {

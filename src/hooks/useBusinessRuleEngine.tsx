@@ -91,8 +91,8 @@ export function useBusinessRuleEngine() {
             break;
           }
         }
-      } catch (err) {
-        console.error(`Rule action failed: ${action.type}`, err);
+      } catch {
+        // Rule action failed — silent fail for background processing
       }
     }
 

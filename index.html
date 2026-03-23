@@ -16,18 +16,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="LogiFlow" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="canonical" href="/" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="LogiFlow - Sistema de Logística Gamificado" />
     <meta property="og:description" content="Gerencie fretes internos, entregas de fornecedores e envios para clientes com gamificação." />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="/icons/icon-512.svg" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@LogiFlow" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:image" content="/icons/icon-512.svg" />
     
     <!-- DNS prefetch for backend -->
     <link rel="dns-prefetch" href="https://uwbpzfcysppwikfpnzok.supabase.co" />
@@ -45,7 +46,7 @@
     
     <!-- Service Worker Registration -->
     <script>
-      if ('serviceWorker' in navigator) {
+      if ('serviceWorker' in navigator && !location.hostname.includes('lovableproject')) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js').catch(() => {});
         });
