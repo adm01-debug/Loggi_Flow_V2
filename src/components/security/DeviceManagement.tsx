@@ -215,7 +215,7 @@ export function DeviceManagement() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-amber-700 dark:text-amber-400">
+              <p className="font-medium text-warning">
                 Dica de Segurança
               </p>
               <p className="text-muted-foreground mt-1">

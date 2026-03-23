@@ -30,7 +30,7 @@ const achievements: Achievement[] = [
   { id: "8", name: "Networker", description: "Cadastre 20 clientes", category: "cadastros", xpReward: 150, icon: Users, unlocked: false, progress: 15, maxProgress: 20, rarity: "common" },
 ];
 
-const rarityColors = { common: "from-gray-400 to-gray-500", rare: "from-blue-400 to-blue-600", epic: "from-purple-400 to-purple-600", legendary: "from-amber-400 to-amber-600" };
+const rarityColors = { common: "from-muted-foreground to-muted-foreground/80", rare: "from-info to-info/80", epic: "from-accent to-accent/80", legendary: "from-warning to-warning/80" };
 const rarityLabels = { common: "Comum", rare: "Raro", epic: "Épico", legendary: "Lendário" };
 
 const filterConfig: FilterConfig<Achievement> = {
