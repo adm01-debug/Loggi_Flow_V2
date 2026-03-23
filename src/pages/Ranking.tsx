@@ -129,8 +129,8 @@ export default function Ranking() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10">
-                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-warning/20 to-warning/10">
+                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-warning" />
               </div>
               <span className="truncate">Ranking Global</span>
             </h1>
