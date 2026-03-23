@@ -155,8 +155,8 @@ export default function AlertasCusto() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-red-400/20 to-red-600/10">
-                <AlertTriangle className="w-6 h-6 text-red-500" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-destructive/10">
+                <AlertTriangle className="w-6 h-6 text-destructive" />
               </div>
               Alertas de Custo
             </h1>
