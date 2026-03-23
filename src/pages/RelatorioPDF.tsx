@@ -208,8 +208,7 @@ export default function RelatorioPDF() {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateSLAReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateSLAReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Relatório SLA / OTIF', 14, 50);
 

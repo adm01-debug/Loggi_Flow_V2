@@ -98,8 +98,7 @@ interface ImportStats {
 export default function ImportacaoMassa() {
   const [history, setHistory] = useState<ImportStats[]>([]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleImport = async (entity: ImportEntity, data: any[]) => {
+  const handleImport = async (entity: ImportEntity, data: Record<string, unknown>[]) => {
     let successCount = 0;
     let errorCount = 0;
     const batchSize = 50;
