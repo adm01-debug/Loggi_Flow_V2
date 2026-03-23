@@ -246,7 +246,7 @@ export default function Conquistas() {
                   <div className="flex items-start gap-3">
                     <div className={cn("p-3 rounded-xl bg-gradient-to-br", rarityColors[a.rarity], "text-white")}><Icon className="w-6 h-6" /></div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2"><h3 className="font-semibold">{a.name}</h3>{a.unlocked && <CheckCircle2 className="w-4 h-4 text-green-500" />}{!a.unlocked && <Lock className="w-4 h-4 text-muted-foreground" />}</div>
+                      <div className="flex items-center gap-2"><h3 className="font-semibold">{a.name}</h3>{a.unlocked && <CheckCircle2 className="w-4 h-4 text-success" />}{!a.unlocked && <Lock className="w-4 h-4 text-muted-foreground" />}</div>
                       <p className="text-sm text-muted-foreground">{a.description}</p>
                       <div className="flex items-center gap-2 mt-2"><Badge variant="outline" className="text-xs">{rarityLabels[a.rarity]}</Badge><Badge variant="secondary" className="text-xs">+{a.xpReward} XP</Badge></div>
                     </div>
