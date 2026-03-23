@@ -8,10 +8,12 @@ vi.mock("recharts", () => {
   const MockLineChart = ({ children }: any) => <div data-testid="line-chart">{children}</div>;
   const MockBarChart = ({ children }: any) => <div data-testid="bar-chart">{children}</div>;
   const MockPieChart = ({ children }: any) => <div data-testid="pie-chart">{children}</div>;
+  const MockAreaChart = ({ children }: any) => <div data-testid="area-chart">{children}</div>;
   const MockPie = ({ children }: any) => <div>{children}</div>;
   const MockCell = () => <div />;
   const MockBar = () => <div />;
   const MockLine = () => <div />;
+  const MockArea = () => <div />;
   const MockXAxis = () => <div />;
   const MockYAxis = () => <div />;
   const MockCartesianGrid = () => <div />;
@@ -21,10 +23,12 @@ vi.mock("recharts", () => {
     LineChart: MockLineChart,
     BarChart: MockBarChart,
     PieChart: MockPieChart,
+    AreaChart: MockAreaChart,
     Pie: MockPie,
     Cell: MockCell,
     Bar: MockBar,
     Line: MockLine,
+    Area: MockArea,
     XAxis: MockXAxis,
     YAxis: MockYAxis,
     CartesianGrid: MockCartesianGrid,
