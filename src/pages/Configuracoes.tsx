@@ -78,7 +78,7 @@ export default function Configuracoes() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-gray-400/20 to-gray-600/10"><Settings className="w-6 h-6 text-gray-500" /></div>Configurações</h1><p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p></div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-muted"><Settings className="w-6 h-6 text-muted-foreground" /></div>Configurações</h1><p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p></div>
           <Button onClick={handleSave} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
         </div>
         <OnboardingTooltip
