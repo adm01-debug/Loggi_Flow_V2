@@ -85,7 +85,7 @@ export function RotaResultsList({ rotas, isLoading, onSelectRota }: RotaResultsL
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     {index === 0 && (
-                      <Badge className="bg-yellow-500 text-white">
+                      <Badge className="bg-warning text-warning-foreground">
                         <Star className="h-3 w-3 mr-1" />
                         Melhor opção
                       </Badge>

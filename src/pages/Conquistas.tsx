@@ -86,7 +86,7 @@ function OnboardingAchievementCard({ achievement, isUnlocked }: {
             <div className="flex items-center gap-2">
               <h4 className="font-medium text-sm truncate">{achievement.name}</h4>
               {isUnlocked ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
               ) : (
                 <Lock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
               )}
@@ -105,7 +105,7 @@ function OnboardingAchievementCard({ achievement, isUnlocked }: {
         </div>
       </div>
       {isUnlocked && (
-        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-emerald-500/20 to-transparent" />
+        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-success/20 to-transparent" />
       )}
     </motion.div>
   );
@@ -146,7 +146,7 @@ export default function Conquistas() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10"><Trophy className="w-6 h-6 text-amber-500" /></div>Conquistas</h1><p className="text-muted-foreground mt-1">Desbloqueie conquistas e ganhe XP</p></div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-warning/20 to-warning/10"><Trophy className="w-6 h-6 text-warning" /></div>Conquistas</h1><p className="text-muted-foreground mt-1">Desbloqueie conquistas e ganhe XP</p></div>
         </div>
 
         <div className="grid grid-cols-3 gap-4">

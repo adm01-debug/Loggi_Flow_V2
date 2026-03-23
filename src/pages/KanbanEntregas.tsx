@@ -47,13 +47,13 @@ interface KanbanColumn {
 
 const COLUMNS: KanbanColumn[] = [
   { id: 'aguardando_producao', title: 'Aguard. Produção', icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-muted/50' },
-  { id: 'pronto_despacho', title: 'Pronto Despacho', icon: Package, color: 'text-blue-500', bgColor: 'bg-blue-500/5' },
-  { id: 'cotacao_frete', title: 'Cotação Frete', icon: DollarSign, color: 'text-purple-500', bgColor: 'bg-purple-500/5' },
-  { id: 'nf_emitida', title: 'NF Emitida', icon: FileText, color: 'text-indigo-500', bgColor: 'bg-indigo-500/5' },
+  { id: 'pronto_despacho', title: 'Pronto Despacho', icon: Package, color: 'text-info', bgColor: 'bg-info/5' },
+  { id: 'cotacao_frete', title: 'Cotação Frete', icon: DollarSign, color: 'text-accent-foreground', bgColor: 'bg-accent/5' },
+  { id: 'nf_emitida', title: 'NF Emitida', icon: FileText, color: 'text-primary', bgColor: 'bg-primary/5' },
   { id: 'despachado', title: 'Despachado', icon: Send, color: 'text-primary', bgColor: 'bg-primary/5' },
-  { id: 'em_transito', title: 'Em Trânsito', icon: Truck, color: 'text-amber-500', bgColor: 'bg-amber-500/5' },
-  { id: 'saiu_entrega', title: 'Saiu p/ Entrega', icon: Truck, color: 'text-orange-500', bgColor: 'bg-orange-500/5' },
-  { id: 'entregue', title: 'Entregue', icon: CheckCircle2, color: 'text-green-500', bgColor: 'bg-green-500/5' },
+  { id: 'em_transito', title: 'Em Trânsito', icon: Truck, color: 'text-warning', bgColor: 'bg-warning/5' },
+  { id: 'saiu_entrega', title: 'Saiu p/ Entrega', icon: Truck, color: 'text-warning', bgColor: 'bg-warning/5' },
+  { id: 'entregue', title: 'Entregue', icon: CheckCircle2, color: 'text-success', bgColor: 'bg-success/5' },
 ];
 
 const VALID_TRANSITIONS: Record<EntregaStatus, EntregaStatus[]> = {

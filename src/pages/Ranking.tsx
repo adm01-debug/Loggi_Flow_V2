@@ -129,8 +129,8 @@ export default function Ranking() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-600/10">
-                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-warning/20 to-warning/10">
+                <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-warning" />
               </div>
               <span className="truncate">Ranking Global</span>
             </h1>
@@ -153,12 +153,12 @@ export default function Ranking() {
             <p className="text-[10px] sm:text-xs text-muted-foreground">Jogadores</p>
           </motion.div>
           <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Zap className="w-5 h-5 text-yellow-500 mx-auto mb-2" />
+            <Zap className="w-5 h-5 text-warning mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{totalXP.toLocaleString()}</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">XP Total</p>
           </motion.div>
           <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Trophy className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+            <Trophy className="w-5 h-5 text-warning mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{totalAchievements}</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Conquistas</p>
           </motion.div>
@@ -217,7 +217,7 @@ export default function Ranking() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-amber-500/10 blur-3xl rounded-full" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-warning/10 blur-3xl rounded-full" />
               <div className="relative flex items-end justify-center gap-4 pt-4 pb-2">
                 {[1, 0, 2].map((pos) => {
                   const user = top3[pos];

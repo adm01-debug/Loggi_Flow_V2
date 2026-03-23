@@ -28,10 +28,10 @@ const statusIcons = {
 };
 
 const statusColors = {
-  completed: "text-green-500 bg-green-500/10",
-  current: "text-blue-500 bg-blue-500/10",
+  completed: "text-success bg-success/10",
+  current: "text-info bg-info/10",
   pending: "text-muted-foreground bg-muted",
-  error: "text-red-500 bg-red-500/10",
+  error: "text-destructive bg-destructive/10",
 };
 
 export function Timeline({ events, className }: TimelineProps) {
@@ -129,8 +129,8 @@ export function StatusTimeline({ steps, className }: StatusTimelineProps) {
             <div
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium",
-                step.status === "completed" && "bg-green-500 text-white",
-                step.status === "current" && "bg-blue-500 text-white",
+                step.status === "completed" && "bg-success text-success-foreground",
+                step.status === "current" && "bg-info text-info-foreground",
                 step.status === "pending" && "bg-muted text-muted-foreground"
               )}
             >
@@ -153,7 +153,7 @@ export function StatusTimeline({ steps, className }: StatusTimelineProps) {
             <div
               className={cn(
                 "flex-1 h-0.5 mx-2",
-                step.status === "completed" ? "bg-green-500" : "bg-border"
+                step.status === "completed" ? "bg-success" : "bg-border"
               )}
             />
           )}

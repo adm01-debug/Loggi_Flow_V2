@@ -191,8 +191,8 @@ export function PulsingBeacon({
 
   const colorClasses = {
     primary: 'bg-primary',
-    success: 'bg-green-500',
-    warning: 'bg-amber-500'
+    success: 'bg-success',
+    warning: 'bg-warning'
   };
 
   return (

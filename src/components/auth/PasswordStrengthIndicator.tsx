@@ -47,15 +47,15 @@ export function PasswordStrengthIndicator({
     if (strength >= 80 && allRequiredMet) {
       level = "strong";
       label = "Forte";
-      color = "bg-green-500";
+      color = "bg-success";
     } else if (strength >= 60 && allRequiredMet) {
       level = "good";
       label = "Boa";
-      color = "bg-yellow-500";
+      color = "bg-warning";
     } else if (strength >= 40) {
       level = "fair";
       label = "Regular";
-      color = "bg-orange-500";
+      color = "bg-warning/70";
     }
 
     return { criteria, strength, level, label, color, allRequiredMet };
@@ -108,9 +108,9 @@ export function PasswordStrengthIndicator({
           <span
             className={cn(
               "font-medium",
-              analysis.level === "strong" && "text-green-500",
-              analysis.level === "good" && "text-yellow-500",
-              analysis.level === "fair" && "text-orange-500",
+              analysis.level === "strong" && "text-success",
+              analysis.level === "good" && "text-warning",
+              analysis.level === "fair" && "text-warning/70",
               analysis.level === "weak" && "text-destructive"
             )}
           >
@@ -135,7 +135,7 @@ export function PasswordStrengthIndicator({
             key={index}
             className={cn(
               "flex items-center gap-2 text-xs transition-colors",
-              criterion.met ? "text-green-500" : criterion.required ? "text-destructive" : "text-muted-foreground"
+              criterion.met ? "text-success" : criterion.required ? "text-destructive" : "text-muted-foreground"
             )}
           >
             {criterion.met ? (
@@ -171,7 +171,7 @@ export function PasswordStrengthIndicator({
             </div>
           </div>
         ) : password.length >= 8 ? (
-          <div className="flex items-center gap-2 text-xs text-green-500">
+          <div className="flex items-center gap-2 text-xs text-success">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span>Senha não encontrada em vazamentos conhecidos</span>
           </div>
