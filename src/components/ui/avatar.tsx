@@ -252,9 +252,9 @@ const AvatarBadge = ({
   const variantStyles = {
     default: "bg-muted text-muted-foreground",
     primary: "bg-primary text-primary-foreground",
-    success: "bg-emerald-500 text-white",
-    warning: "bg-amber-500 text-white",
-    danger: "bg-red-500 text-white",
+    success: "bg-success text-success-foreground",
+    warning: "bg-warning text-warning-foreground",
+    danger: "bg-destructive text-destructive-foreground",
   };
 
   if (dot) {
