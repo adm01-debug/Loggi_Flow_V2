@@ -51,8 +51,8 @@ export function useGlobalShortcuts() {
   const navigate = useNavigate();
 
   useKeyboardShortcut("k", () => {
-    const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
-    searchInput?.focus();
+    // Use a custom event to trigger search focus — avoids document.querySelector
+    window.dispatchEvent(new CustomEvent('logiflow:focus-search'));
   }, { ctrl: true });
 
   useKeyboardShortcut("d", () => navigate("/"), { alt: true });
