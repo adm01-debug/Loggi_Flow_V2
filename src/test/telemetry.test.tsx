@@ -255,7 +255,7 @@ describe("TelemetryCharts", () => {
     it("handles rows with rpc_name instead of table_name", () => {
       const rows = makeRows(3, { table_name: null, rpc_name: "get_leaderboard" });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles very large duration values", () => {
