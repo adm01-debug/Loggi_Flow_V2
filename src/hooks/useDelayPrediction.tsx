@@ -90,10 +90,10 @@ export function useDelayPrediction() {
 
   const getRiskColor = useCallback((risco: DelayPrediction['risco']) => {
     switch (risco) {
-      case 'critico': return 'text-red-600 bg-red-100';
-      case 'alto': return 'text-orange-600 bg-orange-100';
-      case 'medio': return 'text-yellow-600 bg-yellow-100';
-      case 'baixo': return 'text-green-600 bg-green-100';
+      case 'critico': return 'text-destructive bg-destructive/10';
+      case 'alto': return 'text-warning bg-warning/10';
+      case 'medio': return 'text-warning bg-warning/10';
+      case 'baixo': return 'text-success bg-success/10';
       default: return 'text-muted-foreground bg-muted';
     }
   }, []);

@@ -66,8 +66,8 @@ export function useGlobalShortcuts() {
   useKeyboardShortcut("f", () => navigate("/cotacao-frete"), { alt: true });
 
   useKeyboardShortcut("Escape", () => {
-    const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
-    closeButton?.click();
+    // Use a custom event to close dialogs — avoids document.querySelector
+    window.dispatchEvent(new CustomEvent('logiflow:close-dialog'));
   });
 }
 

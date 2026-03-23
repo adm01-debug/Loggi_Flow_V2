@@ -211,9 +211,8 @@ export function MaterialLabelPrinter() {
 
       doc.save(`etiquetas-${new Date().toISOString().slice(0, 10)}.pdf`);
       toast.success(`PDF gerado com ${selectedLabels.length} etiqueta(s)!`);
-    } catch (err) {
+    } catch {
       toast.error('Erro ao gerar PDF');
-      console.error(err);
     }
   }, [selectedLabels]);
 

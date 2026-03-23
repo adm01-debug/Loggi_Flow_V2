@@ -190,9 +190,8 @@ export default function AdminTelemetriaPage() {
 
       doc.save(`telemetria_${format(now, "yyyy-MM-dd")}_${timeFilter}.pdf`);
       toast.success("PDF exportado com sucesso!");
-    } catch (err) {
+    } catch {
       toast.error("Erro ao gerar PDF");
-      console.error(err);
     }
   };
 

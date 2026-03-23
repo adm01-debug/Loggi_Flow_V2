@@ -113,9 +113,9 @@ export default function CalendarioLogistico() {
                 {selectedEvents.length > 0 ? selectedEvents.map((e, i) => (
                   <div key={i} className="card-interactive flex items-center gap-3">
                     {e.type === "entrega" ? (
-                      <Truck className="w-5 h-5 text-blue-500" />
+                      <Truck className="w-5 h-5 text-info" />
                     ) : (
-                      <Package className="w-5 h-5 text-green-500" />
+                      <Package className="w-5 h-5 text-success" />
                     )}
                     <div className="flex-1">
                       <p className="font-medium text-sm">{e.title}</p>

@@ -396,7 +396,7 @@ export function SecurityOverviewPanel() {
                 <div
                   key={i}
                   className={`h-2 w-2 rounded-full ${
-                    i < stats.trustedDevices ? 'bg-green-500' : 'bg-muted'
+                    i < stats.trustedDevices ? 'bg-success' : 'bg-muted'
                   }`}
                 />
               ))}

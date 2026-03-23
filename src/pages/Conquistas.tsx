@@ -150,9 +150,9 @@ export default function Conquistas() {
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          <div className="stat-card text-center"><Trophy className="w-5 h-5 text-amber-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.unlocked}/{stats.total}</p><p className="text-xs text-muted-foreground">Desbloqueadas</p></div>
-          <div className="stat-card text-center"><Sparkles className="w-5 h-5 text-purple-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.totalXp}</p><p className="text-xs text-muted-foreground">XP Ganho</p></div>
-          <div className="stat-card text-center"><Star className="w-5 h-5 text-yellow-500 mx-auto mb-2" /><p className="text-2xl font-bold">Nível {userLevel?.level || 1}</p><p className="text-xs text-muted-foreground">Atual</p></div>
+          <div className="stat-card text-center"><Trophy className="w-5 h-5 text-coins mx-auto mb-2" /><p className="text-2xl font-bold">{stats.unlocked}/{stats.total}</p><p className="text-xs text-muted-foreground">Desbloqueadas</p></div>
+          <div className="stat-card text-center"><Sparkles className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.totalXp}</p><p className="text-xs text-muted-foreground">XP Ganho</p></div>
+          <div className="stat-card text-center"><Star className="w-5 h-5 text-coins mx-auto mb-2" /><p className="text-2xl font-bold">Nível {userLevel?.level || 1}</p><p className="text-xs text-muted-foreground">Atual</p></div>
         </div>
 
         {/* Onboarding Achievements Section */}
