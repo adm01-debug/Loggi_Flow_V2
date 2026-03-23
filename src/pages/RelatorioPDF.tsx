@@ -122,8 +122,9 @@ export default function RelatorioPDF() {
       setGenerating(false);
     }
   };
+  type EntregaRow = NonNullable<typeof entregas>[number];
 
-  const generateEntregasReport = (doc: InstanceType<typeof import('jspdf').default>, data: typeof entregas & object[], autoTableFn: (doc: unknown, opts: Record<string, unknown>) => void) => {
+  const generateEntregasReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Relatório de Entregas', 14, 50);
 
