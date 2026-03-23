@@ -171,7 +171,7 @@ export function PasswordStrengthIndicator({
             </div>
           </div>
         ) : password.length >= 8 ? (
-          <div className="flex items-center gap-2 text-xs text-green-500">
+          <div className="flex items-center gap-2 text-xs text-success">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span>Senha não encontrada em vazamentos conhecidos</span>
           </div>

@@ -105,7 +105,7 @@ function OnboardingAchievementCard({ achievement, isUnlocked }: {
         </div>
       </div>
       {isUnlocked && (
-        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-emerald-500/20 to-transparent" />
+        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-success/20 to-transparent" />
       )}
     </motion.div>
   );
