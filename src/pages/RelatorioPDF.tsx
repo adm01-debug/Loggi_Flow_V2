@@ -14,13 +14,18 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import type jsPDF from 'jspdf';
+
+type PdfDoc = InstanceType<typeof jsPDF>;
+type AutoTableFn = (doc: PdfDoc, opts: Record<string, unknown>) => void;
+
 // Lazy import heavy PDF libs - only loaded when user generates a report
 const loadPdfLibs = () => Promise.all([
   import('jspdf'),
   import('jspdf-autotable'),
 ]).then(([jspdfMod, autoTableMod]) => ({
   jsPDF: jspdfMod.default,
-  autoTable: autoTableMod.default,
+  autoTable: autoTableMod.default as AutoTableFn,
 }));
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -117,9 +122,9 @@ export default function RelatorioPDF() {
       setGenerating(false);
     }
   };
+  type EntregaRow = NonNullable<typeof entregas>[number];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateEntregasReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateEntregasReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Relatório de Entregas', 14, 50);
 
@@ -147,8 +152,7 @@ export default function RelatorioPDF() {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateTransportadorasReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateTransportadorasReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Performance de Transportadoras', 14, 50);
 
@@ -177,8 +181,7 @@ export default function RelatorioPDF() {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateCustosReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateCustosReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Relatório de Custos Logísticos', 14, 50);
 
@@ -205,8 +208,7 @@ export default function RelatorioPDF() {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateSLAReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateSLAReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Relatório SLA / OTIF', 14, 50);
 

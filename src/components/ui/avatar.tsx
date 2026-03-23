@@ -25,9 +25,9 @@ const avatarVariants = cva(
         none: "",
         default: "ring-2 ring-background",
         primary: "ring-2 ring-primary",
-        success: "ring-2 ring-emerald-500",
-        warning: "ring-2 ring-amber-500",
-        danger: "ring-2 ring-red-500",
+        success: "ring-2 ring-success",
+        warning: "ring-2 ring-warning",
+        danger: "ring-2 ring-destructive",
       },
       status: {
         none: "",
@@ -48,10 +48,10 @@ const avatarVariants = cva(
 
 // Status indicator styles
 const statusStyles = {
-  online: "bg-emerald-500",
-  offline: "bg-gray-400",
-  busy: "bg-red-500",
-  away: "bg-amber-500",
+  online: "bg-success",
+  offline: "bg-muted-foreground",
+  busy: "bg-destructive",
+  away: "bg-warning",
 };
 
 // Status indicator sizes based on avatar size
@@ -155,9 +155,9 @@ const avatarFallbackVariants = cva(
         default: "bg-muted text-muted-foreground",
         primary: "bg-primary/10 text-primary",
         gradient: "bg-gradient-to-br from-primary to-primary/60 text-primary-foreground",
-        success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-        warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-        danger: "bg-red-500/10 text-red-600 dark:text-red-400",
+        success: "bg-success/10 text-success",
+        warning: "bg-warning/10 text-warning",
+        danger: "bg-destructive/10 text-destructive",
       }
     },
     defaultVariants: {
@@ -252,9 +252,9 @@ const AvatarBadge = ({
   const variantStyles = {
     default: "bg-muted text-muted-foreground",
     primary: "bg-primary text-primary-foreground",
-    success: "bg-emerald-500 text-white",
-    warning: "bg-amber-500 text-white",
-    danger: "bg-red-500 text-white",
+    success: "bg-success text-success-foreground",
+    warning: "bg-warning text-warning-foreground",
+    danger: "bg-destructive text-destructive-foreground",
   };
 
   if (dot) {

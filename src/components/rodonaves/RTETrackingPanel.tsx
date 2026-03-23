@@ -75,7 +75,7 @@ export function RTETrackingPanel() {
         {events.map((ev: Record<string, unknown>, i: number) => {
           const code = Number(ev.CodigoOcorrencia || ev.occurrenceCode || 0);
           const status = RODONAVES_STATUS_MAP[code];
-          const severityColors = { info: 'bg-primary/10 text-primary', success: 'bg-green-500/10 text-green-500', warning: 'bg-warning/10 text-warning', error: 'bg-destructive/10 text-destructive' };
+          const severityColors = { info: 'bg-primary/10 text-primary', success: 'bg-success/10 text-success', warning: 'bg-warning/10 text-warning', error: 'bg-destructive/10 text-destructive' };
 
           return (
             <div key={i} className="p-3 rounded-lg border bg-card space-y-1">

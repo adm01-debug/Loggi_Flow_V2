@@ -98,15 +98,14 @@ interface ImportStats {
 export default function ImportacaoMassa() {
   const [history, setHistory] = useState<ImportStats[]>([]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleImport = async (entity: ImportEntity, data: any[]) => {
+  const handleImport = async (entity: ImportEntity, data: Record<string, unknown>[]) => {
     let successCount = 0;
     let errorCount = 0;
     const batchSize = 50;
 
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
-      const { error } = await supabase.from(entity).insert(batch);
+      const { error } = await supabase.from(entity).insert(batch as never[]);
       if (error) {
         errorCount += batch.length;
       } else {

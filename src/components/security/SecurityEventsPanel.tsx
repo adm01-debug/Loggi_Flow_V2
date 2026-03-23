@@ -136,12 +136,12 @@ export function SecurityEventsPanel() {
               <p className="text-2xl font-bold">{stats.last24hCount}</p>
               <p className="text-sm text-muted-foreground">Últimas 24h</p>
             </div>
-            <div className="p-4 rounded-lg bg-red-500/10">
-              <p className="text-2xl font-bold text-red-500">{stats.criticalLast7d}</p>
+            <div className="p-4 rounded-lg bg-destructive/10">
+              <p className="text-2xl font-bold text-destructive">{stats.criticalLast7d}</p>
               <p className="text-sm text-muted-foreground">Críticos (7d)</p>
             </div>
-            <div className="p-4 rounded-lg bg-amber-500/10">
-              <p className="text-2xl font-bold text-amber-500">{stats.warningsLast7d}</p>
+            <div className="p-4 rounded-lg bg-warning/10">
+              <p className="text-2xl font-bold text-warning">{stats.warningsLast7d}</p>
               <p className="text-sm text-muted-foreground">Avisos (7d)</p>
             </div>
           </div>

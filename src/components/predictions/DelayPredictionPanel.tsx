@@ -68,21 +68,21 @@ export function DelayPredictionPanel() {
               <div className="text-2xl font-bold">{summary.total_analisados}</div>
               <div className="text-xs text-muted-foreground">Analisados</div>
             </div>
-            <div className="bg-red-100 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-red-600">{summary.criticos}</div>
-              <div className="text-xs text-red-600">Críticos</div>
+            <div className="bg-destructive/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-destructive">{summary.criticos}</div>
+              <div className="text-xs text-destructive">Críticos</div>
             </div>
-            <div className="bg-orange-100 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-orange-600">{summary.altos}</div>
-              <div className="text-xs text-orange-600">Alto Risco</div>
+            <div className="bg-warning/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-warning">{summary.altos}</div>
+              <div className="text-xs text-warning">Alto Risco</div>
             </div>
-            <div className="bg-yellow-100 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-yellow-600">{summary.medios}</div>
-              <div className="text-xs text-yellow-600">Médio Risco</div>
+            <div className="bg-accent/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-accent-foreground">{summary.medios}</div>
+              <div className="text-xs text-accent-foreground">Médio Risco</div>
             </div>
-            <div className="bg-green-100 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-green-600">{summary.baixos}</div>
-              <div className="text-xs text-green-600">Baixo Risco</div>
+            <div className="bg-success/10 rounded-lg p-3 text-center">
+              <div className="text-2xl font-bold text-success">{summary.baixos}</div>
+              <div className="text-xs text-success">Baixo Risco</div>
             </div>
           </div>
         )}
@@ -183,7 +183,7 @@ function PredictionCard({ prediction, isExpanded, onToggle, getRiskColor, getRis
           {/* Reasons */}
           <div>
             <div className="flex items-center gap-2 text-sm font-medium mb-2">
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
+              <AlertTriangle className="h-4 w-4 text-warning" />
               Motivos identificados:
             </div>
             <ul className="text-sm text-muted-foreground pl-6 space-y-1">
