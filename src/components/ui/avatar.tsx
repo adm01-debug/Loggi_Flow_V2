@@ -48,10 +48,10 @@ const avatarVariants = cva(
 
 // Status indicator styles
 const statusStyles = {
-  online: "bg-emerald-500",
-  offline: "bg-gray-400",
-  busy: "bg-red-500",
-  away: "bg-amber-500",
+  online: "bg-success",
+  offline: "bg-muted-foreground",
+  busy: "bg-destructive",
+  away: "bg-warning",
 };
 
 // Status indicator sizes based on avatar size
