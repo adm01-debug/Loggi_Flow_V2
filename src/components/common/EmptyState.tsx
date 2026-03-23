@@ -24,9 +24,9 @@ const variantConfig = {
   },
   search: {
     icon: Search,
-    gradient: "from-blue-500/20 via-blue-500/10 to-transparent",
-    iconColor: "text-blue-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(217 91% 60% / 0.1) 0%, transparent 50%)"
+    gradient: "from-info/20 via-info/10 to-transparent",
+    iconColor: "text-info",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--info) / 0.1) 0%, transparent 50%)"
   },
   error: {
     icon: FileX,
@@ -36,51 +36,51 @@ const variantConfig = {
   },
   inbox: {
     icon: Inbox,
-    gradient: "from-violet-500/20 via-violet-500/10 to-transparent",
-    iconColor: "text-violet-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(263 70% 50% / 0.1) 0%, transparent 50%)"
+    gradient: "from-accent/20 via-accent/10 to-transparent",
+    iconColor: "text-accent-foreground",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--accent) / 0.1) 0%, transparent 50%)"
   },
   data: {
     icon: TrendingUp,
-    gradient: "from-emerald-500/20 via-emerald-500/10 to-transparent",
-    iconColor: "text-emerald-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(160 84% 39% / 0.1) 0%, transparent 50%)"
+    gradient: "from-success/20 via-success/10 to-transparent",
+    iconColor: "text-success",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--success) / 0.1) 0%, transparent 50%)"
   },
   users: {
     icon: Users,
-    gradient: "from-amber-500/20 via-amber-500/10 to-transparent",
-    iconColor: "text-amber-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(38 92% 50% / 0.1) 0%, transparent 50%)"
+    gradient: "from-warning/20 via-warning/10 to-transparent",
+    iconColor: "text-warning",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--warning) / 0.1) 0%, transparent 50%)"
   },
   notifications: {
     icon: Bell,
-    gradient: "from-pink-500/20 via-pink-500/10 to-transparent",
-    iconColor: "text-pink-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(330 81% 60% / 0.1) 0%, transparent 50%)"
+    gradient: "from-primary/20 via-primary/10 to-transparent",
+    iconColor: "text-primary",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.1) 0%, transparent 50%)"
   },
   calendar: {
     icon: Calendar,
-    gradient: "from-cyan-500/20 via-cyan-500/10 to-transparent",
-    iconColor: "text-cyan-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(186 94% 41% / 0.1) 0%, transparent 50%)"
+    gradient: "from-info/20 via-info/10 to-transparent",
+    iconColor: "text-info",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--info) / 0.1) 0%, transparent 50%)"
   },
   analytics: {
     icon: TrendingUp,
-    gradient: "from-indigo-500/20 via-indigo-500/10 to-transparent",
-    iconColor: "text-indigo-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(239 84% 67% / 0.1) 0%, transparent 50%)"
+    gradient: "from-primary/20 via-primary/10 to-transparent",
+    iconColor: "text-primary",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.1) 0%, transparent 50%)"
   },
   delivery: {
     icon: Truck,
-    gradient: "from-orange-500/20 via-orange-500/10 to-transparent",
-    iconColor: "text-orange-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(25 95% 53% / 0.1) 0%, transparent 50%)"
+    gradient: "from-warning/20 via-warning/10 to-transparent",
+    iconColor: "text-warning",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--warning) / 0.1) 0%, transparent 50%)"
   },
   location: {
     icon: MapPin,
-    gradient: "from-rose-500/20 via-rose-500/10 to-transparent",
-    iconColor: "text-rose-500",
-    bgPattern: "radial-gradient(circle at 50% 50%, hsl(350 89% 60% / 0.1) 0%, transparent 50%)"
+    gradient: "from-destructive/20 via-destructive/10 to-transparent",
+    iconColor: "text-destructive",
+    bgPattern: "radial-gradient(circle at 50% 50%, hsl(var(--destructive) / 0.1) 0%, transparent 50%)"
   }
 };
 

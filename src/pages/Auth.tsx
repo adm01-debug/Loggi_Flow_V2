@@ -577,8 +577,8 @@ export default function Auth() {
               <AnimatePresence mode="wait">
                 {forgotPasswordSent ? (
                   <motion.div key="sent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-4">
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring" }} className="mx-auto w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <CheckCircle2 className="w-8 h-8 text-green-500" />
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring" }} className="mx-auto w-16 h-16 rounded-full bg-success/20 flex items-center justify-center">
+                      <CheckCircle2 className="w-8 h-8 text-success" />
                     </motion.div>
                     <p className="text-center text-muted-foreground">Sua solicitação foi enviada para <strong className="text-foreground">{forgotEmail}</strong>. Aguarde aprovação.</p>
                     <Button variant="outline" className="w-full" onClick={() => { setShowForgotPassword(false); setForgotPasswordSent(false); setForgotEmail(""); }}>

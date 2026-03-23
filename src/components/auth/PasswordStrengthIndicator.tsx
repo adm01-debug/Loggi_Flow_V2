@@ -47,15 +47,15 @@ export function PasswordStrengthIndicator({
     if (strength >= 80 && allRequiredMet) {
       level = "strong";
       label = "Forte";
-      color = "bg-green-500";
+      color = "bg-success";
     } else if (strength >= 60 && allRequiredMet) {
       level = "good";
       label = "Boa";
-      color = "bg-yellow-500";
+      color = "bg-warning";
     } else if (strength >= 40) {
       level = "fair";
       label = "Regular";
-      color = "bg-orange-500";
+      color = "bg-warning/70";
     }
 
     return { criteria, strength, level, label, color, allRequiredMet };

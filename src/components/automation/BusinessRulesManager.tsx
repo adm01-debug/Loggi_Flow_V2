@@ -286,10 +286,10 @@ function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
           </div>
 
           {/* Actions */}
-          <div className="p-4 rounded-lg bg-green-500/10 space-y-4">
+          <div className="p-4 rounded-lg bg-success/10 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-medium">
-                <Badge variant="outline" className="bg-green-500/20">ENTÃO</Badge>
+                <Badge variant="outline" className="bg-success/20">ENTÃO</Badge>
                 <span className="text-muted-foreground">Ações</span>
               </div>
               <Button variant="ghost" size="sm" onClick={addAction}>
