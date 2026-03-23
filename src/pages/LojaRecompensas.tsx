@@ -20,7 +20,7 @@ import { useSorting } from "@/hooks/useSorting";
 interface RewardItem { id: string; name: string; description: string; coins_cost: number; category: string; icon: string; rarity: string; available: boolean; stock: number | null; }
 
 const iconMap: Record<string, LucideIcon> = { Gift, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Sparkles };
-const rarityColors: Record<string, string> = { common: "from-gray-400 to-gray-500", rare: "from-blue-400 to-blue-600", epic: "from-purple-400 to-purple-600", legendary: "from-amber-400 to-amber-600" };
+const rarityColors: Record<string, string> = { common: "from-muted-foreground/40 to-muted-foreground/60", rare: "from-info to-info/80", epic: "from-primary to-primary/80", legendary: "from-coins to-coins/80" };
 
 const filterConfig: FilterConfig<RewardItem> = {
   search: {
