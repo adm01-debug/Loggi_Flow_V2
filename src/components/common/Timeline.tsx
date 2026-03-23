@@ -28,10 +28,10 @@ const statusIcons = {
 };
 
 const statusColors = {
-  completed: "text-green-500 bg-green-500/10",
-  current: "text-blue-500 bg-blue-500/10",
+  completed: "text-success bg-success/10",
+  current: "text-info bg-info/10",
   pending: "text-muted-foreground bg-muted",
-  error: "text-red-500 bg-red-500/10",
+  error: "text-destructive bg-destructive/10",
 };
 
 export function Timeline({ events, className }: TimelineProps) {
