@@ -204,9 +204,9 @@ const tableCellVariants = cva(
       },
       highlight: {
         none: "",
-        success: "text-emerald-600 dark:text-emerald-400 font-medium",
-        warning: "text-amber-600 dark:text-amber-400 font-medium",
-        danger: "text-red-600 dark:text-red-400 font-medium",
+        success: "text-success font-medium",
+        warning: "text-warning font-medium",
+        danger: "text-destructive font-medium",
         primary: "text-primary font-medium",
       },
       truncate: {

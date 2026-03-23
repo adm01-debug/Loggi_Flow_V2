@@ -299,8 +299,8 @@ export default function AlertasCusto() {
               <div key={a.id} className={cn("card-interactive", isSelected(a.id) && "ring-2 ring-primary")} style={{ animationDelay: `${i * 30}ms` }}>
                 <div className="flex items-center gap-3">
                   <Checkbox checked={isSelected(a.id)} onCheckedChange={() => toggle(a.id)} />
-                  <div className={cn("p-2 rounded-lg", a.ativo ? "bg-green-100" : "bg-gray-100")}>
-                    <DollarSign className={cn("w-5 h-5", a.ativo ? "text-green-600" : "text-gray-400")} />
+                  <div className={cn("p-2 rounded-lg", a.ativo ? "bg-success/15" : "bg-muted")}>
+                    <DollarSign className={cn("w-5 h-5", a.ativo ? "text-success" : "text-muted-foreground")} />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold">{a.nome}</p>

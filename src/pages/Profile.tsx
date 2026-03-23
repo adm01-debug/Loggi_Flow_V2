@@ -76,12 +76,12 @@ export default function Profile() {
               </TabsContent>
               <TabsContent value="gamification" className="card-base p-6">
                 <div className="grid grid-cols-4 gap-4 mb-6">
-                  <div className="text-center"><Star className="w-6 h-6 text-amber-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.level}</p><p className="text-xs text-muted-foreground">Nível</p></div>
-                  <div className="text-center"><Trophy className="w-6 h-6 text-purple-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.total_xp}</p><p className="text-xs text-muted-foreground">XP</p></div>
-                  <div className="text-center"><Flame className="w-6 h-6 text-orange-500 mx-auto mb-1" /><p className="text-2xl font-bold">{stats.streak_days}</p><p className="text-xs text-muted-foreground">Streak</p></div>
-                  <div className="text-center"><CheckCircle2 className="w-6 h-6 text-green-500 mx-auto mb-1" /><p className="text-2xl font-bold">{unlockedAchievements}</p><p className="text-xs text-muted-foreground">Conquistas</p></div>
+                  <div className="text-center"><Star className="w-6 h-6 text-coins mx-auto mb-1" /><p className="text-2xl font-bold">{stats.level}</p><p className="text-xs text-muted-foreground">Nível</p></div>
+                  <div className="text-center"><Trophy className="w-6 h-6 text-xp mx-auto mb-1" /><p className="text-2xl font-bold">{stats.total_xp}</p><p className="text-xs text-muted-foreground">XP</p></div>
+                  <div className="text-center"><Flame className="w-6 h-6 text-streak mx-auto mb-1" /><p className="text-2xl font-bold">{stats.streak_days}</p><p className="text-xs text-muted-foreground">Streak</p></div>
+                  <div className="text-center"><CheckCircle2 className="w-6 h-6 text-success mx-auto mb-1" /><p className="text-2xl font-bold">{unlockedAchievements}</p><p className="text-xs text-muted-foreground">Conquistas</p></div>
                 </div>
-                <div className="flex items-center gap-2 text-amber-600"><span className="text-2xl">🪙</span><span className="text-xl font-bold">{stats.coins}</span><span className="text-sm">moedas</span></div>
+                <div className="flex items-center gap-2 text-coins"><span className="text-2xl">🪙</span><span className="text-xl font-bold">{stats.coins}</span><span className="text-sm">moedas</span></div>
               </TabsContent>
               <TabsContent value="security" className="card-base p-6 space-y-4">
                 <div><Label>Alterar Senha</Label><div className="flex gap-2 mt-1"><Input type="password" placeholder="Nova senha" /><Button variant="outline">Alterar</Button></div></div>
