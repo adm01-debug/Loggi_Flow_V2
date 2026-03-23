@@ -86,7 +86,7 @@ function OnboardingAchievementCard({ achievement, isUnlocked }: {
             <div className="flex items-center gap-2">
               <h4 className="font-medium text-sm truncate">{achievement.name}</h4>
               {isUnlocked ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
               ) : (
                 <Lock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
               )}
