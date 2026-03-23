@@ -54,7 +54,7 @@ export function useFreightIntelligence() {
         .limit(1000);
 
       if (error) throw error;
-      return (data || []).map((d: any) => ({
+      return (data || []).map((d: Record<string, unknown>) => ({
         id: d.id,
         numero_entrega: d.numero_entrega || "",
         cliente: d.cliente?.nome_fantasia || d.cliente?.razao_social || "Cliente",
