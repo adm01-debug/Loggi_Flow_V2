@@ -25,9 +25,9 @@ const avatarVariants = cva(
         none: "",
         default: "ring-2 ring-background",
         primary: "ring-2 ring-primary",
-        success: "ring-2 ring-emerald-500",
-        warning: "ring-2 ring-amber-500",
-        danger: "ring-2 ring-red-500",
+        success: "ring-2 ring-success",
+        warning: "ring-2 ring-warning",
+        danger: "ring-2 ring-destructive",
       },
       status: {
         none: "",
