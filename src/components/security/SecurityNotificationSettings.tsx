@@ -108,11 +108,11 @@ export function SecurityNotificationSettings() {
         </div>
 
         {/* Info */}
-        <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-4">
+        <div className="rounded-lg bg-info/10 border border-info/20 p-4">
           <div className="flex gap-3">
-            <Bell className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <Bell className="h-5 w-5 text-info flex-shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <p className="text-sm font-medium text-blue-500">
+              <p className="text-sm font-medium text-info">
                 Notificações em Tempo Real
               </p>
               <p className="text-xs text-muted-foreground">
