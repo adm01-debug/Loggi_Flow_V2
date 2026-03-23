@@ -195,9 +195,9 @@ export function RotaFormDialog({
           </div>
 
           {/* Destination section */}
-          <div className="space-y-4 p-4 border rounded-lg bg-red-50/50 dark:bg-red-950/20">
+          <div className="space-y-4 p-4 border rounded-lg bg-destructive/5">
             <h3 className="font-medium flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-red-500" />
+              <MapPin className="h-4 w-4 text-destructive" />
               Destino
             </h3>
             <div className="grid grid-cols-2 gap-4">

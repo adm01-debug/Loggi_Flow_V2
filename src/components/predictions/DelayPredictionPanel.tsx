@@ -139,8 +139,8 @@ function PredictionCard({ prediction, isExpanded, onToggle, getRiskColor, getRis
   return (
     <div 
       className={`border rounded-lg p-3 transition-all ${
-        prediction.risco === 'critico' ? 'border-red-300 bg-red-50/50' :
-        prediction.risco === 'alto' ? 'border-orange-300 bg-orange-50/50' :
+        prediction.risco === 'critico' ? 'border-destructive/30 bg-destructive/5' :
+        prediction.risco === 'alto' ? 'border-warning/30 bg-warning/5' :
         'border-border'
       }`}
     >

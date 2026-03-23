@@ -101,7 +101,7 @@ export default function Configuracoes() {
                 const isConnected = int.status === "connected";
                 return (
                   <div key={int.id} className="card-interactive flex items-center justify-between">
-                    <div className="flex items-center gap-3"><div className={cn("p-2 rounded-lg", isConnected ? "bg-green-100" : "bg-muted")}><Icon className={cn("w-5 h-5", isConnected ? "text-green-600" : "text-muted-foreground")} /></div><div><p className="font-semibold">{int.name}</p><p className="text-sm text-muted-foreground">ID: {int.id}</p></div></div>
+                    <div className="flex items-center gap-3"><div className={cn("p-2 rounded-lg", isConnected ? "bg-success/15" : "bg-muted")}><Icon className={cn("w-5 h-5", isConnected ? "text-success" : "text-muted-foreground")} /></div><div><p className="font-semibold">{int.name}</p><p className="text-sm text-muted-foreground">ID: {int.id}</p></div></div>
                     <div className="flex items-center gap-3">
                       <Badge variant={isConnected ? "default" : int.status === "error" ? "destructive" : "secondary"}>{isConnected ? <><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</> : int.status === "error" ? <><XCircle className="w-3 h-3 mr-1" />Erro</> : "Pendente"}</Badge>
                       <Button variant="outline" size="sm" onClick={() => handleValidateIntegration(int.id)}>Testar</Button>

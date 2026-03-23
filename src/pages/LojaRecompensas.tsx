@@ -148,7 +148,7 @@ export default function LojaRecompensas() {
                       </div>
                     </div>
                     <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center gap-1 text-amber-600"><Coins className="w-4 h-4" /><span className="font-bold">{r.coins_cost}</span></div>
+                      <div className="flex items-center gap-1 text-coins"><Coins className="w-4 h-4" /><span className="font-bold">{r.coins_cost}</span></div>
                       <Button size="sm" disabled={!r.available || !canAfford || redeemMutation.isPending} onClick={() => handleRedeem(r)}>
                         {!canAfford ? "Sem moedas" : !r.available ? "Indisponível" : "Resgatar"}
                       </Button>
