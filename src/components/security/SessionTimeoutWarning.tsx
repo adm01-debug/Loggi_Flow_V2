@@ -20,8 +20,8 @@ export function SessionTimeoutWarning() {
     <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <div className="mx-auto w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
-            <Clock className="h-6 w-6 text-amber-500" />
+          <div className="mx-auto w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center mb-4">
+            <Clock className="h-6 w-6 text-warning" />
           </div>
           <AlertDialogTitle className="text-center">
             Sessão Expirando

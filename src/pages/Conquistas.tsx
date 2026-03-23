@@ -200,15 +200,15 @@ export default function Conquistas() {
 
               {onboardingStats.unlocked === onboardingStats.total && onboardingStats.total > 0 && (
                 <motion.div 
-                  className="mt-4 p-3 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 flex items-center gap-3"
+                  className="mt-4 p-3 rounded-xl bg-gradient-to-r from-success/10 to-success/5 border border-success/20 flex items-center gap-3"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  <div className="p-2 rounded-lg bg-emerald-500 text-white">
+                  <div className="p-2 rounded-lg bg-success text-success-foreground">
                     <CheckCircle2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-medium text-emerald-600 dark:text-emerald-400">Onboarding Completo!</p>
+                    <p className="font-medium text-success">Onboarding Completo!</p>
                     <p className="text-sm text-muted-foreground">Você ganhou {onboardingStats.xpEarned} XP com as conquistas de onboarding</p>
                   </div>
                 </motion.div>

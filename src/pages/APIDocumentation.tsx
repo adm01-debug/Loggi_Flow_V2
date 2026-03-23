@@ -31,10 +31,10 @@ const endpoints: Endpoint[] = [
 ];
 
 const methodColors: Record<string, string> = { 
-  GET: "bg-green-100 text-green-700", 
-  POST: "bg-blue-100 text-blue-700", 
-  PUT: "bg-amber-100 text-amber-700", 
-  DELETE: "bg-red-100 text-red-700" 
+  GET: "bg-success/15 text-success", 
+  POST: "bg-info/15 text-info", 
+  PUT: "bg-warning/15 text-warning", 
+  DELETE: "bg-destructive/15 text-destructive" 
 };
 
 export default function APIDocumentation() {

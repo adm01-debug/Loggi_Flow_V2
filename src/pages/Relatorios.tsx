@@ -296,7 +296,7 @@ export default function Relatorios() {
                 <div className="space-y-4">
                   {driverPerformance.map((user, idx) => (
                     <div key={idx} className="flex items-center gap-4">
-                      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold", idx === 0 ? "bg-amber-500" : idx === 1 ? "bg-slate-400" : idx === 2 ? "bg-orange-500" : "bg-muted")}>{idx + 1}</div>
+                      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold", idx === 0 ? "bg-warning" : idx === 1 ? "bg-muted-foreground" : idx === 2 ? "bg-destructive/80" : "bg-muted")}>{idx + 1}</div>
                       <div className="flex-1 min-w-0"><p className="font-medium truncate">{user.name}</p><p className="text-sm text-muted-foreground">{user.xp.toLocaleString()} XP • Nível {user.nivel}</p></div>
                       <div className="text-right"><p className="font-medium text-success">{user.eficiencia}%</p><p className="text-xs text-muted-foreground">eficiência</p></div>
                     </div>
