@@ -66,8 +66,8 @@ export default function APIDocumentation() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-slate-400/20 to-slate-600/10">
-                <Code className="w-6 h-6 text-slate-500" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-muted to-muted/50">
+                <Code className="w-6 h-6 text-muted-foreground" />
               </div>
               API Documentation
             </h1>
