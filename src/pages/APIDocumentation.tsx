@@ -80,22 +80,22 @@ export default function APIDocumentation() {
 
         <div className="grid grid-cols-4 gap-4">
           <div className="stat-card text-center">
-            <Globe className="w-5 h-5 text-blue-500 mx-auto mb-2" />
+            <Globe className="w-5 h-5 text-info mx-auto mb-2" />
             <p className="text-2xl font-bold">{endpoints.length}</p>
             <p className="text-xs text-muted-foreground">Endpoints</p>
           </div>
           <div className="stat-card text-center">
-            <Zap className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+            <Zap className="w-5 h-5 text-warning mx-auto mb-2" />
             <p className="text-2xl font-bold">REST</p>
             <p className="text-xs text-muted-foreground">Protocolo</p>
           </div>
           <div className="stat-card text-center">
-            <Shield className="w-5 h-5 text-green-500 mx-auto mb-2" />
+            <Shield className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-2xl font-bold">JWT</p>
             <p className="text-xs text-muted-foreground">Auth</p>
           </div>
           <div className="stat-card text-center">
-            <Book className="w-5 h-5 text-purple-500 mx-auto mb-2" />
+            <Book className="w-5 h-5 text-accent-foreground mx-auto mb-2" />
             <p className="text-2xl font-bold">v1</p>
             <p className="text-xs text-muted-foreground">Versão</p>
           </div>
