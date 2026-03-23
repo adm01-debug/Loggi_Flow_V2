@@ -69,7 +69,7 @@ export default function Despachos() {
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
-      return (data || []).map((d: any) => ({
+      return (data || []).map((d: Record<string, unknown>) => ({
         id: d.id,
         numero: d.numero_entrega?.slice(-8) || d.id.slice(0, 8),
         numero_entrega: d.numero_entrega || "",
