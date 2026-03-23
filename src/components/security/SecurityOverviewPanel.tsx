@@ -478,13 +478,13 @@ export function SecurityOverviewPanel() {
             <div className="flex items-center gap-2">
               {stats.mfaEnabled ? (
                 <>
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
-                  <span className="text-lg font-semibold text-green-500">Ativo</span>
+                  <CheckCircle2 className="h-6 w-6 text-success" />
+                  <span className="text-lg font-semibold text-success">Ativo</span>
                 </>
               ) : (
                 <>
-                  <XCircle className="h-6 w-6 text-yellow-500" />
-                  <span className="text-lg font-semibold text-yellow-500">Inativo</span>
+                  <XCircle className="h-6 w-6 text-warning" />
+                  <span className="text-lg font-semibold text-warning">Inativo</span>
                 </>
               )}
             </div>
