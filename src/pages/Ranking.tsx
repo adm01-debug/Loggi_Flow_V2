@@ -217,7 +217,7 @@ export default function Ranking() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-amber-500/10 blur-3xl rounded-full" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-warning/10 blur-3xl rounded-full" />
               <div className="relative flex items-end justify-center gap-4 pt-4 pb-2">
                 {[1, 0, 2].map((pos) => {
                   const user = top3[pos];

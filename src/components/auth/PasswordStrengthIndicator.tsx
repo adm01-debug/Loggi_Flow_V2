@@ -108,9 +108,9 @@ export function PasswordStrengthIndicator({
           <span
             className={cn(
               "font-medium",
-              analysis.level === "strong" && "text-green-500",
-              analysis.level === "good" && "text-yellow-500",
-              analysis.level === "fair" && "text-orange-500",
+              analysis.level === "strong" && "text-success",
+              analysis.level === "good" && "text-warning",
+              analysis.level === "fair" && "text-warning/70",
               analysis.level === "weak" && "text-destructive"
             )}
           >
