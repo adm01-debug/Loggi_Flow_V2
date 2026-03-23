@@ -55,15 +55,15 @@ export function useFreightIntelligence() {
 
       if (error) throw error;
       return (data || []).map((d: Record<string, unknown>) => ({
-        id: d.id,
-        numero_entrega: d.numero_entrega || "",
-        cliente: d.cliente?.nome_fantasia || d.cliente?.razao_social || "Cliente",
-        estado: d.cliente?.estado || extractEstado(d.endereco_entrega) || "N/D",
-        cidade: d.cliente?.cidade || "N/D",
-        valor_frete: d.valor_frete || 0,
-        status: d.status || "",
-        created_at: d.created_at,
-        transportadora: d.transportadora?.nome_fantasia || "Sem transportadora",
+        id: d.id as string,
+        numero_entrega: (d.numero_entrega as string) || "",
+        cliente: (d.cliente as Record<string, string>)?.nome_fantasia || (d.cliente as Record<string, string>)?.razao_social || "Cliente",
+        estado: (d.cliente as Record<string, string>)?.estado || extractEstado(d.endereco_entrega as string) || "N/D",
+        cidade: (d.cliente as Record<string, string>)?.cidade || "N/D",
+        valor_frete: (d.valor_frete as number) || 0,
+        status: (d.status as string) || "",
+        created_at: d.created_at as string,
+        transportadora: (d.transportadora as Record<string, string>)?.nome_fantasia || "Sem transportadora",
       })) as FreightImpactEntry[];
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,

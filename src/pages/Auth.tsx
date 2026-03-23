@@ -361,7 +361,7 @@ function SocialLoginButtons({ isLoading }: { isLoading: boolean }) {
     } catch (err: unknown) {
       socialToast({
         title: "Erro ao entrar com Google",
-        description: err.message || "Tente novamente",
+        description: err instanceof Error ? err.message : "Tente novamente",
         variant: "destructive",
       });
     } finally {

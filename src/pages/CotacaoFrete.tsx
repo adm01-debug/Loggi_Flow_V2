@@ -25,7 +25,7 @@ export default function CotacaoFrete() {
     flow.calculate(data);
   }, [flow]);
 
-  const handleAddTable = useCallback((data: any) => {
+  const handleAddTable = useCallback((data: Record<string, unknown>) => {
     flow.addTabelaFrete?.mutate(data);
   }, [flow.addTabelaFrete]);
 

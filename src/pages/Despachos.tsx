@@ -70,16 +70,16 @@ export default function Despachos() {
         .limit(200);
       if (error) throw error;
       return (data || []).map((d: Record<string, unknown>) => ({
-        id: d.id,
-        numero: d.numero_entrega?.slice(-8) || d.id.slice(0, 8),
-        numero_entrega: d.numero_entrega || "",
-        cliente: d.cliente?.nome_fantasia || d.cliente?.razao_social || "Cliente",
-        destino: d.endereco_entrega || "Endereço",
-        status: d.status || "pronto_despacho",
-        transportadora: d.transportadora?.nome_fantasia,
-        nf_remessa: d.nf_remessa,
-        box_alocado: d.box_alocado,
-        created_at: d.created_at,
+        id: d.id as string,
+        numero: (d.numero_entrega as string)?.slice(-8) || (d.id as string).slice(0, 8),
+        numero_entrega: (d.numero_entrega as string) || "",
+        cliente: (d.cliente as Record<string, string>)?.nome_fantasia || (d.cliente as Record<string, string>)?.razao_social || "Cliente",
+        destino: (d.endereco_entrega as string) || "Endereço",
+        status: (d.status as string) || "pronto_despacho",
+        transportadora: (d.transportadora as Record<string, string>)?.nome_fantasia,
+        nf_remessa: d.nf_remessa as string | undefined,
+        box_alocado: d.box_alocado as string | undefined,
+        created_at: d.created_at as string,
       })) as Despacho[];
     },
   });
