@@ -148,7 +148,7 @@ export default function APIDocumentation() {
                   <span className="text-sm text-muted-foreground">{e.description}</span>
                   <Badge variant="outline">{e.category}</Badge>
                   <Button variant="ghost" size="icon" onClick={() => copyToClipboard(e.path, e.id)}>
-                    {copied === e.id ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    {copied === e.id ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
                   </Button>
                 </div>
               ))}
