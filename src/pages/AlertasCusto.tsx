@@ -224,17 +224,17 @@ export default function AlertasCusto() {
 
         <div className="grid grid-cols-3 gap-4">
           <div className="stat-card text-center">
-            <AlertTriangle className="w-5 h-5 text-red-500 mx-auto mb-2" />
+            <AlertTriangle className="w-5 h-5 text-destructive mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats.total}</p>
             <p className="text-xs text-muted-foreground">Total Alertas</p>
           </div>
           <div className="stat-card text-center">
-            <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" />
+            <CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats.ativos}</p>
             <p className="text-xs text-muted-foreground">Ativos</p>
           </div>
           <div className="stat-card text-center">
-            <Bell className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+            <Bell className="w-5 h-5 text-warning mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats.notificacoes}</p>
             <p className="text-xs text-muted-foreground">Notificações</p>
           </div>
