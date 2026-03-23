@@ -415,13 +415,13 @@ export function SecurityOverviewPanel() {
             <div className="flex items-center gap-1 text-xs">
               {stats.failedLoginAttempts > 0 ? (
                 <>
-                  <TrendingDown className="h-3 w-3 text-red-500" />
-                  <span className="text-red-500">{stats.failedLoginAttempts} falharam</span>
+                  <TrendingDown className="h-3 w-3 text-destructive" />
+                  <span className="text-destructive">{stats.failedLoginAttempts} falharam</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                  <span className="text-green-500">Todas bem-sucedidas</span>
+                  <CheckCircle2 className="h-3 w-3 text-success" />
+                  <span className="text-success">Todas bem-sucedidas</span>
                 </>
               )}
             </div>
