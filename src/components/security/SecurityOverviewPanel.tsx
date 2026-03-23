@@ -331,10 +331,10 @@ export function SecurityOverviewPanel() {
 
       {/* Alerts Section */}
       {alerts.length > 0 && (
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="border-warning/20 bg-warning/5">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              <AlertTriangle className="h-5 w-5 text-warning" />
               Alertas de Segurança
             </CardTitle>
           </CardHeader>
