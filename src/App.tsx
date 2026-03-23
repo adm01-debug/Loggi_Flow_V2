@@ -141,6 +141,7 @@ function AppRoutes() {
       <Route path="/aprovacao-reset-senha" element={<ProtectedRoute requiredRole="admin"><AprovacaoResetSenha /></ProtectedRoute>} />
       <Route path="/seguranca" element={<ProtectedRoute requiredRole="admin"><Seguranca /></ProtectedRoute>} />
       <Route path="/rate-limit" element={<ProtectedRoute requiredRole="admin"><RateLimitDashboard /></ProtectedRoute>} />
+      <Route path="/admin/telemetria" element={<ProtectedRoute requiredRole="admin"><AdminTelemetria /></ProtectedRoute>} />
       <Route path="/rastrear" element={<RastreamentoPublico />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<NotFound />} />
