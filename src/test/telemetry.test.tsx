@@ -116,7 +116,7 @@ describe("TelemetryCharts", () => {
     it("groups by 5-min buckets for 1h filter", () => {
       const rows = makeRows(10, { created_at: new Date().toISOString() });
       const { container } = render(<TelemetryCharts rows={rows} timeFilter="1h" />);
-      expect(container.querySelector('[data-testid="line-chart"]')).toBeInTheDocument();
+      expect(container.querySelector('[data-testid="area-chart"]')).toBeInTheDocument();
     });
 
     it("groups by 15-min buckets for 6h filter", () => {
