@@ -14,21 +14,21 @@ export function SecurityNotificationSettings() {
     switch (permission) {
       case 'granted':
         return {
-          icon: <CheckCircle2 className="h-5 w-5 text-green-500" />,
+          icon: <CheckCircle2 className="h-5 w-5 text-success" />,
           text: 'Ativadas',
-          color: 'bg-green-500/10 text-green-500 border-green-500/20',
+          color: 'bg-success/10 text-success border-success/20',
         };
       case 'denied':
         return {
-          icon: <XCircle className="h-5 w-5 text-red-500" />,
+          icon: <XCircle className="h-5 w-5 text-destructive" />,
           text: 'Bloqueadas',
-          color: 'bg-red-500/10 text-red-500 border-red-500/20',
+          color: 'bg-destructive/10 text-destructive border-destructive/20',
         };
       default:
         return {
-          icon: <AlertTriangle className="h-5 w-5 text-yellow-500" />,
+          icon: <AlertTriangle className="h-5 w-5 text-warning" />,
           text: 'Não configurado',
-          color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+          color: 'bg-warning/10 text-warning border-warning/20',
         };
     }
   };
