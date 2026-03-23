@@ -158,7 +158,7 @@ export default function Ranking() {
             <p className="text-[10px] sm:text-xs text-muted-foreground">XP Total</p>
           </motion.div>
           <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Trophy className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+            <Trophy className="w-5 h-5 text-warning mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{totalAchievements}</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Conquistas</p>
           </motion.div>
