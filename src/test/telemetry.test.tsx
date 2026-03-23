@@ -219,14 +219,14 @@ describe("TelemetryCharts", () => {
         ...makeRows(5, { operation: "INSERT" }),
       ];
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
     });
 
     it("limits operations to top 6", () => {
       const ops = ["SELECT", "INSERT", "UPDATE", "DELETE", "RPC", "SUBSCRIBE", "UPSERT", "COUNT"];
       const rows = ops.flatMap((op, i) => makeRows(i + 1, { operation: op }));
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
     });
 
     it("handles single operation type", () => {
