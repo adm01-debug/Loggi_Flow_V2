@@ -152,8 +152,7 @@ export default function RelatorioPDF() {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateTransportadorasReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateTransportadorasReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
     doc.setFontSize(14);
     doc.text('Performance de Transportadoras', 14, 50);
 
