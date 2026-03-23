@@ -217,9 +217,9 @@ export function SecurityOverviewPanel() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'warning': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      default: return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      case 'critical': return 'bg-destructive/10 text-destructive border-destructive/20';
+      case 'warning': return 'bg-warning/10 text-warning border-warning/20';
+      default: return 'bg-info/10 text-info border-info/20';
     }
   };
 
