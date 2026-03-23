@@ -289,9 +289,9 @@ export function SecurityOverviewPanel() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   {stats.securityScore >= 60 ? (
-                    <ShieldCheck className="h-5 w-5 text-green-500" />
+                    <ShieldCheck className="h-5 w-5 text-success" />
                   ) : (
-                    <ShieldAlert className="h-5 w-5 text-orange-500" />
+                    <ShieldAlert className="h-5 w-5 text-warning" />
                   )}
                   <span className="font-medium">{getScoreLabel(stats.securityScore)}</span>
                 </div>
@@ -305,21 +305,21 @@ export function SecurityOverviewPanel() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {stats.mfaEnabled ? (
-                  <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                     <Lock className="h-3 w-3 mr-1" />
                     MFA Ativo
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
                     <Unlock className="h-3 w-3 mr-1" />
                     MFA Inativo
                   </Badge>
                 )}
-                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                <Badge variant="outline" className="bg-info/10 text-info border-info/20">
                   <Smartphone className="h-3 w-3 mr-1" />
                   {stats.knownDevices} dispositivo(s)
                 </Badge>
-                <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                   <Users className="h-3 w-3 mr-1" />
                   {stats.activeSessions} sessão(ões) ativa(s)
                 </Badge>
