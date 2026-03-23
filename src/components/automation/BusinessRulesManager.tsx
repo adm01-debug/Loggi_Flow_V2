@@ -205,10 +205,10 @@ function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
           </div>
 
           {/* Conditions */}
-          <div className="p-4 rounded-lg bg-blue-500/10 space-y-4">
+          <div className="p-4 rounded-lg bg-info/10 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-medium">
-                <Badge variant="outline" className="bg-blue-500/20">SE</Badge>
+                <Badge variant="outline" className="bg-info/20">SE</Badge>
                 <span className="text-muted-foreground">Condições</span>
               </div>
               <Button variant="ghost" size="sm" onClick={addCondition}>
