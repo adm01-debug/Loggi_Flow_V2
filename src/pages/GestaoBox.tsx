@@ -63,13 +63,13 @@ export default function GestaoBox() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-400/20 to-indigo-600/10"><Box className="w-6 h-6 text-indigo-500" /></div>Gestão de BOX</h1><p className="text-muted-foreground mt-1">Mapa interativo dos 16 boxes</p></div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5"><Box className="w-6 h-6 text-primary" /></div>Gestão de BOX</h1><p className="text-muted-foreground mt-1">Mapa interativo dos 16 boxes</p></div>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Box className="w-5 h-5 text-indigo-500 mx-auto mb-2" /><p className="text-2xl font-bold">{boxes.length}</p><p className="text-xs text-muted-foreground">Total Boxes</p></div>
-          <div className="stat-card text-center"><Package className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{occupiedCount}</p><p className="text-xs text-muted-foreground">Ocupados</p></div>
-          <div className="stat-card text-center"><TrendingUp className="w-5 h-5 text-blue-500 mx-auto mb-2" /><p className="text-2xl font-bold">{availableCount}</p><p className="text-xs text-muted-foreground">Disponíveis</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-amber-500 mx-auto mb-2" /><p className="text-2xl font-bold">{occupancyRate}%</p><p className="text-xs text-muted-foreground">Ocupação</p></div>
+          <div className="stat-card text-center"><Box className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{boxes.length}</p><p className="text-xs text-muted-foreground">Total Boxes</p></div>
+          <div className="stat-card text-center"><Package className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{occupiedCount}</p><p className="text-xs text-muted-foreground">Ocupados</p></div>
+          <div className="stat-card text-center"><TrendingUp className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{availableCount}</p><p className="text-xs text-muted-foreground">Disponíveis</p></div>
+          <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{occupancyRate}%</p><p className="text-xs text-muted-foreground">Ocupação</p></div>
         </div>
         <FilterBar 
           search={filters.search} 

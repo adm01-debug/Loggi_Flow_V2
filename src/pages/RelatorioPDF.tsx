@@ -118,8 +118,7 @@ export default function RelatorioPDF() {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const generateEntregasReport = (doc: any, data: any[], autoTableFn: any) => {
+  const generateEntregasReport = (doc: InstanceType<typeof import('jspdf').default>, data: typeof entregas & object[], autoTableFn: (doc: unknown, opts: Record<string, unknown>) => void) => {
     doc.setFontSize(14);
     doc.text('Relatório de Entregas', 14, 50);
 

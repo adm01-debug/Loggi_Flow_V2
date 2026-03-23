@@ -183,7 +183,7 @@ function PredictionCard({ prediction, isExpanded, onToggle, getRiskColor, getRis
           {/* Reasons */}
           <div>
             <div className="flex items-center gap-2 text-sm font-medium mb-2">
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
+              <AlertTriangle className="h-4 w-4 text-warning" />
               Motivos identificados:
             </div>
             <ul className="text-sm text-muted-foreground pl-6 space-y-1">
