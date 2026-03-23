@@ -43,16 +43,17 @@ function makeTelemetryRow(overrides: Partial<{
   severity: string;
   created_at: string;
 }> = {}) {
-  return {
-    id: overrides.id ?? crypto.randomUUID(),
-    operation: overrides.operation ?? "SELECT",
-    table_name: overrides.table_name ?? "entregas",
-    rpc_name: overrides.rpc_name ?? null,
-    duration_ms: overrides.duration_ms ?? 5000,
-    record_count: overrides.record_count ?? 100,
-    severity: overrides.severity ?? "slow",
-    created_at: overrides.created_at ?? new Date().toISOString(),
+  const defaults = {
+    id: crypto.randomUUID(),
+    operation: "SELECT",
+    table_name: "entregas" as string | null,
+    rpc_name: null as string | null,
+    duration_ms: 5000,
+    record_count: 100 as number | null,
+    severity: "slow",
+    created_at: new Date().toISOString(),
   };
+  return { ...defaults, ...overrides };
 }
 
 function makeRows(count: number, overrides: Partial<ReturnType<typeof makeTelemetryRow>> = {}) {
