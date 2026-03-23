@@ -122,19 +122,19 @@ describe("TelemetryCharts", () => {
     it("groups by 15-min buckets for 6h filter", () => {
       const rows = makeRows(10, { created_at: new Date().toISOString() });
       render(<TelemetryCharts rows={rows} timeFilter="6h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("groups by hour for 24h filter", () => {
       const rows = makeRows(10);
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("groups by hour for 7d filter", () => {
       const rows = makeRows(10);
       render(<TelemetryCharts rows={rows} timeFilter="7d" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("limits timeline to last 20 buckets", () => {
@@ -145,7 +145,7 @@ describe("TelemetryCharts", () => {
         return makeTelemetryRow({ created_at: d.toISOString(), id: `t-${i}` });
       });
       render(<TelemetryCharts rows={rows} timeFilter="7d" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
   });
 
@@ -249,7 +249,7 @@ describe("TelemetryCharts", () => {
     it("handles rows with null table_name and rpc_name", () => {
       const rows = makeRows(3, { table_name: null, rpc_name: null });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles rows with rpc_name instead of table_name", () => {
@@ -261,33 +261,33 @@ describe("TelemetryCharts", () => {
     it("handles very large duration values", () => {
       const rows = makeRows(3, { duration_ms: 999999 });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles zero duration values", () => {
       const rows = makeRows(3, { duration_ms: 0 });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles rows with null record_count", () => {
       const rows = makeRows(3, { record_count: null });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles future dates", () => {
       const future = new Date(Date.now() + 86400000).toISOString();
       const rows = makeRows(3, { created_at: future });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles very old dates", () => {
       const old = new Date("2020-01-01T00:00:00Z").toISOString();
       const rows = makeRows(3, { created_at: old });
       render(<TelemetryCharts rows={rows} timeFilter="7d" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles unknown severity", () => {
@@ -313,7 +313,7 @@ describe("TelemetryCharts", () => {
       const rows = makeRows(5);
       const { rerender } = render(<TelemetryCharts rows={rows} timeFilter="1h" />);
       rerender(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("re-renders when rows change", () => {
