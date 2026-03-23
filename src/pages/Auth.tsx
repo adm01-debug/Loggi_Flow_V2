@@ -246,7 +246,7 @@ function TestimonialCard({ testimonial, isActive }: { testimonial: typeof testim
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: i * 0.1, type: "spring" }}
           >
-            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+            <Star className="w-4 h-4 fill-warning text-warning" />
           </motion.div>
         ))}
       </div>
@@ -1022,7 +1022,7 @@ export default function Auth() {
           >
             <div className="flex items-center justify-center gap-1 mb-2">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <Star key={i} className="w-4 h-4 fill-warning text-warning" />
               ))}
             </div>
             <p className="text-sm text-muted-foreground">

@@ -105,7 +105,7 @@ export function RotaResultsList({ rotas, isLoading, onSelectRota }: RotaResultsL
                     {/* Performance Score */}
                     <div className="text-right">
                       <div className="flex items-center gap-1">
-                        <Star className={`h-4 w-4 ${score >= 80 ? 'text-yellow-500' : score >= 50 ? 'text-blue-500' : 'text-muted-foreground'}`} />
+                        <Star className={`h-4 w-4 ${score >= 80 ? 'text-warning' : score >= 50 ? 'text-info' : 'text-muted-foreground'}`} />
                         <span className="font-bold">{score}</span>
                         <span className="text-xs text-muted-foreground">pts</span>
                       </div>

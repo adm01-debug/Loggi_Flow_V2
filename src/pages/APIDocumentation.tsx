@@ -66,8 +66,8 @@ export default function APIDocumentation() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-slate-400/20 to-slate-600/10">
-                <Code className="w-6 h-6 text-slate-500" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-muted to-muted/50">
+                <Code className="w-6 h-6 text-muted-foreground" />
               </div>
               API Documentation
             </h1>
@@ -80,22 +80,22 @@ export default function APIDocumentation() {
 
         <div className="grid grid-cols-4 gap-4">
           <div className="stat-card text-center">
-            <Globe className="w-5 h-5 text-blue-500 mx-auto mb-2" />
+            <Globe className="w-5 h-5 text-info mx-auto mb-2" />
             <p className="text-2xl font-bold">{endpoints.length}</p>
             <p className="text-xs text-muted-foreground">Endpoints</p>
           </div>
           <div className="stat-card text-center">
-            <Zap className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+            <Zap className="w-5 h-5 text-warning mx-auto mb-2" />
             <p className="text-2xl font-bold">REST</p>
             <p className="text-xs text-muted-foreground">Protocolo</p>
           </div>
           <div className="stat-card text-center">
-            <Shield className="w-5 h-5 text-green-500 mx-auto mb-2" />
+            <Shield className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-2xl font-bold">JWT</p>
             <p className="text-xs text-muted-foreground">Auth</p>
           </div>
           <div className="stat-card text-center">
-            <Book className="w-5 h-5 text-purple-500 mx-auto mb-2" />
+            <Book className="w-5 h-5 text-accent-foreground mx-auto mb-2" />
             <p className="text-2xl font-bold">v1</p>
             <p className="text-xs text-muted-foreground">Versão</p>
           </div>
@@ -148,7 +148,7 @@ export default function APIDocumentation() {
                   <span className="text-sm text-muted-foreground">{e.description}</span>
                   <Badge variant="outline">{e.category}</Badge>
                   <Button variant="ghost" size="icon" onClick={() => copyToClipboard(e.path, e.id)}>
-                    {copied === e.id ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    {copied === e.id ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
                   </Button>
                 </div>
               ))}

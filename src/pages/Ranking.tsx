@@ -107,10 +107,10 @@ export default function Ranking() {
     return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
   };
 
-  const podiumColors = ["from-amber-400 to-amber-600", "from-gray-300 to-gray-500", "from-amber-600 to-amber-800"];
+  const podiumColors = ["from-warning to-warning/80", "from-muted-foreground/60 to-muted-foreground", "from-warning/80 to-warning/60"];
   const podiumIcons = [Crown, Medal, Award];
   const podiumHeights = ["h-28", "h-20", "h-14"];
-  const podiumBg = ["bg-gradient-to-t from-amber-500 to-amber-400", "bg-gradient-to-t from-gray-400 to-gray-300", "bg-gradient-to-t from-amber-700 to-amber-600"];
+  const podiumBg = ["bg-gradient-to-t from-warning to-warning/80", "bg-gradient-to-t from-muted-foreground to-muted-foreground/60", "bg-gradient-to-t from-warning/60 to-warning/80"];
 
   const handleClearFilters = () => {
     clearFilters();
@@ -163,7 +163,7 @@ export default function Ranking() {
             <p className="text-[10px] sm:text-xs text-muted-foreground">Conquistas</p>
           </motion.div>
           <motion.div className="stat-card text-center p-3 sm:p-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Target className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
+            <Target className="w-5 h-5 text-success mx-auto mb-2" />
             <p className="text-xl sm:text-2xl font-bold">{currentUserRank?.rank || "-"}</p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Sua Posição</p>
           </motion.div>
@@ -191,15 +191,15 @@ export default function Ranking() {
               <div className="flex-1">
                 <p className="font-semibold text-lg">{currentUserRank.name} <Badge variant="secondary" className="ml-2">Você</Badge></p>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                  <span className="flex items-center gap-1"><Zap className="w-4 h-4 text-yellow-500" />{currentUserRank.xp.toLocaleString()} XP</span>
-                  <span className="flex items-center gap-1"><Star className="w-4 h-4 text-purple-500" />Nível {currentUserRank.level}</span>
-                  {currentUserRank.streak > 0 && <span className="flex items-center gap-1"><Flame className="w-4 h-4 text-orange-500" />{currentUserRank.streak} dias</span>}
-                  <span className="flex items-center gap-1"><Trophy className="w-4 h-4 text-amber-500" />{currentUserRank.achievements}</span>
+                  <span className="flex items-center gap-1"><Zap className="w-4 h-4 text-warning" />{currentUserRank.xp.toLocaleString()} XP</span>
+                  <span className="flex items-center gap-1"><Star className="w-4 h-4 text-accent-foreground" />Nível {currentUserRank.level}</span>
+                  {currentUserRank.streak > 0 && <span className="flex items-center gap-1"><Flame className="w-4 h-4 text-warning" />{currentUserRank.streak} dias</span>}
+                  <span className="flex items-center gap-1"><Trophy className="w-4 h-4 text-warning" />{currentUserRank.achievements}</span>
                 </div>
               </div>
               <div className="text-right hidden sm:block">
                 <p className="text-sm text-muted-foreground">Moedas</p>
-                <p className="text-lg font-bold flex items-center gap-1 justify-end"><Coins className="w-4 h-4 text-yellow-500" />{currentUserRank.coins.toLocaleString()}</p>
+                <p className="text-lg font-bold flex items-center gap-1 justify-end"><Coins className="w-4 h-4 text-warning" />{currentUserRank.coins.toLocaleString()}</p>
               </div>
             </div>
           </motion.div>
@@ -246,7 +246,7 @@ export default function Ranking() {
                         </div>
                         {pos === 0 && (
                           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                            <Sparkles className="w-6 h-6 text-amber-400 animate-pulse" />
+                            <Sparkles className="w-6 h-6 text-warning animate-pulse" />
                           </div>
                         )}
                       </div>
@@ -336,11 +336,11 @@ export default function Ranking() {
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm",
                     rankUser.rank === 1
-                      ? "bg-gradient-to-br from-amber-400 to-amber-600 text-white"
+                      ? "bg-gradient-to-br from-warning to-warning/80 text-warning-foreground"
                       : rankUser.rank === 2
-                      ? "bg-gradient-to-br from-gray-300 to-gray-500 text-white"
+                      ? "bg-gradient-to-br from-muted-foreground/60 to-muted-foreground text-white"
                       : rankUser.rank === 3
-                      ? "bg-gradient-to-br from-amber-600 to-amber-800 text-white"
+                      ? "bg-gradient-to-br from-warning/80 to-warning/60 text-warning-foreground"
                       : "bg-muted"
                   )}
                 >
@@ -362,12 +362,12 @@ export default function Ranking() {
                     <Badge variant="outline" className="text-xs">Nível {rankUser.level}</Badge>
                     {rankUser.streak > 0 && (
                       <span className="flex items-center gap-1">
-                        <Flame className="w-3 h-3 text-orange-500" />
+                        <Flame className="w-3 h-3 text-warning" />
                         {rankUser.streak}
                       </span>
                     )}
                     <span className="flex items-center gap-1">
-                      <Trophy className="w-3 h-3 text-amber-500" />
+                      <Trophy className="w-3 h-3 text-warning" />
                       {rankUser.achievements}
                     </span>
                   </div>

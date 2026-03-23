@@ -28,7 +28,7 @@ export function SessionTimeoutWarning() {
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
             Sua sessão expira em{" "}
-            <span className="font-semibold text-amber-500">
+            <span className="font-semibold text-warning">
               {sessionInfo.remainingMinutes} minuto{sessionInfo.remainingMinutes !== 1 ? "s" : ""}
             </span>
             . Deseja continuar conectado?

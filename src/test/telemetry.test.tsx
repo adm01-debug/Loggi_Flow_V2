@@ -8,10 +8,12 @@ vi.mock("recharts", () => {
   const MockLineChart = ({ children }: any) => <div data-testid="line-chart">{children}</div>;
   const MockBarChart = ({ children }: any) => <div data-testid="bar-chart">{children}</div>;
   const MockPieChart = ({ children }: any) => <div data-testid="pie-chart">{children}</div>;
+  const MockAreaChart = ({ children }: any) => <div data-testid="area-chart">{children}</div>;
   const MockPie = ({ children }: any) => <div>{children}</div>;
   const MockCell = () => <div />;
   const MockBar = () => <div />;
   const MockLine = () => <div />;
+  const MockArea = () => <div />;
   const MockXAxis = () => <div />;
   const MockYAxis = () => <div />;
   const MockCartesianGrid = () => <div />;
@@ -21,10 +23,12 @@ vi.mock("recharts", () => {
     LineChart: MockLineChart,
     BarChart: MockBarChart,
     PieChart: MockPieChart,
+    AreaChart: MockAreaChart,
     Pie: MockPie,
     Cell: MockCell,
     Bar: MockBar,
     Line: MockLine,
+    Area: MockArea,
     XAxis: MockXAxis,
     YAxis: MockYAxis,
     CartesianGrid: MockCartesianGrid,
@@ -75,7 +79,7 @@ describe("TelemetryCharts", () => {
 
     it("renders charts when rows are provided", () => {
       render(<TelemetryCharts rows={makeRows(5)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
       expect(screen.getByText("Por Severidade")).toBeInTheDocument();
     });
 
@@ -85,12 +89,12 @@ describe("TelemetryCharts", () => {
         ...makeRows(2, { operation: "INSERT" }),
       ];
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
 
-    it("renders line chart component", () => {
+    it("renders area chart component", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="1h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart").length).toBeGreaterThanOrEqual(1);
     });
 
     it("renders pie chart component", () => {
@@ -100,7 +104,7 @@ describe("TelemetryCharts", () => {
 
     it("renders bar chart when operations data exists", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -112,25 +116,25 @@ describe("TelemetryCharts", () => {
     it("groups by 5-min buckets for 1h filter", () => {
       const rows = makeRows(10, { created_at: new Date().toISOString() });
       const { container } = render(<TelemetryCharts rows={rows} timeFilter="1h" />);
-      expect(container.querySelector('[data-testid="line-chart"]')).toBeInTheDocument();
+      expect(container.querySelector('[data-testid="area-chart"]')).toBeInTheDocument();
     });
 
     it("groups by 15-min buckets for 6h filter", () => {
       const rows = makeRows(10, { created_at: new Date().toISOString() });
       render(<TelemetryCharts rows={rows} timeFilter="6h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("groups by hour for 24h filter", () => {
       const rows = makeRows(10);
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("groups by hour for 7d filter", () => {
       const rows = makeRows(10);
       render(<TelemetryCharts rows={rows} timeFilter="7d" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("limits timeline to last 20 buckets", () => {
@@ -141,7 +145,7 @@ describe("TelemetryCharts", () => {
         return makeTelemetryRow({ created_at: d.toISOString(), id: `t-${i}` });
       });
       render(<TelemetryCharts rows={rows} timeFilter="7d" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
   });
 
@@ -205,7 +209,7 @@ describe("TelemetryCharts", () => {
         ...makeRows(1, { operation: "UPDATE" }),
       ];
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
 
     it("sorts operations by count descending", () => {
@@ -215,20 +219,20 @@ describe("TelemetryCharts", () => {
         ...makeRows(5, { operation: "INSERT" }),
       ];
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
     });
 
     it("limits operations to top 6", () => {
       const ops = ["SELECT", "INSERT", "UPDATE", "DELETE", "RPC", "SUBSCRIBE", "UPSERT", "COUNT"];
       const rows = ops.flatMap((op, i) => makeRows(i + 1, { operation: op }));
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
     });
 
     it("handles single operation type", () => {
       const rows = makeRows(10, { operation: "SELECT" });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
   });
 
@@ -239,51 +243,51 @@ describe("TelemetryCharts", () => {
   describe("Edge cases", () => {
     it("handles single row", () => {
       render(<TelemetryCharts rows={[makeTelemetryRow()]} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
 
     it("handles rows with null table_name and rpc_name", () => {
       const rows = makeRows(3, { table_name: null, rpc_name: null });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles rows with rpc_name instead of table_name", () => {
       const rows = makeRows(3, { table_name: null, rpc_name: "get_leaderboard" });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles very large duration values", () => {
       const rows = makeRows(3, { duration_ms: 999999 });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles zero duration values", () => {
       const rows = makeRows(3, { duration_ms: 0 });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles rows with null record_count", () => {
       const rows = makeRows(3, { record_count: null });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles future dates", () => {
       const future = new Date(Date.now() + 86400000).toISOString();
       const rows = makeRows(3, { created_at: future });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles very old dates", () => {
       const old = new Date("2020-01-01T00:00:00Z").toISOString();
       const rows = makeRows(3, { created_at: old });
       render(<TelemetryCharts rows={rows} timeFilter="7d" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("handles unknown severity", () => {
@@ -296,7 +300,7 @@ describe("TelemetryCharts", () => {
     it("handles large dataset (200 rows)", () => {
       const rows = makeRows(200);
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
   });
 
@@ -309,18 +313,18 @@ describe("TelemetryCharts", () => {
       const rows = makeRows(5);
       const { rerender } = render(<TelemetryCharts rows={rows} timeFilter="1h" />);
       rerender(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByTestId("line-chart")).toBeInTheDocument();
+      expect(screen.getAllByTestId("area-chart")[0]).toBeInTheDocument();
     });
 
     it("re-renders when rows change", () => {
       const { rerender } = render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
       rerender(<TelemetryCharts rows={makeRows(10)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
 
     it("transitions from data to empty gracefully", () => {
       const { rerender, container } = render(<TelemetryCharts rows={makeRows(5)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
       rerender(<TelemetryCharts rows={[]} timeFilter="24h" />);
       expect(container.innerHTML).toBe("");
     });
@@ -328,7 +332,7 @@ describe("TelemetryCharts", () => {
     it("transitions from empty to data gracefully", () => {
       const { rerender } = render(<TelemetryCharts rows={[]} timeFilter="24h" />);
       rerender(<TelemetryCharts rows={makeRows(5)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
   });
 
@@ -337,9 +341,9 @@ describe("TelemetryCharts", () => {
   // ═══════════════════════════════════════════════════════════
 
   describe("Card titles and structure", () => {
-    it("displays 'Queries ao Longo do Tempo' title", () => {
+    it("displays 'Alertas ao Longo do Tempo' title", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
 
     it("displays 'Por Severidade' title", () => {
@@ -347,15 +351,15 @@ describe("TelemetryCharts", () => {
       expect(screen.getByText("Por Severidade")).toBeInTheDocument();
     });
 
-    it("displays 'Por Tipo de Operação' title", () => {
+    it("displays 'Por Operação' title", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
 
-    it("renders 3 responsive containers (line, pie, bar)", () => {
+    it("renders 5 responsive containers (2 area, pie, 2 bar)", () => {
       render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
       const containers = screen.getAllByTestId("responsive-container");
-      expect(containers.length).toBe(3);
+      expect(containers.length).toBe(5);
     });
   });
 });

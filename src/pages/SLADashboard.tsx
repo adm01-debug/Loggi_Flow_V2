@@ -49,7 +49,7 @@ export default function SLADashboard() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/10"><Target className="w-6 h-6 text-emerald-500" /></div>Dashboard SLA</h1><p className="text-muted-foreground mt-1">Monitoramento de Service Level Agreement</p></div>
+          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-success/20 to-success/5"><Target className="w-6 h-6 text-success" /></div>Dashboard SLA</h1><p className="text-muted-foreground mt-1">Monitoramento de Service Level Agreement</p></div>
           <div className="flex gap-2"><DateRangePicker value={dateRange} onChange={handleDateChange} /><Button variant="outline" onClick={() => refetch()}><RefreshCw className="w-4 h-4 mr-2" />Atualizar</Button></div>
         </div>
         <div className="grid grid-cols-4 gap-4">
