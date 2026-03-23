@@ -209,7 +209,7 @@ describe("TelemetryCharts", () => {
         ...makeRows(1, { operation: "UPDATE" }),
       ];
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
 
     it("sorts operations by count descending", () => {
@@ -232,7 +232,7 @@ describe("TelemetryCharts", () => {
     it("handles single operation type", () => {
       const rows = makeRows(10, { operation: "SELECT" });
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Por Tipo de Operação")).toBeInTheDocument();
+      expect(screen.getByText("Por Operação")).toBeInTheDocument();
     });
   });
 
@@ -243,7 +243,7 @@ describe("TelemetryCharts", () => {
   describe("Edge cases", () => {
     it("handles single row", () => {
       render(<TelemetryCharts rows={[makeTelemetryRow()]} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
 
     it("handles rows with null table_name and rpc_name", () => {
@@ -300,7 +300,7 @@ describe("TelemetryCharts", () => {
     it("handles large dataset (200 rows)", () => {
       const rows = makeRows(200);
       render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
   });
 
@@ -319,12 +319,12 @@ describe("TelemetryCharts", () => {
     it("re-renders when rows change", () => {
       const { rerender } = render(<TelemetryCharts rows={makeRows(3)} timeFilter="24h" />);
       rerender(<TelemetryCharts rows={makeRows(10)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
 
     it("transitions from data to empty gracefully", () => {
       const { rerender, container } = render(<TelemetryCharts rows={makeRows(5)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
       rerender(<TelemetryCharts rows={[]} timeFilter="24h" />);
       expect(container.innerHTML).toBe("");
     });
@@ -332,7 +332,7 @@ describe("TelemetryCharts", () => {
     it("transitions from empty to data gracefully", () => {
       const { rerender } = render(<TelemetryCharts rows={[]} timeFilter="24h" />);
       rerender(<TelemetryCharts rows={makeRows(5)} timeFilter="24h" />);
-      expect(screen.getByText("Queries ao Longo do Tempo")).toBeInTheDocument();
+      expect(screen.getByText("Alertas ao Longo do Tempo")).toBeInTheDocument();
     });
   });
 
