@@ -99,8 +99,8 @@ export function RateLimitDashboardPanel() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-blue-500/10">
-                <Gauge className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-full bg-info/10">
+                <Gauge className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.topEndpoints.length}</p>
