@@ -58,6 +58,7 @@ const ImportacaoMassa = lazy(() => import("./pages/ImportacaoMassa"));
 const AutomacaoRegras = lazy(() => import("./pages/AutomacaoRegras"));
 const CentralRastreamento = lazy(() => import("./pages/CentralRastreamento"));
 const AdminTelemetria = lazy(() => import("./pages/AdminTelemetria"));
+const GestaoWebhooks = lazy(() => import("./pages/GestaoWebhooks"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load non-critical providers
@@ -142,6 +143,7 @@ function AppRoutes() {
       <Route path="/seguranca" element={<ProtectedRoute requiredRole="admin"><Seguranca /></ProtectedRoute>} />
       <Route path="/rate-limit" element={<ProtectedRoute requiredRole="admin"><RateLimitDashboard /></ProtectedRoute>} />
       <Route path="/admin/telemetria" element={<ProtectedRoute requiredRole="admin"><AdminTelemetria /></ProtectedRoute>} />
+      <Route path="/webhooks" element={<ProtectedRoute requiredRole="admin"><GestaoWebhooks /></ProtectedRoute>} />
       <Route path="/rastrear" element={<RastreamentoPublico />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<NotFound />} />

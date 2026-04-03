@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calculator, TrendingUp, MapPin, Truck, Clock, Bookmark, SplitSquareVertical } from 'lucide-react';
+import { Calculator, TrendingUp, MapPin, Truck, Clock, Bookmark, SplitSquareVertical, FileCheck } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { DataExporter } from '@/components/common/DataExporter';
@@ -16,6 +16,7 @@ import {
   CargoTemplates,
   ScenarioSimulator,
 } from '@/components/freight';
+import { CotacoesFreteManager } from '@/components/freight/CotacoesFreteManager';
 import type { QuotationFormData } from '@/components/freight/QuotationForm';
 
 export default function CotacaoFrete() {
@@ -86,6 +87,7 @@ export default function CotacaoFrete() {
             <TabsTrigger value="historico"><Clock className="w-4 h-4 mr-1" />Histórico</TabsTrigger>
             <TabsTrigger value="templates"><Bookmark className="w-4 h-4 mr-1" />Templates</TabsTrigger>
             <TabsTrigger value="cenarios"><SplitSquareVertical className="w-4 h-4 mr-1" />Cenários</TabsTrigger>
+            <TabsTrigger value="cotacoes-salvas"><FileCheck className="w-4 h-4 mr-1" />Cotações Salvas</TabsTrigger>
             <TabsTrigger value="ia">🤖 IA Recomendação</TabsTrigger>
           </TabsList>
 
@@ -128,6 +130,10 @@ export default function CotacaoFrete() {
 
           <TabsContent value="cenarios" className="space-y-4">
             <ScenarioSimulator cargoData={flow.cargoData} simulateScenario={flow.simulateScenario} />
+          </TabsContent>
+
+          <TabsContent value="cotacoes-salvas" className="space-y-4">
+            <CotacoesFreteManager />
           </TabsContent>
 
           <TabsContent value="ia">

@@ -85,7 +85,7 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
     };
   }, [isAdmin, queryClient]);
 
-  // Log a new security event
+  // Log a new security event via edge function
   const logEventMutation = useMutation({
     mutationFn: async (event: {
       event_type: string;
@@ -93,24 +93,47 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
       severity?: string;
       metadata?: Record<string, unknown>;
     }) => {
-      const { data, error } = await supabase
-        .from("security_events")
-        .insert([{
+      // Try edge function first for enriched logging (IP detection, etc.)
+      const { data, error } = await supabase.functions.invoke('log-security-event', {
+        body: {
           event_type: event.event_type,
           description: event.description,
           severity: event.severity || "info",
-          metadata: (event.metadata || {}) as unknown as Record<string, never>,
-          ip_address: null,
+          metadata: event.metadata || {},
           user_agent: navigator.userAgent,
-        }])
-        .select()
-        .single();
+        },
+      });
 
-      if (error) throw error;
+      if (error) {
+        // Fallback to direct DB insert
+        const { error: dbError } = await supabase
+          .from("security_events")
+          .insert([{
+            event_type: event.event_type,
+            description: event.description,
+            severity: event.severity || "info",
+            metadata: (event.metadata || {}) as unknown as Record<string, never>,
+            ip_address: null,
+            user_agent: navigator.userAgent,
+          }]);
+        if (dbError) throw dbError;
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["security-events"] });
+    },
+  });
+
+  // Check rate limit status
+  const checkRateLimit = useMutation({
+    mutationFn: async (params: { action: string; identifier?: string }) => {
+      const { data, error } = await supabase.functions.invoke('check-rate-limit', {
+        body: params,
+      });
+      if (error) throw error;
+      return data as { allowed: boolean; remaining: number; resetAt: string };
     },
   });
 
@@ -161,5 +184,8 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
     refetch,
     logEvent: logEventMutation.mutate,
     isLogging: logEventMutation.isPending,
+    checkRateLimit: checkRateLimit.mutate,
+    isCheckingRateLimit: checkRateLimit.isPending,
+    rateLimitResult: checkRateLimit.data,
   };
 }

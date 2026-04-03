@@ -5,7 +5,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Gift, Coins, ShoppingCart, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Loader2, Sparkles, ArrowUpDown, ChevronUp, ChevronDown, LucideIcon } from "lucide-react";
+import { Gift, Coins, ShoppingCart, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Loader2, Sparkles, ArrowUpDown, ChevronUp, ChevronDown, LucideIcon, History } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
@@ -16,6 +16,7 @@ import { FilterBar } from "@/components/common/FilterBar";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
+import { RewardPurchaseHistory } from "@/components/rewards/RewardPurchaseHistory";
 
 interface RewardItem { id: string; name: string; description: string; coins_cost: number; category: string; icon: string; rarity: string; available: boolean; stock: number | null; }
 
@@ -110,7 +111,7 @@ export default function LojaRecompensas() {
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-coins/15 text-coins"><Coins className="w-5 h-5" /><span className="font-bold text-lg">{coins}</span><span className="text-sm">moedas</span></div>
         </div>
 
-        <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="all">Todos</TabsTrigger><TabsTrigger value="alimentacao">Alimentação</TabsTrigger><TabsTrigger value="vestuario">Vestuário</TabsTrigger><TabsTrigger value="tecnologia">Tecnologia</TabsTrigger><TabsTrigger value="experiencia">Experiências</TabsTrigger></TabsList></Tabs>
+        <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="all">Todos</TabsTrigger><TabsTrigger value="alimentacao">Alimentação</TabsTrigger><TabsTrigger value="vestuario">Vestuário</TabsTrigger><TabsTrigger value="tecnologia">Tecnologia</TabsTrigger><TabsTrigger value="experiencia">Experiências</TabsTrigger><TabsTrigger value="historico"><History className="w-4 h-4 mr-1" />Meus Resgates</TabsTrigger></TabsList></Tabs>
 
         <FilterBar 
           search={filters.search} 
@@ -160,7 +161,9 @@ export default function LojaRecompensas() {
           </div>
         )}
 
-        {!isLoading && sortedData.length === 0 && <div className="flex flex-col items-center py-12"><ShoppingCart className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma recompensa encontrada</p></div>}
+        {!isLoading && sortedData.length === 0 && tab !== "historico" && <div className="flex flex-col items-center py-12"><ShoppingCart className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma recompensa encontrada</p></div>}
+
+        {tab === "historico" && <RewardPurchaseHistory />}
         {sortedData.length > 0 && (
           <Pagination
             currentPage={pagination.currentPage}
