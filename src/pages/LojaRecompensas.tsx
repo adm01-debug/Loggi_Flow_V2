@@ -16,6 +16,7 @@ import { FilterBar } from "@/components/common/FilterBar";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
+import { RewardPurchaseHistory } from "@/components/rewards/RewardPurchaseHistory";
 
 interface RewardItem { id: string; name: string; description: string; coins_cost: number; category: string; icon: string; rarity: string; available: boolean; stock: number | null; }
 
