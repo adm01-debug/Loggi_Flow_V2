@@ -16,6 +16,7 @@ import {
   CargoTemplates,
   ScenarioSimulator,
 } from '@/components/freight';
+import { CotacoesFreteManager } from '@/components/freight/CotacoesFreteManager';
 import type { QuotationFormData } from '@/components/freight/QuotationForm';
 
 export default function CotacaoFrete() {
