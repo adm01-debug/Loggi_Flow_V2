@@ -79,6 +79,9 @@ export { useRodonavesTracking, RODONAVES_STATUS_MAP } from './useRodonavesTracki
 // Integration Hooks
 // ============================================
 export { useLalamoveTracking } from './useLalamoveTracking';
+export { useLalamoveOrders } from './useLalamoveOrders';
+export { useRodonavesWebhook } from './useRodonavesWebhook';
+export { useExternalDbBridge } from './useExternalDbBridge';
 export { useTimezone } from './useTimezone';
 export { usePushNotifications } from './usePushNotifications';
 export { useNotifications } from './useNotifications';
@@ -86,6 +89,9 @@ export { useNotificationPreferences } from './useNotificationPreferences';
 export { useIntegrationValidation } from './useIntegrationValidation';
 export { useWhatsAppNotification } from './useWhatsAppNotification';
 export { useMelhorEnvio } from './useMelhorEnvio';
+export { useRewardPurchases } from './useRewardPurchases';
+export { useClientWebhooks } from './useClientWebhooks';
+export { useCotacoesFrete } from './useCotacoesFrete';
 
 // ============================================
 // Logistics & Business

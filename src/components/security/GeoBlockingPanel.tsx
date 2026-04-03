@@ -91,6 +91,58 @@ export function GeoBlockingPanel() {
   const [customName, setCustomName] = useState("");
   const [useCustom, setUseCustom] = useState(false);
 
+  // Fetch geo_blocking_settings (mode: whitelist/blacklist)
+  const { data: blockingSettings } = useQuery({
+    queryKey: ["geo-blocking-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("geo_blocking_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  // Update blocking mode
+  const updateModeMutation = useMutation({
+    mutationFn: async (mode: string) => {
+      if (blockingSettings?.id) {
+        const { error } = await supabase
+          .from("geo_blocking_settings")
+          .update({ mode, default_action: mode === "whitelist" ? "block" : "allow" })
+          .eq("id", blockingSettings.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("geo_blocking_settings")
+          .insert({ mode, default_action: mode === "whitelist" ? "block" : "allow" });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["geo-blocking-settings"] });
+      toast.success("Modo de bloqueio atualizado");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  // Fetch geo_blocking_rules (advanced rules)
+  const { data: blockingRules = [] } = useQuery({
+    queryKey: ["geo-blocking-rules"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("geo_blocking_rules")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
   // Fetch allowed countries
   const { data: rules = [], isLoading: rulesLoading } = useQuery({
     queryKey: ["geo-access-rules"],
@@ -225,6 +277,45 @@ export function GeoBlockingPanel() {
 
   return (
     <div className="space-y-6">
+      {/* Blocking Mode Configuration */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Modo de Bloqueio Geográfico
+          </CardTitle>
+          <CardDescription>
+            Configure o modo de controle de acesso geográfico
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <Select
+              value={blockingSettings?.mode || "whitelist"}
+              onValueChange={(v) => updateModeMutation.mutate(v)}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="whitelist">Whitelist (permitir listados)</SelectItem>
+                <SelectItem value="blacklist">Blacklist (bloquear listados)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">
+              {blockingSettings?.mode === "blacklist"
+                ? "Todos os países são permitidos, exceto os listados"
+                : "Apenas países na whitelist podem acessar"}
+            </p>
+            {blockingRules.length > 0 && (
+              <Badge variant="outline" className="sm:ml-auto">
+                {blockingRules.filter(r => r.is_active).length} regras avançadas ativas
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
