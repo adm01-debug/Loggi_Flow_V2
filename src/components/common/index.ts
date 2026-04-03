@@ -48,3 +48,6 @@ export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 
 // Bulk Actions
 export { BulkActions, useSelection } from './BulkActions';
+
+// Responsive
+export { ResponsiveTable } from './ResponsiveTable';

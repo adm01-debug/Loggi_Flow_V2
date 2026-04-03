@@ -112,18 +112,28 @@ const adminItems = [
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const [openSections, setOpenSections] = useState<string[]>(["overview", "operations"]);
   const location = useLocation();
   const { isAdmin } = useAuth();
   const { prefetch } = usePrefetch();
+
+  // Determine initially active section based on current route
+  const getActiveSection = () => {
+    for (const section of menuSections) {
+      if (section.items.some(item => location.pathname === item.url)) {
+        return section.id;
+      }
+    }
+    return "overview";
+  };
+
+  // Exclusive accordion — only one section open at a time
+  const [openSection, setOpenSection] = useState<string | null>(getActiveSection);
 
   const isActive = (path: string) => location.pathname === path;
   const isSectionActive = (section: MenuSection) => section.items.some(item => isActive(item.url));
 
   const toggleSection = (id: string) => {
-    setOpenSections(prev => 
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
+    setOpenSection(prev => prev === id ? null : id);
   };
 
   return (
@@ -158,11 +168,11 @@ export function AppSidebar() {
       <div className="absolute top-[73px] left-0 right-0 h-6 bg-gradient-to-b from-sidebar to-transparent z-10 pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto scrollbar-thin">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
         {menuSections.map((section) => (
           <Collapsible 
             key={section.id} 
-            open={openSections.includes(section.id) || collapsed}
+            open={openSection === section.id || collapsed}
             onOpenChange={() => !collapsed && toggleSection(section.id)}
           >
             <CollapsibleTrigger asChild>
@@ -183,9 +193,12 @@ export function AppSidebar() {
                     <span className="flex-1 text-left text-xs font-semibold uppercase tracking-wider">
                       {section.title}
                     </span>
+                    <span className="text-[10px] font-medium text-muted-foreground/60 tabular-nums mr-1">
+                      {section.items.length}
+                    </span>
                     <ChevronDown className={cn(
                       "w-4 h-4 transition-transform duration-200",
-                      openSections.includes(section.id) && "rotate-180"
+                      openSection === section.id && "rotate-180"
                     )} />
                   </>
                 )}
@@ -202,13 +215,17 @@ export function AppSidebar() {
                     to={item.url}
                     onMouseEnter={() => prefetch(item.url)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group/item",
+                      "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group/item relative",
                       collapsed ? "justify-center" : "ml-2",
                       isActive(item.url)
                         ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                         : "text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground"
                     )}
                   >
+                    {/* Active indicator pill */}
+                    {isActive(item.url) && !collapsed && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-primary-foreground/60" />
+                    )}
                     <item.icon className={cn(
                       "w-4 h-4 flex-shrink-0 transition-transform duration-200",
                       !isActive(item.url) && "group-hover/item:scale-110"
