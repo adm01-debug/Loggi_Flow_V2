@@ -359,9 +359,33 @@
 }
 
 @layer components {
-  /* Card Styles */
+  /* Card Elevation System — 3-tier hierarchy */
+  .card-flat {
+    @apply bg-card rounded-xl border border-border p-6 transition-colors duration-200;
+  }
+
   .card-base {
     @apply bg-card rounded-xl border border-border p-6 transition-all duration-200;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .card-raised {
+    @apply bg-card rounded-xl border border-border p-6 transition-all duration-200;
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-raised:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-prominent {
+    @apply bg-card rounded-xl border border-primary/20 p-6 transition-all duration-200;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-prominent:hover {
+    @apply border-primary/30;
+    box-shadow: var(--shadow-xl);
   }
 
   .card-elevated {
@@ -389,7 +413,12 @@
   }
 
   .stat-card {
-    @apply bg-card rounded-xl border border-border p-4 transition-all duration-200 hover:border-primary/20 hover:shadow-sm;
+    @apply bg-card rounded-xl border border-border p-4 transition-all duration-200 hover:border-primary/20;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .stat-card:hover {
+    box-shadow: var(--shadow-sm);
   }
 
   /* Gradient Text */
