@@ -5,7 +5,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Gift, Coins, ShoppingCart, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Loader2, Sparkles, ArrowUpDown, ChevronUp, ChevronDown, LucideIcon } from "lucide-react";
+import { Gift, Coins, ShoppingCart, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Loader2, Sparkles, ArrowUpDown, ChevronUp, ChevronDown, LucideIcon, History } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
