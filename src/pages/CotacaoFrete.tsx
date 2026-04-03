@@ -132,6 +132,10 @@ export default function CotacaoFrete() {
             <ScenarioSimulator cargoData={flow.cargoData} simulateScenario={flow.simulateScenario} />
           </TabsContent>
 
+          <TabsContent value="cotacoes-salvas" className="space-y-4">
+            <CotacoesFreteManager />
+          </TabsContent>
+
           <TabsContent value="ia">
             <SmartCarrierSelector />
           </TabsContent>
