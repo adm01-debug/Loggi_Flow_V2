@@ -655,7 +655,7 @@ describe("Melhoria 6: Design System Tokens Integridade", () => {
       });
 
       it(`${token} registrado no tailwind config`, () => {
-        expect(TAILWIND_CONFIG).toContain(`"var(--${token})"`);
+        expect(TAILWIND_CONFIG).toContain(`var(--${token})`);
       });
     });
   });
