@@ -866,7 +866,9 @@ describe("Melhoria 8: Animações no Design System", () => {
 
   expectedKeyframes.forEach((kf) => {
     it(`keyframe '${kf}' registrado no tailwind config`, () => {
-      expect(TAILWIND_CONFIG).toContain(`"${kf}"`);
+      // Some keys use quotes, some don't — check for the key name followed by colon or in quotes
+      const hasKey = TAILWIND_CONFIG.includes(`"${kf}"`) || TAILWIND_CONFIG.includes(`${kf}:`);
+      expect(hasKey).toBe(true);
     });
   });
 
