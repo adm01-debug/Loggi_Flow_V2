@@ -87,6 +87,7 @@ export default function CotacaoFrete() {
             <TabsTrigger value="historico"><Clock className="w-4 h-4 mr-1" />Histórico</TabsTrigger>
             <TabsTrigger value="templates"><Bookmark className="w-4 h-4 mr-1" />Templates</TabsTrigger>
             <TabsTrigger value="cenarios"><SplitSquareVertical className="w-4 h-4 mr-1" />Cenários</TabsTrigger>
+            <TabsTrigger value="cotacoes-salvas"><FileCheck className="w-4 h-4 mr-1" />Cotações Salvas</TabsTrigger>
             <TabsTrigger value="ia">🤖 IA Recomendação</TabsTrigger>
           </TabsList>
 
