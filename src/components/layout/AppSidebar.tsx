@@ -193,6 +193,9 @@ export function AppSidebar() {
                     <span className="flex-1 text-left text-xs font-semibold uppercase tracking-wider">
                       {section.title}
                     </span>
+                    <span className="text-[10px] font-medium text-muted-foreground/60 tabular-nums mr-1">
+                      {section.items.length}
+                    </span>
                     <ChevronDown className={cn(
                       "w-4 h-4 transition-transform duration-200",
                       openSection === section.id && "rotate-180"
