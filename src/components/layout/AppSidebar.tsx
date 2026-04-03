@@ -172,7 +172,7 @@ export function AppSidebar() {
         {menuSections.map((section) => (
           <Collapsible 
             key={section.id} 
-            open={openSections.includes(section.id) || collapsed}
+            open={openSection === section.id || collapsed}
             onOpenChange={() => !collapsed && toggleSection(section.id)}
           >
             <CollapsibleTrigger asChild>
