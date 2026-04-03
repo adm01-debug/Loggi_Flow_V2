@@ -168,7 +168,7 @@ export function AppSidebar() {
       <div className="absolute top-[73px] left-0 right-0 h-6 bg-gradient-to-b from-sidebar to-transparent z-10 pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto scrollbar-thin">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
         {menuSections.map((section) => (
           <Collapsible 
             key={section.id} 
