@@ -142,115 +142,11 @@ export function useSmartAlerts() {
     });
   }, []);
 
-  // Set up realtime subscriptions
+  // Poll for changes instead of Realtime (tables removed from publication for security)
   useEffect(() => {
-    // Subscribe to coletas changes
-    const coletasChannel = supabase
-      .channel('coletas-alerts')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'coletas',
-        },
-        (payload: RealtimePostgresChangesPayload<ColetaRow>) => {
-          const newRecord = payload.new as ColetaRow | null;
-          const oldRecord = payload.old as Partial<ColetaRow> | null;
-          
-          // Check for divergence
-          if (newRecord?.divergencia_percentual && newRecord.divergencia_percentual > 5) {
-            const severity = newRecord.divergencia_percentual > 10 ? 'error' : 'warning';
-            addAlert({
-              type: 'divergencia',
-              title: severity === 'error' ? 'Divergência Alta' : 'Divergência Detectada',
-              message: `Coleta ${newRecord.numero_coleta} com ${newRecord.divergencia_percentual}% de divergência`,
-              severity,
-              entityId: newRecord.id,
-              entityType: 'coleta',
-            });
-          }
-          
-          // Status change notifications
-          if (oldRecord?.status !== newRecord?.status) {
-            if (newRecord?.status === 'divergencia') {
-              addAlert({
-                type: 'divergencia',
-                title: 'Status Divergência',
-                message: `Coleta ${newRecord.numero_coleta} marcada com divergência`,
-                severity: 'warning',
-                entityId: newRecord.id,
-                entityType: 'coleta',
-              });
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    // Subscribe to entregas changes
-    const entregasChannel = supabase
-      .channel('entregas-alerts')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'entregas',
-        },
-        (payload: RealtimePostgresChangesPayload<EntregaRow>) => {
-          const newRecord = payload.new as EntregaRow | null;
-          const oldRecord = payload.old as Partial<EntregaRow> | null;
-          
-          // Status change to ocorrencia
-          if (oldRecord?.status !== newRecord?.status && newRecord?.status === 'ocorrencia') {
-            addAlert({
-              type: 'ocorrencia',
-              title: 'Nova Ocorrência',
-              message: `Entrega ${newRecord.numero_entrega} registrou ocorrência`,
-              severity: 'error',
-              entityId: newRecord.id,
-              entityType: 'entrega',
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    // Subscribe to ocorrencias
-    const ocorrenciasChannel = supabase
-      .channel('ocorrencias-alerts')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'ocorrencias',
-        },
-        (payload: RealtimePostgresChangesPayload<OcorrenciaRow>) => {
-          const newRecord = payload.new as OcorrenciaRow;
-          addAlert({
-            type: 'ocorrencia',
-            title: 'Nova Ocorrência Registrada',
-            message: `Ocorrência: ${newRecord.tipo_ocorrencia}`,
-            severity: 'error',
-            entityId: newRecord.id,
-            entityType: 'ocorrencia',
-          });
-        }
-      )
-      .subscribe();
-
-    // Check critical deadlines every 5 minutes
     checkCriticalDeadlines();
     const interval = setInterval(checkCriticalDeadlines, 5 * 60 * 1000);
-
-    return () => {
-      supabase.removeChannel(coletasChannel);
-      supabase.removeChannel(entregasChannel);
-      supabase.removeChannel(ocorrenciasChannel);
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, [checkCriticalDeadlines]);
 
   const markAsRead = useCallback((alertId: string) => {

@@ -265,58 +265,45 @@ export function useSLANotifications() {
     });
   }, [config, permission, toast]);
 
-  // Subscribe to realtime updates
+  // Poll for SLA changes instead of Realtime (tables removed from publication for security)
   useEffect(() => {
     if (!config.enabled) return;
 
-    // Setting up SLA notifications realtime subscription
+    let lastCheckedAt = new Date().toISOString();
 
-    const channel = supabase
-      .channel("sla-alerts")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "entregas",
-        },
-        (payload) => {
-          // Entrega change detected
-          
-          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-            const alert = checkEntregaSLA(payload.new);
-            if (alert) {
-              handleSLAAlert(alert.type, alert.message, alert.numero, "entrega");
-            }
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "coletas",
-        },
-        (payload) => {
-          // Coleta change detected
-          
-          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-            const alert = checkColetaSLA(payload.new);
-            if (alert) {
-              handleSLAAlert(alert.type, alert.message, alert.numero, "coleta");
-            }
-          }
-        }
-      )
-      .subscribe((status) => {
-        // SLA notifications subscription status updated
-      });
+    const interval = setInterval(async () => {
+      // Check entregas
+      const { data: entregas } = await supabase
+        .from('entregas')
+        .select('*')
+        .gt('updated_at', lastCheckedAt)
+        .limit(50);
 
-    return () => {
-      // Cleaning up SLA notifications subscription
-      supabase.removeChannel(channel);
-    };
+      if (entregas) {
+        for (const e of entregas) {
+          const alert = checkEntregaSLA(e);
+          if (alert) handleSLAAlert(alert.type, alert.message, alert.numero, 'entrega');
+        }
+      }
+
+      // Check coletas
+      const { data: coletas } = await supabase
+        .from('coletas')
+        .select('*')
+        .gt('updated_at', lastCheckedAt)
+        .limit(50);
+
+      if (coletas) {
+        for (const c of coletas) {
+          const alert = checkColetaSLA(c);
+          if (alert) handleSLAAlert(alert.type, alert.message, alert.numero, 'coleta');
+        }
+      }
+
+      lastCheckedAt = new Date().toISOString();
+    }, 60000); // Check every 60s
+
+    return () => clearInterval(interval);
   }, [config.enabled, checkEntregaSLA, checkColetaSLA, handleSLAAlert]);
 
   // Clear processed IDs periodically (every hour)

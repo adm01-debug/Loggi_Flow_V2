@@ -172,46 +172,34 @@ export const useCostAlerts = () => {
     checkCosts();
   }, [checkCosts]);
 
-  // Listen for realtime notifications
+  // Poll for cost notifications instead of Realtime (table removed from publication for security)
   useEffect(() => {
-    const channel = supabase
-      .channel('cost-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notificacoes_custo',
-        },
-        (payload) => {
-          const notif = payload.new as NotificacaoCusto;
-          
-          // Show toast based on type
+    let lastCheckedAt = new Date().toISOString();
+
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from('notificacoes_custo')
+        .select('*')
+        .gt('created_at', lastCheckedAt)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (data && data.length > 0) {
+        lastCheckedAt = data[0].created_at;
+        for (const notif of data as NotificacaoCusto[]) {
           if (notif.tipo_notificacao === 'exceeded') {
-            toast.error(notif.mensagem, {
-              duration: 10000,
-              icon: '🚨',
-            });
+            toast.error(notif.mensagem, { duration: 10000, icon: '🚨' });
           } else if (notif.tipo_notificacao === 'critical') {
-            toast.warning(notif.mensagem, {
-              duration: 8000,
-              icon: '⚠️',
-            });
+            toast.warning(notif.mensagem, { duration: 8000, icon: '⚠️' });
           } else {
-            toast.info(notif.mensagem, {
-              duration: 5000,
-              icon: '💰',
-            });
+            toast.info(notif.mensagem, { duration: 5000, icon: '💰' });
           }
-
-          refetchNotificacoes();
         }
-      )
-      .subscribe();
+        refetchNotificacoes();
+      }
+    }, 30000);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => clearInterval(interval);
   }, [refetchNotificacoes]);
 
   // Create alert
