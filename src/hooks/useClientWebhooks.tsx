@@ -19,11 +19,10 @@ export interface WebhookDelivery {
   id: string;
   webhook_id: string;
   event_type: string;
-  payload: Record<string, unknown>;
+  payload: Record<string, unknown> | null;
   response_status: number | null;
-  response_body: string | null;
+  error_message: string | null;
   success: boolean;
-  delivered_at: string;
   created_at: string;
 }
 
