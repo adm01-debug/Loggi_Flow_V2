@@ -40,79 +40,9 @@ export function useNotifications() {
       return data as Notification[];
     },
     enabled: !!user?.id,
-    staleTime: 30 * 1000, // 30s - dynamic data
+    staleTime: 15 * 1000,
+    refetchInterval: 15000, // Poll every 15s (table removed from Realtime for security)
   });
-
-  // Subscribe to realtime notifications
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const newChannel = supabase
-      .channel(`notifications:${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${user.id}`,
-        },
-        (payload) => {
-          const notification = payload.new as Notification;
-          
-          // Add to cache immediately
-          queryClient.setQueryData(
-            ["notifications", user.id],
-            (old: Notification[] = []) => [notification, ...old]
-          );
-
-          // Check if notification should be shown based on preferences
-          const metadata = notification.metadata || {};
-          const shouldShow = shouldShowNotification(notification.type, metadata);
-
-          if (shouldShow) {
-            // Show toast based on type
-            const toastFn = notification.type === "error" ? toast.error 
-              : notification.type === "warning" ? toast.warning 
-              : notification.type === "success" ? toast.success 
-              : toast.info;
-            
-            toastFn(notification.title, {
-              description: notification.message,
-              action: notification.action_url ? {
-                label: "Ver",
-                onClick: () => window.location.href = notification.action_url!,
-              } : undefined,
-            });
-
-            // Show browser notification if permission granted, tab not focused, and preferences allow
-            if (document.hidden && window.Notification?.permission === "granted" && shouldShowBrowserNotification(notification.type, metadata)) {
-              const browserNotification = new window.Notification(notification.title, {
-                body: notification.message,
-                icon: "/favicon.ico",
-                tag: notification.id,
-                requireInteraction: notification.type === "error" || notification.type === "warning",
-              });
-
-              browserNotification.onclick = () => {
-                window.focus();
-                if (notification.action_url) {
-                  window.location.href = notification.action_url;
-                }
-                browserNotification.close();
-              };
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    setChannel(newChannel);
-
-    return () => {
-      supabase.removeChannel(newChannel);
-    };
-  }, [user?.id, queryClient, shouldShowNotification, shouldShowBrowserNotification]);
 
   // Mark as read mutation
   const markAsReadMutation = useMutation({

@@ -147,130 +147,33 @@ export function useSecurityPushNotifications() {
     });
   }, []);
 
-  // Subscribe to realtime security events
+  // Poll for new security events instead of Realtime (tables removed from publication for security)
   useEffect(() => {
     if (!user?.id) return;
 
-    const channel = supabase
-      .channel('security-events-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'security_events',
-        },
-        (payload) => {
-          const event = payload.new as SecurityEvent;
-          
-          // For admins, show all events
-          // For regular users, only show their own events
+    let lastCheckedAt = new Date().toISOString();
+
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from('security_events')
+        .select('*')
+        .gt('created_at', lastCheckedAt)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (data && data.length > 0) {
+        lastCheckedAt = data[0].created_at;
+        for (const row of data) {
+          const event = row as unknown as SecurityEvent;
           if (isAdmin || event.user_id === user.id) {
-            // Show push notification
-            showNotification(event);
-            
-            // Also show in-app toast
-            showInAppAlert(event);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id, isAdmin, showNotification, showInAppAlert]);
-
-  // Subscribe to login attempts for admins
-  useEffect(() => {
-    if (!user?.id || !isAdmin) return;
-
-    const channel = supabase
-      .channel('login-attempts-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'login_attempts',
-        },
-        (payload) => {
-          const attempt = payload.new as {
-            id: string;
-            email: string;
-            success: boolean;
-            failure_reason: string | null;
-            ip_address: string | null;
-            created_at: string;
-          };
-          
-          // Only notify on failed attempts
-          if (!attempt.success) {
-            const event: SecurityEvent = {
-              id: attempt.id,
-              event_type: 'failed_login',
-              description: `Tentativa de login falhada para ${attempt.email}${attempt.failure_reason ? `: ${attempt.failure_reason}` : ''}`,
-              severity: 'warning',
-              user_id: null,
-              ip_address: attempt.ip_address,
-              created_at: attempt.created_at,
-              metadata: { email: attempt.email },
-            };
-            
             showNotification(event);
             showInAppAlert(event);
           }
         }
-      )
-      .subscribe();
+      }
+    }, 15000);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id, isAdmin, showNotification, showInAppAlert]);
-
-  // Subscribe to rate limit blocks for admins
-  useEffect(() => {
-    if (!user?.id || !isAdmin) return;
-
-    const channel = supabase
-      .channel('rate-limit-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'rate_limit_logs',
-          filter: 'blocked=eq.true',
-        },
-        (payload) => {
-          const log = payload.new as {
-            id: string;
-            ip_address: string;
-            endpoint: string;
-            created_at: string;
-          };
-          
-          const event: SecurityEvent = {
-            id: log.id,
-            event_type: 'rate_limit_exceeded',
-            description: `IP ${log.ip_address} bloqueado por excesso de requisições em ${log.endpoint}`,
-            severity: 'warning',
-            user_id: null,
-            ip_address: log.ip_address,
-            created_at: log.created_at,
-            metadata: { endpoint: log.endpoint },
-          };
-          
-          showNotification(event);
-          showInAppAlert(event);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => clearInterval(interval);
   }, [user?.id, isAdmin, showNotification, showInAppAlert]);
 
   return {

@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { useEffect } from "react";
 
 interface SecurityEvent {
   id: string;
@@ -59,31 +58,8 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
       return data as SecurityEvent[];
     },
     enabled: isAdmin,
+    refetchInterval: 15000, // Poll every 15s instead of Realtime (security table removed from publication)
   });
-
-  // Subscribe to realtime updates
-  useEffect(() => {
-    if (!isAdmin) return;
-
-    const channel = supabase
-      .channel("security-events-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "security_events",
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["security-events"] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [isAdmin, queryClient]);
 
   // Log a new security event via edge function
   const logEventMutation = useMutation({

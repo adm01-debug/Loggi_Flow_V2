@@ -53,19 +53,8 @@ export const useCotacoesMulticanal = () => {
       return data as CotacaoMulticanal[];
     },
     enabled: !!user?.id,
+    refetchInterval: 30000, // Poll every 30s (table removed from Realtime for security)
   });
-
-  // Realtime subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel('cotacoes-multicanal-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'cotacoes_multicanal' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['cotacoes-multicanal'] });
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [queryClient]);
 
   const createCotacao = useMutation({
     mutationFn: async (data: {

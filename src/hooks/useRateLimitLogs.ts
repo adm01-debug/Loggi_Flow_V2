@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { useEffect } from "react";
 import { toast } from "sonner";
 
 interface RateLimitLog {
@@ -41,40 +40,8 @@ export function useRateLimitLogs() {
       return data as RateLimitLog[];
     },
     enabled: isAdmin,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 15000, // Poll every 15s (table removed from Realtime publication for security)
   });
-
-  // Subscribe to realtime updates
-  useEffect(() => {
-    if (!isAdmin) return;
-
-    const channel = supabase
-      .channel("rate-limit-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "rate_limit_logs",
-        },
-        (payload) => {
-          queryClient.invalidateQueries({ queryKey: ["rate-limit-logs"] });
-          
-          // Show alert for blocked requests
-          if (payload.eventType === "INSERT" && (payload.new as RateLimitLog).blocked) {
-            toast.warning(
-              `IP ${(payload.new as RateLimitLog).ip_address} bloqueado por rate limiting`,
-              { duration: 5000 }
-            );
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [isAdmin, queryClient]);
 
   // Calculate statistics
   const stats: RateLimitStats = {
