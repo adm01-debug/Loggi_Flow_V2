@@ -112,18 +112,28 @@ const adminItems = [
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const [openSections, setOpenSections] = useState<string[]>(["overview", "operations"]);
   const location = useLocation();
   const { isAdmin } = useAuth();
   const { prefetch } = usePrefetch();
+
+  // Determine initially active section based on current route
+  const getActiveSection = () => {
+    for (const section of menuSections) {
+      if (section.items.some(item => location.pathname === item.url)) {
+        return section.id;
+      }
+    }
+    return "overview";
+  };
+
+  // Exclusive accordion — only one section open at a time
+  const [openSection, setOpenSection] = useState<string | null>(getActiveSection);
 
   const isActive = (path: string) => location.pathname === path;
   const isSectionActive = (section: MenuSection) => section.items.some(item => isActive(item.url));
 
   const toggleSection = (id: string) => {
-    setOpenSections(prev => 
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
+    setOpenSection(prev => prev === id ? null : id);
   };
 
   return (
