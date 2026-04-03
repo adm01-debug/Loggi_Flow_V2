@@ -184,5 +184,8 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
     refetch,
     logEvent: logEventMutation.mutate,
     isLogging: logEventMutation.isPending,
+    checkRateLimit: checkRateLimit.mutate,
+    isCheckingRateLimit: checkRateLimit.isPending,
+    rateLimitResult: checkRateLimit.data,
   };
 }
