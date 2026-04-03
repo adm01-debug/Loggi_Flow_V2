@@ -195,7 +195,7 @@ export function AppSidebar() {
                     </span>
                     <ChevronDown className={cn(
                       "w-4 h-4 transition-transform duration-200",
-                      openSections.includes(section.id) && "rotate-180"
+                      openSection === section.id && "rotate-180"
                     )} />
                   </>
                 )}
