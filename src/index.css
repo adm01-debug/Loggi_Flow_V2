@@ -179,7 +179,7 @@
 
     /* ===== MUTED ===== */
     --muted: 220 15% 94%;
-    --muted-foreground: 215 15% 45%;
+    --muted-foreground: 215 15% 40%;
 
     /* ===== HIGH CONTRAST MODE ===== */
     --high-contrast-muted-foreground: 215 20% 30%;
