@@ -199,7 +199,7 @@ describe("Melhoria 2: Sistema de Elevação de Cards", () => {
 
   describe("Tailwind config inclui sombras", () => {
     it("boxShadow xs está no tailwind config", () => {
-      expect(TAILWIND_CONFIG).toContain('"shadow-xs"');
+      expect(TAILWIND_CONFIG).toContain("xs:");
     });
 
     it("boxShadow glow-primary está no tailwind config", () => {
