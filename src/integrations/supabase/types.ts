@@ -2102,6 +2102,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notification_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          notifications_achievements: boolean
+          notifications_coletas: boolean
+          notifications_custos: boolean
+          notifications_email: boolean
+          notifications_entregas: boolean
+          notifications_ocorrencias: boolean
+          notifications_push: boolean
+          notifications_sla: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notifications_achievements?: boolean
+          notifications_coletas?: boolean
+          notifications_custos?: boolean
+          notifications_email?: boolean
+          notifications_entregas?: boolean
+          notifications_ocorrencias?: boolean
+          notifications_push?: boolean
+          notifications_sla?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notifications_achievements?: boolean
+          notifications_coletas?: boolean
+          notifications_custos?: boolean
+          notifications_email?: boolean
+          notifications_entregas?: boolean
+          notifications_ocorrencias?: boolean
+          notifications_push?: boolean
+          notifications_sla?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_onboarding: {
         Row: {
           completed_at: string | null
