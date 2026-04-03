@@ -143,6 +143,7 @@ function AppRoutes() {
       <Route path="/seguranca" element={<ProtectedRoute requiredRole="admin"><Seguranca /></ProtectedRoute>} />
       <Route path="/rate-limit" element={<ProtectedRoute requiredRole="admin"><RateLimitDashboard /></ProtectedRoute>} />
       <Route path="/admin/telemetria" element={<ProtectedRoute requiredRole="admin"><AdminTelemetria /></ProtectedRoute>} />
+      <Route path="/webhooks" element={<ProtectedRoute requiredRole="admin"><GestaoWebhooks /></ProtectedRoute>} />
       <Route path="/rastrear" element={<RastreamentoPublico />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<NotFound />} />
