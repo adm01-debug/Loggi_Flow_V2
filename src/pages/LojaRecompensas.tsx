@@ -161,7 +161,9 @@ export default function LojaRecompensas() {
           </div>
         )}
 
-        {!isLoading && sortedData.length === 0 && <div className="flex flex-col items-center py-12"><ShoppingCart className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma recompensa encontrada</p></div>}
+        {!isLoading && sortedData.length === 0 && tab !== "historico" && <div className="flex flex-col items-center py-12"><ShoppingCart className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma recompensa encontrada</p></div>}
+
+        {tab === "historico" && <RewardPurchaseHistory />}
         {sortedData.length > 0 && (
           <Pagination
             currentPage={pagination.currentPage}
