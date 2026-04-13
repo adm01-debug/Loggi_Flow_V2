@@ -18,7 +18,7 @@ import { isPast, differenceInHours, differenceInMinutes } from 'date-fns';
 import { TrechoComparativo } from './dashboard-cotacoes/TrechoComparativo';
 
 function TimeRemaining({ expiresAt }: { expiresAt: string }) {
-  const [now, setNow] = useStateReact(Date.now());
+  const [now, setNow] = useState(Date.now());
   useEffect(() => { const interval = setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(interval); }, []);
   const expDate = new Date(expiresAt);
   const expired = isPast(expDate);
