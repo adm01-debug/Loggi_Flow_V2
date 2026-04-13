@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,6 @@ import { StatsCard } from '@/components/common/StatsCard';
 import { Clock, CheckCircle2, AlertTriangle, Truck, MessageCircle, Mail, Globe, Timer, FileText, TrendingDown, RefreshCw, Zap, AlertCircle, Award, Send } from 'lucide-react';
 import { useCotacoesMulticanal, type CotacaoMulticanal } from '@/hooks/useCotacoesMulticanal';
 import { isPast, differenceInHours, differenceInMinutes } from 'date-fns';
-import { useState as useStateReact, useEffect } from 'react';
 import { TrechoComparativo } from './dashboard-cotacoes/TrechoComparativo';
 
 function TimeRemaining({ expiresAt }: { expiresAt: string }) {
