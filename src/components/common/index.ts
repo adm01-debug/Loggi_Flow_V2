@@ -30,7 +30,9 @@ export { ImageUploader } from './ImageUploader';
 export { DocumentUploadField } from './DocumentUploadField';
 
 // Dialogs & Modals
-export { ConfirmDialog } from './ConfirmDialog';
+export { ConfirmDialog, ConfirmProvider, useConfirm } from './ConfirmDialog';
+export { DeleteButton } from './DeleteButton';
+export { InlineConfirm } from './InlineConfirm';
 export { DetailSheet } from './DetailSheet';
 
 // Data Import/Export
