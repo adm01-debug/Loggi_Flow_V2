@@ -151,78 +151,105 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
         />
       )}
 
-      <div className="space-y-2" style={{ maxHeight, overflowY: "auto" }}>
-        <AnimatePresence>
-          {pagination.paginatedData.map((log, i) => {
+      <div 
+        ref={parentRef}
+        className="space-y-2 overflow-y-auto pr-2 custom-scrollbar" 
+        style={{ maxHeight, position: 'relative' }}
+      >
+        <div
+          style={{
+            height: `${totalSize}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {virtualItems.map((virtualRow) => {
+            const log = pagination.paginatedData[virtualRow.index];
+            if (!log) return null;
+            
             const TableIcon = getTableIcon(log.table_name);
             const isExpanded = expandedIds.has(log.id);
+            
             return (
-              <motion.div 
-                key={log.id} 
-                initial={{ opacity: 0, y: 10 }} 
-                animate={{ opacity: 1, y: 0 }} 
-                exit={{ opacity: 0, y: -10 }} 
-                transition={{ delay: i * 0.02 }}
-                className={cn("border rounded-lg p-3 bg-card hover:bg-muted/50 transition-colors", isSelected(log.id) && "ring-2 ring-primary")}
+              <div
+                key={log.id}
+                data-index={virtualRow.index}
+                ref={virtualRow.measureElement}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+                className="pb-2"
               >
-                <div className="flex items-start gap-3">
-                  <Checkbox checked={isSelected(log.id)} onCheckedChange={() => toggle(log.id)} className="mt-1" />
-                  <div className={cn("p-2 rounded-lg shrink-0", getActionColor(log.action))}>{getActionIcon(log.action)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={cn("px-2 py-0.5 rounded text-xs font-medium", getActionColor(log.action))}>
-                        {actionLabels[log.action] || log.action}
-                      </span>
-                      <span className="flex items-center gap-1 text-sm">
-                        <TableIcon className="w-3 h-3" />
-                        {tableNameLabels[log.table_name] || log.table_name}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        {log.user_id?.slice(0, 8) || "Sistema"}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {format(new Date(log.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
-                      </span>
-                      <span className="font-mono text-xs">ID: {log.record_id.slice(0, 8)}</span>
-                    </div>
-                  </div>
-                  {(log.old_data || log.new_data) && (
-                    <Button variant="ghost" size="sm" onClick={() => toggleExpanded(log.id)}>
-                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </Button>
+                <motion.div 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  className={cn(
+                    "border rounded-lg p-3 bg-card hover:bg-muted/50 transition-colors", 
+                    isSelected(log.id) && "ring-2 ring-primary"
                   )}
-                </div>
-                {isExpanded && (log.old_data || log.new_data) && (
-                  <motion.div 
-                    initial={{ height: 0, opacity: 0 }} 
-                    animate={{ height: "auto", opacity: 1 }} 
-                    exit={{ height: 0, opacity: 0 }} 
-                    className="mt-3 pt-3 border-t"
-                  >
-                    <div className="grid grid-cols-2 gap-4 text-xs">
-                      {log.old_data && (
-                        <div>
-                          <p className="font-medium text-muted-foreground mb-1">Antes:</p>
-                          <pre className="bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(log.old_data, null, 2)}</pre>
-                        </div>
-                      )}
-                      {log.new_data && (
-                        <div>
-                          <p className="font-medium text-muted-foreground mb-1">Depois:</p>
-                          <pre className="bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(log.new_data, null, 2)}</pre>
-                        </div>
-                      )}
+                >
+                  <div className="flex items-start gap-3">
+                    <Checkbox checked={isSelected(log.id)} onCheckedChange={() => toggle(log.id)} className="mt-1" />
+                    <div className={cn("p-2 rounded-lg shrink-0", getActionColor(log.action))}>{getActionIcon(log.action)}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={cn("px-2 py-0.5 rounded text-xs font-medium", getActionColor(log.action))}>
+                          {actionLabels[log.action] || log.action}
+                        </span>
+                        <span className="flex items-center gap-1 text-sm">
+                          <TableIcon className="w-3 h-3" />
+                          {tableNameLabels[log.table_name] || log.table_name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <User className="w-3 h-3" />
+                          {log.user_id?.slice(0, 8) || "Sistema"}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {format(new Date(log.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
+                        </span>
+                        <span className="font-mono text-xs">ID: {log.record_id.slice(0, 8)}</span>
+                      </div>
                     </div>
-                  </motion.div>
-                )}
-              </motion.div>
+                    {(log.old_data || log.new_data) && (
+                      <Button variant="ghost" size="sm" onClick={() => toggleExpanded(log.id)}>
+                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </Button>
+                    )}
+                  </div>
+                  {isExpanded && (log.old_data || log.new_data) && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }} 
+                      animate={{ height: "auto", opacity: 1 }} 
+                      className="mt-3 pt-3 border-t"
+                    >
+                      <div className="grid grid-cols-2 gap-4 text-xs">
+                        {log.old_data && (
+                          <div>
+                            <p className="font-medium text-muted-foreground mb-1">Antes:</p>
+                            <pre className="bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(log.old_data, null, 2)}</pre>
+                          </div>
+                        )}
+                        {log.new_data && (
+                          <div>
+                            <p className="font-medium text-muted-foreground mb-1">Depois:</p>
+                            <pre className="bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(log.new_data, null, 2)}</pre>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </div>
             );
           })}
-        </AnimatePresence>
+        </div>
       </div>
 
       {sortedData.length === 0 && (
