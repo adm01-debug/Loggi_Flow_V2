@@ -102,13 +102,18 @@ export default function InteligenciaFrete() {
 
         {/* Tabs */}
         <Tabs defaultValue="impacto" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-4">
             <TabsTrigger value="impacto">Impacto Regional</TabsTrigger>
             <TabsTrigger value="consolidacao">Consolidação</TabsTrigger>
             <TabsTrigger value="negociacao">Negociação</TabsTrigger>
             <TabsTrigger value="simulador"><Calculator className="w-4 h-4 mr-1" />Simulador</TabsTrigger>
+            <TabsTrigger value="previsao"><Sparkles className="w-4 h-4 mr-1" />Previsão IA</TabsTrigger>
             <TabsTrigger value="abusivos">Alertas</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="previsao" className="space-y-4">
+            <AIFreightForecasting currentTotal={summary.totalFreight} />
+          </TabsContent>
 
           <TabsContent value="simulador" className="space-y-4">
             <StrategySimulator 
