@@ -280,10 +280,13 @@ export default function InteligenciaFrete() {
 
           {/* Tab 4: Abusive Freight Alerts */}
           <TabsContent value="abusivos" className="space-y-4">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/20 text-sm">
-              <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
-              <span className="text-destructive">Fretes com custo <strong>&gt;20% acima</strong> da média histórica para a mesma região</span>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 space-y-4">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/20 text-sm">
+                  <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
+                  <span className="text-destructive font-medium">Alertas de Fretes Atípicos</span>
+                  <span className="text-xs text-muted-foreground ml-auto">Custo >20% acima da média histórica</span>
+                </div>
 
             {abusiveFreights.length === 0 ? (
               <div className="card-base p-8 text-center">
