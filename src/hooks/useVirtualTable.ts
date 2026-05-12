@@ -19,6 +19,7 @@ export function useVirtualTable({ count, estimateSize = 60, overscan = 5 }: UseV
 
   return {
     parentRef,
+    rowVirtualizer,
     virtualItems: rowVirtualizer.getVirtualItems(),
     totalSize: rowVirtualizer.getTotalSize(),
     scrollToIndex: rowVirtualizer.scrollToIndex,
