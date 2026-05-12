@@ -103,7 +103,7 @@ export default function Coletas() {
             <Button variant="outline" size="sm" onClick={() => exportToCSV(coletas as any, { filename: "coletas" })}>
               <Download className="w-4 h-4 mr-2" /> Exportar
             </Button>
-            <Button>
+            <Button onClick={() => { setSelectedPickup(null); setIsDialogOpen(true); }}>
               <Plus className="w-4 h-4 mr-2" /> Nova
             </Button>
           </div>
