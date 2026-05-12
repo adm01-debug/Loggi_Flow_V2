@@ -96,23 +96,27 @@ export function ConciliacaoItensTable({
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {item.status === "pendente" && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => onMatchItem(item)}>
-                              <ArrowLeftRight className="w-4 h-4 mr-2" />Conciliar Manual
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onMatchItem(item)}>
+                            <ArrowLeftRight className="w-4 h-4 mr-2" />
+                            {item.status === "divergencia" ? "Resolver Divergência" : "Conciliar Manual"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onIgnoreItem(item.id)}>
+                            <XCircle className="w-4 h-4 mr-2" />Ignorar
+                          </DropdownMenuItem>
+                          {item.observacoes && (
+                            <DropdownMenuItem className="text-xs italic text-muted-foreground" disabled>
+                              Obs: {item.observacoes.substring(0, 30)}...
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onIgnoreItem(item.id)}>
-                              <XCircle className="w-4 h-4 mr-2" />Ignorar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 );

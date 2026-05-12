@@ -306,11 +306,12 @@ export function useConciliacao() {
 
   // Manual match
   const manualMatch = useMutation({
-    mutationFn: async ({ itemId, sistemaId, status }: { itemId: string; sistemaId?: string; status: "conciliado" | "divergencia" | "ignorado" }) => {
+    mutationFn: async ({ itemId, sistemaId, status, observacoes }: { itemId: string; sistemaId?: string; status: "conciliado" | "divergencia" | "ignorado"; observacoes?: string }) => {
       const updates: Record<string, unknown> = {
         status,
         conciliado_em: new Date().toISOString(),
         conciliado_por: user?.id,
+        observacoes: observacoes || null,
       };
 
       if (sistemaId) {
@@ -330,9 +331,31 @@ export function useConciliacao() {
         .eq("id", itemId);
 
       if (error) throw error;
+      
+      // Update conciliacao summary
+      if (selectedConciliacao) {
+        const { data: updatedItems } = await supabase
+          .from("conciliacao_itens_importados")
+          .select("status, diferenca_valor")
+          .eq("conciliacao_id", selectedConciliacao.id);
+
+        const totalConciliados = updatedItems?.filter((i) => i.status === "conciliado").length || 0;
+        const totalDivergencias = updatedItems?.filter((i) => i.status === "divergencia").length || 0;
+        const diferencaTotal = updatedItems?.reduce((sum, i) => sum + (i.diferenca_valor || 0), 0) || 0;
+
+        await supabase
+          .from("conciliacoes")
+          .update({
+            total_itens_conciliados: totalConciliados,
+            total_divergencias: totalDivergencias,
+            diferenca_total: diferencaTotal,
+          })
+          .eq("id", selectedConciliacao.id);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conciliacao_itens"] });
+      queryClient.invalidateQueries({ queryKey: ["conciliacoes"] });
       toast.success("Item atualizado!");
     },
     onError: (e: Error) => toast.error("Erro: " + e.message),
