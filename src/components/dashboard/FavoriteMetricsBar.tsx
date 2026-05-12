@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Package,
@@ -36,7 +36,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useFavoriteMetrics, AVAILABLE_METRICS } from "@/hooks/useFavoriteMetrics";
+import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
+import { useSLAMetrics } from "@/hooks/useSLAMetrics";
+import { useLogisticsCosts } from "@/hooks/useLogisticsCosts";
+import { useGamification } from "@/hooks/useGamification";
 import { cn } from "@/lib/utils";
+import { subMonths, startOfMonth, endOfMonth } from "date-fns";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Package,
@@ -62,22 +67,6 @@ const categoryLabels: Record<string, string> = {
   gamificacao: "Gamificação",
 };
 
-// Mock data - em produção viria do hook de métricas
-const mockMetricValues: Record<string, { value: string | number; change?: number; changeType?: "positive" | "negative" | "neutral" }> = {
-  "coletas-pendentes": { value: 12, change: -3, changeType: "positive" },
-  "coletas-transito": { value: 8, change: 2, changeType: "neutral" },
-  "coletas-finalizadas": { value: 156, change: 12, changeType: "positive" },
-  "entregas-pendentes": { value: 23, change: 5, changeType: "negative" },
-  "entregas-transito": { value: 45, change: -8, changeType: "positive" },
-  "entregas-finalizadas": { value: 312, change: 28, changeType: "positive" },
-  "ocorrencias-abertas": { value: 3, change: 1, changeType: "negative" },
-  "sla-cumprido": { value: "94.5%", change: 2.3, changeType: "positive" },
-  "custo-mensal": { value: "R$ 45.230", change: -5.2, changeType: "positive" },
-  "economia-mes": { value: "R$ 3.450", change: 890, changeType: "positive" },
-  "xp-total": { value: 4850, change: 350, changeType: "positive" },
-  "nivel-atual": { value: 12, change: 1, changeType: "positive" },
-};
-
 export function FavoriteMetricsBar() {
   const {
     favorites,
@@ -92,6 +81,82 @@ export function FavoriteMetricsBar() {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const favoriteMetrics = getFavoriteMetrics();
   const metricsByCategory = getMetricsByCategory();
+
+  // Data fetching
+  const { data: dashboardData } = useDashboardMetrics();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data: slaData } = useSLAMetrics();
+  const { userLevel } = useGamification();
+  
+  const now = new Date();
+  const startDate = startOfMonth(subMonths(now, 1));
+  const endDate = endOfMonth(now);
+  const { summary: costSummary } = useLogisticsCosts(startDate, endDate);
+
+  const realMetricValues = useMemo(() => {
+    return {
+      "coletas-pendentes": { 
+        value: dashboardData?.coletasPendentes ?? 0, 
+        change: dashboardData?.coletasAtrasadas ?? 0, 
+        changeType: (dashboardData?.coletasAtrasadas ?? 0) > 0 ? "negative" : "neutral" 
+      },
+      "coletas-transito": { 
+        value: dashboardData?.coletasEmTransito ?? 0, 
+        change: undefined, 
+        changeType: "neutral" 
+      },
+      "coletas-finalizadas": { 
+        value: dashboardData?.coletasFinalizadas ?? 0, 
+        change: undefined, 
+        changeType: "positive" 
+      },
+      "entregas-pendentes": { 
+        value: dashboardData?.entregasPendentes ?? 0, 
+        change: undefined, 
+        changeType: "neutral" 
+      },
+      "entregas-transito": { 
+        value: dashboardData?.entregasEmTransito ?? 0, 
+        change: undefined, 
+        changeType: "neutral" 
+      },
+      "entregas-finalizadas": { 
+        value: dashboardData?.entregasFinalizadas ?? 0, 
+        change: undefined, 
+        changeType: "positive" 
+      },
+      "ocorrencias-abertas": { 
+        value: dashboardData?.entregasComOcorrencia ?? 0, 
+        change: undefined, 
+        changeType: (dashboardData?.entregasComOcorrencia ?? 0) > 0 ? "negative" : "neutral" 
+      },
+      "sla-cumprido": { 
+        value: `${dashboardData?.taxaEntregaNoPrazo ?? 0}%`, 
+        change: undefined, 
+        changeType: (dashboardData?.taxaEntregaNoPrazo ?? 0) > 90 ? "positive" : "negative" 
+      },
+      "custo-mensal": { 
+        value: `R$ ${costSummary?.total_spent?.toLocaleString('pt-BR') ?? "0"}`, 
+        change: undefined, 
+        changeType: "neutral" 
+      },
+      "economia-mes": { 
+        value: `R$ ${(costSummary?.total_spent ? (costSummary.total_spent * 0.05) : 0).toLocaleString('pt-BR')}`, 
+        change: undefined, 
+        changeType: "positive" 
+      },
+      "xp-total": { 
+        value: userLevel?.total_xp ?? 0, 
+        change: undefined, 
+        changeType: "positive" 
+      },
+      "nivel-atual": { 
+        value: userLevel?.level ?? 1, 
+        change: undefined, 
+        changeType: "positive" 
+      },
+    };
+  }, [dashboardData, costSummary, userLevel]);
 
   if (favorites.length === 0 && !isEditMode) {
     return (
@@ -210,7 +275,7 @@ export function FavoriteMetricsBar() {
           <AnimatePresence mode="popLayout">
             {favoriteMetrics.map((metric) => {
               const IconComponent = iconMap[metric.icon];
-              const data = mockMetricValues[metric.id] || { value: "-" };
+              const data = realMetricValues[metric.id as keyof typeof realMetricValues] || { value: "-" };
 
               return (
                 <motion.div
