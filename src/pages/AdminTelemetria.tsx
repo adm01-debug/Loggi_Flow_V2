@@ -7,18 +7,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon } from "lucide-react";
+import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug, Info } from "lucide-react";
 import { TelemetryCharts } from "@/components/admin/telemetry/TelemetryCharts";
 import { TelemetryStatsCards } from "./admin-telemetria/TelemetryStatsCards";
 import { TelemetryTopOffenders } from "./admin-telemetria/TelemetryTopOffenders";
 import { TelemetryTable, type TelemetryRow } from "./admin-telemetria/TelemetryTable";
+import { TelemetryViewer } from "@/components/admin/TelemetryViewer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 type SeverityFilter = "all" | "slow" | "very_slow" | "error";
 type TimeFilter = "1h" | "6h" | "24h" | "7d" | "custom";
 
 export default function AdminTelemetriaPage() {
+  const [activeTab, setActiveTab] = useState("database");
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("all");
+
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("24h");
   const [customDateFrom, setCustomDateFrom] = useState<Date | undefined>();
   const [customDateTo, setCustomDateTo] = useState<Date | undefined>();
@@ -97,7 +101,7 @@ export default function AdminTelemetriaPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Activity className="h-7 w-7 text-primary" />
-            <div><h1 className="text-2xl font-bold">Telemetria de Queries</h1><p className="text-sm text-muted-foreground">Monitoramento de performance</p></div>
+            <div><h1 className="text-2xl font-bold">Painel de Telemetria</h1><p className="text-sm text-muted-foreground">Monitoramento de performance e erros</p></div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={rows.length === 0}><Download className="h-3.5 w-3.5 mr-1.5" />CSV</Button>
@@ -107,41 +111,69 @@ export default function AdminTelemetriaPage() {
           </div>
         </div>
 
-        <TelemetryStatsCards verySlow={verySlow} slow={slow} errors={errors} avgDuration={avgDuration} />
-        <TelemetryTopOffenders topOffenders={topOffenders} />
-        <TelemetryCharts rows={rows} timeFilter={timeFilter} />
+        <Tabs defaultValue="database" className="space-y-4" onValueChange={setActiveTab}>
+          <TabsList className="bg-background border">
+            <TabsTrigger value="database" className="gap-2">
+              <Activity className="h-4 w-4" />
+              Banco de Dados
+            </TabsTrigger>
+            <TabsTrigger value="application" className="gap-2">
+              <Bug className="h-4 w-4" />
+              Aplicação & Erros
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Select value={severityFilter} onValueChange={(v) => setSeverityFilter(v as SeverityFilter)}>
-            <SelectTrigger className="w-44"><SelectValue placeholder="Severidade" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              <SelectItem value="slow">🟡 Lentas</SelectItem>
-              <SelectItem value="very_slow">🔴 Muito Lentas</SelectItem>
-              <SelectItem value="error">❌ Erros</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
-            <SelectTrigger className="w-44"><SelectValue placeholder="Período" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1h">Última hora</SelectItem>
-              <SelectItem value="6h">Últimas 6h</SelectItem>
-              <SelectItem value="24h">Últimas 24h</SelectItem>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="custom">📅 Personalizado</SelectItem>
-            </SelectContent>
-          </Select>
-          {timeFilter === "custom" && (
-            <div className="flex items-center gap-2">
-              <Popover><PopoverTrigger asChild><Button variant="outline" size="sm" className="text-xs"><CalendarIcon className="h-3.5 w-3.5 mr-1.5" />{customDateFrom ? format(customDateFrom, "dd/MM/yyyy") : "De"}</Button></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={customDateFrom} onSelect={setCustomDateFrom} /></PopoverContent></Popover>
-              <span className="text-xs text-muted-foreground">até</span>
-              <Popover><PopoverTrigger asChild><Button variant="outline" size="sm" className="text-xs"><CalendarIcon className="h-3.5 w-3.5 mr-1.5" />{customDateTo ? format(customDateTo, "dd/MM/yyyy") : "Até"}</Button></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={customDateTo} onSelect={setCustomDateTo} /></PopoverContent></Popover>
+          <TabsContent value="database" className="space-y-6">
+            <TelemetryStatsCards verySlow={verySlow} slow={slow} errors={errors} avgDuration={avgDuration} />
+            <TelemetryTopOffenders topOffenders={topOffenders} />
+            <TelemetryCharts rows={rows} timeFilter={timeFilter} />
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Select value={severityFilter} onValueChange={(v) => setSeverityFilter(v as SeverityFilter)}>
+                <SelectTrigger className="w-44"><SelectValue placeholder="Severidade" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="slow">🟡 Lentas</SelectItem>
+                  <SelectItem value="very_slow">🔴 Muito Lentas</SelectItem>
+                  <SelectItem value="error">❌ Erros</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
+                <SelectTrigger className="w-44"><SelectValue placeholder="Período" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1h">Última hora</SelectItem>
+                  <SelectItem value="6h">Últimas 6h</SelectItem>
+                  <SelectItem value="24h">Últimas 24h</SelectItem>
+                  <SelectItem value="7d">Últimos 7 dias</SelectItem>
+                  <SelectItem value="custom">📅 Personalizado</SelectItem>
+                </SelectContent>
+              </Select>
+              {timeFilter === "custom" && (
+                <div className="flex items-center gap-2">
+                  <Popover><PopoverTrigger asChild><Button variant="outline" size="sm" className="text-xs"><CalendarIcon className="h-3.5 w-3.5 mr-1.5" />{customDateFrom ? format(customDateFrom, "dd/MM/yyyy") : "De"}</Button></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={customDateFrom} onSelect={setCustomDateFrom} /></PopoverContent></Popover>
+                  <span className="text-xs text-muted-foreground">até</span>
+                  <Popover><PopoverTrigger asChild><Button variant="outline" size="sm" className="text-xs"><CalendarIcon className="h-3.5 w-3.5 mr-1.5" />{customDateTo ? format(customDateTo, "dd/MM/yyyy") : "Até"}</Button></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={customDateTo} onSelect={setCustomDateTo} /></PopoverContent></Popover>
+                </div>
+              )}
+              <span className="text-xs text-muted-foreground ml-auto">{rows.length} registros · auto-refresh 30s</span>
             </div>
-          )}
-          <span className="text-xs text-muted-foreground ml-auto">{rows.length} registros · auto-refresh 30s</span>
-        </div>
 
-        <TelemetryTable rows={rows} isLoading={isLoading} />
+            <TelemetryTable rows={rows} isLoading={isLoading} />
+          </TabsContent>
+
+          <TabsContent value="application" className="space-y-6">
+            <div className="flex flex-col gap-4">
+              <div className="p-4 rounded-lg bg-info/5 border border-info/20 text-sm text-muted-foreground">
+                <p className="flex items-center gap-2 font-medium text-foreground mb-1">
+                  <Info className="h-4 w-4" />
+                  Logs de Telemetria da Aplicação
+                </p>
+                Rastreamento proativo de erros no frontend, exceções de integração e eventos críticos do sistema capturados em tempo real.
+              </div>
+              <TelemetryViewer />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </MainLayout>
   );

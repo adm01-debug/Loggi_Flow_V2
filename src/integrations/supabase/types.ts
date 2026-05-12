@@ -1438,6 +1438,42 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          device_name: string | null
+          device_type: string | null
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          device_name?: string | null
+          device_type?: string | null
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          device_name?: string | null
+          device_type?: string | null
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       query_telemetry: {
         Row: {
           count_mode: string | null
@@ -1918,6 +1954,45 @@ export type Database = {
           },
         ]
       }
+      telemetry_logs: {
+        Row: {
+          category: string
+          created_at: string
+          device_info: Json | null
+          id: string
+          message: string
+          metadata: Json | null
+          severity: string
+          stack_trace: string | null
+          url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          device_info?: Json | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          severity: string
+          stack_trace?: string | null
+          url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          device_info?: Json | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          severity?: string
+          stack_trace?: string | null
+          url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       transportadora_rotas: {
         Row: {
           ativo: boolean | null
@@ -2382,6 +2457,7 @@ export type Database = {
         Returns: undefined
       }
       calculate_level: { Args: { xp: number }; Returns: number }
+      cleanup_old_telemetry_logs: { Args: never; Returns: undefined }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
         Returns: {

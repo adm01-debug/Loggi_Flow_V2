@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
+import { RealtimeStatus } from "@/components/common/RealtimeStatus";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,17 +23,6 @@ const UserNotificationCenter = lazy(() => import("@/components/notifications/Use
 const SLANotificationSettings = lazy(() => import("@/components/notifications/SLANotificationSettings").then(m => ({ default: m.SLANotificationSettings })));
 const GlobalSearch = lazy(() => import("@/components/search/GlobalSearch").then(m => ({ default: m.GlobalSearch })));
 
-function RealtimeIndicator() {
-  return (
-    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
-      </span>
-      <span className="text-sm font-medium text-success">Dados em tempo real</span>
-    </div>
-  );
-}
 
 export function Header() {
   const { profile, isAdmin, signOut } = useAuth();
@@ -96,8 +86,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* Center - Realtime Indicator */}
-      <RealtimeIndicator />
+      {/* Center - Realtime Status */}
+      <RealtimeStatus />
 
       {/* Gamification Stats - Compact on tablet */}
       <div className="hidden md:flex items-center gap-2 lg:gap-4">
