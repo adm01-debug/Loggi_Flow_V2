@@ -40,14 +40,16 @@ export const handler = async (req: Request) => {
       { data: entregasAtivas },
       { data: custosRecentes },
       { data: ocorrenciasAbertas },
-      { data: slaStats }
+      { data: slaStats, error: slaError }
     ] = await Promise.all([
       supabase.from('transportadoras').select('id, nome_fantasia, score_performance, score_frete, score_pontualidade, homologada').eq('homologada', true).order('score_performance', { ascending: false }).limit(10),
       supabase.from('entregas').select('id, status, previsao_entrega, endereco_entrega, transportadoras(nome_fantasia)').in('status', ['despachado', 'em_transito', 'saiu_entrega']).limit(50),
       supabase.from('entregas').select('valor_frete, created_at').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
       supabase.from('ocorrencias').select('tipo_ocorrencia, gravidade, status').eq('status', 'aberta'),
-      supabase.rpc('get_carrier_performance_stats') // Assume this exists or fallback to manual calc
+      supabase.rpc('get_carrier_performance_stats').catch(() => ({ data: null, error: true }))
     ]);
+
+    if (slaError) console.warn("Aviso: Falha ao carregar estatísticas de performance via RPC.");
 
     // Manual SLA calc fallback
     const totalFrete = custosRecentes?.reduce((acc, curr) => acc + (Number(curr.valor_frete) || 0), 0) || 0;
@@ -88,7 +90,7 @@ export const handler = async (req: Request) => {
       method: "POST",
       headers: { "Authorization": `Bearer ${lovableApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-1.5-pro",
         messages: [
           { role: "system", content: systemPrompt }, 
           ...conversationHistory.slice(-10), 
