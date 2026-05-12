@@ -34,23 +34,45 @@ export function StrategySimulator({ currentMonthlyFreight, totalDeliveries }: St
   const [volumeChange, setVolumeChange] = useState(0); 
   const [rateChange, setRateChange] = useState(0); 
   const [negotiationTarget, setNegotiationTarget] = useState(0); 
+  const [consolidationLevel, setConsolidationLevel] = useState(0);
 
   const avgFreight = totalDeliveries > 0 ? currentMonthlyFreight / totalDeliveries : 0;
   
   const simulation = useMemo(() => {
     const newVolume = totalDeliveries * (1 + volumeChange / 100);
-    const newRate = avgFreight * (1 + rateChange / 100) * (1 - negotiationTarget / 100);
-    const newTotal = newVolume * newRate;
-    const savings = currentMonthlyFreight * (1 + volumeChange / 100) - newTotal;
+    // Consolidation reduces total shipments while keeping total weight/volume the same, 
+    // usually resulting in ~20% lower cost for consolidated volume
+    const consolidatedVolume = newVolume * (consolidationLevel / 100);
+    const standardVolume = newVolume - consolidatedVolume;
+    
+    const standardRate = avgFreight * (1 + rateChange / 100) * (1 - negotiationTarget / 100);
+    const consolidatedRate = standardRate * 0.75; // 25% discount for consolidated
+    
+    const newTotal = (standardVolume * standardRate) + (consolidatedVolume * consolidatedRate);
+    const costWithoutOptimization = (totalDeliveries * (1 + volumeChange / 100)) * avgFreight;
+    const savings = costWithoutOptimization - newTotal;
     
     return {
       volume: Math.round(newVolume),
-      avgRate: newRate,
+      avgRate: newTotal / newVolume,
       total: newTotal,
       savings: savings,
       percentChange: currentMonthlyFreight > 0 ? ((newTotal - currentMonthlyFreight) / currentMonthlyFreight) * 100 : 0
     };
-  }, [currentMonthlyFreight, totalDeliveries, volumeChange, rateChange, negotiationTarget, avgFreight]);
+  }, [currentMonthlyFreight, totalDeliveries, volumeChange, rateChange, negotiationTarget, consolidationLevel, avgFreight]);
+
+  const scenarios = [
+    { name: "Conservador", vol: 5, rate: 0, neg: 2, cons: 5 },
+    { name: "Otimizado", vol: 10, rate: -2, neg: 5, cons: 15 },
+    { name: "Agressivo", vol: 20, rate: -5, neg: 10, cons: 30 },
+  ];
+
+  const applyScenario = (s: typeof scenarios[0]) => {
+    setVolumeChange(s.vol);
+    setRateChange(s.rate);
+    setNegotiationTarget(s.neg);
+    setConsolidationLevel(s.cons);
+  };
 
   const chartData = [
     { name: "Atual", valor: currentMonthlyFreight },
