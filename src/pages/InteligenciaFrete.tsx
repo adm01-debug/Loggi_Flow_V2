@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator, Sparkles, FileText, CheckCircle2, Wand2, Download } from "lucide-react";
-import { StrategySimulator, AIFreightForecasting } from "@/components/freight";
+import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator, Sparkles, FileText, CheckCircle2, Wand2, Download, FileCheck } from "lucide-react";
+import { StrategySimulator, AIFreightForecasting, FreightAudit } from "@/components/freight";
 
 const pieColors = ["hsl(var(--primary))", "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--accent))", "hsl(var(--muted))", "hsl(var(--secondary))"];
 
@@ -102,11 +102,12 @@ export default function InteligenciaFrete() {
 
         {/* Tabs */}
         <Tabs defaultValue="impacto" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-4">
+          <TabsList className="grid w-full grid-cols-4 sm:grid-cols-7 mb-4">
             <TabsTrigger value="impacto">Impacto Regional</TabsTrigger>
             <TabsTrigger value="consolidacao">Consolidação</TabsTrigger>
             <TabsTrigger value="negociacao">Negociação</TabsTrigger>
             <TabsTrigger value="simulador"><Calculator className="w-4 h-4 mr-1" />Simulador</TabsTrigger>
+            <TabsTrigger value="auditoria"><FileCheck className="w-4 h-4 mr-1" />Auditoria</TabsTrigger>
             <TabsTrigger value="previsao"><Sparkles className="w-4 h-4 mr-1" />Previsão IA</TabsTrigger>
             <TabsTrigger value="abusivos">Alertas</TabsTrigger>
           </TabsList>
@@ -120,6 +121,10 @@ export default function InteligenciaFrete() {
               currentMonthlyFreight={summary.totalFreight} 
               totalDeliveries={summary.totalEntregas} 
             />
+          </TabsContent>
+
+          <TabsContent value="auditoria" className="space-y-4">
+            <FreightAudit />
           </TabsContent>
 
           {/* Tab 1: Regional Impact */}

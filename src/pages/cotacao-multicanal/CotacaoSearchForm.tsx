@@ -16,6 +16,10 @@ interface CotacaoSearchFormProps {
   setOrigemCidade: (v: string) => void;
   destinoCidade: string;
   setDestinoCidade: (v: string) => void;
+  origemCep: string;
+  setOrigemCep: (v: string) => void;
+  destinoCep: string;
+  setDestinoCep: (v: string) => void;
   pesoKg: string;
   setPesoKg: (v: string) => void;
   volumes: string;
@@ -27,7 +31,7 @@ interface CotacaoSearchFormProps {
 }
 
 export function CotacaoSearchForm(props: CotacaoSearchFormProps) {
-  const { origemEstado, setOrigemEstado, destinoEstado, setDestinoEstado, origemCidade, setOrigemCidade, destinoCidade, setDestinoCidade, pesoKg, setPesoKg, volumes, setVolumes, valorMercadoria, setValorMercadoria, isSearching, onSearch } = props;
+  const { origemEstado, setOrigemEstado, destinoEstado, setDestinoEstado, origemCidade, setOrigemCidade, destinoCidade, setDestinoCidade, origemCep, setOrigemCep, destinoCep, setDestinoCep, pesoKg, setPesoKg, volumes, setVolumes, valorMercadoria, setValorMercadoria, isSearching, onSearch } = props;
 
   return (
     <Card>
@@ -43,17 +47,23 @@ export function CotacaoSearchForm(props: CotacaoSearchFormProps) {
             <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <MapPin className="w-4 h-4 text-success" /> ORIGEM
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <div>
-                <Label>Estado</Label>
-                <Select value={origemEstado} onValueChange={setOrigemEstado}>
-                  <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
-                  <SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent>
-                </Select>
+                <Label>CEP</Label>
+                <Input value={origemCep} onChange={e => setOrigemCep(e.target.value)} placeholder="00000-000" />
               </div>
-              <div>
-                <Label>Cidade (opcional)</Label>
-                <Input value={origemCidade} onChange={e => setOrigemCidade(e.target.value)} placeholder="Ex: São Paulo" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Estado</Label>
+                  <Select value={origemEstado} onValueChange={setOrigemEstado}>
+                    <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
+                    <SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Cidade (opcional)</Label>
+                  <Input value={origemCidade} onChange={e => setOrigemCidade(e.target.value)} placeholder="Ex: São Paulo" />
+                </div>
               </div>
             </div>
           </div>
@@ -61,17 +71,23 @@ export function CotacaoSearchForm(props: CotacaoSearchFormProps) {
             <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <MapPin className="w-4 h-4 text-destructive" /> DESTINO
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <div>
-                <Label>Estado</Label>
-                <Select value={destinoEstado} onValueChange={setDestinoEstado}>
-                  <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
-                  <SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent>
-                </Select>
+                <Label>CEP</Label>
+                <Input value={destinoCep} onChange={e => setDestinoCep(e.target.value)} placeholder="00000-000" />
               </div>
-              <div>
-                <Label>Cidade (opcional)</Label>
-                <Input value={destinoCidade} onChange={e => setDestinoCidade(e.target.value)} placeholder="Ex: Recife" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Estado</Label>
+                  <Select value={destinoEstado} onValueChange={setDestinoEstado}>
+                    <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
+                    <SelectContent>{ESTADOS_BRASIL.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Cidade (opcional)</Label>
+                  <Input value={destinoCidade} onChange={e => setDestinoCidade(e.target.value)} placeholder="Ex: Recife" />
+                </div>
               </div>
             </div>
           </div>
