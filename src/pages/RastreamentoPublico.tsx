@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { 
   Package, Truck, CheckCircle2, Clock, Search, Loader2, 
   AlertTriangle, Phone, Share2, MessageCircle, LucideIcon, Copy,
-  MapPin, Calendar, FileText, User, Navigation
+  MapPin, Calendar, FileText, User, Navigation, Send, Eye
 } from "lucide-react";
 import { Timeline } from "@/components/common/Timeline";
 import { cn } from "@/lib/utils";
