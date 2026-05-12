@@ -122,7 +122,7 @@ export function GlobalSearch() {
               <ScrollArea className="max-h-[400px]">
                 <div className="p-2">
                   {Object.entries(groupedResults).map(([type, items], groupIndex) => {
-                    const Icon = typeIcons[type as keyof typeof typeIcons] || Package;
+                    const SectionIcon = typeIcons[type as keyof typeof typeIcons] || Package;
                     return (
                       <div key={type}>
                         {groupIndex > 0 && <Separator className="my-2" />}
