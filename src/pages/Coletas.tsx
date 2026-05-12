@@ -224,6 +224,21 @@ export default function Coletas() {
           onLastPage={pagination.lastPage}
         />
       </div>
+
+      <PickupDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen} 
+        onSuccess={fetchData} 
+        pickup={selectedPickup} 
+      />
+
+      <PickupDetailsDialog 
+        open={isDetailsOpen} 
+        onOpenChange={setIsDetailsOpen} 
+        pickup={selectedPickup} 
+        statusConfig={statusConfig} 
+        onStatusUpdate={fetchData} 
+      />
     </MainLayout>
   );
 }
