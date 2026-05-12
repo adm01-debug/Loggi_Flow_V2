@@ -10,3 +10,4 @@ export { QuotationHistory } from './QuotationHistory';
 export { CargoTemplates } from './CargoTemplates';
 export { ScenarioSimulator } from './ScenarioSimulator';
 export { QuickQuoteWidget } from './QuickQuoteWidget';
+export { StrategySimulator } from './StrategySimulator';
