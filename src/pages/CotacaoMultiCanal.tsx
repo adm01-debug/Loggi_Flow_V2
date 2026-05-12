@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CotacaoSearchForm } from './cotacao-multicanal/CotacaoSearchForm';
 import { CotacaoCarrierList } from './cotacao-multicanal/CotacaoCarrierList';
 import { CotacaoResultsTable } from './cotacao-multicanal/CotacaoResultsTable';
+import { NegotiationAssistant } from '@/components/freight';
 import type { CotacaoManual, TransportadoraComCanal } from './cotacao-multicanal/types';
 
 export default function CotacaoMultiCanal() {
