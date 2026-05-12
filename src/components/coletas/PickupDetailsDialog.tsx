@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, MapPin, Calendar, Clock, AlertTriangle, CheckCircle2, History, Info, ChevronRight } from "lucide-react";
+import { Truck, Package, MapPin, Calendar, Clock, AlertTriangle, CheckCircle2, History, Info, ChevronRight, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -146,26 +146,33 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
               )}
 
               <div className="pt-4 border-t space-y-3">
-                <h3 className="font-semibold">Ações Disponíveis</h3>
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-primary" /> Ações do Fluxo
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {pickup.status === 'aguardando_liberacao' && (
-                    <Button onClick={() => updateStatus('solicitada')} className="bg-primary hover:bg-primary/90">
-                      <Calendar className="w-4 h-4 mr-2" /> Solicitar Coleta
+                    <Button onClick={() => updateStatus('solicitada')} className="bg-primary hover:bg-primary/90 shadow-sm">
+                      <Calendar className="w-4 h-4 mr-2" /> Agendar Coleta
                     </Button>
                   )}
                   {pickup.status === 'solicitada' && (
-                    <Button onClick={() => updateStatus('em_transito')} className="bg-warning hover:bg-warning/90 text-warning-foreground">
-                      <Truck className="w-4 h-4 mr-2" /> Confirmar Saída (Em Trânsito)
+                    <Button onClick={() => updateStatus('em_transito')} className="bg-warning hover:bg-warning/90 text-warning-foreground shadow-sm">
+                      <Truck className="w-4 h-4 mr-2" /> Confirmar Saída
                     </Button>
                   )}
                   {pickup.status === 'em_transito' && (
-                    <Button onClick={() => updateStatus('chegou_expedicao')} variant="outline">
-                      <Building2 className="w-4 h-4 mr-2" /> Chegou na Expedição
+                    <Button onClick={() => updateStatus('chegou_expedicao')} variant="outline" className="border-primary/20 hover:bg-primary/5">
+                      <Building2 className="w-4 h-4 mr-2 text-primary" /> Receber na Expedição
                     </Button>
                   )}
                   {(pickup.status === 'chegou_expedicao' || pickup.status === 'divergencia') && (
-                    <Button onClick={() => setActiveTab('conferencia')} className="bg-success hover:bg-success/90">
-                      <CheckCircle2 className="w-4 h-4 mr-2" /> Iniciar Conferência
+                    <Button onClick={() => setActiveTab('conferencia')} className="bg-success hover:bg-success/90 shadow-sm shadow-success/10">
+                      <CheckCircle2 className="w-4 h-4 mr-2" /> Iniciar Conferência Real
+                    </Button>
+                  )}
+                  {pickup.tipo_coleta === 'transportadora' && (
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" onClick={() => toast.info("Consultando API Rodonaves...")}>
+                      <History className="w-4 h-4 mr-1" /> Log API
                     </Button>
                   )}
                 </div>

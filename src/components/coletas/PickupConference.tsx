@@ -18,17 +18,19 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [qtdRecebida, setQtdRecebida] = useState(pickup.qtd_recebida || pickup.qtd_volumes || 0);
-  const [pesoEfetivo, setPesoEfetivo] = useState(pickup.peso_estimado_kg || 0);
+  const [pesoEfetivo, setPesoEfetivo] = useState(pickup.peso_efetivo || pickup.peso_estimado_kg || 0);
   const [divergencia, setDivergencia] = useState<{ volumes: boolean; peso: boolean } | null>(null);
 
   const checkDivergences = () => {
     const volDiv = Number(qtdRecebida) !== Number(pickup.qtd_volumes);
-    // Allow 5% weight variation
-    const pesoVariacao = Math.abs(Number(pesoEfetivo) - Number(pickup.peso_estimado_kg));
-    const pesoDiv = pesoVariacao > (Number(pickup.peso_estimado_kg) * 0.05);
+    // Variação de peso superior a 5% ou absoluta > 2kg
+    const pesoEsperado = Number(pickup.peso_estimado_kg);
+    const pesoVariacao = Math.abs(Number(pesoEfetivo) - pesoEsperado);
+    const pesoDiv = pesoVariacao > (pesoEsperado * 0.05) || (pesoEsperado > 0 && pesoVariacao > 2);
     
-    setDivergencia({ volumes: volDiv, peso: pesoDiv });
-    return volDiv || pesoDiv;
+    const result = { volumes: volDiv, peso: pesoDiv };
+    setDivergencia(result);
+    return result.volumes || result.peso;
   };
 
   const handleFinish = async () => {
@@ -41,6 +43,7 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
         .from("coletas")
         .update({
           qtd_recebida: Number(qtdRecebida),
+          peso_efetivo: Number(pesoEfetivo),
           status: status as any,
           data_recebimento: new Date().toISOString(),
           divergencia_percentual: pickup.peso_estimado_kg ? (Math.abs(Number(pesoEfetivo) - pickup.peso_estimado_kg) / pickup.peso_estimado_kg) * 100 : 0
@@ -51,7 +54,9 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
 
       toast({
         title: hasDivergence ? "Conferência com Divergências" : "Conferência Finalizada",
-        description: hasDivergence ? "Foram detectadas divergências de peso ou volumes." : "Volumes conferidos com sucesso.",
+        description: hasDivergence 
+          ? "Detectamos discrepâncias. Verifique o alerta abaixo." 
+          : "Volumes e pesos conferidos com sucesso.",
         variant: hasDivergence ? "destructive" : "default"
       });
       
