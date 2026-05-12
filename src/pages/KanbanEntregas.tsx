@@ -3,24 +3,25 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { EmptyState } from '@/components/common/EmptyState';
-import {
-  Package, Send, Truck, CheckCircle2, AlertTriangle, Clock,
-  FileText, DollarSign, GripVertical, ArrowRight, Eye, RefreshCw,
-  Kanban as KanbanIcon, List
+import { 
+  Package, Send, Truck, CheckCircle2, AlertTriangle, Clock, 
+  FileText, DollarSign, GripVertical, RefreshCw, Filter, Search,
+  Camera, Eye
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useRealtime } from '@/hooks/useRealtime';
-import type { LucideIcon } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DeliveryReceiptUpload } from '@/components/shipping/DeliveryReceiptUpload';
 
 type EntregaStatus = 'aguardando_producao' | 'pronto_despacho' | 'cotacao_frete' | 'nf_emitida' | 'despachado' | 'em_transito' | 'saiu_entrega' | 'entregue' | 'ocorrencia' | 'finalizado';
 
@@ -33,146 +34,125 @@ interface KanbanEntrega {
   valor_frete: number | null;
   nf_remessa: string | null;
   created_at: string;
+  comprovante_entrega_url: string | null;
   cliente: { razao_social: string; nome_fantasia: string | null } | null;
   transportadora: { nome_fantasia: string } | null;
 }
 
-interface KanbanColumn {
-  id: EntregaStatus;
-  title: string;
-  icon: LucideIcon;
-  color: string;
-  bgColor: string;
-}
-
-const COLUMNS: KanbanColumn[] = [
-  { id: 'aguardando_producao', title: 'Aguard. Produção', icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-muted/50' },
+const COLUMNS = [
   { id: 'pronto_despacho', title: 'Pronto Despacho', icon: Package, color: 'text-info', bgColor: 'bg-info/5' },
-  { id: 'cotacao_frete', title: 'Cotação Frete', icon: DollarSign, color: 'text-accent-foreground', bgColor: 'bg-accent/5' },
   { id: 'nf_emitida', title: 'NF Emitida', icon: FileText, color: 'text-primary', bgColor: 'bg-primary/5' },
-  { id: 'despachado', title: 'Despachado', icon: Send, color: 'text-primary', bgColor: 'bg-primary/5' },
+  { id: 'despachado', title: 'Despachado', icon: Send, color: 'text-indigo-500', bgColor: 'bg-indigo-50/50' },
   { id: 'em_transito', title: 'Em Trânsito', icon: Truck, color: 'text-warning', bgColor: 'bg-warning/5' },
-  { id: 'saiu_entrega', title: 'Saiu p/ Entrega', icon: Truck, color: 'text-warning', bgColor: 'bg-warning/5' },
   { id: 'entregue', title: 'Entregue', icon: CheckCircle2, color: 'text-success', bgColor: 'bg-success/5' },
-];
+] as const;
 
-const VALID_TRANSITIONS: Record<EntregaStatus, EntregaStatus[]> = {
-  aguardando_producao: ['pronto_despacho'],
-  pronto_despacho: ['cotacao_frete', 'aguardando_producao'],
-  cotacao_frete: ['nf_emitida', 'pronto_despacho'],
-  nf_emitida: ['despachado', 'cotacao_frete'],
-  despachado: ['em_transito'],
-  em_transito: ['saiu_entrega', 'ocorrencia'],
-  saiu_entrega: ['entregue', 'ocorrencia'],
-  entregue: ['finalizado'],
-  ocorrencia: ['em_transito', 'saiu_entrega'],
-  finalizado: [],
-};
-
-function EntregaCard({ entrega, onMoveForward, onMoveBack, isUpdating }: {
-  entrega: KanbanEntrega;
-  onMoveForward: () => void;
-  onMoveBack: () => void;
-  isUpdating: boolean;
-}) {
-  const nextStatuses = VALID_TRANSITIONS[entrega.status] || [];
-  const canGoForward = nextStatuses.length > 0;
-  const prevStatuses = Object.entries(VALID_TRANSITIONS)
-    .filter(([, nexts]) => nexts.includes(entrega.status))
-    .map(([status]) => status);
-  const canGoBack = prevStatuses.length > 0;
+function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number }) {
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className="p-3 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
-    >
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex items-center gap-1.5">
-          <GripVertical className="w-3.5 h-3.5 text-muted-foreground/50" />
-          <span className="font-mono text-xs font-bold text-primary">{entrega.numero_entrega}</span>
-        </div>
-        {entrega.valor_frete && (
-          <Badge variant="outline" className="text-[10px] h-5">
-            R$ {entrega.valor_frete.toFixed(0)}
-          </Badge>
-        )}
-      </div>
+    <Draggable draggableId={entrega.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={cn(
+            "p-3 rounded-xl border bg-card shadow-sm transition-all select-none group relative",
+            snapshot.isDragging ? "shadow-xl ring-2 ring-primary border-primary scale-105 z-50" : "hover:border-primary/30"
+          )}
+        >
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <GripVertical className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary/50 transition-colors" />
+              <span className="font-mono text-xs font-bold text-primary">{entrega.numero_entrega}</span>
+            </div>
+            {entrega.comprovante_entrega_url && (
+              <Badge variant="outline" className="text-[9px] h-4 bg-success/10 text-success border-success/20">
+                <CheckCircle2 className="w-2.5 h-2.5 mr-1" /> OK
+              </Badge>
+            )}
+          </div>
 
-      <p className="text-xs text-muted-foreground truncate mb-1">
-        {entrega.cliente?.nome_fantasia || entrega.cliente?.razao_social || 'Sem cliente'}
-      </p>
+          <p className="text-xs font-medium truncate mb-1">
+            {entrega.cliente?.nome_fantasia || entrega.cliente?.razao_social || 'Sem cliente'}
+          </p>
 
-      <p className="text-[11px] text-muted-foreground/70 truncate mb-2">
-        {entrega.endereco_entrega.length > 35
-          ? entrega.endereco_entrega.substring(0, 35) + '…'
-          : entrega.endereco_entrega}
-      </p>
+          <p className="text-[10px] text-muted-foreground line-clamp-2 mb-2">
+            {entrega.endereco_entrega}
+          </p>
 
-      {entrega.transportadora && (
-        <div className="flex items-center gap-1 mb-2">
-          <Truck className="w-3 h-3 text-muted-foreground/50" />
-          <span className="text-[10px] text-muted-foreground">{entrega.transportadora.nome_fantasia}</span>
+          <div className="flex items-center justify-between gap-2 pt-2 border-t mt-auto">
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-muted-foreground/50" />
+              <span className="text-[9px] text-muted-foreground">
+                {entrega.previsao_entrega ? format(new Date(entrega.previsao_entrega), 'dd/MM', { locale: ptBR }) : '--/--'}
+              </span>
+            </div>
+            
+            <Dialog open={showDetails} onOpenChange={setShowDetails}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Eye className="w-3 h-3" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-primary" />
+                    Entrega {entrega.numero_entrega}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase font-bold">Cliente</label>
+                      <p className="font-medium">{entrega.cliente?.razao_social}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase font-bold">Status</label>
+                      <Badge variant="secondary" className="block w-fit">{entrega.status}</Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground uppercase font-bold">Endereço</label>
+                    <p className="text-sm">{entrega.endereco_entrega}</p>
+                  </div>
+                  
+                  <div className="pt-4 border-t">
+                    <label className="text-xs text-muted-foreground uppercase font-bold mb-2 block">Comprovante de Entrega</label>
+                    <DeliveryReceiptUpload 
+                      entregaId={entrega.id} 
+                      currentUrl={entrega.comprovante_entrega_url} 
+                    />
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       )}
-
-      {entrega.previsao_entrega && (
-        <div className="flex items-center gap-1 mb-2">
-          <Clock className="w-3 h-3 text-muted-foreground/50" />
-          <span className="text-[10px] text-muted-foreground">
-            {format(new Date(entrega.previsao_entrega), 'dd/MM', { locale: ptBR })}
-          </span>
-        </div>
-      )}
-
-      <div className="flex items-center justify-between gap-1 pt-2 border-t">
-        {canGoBack ? (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 text-[10px] px-2"
-            onClick={onMoveBack}
-            disabled={isUpdating}
-          >
-            ← Voltar
-          </Button>
-        ) : <span />}
-        {canGoForward && (
-          <Button
-            size="sm"
-            variant="default"
-            className="h-6 text-[10px] px-2"
-            onClick={onMoveForward}
-            disabled={isUpdating}
-          >
-            Avançar →
-          </Button>
-        )}
-      </div>
-    </motion.div>
+    </Draggable>
   );
 }
 
 export default function KanbanEntregas() {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState('');
 
   useRealtime({
     table: 'entregas',
     queryKey: ['kanban-entregas'],
   });
 
-  const { data: entregas, isLoading } = useQuery({
+  const { data: entregas = [], isLoading } = useQuery({
     queryKey: ['kanban-entregas'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('entregas')
         .select(`
           id, numero_entrega, status, endereco_entrega, previsao_entrega,
-          valor_frete, nf_remessa, created_at,
+          valor_frete, nf_remessa, created_at, comprovante_entrega_url,
           cliente:clientes (razao_social, nome_fantasia),
           transportadora:transportadoras (nome_fantasia)
         `)
@@ -182,7 +162,6 @@ export default function KanbanEntregas() {
       if (error) throw error;
       return data as KanbanEntrega[];
     },
-    enabled: !!user?.id,
   });
 
   const updateStatus = useMutation({
@@ -197,107 +176,114 @@ export default function KanbanEntregas() {
       queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] });
       toast.success('Status atualizado!');
     },
-    onError: (err) => {
+    onError: (err: any) => {
       toast.error('Erro ao atualizar status', { description: err.message });
     },
   });
 
-  const handleMoveForward = useCallback((entrega: KanbanEntrega) => {
-    const nextStatuses = VALID_TRANSITIONS[entrega.status];
-    if (nextStatuses.length > 0) {
-      updateStatus.mutate({ id: entrega.id, status: nextStatuses[0] as EntregaStatus });
-    }
-  }, [updateStatus]);
+  const onDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
 
-  const handleMoveBack = useCallback((entrega: KanbanEntrega) => {
-    const prevStatuses = Object.entries(VALID_TRANSITIONS)
-      .filter(([, nexts]) => nexts.includes(entrega.status))
-      .map(([status]) => status as EntregaStatus);
-    if (prevStatuses.length > 0) {
-      updateStatus.mutate({ id: entrega.id, status: prevStatuses[0] });
-    }
-  }, [updateStatus]);
+    if (!destination) return;
+    if (destination.droppableId === source.droppableId) return;
 
-  const getColumnEntregas = (columnId: EntregaStatus) => {
-    return (entregas || []).filter(e => e.status === columnId);
+    updateStatus.mutate({ 
+      id: draggableId, 
+      status: destination.droppableId as EntregaStatus 
+    });
   };
+
+  const filteredEntregas = entregas.filter(e => 
+    e.numero_entrega.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    e.cliente?.razao_social.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <MainLayout>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
-                <Package className="w-6 h-6 text-primary" />
-              </div>
-              Kanban de Entregas
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Arraste entregas entre colunas para atualizar o status
-            </p>
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 shadow-inner">
+              <Package className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight">Kanban de Entregas</h1>
+              <p className="text-muted-foreground">Gestão visual do fluxo logístico de entregas</p>
+            </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] })} className="gap-2">
-            <RefreshCw className="w-4 h-4" /> Atualizar
-          </Button>
+          
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input 
+                placeholder="Filtrar entregas..." 
+                className="pl-9 w-[240px] bg-muted/30 border-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" size="sm" onClick={() => queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] })} className="gap-2">
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
-        {/* Summary badges */}
-        <div className="flex flex-wrap gap-2">
-          {COLUMNS.map(col => {
-            const count = getColumnEntregas(col.id).length;
-            if (count === 0) return null;
-            const Icon = col.icon;
-            return (
-              <Badge key={col.id} variant="outline" className={cn("gap-1", col.color)}>
-                <Icon className="w-3 h-3" />
-                {col.title}: {count}
-              </Badge>
-            );
-          })}
-        </div>
-
-        {/* Kanban Board */}
-        <div className="overflow-x-auto pb-4">
-          <div className="flex gap-3 min-w-max">
-            {COLUMNS.map(column => {
-              const items = getColumnEntregas(column.id);
-              const Icon = column.icon;
-              return (
-                <div key={column.id} className={cn("w-[240px] flex-shrink-0 rounded-xl border", column.bgColor)}>
-                  <div className="p-3 border-b flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Icon className={cn("w-4 h-4", column.color)} />
-                      <span className="text-xs font-semibold">{column.title}</span>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent">
+            <div className="flex gap-4 min-w-max h-[calc(100vh-240px)]">
+              {COLUMNS.map(column => {
+                const columnItems = filteredEntregas.filter(e => e.status === column.id);
+                const Icon = column.icon;
+                
+                return (
+                  <div key={column.id} className={cn("w-[280px] flex flex-col rounded-2xl border bg-muted/30")}>
+                    <div className="p-4 flex items-center justify-between border-b bg-background/50 backdrop-blur-sm rounded-t-2xl">
+                      <div className="flex items-center gap-2">
+                        <div className={cn("p-1.5 rounded-lg", column.bgColor)}>
+                          <Icon className={cn("w-4 h-4", column.color)} />
+                        </div>
+                        <span className="text-sm font-bold tracking-tight">{column.title}</span>
+                      </div>
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-black">{columnItems.length}</Badge>
                     </div>
-                    <Badge variant="secondary" className="h-5 text-[10px]">{items.length}</Badge>
-                  </div>
-                  <ScrollArea className="h-[calc(100vh-280px)]">
-                    <div className="p-2 space-y-2">
-                      <AnimatePresence>
-                        {items.length === 0 ? (
-                          <div className="p-4 text-center text-xs text-muted-foreground/50">
-                            Nenhuma entrega
+
+                    <Droppable droppableId={column.id}>
+                      {(provided, snapshot) => (
+                        <ScrollArea className="flex-1">
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            className={cn(
+                              "p-3 space-y-3 min-h-[150px] transition-colors",
+                              snapshot.isDraggingOver && "bg-primary/5"
+                            )}
+                          >
+                            <AnimatePresence>
+                              {columnItems.map((entrega, index) => (
+                                <EntregaCard 
+                                  key={entrega.id} 
+                                  entrega={entrega} 
+                                  index={index} 
+                                />
+                              ))}
+                            </AnimatePresence>
+                            {provided.placeholder}
+                            {columnItems.length === 0 && !snapshot.isDraggingOver && (
+                              <div className="flex flex-col items-center justify-center py-10 opacity-20 select-none">
+                                <Icon className="w-10 h-10 mb-2" />
+                                <span className="text-[10px] uppercase font-bold tracking-tighter text-center">Nenhuma entrega</span>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          items.map(entrega => (
-                            <EntregaCard
-                              key={entrega.id}
-                              entrega={entrega}
-                              onMoveForward={() => handleMoveForward(entrega)}
-                              onMoveBack={() => handleMoveBack(entrega)}
-                              isUpdating={updateStatus.isPending}
-                            />
-                          ))
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </ScrollArea>
-                </div>
-              );
-            })}
+                        </ScrollArea>
+                      )}
+                    </Droppable>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </DragDropContext>
       </div>
     </MainLayout>
   );

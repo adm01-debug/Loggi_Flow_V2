@@ -1,14 +1,11 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { BoxGrid } from "@/components/box/BoxGrid";
 import { BoxDetailModal } from "@/components/box/BoxDetailModal";
-import { useBoxManagement, BoxData } from "@/hooks/useBoxManagement";
+import { useBoxManagement, BoxData, DeliveryWithRelations } from "@/hooks/useBoxManagement";
 import { 
-  Package, 
   Box, 
-  TrendingUp, 
-  Clock, 
   Loader2, 
   Trash2, 
   QrCode, 
@@ -16,7 +13,10 @@ import {
   ArrowRightLeft, 
   LayoutGrid,
   Search,
-  CheckCircle2
+  CheckCircle2,
+  Clock,
+  GripVertical,
+  Package
 } from "lucide-react";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 const filterConfig: FilterConfig<BoxData> = {
   search: {
@@ -35,6 +37,36 @@ const filterConfig: FilterConfig<BoxData> = {
     placeholder: "Buscar box..."
   }
 };
+
+function PendingDeliveryCard({ delivery }: { delivery: DeliveryWithRelations }) {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("deliveryId", delivery.id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  return (
+    <div 
+      draggable 
+      onDragStart={handleDragStart}
+      className="p-3 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all cursor-grab active:cursor-grabbing group"
+    >
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <GripVertical className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary/50" />
+          <span className="font-mono text-[10px] font-bold text-primary">{delivery.numero_entrega}</span>
+        </div>
+        {delivery.isUrgent && (
+          <Badge variant="destructive" className="h-4 px-1 text-[8px] animate-pulse">URGENTE</Badge>
+        )}
+      </div>
+      <p className="text-[11px] font-medium truncate">{delivery.cliente?.razao_social}</p>
+      <div className="flex items-center gap-1.5 mt-2">
+        <Package className="w-3 h-3 text-muted-foreground/50" />
+        <span className="text-[9px] text-muted-foreground truncate">{delivery.endereco_entrega}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function GestaoBox() {
   const { 
@@ -55,16 +87,16 @@ export default function GestaoBox() {
   const boxesList = useMemo(() => (boxes || []).map((b, i) => ({ ...b, id: `box-${b.number}` })), [boxes]);
   
   const statusFiltered = useMemo(() => {
-    if (statusFilter === "all") return boxesList;
-    if (statusFilter === "ocupado") return boxesList.filter(b => b.isOccupied);
-    if (statusFilter === "livre") return boxesList.filter(b => !b.isOccupied);
-    if (statusFilter === "cross_docking") return boxesList.filter(b => b.isCrossDocking);
-    return boxesList;
+    let result = boxesList;
+    if (statusFilter === "ocupado") result = boxesList.filter(b => b.isOccupied);
+    else if (statusFilter === "livre") result = boxesList.filter(b => !b.isOccupied);
+    else if (statusFilter === "cross_docking") result = boxesList.filter(b => b.isCrossDocking);
+    return result;
   }, [boxesList, statusFilter]);
   
   const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(statusFiltered, filterConfig);
   const pagination = usePagination(filteredData, { initialPageSize: 16 });
-  const { selectedIds, toggle, selectAll, clearSelection } = useSelection(pagination.paginatedData.map(b => ({ ...b, id: `box-${b.number}` })));
+  const { selectedIds, clearSelection } = useSelection(pagination.paginatedData.map(b => ({ ...b, id: `box-${b.number}` })));
 
   const occupiedCount = boxes.filter((b) => b.isOccupied).length;
   const crossDockingCount = boxes.filter((b) => b.isCrossDocking).length;
@@ -103,7 +135,6 @@ export default function GestaoBox() {
       if (freeBox) {
         await allocateToBox(freeBox.number, delivery.id);
         setScanValue("");
-        toast.success(`Entrega ${delivery.numero_entrega} alocada no BOX ${freeBox.number}`);
       } else {
         toast.error("Nenhum box livre disponível");
       }
@@ -114,13 +145,13 @@ export default function GestaoBox() {
 
   const smartAllocate = async () => {
     if (pendingDeliveries.length === 0) {
-      toast.info("Não há entregas pendentes para alocação");
+      toast.info("Não há entregas pendentes");
       return;
     }
 
     const freeBoxes = boxes.filter(b => !b.isOccupied);
     if (freeBoxes.length === 0) {
-      toast.error("Não há boxes livres disponíveis");
+      toast.error("Não há boxes livres");
       return;
     }
 
@@ -133,13 +164,8 @@ export default function GestaoBox() {
       }
       toast.success("Alocação inteligente concluída", { id: loadingToast });
     } catch (error) {
-      toast.error("Erro durante a alocação inteligente", { id: loadingToast });
+      toast.error("Erro na alocação inteligente", { id: loadingToast });
     }
-  };
-
-  const handleClearFilters = () => {
-    clearFilters();
-    setStatusFilter("all");
   };
 
   return (
@@ -153,8 +179,7 @@ export default function GestaoBox() {
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight">Gestão de BOX</h1>
               <p className="text-muted-foreground flex items-center gap-2">
-                Controle avançado de entrada e saída (Cross-docking)
-                <Badge variant="outline" className="text-[10px] font-bold uppercase py-0 px-1.5 h-4 border-primary/20 bg-primary/5">10/10 Pro</Badge>
+                Controle avançado de expedição (10/10 Pro)
               </p>
             </div>
           </div>
@@ -165,131 +190,108 @@ export default function GestaoBox() {
               <Input 
                 ref={scanInputRef}
                 placeholder="Escanear Código/NF..." 
-                className="pl-10 w-[240px] bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary shadow-sm"
+                className="pl-10 w-[240px] bg-muted/30 border-none"
                 value={scanValue}
                 onChange={(e) => setScanValue(e.target.value)}
               />
             </form>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/5 shadow-sm" onClick={smartAllocate}>
-                    <Zap className="w-4 h-4 text-primary" />
-                    <span className="hidden sm:inline">Inteligente</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Alocação automática das entregas pendentes</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/5" onClick={smartAllocate}>
+              <Zap className="w-4 h-4 text-primary" />
+              <span className="hidden sm:inline">Smart Allocate</span>
+            </Button>
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-muted/5 border-none shadow-sm hover:shadow-md transition-all duration-300">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <LayoutGrid className="w-5 h-5 text-primary mb-2 opacity-70" />
-              <p className="text-2xl font-black text-foreground">{boxes.length}</p>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Total de Boxes</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-success/5 border-none shadow-sm hover:shadow-md transition-all duration-300">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <CheckCircle2 className="w-5 h-5 text-success mb-2 opacity-70" />
-              <p className="text-2xl font-black text-success">{boxes.length - occupiedCount}</p>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Disponíveis</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-info/5 border-none shadow-sm hover:shadow-md transition-all duration-300">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <ArrowRightLeft className="w-5 h-5 text-info mb-2 opacity-70" />
-              <p className="text-2xl font-black text-info">{crossDockingCount}</p>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Cross-docking</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-warning/5 border-none shadow-sm hover:shadow-md transition-all duration-300">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-              <div className="relative mb-2">
-                <Clock className="w-5 h-5 text-warning opacity-70" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-warning rounded-full animate-ping" />
-              </div>
-              <p className="text-2xl font-black text-warning">{occupancyRate}%</p>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Ocupação Atual</p>
-            </CardContent>
-          </Card>
+          {[
+            { label: "Total Boxes", val: boxes.length, icon: LayoutGrid, color: "text-primary", bg: "bg-primary/5" },
+            { label: "Disponíveis", val: boxes.length - occupiedCount, icon: CheckCircle2, color: "text-success", bg: "bg-success/5" },
+            { label: "Cross-docking", val: crossDockingCount, icon: ArrowRightLeft, color: "text-info", bg: "bg-info/5" },
+            { label: "Ocupação", val: `${occupancyRate}%`, icon: Clock, color: "text-warning", bg: "bg-warning/5" }
+          ].map((stat, i) => (
+            <Card key={i} className={cn("border-none shadow-sm", stat.bg)}>
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                <stat.icon className={cn("w-5 h-5 mb-2 opacity-70", stat.color)} />
+                <p className={cn("text-2xl font-black", stat.color)}>{stat.val}</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{stat.label}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-lg">
-          <FilterBar 
-            search={filters.search} 
-            onSearchChange={setSearch} 
-            searchPlaceholder="Buscar por número do box..." 
-            status={statusFilter}
-            onStatusChange={setStatusFilter}
-            statusOptions={[
-              { value: "ocupado", label: "Ocupados" }, 
-              { value: "livre", label: "Livres" },
-              { value: "cross_docking", label: "Cross-docking" }
-            ]}
-            statusLabel="Filtrar por Status"
-            onClearFilters={handleClearFilters} 
-            hasActiveFilters={hasActiveFilters || statusFilter !== "all"} 
-            totalFiltered={filteredData.length} 
-            totalOriginal={boxesList.length} 
-          />
-
-          <div className="mt-6">
-            {selectedIds.length > 0 && (
-              <div className="mb-4 animate-in slide-in-from-top-4 duration-300">
-                <BulkActions 
-                  selectedIds={selectedIds} 
-                  totalCount={pagination.paginatedData.length} 
-                  onClearSelection={clearSelection} 
-                  onSelectAll={() => {}} 
-                  actions={[{ id: "clear", label: "Liberar Selecionados", icon: Trash2, variant: "destructive", onClick: bulkClear }]} 
-                />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Pending Deliveries Sidebar */}
+          <div className="lg:col-span-1 space-y-4">
+            <Card className="h-full bg-muted/20 border-none overflow-hidden flex flex-col">
+              <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <Package className="w-4 h-4 text-primary" />
+                  Pendentes
+                </h3>
+                <Badge variant="secondary" className="font-black">{pendingDeliveries.length}</Badge>
               </div>
-            )}
-
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-primary opacity-50" />
-                <p className="text-sm text-muted-foreground animate-pulse">Sincronizando mapa de boxes...</p>
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-3">
+                  {pendingDeliveries.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 opacity-30 text-center">
+                      <CheckCircle2 className="w-8 h-8 mb-2" />
+                      <p className="text-[10px] uppercase font-bold">Tudo alocado</p>
+                    </div>
+                  ) : (
+                    pendingDeliveries.map(d => (
+                      <PendingDeliveryCard key={d.id} delivery={d} />
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+              <div className="p-3 bg-primary/5 text-center">
+                <p className="text-[9px] text-primary/70 font-medium">Arraste para um box livre</p>
               </div>
-            ) : filteredData.length > 0 ? (
-              <BoxGrid boxes={pagination.paginatedData} onBoxClick={handleBoxClick} onDrop={handleDrop} />
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 bg-muted/5 rounded-xl border border-dashed border-border/50">
-                <Search className="w-12 h-12 text-muted-foreground opacity-20 mb-4" />
-                <p className="text-lg font-medium text-muted-foreground">Nenhum box encontrado para os filtros atuais</p>
-                <Button variant="link" onClick={handleClearFilters} className="text-primary mt-2">Limpar todos os filtros</Button>
-              </div>
-            )}
+            </Card>
           </div>
 
-          {filteredData.length > 16 && (
-            <div className="mt-6 pt-6 border-t">
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                pageSize={pagination.pageSize}
-                totalItems={pagination.totalItems}
-                startIndex={pagination.startIndex}
-                endIndex={pagination.endIndex}
-                hasNextPage={pagination.hasNextPage}
-                hasPrevPage={pagination.hasPrevPage}
-                pageSizeOptions={pagination.pageSizeOptions}
-                onPageChange={pagination.setPage}
-                onPageSizeChange={pagination.setPageSize}
-                onNextPage={pagination.nextPage}
-                onPrevPage={pagination.prevPage}
-                onFirstPage={pagination.firstPage}
-                onLastPage={pagination.lastPage}
+          {/* Boxes Grid */}
+          <div className="lg:col-span-3 space-y-4">
+            <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-lg">
+              <FilterBar 
+                search={filters.search} 
+                onSearchChange={setSearch} 
+                searchPlaceholder="Buscar box..." 
+                status={statusFilter}
+                onStatusChange={setStatusFilter}
+                statusOptions={[
+                  { value: "ocupado", label: "Ocupados" }, 
+                  { value: "livre", label: "Livres" },
+                  { value: "cross_docking", label: "Cross-docking" }
+                ]}
+                onClearFilters={() => { clearFilters(); setStatusFilter("all"); }} 
+                hasActiveFilters={hasActiveFilters || statusFilter !== "all"} 
+                totalFiltered={filteredData.length} 
+                totalOriginal={boxesList.length} 
               />
+
+              <div className="mt-6">
+                {selectedIds.length > 0 && (
+                  <div className="mb-4">
+                    <BulkActions 
+                      selectedIds={selectedIds} 
+                      totalCount={pagination.paginatedData.length} 
+                      onClearSelection={clearSelection} 
+                      actions={[{ id: "clear", label: "Liberar Selecionados", icon: Trash2, variant: "destructive", onClick: bulkClear }]} 
+                    />
+                  </div>
+                )}
+
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center py-20 gap-4">
+                    <Loader2 className="w-10 h-10 animate-spin text-primary opacity-50" />
+                  </div>
+                ) : (
+                  <BoxGrid boxes={pagination.paginatedData} onBoxClick={handleBoxClick} onDrop={handleDrop} />
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
 
         <BoxDetailModal 

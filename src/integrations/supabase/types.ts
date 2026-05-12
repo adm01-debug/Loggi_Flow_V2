@@ -2479,9 +2479,11 @@ export type Database = {
         Args: { p_code: string }
         Returns: {
           codigo_rastreamento: string
+          comprovante_entrega_url: string
           created_at: string
           data_despacho: string
           data_entrega_efetiva: string
+          endereco_entrega: string
           nf_remessa: string
           numero_entrega: string
           previsao_entrega: string
