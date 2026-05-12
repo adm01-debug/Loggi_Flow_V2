@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
+import { RealtimeStatus } from "@/components/common/RealtimeStatus";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
