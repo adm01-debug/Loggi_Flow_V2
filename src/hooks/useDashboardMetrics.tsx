@@ -44,7 +44,7 @@ export interface RecentAlert {
 export function useDashboardMetrics() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ['dashboard-metrics', user?.id],
+    queryKey: QUERY_KEYS.analytics.dashboard,
     queryFn: async (): Promise<DashboardMetrics> => {
       // Buscar coletas
       const { data: coletas, error: coletasError } = await supabase
