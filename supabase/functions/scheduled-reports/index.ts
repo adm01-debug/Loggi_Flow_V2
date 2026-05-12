@@ -9,7 +9,7 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-serve(async (req) => {
+export const handler = async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -106,7 +106,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-});
+};
 
 async function generateReportData(supabase: any, reportType: string, filters: any) {
   const now = new Date();
@@ -250,4 +250,6 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
     }),
   });
 }
+
+serve(handler);
 
