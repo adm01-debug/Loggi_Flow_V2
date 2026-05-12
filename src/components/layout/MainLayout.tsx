@@ -25,9 +25,12 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen w-full bg-background">
+      {/* Global Progress Bar */}
+      <GlobalLoadingBar />
+
       {/* Skip Links - Acessibilidade aprimorada */}
       <SkipLinks />
-      
+
       {/* Offline Banner - PWA */}
       <OfflineBanner />
 
