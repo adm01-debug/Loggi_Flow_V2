@@ -73,12 +73,14 @@ export function useDeviceSessions() {
       const userAgent = navigator.userAgent;
       const { browser, os, deviceType } = parseUserAgent(userAgent);
 
-      // Get IP from external service
+      // Get IP and Geo data from external service
       let ipAddress = null;
+      let location = null;
       try {
-        const response = await fetch("https://api.ipify.org?format=json");
+        const response = await fetch("https://ipapi.co/json/");
         const data = await response.json();
         ipAddress = data.ip;
+        location = `${data.city}, ${data.region}, ${data.country_name}`;
       } catch {
         // Silent fail on IP fetch - non-critical
       }
