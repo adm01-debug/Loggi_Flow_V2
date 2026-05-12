@@ -1,188 +1,158 @@
-import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, X, Package, Truck, Users, Building2, AlertCircle, ArrowRight } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { useGlobalSearch, getSearchTypeLabel, getSearchTypeColor } from '@/hooks/useGlobalSearch';
-import { motion, AnimatePresence } from 'framer-motion';
-
-const typeIcons = {
-  entrega: Truck,
-  coleta: Package,
-  cliente: Users,
-  fornecedor: Building2,
-  transportadora: Truck,
-  ocorrencia: AlertCircle,
-  page: Search,
-};
-
+import * as React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Calculator,
+  Calendar,
+  CreditCard,
+  Settings,
+  Smile,
+  User,
+  Truck,
+  Package,
+  Users,
+  Building2,
+  AlertCircle,
+  Search,
+  Plus,
+  Moon,
+  Sun,
+  Bot,
+  Activity,
+  LogOut,
+  Map,
+} from "lucide-react";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command";
+import { useGlobalSearch } from "@/hooks/useGlobalSearch";
+import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "next-themes";
+import { useToast } from "@/hooks/use-toast";
 
 export function GlobalSearch() {
   const navigate = useNavigate();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { user, signOut, isAdmin } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
   
   const {
     query,
     setQuery,
     results,
-    hasResults,
-    isSearching,
     isOpen,
     setIsOpen,
     clearSearch,
   } = useGlobalSearch();
 
-  // Handle click outside to close
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsOpen((open) => !open);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, [setIsOpen]);
 
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        inputRef.current?.focus();
-        setIsOpen(true);
-      }
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-        inputRef.current?.blur();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setIsOpen]);
-
-  const handleResultClick = (url: string, id: string) => {
-    navigate(`${url}?highlight=${id}`);
+  const handleCommand = (callback: () => void) => {
+    callback();
+    setIsOpen(false);
     clearSearch();
   };
 
-  const groupedResults = results.reduce((acc, result) => {
-    if (!acc[result.type]) {
-      acc[result.type] = [];
-    }
-    acc[result.type].push(result);
-    return acc;
-  }, {} as Record<string, typeof results>);
-
   return (
-    <div ref={containerRef} className="relative w-full max-w-md">
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          ref={inputRef}
-          type="text"
-          placeholder="Buscar entregas, coletas, clientes... (⌘K)"
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground border rounded-md hover:bg-accent transition-colors w-full max-w-[200px] md:max-w-[300px]"
+      >
+        <Search className="h-4 w-4" />
+        <span className="flex-1 text-left">Busca rápida...</span>
+        <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+          <span className="text-xs">⌘</span>K
+        </kbd>
+      </button>
+
+      <CommandDialog open={isOpen} onOpenChange={setIsOpen}>
+        <CommandInput 
+          placeholder="Busque entregas, coletas ou digite um comando..." 
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
-          }}
-          onFocus={() => setIsOpen(true)}
-          className="pl-10 pr-10 bg-background/50 border-border/50 focus:bg-background transition-colors"
+          onValueChange={setQuery}
         />
-        {query && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
-            onClick={clearSearch}
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
+        <CommandList>
+          <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
+          
+          {query.length > 0 && results.length > 0 && (
+            <CommandGroup heading="Resultados da Busca">
+              {results.map((result) => (
+                <CommandItem
+                  key={result.id}
+                  onSelect={() => handleCommand(() => navigate(`${result.url}?highlight=${result.id}`))}
+                >
+                  {result.type === 'entrega' && <Truck className="mr-2 h-4 w-4" />}
+                  {result.type === 'coleta' && <Package className="mr-2 h-4 w-4" />}
+                  {result.type === 'cliente' && <Users className="mr-2 h-4 w-4" />}
+                  {result.type === 'fornecedor' && <Building2 className="mr-2 h-4 w-4" />}
+                  <span>{result.title}</span>
+                  <span className="ml-2 text-xs text-muted-foreground">{result.subtitle}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
 
-      {/* Search Results Dropdown */}
-      <AnimatePresence>
-        {isOpen && isSearching && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg overflow-hidden z-50"
-          >
-            {hasResults ? (
-              <ScrollArea className="max-h-[400px]">
-                <div className="p-2">
-                  {Object.entries(groupedResults).map(([type, items], groupIndex) => {
-                    const SectionIcon = typeIcons[type as keyof typeof typeIcons] || Package;
-                    return (
-                      <div key={type}>
-                        {groupIndex > 0 && <Separator className="my-2" />}
-                        <div className="px-2 py-1 mb-1">
-                          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                            <SectionIcon className="w-3 h-3" />
-                            {getSearchTypeLabel(type as keyof typeof typeIcons)}s ({items.length})
-                          </span>
-                        </div>
-                        {items.map((result) => (
-                          <button
-                            key={result.id}
-                            onClick={() => handleResultClick(result.url, result.id)}
-                            className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left group"
-                          >
-                            {result.type === 'page' && result.icon ? (
-                              <div className="shrink-0 p-1.5 rounded-md bg-secondary text-secondary-foreground">
-                                <result.icon className="w-4 h-4" />
-                              </div>
-                            ) : (
-                              <Badge variant="secondary" className={`shrink-0 ${getSearchTypeColor(result.type)}`}>
-                                {getSearchTypeLabel(result.type).slice(0, 3)}
-                              </Badge>
-                            )}
+          <CommandGroup heading="Ações Rápidas">
+            <CommandItem onSelect={() => handleCommand(() => navigate("/despachos"))}>
+              <Plus className="mr-2 h-4 w-4" />
+              <span>Novo Despacho</span>
+              <CommandShortcut>⌘N</CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => handleCommand(() => navigate("/coletas"))}>
+              <Package className="mr-2 h-4 w-4" />
+              <span>Nova Coleta</span>
+            </CommandItem>
+            <CommandItem onSelect={() => handleCommand(() => navigate("/rastreamento"))}>
+              <Map className="mr-2 h-4 w-4" />
+              <span>Central de Rastreamento</span>
+            </CommandItem>
+          </CommandGroup>
 
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">
-                                {result.title}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {result.subtitle}
-                              </p>
-                            </div>
-                            {result.status && (
-                              <Badge variant="outline" className="text-xs shrink-0">
-                                {result.status.replace(/_/g, ' ')}
-                              </Badge>
-                            )}
-                            <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                          </button>
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            ) : (
-              <div className="p-6 text-center">
-                <Search className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  Nenhum resultado para "{query}"
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Tente buscar por número, endereço ou nome
-                </p>
-              </div>
+          <CommandSeparator />
+
+          <CommandGroup heading="Configurações e Ferramentas">
+            <CommandItem onSelect={() => handleCommand(() => setTheme(theme === "dark" ? "light" : "dark"))}>
+              {theme === "dark" ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+              <span>Alternar Tema ({theme === "dark" ? "Claro" : "Escuro"})</span>
+            </CommandItem>
+            <CommandItem onSelect={() => handleCommand(() => navigate("/profile"))}>
+              <User className="mr-2 h-4 w-4" />
+              <span>Meu Perfil</span>
+              <CommandShortcut>⌘P</CommandShortcut>
+            </CommandItem>
+            {isAdmin && (
+              <CommandItem onSelect={() => handleCommand(() => navigate("/admin/telemetria"))}>
+                <Activity className="mr-2 h-4 w-4" />
+                <span>Telemetria do Sistema</span>
+              </CommandItem>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            <CommandItem onSelect={() => handleCommand(() => {
+              signOut();
+              toast({ title: "Sessão encerrada" });
+            })}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Sair do Sistema</span>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </>
   );
 }
