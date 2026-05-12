@@ -207,7 +207,13 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                           </p>
                           <div className="text-xs text-muted-foreground mt-1 space-y-1">
                             {event.new_data?.status && (
-                              <p>Novo status: <span className="font-semibold">{statusConfig[event.new_data.status]?.label || event.new_data.status}</span></p>
+                              <p>Novo status: <span className="font-semibold text-primary">{statusConfig[event.new_data.status]?.label || event.new_data.status}</span></p>
+                            )}
+                            {event.new_data?.qtd_recebida !== undefined && (
+                              <p>Volumes conferidos: <span className="font-semibold">{event.new_data.qtd_recebida}</span></p>
+                            )}
+                            {event.new_data?.peso_efetivo !== undefined && (
+                              <p>Peso aferido: <span className="font-semibold">{event.new_data.peso_efetivo} kg</span></p>
                             )}
                             <p className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" /> {format(new Date(event.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
