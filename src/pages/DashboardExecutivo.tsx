@@ -67,7 +67,7 @@ export default function DashboardExecutivo() {
     const entregues = curr.filter(e => e.status === "entregue" || e.status === "finalizado");
 
     const onTime = entregues.filter(e => {
-      if (!e.previsao_entrega || !e.data_entrega_efetiva) return true;
+      if (!e.previsao_entrega || !e.data_entrega_efetiva) return false;
       return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega);
     });
     const otifRate = entregues.length > 0 ? (onTime.length / entregues.length) * 100 : 0;

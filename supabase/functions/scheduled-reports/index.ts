@@ -120,17 +120,18 @@ async function generateReportData(supabase: any, reportType: string, filters: an
         .gte('created_at', startOfMonth.toISOString())
         .order('created_at', { ascending: false });
       
-      const total = data?.length || 0;
-      const entregues = data?.filter((e: any) => e.status === 'entregue').length || 0;
-      const atrasadas = data?.filter((e: any) => 
+      const deliveries = data || [];
+      const total = deliveries.length;
+      const entregues = deliveries.filter((e: any) => e.status === 'entregue').length;
+      const atrasadas = deliveries.filter((e: any) => 
         e.previsao_entrega && new Date(e.previsao_entrega) < now && e.status !== 'entregue'
-      ).length || 0;
+      ).length;
       
       return {
         type: 'entregas',
         period: `${startOfMonth.toLocaleDateString('pt-BR')} - ${now.toLocaleDateString('pt-BR')}`,
-        summary: { total, entregues, atrasadas, taxaEntrega: total > 0 ? ((entregues / total) * 100).toFixed(1) : 0 },
-        items: data?.slice(0, 20) || [],
+        summary: { total, entregues, atrasadas, taxaEntrega: total > 0 ? ((entregues / total) * 100).toFixed(1) : "0" },
+        items: deliveries.slice(0, 20),
       };
     }
 
@@ -184,8 +185,9 @@ async function generateReportData(supabase: any, reportType: string, filters: an
         .select('status, previsao_entrega, data_entrega_efetiva')
         .gte('created_at', startOfMonth.toISOString());
       
-      const entregues = entregas?.filter((e: any) => e.status === 'entregue') || [];
-      const noPrazo = entregues.filter((e: any) => 
+      const allDeliveries = entregas || [];
+      const deliveredOnes = allDeliveries.filter((e: any) => e.status === 'entregue');
+      const onTime = deliveredOnes.filter((e: any) => 
         e.data_entrega_efetiva && e.previsao_entrega && 
         new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega)
       ).length;
@@ -194,9 +196,9 @@ async function generateReportData(supabase: any, reportType: string, filters: an
         type: 'sla',
         period: `${startOfMonth.toLocaleDateString('pt-BR')} - ${now.toLocaleDateString('pt-BR')}`,
         summary: {
-          totalEntregues: entregues.length,
-          noPrazo,
-          taxaSLA: entregues.length > 0 ? ((noPrazo / entregues.length) * 100).toFixed(1) : 0,
+          totalEntregues: deliveredOnes.length,
+          noPrazo: onTime,
+          taxaSLA: deliveredOnes.length > 0 ? ((onTime / deliveredOnes.length) * 100).toFixed(1) : "0",
         },
       };
     }
@@ -236,19 +238,30 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
     </div>
   `;
 
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      from: "LogiFlow Reports <notificacoes@resend.dev>",
-      to: recipients,
-      subject,
-      html,
-    }),
-  });
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        from: "LogiFlow Reports <notificacoes@resend.dev>",
+        to: recipients,
+        subject,
+        html,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("[Scheduled Reports] Resend API error:", errorData);
+    } else {
+      console.log("[Scheduled Reports] Email sent successfully to:", recipients.join(", "));
+    }
+  } catch (err) {
+    console.error("[Scheduled Reports] Failed to send email:", err);
+  }
 }
 
 serve(handler);
