@@ -3,25 +3,15 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, MoreVertical, Building2, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, ScanLine, LucideIcon } from "lucide-react";
-import { ScannerButton } from "@/components/scanner/ScannerButton";
-import { ScanResult } from "@/hooks/useQRScanner";
+import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, Download, Loader2, LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
-import { BulkActions, useSelection } from "@/components/common/BulkActions";
 import { RealtimeBadge } from "@/components/common/RealtimeBadge";
-import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
@@ -38,9 +28,6 @@ interface Coleta {
   transportadoras?: { nome_fantasia: string } | null;
 }
 
-interface Fornecedor { id: string; razao_social: string; nome_fantasia: string | null; endereco_completo: string; contato_nome: string | null; contato_telefone: string | null; }
-interface Transportadora { id: string; nome_fantasia: string; }
-
 const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: LucideIcon }> = {
   aguardando_liberacao: { label: "Aguardando", color: "bg-muted text-muted-foreground", icon: Clock },
   solicitada: { label: "Solicitada", color: "bg-primary/15 text-primary", icon: Package },
@@ -52,24 +39,18 @@ const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: L
 };
 
 export default function Coletas() {
-  const { toast } = useToast();
-  const { exportToCSV, exportToJSON } = useExport();
+  const { exportToCSV } = useExport();
   const [coletas, setColetas] = useState<Coleta[]>([]);
-  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
-  const [transportadoras, setTransportadoras] = useState<Transportadora[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({ fornecedor_id: "", tipo_coleta: "lalamove" as ColetaTipo, transportadora_id: "", endereco_coleta: "", contato_coleta: "", data_prevista_coleta: "", qtd_volumes: "", peso_estimado_kg: "", observacoes: "" });
 
   const filterConfig: FilterConfig<Coleta> = {
     search: { fields: ["numero_coleta", "endereco_coleta", "observacoes"], placeholder: "Buscar coletas..." },
-    status: { field: "status", options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label })), label: "Status" },
-    select: { tipo: { field: "tipo_coleta", options: [{ value: "lalamove", label: "Lalamove" }, { value: "transportadora", label: "Transportadora" }], label: "Tipo" } }
+    status: { field: "status", options: Object.entries(statusConfig).map(([k, v]) => ({ value: k, label: v.label })), label: "Status" }
   };
 
-  const { filteredData, filters, setSearch, setStatus, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(coletas, filterConfig);
-  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
+  const { filteredData, filters, setSearch, setStatus, totalFiltered, totalOriginal } = useFilters(coletas, filterConfig);
+  const { sortedData } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
 
   useEffect(() => { 
@@ -85,14 +66,8 @@ export default function Coletas() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [coletasRes, fornecedoresRes, transportadorasRes] = await Promise.all([
-      supabase.from("coletas").select("*, fornecedores(razao_social, nome_fantasia), transportadoras(nome_fantasia)").order("created_at", { ascending: false }),
-      supabase.from("fornecedores").select("id, razao_social, nome_fantasia, endereco_completo, contato_nome, contato_telefone").order("razao_social"),
-      supabase.from("transportadoras").select("id, nome_fantasia").order("nome_fantasia")
-    ]);
-    if (coletasRes.data) setColetas(coletasRes.data);
-    if (fornecedoresRes.data) setFornecedores(fornecedoresRes.data);
-    if (transportadorasRes.data) setTransportadoras(transportadorasRes.data);
+    const { data } = await supabase.from("coletas").select("*, fornecedores(razao_social, nome_fantasia), transportadoras(nome_fantasia)").order("created_at", { ascending: false });
+    if (data) setColetas(data as any);
     setLoading(false);
   };
 
@@ -123,7 +98,7 @@ export default function Coletas() {
             <Button variant="outline" size="sm" onClick={() => exportToCSV(coletas as any, { filename: "coletas" })}>
               <Download className="w-4 h-4 mr-2" /> Exportar
             </Button>
-            <Button onClick={() => setDialogOpen(true)}>
+            <Button>
               <Plus className="w-4 h-4 mr-2" /> Nova
             </Button>
           </div>
@@ -166,26 +141,29 @@ export default function Coletas() {
           <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {pagination.paginatedData.map(c => (
-              <Card key={c.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className={cn("p-2 rounded-lg", statusConfig[c.status]?.color)}>
-                      {statusConfig[c.status]?.icon && <statusConfig.status.icon className="w-5 h-5" />}
+            {pagination.paginatedData.map(c => {
+              const Icon = statusConfig[c.status]?.icon || Package;
+              return (
+                <Card key={c.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={cn("p-2 rounded-lg", statusConfig[c.status]?.color)}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-bold">{c.numero_coleta}</p>
+                        <p className="text-sm text-muted-foreground">{(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold">{c.numero_coleta}</p>
-                      <p className="text-sm text-muted-foreground">{(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {c.endereco_coleta}</div>
+                      <div className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString() : '-'}</div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {c.endereco_coleta}</div>
-                    <div className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString() : '-'}</div>
-                  </div>
-                  <Badge variant="outline" className="capitalize">{statusConfig[c.status]?.label}</Badge>
-                </CardContent>
-              </Card>
-            ))}
+                    <Badge variant="outline" className="capitalize">{statusConfig[c.status]?.label}</Badge>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
         
@@ -193,6 +171,18 @@ export default function Coletas() {
           currentPage={pagination.currentPage} 
           totalPages={pagination.totalPages} 
           onPageChange={pagination.setPage}
+          pageSize={pagination.pageSize}
+          totalItems={totalFiltered}
+          startIndex={pagination.startIndex}
+          endIndex={pagination.endIndex}
+          hasNextPage={pagination.hasNextPage}
+          hasPrevPage={pagination.hasPrevPage}
+          pageSizeOptions={[10, 20, 50]}
+          onPageSizeChange={pagination.setPageSize}
+          onNextPage={pagination.nextPage}
+          onPrevPage={pagination.prevPage}
+          onFirstPage={pagination.firstPage}
+          onLastPage={pagination.lastPage}
         />
       </div>
     </MainLayout>
