@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator } from "lucide-react";
-import { StrategySimulator } from "@/components/freight";
+import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator, Sparkles, FileText, CheckCircle2, Wand2, Download } from "lucide-react";
+import { StrategySimulator, AIFreightForecasting } from "@/components/freight";
 
 const pieColors = ["hsl(var(--primary))", "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--accent))", "hsl(var(--muted))", "hsl(var(--secondary))"];
 
@@ -102,13 +102,18 @@ export default function InteligenciaFrete() {
 
         {/* Tabs */}
         <Tabs defaultValue="impacto" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-4">
             <TabsTrigger value="impacto">Impacto Regional</TabsTrigger>
             <TabsTrigger value="consolidacao">Consolidação</TabsTrigger>
             <TabsTrigger value="negociacao">Negociação</TabsTrigger>
             <TabsTrigger value="simulador"><Calculator className="w-4 h-4 mr-1" />Simulador</TabsTrigger>
+            <TabsTrigger value="previsao"><Sparkles className="w-4 h-4 mr-1" />Previsão IA</TabsTrigger>
             <TabsTrigger value="abusivos">Alertas</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="previsao" className="space-y-4">
+            <AIFreightForecasting currentTotal={summary.totalFreight} />
+          </TabsContent>
 
           <TabsContent value="simulador" className="space-y-4">
             <StrategySimulator 
@@ -275,51 +280,92 @@ export default function InteligenciaFrete() {
 
           {/* Tab 4: Abusive Freight Alerts */}
           <TabsContent value="abusivos" className="space-y-4">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/20 text-sm">
-              <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
-              <span className="text-destructive">Fretes com custo <strong>&gt;20% acima</strong> da média histórica para a mesma região</span>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 space-y-4">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/20 text-sm">
+                  <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
+                  <span className="text-destructive font-medium">Alertas de Fretes Atípicos</span>
+                  <span className="text-xs text-muted-foreground ml-auto">Custo superior a 20% da média histórica</span>
+                </div>
 
-            {abusiveFreights.length === 0 ? (
-              <div className="card-base p-8 text-center">
-                <AlertTriangle className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">Nenhum frete abusivo detectado — ótimo controle!</p>
+                {abusiveFreights.length === 0 ? (
+                  <div className="card-base p-8 text-center">
+                    <CheckCircle2 className="w-12 h-12 text-success mx-auto mb-3" />
+                    <p className="text-muted-foreground">Nenhum frete abusivo detectado — ótimo controle!</p>
+                  </div>
+                ) : (
+                  <div className="card-base p-4">
+                    <h3 className="font-semibold mb-4 text-sm">Listagem de Discrepâncias ({abusiveFreights.length})</h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-2 text-muted-foreground font-medium text-[10px] uppercase">Entrega</th>
+                            <th className="text-center py-2 text-muted-foreground font-medium text-[10px] uppercase">Transportadora</th>
+                            <th className="text-center py-2 text-muted-foreground font-medium text-[10px] uppercase">Valor</th>
+                            <th className="text-center py-2 text-muted-foreground font-medium text-[10px] uppercase">Média Região</th>
+                            <th className="text-center py-2 text-muted-foreground font-medium text-[10px] uppercase">%</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {abusiveFreights.slice(0, 15).map((e, i) => (
+                            <tr key={i} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                              <td className="py-2">
+                                <p className="font-mono text-xs">{e.numero_entrega}</p>
+                                <p className="text-[10px] text-muted-foreground truncate max-w-[100px]">{e.cliente}</p>
+                              </td>
+                              <td className="py-2 text-center text-[10px]">{e.transportadora}</td>
+                              <td className="py-2 text-center font-bold text-destructive">{formatCurrency(e.valor_frete)}</td>
+                              <td className="py-2 text-center text-muted-foreground text-[10px]">{formatCurrency(e.avgForState)}</td>
+                              <td className="py-2 text-center">
+                                <Badge className="bg-destructive/10 text-destructive border-destructive/20 text-[10px]">+{e.percentAbove.toFixed(0)}%</Badge>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="card-base p-4">
-                <h3 className="font-semibold mb-4">Fretes Acima da Média ({abusiveFreights.length})</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2 text-muted-foreground font-medium">Entrega</th>
-                        <th className="text-left py-2 text-muted-foreground font-medium">Cliente</th>
-                        <th className="text-center py-2 text-muted-foreground font-medium">Estado</th>
-                        <th className="text-center py-2 text-muted-foreground font-medium">Transportadora</th>
-                        <th className="text-center py-2 text-muted-foreground font-medium">Valor Frete</th>
-                        <th className="text-center py-2 text-muted-foreground font-medium">Média Estado</th>
-                        <th className="text-center py-2 text-muted-foreground font-medium">% Acima</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {abusiveFreights.slice(0, 30).map((e, i) => (
-                        <tr key={i} className="border-b last:border-0">
-                          <td className="py-2 font-mono text-xs">{e.numero_entrega}</td>
-                          <td className="py-2 truncate max-w-[120px]">{e.cliente}</td>
-                          <td className="py-2 text-center">{e.estado}</td>
-                          <td className="py-2 text-center text-xs">{e.transportadora}</td>
-                          <td className="py-2 text-center font-bold text-destructive">{formatCurrency(e.valor_frete)}</td>
-                          <td className="py-2 text-center text-muted-foreground">{formatCurrency(e.avgForState)}</td>
-                          <td className="py-2 text-center">
-                            <Badge className="bg-destructive/20 text-destructive text-xs">+{e.percentAbove.toFixed(0)}%</Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+
+              <div className="space-y-4">
+                <div className="card-base p-4 bg-primary/5 border-primary/20">
+                  <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
+                    <Wand2 className="w-4 h-4 text-primary" />
+                    Ações Corretivas
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-lg bg-background border border-border">
+                      <p className="text-xs font-bold">Revisar Tabela Rodonaves</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">Detectada divergência persistente em entregas para o Nordeste.</p>
+                      <Button variant="outline" size="sm" className="w-full mt-2 h-7 text-[10px]">Abrir Tabela</Button>
+                    </div>
+                    <div className="p-3 rounded-lg bg-background border border-border">
+                      <p className="text-xs font-bold">Solicitar Estorno (Loggi)</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">3 entregas recentes ultrapassaram o teto de cotação em +40%.</p>
+                      <Button variant="outline" size="sm" className="w-full mt-2 h-7 text-[10px]">Gerar Ofício</Button>
+                    </div>
+                    <div className="p-3 rounded-lg bg-success/10 border border-success/20">
+                      <p className="text-xs font-bold text-success">Otimizar Rotas</p>
+                      <p className="text-[10px] text-success/80 mt-1">Consolidação pode reduzir em até R$ 4.200 o custo mensal atual.</p>
+                      <Button className="w-full mt-2 h-7 text-[10px] bg-success hover:bg-success/90">Ativar Consolidador</Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="card-base p-4">
+                  <h4 className="text-xs font-bold mb-2 flex items-center gap-2">
+                    <FileText className="w-3 h-3" />
+                    Exportar Relatório
+                  </h4>
+                  <p className="text-[10px] text-muted-foreground mb-3">Baixe a análise detalhada de custos e oportunidades para a diretoria.</p>
+                  <Button variant="outline" size="sm" className="w-full h-8 text-[11px] gap-2">
+                    <Download className="w-3 h-3" /> PDF Detalhado
+                  </Button>
                 </div>
               </div>
-            )}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
