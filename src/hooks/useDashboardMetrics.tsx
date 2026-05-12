@@ -1,29 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { QUERY_KEYS } from "@/lib/queryKeys";
+import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
 
 export interface DashboardMetrics {
-  // Coletas
   totalColetas: number;
   coletasPendentes: number;
   coletasEmTransito: number;
   coletasFinalizadas: number;
   coletasComDivergencia: number;
-  
-  // Entregas
   totalEntregas: number;
   entregasPendentes: number;
   entregasEmTransito: number;
   entregasFinalizadas: number;
   entregasComOcorrencia: number;
-  
-  // Performance
   otifRate: number;
   tempoMedioColetaSP: number;
   taxaOcorrencias: number;
   taxaEntregaNoPrazo: number;
-  
-  // Alertas
   alertasCriticos: number;
   coletasAtrasadas: number;
   divergenciasAltas: number;
@@ -42,23 +37,20 @@ export interface RecentAlert {
 export function useDashboardMetrics() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ['dashboard-metrics', user?.id],
+    queryKey: QUERY_KEYS.analytics.dashboard,
     queryFn: async (): Promise<DashboardMetrics> => {
-      // Buscar coletas
       const { data: coletas, error: coletasError } = await supabase
         .from('coletas')
         .select('id, status, divergencia_percentual, data_prevista_coleta, created_at');
       
       if (coletasError) throw coletasError;
       
-      // Buscar entregas
       const { data: entregas, error: entregasError } = await supabase
         .from('entregas')
         .select('id, status, previsao_entrega, data_entrega_efetiva, created_at');
       
       if (entregasError) throw entregasError;
       
-      // Buscar ocorrências não resolvidas
       const { data: ocorrencias, error: ocorrenciasError } = await supabase
         .from('ocorrencias')
         .select('id, resolvida')
@@ -66,7 +58,6 @@ export function useDashboardMetrics() {
       
       if (ocorrenciasError) throw ocorrenciasError;
       
-      // Calcular métricas de coletas
       const totalColetas = coletas?.length || 0;
       const coletasPendentes = coletas?.filter(c => 
         ['aguardando_liberacao', 'solicitada'].includes(c.status)
@@ -77,7 +68,6 @@ export function useDashboardMetrics() {
         c.divergencia_percentual && c.divergencia_percentual > 5
       ).length || 0;
       
-      // Calcular métricas de entregas
       const totalEntregas = entregas?.length || 0;
       const entregasPendentes = entregas?.filter(e => 
         ['aguardando_producao', 'pronto_despacho', 'cotacao_frete', 'nf_emitida'].includes(e.status)
@@ -90,7 +80,6 @@ export function useDashboardMetrics() {
       ).length || 0;
       const entregasComOcorrencia = entregas?.filter(e => e.status === 'ocorrencia').length || 0;
       
-      // Calcular taxas de performance
       const entregasComPrazo = entregas?.filter(e => 
         e.previsao_entrega && e.data_entrega_efetiva
       ) || [];
@@ -109,12 +98,10 @@ export function useDashboardMetrics() {
         ? (entregasComOcorrencia / totalEntregas) * 100 
         : 0;
       
-      // OTIF simplificado (On-Time In-Full)
       const otifRate = totalEntregas > 0 
         ? Math.max(0, taxaEntregaNoPrazo - taxaOcorrencias) 
         : 100;
       
-      // Coletas atrasadas (mais de 48h desde a criação sem finalizar)
       const now = new Date();
       const coletasAtrasadas = coletas?.filter(c => {
         if (['finalizada', 'conferencia_ok'].includes(c.status)) return false;
@@ -123,11 +110,7 @@ export function useDashboardMetrics() {
         return hoursElapsed > 48;
       }).length || 0;
       
-      // Divergências altas (> 5%)
-      const divergenciasAltas = coletasComDivergencia;
-      
-      // Alertas críticos = coletas atrasadas + divergências + ocorrências não resolvidas
-      const alertasCriticos = coletasAtrasadas + divergenciasAltas + (ocorrencias?.length || 0);
+      const alertasCriticos = coletasAtrasadas + coletasComDivergencia + (ocorrencias?.length || 0);
       
       return {
         totalColetas,
@@ -141,16 +124,16 @@ export function useDashboardMetrics() {
         entregasFinalizadas,
         entregasComOcorrencia,
         otifRate: Math.round(otifRate * 10) / 10,
-        tempoMedioColetaSP: 36, // Placeholder - seria calculado com dados reais
+        tempoMedioColetaSP: 36,
         taxaOcorrencias: Math.round(taxaOcorrencias * 10) / 10,
         taxaEntregaNoPrazo: Math.round(taxaEntregaNoPrazo * 10) / 10,
         alertasCriticos,
         coletasAtrasadas,
-        divergenciasAltas,
+        divergenciasAltas: coletasComDivergencia,
       };
     },
-    staleTime: 1000 * 60 * 2,
-    refetchInterval: 1000 * 60 * 2,
+    staleTime: QUERY_STALE_TIME.DASHBOARD,
+    refetchInterval: QUERY_REFETCH_INTERVAL.DASHBOARD,
     enabled: !!user?.id,
   });
 }
@@ -163,7 +146,6 @@ export function useRecentAlerts() {
       const alerts: RecentAlert[] = [];
       const now = new Date();
       
-      // Buscar coletas com problemas
       const { data: coletas } = await supabase
         .from('coletas')
         .select('id, numero_coleta, status, divergencia_percentual, created_at')
@@ -208,7 +190,6 @@ export function useRecentAlerts() {
         }
       });
       
-      // Buscar entregas com ocorrências
       const { data: entregas } = await supabase
         .from('entregas')
         .select('id, numero_entrega, status, created_at')
@@ -226,7 +207,6 @@ export function useRecentAlerts() {
         });
       });
       
-      // Ordenar por severidade e data
       return alerts.sort((a, b) => {
         const severityOrder = { error: 0, warning: 1, info: 2 };
         if (severityOrder[a.severity] !== severityOrder[b.severity]) {
@@ -235,8 +215,8 @@ export function useRecentAlerts() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }).slice(0, 10);
     },
-    staleTime: 1000 * 60 * 1,
-    refetchInterval: 1000 * 60 * 1,
+    staleTime: QUERY_STALE_TIME.DYNAMIC,
+    refetchInterval: QUERY_REFETCH_INTERVAL.NOTIFICATIONS,
     enabled: !!user?.id,
   });
 }
@@ -257,7 +237,7 @@ export function useTransportadoraPerformance() {
       
       return transportadoras || [];
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: QUERY_STALE_TIME.STATIC,
     enabled: !!user?.id,
   });
 }

@@ -2,13 +2,14 @@ import { ReactNode, Suspense, lazy } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
+import { MobileQuickActions } from "./MobileQuickActions";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { ScrollRestoration } from "@/components/common/ScrollRestoration";
+import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 
-// Lazy-load non-critical overlays to reduce MainLayout chunk size
 const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));
 const OnboardingProgress = lazy(() => import("@/components/onboarding/OnboardingProgress").then(m => ({ default: m.OnboardingProgress })));
 const BrowserNotificationPrompt = lazy(() => import("@/components/notifications/BrowserNotificationPrompt").then(m => ({ default: m.BrowserNotificationPrompt })));
@@ -24,16 +25,11 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen w-full bg-background">
-      {/* Skip Links - Acessibilidade aprimorada */}
+      <GlobalLoadingBar />
       <SkipLinks />
-      
-      {/* Offline Banner - PWA */}
       <OfflineBanner />
-
-      {/* Scroll Restoration + Focus Management */}
       <ScrollRestoration />
       
-      {/* Sidebar - hidden on mobile */}
       <aside className="hidden md:block" aria-label="Navegação principal" id="main-navigation">
         <AppSidebar />
       </aside>
@@ -47,27 +43,23 @@ export function MainLayout({ children }: MainLayoutProps) {
           role="main"
           aria-label="Conteúdo principal"
         >
-          {/* Breadcrumbs navigation */}
           <nav aria-label="Navegação breadcrumb">
             <Breadcrumbs className="mb-4" />
           </nav>
           
-          {/* Onboarding progress bar for new users */}
           <Suspense fallback={null}>
             <OnboardingProgress variant="full" className="mb-6" />
           </Suspense>
           
-          {/* Main content with Suspense for lazy loading */}
           <Suspense fallback={<PageSkeleton />}>
             {children}
           </Suspense>
         </main>
       </div>
       
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
+      <MobileQuickActions />
       
-      {/* Non-critical overlays - lazy loaded */}
       <Suspense fallback={null}>
         <InstallPrompt />
         <UpdatePrompt />
