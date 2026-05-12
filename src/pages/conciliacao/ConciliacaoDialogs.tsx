@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Loader2, Check, AlertTriangle } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
@@ -79,7 +80,7 @@ interface MatchDialogProps {
   onOpenChange: (open: boolean) => void;
   selectedItem: ItemImportado | null;
   entregasSistema: Array<{ id: string; numero: string; data: string; transportadora: string; valor: number }>;
-  onMatch: (sistemaId: string, status: "conciliado" | "divergencia", observacoes?: string) => void;
+  onMatch: (sistemaId: string, status: "conciliado" | "divergencia" | "ignorado", observacoes?: string) => void;
 }
 
 export function MatchDialog({ open, onOpenChange, selectedItem, entregasSistema, onMatch }: MatchDialogProps) {
