@@ -251,3 +251,5 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
   });
 }
 
+serve(handler);
+
