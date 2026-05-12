@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ShortcutConfig {
@@ -9,9 +9,6 @@ interface ShortcutConfig {
   description: string;
 }
 
-/**
- * Hook para registrar atalhos de teclado
- */
 export function useKeyboardShortcut(
   key: string,
   callback: () => void,
@@ -44,49 +41,74 @@ export function useKeyboardShortcut(
   }, [key, ctrl, shift, alt, callback, enabled]);
 }
 
-/**
- * Hook com atalhos globais pré-configurados
- */
 export function useGlobalShortcuts() {
   const navigate = useNavigate();
+  const lastKeyRef = useRef<string | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Power User Sequence: "G" then another key
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) return;
+
+      if (event.key.toLowerCase() === 'g') {
+        lastKeyRef.current = 'g';
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => { lastKeyRef.current = null; }, 1000);
+        return;
+      }
+
+      if (lastKeyRef.current === 'g') {
+        const routes: Record<string, string> = {
+          'd': '/',
+          'c': '/coletas',
+          'e': '/envios',
+          't': '/transportadoras',
+          'a': '/analytics',
+          's': '/seguranca',
+          'k': '/kanban-entregas',
+          'b': '/gestao-box',
+          'p': '/perfil'
+        };
+
+        const targetRoute = routes[event.key.toLowerCase()];
+        if (targetRoute) {
+          event.preventDefault();
+          navigate(targetRoute);
+          lastKeyRef.current = null;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [navigate]);
 
   useKeyboardShortcut("k", () => {
-    // Use a custom event to trigger search focus — avoids document.querySelector
     window.dispatchEvent(new CustomEvent('logiflow:focus-search'));
   }, { ctrl: true });
 
-  useKeyboardShortcut("d", () => navigate("/"), { alt: true });
-  useKeyboardShortcut("c", () => navigate("/coletas"), { alt: true });
-  useKeyboardShortcut("e", () => navigate("/envios"), { alt: true });
-  useKeyboardShortcut("r", () => navigate("/relatorios"), { alt: true });
-  useKeyboardShortcut("s", () => navigate("/configuracoes"), { alt: true });
-  useKeyboardShortcut("t", () => navigate("/transportadoras"), { alt: true });
-  useKeyboardShortcut("a", () => navigate("/analytics"), { alt: true });
-  useKeyboardShortcut("n", () => navigate("/notificacoes"), { alt: true });
-  useKeyboardShortcut("f", () => navigate("/cotacao-frete"), { alt: true });
-
   useKeyboardShortcut("Escape", () => {
-    // Use a custom event to close dialogs — avoids document.querySelector
     window.dispatchEvent(new CustomEvent('logiflow:close-dialog'));
   });
 }
 
 export const shortcutsList: ShortcutConfig[] = [
   { key: "k", ctrl: true, description: "Abrir busca global" },
-  { key: "d", alt: true, description: "Ir para Dashboard" },
-  { key: "c", alt: true, description: "Ir para Coletas" },
-  { key: "e", alt: true, description: "Ir para Entregas" },
-  { key: "r", alt: true, description: "Ir para Relatórios" },
-  { key: "s", alt: true, description: "Ir para Configurações" },
-  { key: "t", alt: true, description: "Ir para Transportadoras" },
-  { key: "a", alt: true, description: "Ir para Analytics" },
-  { key: "n", alt: true, description: "Ir para Notificações" },
-  { key: "f", alt: true, description: "Ir para Cotação de Frete" },
+  { key: "g + d", description: "Ir para Dashboard" },
+  { key: "g + c", description: "Ir para Coletas" },
+  { key: "g + e", description: "Ir para Entregas" },
+  { key: "g + t", description: "Ir para Transportadoras" },
+  { key: "g + k", description: "Ir para Kanban" },
+  { key: "g + b", description: "Ir para Gestão de BOX" },
+  { key: "g + s", description: "Ir para Segurança" },
   { key: "?", shift: true, description: "Mostrar atalhos de teclado" },
   { key: "Escape", description: "Fechar modal/popup" },
 ];
 
 export function formatShortcut(shortcut: ShortcutConfig): string {
+  if (shortcut.key.includes(" + ")) return shortcut.key.toUpperCase();
   const parts: string[] = [];
   if (shortcut.ctrl) parts.push("Ctrl");
   if (shortcut.alt) parts.push("Alt");
@@ -97,8 +119,6 @@ export function formatShortcut(shortcut: ShortcutConfig): string {
 
 export function useShortcutsDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  
   useKeyboardShortcut("?", () => setIsOpen(true), { shift: true });
-  
   return { isOpen, setIsOpen, shortcuts: shortcutsList };
 }
