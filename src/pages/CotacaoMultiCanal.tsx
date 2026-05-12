@@ -30,6 +30,8 @@ export default function CotacaoMultiCanal() {
   const [destinoEstado, setDestinoEstado] = useState('');
   const [origemCidade, setOrigemCidade] = useState('');
   const [destinoCidade, setDestinoCidade] = useState('');
+  const [origemCep, setOrigemCep] = useState('');
+  const [destinoCep, setDestinoCep] = useState('');
   const [pesoKg, setPesoKg] = useState('');
   const [volumes, setVolumes] = useState('1');
   const [valorMercadoria, setValorMercadoria] = useState('');
@@ -124,7 +126,7 @@ export default function CotacaoMultiCanal() {
           )}
         </div>
 
-        <CotacaoSearchForm origemEstado={origemEstado} setOrigemEstado={setOrigemEstado} destinoEstado={destinoEstado} setDestinoEstado={setDestinoEstado} origemCidade={origemCidade} setOrigemCidade={setOrigemCidade} destinoCidade={destinoCidade} setDestinoCidade={setDestinoCidade} pesoKg={pesoKg} setPesoKg={setPesoKg} volumes={volumes} setVolumes={setVolumes} valorMercadoria={valorMercadoria} setValorMercadoria={setValorMercadoria} isSearching={isSearching} onSearch={handleSearch} />
+        <CotacaoSearchForm origemEstado={origemEstado} setOrigemEstado={setOrigemEstado} destinoEstado={destinoEstado} setDestinoEstado={setDestinoEstado} origemCidade={origemCidade} setOrigemCidade={setOrigemCidade} destinoCidade={destinoCidade} setDestinoCidade={setDestinoCidade} origemCep={origemCep} setOrigemCep={setOrigemCep} destinoCep={destinoCep} setDestinoCep={setDestinoCep} pesoKg={pesoKg} setPesoKg={setPesoKg} volumes={volumes} setVolumes={setVolumes} valorMercadoria={valorMercadoria} setValorMercadoria={setValorMercadoria} isSearching={isSearching} onSearch={handleSearch} />
 
         <AnimatePresence>
           {hasSearched && (
