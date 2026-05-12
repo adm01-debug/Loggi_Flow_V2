@@ -4,7 +4,8 @@ import {
   playErrorSound, 
   playClickSound, 
   playPopSound, 
-  playWhooshSound 
+  playWhooshSound,
+  playToggleSound
 } from '@/utils/celebrationSounds';
 
 export function useAudioFeedback() {
@@ -28,11 +29,16 @@ export function useAudioFeedback() {
     playWhooshSound();
   }, []);
 
+  const playToggle = useCallback((on: boolean) => {
+    playToggleSound(on);
+  }, []);
+
   return {
     playSuccess,
     playError,
     playAction,
     playPop,
-    playWhoosh
+    playWhoosh,
+    playToggle
   };
 }
