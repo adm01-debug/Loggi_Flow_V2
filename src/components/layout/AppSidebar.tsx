@@ -121,6 +121,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin } = useAuth();
   const { prefetch } = usePrefetch();
+  const { userLevel, levelProgress } = useGamification();
 
   // Determine initially active section based on current route
   const getActiveSection = () => {
