@@ -1,0 +1,1 @@
+ALTER TABLE public.entregas ADD COLUMN is_cross_docking BOOLEAN DEFAULT false;
