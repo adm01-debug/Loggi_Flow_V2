@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator, Sparkles, FileText, CheckCircle2, Wand2, Download } from "lucide-react";
+import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator, Sparkles, FileText, CheckCircle2, Wand2, Download, FileCheck } from "lucide-react";
 import { StrategySimulator, AIFreightForecasting, FreightAudit } from "@/components/freight";
 
 const pieColors = ["hsl(var(--primary))", "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--accent))", "hsl(var(--muted))", "hsl(var(--secondary))"];
