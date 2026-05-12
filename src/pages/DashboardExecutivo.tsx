@@ -129,15 +129,88 @@ export default function DashboardExecutivo() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-              <BarChart3 className="w-6 h-6 text-primary" />
-            </div>
-            Dashboard Executivo
-          </h1>
-          <p className="text-muted-foreground mt-1">Visão C-level — {format(new Date(), "MMMM yyyy", { locale: ptBR })}</p>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                <BarChart3 className="w-6 h-6 text-primary" />
+              </div>
+              Dashboard Executivo
+            </h1>
+            <p className="text-muted-foreground mt-1">Visão C-level — {format(new Date(), "MMMM yyyy", { locale: ptBR })}</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button 
+              variant={showAI ? "secondary" : "default"}
+              className={cn(
+                "gap-2 transition-all duration-300",
+                !showAI && "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+              )}
+              onClick={() => setShowAI(!showAI)}
+            >
+              {showAI ? <X className="w-4 h-4" /> : <BrainCircuit className="w-4 h-4 animate-pulse" />}
+              {showAI ? "Fechar Assistente" : "Assistente Logístico IA"}
+              {!showAI && <Badge variant="secondary" className="ml-1 h-5 bg-white/20 text-white border-none text-[10px]">Gemini 2.5</Badge>}
+            </Button>
+          </div>
         </div>
+
+        {/* AI Overlay / Section */}
+        {showAI && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in slide-in-from-top duration-500">
+            <div className="lg:col-span-2">
+              <div className="card-base p-6 bg-gradient-to-br from-primary/5 via-transparent to-transparent border-primary/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold">Insights Estratégicos</h2>
+                    <p className="text-sm text-muted-foreground">Análise preditiva em tempo real sobre sua operação.</p>
+                  </div>
+                </div>
+                <div className="h-[400px]">
+                  <AIAssistant />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="card-base p-4 border-warning/30 bg-warning/5">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-warning">
+                  <AlertTriangle className="w-4 h-4" />
+                  Alertas Preditos (IA)
+                </h3>
+                <div className="mt-3 space-y-3">
+                  <div className="p-3 bg-background rounded-lg border text-xs">
+                    <p className="font-semibold text-destructive">⚠️ Risco Alto: Rota Curitiba → SP</p>
+                    <p className="text-muted-foreground mt-1">Obras na BR-116 podem causar atrasos de até 4h em 12 entregas.</p>
+                  </div>
+                  <div className="p-3 bg-background rounded-lg border text-xs">
+                    <p className="font-semibold text-warning">⚡ Oportunidade: Consolidação</p>
+                    <p className="text-muted-foreground mt-1">8 encomendas para Campinas podem ser consolidadas na Rodonaves para economia de 12%.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="card-base p-4 border-primary/30 bg-primary/5">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-primary">
+                  <Target className="w-4 h-4" />
+                  Metas em Foco
+                </h3>
+                <div className="mt-3 space-y-2">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span>Meta OTIF (95%)</span>
+                    <span className="font-bold">92.4%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-primary" style={{ width: '92.4%' }} />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground italic">"IA sugere priorizar coletas pendentes para subir 1.5%."</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
