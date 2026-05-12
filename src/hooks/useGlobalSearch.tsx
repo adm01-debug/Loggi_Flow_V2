@@ -6,8 +6,9 @@ import {
   Trophy, Zap, Box, PackageSearch, History, Shield, Target, CalendarDays,
   Calculator, DollarSign, AlertTriangle, Map, Navigation, Users, Bell, 
   FileCheck, Route, Bot, Cog, KeyRound, Award, Upload, Webhook, TrendingUp,
-  Activity, Search, List, Smartphone, Info
+  Activity, Search, List, Smartphone, Info, Gift
 } from "lucide-react";
+
 
 
 interface SearchResult {
