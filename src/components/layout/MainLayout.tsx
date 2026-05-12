@@ -7,6 +7,7 @@ import { ScrollRestoration } from "@/components/common/ScrollRestoration";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
+import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 
 // Lazy-load non-critical overlays to reduce MainLayout chunk size
 const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));
