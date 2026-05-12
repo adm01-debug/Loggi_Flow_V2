@@ -11,6 +11,7 @@ export interface DeliveryWithRelations {
   status: string;
   previsao_entrega: string | null;
   box_alocado: string | null;
+  is_cross_docking: boolean;
   cliente: {
     razao_social: string;
   } | null;
@@ -24,6 +25,7 @@ export interface BoxData {
   number: number;
   isOccupied: boolean;
   isUrgent: boolean;
+  isCrossDocking: boolean;
   delivery: DeliveryWithRelations | null;
 }
 
@@ -45,6 +47,7 @@ export function useBoxManagement() {
           status,
           previsao_entrega,
           box_alocado,
+          is_cross_docking,
           cliente:clientes(razao_social),
           transportadora:transportadoras(nome_fantasia)
         `)
@@ -75,6 +78,7 @@ export function useBoxManagement() {
       number: boxNumber,
       isOccupied: !!delivery,
       isUrgent: delivery?.isUrgent || false,
+      isCrossDocking: delivery?.is_cross_docking || false,
       delivery: delivery as DeliveryWithRelations | null,
     };
   });
@@ -100,6 +104,25 @@ export function useBoxManagement() {
     },
     onError: () => {
       toast.error("Erro ao alocar entrega no box");
+    },
+  });
+
+  // Toggle Cross-docking
+  const toggleCrossDockingMutation = useMutation({
+    mutationFn: async ({ deliveryId, isCrossDocking }: { deliveryId: string, isCrossDocking: boolean }) => {
+      const { error } = await supabase
+        .from("entregas")
+        .update({ is_cross_docking: isCrossDocking })
+        .eq("id", deliveryId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["box-deliveries"] });
+      toast.success("Status de Cross-docking atualizado");
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar Cross-docking");
     },
   });
 
@@ -132,11 +155,16 @@ export function useBoxManagement() {
     return removeMutation.mutateAsync(boxNumber);
   };
 
+  const toggleCrossDocking = (deliveryId: string, isCrossDocking: boolean) => {
+    return toggleCrossDockingMutation.mutateAsync({ deliveryId, isCrossDocking });
+  };
+
   return {
     boxes,
     pendingDeliveries: pendingDeliveries as DeliveryWithRelations[],
     isLoading,
     allocateToBox,
     removeFromBox,
+    toggleCrossDocking,
   };
 }
