@@ -106,7 +106,9 @@ export const handler = async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-});
+};
+
+serve(handler);
 
 async function generateReportData(supabase: any, reportType: string, filters: any) {
   const now = new Date();
