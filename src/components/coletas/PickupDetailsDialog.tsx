@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, MapPin, Calendar, Clock, AlertTriangle, CheckCircle2, History, Info, ChevronRight, Zap } from "lucide-react";
+import { Truck, Package, MapPin, Calendar, Clock, AlertTriangle, CheckCircle2, History, Info, ChevronRight, Zap, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 import { PickupConference } from "./PickupConference";
 
 interface PickupDetailsDialogProps {
@@ -24,6 +25,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
   const [timeline, setTimeline] = useState<any[]>([]);
   const [loadingTimeline, setLoadingTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState("detalhes");
+  const { playSuccess, playAction, playWhoosh } = useAudioFeedback();
 
   useEffect(() => {
     if (open && pickup) {
@@ -59,9 +61,15 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
       .eq("id", pickup.id);
     
     if (!error) {
+      playSuccess();
       onStatusUpdate();
       fetchTimeline();
     }
+  };
+
+  const handleTabChange = (value: string) => {
+    playWhoosh();
+    setActiveTab(value);
   };
 
   return (
@@ -80,7 +88,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
         </DialogHeader>
 
         <div className="px-6 flex-1 overflow-y-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-4">
               <TabsTrigger value="detalhes">Detalhes</TabsTrigger>
               <TabsTrigger value="conferencia">Conferência</TabsTrigger>
@@ -167,7 +175,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                     </Button>
                   )}
                   {(pickup.status === 'chegou_expedicao' || pickup.status === 'divergencia') && (
-                    <Button onClick={() => setActiveTab('conferencia')} className="bg-success hover:bg-success/90 shadow-sm shadow-success/10">
+                    <Button onClick={() => handleTabChange('conferencia')} className="bg-success hover:bg-success/90 shadow-sm shadow-success/10">
                       <CheckCircle2 className="w-4 h-4 mr-2" /> Iniciar Conferência Real
                     </Button>
                   )}
@@ -185,7 +193,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                 pickup={pickup} 
                 onSuccess={() => {
                   onStatusUpdate();
-                  setActiveTab('detalhes');
+                  handleTabChange('detalhes');
                 }} 
               />
             </TabsContent>
