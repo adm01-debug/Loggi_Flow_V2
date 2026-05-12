@@ -33,35 +33,44 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Fetch rich contextual data
     const [
       { data: transportadoras },
       { data: rotas },
       { data: entregas },
       { data: coletas },
+      { data: conciliacao }
     ] = await Promise.all([
-      supabase.from('transportadoras').select('id, nome_fantasia, score_performance, homologada, regioes_atendidas').eq('homologada', true).limit(50),
+      supabase.from('transportadoras').select('id, nome_fantasia, razao_social, score_performance, homologada, regioes_atendidas').eq('homologada', true).limit(50),
       supabase.from('transportadora_rotas').select('*, transportadora:transportadoras(nome_fantasia)').eq('ativo', true).limit(100),
-      supabase.from('entregas').select('id, numero_entrega, status, previsao_entrega, data_entrega_efetiva, cliente:clientes(razao_social)').order('created_at', { ascending: false }).limit(50),
+      supabase.from('entregas').select('id, numero_entrega, status, previsao_entrega, data_entrega_efetiva, valor_frete, endereco_entrega, cliente:clientes(razao_social)').order('created_at', { ascending: false }).limit(50),
       supabase.from('coletas').select('id, numero_coleta, status, data_prevista_coleta, data_efetiva_coleta').order('created_at', { ascending: false }).limit(30),
+      supabase.from('conciliacao_financeira').select('valor_faturado, valor_cotado, status_conciliacao').limit(100)
     ]);
 
-    const transportadorasContext = transportadoras?.map(t => `- ${t.nome_fantasia} (Score: ${t.score_performance}, Regiões: ${t.regioes_atendidas?.join(', ') || 'N/A'})`).join('\n') || 'Nenhuma';
-    const rotasContext = rotas?.map(r => `- ${(r.transportadora as any)?.nome_fantasia}: ${r.origem_cidade || r.origem_estado} → ${r.destino_cidade || r.destino_estado} (${r.prazo_dias} dias, R$${r.taxa_fixa} + R$${r.preco_por_kg}/kg)`).join('\n') || 'Nenhuma';
+    const transportadorasContext = transportadoras?.map(t => `- ${t.nome_fantasia} (Score: ${t.score_performance})`).join('\n') || 'Nenhuma';
+    
+    // Calculate total cost and potential savings
+    const totalFrete = entregas?.reduce((acc, curr) => acc + (Number(curr.valor_frete) || 0), 0) || 0;
+    const divergencias = conciliacao?.filter(c => c.status_conciliacao === 'divergente').length || 0;
     
     const now = new Date();
     const entregasAtrasadas = entregas?.filter(e => e.previsao_entrega && !e.data_entrega_efetiva && new Date(e.previsao_entrega) < now && ['aguardando_producao', 'pronto_despacho', 'despachado', 'em_transito', 'saiu_entrega'].includes(e.status)) || [];
     
-    const systemPrompt = `Você é o Cérebro Logístico do sistema LogiFlow. 
-    DADOS ATUAIS:
-    Transportadoras: ${transportadorasContext}
-    Rotas: ${rotasContext}
-    Atrasos Críticos: ${entregasAtrasadas.length} entregas em atraso.
+    const systemPrompt = `Você é o Cérebro Estratégico Logístico da LogiFlow. 
+    ESTADO OPERACIONAL:
+    - Transportadoras: ${transportadorasContext}
+    - Entregas Atrasadas: ${entregasAtrasadas.length}
+    - Custo Total Recente de Frete: R$ ${totalFrete.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+    - Divergências de Conciliação: ${divergencias} casos detectados.
     
-    INSTRUÇÕES:
-    1. Responda em Português (BR) de forma executiva e analítica.
-    2. Seja PROATIVO: se houver atrasos, sugira ações imediatas.
-    3. Recomende transportadoras baseado em Score e Rota.
-    4. Formate moedas (R$ X.XXX,XX) e use emojis (⚠️, ✅, 🚀) para status.`;
+    INSTRUÇÕES DE ELITE:
+    1. Responda de forma analítica, proativa e executiva.
+    2. Se houver divergências financeiras, sugira revisar as tabelas de frete das transportadoras envolvidas.
+    3. Se o custo de frete estiver subindo, sugira consolidação de carga para as regiões com maior volume.
+    4. Analise o Score de performance: não recomende transportadoras com score < 75.
+    5. Formate moedas (R$ X.XXX,XX) e use emojis táticos (⚠️, 📈, ✅).
+    6. Seja breve mas denso em insights.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -77,14 +86,14 @@ serve(async (req) => {
     if (stream) return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
 
     const data = await response.json();
-    const assistantMessage = data.choices?.[0]?.message?.content || "Erro ao processar.";
+    const assistantMessage = data.choices?.[0]?.message?.content || "Erro ao gerar insight.";
 
     return new Response(JSON.stringify({ success: true, message: assistantMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error) {
-    return new Response(JSON.stringify({ success: false, message: "Erro interno na IA." }), {
+    return new Response(JSON.stringify({ success: false, message: "Erro de processamento na IA de elite." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
