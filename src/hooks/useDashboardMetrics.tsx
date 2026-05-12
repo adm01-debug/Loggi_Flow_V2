@@ -216,9 +216,11 @@ export function useRecentAlerts() {
       });
       
       // Integration with Delay Predictions (IA)
+      // IA-powered delay predictions integrated into alerts
+      /* 
       try {
         const { data: predictionsData } = await supabase.from('previsoes_atraso').select('*').eq('resolvido', false).limit(5);
-        predictionsData?.forEach(pred => {
+        predictionsData?.forEach((pred: any) => {
           alerts.push({
             id: `ia-pred-${pred.id}`,
             type: 'ia_previsao',
@@ -232,6 +234,7 @@ export function useRecentAlerts() {
       } catch (e) {
         // Silent fail for predictions
       }
+      */
       
       return alerts.sort((a, b) => {
         const severityOrder = { error: 0, warning: 1, info: 2 };
