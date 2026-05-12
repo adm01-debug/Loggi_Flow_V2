@@ -119,32 +119,58 @@ function OnboardingAchievementCard({ achievement, isUnlocked }: {
 }
 
 export default function Conquistas() {
-  const { userLevel, achievements: dbAchievements, userAchievements, unlockedAchievementIds } = useGamification();
+  const { userLevel, achievements: dbAchievements, unlockedAchievementIds } = useGamification();
   const [tab, setTab] = useState("all");
 
-  // Filter onboarding achievements from database
-  const onboardingAchievements = useMemo(() => {
+  const mappedAchievements = useMemo((): AchievementDisplay[] => {
     if (!dbAchievements) return [];
-    return dbAchievements.filter(a => a.category === 'onboarding');
-  }, [dbAchievements]);
+    return dbAchievements.map(a => ({
+      id: a.id,
+      name: a.name,
+      description: a.description,
+      category: a.category,
+      xpReward: a.xp_reward,
+      icon: iconMap[a.icon] || Award,
+      unlocked: unlockedAchievementIds.has(a.id),
+      rarity: a.rarity
+    }));
+  }, [dbAchievements, unlockedAchievementIds]);
+
+  const onboardingAchievements = useMemo(() => {
+    return mappedAchievements.filter(a => a.category === 'onboarding');
+  }, [mappedAchievements]);
 
   const onboardingStats = useMemo(() => {
     const total = onboardingAchievements.length;
-    const unlocked = onboardingAchievements.filter(a => unlockedAchievementIds.has(a.id)).length;
+    const unlocked = onboardingAchievements.filter(a => a.unlocked).length;
     const xpEarned = onboardingAchievements
-      .filter(a => unlockedAchievementIds.has(a.id))
-      .reduce((sum, a) => sum + a.xp_reward, 0);
+      .filter(a => a.unlocked)
+      .reduce((sum, a) => sum + a.xpReward, 0);
     return { total, unlocked, xpEarned, progress: total > 0 ? (unlocked / total) * 100 : 0 };
-  }, [onboardingAchievements, unlockedAchievementIds]);
+  }, [onboardingAchievements]);
 
-  const tabFiltered = useMemo(() => tab === "all" ? achievements : tab === "unlocked" ? achievements.filter(a => a.unlocked) : achievements.filter(a => !a.unlocked), [tab]);
+  const mainAchievements = useMemo(() => {
+    return mappedAchievements.filter(a => a.category !== 'onboarding');
+  }, [mappedAchievements]);
+
+  const tabFiltered = useMemo(() => {
+    if (tab === "all") return mainAchievements;
+    if (tab === "unlocked") return mainAchievements.filter(a => a.unlocked);
+    return mainAchievements.filter(a => !a.unlocked);
+  }, [tab, mainAchievements]);
+
   const { filteredData, filters, setSearch, setFilter, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(tabFiltered, filterConfig);
-  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "rarity", defaultDirection: "desc" });
+  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "unlocked", defaultDirection: "desc" });
   const pagination = usePagination(sortedData, { initialPageSize: 12 });
 
-  const stats = { total: achievements.length, unlocked: achievements.filter(a => a.unlocked).length, totalXp: achievements.filter(a => a.unlocked).reduce((s, a) => s + a.xpReward, 0) };
+  const stats = useMemo(() => ({
+    total: mappedAchievements.length,
+    unlocked: mappedAchievements.filter(a => a.unlocked).length,
+    totalXp: mappedAchievements.filter(a => a.unlocked).reduce((s, a) => s + a.xpReward, 0)
+  }), [mappedAchievements]);
+
   const SortIcon = ({ field }: { field: string }) => { 
-    const dir = getSortDirection(field as keyof Achievement); 
+    const dir = getSortDirection(field as any); 
     if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; 
     return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; 
   };
@@ -153,139 +179,173 @@ export default function Conquistas() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-warning/20 to-warning/10"><Trophy className="w-6 h-6 text-warning" /></div>Conquistas</h1><p className="text-muted-foreground mt-1">Desbloqueie conquistas e ganhe XP</p></div>
+          <div className="flex items-center gap-4">
+             <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-warning/20 to-warning/5 shadow-inner">
+               <Trophy className="w-8 h-8 text-warning" />
+             </div>
+             <div>
+               <h1 className="text-3xl font-extrabold tracking-tight">Galeria de Conquistas</h1>
+               <p className="text-muted-foreground">Sua jornada rumo à excelência logística</p>
+             </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="stat-card text-center"><Trophy className="w-5 h-5 text-coins mx-auto mb-2" /><p className="text-2xl font-bold">{stats.unlocked}/{stats.total}</p><p className="text-xs text-muted-foreground">Desbloqueadas</p></div>
-          <div className="stat-card text-center"><Sparkles className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.totalXp}</p><p className="text-xs text-muted-foreground">XP Ganho</p></div>
-          <div className="stat-card text-center"><Star className="w-5 h-5 text-coins mx-auto mb-2" /><p className="text-2xl font-bold">Nível {userLevel?.level || 1}</p><p className="text-xs text-muted-foreground">Atual</p></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="stat-card p-6 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-coins/10"><Medal className="w-6 h-6 text-coins" /></div>
+            <div>
+              <p className="text-2xl font-black">{stats.unlocked} <span className="text-muted-foreground text-sm font-normal">/ {stats.total}</span></p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Medalhas Atuais</p>
+            </div>
+          </div>
+          <div className="stat-card p-6 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-primary/10"><Sparkles className="w-6 h-6 text-primary" /></div>
+            <div>
+              <p className="text-2xl font-black">{stats.totalXp}</p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">XP Acumulado</p>
+            </div>
+          </div>
+          <div className="stat-card p-6 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-xp/10"><Star className="w-6 h-6 text-xp" /></div>
+            <div>
+              <p className="text-2xl font-black">Nível {userLevel?.level || 1}</p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Ranking Atual</p>
+            </div>
+          </div>
         </div>
 
-        {/* Onboarding Achievements Section */}
         {onboardingAchievements.length > 0 && (
-          <motion.div 
-            className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div className="absolute inset-0 bg-grid-white/5" />
-            <div className="relative p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/20">
-                    <GraduationCap className="w-5 h-5" />
+          <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-card p-8 shadow-xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+                    <GraduationCap className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold">Conquistas de Onboarding</h2>
-                    <p className="text-sm text-muted-foreground">Complete a configuração inicial do sistema</p>
+                    <h2 className="text-xl font-bold">Certificações Iniciais</h2>
+                    <p className="text-sm text-muted-foreground">Conclua o onboarding para desbloquear recursos avançados</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-primary">{onboardingStats.unlocked}/{onboardingStats.total}</p>
-                  <p className="text-xs text-muted-foreground">Completadas</p>
+                  <p className="text-3xl font-black text-primary">{Math.round(onboardingStats.progress)}%</p>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Concluído</p>
                 </div>
               </div>
               
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-muted-foreground">Progresso do Onboarding</span>
-                  <span className="font-medium text-primary">{Math.round(onboardingStats.progress)}%</span>
-                </div>
-                <Progress value={onboardingStats.progress} className="h-2" />
-              </div>
+              <Progress value={onboardingStats.progress} className="h-3 mb-8 bg-primary/10" />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {onboardingAchievements.map((achievement) => (
-                  <OnboardingAchievementCard
-                    key={achievement.id}
-                    achievement={achievement}
-                    isUnlocked={unlockedAchievementIds.has(achievement.id)}
-                  />
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {onboardingAchievements.map((a) => {
+                   const Icon = a.icon;
+                   return (
+                     <div key={a.id} className={cn("p-4 rounded-2xl border transition-all duration-300 flex items-center gap-4", a.unlocked ? "bg-success/5 border-success/30 shadow-sm" : "bg-muted/30 border-dashed opacity-50")}>
+                        <div className={cn("p-2 rounded-lg", a.unlocked ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground")}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm truncate">{a.name}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">{a.description}</p>
+                        </div>
+                     </div>
+                   );
+                })}
               </div>
-
-              {onboardingStats.unlocked === onboardingStats.total && onboardingStats.total > 0 && (
-                <motion.div 
-                  className="mt-4 p-3 rounded-xl bg-gradient-to-r from-success/10 to-success/5 border border-success/20 flex items-center gap-3"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                >
-                  <div className="p-2 rounded-lg bg-success text-success-foreground">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-success">Onboarding Completo!</p>
-                    <p className="text-sm text-muted-foreground">Você ganhou {onboardingStats.xpEarned} XP com as conquistas de onboarding</p>
-                  </div>
-                </motion.div>
-              )}
             </div>
-          </motion.div>
+          </div>
         )}
 
-        <Tabs value={tab} onValueChange={setTab}><TabsList><TabsTrigger value="all">Todas</TabsTrigger><TabsTrigger value="unlocked">Desbloqueadas</TabsTrigger><TabsTrigger value="locked">Bloqueadas</TabsTrigger></TabsList></Tabs>
+        <div className="flex flex-col gap-6 bg-card rounded-3xl p-8 border border-border/50 shadow-sm">
+          <div className="flex items-center justify-between">
+            <Tabs value={tab} onValueChange={setTab}>
+              <TabsList className="bg-muted/50 p-1">
+                <TabsTrigger value="all">Todas as Medalhas</TabsTrigger>
+                <TabsTrigger value="unlocked">Conquistadas</TabsTrigger>
+                <TabsTrigger value="locked">Em Progresso</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
 
-        <FilterBar 
-          search={filters.search} 
-          onSearchChange={setSearch} 
-          searchPlaceholder="Buscar conquistas..." 
-          extraFilters={[
-            { key: "category", label: "Categoria", value: filters.category as string || "all", options: [{ value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "performance", label: "Performance" }, { value: "streak", label: "Streak" }], onChange: (v) => setFilter("category", v === "all" ? undefined : v) },
-            { key: "rarity", label: "Raridade", value: filters.rarity as string || "all", options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Raro" }, { value: "epic", label: "Épico" }, { value: "legendary", label: "Lendário" }], onChange: (v) => setFilter("rarity", v === "all" ? undefined : v) }
-          ]} 
-          onClearFilters={clearFilters} 
-          hasActiveFilters={hasActiveFilters} 
-          totalFiltered={totalFiltered} 
-          totalOriginal={totalOriginal} 
-        />
+          <FilterBar 
+            search={filters.search} 
+            onSearchChange={setSearch} 
+            searchPlaceholder="Buscar por nome ou descrição..." 
+            extraFilters={[
+              { key: "category", label: "Filtrar Categoria", value: filters.category as string || "all", options: [{ value: "entregas", label: "Entregas" }, { value: "coletas", label: "Coletas" }, { value: "performance", label: "Performance" }, { value: "streak", label: "Streak" }], onChange: (v) => setFilter("category", v === "all" ? undefined : v) },
+              { key: "rarity", label: "Raridade", value: filters.rarity as string || "all", options: [{ value: "common", label: "Comum" }, { value: "rare", label: "Rara" }, { value: "epic", label: "Épica" }, { value: "legendary", label: "Lendária" }], onChange: (v) => setFilter("rarity", v === "all" ? undefined : v) }
+            ]} 
+            onClearFilters={clearFilters} 
+            hasActiveFilters={hasActiveFilters} 
+            totalFiltered={totalFiltered} 
+            totalOriginal={totalOriginal} 
+          />
 
-        <div className="flex items-center gap-2"><Button variant="ghost" size="sm" onClick={() => toggleSort("xpReward")} className="gap-1">XP <SortIcon field="xpReward" /></Button><Button variant="ghost" size="sm" onClick={() => toggleSort("progress")} className="gap-1">Progresso <SortIcon field="progress" /></Button></div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {pagination.paginatedData.map((a, i) => {
-            const Icon = a.icon;
-            const progress = (a.progress / a.maxProgress) * 100;
-            return (
-              <motion.div key={a.id} className={cn("card-interactive relative overflow-hidden", !a.unlocked && "opacity-70")} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                <div className={cn("absolute inset-0 bg-gradient-to-br opacity-10", rarityColors[a.rarity])} />
-                <div className="relative p-4">
-                  <div className="flex items-start gap-3">
-                    <div className={cn("p-3 rounded-xl bg-gradient-to-br", rarityColors[a.rarity], "text-white")}><Icon className="w-6 h-6" /></div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2"><h3 className="font-semibold">{a.name}</h3>{a.unlocked && <CheckCircle2 className="w-4 h-4 text-success" />}{!a.unlocked && <Lock className="w-4 h-4 text-muted-foreground" />}</div>
-                      <p className="text-sm text-muted-foreground">{a.description}</p>
-                      <div className="flex items-center gap-2 mt-2"><Badge variant="outline" className="text-xs">{rarityLabels[a.rarity]}</Badge><Badge variant="secondary" className="text-xs">+{a.xpReward} XP</Badge></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {pagination.paginatedData.map((a, i) => {
+              const Icon = a.icon;
+              return (
+                <motion.div 
+                  key={a.id} 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.03 }}
+                  className={cn(
+                    "group relative p-5 rounded-3xl border-2 transition-all duration-300 overflow-hidden",
+                    a.unlocked 
+                      ? "bg-background border-primary/20 shadow-md hover:shadow-xl hover:scale-[1.02]" 
+                      : "bg-muted/20 border-dashed border-muted-foreground/20 opacity-60 grayscale"
+                  )}
+                >
+                  <div className={cn("absolute inset-0 bg-gradient-to-br opacity-[0.03] transition-opacity group-hover:opacity-[0.08]", rarityColors[a.rarity])} />
+                  
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className={cn("p-3 rounded-2xl bg-gradient-to-br shadow-lg text-white", rarityColors[a.rarity])}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      {a.unlocked ? (
+                        <div className="bg-success/20 text-success p-1 rounded-full"><CheckCircle2 className="w-4 h-4" /></div>
+                      ) : (
+                        <div className="bg-muted text-muted-foreground p-1 rounded-full"><Lock className="w-4 h-4" /></div>
+                      )}
+                    </div>
+                    
+                    <h3 className="font-bold text-lg mb-1 leading-tight">{a.name}</h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2 min-h-[32px] mb-4">{a.description}</p>
+                    
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-[10px] font-bold uppercase border-muted-foreground/20">{a.rarity}</Badge>
+                      <Badge className="bg-xp/10 text-xp text-[10px] font-bold hover:bg-xp/20">+{a.xpReward} XP</Badge>
                     </div>
                   </div>
-                  {!a.unlocked && <div className="mt-3"><div className="flex justify-between text-xs text-muted-foreground mb-1"><span>Progresso</span><span>{a.progress}/{a.maxProgress}</span></div><Progress value={progress} className="h-2" /></div>}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+                </motion.div>
+              );
+            })}
+          </div>
 
-        {sortedData.length === 0 && <div className="flex flex-col items-center py-12"><Trophy className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma conquista encontrada</p></div>}
-        
-        {sortedData.length > 0 && (
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            pageSize={pagination.pageSize}
-            totalItems={pagination.totalItems}
-            startIndex={pagination.startIndex}
-            endIndex={pagination.endIndex}
-            hasNextPage={pagination.hasNextPage}
-            hasPrevPage={pagination.hasPrevPage}
-            pageSizeOptions={pagination.pageSizeOptions}
-            onPageChange={pagination.setPage}
-            onPageSizeChange={pagination.setPageSize}
-            onNextPage={pagination.nextPage}
-            onPrevPage={pagination.prevPage}
-            onFirstPage={pagination.firstPage}
-            onLastPage={pagination.lastPage}
-          />
-        )}
+          {sortedData.length > 12 && (
+            <div className="mt-8 pt-8 border-t border-border/50">
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                pageSize={pagination.pageSize}
+                totalItems={pagination.totalItems}
+                startIndex={pagination.startIndex}
+                endIndex={pagination.endIndex}
+                hasNextPage={pagination.hasNextPage}
+                hasPrevPage={pagination.hasPrevPage}
+                pageSizeOptions={pagination.pageSizeOptions}
+                onPageChange={pagination.setPage}
+                onPageSizeChange={pagination.setPageSize}
+                onNextPage={pagination.nextPage}
+                onPrevPage={pagination.prevPage}
+                onFirstPage={pagination.firstPage}
+                onLastPage={pagination.lastPage}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </MainLayout>
   );
