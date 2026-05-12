@@ -23,8 +23,36 @@ export const usePushNotifications = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
 
+  const checkSubscription = useCallback(async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const sub = await registration.pushManager.getSubscription();
+      setSubscription(sub);
+      setIsSubscribed(!!sub);
+      
+      // Verify subscription is saved in Supabase
+      if (sub) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: existing } = await supabase
+            .from('push_subscriptions')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('endpoint', sub.endpoint)
+            .maybeSingle();
+
+          if (!existing) {
+            // Re-sync if missing in DB
+            await saveSubscriptionToDB(sub, user.id);
+          }
+        }
+      }
+    } catch {
+      // Silent fail on subscription check
+    }
+  }, []);
+
   useEffect(() => {
-    // Check if push notifications are supported
     const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
     setIsSupported(supported);
 
@@ -32,35 +60,24 @@ export const usePushNotifications = () => {
       setPermission(Notification.permission);
       checkSubscription();
     }
-  }, []);
+  }, [checkSubscription]);
 
-  const checkSubscription = async () => {
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      const sub = await registration.pushManager.getSubscription();
-      setSubscription(sub);
-      setIsSubscribed(!!sub);
-      
-      // Verify subscription is saved in user preferences
-      if (sub) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const saved = localStorage.getItem(`push_subscription_${user.id}`);
-          if (!saved) {
-            // Save subscription to localStorage as fallback
-            localStorage.setItem(`push_subscription_${user.id}`, JSON.stringify({
-              endpoint: sub.endpoint,
-              keys: {
-                p256dh: arrayBufferToBase64(sub.getKey('p256dh')),
-                auth: arrayBufferToBase64(sub.getKey('auth')),
-              }
-            }));
-          }
-        }
-      }
-    } catch {
-      // Silent fail on subscription check
-    }
+  const saveSubscriptionToDB = async (sub: PushSubscription, userId: string) => {
+    const p256dh = arrayBufferToBase64(sub.getKey('p256dh'));
+    const auth = arrayBufferToBase64(sub.getKey('auth'));
+
+    const { error } = await supabase.from('push_subscriptions').upsert({
+      user_id: userId,
+      endpoint: sub.endpoint,
+      p256dh,
+      auth,
+      device_name: navigator.userAgent.split(')')[0].split('(')[1] || 'Unknown Device',
+      device_type: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
+    }, {
+      onConflict: 'user_id, endpoint'
+    });
+
+    if (error) console.error('Error saving push subscription to DB:', error);
   };
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
@@ -117,26 +134,18 @@ export const usePushNotifications = () => {
         applicationServerKey: applicationServerKey.buffer as ArrayBuffer,
       });
 
-      // Store subscription data
-      const subscriptionData: PushSubscriptionData = {
-        endpoint: sub.endpoint,
-        keys: {
-          p256dh: arrayBufferToBase64(sub.getKey('p256dh')),
-          auth: arrayBufferToBase64(sub.getKey('auth')),
-        }
-      };
-
-      // Save subscription to localStorage for persistence
+      // Sync with Supabase
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        localStorage.setItem(`push_subscription_${user.id}`, JSON.stringify(subscriptionData));
+        await saveSubscriptionToDB(sub, user.id);
       }
 
       setSubscription(sub);
       setIsSubscribed(true);
       toast.success('Inscrito para notificações push!');
       return true;
-    } catch {
+    } catch (err) {
+      console.error('Subscription error:', err);
       toast.error('Erro ao ativar notificações push');
       return false;
     } finally {
@@ -151,14 +160,17 @@ export const usePushNotifications = () => {
       const sub = await registration.pushManager.getSubscription();
 
       if (sub) {
-        await sub.unsubscribe();
-        
-        // Remove from localStorage
+        // Remove from DB first
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          localStorage.removeItem(`push_subscription_${user.id}`);
+          await supabase
+            .from('push_subscriptions')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('endpoint', sub.endpoint);
         }
-        
+
+        await sub.unsubscribe();
         setSubscription(null);
         setIsSubscribed(false);
         toast.success('Desinscrição realizada com sucesso');
