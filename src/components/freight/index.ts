@@ -12,3 +12,4 @@ export { ScenarioSimulator } from './ScenarioSimulator';
 export { QuickQuoteWidget } from './QuickQuoteWidget';
 export { StrategySimulator } from './StrategySimulator';
 export { AIFreightForecasting } from './AIFreightForecasting';
+export { NegotiationAssistant } from './NegotiationAssistant';
