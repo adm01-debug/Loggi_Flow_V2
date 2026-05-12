@@ -110,12 +110,19 @@ export default function CotacaoMultiCanal() {
         </PageHeader>
         <StepProgress steps={[{ id: 'buscar', title: 'Buscar Transportadoras' }, { id: 'cotar', title: 'Enviar Cotações' }, { id: 'receber', title: 'Receber Respostas' }, { id: 'selecionar', title: 'Selecionar Melhor' }]} currentStep={currentStep} />
 
-        {savings > 0 && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
-            <TrendingDown className="w-5 h-5 text-success shrink-0" />
-            <p className="text-sm font-medium">Economia de <span className="text-success font-bold">R$ {savings.toFixed(2)}</span> entre {respondidas.length} cotações</p>
-          </motion.div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {savings > 0 && (
+            <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
+              <TrendingDown className="w-5 h-5 text-success shrink-0" />
+              <p className="text-sm font-medium">Economia de <span className="text-success font-bold">R$ {savings.toFixed(2)}</span> entre {respondidas.length} cotações</p>
+            </motion.div>
+          )}
+          {melhorCotacao && (
+            <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}>
+              <NegotiationAssistant bestValue={melhorCotacao.valor} carrierName={melhorCotacao.transportadora_nome} />
+            </motion.div>
+          )}
+        </div>
 
         <CotacaoSearchForm origemEstado={origemEstado} setOrigemEstado={setOrigemEstado} destinoEstado={destinoEstado} setDestinoEstado={setDestinoEstado} origemCidade={origemCidade} setOrigemCidade={setOrigemCidade} destinoCidade={destinoCidade} setDestinoCidade={setDestinoCidade} pesoKg={pesoKg} setPesoKg={setPesoKg} volumes={volumes} setVolumes={setVolumes} valorMercadoria={valorMercadoria} setValorMercadoria={setValorMercadoria} isSearching={isSearching} onSearch={handleSearch} />
 
