@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Trash2, MapPin, Loader2, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, MapPin, Loader2, ArrowUpDown, ChevronUp, ChevronDown, Download, Upload } from 'lucide-react';
 import { Pagination } from '@/components/common/Pagination';
 import { FilterBar } from '@/components/common/FilterBar';
 import { BulkActions, useSelection } from '@/components/common/BulkActions';
@@ -107,7 +107,26 @@ export function FreightTableManager({ tabelasList, transportadoras, isLoading, o
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => {
+            const csv = [
+              ['ID', 'Transportadora', 'Estado', 'Peso Min', 'Peso Max', 'Valor/kg', 'Prazo'],
+              ...sortedData.map(t => [t.id, t.transportadora_nome, t.estado_destino, t.peso_min, t.peso_max, t.valor_kg, t.prazo_dias])
+            ].map(row => row.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tabelas-frete.csv';
+            a.click();
+          }}>
+            <Download className="w-4 h-4 mr-2" /> Exportar CSV
+          </Button>
+          <Button variant="outline" size="sm">
+            <Upload className="w-4 h-4 mr-2" /> Importar CSV
+          </Button>
+        </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" />Nova Tabela</Button>
