@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAudioFeedback } from '@/hooks/useAudioFeedback';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -139,6 +140,7 @@ function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number
 export default function KanbanEntregas() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
+  const { playSuccess, playError } = useAudioFeedback();
 
   useRealtime({
     table: 'entregas',
@@ -175,9 +177,11 @@ export default function KanbanEntregas() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] });
       toast.success('Status atualizado!');
+      playSuccess();
     },
     onError: (err: any) => {
       toast.error('Erro ao atualizar status', { description: err.message });
+      playError();
     },
   });
 

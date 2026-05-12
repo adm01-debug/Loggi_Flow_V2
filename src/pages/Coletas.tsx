@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
 import { cn } from "@/lib/utils";
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -48,6 +49,7 @@ export default function Coletas() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState<Coleta | null>(null);
+  const { playAction } = useAudioFeedback();
 
   const filterConfig: FilterConfig<Coleta> = {
     search: { fields: ["numero_coleta", "endereco_coleta", "observacoes"], placeholder: "Buscar coletas..." },
@@ -152,7 +154,11 @@ export default function Coletas() {
                 <Card 
                   key={c.id} 
                   className="hover:shadow-md transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary group"
-                  onClick={() => { setSelectedPickup(c); setIsDetailsOpen(true); }}
+                  onClick={() => { 
+                    playAction();
+                    setSelectedPickup(c); 
+                    setIsDetailsOpen(true); 
+                  }}
                 >
                   <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1">
