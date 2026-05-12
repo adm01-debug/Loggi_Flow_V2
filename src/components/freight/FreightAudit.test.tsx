@@ -46,7 +46,7 @@ describe('FreightAudit', () => {
     render(<FreightAudit />);
     const auditButton = screen.getByText('Auditar Lançamento');
     fireEvent.click(auditButton);
-    expect(toast.error).toHaveBeenCalledWith('Preencha todos os campos para auditoria');
+    expect(vi.mocked(toast.error)).toHaveBeenCalledWith('Preencha todos os campos para auditoria');
   });
 
   // Note: Testing Radix Select in unit tests requires more setup (mocking ResizeObserver, etc.)

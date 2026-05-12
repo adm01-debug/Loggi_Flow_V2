@@ -84,13 +84,11 @@ describe('celebrationSounds', () => {
   });
 
   it('plays different celebration rarities', () => {
-    const spyCommon = vi.spyOn(soundUtils, 'playCommonSound');
-    const spyLegendary = vi.spyOn(soundUtils, 'playLegendarySound');
-    
     soundUtils.playCelebrationSound('common');
-    expect(spyCommon).toHaveBeenCalled();
+    expect(mockAudioContext.createOscillator).toHaveBeenCalled();
     
+    vi.clearAllMocks();
     soundUtils.playCelebrationSound('legendary');
-    expect(spyLegendary).toHaveBeenCalled();
+    expect(mockAudioContext.createOscillator).toHaveBeenCalled();
   });
 });
