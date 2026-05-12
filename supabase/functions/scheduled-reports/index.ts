@@ -238,19 +238,30 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
     </div>
   `;
 
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      from: "LogiFlow Reports <notificacoes@resend.dev>",
-      to: recipients,
-      subject,
-      html,
-    }),
-  });
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        from: "LogiFlow Reports <notificacoes@resend.dev>",
+        to: recipients,
+        subject,
+        html,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("[Scheduled Reports] Resend API error:", errorData);
+    } else {
+      console.log("[Scheduled Reports] Email sent successfully to:", recipients.join(", "));
+    }
+  } catch (err) {
+    console.error("[Scheduled Reports] Failed to send email:", err);
+  }
 }
 
 serve(handler);
