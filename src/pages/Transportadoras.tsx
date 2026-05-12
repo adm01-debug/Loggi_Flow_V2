@@ -160,9 +160,18 @@ export default function Transportadoras() {
 
   const FormFields = () => (
     <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Razão Social *</Label><Input value={form.razao_social} onChange={(e) => setForm({ ...form, razao_social: e.target.value })} /></div><div className="grid gap-2"><Label>Nome Fantasia *</Label><Input value={form.nome_fantasia} onChange={(e) => setForm({ ...form, nome_fantasia: e.target.value })} /></div></div>
-      <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>CNPJ</Label><Input value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })} /></div><div className="grid gap-2"><Label>Contato Comercial</Label><Input value={form.contato_comercial} onChange={(e) => setForm({ ...form, contato_comercial: e.target.value })} /></div></div>
-      <div className="grid grid-cols-2 gap-4"><div className="grid gap-2"><Label>Email Comercial</Label><Input type="email" value={form.email_comercial} onChange={(e) => setForm({ ...form, email_comercial: e.target.value })} /></div><div className="grid gap-2"><Label>WhatsApp</Label><Input value={form.whatsapp_operacional} onChange={(e) => setForm({ ...form, whatsapp_operacional: e.target.value })} /></div></div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-2"><Label>Razão Social *</Label><Input value={form.razao_social} onChange={(e) => setForm({ ...form, razao_social: e.target.value })} /></div>
+        <div className="grid gap-2"><Label>Nome Fantasia *</Label><Input value={form.nome_fantasia} onChange={(e) => setForm({ ...form, nome_fantasia: e.target.value })} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-2"><Label>CNPJ</Label><MaskedInput maskType="cnpj" value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })} /></div>
+        <div className="grid gap-2"><Label>Contato Comercial</Label><Input value={form.contato_comercial} onChange={(e) => setForm({ ...form, contato_comercial: e.target.value })} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-2"><Label>Email Comercial</Label><Input type="email" value={form.email_comercial} onChange={(e) => setForm({ ...form, email_comercial: e.target.value })} /></div>
+        <div className="grid gap-2"><Label>WhatsApp</Label><MaskedInput maskType="phone" value={form.whatsapp_operacional} onChange={(e) => setForm({ ...form, whatsapp_operacional: e.target.value })} /></div>
+      </div>
       <div className="grid gap-2"><Label>URL Rastreamento</Label><Input value={form.url_rastreamento} onChange={(e) => setForm({ ...form, url_rastreamento: e.target.value })} /></div>
       <div className="flex items-center gap-2"><Switch checked={form.homologada} onCheckedChange={(v) => setForm({ ...form, homologada: v })} /><Label>Homologada</Label></div>
       <div className="grid gap-2"><Label>Observações</Label><Textarea value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} /></div>
