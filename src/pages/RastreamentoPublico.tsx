@@ -30,6 +30,7 @@ interface PublicTracking {
   updated_at: string;
   endereco_entrega: string;
   comprovante_entrega_url: string | null;
+  cliente_razao_social: string | null;
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon; description: string }> = {
@@ -212,7 +213,7 @@ export default function RastreamentoPublico() {
                       <span className="text-xs font-bold uppercase tracking-wider">Destino</span>
                     </div>
                     <p className="text-sm font-bold text-slate-900 truncate">
-                      {tracking.endereco_entrega?.split(',')[1] || "Em trânsito"}
+                      {tracking.cliente_razao_social || "Em trânsito"}
                     </p>
                   </div>
                 </div>
