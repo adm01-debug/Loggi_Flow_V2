@@ -125,6 +125,7 @@ function AppRoutes() {
       <Route path="/loja" element={<ProtectedRoute><LojaRecompensas /></ProtectedRoute>} />
       <Route path="/conciliacao" element={<ProtectedRoute><ConciliacaoFinanceira /></ProtectedRoute>} />
       <Route path="/rotas-transportadoras" element={<ProtectedRoute><RotasTransportadoras /></ProtectedRoute>} />
+      <Route path="/logistica-reversa" element={<ProtectedRoute><LogisticaReversa /></ProtectedRoute>} />
       <Route path="/gestao-rodonaves" element={<ProtectedRoute><GestaoRodonaves /></ProtectedRoute>} />
       <Route path="/melhor-envio" element={<ProtectedRoute><GestaoMelhorEnvio /></ProtectedRoute>} />
       <Route path="/dashboard-executivo" element={<ProtectedRoute><DashboardExecutivo /></ProtectedRoute>} />
