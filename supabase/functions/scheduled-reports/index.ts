@@ -108,8 +108,6 @@ export const handler = async (req: Request) => {
   }
 };
 
-serve(handler);
-
 async function generateReportData(supabase: any, reportType: string, filters: any) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
