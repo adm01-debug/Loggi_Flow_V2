@@ -1211,6 +1211,66 @@ export type Database = {
         }
         Relationships: []
       }
+      logistica_reversa: {
+        Row: {
+          cliente_id: string | null
+          codigo_rastreio_reverso: string | null
+          created_at: string | null
+          created_by: string | null
+          descricao_detalhada: string | null
+          entrega_id: string | null
+          id: string
+          motivo: string
+          prioridade: string | null
+          status: string
+          updated_at: string | null
+          valor_estorno: number | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          codigo_rastreio_reverso?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          descricao_detalhada?: string | null
+          entrega_id?: string | null
+          id?: string
+          motivo: string
+          prioridade?: string | null
+          status?: string
+          updated_at?: string | null
+          valor_estorno?: number | null
+        }
+        Update: {
+          cliente_id?: string | null
+          codigo_rastreio_reverso?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          descricao_detalhada?: string | null
+          entrega_id?: string | null
+          id?: string
+          motivo?: string
+          prioridade?: string | null
+          status?: string
+          updated_at?: string | null
+          valor_estorno?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logistica_reversa_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "logistica_reversa_entrega_id_fkey"
+            columns: ["entrega_id"]
+            isOneToOne: false
+            referencedRelation: "entregas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notificacoes_custo: {
         Row: {
           alerta_id: string | null

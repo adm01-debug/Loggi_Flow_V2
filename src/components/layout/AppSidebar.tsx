@@ -6,7 +6,7 @@ import {
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
   Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award, Upload, Zap as ZapIcon, Webhook,
-  Code, Star, Coins
+  Code, Star, Coins, RotateCcw
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -64,6 +64,7 @@ const menuSections: MenuSection[] = [
       { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
       { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
       { title: "Ocorrências", url: "/ocorrencias", icon: AlertTriangle },
+      { title: "Logística Reversa", url: "/logistica-reversa", icon: RotateCcw },
     ],
   },
   {
