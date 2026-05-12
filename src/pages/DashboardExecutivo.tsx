@@ -151,7 +151,7 @@ export default function DashboardExecutivo() {
             >
               {showAI ? <X className="w-4 h-4" /> : <BrainCircuit className="w-4 h-4 animate-pulse" />}
               {showAI ? "Fechar Assistente" : "Assistente Logístico IA"}
-              {!showAI && <Badge variant="secondary" className="ml-1 h-5 bg-white/20 text-white border-none text-[10px]">Gemini 2.5</Badge>}
+              {!showAI && <Badge variant="secondary" className="ml-1 h-5 bg-white/20 text-white border-none text-[10px]">Gemini 2.0</Badge>}
             </Button>
           </div>
         </div>

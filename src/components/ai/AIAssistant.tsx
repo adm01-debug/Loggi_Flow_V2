@@ -144,7 +144,7 @@ export function AIAssistant() {
             </h3>
             <p className="text-[10px] text-muted-foreground flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
-              Gemini 2.5 Pro Ativo
+              Gemini 2.0 Flash Ativo
             </p>
           </div>
         </div>
