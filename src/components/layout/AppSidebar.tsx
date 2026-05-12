@@ -108,7 +108,9 @@ const adminItems = [
   { title: "Webhooks", url: "/webhooks", icon: Webhook },
   { title: "Reset Senha", url: "/aprovacao-reset-senha", icon: KeyRound },
   { title: "Audit Trail", url: "/audit-trail", icon: History },
+  { title: "Documentação API", url: "/api-docs", icon: Code },
 ];
+
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
