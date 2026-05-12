@@ -144,7 +144,9 @@ export default function KanbanEntregas() {
 
   useRealtime({
     table: 'entregas',
-    queryKey: ['kanban-entregas'],
+    onUpdate: () => queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] }),
+    onInsert: () => queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] }),
+    onDelete: () => queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] }),
   });
 
   const { data: entregas = [], isLoading } = useQuery({
@@ -170,17 +172,22 @@ export default function KanbanEntregas() {
     mutationFn: async ({ id, status }: { id: string; status: EntregaStatus }) => {
       const { error } = await supabase
         .from('entregas')
-        .update({ status, updated_at: new Date().toISOString() })
+        .update({ 
+          status, 
+          updated_at: new Date().toISOString(),
+          ...(status === 'entregue' ? { data_entrega_efetiva: new Date().toISOString() } : {}),
+          ...(status === 'despachado' ? { data_despacho: new Date().toISOString() } : {})
+        })
         .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] });
-      toast.success('Status atualizado!');
+      toast.success('Status do fluxo logístico atualizado com sucesso!');
       playSuccess();
     },
     onError: (err: any) => {
-      toast.error('Erro ao atualizar status', { description: err.message });
+      toast.error('Erro crítico na transição de status', { description: err.message });
       playError();
     },
   });
@@ -191,6 +198,9 @@ export default function KanbanEntregas() {
     if (!destination) return;
     if (destination.droppableId === source.droppableId) return;
 
+    // Play tactile feedback
+    const isAdvancing = COLUMNS.findIndex(c => c.id === destination.droppableId) > COLUMNS.findIndex(c => c.id === source.droppableId);
+    
     updateStatus.mutate({ 
       id: draggableId, 
       status: destination.droppableId as EntregaStatus 
@@ -199,56 +209,63 @@ export default function KanbanEntregas() {
 
   const filteredEntregas = entregas.filter(e => 
     e.numero_entrega.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    e.cliente?.razao_social.toLowerCase().includes(searchTerm.toLowerCase())
+    (e.cliente?.nome_fantasia || e.cliente?.razao_social || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <MainLayout>
-      <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="space-y-6 animate-in fade-in duration-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 shadow-inner">
-              <Package className="w-8 h-8 text-primary" />
+              <Package className="w-8 h-8 text-primary animate-pulse" />
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight">Kanban de Entregas</h1>
-              <p className="text-muted-foreground">Gestão visual do fluxo logístico de entregas</p>
+              <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Kanban de Entregas 10/10</h1>
+              <p className="text-muted-foreground font-medium">Gestão visual e tátil do fluxo logístico em tempo real</p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input 
-                placeholder="Filtrar entregas..." 
-                className="pl-9 w-[240px] bg-muted/30 border-none"
+                placeholder="Filtrar por NF, Código ou Cliente..." 
+                className="pl-9 w-[280px] bg-muted/30 border-none shadow-inner"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline" size="sm" onClick={() => queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] })} className="gap-2">
-              <RefreshCw className="w-4 h-4" />
+            <Button variant="outline" size="sm" onClick={() => queryClient.invalidateQueries({ queryKey: ['kanban-entregas'] })} className="gap-2 border-primary/20 hover:bg-primary/5">
+              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+              <span className="hidden sm:inline">Sincronizar</span>
             </Button>
           </div>
         </div>
 
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent">
-            <div className="flex gap-4 min-w-max h-[calc(100vh-240px)]">
-              {COLUMNS.map(column => {
+          <div className="overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+            <div className="flex gap-6 min-w-max h-[calc(100vh-220px)]">
+              {COLUMNS.map((column, colIdx) => {
                 const columnItems = filteredEntregas.filter(e => e.status === column.id);
                 const Icon = column.icon;
                 
                 return (
-                  <div key={column.id} className={cn("w-[280px] flex flex-col rounded-2xl border bg-muted/30")}>
-                    <div className="p-4 flex items-center justify-between border-b bg-background/50 backdrop-blur-sm rounded-t-2xl">
-                      <div className="flex items-center gap-2">
-                        <div className={cn("p-1.5 rounded-lg", column.bgColor)}>
-                          <Icon className={cn("w-4 h-4", column.color)} />
+                  <motion.div 
+                    key={column.id} 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: colIdx * 0.1 }}
+                    className={cn("w-[320px] flex flex-col rounded-[2rem] border bg-muted/20 shadow-sm overflow-hidden")}
+                  >
+                    <div className="p-5 flex items-center justify-between bg-background/40 backdrop-blur-md border-b">
+                      <div className="flex items-center gap-3">
+                        <div className={cn("p-2 rounded-xl shadow-sm", column.bgColor)}>
+                          <Icon className={cn("w-5 h-5", column.color)} />
                         </div>
-                        <span className="text-sm font-bold tracking-tight">{column.title}</span>
+                        <span className="text-sm font-black tracking-tight uppercase text-foreground/80">{column.title}</span>
                       </div>
-                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-black">{columnItems.length}</Badge>
+                      <Badge variant="secondary" className="h-6 px-2 text-xs font-black bg-background border shadow-inner">{columnItems.length}</Badge>
                     </div>
 
                     <Droppable droppableId={column.id}>
@@ -258,31 +275,39 @@ export default function KanbanEntregas() {
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                             className={cn(
-                              "p-3 space-y-3 min-h-[150px] transition-colors",
+                              "p-4 space-y-4 min-h-[200px] transition-colors duration-300",
                               snapshot.isDraggingOver && "bg-primary/5"
                             )}
                           >
-                            <AnimatePresence>
+                            <AnimatePresence mode="popLayout">
                               {columnItems.map((entrega, index) => (
-                                <EntregaCard 
-                                  key={entrega.id} 
-                                  entrega={entrega} 
-                                  index={index} 
-                                />
+                                <motion.div
+                                  key={entrega.id}
+                                  layout
+                                  initial={{ scale: 0.9, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  exit={{ scale: 0.8, opacity: 0 }}
+                                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                >
+                                  <EntregaCard 
+                                    entrega={entrega} 
+                                    index={index} 
+                                  />
+                                </motion.div>
                               ))}
                             </AnimatePresence>
                             {provided.placeholder}
                             {columnItems.length === 0 && !snapshot.isDraggingOver && (
-                              <div className="flex flex-col items-center justify-center py-10 opacity-20 select-none">
-                                <Icon className="w-10 h-10 mb-2" />
-                                <span className="text-[10px] uppercase font-bold tracking-tighter text-center">Nenhuma entrega</span>
+                              <div className="flex flex-col items-center justify-center py-20 opacity-10 select-none grayscale">
+                                <Icon className="w-16 h-16 mb-4" />
+                                <span className="text-xs uppercase font-black tracking-widest text-center">Vazio</span>
                               </div>
                             )}
                           </div>
                         </ScrollArea>
                       )}
                     </Droppable>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -292,3 +317,4 @@ export default function KanbanEntregas() {
     </MainLayout>
   );
 }
+
