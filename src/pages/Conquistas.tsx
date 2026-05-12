@@ -40,7 +40,7 @@ const rarityColors = {
 };
 const rarityLabels = { common: "Comum", rare: "Raro", epic: "Épico", legendary: "Lendário" };
 
-const filterConfig: FilterConfig<Achievement> = {
+const filterConfig: FilterConfig<AchievementDisplay> = {
   search: {
     fields: ["name", "description"],
     placeholder: "Buscar conquistas..."
