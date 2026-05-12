@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { playSuccessSound, playErrorSound } from '@/utils/celebrationSounds';
 import type { Database } from '@/integrations/supabase/types';
 
 type TableNames = keyof Database['public']['Tables'];
