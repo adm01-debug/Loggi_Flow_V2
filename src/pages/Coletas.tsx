@@ -149,26 +149,60 @@ export default function Coletas() {
             {pagination.paginatedData.map(c => {
               const Icon = statusConfig[c.status]?.icon || Package;
               return (
-                <Card key={c.id} className="hover:shadow-md transition-shadow">
+                <Card 
+                  key={c.id} 
+                  className="hover:shadow-md transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary group"
+                  onClick={() => { setSelectedPickup(c); setIsDetailsOpen(true); }}
+                >
                   <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className={cn("p-2 rounded-lg", statusConfig[c.status]?.color)}>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className={cn("p-2.5 rounded-xl transition-colors", statusConfig[c.status]?.color)}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-bold">{c.numero_coleta}</p>
-                        <p className="text-sm text-muted-foreground">{(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-lg">{c.numero_coleta}</p>
+                          <Badge variant="secondary" className="text-[10px] h-5 uppercase">
+                            {c.tipo_coleta}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground font-medium">
+                          {(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {c.endereco_coleta}</div>
-                      <div className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString() : '-'}</div>
+                    
+                    <div className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-8 flex-1">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="w-4 h-4 text-primary/60" /> 
+                        <span className="truncate max-w-[150px]">{c.endereco_coleta}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="w-4 h-4 text-primary/60" /> 
+                        {c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString() : '-'}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Package className="w-4 h-4 text-primary/60" /> 
+                        {c.qtd_volumes} vol
+                      </div>
                     </div>
-                    <Badge variant="outline" className="capitalize">{statusConfig[c.status]?.label}</Badge>
+
+                    <div className="flex items-center gap-3">
+                      <Badge className={cn("px-3 py-1 capitalize", statusConfig[c.status]?.color)}>
+                        {statusConfig[c.status]?.label}
+                      </Badge>
+                    </div>
                   </CardContent>
                 </Card>
               );
             })}
+            {pagination.paginatedData.length === 0 && (
+              <div className="text-center py-20 bg-muted/20 rounded-xl border-2 border-dashed">
+                <Package className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-muted-foreground font-medium">Nenhuma coleta encontrada</p>
+                <Button variant="link" onClick={() => { setSearch(""); setStatus("all"); }}>Limpar filtros</Button>
+              </div>
+            )}
           </div>
         )}
         
