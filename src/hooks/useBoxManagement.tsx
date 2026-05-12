@@ -48,6 +48,7 @@ export function useBoxManagement() {
           previsao_entrega,
           box_alocado,
           is_cross_docking,
+          updated_at,
           cliente:clientes(razao_social),
           transportadora:transportadoras(nome_fantasia)
         `)
