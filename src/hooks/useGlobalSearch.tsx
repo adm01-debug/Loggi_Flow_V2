@@ -4,12 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface SearchResult {
   id: string;
-  type: 'entrega' | 'coleta' | 'cliente' | 'fornecedor' | 'transportadora' | 'ocorrencia';
+  type: 'entrega' | 'coleta' | 'cliente' | 'fornecedor' | 'transportadora' | 'ocorrencia' | 'page';
   title: string;
   subtitle: string;
   status?: string;
   url: string;
+  icon?: React.ElementType;
 }
+
 
 interface UseGlobalSearchOptions {
   minQueryLength?: number;
