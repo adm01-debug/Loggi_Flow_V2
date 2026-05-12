@@ -6,7 +6,9 @@ import {
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
   Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award, Upload, Zap as ZapIcon, Webhook,
+  Code,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -108,7 +110,9 @@ const adminItems = [
   { title: "Webhooks", url: "/webhooks", icon: Webhook },
   { title: "Reset Senha", url: "/aprovacao-reset-senha", icon: KeyRound },
   { title: "Audit Trail", url: "/audit-trail", icon: History },
+  { title: "Documentação API", url: "/api-docs", icon: Code },
 ];
+
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);

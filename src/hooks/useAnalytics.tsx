@@ -302,13 +302,47 @@ export function useAnalytics(dateRange?: DateRange) {
         curr.count > (max?.count || 0) ? curr : max
       , heatmapData[0] || { hour: 10, region: 'SP', count: 0 });
       
+      // Calculate SLA for this month
+      const { data: entregasSLA } = await supabase
+        .from('entregas')
+        .select('previsao_entrega, data_entrega_efetiva')
+        .gte('created_at', thisMonth)
+        .eq('status', 'entregue');
+      
+      const onTime = entregasSLA?.filter(e => 
+        e.previsao_entrega && e.data_entrega_efetiva && 
+        new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega)
+      ).length || 0;
+      
+      const onTimeRate = entregasSLA?.length ? Math.round((onTime / entregasSLA.length) * 100) : 100;
+
+      // Average delivery time (in hours)
+      const { data: temposEntrega } = await supabase
+        .from('entregas')
+        .select('data_despacho, data_entrega_efetiva')
+        .gte('created_at', thisMonth)
+        .eq('status', 'entregue')
+        .not('data_despacho', 'is', null)
+        .not('data_entrega_efetiva', 'is', null);
+
+      const totalHours = temposEntrega?.reduce((sum, e) => {
+        const start = new Date(e.data_despacho!);
+        const end = new Date(e.data_entrega_efetiva!);
+        return sum + (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+      }, 0) || 0;
+
+      const avgDeliveryTime = temposEntrega?.length ? Math.round(totalHours / temposEntrega.length) : 0;
+
       return {
         totalEntregas: thisMonthEntregas || 0,
         entregasGrowth,
         avgCost,
         peakHour: peakHourData?.hour || 10,
         peakRegion: peakHourData?.region || 'SP',
+        onTimeRate,
+        avgDeliveryTime,
       };
+
     },
     enabled: !!user?.id && heatmapData.length > 0,
   });

@@ -16,7 +16,9 @@ const typeIcons = {
   fornecedor: Building2,
   transportadora: Truck,
   ocorrencia: AlertCircle,
+  page: Search,
 };
+
 
 export function GlobalSearch() {
   const navigate = useNavigate();
@@ -120,13 +122,13 @@ export function GlobalSearch() {
               <ScrollArea className="max-h-[400px]">
                 <div className="p-2">
                   {Object.entries(groupedResults).map(([type, items], groupIndex) => {
-                    const Icon = typeIcons[type as keyof typeof typeIcons] || Package;
+                    const SectionIcon = typeIcons[type as keyof typeof typeIcons] || Package;
                     return (
                       <div key={type}>
                         {groupIndex > 0 && <Separator className="my-2" />}
                         <div className="px-2 py-1 mb-1">
                           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                            <Icon className="w-3 h-3" />
+                            <SectionIcon className="w-3 h-3" />
                             {getSearchTypeLabel(type as keyof typeof typeIcons)}s ({items.length})
                           </span>
                         </div>
@@ -136,9 +138,16 @@ export function GlobalSearch() {
                             onClick={() => handleResultClick(result.url, result.id)}
                             className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left group"
                           >
-                            <Badge variant="secondary" className={`shrink-0 ${getSearchTypeColor(result.type)}`}>
-                              {getSearchTypeLabel(result.type).slice(0, 3)}
-                            </Badge>
+                            {result.type === 'page' && result.icon ? (
+                              <div className="shrink-0 p-1.5 rounded-md bg-secondary text-secondary-foreground">
+                                <result.icon className="w-4 h-4" />
+                              </div>
+                            ) : (
+                              <Badge variant="secondary" className={`shrink-0 ${getSearchTypeColor(result.type)}`}>
+                                {getSearchTypeLabel(result.type).slice(0, 3)}
+                              </Badge>
+                            )}
+
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">
                                 {result.title}

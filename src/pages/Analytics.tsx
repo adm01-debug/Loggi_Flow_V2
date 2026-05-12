@@ -28,11 +28,12 @@ export default function Analytics() {
 
   const stats = {
     totalDeliveries: summaryMetrics?.totalEntregas || 0,
-    onTimeRate: summaryMetrics?.totalEntregas ? 95 : 0,
-    avgDeliveryTime: 24,
+    onTimeRate: summaryMetrics?.onTimeRate ?? 0,
+    avgDeliveryTime: summaryMetrics?.avgDeliveryTime ?? 0,
     totalRevenue: (summaryMetrics?.avgCost ?? 0) * (summaryMetrics?.totalEntregas || 0),
     growthRate: summaryMetrics?.entregasGrowth || 0,
   };
+
 
   const handleDateRangeChange = (range: DayPickerDateRange | undefined) => {
     setDateRange(range);
