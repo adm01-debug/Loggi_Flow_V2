@@ -43,7 +43,6 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
     search: { fields: ["table_name", "action", "record_id"] as (keyof AuditLog)[] }
   });
 
-  // Apply additional filters
   const fullyFilteredData = filteredData.filter(log => {
     if (actionFilter !== "all" && log.action !== actionFilter) return false;
     if (tableFilter !== "all" && log.table_name !== tableFilter) return false;
@@ -51,7 +50,7 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
   });
 
   const { sortedData, toggleSort, getSortDirection } = useSorting(fullyFilteredData, { defaultKey: "created_at", defaultDirection: "desc" });
-  const pagination = usePagination(sortedData, { initialPageSize: 20 });
+  const pagination = usePagination(sortedData, { initialPageSize: 50 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
 
   const { parentRef, virtualItems, totalSize } = useVirtualTable({
@@ -158,8 +157,8 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
 
       <div 
         ref={parentRef}
-        className="space-y-2 overflow-y-auto pr-2 custom-scrollbar" 
-        style={{ maxHeight, position: 'relative' }}
+        className="overflow-y-auto pr-2 custom-scrollbar relative" 
+        style={{ maxHeight }}
       >
         <div
           style={{
@@ -178,25 +177,13 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
             return (
               <div
                 key={log.id}
-                data-index={virtualRow.index}
-                ref={virtualRow.measureElement}
+                className="pb-2 absolute top-0 left-0 w-full"
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
+                  height: `${virtualRow.size}px`,
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
-                className="pb-2"
               >
-                <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  className={cn(
-                    "border rounded-lg p-3 bg-card hover:bg-muted/50 transition-colors", 
-                    isSelected(log.id) && "ring-2 ring-primary"
-                  )}
-                >
+                <div className={cn("border rounded-lg p-3 bg-card hover:bg-muted/50 transition-colors", isSelected(log.id) && "ring-2 ring-primary")}>
                   <div className="flex items-start gap-3">
                     <Checkbox checked={isSelected(log.id)} onCheckedChange={() => toggle(log.id)} className="mt-1" />
                     <div className={cn("p-2 rounded-lg shrink-0", getActionColor(log.action))}>{getActionIcon(log.action)}</div>
@@ -229,11 +216,7 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
                     )}
                   </div>
                   {isExpanded && (log.old_data || log.new_data) && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }} 
-                      animate={{ height: "auto", opacity: 1 }} 
-                      className="mt-3 pt-3 border-t"
-                    >
+                    <div className="mt-3 pt-3 border-t">
                       <div className="grid grid-cols-2 gap-4 text-xs">
                         {log.old_data && (
                           <div>
@@ -248,9 +231,9 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
                           </div>
                         )}
                       </div>
-                    </motion.div>
+                    </div>
                   )}
-                </motion.div>
+                </div>
               </div>
             );
           })}
