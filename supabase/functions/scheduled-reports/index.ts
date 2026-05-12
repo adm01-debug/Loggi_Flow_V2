@@ -199,6 +199,12 @@ async function generateReportData(supabase: any, reportType: string, filters: an
           taxaSLA: entregues.length > 0 ? ((noPrazo / entregues.length) * 100).toFixed(1) : 0,
         },
       };
+    }
+
+    default:
+      return { type: reportType, error: 'Tipo de relatório não suportado' };
+  }
+}
 
 async function sendReportEmail(recipients: string[], report: any, apiKey: string) {
   const subject = `LogiFlow: Relatório de ${report.type.charAt(0).toUpperCase() + report.type.slice(1)} - ${report.period}`;
@@ -245,7 +251,3 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
   });
 }
 
-    default:
-      return { type: reportType, error: 'Tipo de relatório não suportado' };
-  }
-}
