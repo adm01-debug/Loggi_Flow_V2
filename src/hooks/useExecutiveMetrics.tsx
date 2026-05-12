@@ -32,8 +32,8 @@ export function useExecutiveMetrics() {
       const now = new Date();
       const months: MonthlyTrend[] = [];
 
-      for (let i = 5; i >= 0; i--) {
-        const monthDate = subMonths(now, i);
+      const monthsPromises = Array.from({ length: 6 }).map(async (_, i) => {
+        const monthDate = subMonths(now, 5 - i); // Reversed order to build chronologically
         const start = startOfMonth(monthDate).toISOString();
         const end = endOfMonth(monthDate).toISOString();
         const label = format(monthDate, "MMM/yy");
@@ -47,23 +47,23 @@ export function useExecutiveMetrics() {
         const entregasList = entregas.data || [];
         const delivered = entregasList.filter(e => e.status === "entregue" || e.status === "finalizado");
         const onTime = delivered.filter(e => {
-          if (!e.previsao_entrega || !e.data_entrega_efetiva) return true;
+          if (!e.previsao_entrega || !e.data_entrega_efetiva) return false;
           return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega);
         });
         const otif = delivered.length > 0 ? (onTime.length / delivered.length) * 100 : 0;
         const custoFrete = entregasList.reduce((acc, e) => acc + (e.valor_frete || 0), 0);
 
-        months.push({
+        return {
           month: label,
           entregas: entregasList.length,
           coletas: coletas.data?.length || 0,
           ocorrencias: ocorrencias.data?.length || 0,
           custoFrete,
           otif: Math.round(otif * 10) / 10,
-        });
-      }
+        };
+      });
 
-      return months;
+      return await Promise.all(monthsPromises);
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD * 5,
     refetchInterval: QUERY_REFETCH_INTERVAL.DASHBOARD * 2,
@@ -86,7 +86,7 @@ export function useExecutiveMetrics() {
         const carrierEntregas = entregasList.filter(e => e.transportadora_id === c.id);
         const delivered = carrierEntregas.filter(e => e.status === "entregue" || e.status === "finalizado");
         const onTime = delivered.filter(e => {
-          if (!e.previsao_entrega || !e.data_entrega_efetiva) return true;
+          if (!e.previsao_entrega || !e.data_entrega_efetiva) return false;
           return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega);
         });
         const totalCost = carrierEntregas.reduce((acc, e) => acc + (e.valor_frete || 0), 0);
