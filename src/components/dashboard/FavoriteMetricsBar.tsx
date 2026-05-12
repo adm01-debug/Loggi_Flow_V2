@@ -278,7 +278,7 @@ export function FavoriteMetricsBar() {
           <AnimatePresence mode="popLayout">
             {favoriteMetrics.map((metric) => {
               const IconComponent = iconMap[metric.icon];
-              const data = realMetricValues[metric.id as keyof typeof realMetricValues] || { value: "-" };
+              const data = realMetricValues[metric.id as keyof typeof realMetricValues] || { value: "-", change: undefined, changeType: "neutral" as const };
 
               return (
                 <motion.div
