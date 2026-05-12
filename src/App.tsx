@@ -60,6 +60,7 @@ const CentralRastreamento = lazy(() => import("./pages/CentralRastreamento"));
 const AdminTelemetria = lazy(() => import("./pages/AdminTelemetria"));
 const GestaoWebhooks = lazy(() => import("./pages/GestaoWebhooks"));
 const IntegracaoBitrix = lazy(() => import("./pages/IntegracaoBitrix"));
+const LogisticaReversa = lazy(() => import("./pages/LogisticaReversa"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load non-critical providers
