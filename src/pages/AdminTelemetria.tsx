@@ -7,18 +7,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon } from "lucide-react";
+import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug } from "lucide-react";
 import { TelemetryCharts } from "@/components/admin/telemetry/TelemetryCharts";
 import { TelemetryStatsCards } from "./admin-telemetria/TelemetryStatsCards";
 import { TelemetryTopOffenders } from "./admin-telemetria/TelemetryTopOffenders";
 import { TelemetryTable, type TelemetryRow } from "./admin-telemetria/TelemetryTable";
+import { TelemetryViewer } from "@/components/admin/TelemetryViewer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 type SeverityFilter = "all" | "slow" | "very_slow" | "error";
 type TimeFilter = "1h" | "6h" | "24h" | "7d" | "custom";
 
 export default function AdminTelemetriaPage() {
+  const [activeTab, setActiveTab] = useState("database");
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("all");
+
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("24h");
   const [customDateFrom, setCustomDateFrom] = useState<Date | undefined>();
   const [customDateTo, setCustomDateTo] = useState<Date | undefined>();
