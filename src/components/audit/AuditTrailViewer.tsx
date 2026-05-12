@@ -54,6 +54,11 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
   const pagination = usePagination(sortedData, { initialPageSize: 20 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
 
+  const { parentRef, virtualItems, totalSize } = useVirtualTable({
+    count: pagination.paginatedData.length,
+    estimateSize: 85,
+  });
+
   const toggleExpanded = (id: string) => { 
     const s = new Set(expandedIds); 
     s.has(id) ? s.delete(id) : s.add(id); 
