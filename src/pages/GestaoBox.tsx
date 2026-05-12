@@ -25,6 +25,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -77,6 +78,7 @@ export default function GestaoBox() {
     removeFromBox, 
     toggleCrossDocking 
   } = useBoxManagement();
+  const { playSuccess, playError, playAction } = useAudioFeedback();
   
   const [selectedBox, setSelectedBox] = useState<BoxData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -103,8 +105,15 @@ export default function GestaoBox() {
   const occupancyRate = boxes.length > 0 ? Math.round((occupiedCount / boxes.length) * 100) : 0;
 
   const handleBoxClick = (box: BoxData) => { setSelectedBox(box); setIsModalOpen(true); };
-  const handleDrop = async (boxNumber: number, deliveryId: string) => { await allocateToBox(boxNumber, deliveryId); };
-  const handleRemoveFromBox = async (boxNumber: number) => { await removeFromBox(boxNumber); setIsModalOpen(false); };
+  const handleDrop = async (boxNumber: number, deliveryId: string) => { 
+    playAction();
+    await allocateToBox(boxNumber, deliveryId); 
+  };
+  const handleRemoveFromBox = async (boxNumber: number) => { 
+    playAction();
+    await removeFromBox(boxNumber); 
+    setIsModalOpen(false); 
+  };
   
   const bulkClear = async (ids: string[]) => { 
     const loadingToast = toast.loading("Liberando boxes...");

@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { History } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 
 interface BoxDetailModalProps {
   box: BoxData | null;
@@ -39,6 +40,7 @@ interface BoxDetailModalProps {
 
 export function BoxDetailModal({ box, isOpen, onClose, onRemove, onToggleCrossDocking }: BoxDetailModalProps) {
   if (!box) return null;
+  const { playWhoosh, playToggle } = useAudioFeedback();
 
   const delivery = box.delivery;
 
@@ -86,7 +88,7 @@ export function BoxDetailModal({ box, isOpen, onClose, onRemove, onToggleCrossDo
         </DialogHeader>
 
         {box.isOccupied && delivery && (
-          <Tabs defaultValue="info" className="w-full">
+          <Tabs defaultValue="info" className="w-full" onValueChange={() => playWhoosh()}>
             <TabsList className="grid w-full grid-cols-2 h-12 p-1 bg-muted/50 rounded-lg">
               <TabsTrigger value="info" className="flex items-center gap-2 rounded-md">
                 <Package className="w-4 h-4" />
@@ -166,7 +168,10 @@ export function BoxDetailModal({ box, isOpen, onClose, onRemove, onToggleCrossDo
                 <Switch 
                   id="cross-docking" 
                   checked={delivery.is_cross_docking} 
-                  onCheckedChange={(checked) => onToggleCrossDocking?.(delivery.id, checked)}
+                  onCheckedChange={(checked) => {
+                    playToggle(checked);
+                    onToggleCrossDocking?.(delivery.id, checked);
+                  }}
                 />
               </div>
 

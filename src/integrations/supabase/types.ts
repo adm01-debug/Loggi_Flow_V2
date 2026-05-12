@@ -2478,6 +2478,7 @@ export type Database = {
       get_public_tracking: {
         Args: { p_code: string }
         Returns: {
+          cliente_razao_social: string
           codigo_rastreamento: string
           comprovante_entrega_url: string
           created_at: string
