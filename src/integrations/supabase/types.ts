@@ -799,6 +799,7 @@ export type Database = {
           endereco_entrega: string
           geocoded_at: string | null
           id: string
+          is_cross_docking: boolean | null
           latitude: number | null
           link_rastreamento: string | null
           longitude: number | null
@@ -827,6 +828,7 @@ export type Database = {
           endereco_entrega: string
           geocoded_at?: string | null
           id?: string
+          is_cross_docking?: boolean | null
           latitude?: number | null
           link_rastreamento?: string | null
           longitude?: number | null
@@ -855,6 +857,7 @@ export type Database = {
           endereco_entrega?: string
           geocoded_at?: string | null
           id?: string
+          is_cross_docking?: boolean | null
           latitude?: number | null
           link_rastreamento?: string | null
           longitude?: number | null

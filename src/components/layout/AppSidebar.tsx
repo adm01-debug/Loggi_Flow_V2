@@ -6,7 +6,7 @@ import {
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
   Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award, Upload, Zap as ZapIcon, Webhook,
-  Code,
+  Code, Star, Coins
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -17,6 +17,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 const AIAssistant = lazy(() => import("@/components/ai/AIAssistant").then(m => ({ default: m.AIAssistant })));
 import { usePrefetch } from "@/hooks/usePrefetch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useGamification } from "@/hooks/useGamification";
+import { Progress } from "@/components/ui/progress";
 
 interface MenuSection {
   id: string;
@@ -77,10 +79,11 @@ const menuSections: MenuSection[] = [
       { title: "Mapa de Rotas", url: "/mapa-rotas", icon: Map },
       { title: "Central Rastreamento", url: "/central-rastreamento", icon: Target },
       { title: "Rastreamento Motorista", url: "/rastreamento-motorista", icon: Navigation },
-      { title: "Rodonaves RTE", url: "/gestao-rodonaves", icon: Truck },
-      { title: "Melhor Envio", url: "/melhor-envio", icon: Package },
-    ],
-  },
+       { title: "Rodonaves RTE", url: "/gestao-rodonaves", icon: Truck },
+       { title: "Melhor Envio", url: "/melhor-envio", icon: Package },
+       { title: "Bitrix24 CRM", url: "/bitrix24", icon: Building2 },
+     ],
+   },
   {
     id: "entities",
     title: "Cadastros",
@@ -119,6 +122,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin } = useAuth();
   const { prefetch } = usePrefetch();
+  const { userLevel, levelProgress } = useGamification();
 
   // Determine initially active section based on current route
   const getActiveSection = () => {
@@ -168,8 +172,31 @@ export function AppSidebar() {
         )}
       </div>
 
+      {/* XP Progress Bar */}
+      {!collapsed && (
+        <div className="px-4 py-3 border-b border-sidebar-border/50 bg-sidebar-accent/30">
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center gap-1.5">
+              <div className="p-1 rounded bg-xp/20">
+                <Star className="w-3 h-3 text-xp fill-xp" />
+              </div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nível {levelProgress.currentLevel}</span>
+            </div>
+            <span className="text-[10px] font-bold text-xp">{Math.round(levelProgress.progress)}%</span>
+          </div>
+          <Progress value={levelProgress.progress} className="h-1 bg-xp/10" />
+          <div className="flex justify-between items-center mt-1.5">
+             <div className="flex items-center gap-1">
+               <Coins className="w-3 h-3 text-warning" />
+               <span className="text-[10px] font-bold text-foreground">{userLevel?.coins || 0}</span>
+             </div>
+             <span className="text-[9px] text-muted-foreground tabular-nums">{levelProgress.currentLevelXP} / {levelProgress.nextLevelXP} XP</span>
+          </div>
+        </div>
+      )}
+
       {/* Scroll indicator top */}
-      <div className="absolute top-[73px] left-0 right-0 h-6 bg-gradient-to-b from-sidebar to-transparent z-10 pointer-events-none" />
+      <div className="absolute top-[145px] left-0 right-0 h-6 bg-gradient-to-b from-sidebar to-transparent z-10 pointer-events-none" />
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">

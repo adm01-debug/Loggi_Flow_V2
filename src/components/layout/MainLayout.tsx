@@ -9,6 +9,7 @@ import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
+import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 
 const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));
 const OnboardingProgress = lazy(() => import("@/components/onboarding/OnboardingProgress").then(m => ({ default: m.OnboardingProgress })));
@@ -59,6 +60,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       
       <MobileBottomNav />
       <MobileQuickActions />
+      <LevelUpModal />
       
       <Suspense fallback={null}>
         <InstallPrompt />

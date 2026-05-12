@@ -79,6 +79,15 @@ serve(async (req) => {
       case 'generate': {
         // Generate report data based on type
         const report = await generateReportData(supabase, reportData.report_type, reportData.filters);
+        
+        // Send email if recipients are provided
+        if (reportData.recipients && reportData.recipients.length > 0) {
+          const resendApiKey = Deno.env.get("RESEND_API_KEY");
+          if (resendApiKey) {
+            await sendReportEmail(reportData.recipients, report, resendApiKey);
+          }
+        }
+
         return new Response(JSON.stringify({ success: true, data: report }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -190,7 +199,51 @@ async function generateReportData(supabase: any, reportType: string, filters: an
           taxaSLA: entregues.length > 0 ? ((noPrazo / entregues.length) * 100).toFixed(1) : 0,
         },
       };
+
+async function sendReportEmail(recipients: string[], report: any, apiKey: string) {
+  const subject = `LogiFlow: Relatório de ${report.type.charAt(0).toUpperCase() + report.type.slice(1)} - ${report.period}`;
+  
+  let html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+      <h1 style="color: #2563eb;">Relatório Logístico LogiFlow</h1>
+      <p>Olá, este é o seu relatório agendado de <strong>${report.type}</strong>.</p>
+      <p>Período: ${report.period}</p>
+      
+      <div style="background: #f3f4f6; padding: 20px; rounded: 8px; margin: 20px 0;">
+        <h2 style="margin-top: 0;">Resumo</h2>
+        <ul style="list-style: none; padding: 0;">
+  `;
+
+  if (report.summary) {
+    for (const [key, value] of Object.entries(report.summary)) {
+      html += `<li><strong>${key}:</strong> ${value}</li>`;
     }
+  }
+
+  html += `
+        </ul>
+      </div>
+      
+      <p style="font-size: 12px; color: #666; margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
+        Este é um e-mail automático enviado pelo sistema LogiFlow.
+      </p>
+    </div>
+  `;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      from: "LogiFlow Reports <notificacoes@resend.dev>",
+      to: recipients,
+      subject,
+      html,
+    }),
+  });
+}
 
     default:
       return { type: reportType, error: 'Tipo de relatório não suportado' };

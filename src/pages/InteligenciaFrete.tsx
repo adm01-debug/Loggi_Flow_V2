@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap } from "lucide-react";
+import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator } from "lucide-react";
+import { StrategySimulator } from "@/components/freight";
 
 const pieColors = ["hsl(var(--primary))", "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--accent))", "hsl(var(--muted))", "hsl(var(--secondary))"];
 
@@ -101,12 +102,20 @@ export default function InteligenciaFrete() {
 
         {/* Tabs */}
         <Tabs defaultValue="impacto" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="impacto">Impacto por Região</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="impacto">Impacto Regional</TabsTrigger>
             <TabsTrigger value="consolidacao">Consolidação</TabsTrigger>
             <TabsTrigger value="negociacao">Negociação</TabsTrigger>
-            <TabsTrigger value="abusivos">Alertas Abusivos</TabsTrigger>
+            <TabsTrigger value="simulador"><Calculator className="w-4 h-4 mr-1" />Simulador</TabsTrigger>
+            <TabsTrigger value="abusivos">Alertas</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="simulador" className="space-y-4">
+            <StrategySimulator 
+              currentMonthlyFreight={summary.totalFreight} 
+              totalDeliveries={summary.totalEntregas} 
+            />
+          </TabsContent>
 
           {/* Tab 1: Regional Impact */}
           <TabsContent value="impacto" className="space-y-4">

@@ -1,69 +1,81 @@
-import { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { SplitSquareVertical, TrendingDown } from 'lucide-react';
-import type { QuotationResult } from '@/hooks/useFreightQuotation';
-import type { CargoData } from '@/hooks/useQuotationFlow';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { SplitSquareVertical, Package } from 'lucide-react';
+import { formatCurrency } from '@/lib/formatters';
 
 interface ScenarioSimulatorProps {
-  cargoData: CargoData | null;
-  simulateScenario: (data: CargoData, splitVolumes: number) => Array<{ volumes: number; results: QuotationResult[] }>;
+  cargoData: any;
+  simulateScenario: (data: any, splitVolumes: number) => any[];
 }
 
 export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimulatorProps) {
-  const [splits, setSplits] = useState(2);
+  const [volumes, setVolumes] = useState(2);
+  const [results, setResults] = useState<any[]>([]);
 
-  const scenarios = useMemo(() => {
-    if (!cargoData) return [];
-    return simulateScenario(cargoData, splits);
-  }, [cargoData, splits, simulateScenario]);
-
-  if (!cargoData) {
-    return (
-      <div className="card-base p-4 text-center text-muted-foreground text-sm">
-        <SplitSquareVertical className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
-        Faça uma cotação primeiro para simular cenários
-      </div>
-    );
-  }
-
-  const bestPerScenario = scenarios.map(s => ({
-    volumes: s.volumes,
-    best: s.results[0],
-    total: s.results[0] ? s.results[0].valor_total * (s.volumes > 1 ? 1 : 1) : 0,
-  }));
+  const handleSimulate = () => {
+    if (!cargoData) return;
+    const scenarios = simulateScenario(cargoData, volumes);
+    setResults(scenarios);
+  };
 
   return (
-    <div className="card-base p-4 space-y-4">
-      <div className="flex items-center gap-2">
-        <SplitSquareVertical className="w-5 h-5 text-primary" />
-        <span className="font-semibold">Simulação de Cenários</span>
-      </div>
-
-      <div>
-        <Label>Dividir em até {splits} volumes</Label>
-        <Slider value={[splits]} onValueChange={v => setSplits(v[0])} min={2} max={5} step={1} className="mt-2" />
-      </div>
-
-      <div className="space-y-2">
-        {bestPerScenario.filter(s => s.best).map(s => (
-          <div key={s.volumes} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border">
-            <div>
-              <p className="font-medium text-sm">{s.volumes === 1 ? 'Envio único' : `${s.volumes} volumes`}</p>
-              <p className="text-xs text-muted-foreground">{s.best.transportadora_nome} · {s.best.prazo_dias} dias</p>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <SplitSquareVertical className="w-5 h-5 text-primary" />
+            Simulador de Fracionamento
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+            <div className="space-y-2">
+              <Label htmlFor="volumes">Número de Volumes para Fracionar</Label>
+              <Input
+                id="volumes"
+                type="number"
+                value={volumes}
+                onChange={(e) => setVolumes(Number(e.target.value))}
+                min={2}
+                max={10}
+              />
             </div>
-            <div className="text-right">
-              <p className="font-bold text-primary">R$ {s.best.valor_total.toFixed(2)}</p>
-            </div>
+            <Button onClick={handleSimulate} disabled={!cargoData} className="w-full sm:w-auto">
+              Simular Impacto
+            </Button>
           </div>
-        ))}
-      </div>
+          {!cargoData && (
+            <p className="text-xs text-muted-foreground bg-muted p-2 rounded">
+              Preencha os dados da carga na aba Cotação primeiro.
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
-      {bestPerScenario.length >= 2 && bestPerScenario[0]?.best && bestPerScenario[bestPerScenario.length - 1]?.best && (
-        <div className="flex items-center gap-2 text-sm text-success">
-          <TrendingDown className="w-4 h-4" />
-          Compare os cenários para encontrar a melhor opção de envio
+      {results.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {results.map((res, idx) => (
+            <Card key={idx} className="border-primary/20">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <Badge variant="outline">Volume {res.volumes}</Badge>
+                  <Package className="w-4 h-4 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  {res.results.slice(0, 2).map((r: any, i: number) => (
+                    <div key={i} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground truncate">{r.transportadora_nome}</span>
+                      <span className="font-bold">{formatCurrency(r.valor_total)}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </div>
