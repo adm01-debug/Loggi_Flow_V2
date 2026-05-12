@@ -232,6 +232,7 @@ export function getSearchTypeLabel(type: SearchResult['type']): string {
     fornecedor: 'Fornecedor',
     transportadora: 'Transportadora',
     ocorrencia: 'Ocorrência',
+    page: 'Página',
   };
   return labels[type] || type;
 }
@@ -245,6 +246,8 @@ export function getSearchTypeColor(type: SearchResult['type']): string {
     fornecedor: 'bg-warning/10 text-warning',
     transportadora: 'bg-accent text-accent-foreground',
     ocorrencia: 'bg-destructive/10 text-destructive',
+    page: 'bg-secondary text-secondary-foreground',
   };
   return colors[type] || 'bg-muted text-muted-foreground';
 }
+
