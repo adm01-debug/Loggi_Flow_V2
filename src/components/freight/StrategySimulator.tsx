@@ -82,33 +82,61 @@ export function StrategySimulator({ currentMonthlyFreight, totalDeliveries }: St
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-1">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-primary" />
-            Parâmetros
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-primary" />
+              Parâmetros
+            </div>
+            <Sparkles className="w-4 h-4 text-warning animate-pulse" />
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-5">
+          <div className="flex flex-wrap gap-2 mb-2">
+            {scenarios.map(s => (
+              <Button 
+                key={s.name} 
+                variant="outline" 
+                size="xs" 
+                className="h-7 text-[10px] px-2"
+                onClick={() => applyScenario(s)}
+              >
+                {s.name}
+              </Button>
+            ))}
+          </div>
+
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label>Variação Volume</Label>
-              <Badge>{volumeChange}%</Badge>
+              <Label className="text-xs">Variação Volume</Label>
+              <Badge variant="secondary" className="text-[10px]">{volumeChange}%</Badge>
             </div>
             <Slider value={[volumeChange]} onValueChange={(v) => setVolumeChange(v[0])} min={-50} max={100} />
           </div>
+
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label>Ajuste Taxas</Label>
-              <Badge>{rateChange}%</Badge>
+              <Label className="text-xs">Ajuste de Mercado (Taxas)</Label>
+              <Badge variant="secondary" className="text-[10px]">{rateChange > 0 ? '+' : ''}{rateChange}%</Badge>
             </div>
             <Slider value={[rateChange]} onValueChange={(v) => setRateChange(v[0])} min={-30} max={30} />
           </div>
+
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label>Negociação</Label>
-              <Badge>-{negotiationTarget}%</Badge>
+              <Label className="text-xs">Meta de Negociação</Label>
+              <Badge variant="outline" className="text-[10px] text-success border-success/30">-{negotiationTarget}%</Badge>
             </div>
             <Slider value={[negotiationTarget]} onValueChange={(v) => setNegotiationTarget(v[0])} min={0} max={20} />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label className="text-xs">Nível de Consolidação</Label>
+              <Badge variant="outline" className="text-[10px] text-primary border-primary/30">{consolidationLevel}%</Badge>
+            </div>
+            <Slider value={[consolidationLevel]} onValueChange={(v) => setConsolidationLevel(v[0])} min={0} max={100} />
+            <p className="text-[10px] text-muted-foreground">Volume direcionado para Hubs de consolidação</p>
           </div>
         </CardContent>
       </Card>
