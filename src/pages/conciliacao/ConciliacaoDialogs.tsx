@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,65 +79,112 @@ interface MatchDialogProps {
   onOpenChange: (open: boolean) => void;
   selectedItem: ItemImportado | null;
   entregasSistema: Array<{ id: string; numero: string; data: string; transportadora: string; valor: number }>;
-  onMatch: (sistemaId: string, status: "conciliado" | "divergencia") => void;
+  onMatch: (sistemaId: string, status: "conciliado" | "divergencia", observacoes?: string) => void;
 }
 
 export function MatchDialog({ open, onOpenChange, selectedItem, entregasSistema, onMatch }: MatchDialogProps) {
+  const [observacoes, setObservacoes] = useState("");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
-        <DialogHeader><DialogTitle>Conciliar Manualmente</DialogTitle></DialogHeader>
+      <DialogContent className="max-w-3xl max-h-[90vh]">
+        <DialogHeader><DialogTitle>Conciliar Manualmente / Gestão de Divergência</DialogTitle></DialogHeader>
         {selectedItem && (
-          <div className="space-y-4">
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">Item Importado</p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{selectedItem.referencia_externa || "Sem referência"}</p>
-                  <p className="text-sm text-muted-foreground">{selectedItem.descricao}</p>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-muted/50 rounded-lg border">
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Item Importado (Fatura)</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold">{selectedItem.referencia_externa || "Sem referência"}</p>
+                    <p className="text-sm text-muted-foreground">{selectedItem.descricao}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{selectedItem.transportadora_nome}</p>
+                  </div>
+                  <p className="text-xl font-bold text-primary">{formatCurrency(selectedItem.valor)}</p>
                 </div>
-                <p className="text-xl font-bold">{formatCurrency(selectedItem.valor)}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Observações / Justificativa de Divergência</Label>
+                <Textarea 
+                  placeholder="Ex: Cobrança indevida de reentrega, contestação aberta..." 
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  className="h-20"
+                />
               </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Selecione o item do sistema:</p>
-              <ScrollArea className="h-[300px] border rounded-lg">
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Vincular a Entrega do Sistema:</p>
+                <Badge variant="outline">{entregasSistema.length} resultados</Badge>
+              </div>
+              <ScrollArea className="h-[350px] border rounded-lg">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-muted/50 sticky top-0 z-10">
                     <TableRow>
                       <TableHead>Número</TableHead>
                       <TableHead>Data</TableHead>
-                      <TableHead>Transportadora</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
+                      <TableHead>Transp.</TableHead>
+                      <TableHead className="text-right">Valor Sistema</TableHead>
                       <TableHead className="text-right">Diferença</TableHead>
-                      <TableHead></TableHead>
+                      <TableHead className="text-right">Ação</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {entregasSistema.map((e) => {
-                      const diferenca = selectedItem.valor - e.valor;
-                      const match = Math.abs(diferenca) < 0.01;
-                      return (
-                        <TableRow key={e.id} className={match ? "bg-success/5" : ""}>
-                          <TableCell className="font-medium">{e.numero}</TableCell>
-                          <TableCell>{formatDate(e.data)}</TableCell>
-                          <TableCell>{e.transportadora}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(e.valor)}</TableCell>
-                          <TableCell className={cn("text-right", diferenca !== 0 && "text-warning")}>
-                            {formatCurrency(diferenca)}
-                          </TableCell>
-                          <TableCell>
-                            <Button size="sm" variant={match ? "default" : "outline"} onClick={() => onMatch(e.id, match ? "conciliado" : "divergencia")}>
-                              {match ? <Check className="w-4 h-4 mr-1" /> : <AlertTriangle className="w-4 h-4 mr-1" />}
-                              {match ? "Conciliar" : "Com Divergência"}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                    {entregasSistema.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          Nenhuma entrega encontrada para o período selecionado.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      entregasSistema.map((e) => {
+                        const diferenca = selectedItem.valor - e.valor;
+                        const match = Math.abs(diferenca) < 0.01;
+                        return (
+                          <TableRow key={e.id} className={cn(match ? "bg-success/5" : "hover:bg-muted/30 transition-colors")}>
+                            <TableCell className="font-medium">{e.numero}</TableCell>
+                            <TableCell className="text-xs">{formatDate(e.data)}</TableCell>
+                            <TableCell className="text-xs max-w-[100px] truncate">{e.transportadora}</TableCell>
+                            <TableCell className="text-right font-medium">{formatCurrency(e.valor)}</TableCell>
+                            <TableCell className={cn("text-right font-semibold", diferenca === 0 ? "text-success" : "text-warning")}>
+                              {formatCurrency(diferenca)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button 
+                                size="sm" 
+                                variant={match ? "default" : "outline"} 
+                                className={cn(match ? "bg-success hover:bg-success/90" : "border-warning text-warning hover:bg-warning/10")}
+                                onClick={() => {
+                                  onMatch(e.id, match ? "conciliado" : "divergencia", observacoes);
+                                  setObservacoes("");
+                                }}
+                              >
+                                {match ? <Check className="w-4 h-4 mr-1" /> : <AlertTriangle className="w-4 h-4 mr-1" />}
+                                {match ? "Aprovar" : "Contestar"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
                   </TableBody>
                 </Table>
               </ScrollArea>
+            </div>
+            
+            <div className="flex justify-between items-center pt-2">
+              <p className="text-xs text-muted-foreground">
+                Dica: O status "Divergência" será aplicado se o valor cotado for diferente do faturado.
+              </p>
+              <Button variant="ghost" size="sm" onClick={() => {
+                onMatch(selectedItem.id, "ignorado", observacoes);
+                setObservacoes("");
+              }}>
+                Ignorar este item
+              </Button>
             </div>
           </div>
         )}

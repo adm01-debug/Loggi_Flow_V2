@@ -43,9 +43,9 @@ export default function ConciliacaoFinanceira() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleManualMatch = (sistemaId: string, status: "conciliado" | "divergencia") => {
+  const handleManualMatch = (sistemaId: string, status: "conciliado" | "divergencia", observacoes?: string) => {
     if (!selectedItem) return;
-    manualMatch.mutate({ itemId: selectedItem.id, sistemaId, status });
+    manualMatch.mutate({ itemId: selectedItem.id, sistemaId, status, observacoes });
     setDlgMatch(false);
     setSelectedItem(null);
   };
