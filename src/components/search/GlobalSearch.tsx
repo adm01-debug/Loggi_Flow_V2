@@ -138,9 +138,16 @@ export function GlobalSearch() {
                             onClick={() => handleResultClick(result.url, result.id)}
                             className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left group"
                           >
-                            <Badge variant="secondary" className={`shrink-0 ${getSearchTypeColor(result.type)}`}>
-                              {getSearchTypeLabel(result.type).slice(0, 3)}
-                            </Badge>
+                            {result.type === 'page' && result.icon ? (
+                              <div className="shrink-0 p-1.5 rounded-md bg-secondary text-secondary-foreground">
+                                <result.icon className="w-4 h-4" />
+                              </div>
+                            ) : (
+                              <Badge variant="secondary" className={`shrink-0 ${getSearchTypeColor(result.type)}`}>
+                                {getSearchTypeLabel(result.type).slice(0, 3)}
+                              </Badge>
+                            )}
+
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">
                                 {result.title}
