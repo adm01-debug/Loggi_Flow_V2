@@ -14,6 +14,7 @@ import { useTransportadoraRotas } from '@/hooks/useTransportadoraRotas';
 import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { useCotacoesMulticanal } from '@/hooks/useCotacoesMulticanal';
+import { useLalamoveOrders } from '@/hooks/useLalamoveOrders';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CotacaoSearchForm } from './cotacao-multicanal/CotacaoSearchForm';
@@ -25,6 +26,9 @@ import type { CotacaoManual, TransportadoraComCanal } from './cotacao-multicanal
 export default function CotacaoMultiCanal() {
   const { searchRoutes } = useTransportadoraRotas();
   const { createCotacao } = useCotacoesMulticanal();
+  const rodonaves = useRodonavesTracking();
+  const melhorEnvio = useMelhorEnvio();
+  const lalamove = useLalamoveOrders();
 
   const [origemEstado, setOrigemEstado] = useState('');
   const [destinoEstado, setDestinoEstado] = useState('');
@@ -46,21 +50,122 @@ export default function CotacaoMultiCanal() {
   const [cotacoes, setCotacoes] = useState<CotacaoManual[]>([]);
 
   const handleSearch = async () => {
-    if (!origemEstado || !destinoEstado) { toast.error('Selecione os estados de origem e destino'); return; }
-    setIsSearching(true); setHasSearched(true); setCotacoes([]);
+    if (!origemEstado || !destinoEstado) { 
+      toast.error('Selecione os estados de origem e destino'); 
+      return; 
+    }
+    
+    setIsSearching(true); 
+    setHasSearched(true); 
+    setCotacoes([]);
+    setCarriers([]);
+
     try {
-      const results = await searchRoutes(origemEstado, destinoEstado, origemCidade || undefined, destinoCidade || undefined);
-      const enriched: TransportadoraComCanal[] = results.map(rota => {
-        const t = rota.transportadora as Record<string, unknown>;
+      // 1. Local routes search
+      const localResults = await searchRoutes(origemEstado, destinoEstado, origemCidade || undefined, destinoCidade || undefined);
+      const enriched: TransportadoraComCanal[] = localResults.map(rota => {
+        const t = rota.transportadora as any;
         const hasApi = t?.api_disponivel === true;
         const hasWhatsapp = !!t?.whatsapp_operacional;
         let canal: 'api' | 'whatsapp' | 'email' = 'email';
         if (hasApi) canal = 'api'; else if (hasWhatsapp) canal = 'whatsapp';
-        return { ...rota, canal_cotacao: canal, whatsapp: t?.whatsapp_operacional as string | null, email: t?.email_comercial as string | null, api_disponivel: hasApi };
+        return { 
+          ...rota, 
+          canal_cotacao: canal, 
+          whatsapp: t?.whatsapp_operacional, 
+          email: t?.email_comercial, 
+          api_disponivel: hasApi 
+        };
       });
       setCarriers(enriched);
-      if (enriched.length === 0) toast.info('Nenhuma transportadora encontrada'); else toast.success(`${enriched.length} transportadora(s) encontrada(s)`);
-    } catch { toast.error('Erro ao buscar transportadoras'); } finally { setIsSearching(false); }
+
+      // 2. Automated API Quotes (Rodonaves, Melhor Envio, Lalamove)
+      if (origemCep && destinoCep && pesoKg) {
+        const cleanedOrigemCep = origemCep.replace(/\D/g, '');
+        const cleanedDestinoCep = destinoCep.replace(/\D/g, '');
+        const weight = parseFloat(pesoKg);
+        const value = valorMercadoria ? parseFloat(valorMercadoria) : 0;
+        const vol = parseInt(volumes) || 1;
+
+        // Rodonaves
+        rodonaves.getQuotationAsync({
+          cepOrigem: cleanedOrigemCep,
+          cepDestino: cleanedDestinoCep,
+          peso: weight,
+          volumes: vol,
+          valorMercadoria: value
+        }).then(res => {
+          if (res?.data) {
+            addCotacao({
+              id: crypto.randomUUID(),
+              transportadora_id: 'rodonaves-id', // Use a standard ID or find in carriers
+              transportadora_nome: 'Rodonaves RTE',
+              canal: 'api',
+              valor: res.data.Valor,
+              prazo_dias: res.data.PrazoEntrega,
+              status: 'respondido',
+              observacoes: 'Cotação automática API Rodonaves',
+              created_at: new Date().toISOString()
+            });
+          }
+        }).catch(e => console.error('Rodonaves error:', e));
+
+        // Melhor Envio
+        melhorEnvio.calcularFrete.mutateAsync({
+          from: { postal_code: cleanedOrigemCep },
+          to: { postal_code: cleanedDestinoCep },
+          volumes: [{ width: 20, height: 20, length: 20, weight: weight }] // Default volume if not provided
+        }).then((res: any) => {
+          if (Array.isArray(res)) {
+            res.forEach((option: any) => {
+              if (!option.error) {
+                addCotacao({
+                  id: crypto.randomUUID(),
+                  transportadora_id: `me-${option.id}`,
+                  transportadora_nome: `Melhor Envio - ${option.name}`,
+                  canal: 'api',
+                  valor: parseFloat(option.price),
+                  prazo_dias: option.delivery_range?.max || option.delivery_time,
+                  status: 'respondido',
+                  observacoes: `Serviço: ${option.name}`,
+                  created_at: new Date().toISOString()
+                });
+              }
+            });
+          }
+        }).catch(e => console.error('Melhor Envio error:', e));
+
+        // Lalamove (Simplified)
+        lalamove.getQuotation.mutateAsync({
+          stops: [
+            { lat: 0, lng: 0, address: cleanedOrigemCep }, // Lalamove usually needs real addresses/coords
+            { lat: 0, lng: 0, address: cleanedDestinoCep }
+          ]
+        }).then(res => {
+          if (res?.priceBreakdown) {
+            addCotacao({
+              id: crypto.randomUUID(),
+              transportadora_id: 'lalamove-id',
+              transportadora_nome: 'Lalamove',
+              canal: 'api',
+              valor: parseFloat(res.priceBreakdown.total),
+              prazo_dias: 1, // Lalamove is usually same day
+              status: 'respondido',
+              observacoes: 'Cotação automática Lalamove',
+              created_at: new Date().toISOString()
+            });
+          }
+        }).catch(e => console.error('Lalamove error:', e));
+      }
+
+      if (enriched.length === 0) toast.info('Nenhuma transportadora local encontrada'); 
+      else toast.success(`${enriched.length} transportadora(s) local(is) encontrada(s)`);
+    } catch (error) { 
+      console.error(error);
+      toast.error('Erro ao buscar transportadoras'); 
+    } finally { 
+      setIsSearching(false); 
+    }
   };
 
   const addCotacao = (c: CotacaoManual) => setCotacoes(prev => [...prev, c]);
