@@ -45,6 +45,9 @@ export default function Coletas() {
   const [coletas, setColetas] = useState<Coleta[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedPickup, setSelectedPickup] = useState<Coleta | null>(null);
 
   const filterConfig: FilterConfig<Coleta> = {
     search: { fields: ["numero_coleta", "endereco_coleta", "observacoes"], placeholder: "Buscar coletas..." },
