@@ -8,6 +8,7 @@ import { Package, AlertTriangle, CheckCircle2, Loader2, Weight } from "lucide-re
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 
 interface PickupConferenceProps {
   pickup: any;
@@ -20,6 +21,7 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
   const [qtdRecebida, setQtdRecebida] = useState(pickup.qtd_recebida || pickup.qtd_volumes || 0);
   const [pesoEfetivo, setPesoEfetivo] = useState(pickup.peso_efetivo || pickup.peso_estimado_kg || 0);
   const [divergencia, setDivergencia] = useState<{ volumes: boolean; peso: boolean } | null>(null);
+  const { playSuccess, playError } = useAudioFeedback();
 
   const checkDivergences = () => {
     const volDiv = Number(qtdRecebida) !== Number(pickup.qtd_volumes);
@@ -59,6 +61,12 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
           : "Volumes e pesos conferidos com sucesso.",
         variant: hasDivergence ? "destructive" : "default"
       });
+      
+      if (hasDivergence) {
+        playError();
+      } else {
+        playSuccess();
+      }
       
       onSuccess();
     } catch (error: any) {
