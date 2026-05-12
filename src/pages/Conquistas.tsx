@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useGamification } from "@/hooks/useGamification";
+import { useGamification, Achievement as DbAchievement } from "@/hooks/useGamification";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -15,22 +15,29 @@ import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 
-interface Achievement { id: string; name: string; description: string; category: string; xpReward: number; icon: LucideIcon; unlocked: boolean; progress: number; maxProgress: number; rarity: "common" | "rare" | "epic" | "legendary"; }
+interface AchievementDisplay { 
+  id: string; 
+  name: string; 
+  description: string; 
+  category: string; 
+  xpReward: number; 
+  icon: LucideIcon; 
+  unlocked: boolean; 
+  rarity: "common" | "rare" | "epic" | "legendary"; 
+}
 
-const iconMap: Record<string, LucideIcon> = { Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, Calendar, Package, Users, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins, GraduationCap, User, Bell };
+const iconMap: Record<string, LucideIcon> = { 
+  Zap, Trophy, Flame, Star, Target, Truck, Clock, Award, Crown, Rocket, Shield, TrendingUp, 
+  Calendar, Package, Users, PackagePlus, Boxes, Container, Warehouse, Timer, ShieldCheck, 
+  Medal, LayoutGrid, Building2, Moon, Sunrise, PackageCheck, Coins, GraduationCap, User, Bell 
+};
 
-const achievements: Achievement[] = [
-  { id: "1", name: "Primeiro Passo", description: "Complete sua primeira entrega", category: "entregas", xpReward: 50, icon: Truck, unlocked: true, progress: 1, maxProgress: 1, rarity: "common" },
-  { id: "2", name: "Velocista", description: "10 entregas no mesmo dia", category: "entregas", xpReward: 200, icon: Zap, unlocked: false, progress: 7, maxProgress: 10, rarity: "rare" },
-  { id: "3", name: "Maratonista", description: "100 entregas no mês", category: "entregas", xpReward: 500, icon: Trophy, unlocked: false, progress: 45, maxProgress: 100, rarity: "epic" },
-  { id: "4", name: "Lenda", description: "1000 entregas totais", category: "entregas", xpReward: 1000, icon: Crown, unlocked: false, progress: 312, maxProgress: 1000, rarity: "legendary" },
-  { id: "5", name: "Pontual", description: "50 entregas sem atraso", category: "performance", xpReward: 300, icon: Clock, unlocked: true, progress: 50, maxProgress: 50, rarity: "rare" },
-  { id: "6", name: "Streak Master", description: "30 dias consecutivos", category: "streak", xpReward: 500, icon: Flame, unlocked: false, progress: 12, maxProgress: 30, rarity: "epic" },
-  { id: "7", name: "Coletor", description: "50 coletas realizadas", category: "coletas", xpReward: 200, icon: Package, unlocked: true, progress: 50, maxProgress: 50, rarity: "rare" },
-  { id: "8", name: "Networker", description: "Cadastre 20 clientes", category: "cadastros", xpReward: 150, icon: Users, unlocked: false, progress: 15, maxProgress: 20, rarity: "common" },
-];
-
-const rarityColors = { common: "from-muted-foreground to-muted-foreground/80", rare: "from-info to-info/80", epic: "from-accent to-accent/80", legendary: "from-warning to-warning/80" };
+const rarityColors = { 
+  common: "from-muted-foreground to-muted-foreground/80", 
+  rare: "from-info to-info/80", 
+  epic: "from-accent to-accent/80", 
+  legendary: "from-warning to-warning/80" 
+};
 const rarityLabels = { common: "Comum", rare: "Raro", epic: "Épico", legendary: "Lendário" };
 
 const filterConfig: FilterConfig<Achievement> = {
