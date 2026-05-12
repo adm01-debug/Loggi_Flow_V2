@@ -2521,6 +2521,17 @@ export type Database = {
       }
       calculate_level: { Args: { xp: number }; Returns: number }
       cleanup_old_telemetry_logs: { Args: never; Returns: undefined }
+      get_carrier_performance_stats: {
+        Args: never
+        Returns: {
+          entregas_no_prazo: number
+          nome_fantasia: string
+          otif_percent: number
+          tempo_medio_coleta_horas: number
+          total_entregas: number
+          transportadora_id: string
+        }[]
+      }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
         Returns: {
