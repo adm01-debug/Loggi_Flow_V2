@@ -98,7 +98,7 @@ export function StrategySimulator({ currentMonthlyFreight, totalDeliveries }: St
               <Button 
                 key={s.name} 
                 variant="outline" 
-                size="xs" 
+                size="sm" 
                 className="h-7 text-[10px] px-2"
                 onClick={() => applyScenario(s)}
               >
