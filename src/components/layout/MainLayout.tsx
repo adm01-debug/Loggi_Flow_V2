@@ -60,6 +60,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       
       <MobileBottomNav />
       <MobileQuickActions />
+      <LevelUpModal />
       
       <Suspense fallback={null}>
         <InstallPrompt />
