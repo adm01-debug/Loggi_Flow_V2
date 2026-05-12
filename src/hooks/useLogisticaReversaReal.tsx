@@ -15,7 +15,7 @@ export interface LogisticaReversa {
   created_at: string;
   updated_at: string;
   created_by: string | null;
-  clientes?: { nome: string };
+  clientes?: { razao_social: string };
   entregas?: { codigo_rastreio: string };
 }
 
@@ -29,18 +29,18 @@ export const useLogisticaReversaReal = () => {
         .from("logistica_reversa")
         .select(`
           *,
-          clientes (nome),
+          clientes (razao_social),
           entregas (codigo_rastreio)
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as LogisticaReversa[];
+      return data as any[];
     },
   });
 
   const create = useMutation({
-    mutationFn: async (newItem: Partial<LogisticaReversa>) => {
+    mutationFn: async (newItem: { motivo: string; [key: string]: any }) => {
       const { data, error } = await supabase
         .from("logistica_reversa")
         .insert([newItem])
@@ -61,7 +61,7 @@ export const useLogisticaReversaReal = () => {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: LogisticaReversa['status'] }) => {
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { data, error } = await supabase
         .from("logistica_reversa")
         .update({ status, updated_at: new Date().toISOString() })
