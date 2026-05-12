@@ -337,6 +337,7 @@ export type Database = {
           contato_nome: string | null
           contato_telefone: string | null
           created_at: string
+          deleted_at: string | null
           endereco_completo: string
           estado: string | null
           horario_entrega: string | null
@@ -354,6 +355,7 @@ export type Database = {
           contato_nome?: string | null
           contato_telefone?: string | null
           created_at?: string
+          deleted_at?: string | null
           endereco_completo: string
           estado?: string | null
           horario_entrega?: string | null
@@ -371,6 +373,7 @@ export type Database = {
           contato_nome?: string | null
           contato_telefone?: string | null
           created_at?: string
+          deleted_at?: string | null
           endereco_completo?: string
           estado?: string | null
           horario_entrega?: string | null
@@ -391,6 +394,7 @@ export type Database = {
           data_efetiva_coleta: string | null
           data_prevista_coleta: string | null
           data_recebimento: string | null
+          deleted_at: string | null
           divergencia_percentual: number | null
           endereco_coleta: string
           fornecedor_id: string | null
@@ -417,6 +421,7 @@ export type Database = {
           data_efetiva_coleta?: string | null
           data_prevista_coleta?: string | null
           data_recebimento?: string | null
+          deleted_at?: string | null
           divergencia_percentual?: number | null
           endereco_coleta: string
           fornecedor_id?: string | null
@@ -443,6 +448,7 @@ export type Database = {
           data_efetiva_coleta?: string | null
           data_prevista_coleta?: string | null
           data_recebimento?: string | null
+          deleted_at?: string | null
           divergencia_percentual?: number | null
           endereco_coleta?: string
           fornecedor_id?: string | null
@@ -789,6 +795,7 @@ export type Database = {
           created_at: string
           data_despacho: string | null
           data_entrega_efetiva: string | null
+          deleted_at: string | null
           endereco_entrega: string
           geocoded_at: string | null
           id: string
@@ -816,6 +823,7 @@ export type Database = {
           created_at?: string
           data_despacho?: string | null
           data_entrega_efetiva?: string | null
+          deleted_at?: string | null
           endereco_entrega: string
           geocoded_at?: string | null
           id?: string
@@ -843,6 +851,7 @@ export type Database = {
           created_at?: string
           data_despacho?: string | null
           data_entrega_efetiva?: string | null
+          deleted_at?: string | null
           endereco_entrega?: string
           geocoded_at?: string | null
           id?: string
@@ -887,6 +896,7 @@ export type Database = {
           contato_nome: string | null
           contato_telefone: string | null
           created_at: string
+          deleted_at: string | null
           endereco_completo: string
           estado: string | null
           id: string
@@ -902,6 +912,7 @@ export type Database = {
           contato_nome?: string | null
           contato_telefone?: string | null
           created_at?: string
+          deleted_at?: string | null
           endereco_completo: string
           estado?: string | null
           id?: string
@@ -917,6 +928,7 @@ export type Database = {
           contato_nome?: string | null
           contato_telefone?: string | null
           created_at?: string
+          deleted_at?: string | null
           endereco_completo?: string
           estado?: string | null
           id?: string
@@ -1981,6 +1993,7 @@ export type Database = {
           contato_comercial: string
           created_at: string
           data_homologacao: string | null
+          deleted_at: string | null
           email_comercial: string
           homologada: boolean | null
           id: string
@@ -2000,6 +2013,7 @@ export type Database = {
           contato_comercial: string
           created_at?: string
           data_homologacao?: string | null
+          deleted_at?: string | null
           email_comercial: string
           homologada?: boolean | null
           id?: string
@@ -2019,6 +2033,7 @@ export type Database = {
           contato_comercial?: string
           created_at?: string
           data_homologacao?: string | null
+          deleted_at?: string | null
           email_comercial?: string
           homologada?: boolean | null
           id?: string
