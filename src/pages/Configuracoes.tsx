@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Zap } from "lucide-react";
+import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Zap, Truck, Package } from "lucide-react";
 import { useIntegrationValidation } from "@/hooks/useIntegrationValidation";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
@@ -40,6 +40,8 @@ export default function Configuracoes() {
     { id: "bitrix24", name: "Bitrix24", icon: Link, status: integrations.find(i => i.name === "bitrix24")?.status || "unknown" },
     { id: "lalamove", name: "Lalamove", icon: Globe, status: integrations.find(i => i.name === "lalamove")?.status || "unknown" },
     { id: "n8n", name: "n8n", icon: Settings, status: integrations.find(i => i.name === "n8n")?.status || "unknown" },
+    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: "connected" },
+    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: "connected" },
   ];
 
   const handleValidateIntegration = (id: string) => {
