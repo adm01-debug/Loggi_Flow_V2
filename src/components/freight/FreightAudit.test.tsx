@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FreightAudit } from './FreightAudit';
 import React from 'react';
+import { toast } from 'sonner';
 
 // Mock the hook
 vi.mock('@/hooks/useFreightQuotation', () => ({
@@ -42,11 +43,10 @@ describe('FreightAudit', () => {
   // We'll focus on the logic triggering the audit results.
   
   it('shows error toast if fields are empty', () => {
-    const { toast } = require('sonner');
     render(<FreightAudit />);
     const auditButton = screen.getByText('Auditar Lançamento');
     fireEvent.click(auditButton);
-    expect(vi.mocked(toast.error)).toHaveBeenCalledWith('Preencha todos os campos para auditoria');
+    expect(toast.error).toHaveBeenCalledWith('Preencha todos os campos para auditoria');
   });
 
   // Note: Testing Radix Select in unit tests requires more setup (mocking ResizeObserver, etc.)
