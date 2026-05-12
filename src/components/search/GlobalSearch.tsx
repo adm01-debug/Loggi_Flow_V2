@@ -16,7 +16,9 @@ const typeIcons = {
   fornecedor: Building2,
   transportadora: Truck,
   ocorrencia: AlertCircle,
+  page: Search,
 };
+
 
 export function GlobalSearch() {
   const navigate = useNavigate();
