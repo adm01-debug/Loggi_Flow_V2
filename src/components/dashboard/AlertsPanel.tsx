@@ -25,6 +25,8 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
           return AlertCircle;
         case 'prazo_critico':
           return AlertTriangle;
+        case 'ia_previsao':
+          return AlertTriangle; // Ideally a Brain icon, but AlertTriangle works for now
         default:
           return Info;
       }
@@ -63,6 +65,8 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
           return 'Ocorrência';
         case 'prazo_critico':
           return 'Prazo';
+        case 'ia_previsao':
+          return 'IA Previsão';
         default:
           return 'Alerta';
       }
