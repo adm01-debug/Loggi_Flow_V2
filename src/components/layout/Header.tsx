@@ -86,8 +86,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* Center - Realtime Indicator */}
-      <RealtimeIndicator />
+      {/* Center - Realtime Status */}
+      <RealtimeStatus />
 
       {/* Gamification Stats - Compact on tablet */}
       <div className="hidden md:flex items-center gap-2 lg:gap-4">
