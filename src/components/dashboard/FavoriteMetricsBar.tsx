@@ -94,69 +94,72 @@ export function FavoriteMetricsBar() {
   const { summary: costSummary } = useLogisticsCosts(startDate, endDate);
 
   const realMetricValues = useMemo(() => {
+    const defaultData = { value: "-", change: undefined, changeType: "neutral" as const };
+    
     return {
       "coletas-pendentes": { 
         value: dashboardData?.coletasPendentes ?? 0, 
         change: dashboardData?.coletasAtrasadas ?? 0, 
-        changeType: (dashboardData?.coletasAtrasadas ?? 0) > 0 ? "negative" : "neutral" 
+        changeType: (dashboardData?.coletasAtrasadas ?? 0) > 0 ? "negative" as const : "neutral" as const 
       },
       "coletas-transito": { 
         value: dashboardData?.coletasEmTransito ?? 0, 
         change: undefined, 
-        changeType: "neutral" 
+        changeType: "neutral" as const 
       },
       "coletas-finalizadas": { 
         value: dashboardData?.coletasFinalizadas ?? 0, 
         change: undefined, 
-        changeType: "positive" 
+        changeType: "positive" as const 
       },
       "entregas-pendentes": { 
         value: dashboardData?.entregasPendentes ?? 0, 
         change: undefined, 
-        changeType: "neutral" 
+        changeType: "neutral" as const 
       },
       "entregas-transito": { 
         value: dashboardData?.entregasEmTransito ?? 0, 
         change: undefined, 
-        changeType: "neutral" 
+        changeType: "neutral" as const 
       },
       "entregas-finalizadas": { 
         value: dashboardData?.entregasFinalizadas ?? 0, 
         change: undefined, 
-        changeType: "positive" 
+        changeType: "positive" as const 
       },
       "ocorrencias-abertas": { 
         value: dashboardData?.entregasComOcorrencia ?? 0, 
         change: undefined, 
-        changeType: (dashboardData?.entregasComOcorrencia ?? 0) > 0 ? "negative" : "neutral" 
+        changeType: (dashboardData?.entregasComOcorrencia ?? 0) > 0 ? "negative" as const : "neutral" as const 
       },
       "sla-cumprido": { 
         value: `${dashboardData?.taxaEntregaNoPrazo ?? 0}%`, 
         change: undefined, 
-        changeType: (dashboardData?.taxaEntregaNoPrazo ?? 0) > 90 ? "positive" : "negative" 
+        changeType: (dashboardData?.taxaEntregaNoPrazo ?? 0) > 90 ? "positive" as const : "negative" as const 
       },
       "custo-mensal": { 
         value: `R$ ${costSummary?.total_spent?.toLocaleString('pt-BR') ?? "0"}`, 
         change: undefined, 
-        changeType: "neutral" 
+        changeType: "neutral" as const 
       },
       "economia-mes": { 
         value: `R$ ${(costSummary?.total_spent ? (costSummary.total_spent * 0.05) : 0).toLocaleString('pt-BR')}`, 
         change: undefined, 
-        changeType: "positive" 
+        changeType: "positive" as const 
       },
       "xp-total": { 
         value: userLevel?.total_xp ?? 0, 
         change: undefined, 
-        changeType: "positive" 
+        changeType: "positive" as const 
       },
       "nivel-atual": { 
         value: userLevel?.level ?? 1, 
         change: undefined, 
-        changeType: "positive" 
+        changeType: "positive" as const 
       },
     };
   }, [dashboardData, costSummary, userLevel]);
+
 
   if (favorites.length === 0 && !isEditMode) {
     return (
