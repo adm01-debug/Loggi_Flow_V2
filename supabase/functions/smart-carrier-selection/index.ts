@@ -126,8 +126,8 @@ serve(async (req) => {
       console.error("[smart-carrier-selection] LOVABLE_API_KEY not configured");
       // Fallback to simple algorithm
       const sorted = carrierData.sort((a: any, b: any) => {
-        const scoreA = (a.scorePerformance * 0.3) + ((a.onTimeRate || 50) * 0.3) + ((1 / a.valorTotal) * 10000 * 0.2) + ((1 / a.prazoDias) * 10 * 0.2);
-        const scoreB = (b.scorePerformance * 0.3) + ((b.onTimeRate || 50) * 0.3) + ((1 / b.valorTotal) * 10000 * 0.2) + ((1 / b.prazoDias) * 10 * 0.2);
+        const scoreA = (a.scorePerformance * 0.3) + ((a.onTimeRate || 50) * 0.3) + ((1 / Math.max(0.1, a.valorTotal)) * 10000 * 0.2) + ((1 / Math.max(0.1, a.prazoDias)) * 10 * 0.2);
+        const scoreB = (b.scorePerformance * 0.3) + ((b.onTimeRate || 50) * 0.3) + ((1 / Math.max(0.1, b.valorTotal)) * 10000 * 0.2) + ((1 / Math.max(0.1, b.prazoDias)) * 10 * 0.2);
         return scoreB - scoreA;
       });
 
@@ -188,7 +188,7 @@ Responda em JSON com este formato exato:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.0-flash",
         messages: [
           { role: "system", content: "Você é um especialista em logística e seleção de transportadoras. Responda sempre em JSON válido." },
           { role: "user", content: prompt },
