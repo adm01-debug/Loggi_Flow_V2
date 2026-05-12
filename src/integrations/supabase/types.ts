@@ -1918,6 +1918,45 @@ export type Database = {
           },
         ]
       }
+      telemetry_logs: {
+        Row: {
+          category: string
+          created_at: string
+          device_info: Json | null
+          id: string
+          message: string
+          metadata: Json | null
+          severity: string
+          stack_trace: string | null
+          url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          device_info?: Json | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          severity: string
+          stack_trace?: string | null
+          url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          device_info?: Json | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          severity?: string
+          stack_trace?: string | null
+          url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       transportadora_rotas: {
         Row: {
           ativo: boolean | null
@@ -2382,6 +2421,7 @@ export type Database = {
         Returns: undefined
       }
       calculate_level: { Args: { xp: number }; Returns: number }
+      cleanup_old_telemetry_logs: { Args: never; Returns: undefined }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
         Returns: {
