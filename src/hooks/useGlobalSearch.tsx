@@ -1,6 +1,14 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { 
+  LayoutDashboard, Truck, Package, Building2, Send, BarChart3, Settings,
+  Trophy, Zap, Box, PackageSearch, History, Shield, Target, CalendarDays,
+  Calculator, DollarSign, AlertTriangle, Map, Navigation, Users, Bell, 
+  FileCheck, Route, Bot, Cog, KeyRound, Award, Upload, Webhook, TrendingUp,
+  Activity, Search, List, Smartphone, Info
+} from "lucide-react";
+
 
 interface SearchResult {
   id: string;
