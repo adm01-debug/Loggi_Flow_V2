@@ -1,9 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
-import { BarChart3, Target, Truck, DollarSign, Clock, AlertTriangle, CheckCircle2, Package, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { BarChart3, Target, Truck, DollarSign, Clock, AlertTriangle, CheckCircle2, Package, ArrowUpRight, ArrowDownRight, Minus, Bot, BrainCircuit, Sparkles, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
@@ -11,8 +11,11 @@ import { ptBR } from "date-fns/locale";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Area, AreaChart } from "recharts";
 import { formatCurrency } from "@/lib/formatters";
 import { useExecutiveMetrics } from "@/hooks/useExecutiveMetrics";
+import { AIAssistant } from "@/components/ai/AIAssistant";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardExecutivo() {
+  const [showAI, setShowAI] = useState(false);
   const { trends, carrierOtif, avgCollectionTime } = useExecutiveMetrics();
 
   // Core monthly metrics (current vs previous)
