@@ -236,11 +236,21 @@ Deno.serve(async (req) => {
       body: fetchBody,
     });
 
-    const data = await response.json();
+    let data;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      data = { error: "Non-JSON response from API", details: text };
+    }
 
     if (!response.ok) {
       return new Response(
-        JSON.stringify({ error: data.message || data.error || "API error", details: data }),
+        JSON.stringify({ 
+          error: data.message || data.error || "API error", 
+          details: data 
+        }),
         { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

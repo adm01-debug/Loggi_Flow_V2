@@ -86,8 +86,8 @@ export function useDashboardMetrics() {
       ) || [];
       
       const entregasNoPrazo = entregasComPrazo.filter(e => {
-        const previsao = new Date(e.previsao_entrega!);
-        const efetiva = new Date(e.data_entrega_efetiva!);
+        const previsao = parseISO(e.previsao_entrega!);
+        const efetiva = parseISO(e.data_entrega_efetiva!);
         return efetiva <= previsao;
       });
       
@@ -99,8 +99,16 @@ export function useDashboardMetrics() {
         ? (entregasComOcorrencia / totalEntregas) * 100 
         : 0;
       
-      const otifRate = totalEntregas > 0 
-        ? Math.max(0, taxaEntregaNoPrazo - taxaOcorrencias) 
+      // OTIF definition: On Time In Full (No delays AND no occurrences)
+      const entregasOTIF = entregasComPrazo.filter(e => {
+        const previsao = parseISO(e.previsao_entrega!);
+        const efetiva = parseISO(e.data_entrega_efetiva!);
+        const semOcorrencia = e.status !== 'ocorrencia';
+        return efetiva <= previsao && semOcorrencia;
+      });
+
+      const otifRate = entregasComPrazo.length > 0 
+        ? (entregasOTIF.length / entregasComPrazo.length) * 100 
         : 100;
       
       const now = new Date();

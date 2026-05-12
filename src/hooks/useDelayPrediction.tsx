@@ -57,14 +57,20 @@ export function useDelayPrediction() {
       const criticos = data.summary?.criticos || 0;
       const altos = data.summary?.altos || 0;
 
-      if (criticos > 0) {
-        toast.error(`🚨 ${criticos} entrega(s) com risco CRÍTICO de atraso!`, {
-          duration: 8000,
-        });
-      } else if (altos > 0) {
-        toast.warning(`⚠️ ${altos} entrega(s) com risco ALTO de atraso`, {
-          duration: 5000,
-        });
+      if (criticos > 0 || altos > 0) {
+        if (criticos > 0 && altos > 0) {
+          toast.error(`🚨 Alerta Crítico: ${criticos} entregas críticas e ${altos} com alto risco de atraso!`, {
+            duration: 10000,
+          });
+        } else if (criticos > 0) {
+          toast.error(`🚨 ${criticos} entrega(s) com risco CRÍTICO de atraso!`, {
+            duration: 8000,
+          });
+        } else {
+          toast.warning(`⚠️ ${altos} entrega(s) com risco ALTO de atraso`, {
+            duration: 6000,
+          });
+        }
       } else {
         toast.success('Análise concluída! Nenhum risco crítico detectado.');
       }
@@ -91,7 +97,7 @@ export function useDelayPrediction() {
   const getRiskColor = useCallback((risco: DelayPrediction['risco']) => {
     switch (risco) {
       case 'critico': return 'text-destructive bg-destructive/10';
-      case 'alto': return 'text-warning bg-warning/10';
+      case 'alto': return 'text-destructive/80 bg-destructive/10';
       case 'medio': return 'text-warning bg-warning/10';
       case 'baixo': return 'text-success bg-success/10';
       default: return 'text-muted-foreground bg-muted';
