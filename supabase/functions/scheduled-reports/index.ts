@@ -251,7 +251,3 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
   });
 }
 
-    default:
-      return { type: reportType, error: 'Tipo de relatório não suportado' };
-  }
-}
