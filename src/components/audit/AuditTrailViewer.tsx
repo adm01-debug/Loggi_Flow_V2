@@ -16,6 +16,7 @@ import { useFilters } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 import { useRealtime } from "@/hooks/useRealtime";
 import { useExport } from "@/hooks/useExport";
+import { useVirtualTable } from "@/hooks/useVirtualTable";
 
 interface AuditTrailViewerProps { 
   recordId?: string; 
