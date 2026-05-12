@@ -64,6 +64,7 @@ const menuSections: MenuSection[] = [
       { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
       { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
       { title: "Ocorrências", url: "/ocorrencias", icon: AlertTriangle },
+      { title: "Logística Reversa", url: "/logistica-reversa", icon: RotateCcw },
     ],
   },
   {
