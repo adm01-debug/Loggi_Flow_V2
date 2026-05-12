@@ -21,6 +21,9 @@ import {
   AlertTriangle,
   X 
 } from "lucide-react";
+import { ActivityTimeline } from "@/components/common/ActivityTimeline";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { History } from "lucide-react";
 
 interface BoxDetailModalProps {
   box: BoxData | null;
