@@ -128,7 +128,7 @@ export function GlobalSearch() {
                         {groupIndex > 0 && <Separator className="my-2" />}
                         <div className="px-2 py-1 mb-1">
                           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                            <Icon className="w-3 h-3" />
+                            <SectionIcon className="w-3 h-3" />
                             {getSearchTypeLabel(type as keyof typeof typeIcons)}s ({items.length})
                           </span>
                         </div>
