@@ -71,6 +71,9 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
       
+      {/* Quick Actions for Mobile */}
+      <MobileQuickActions />
+
       {/* Non-critical overlays - lazy loaded */}
       <Suspense fallback={null}>
         <InstallPrompt />
