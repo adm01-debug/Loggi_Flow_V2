@@ -19,7 +19,6 @@ interface UserSession {
 }
 
 function parseUserAgent(userAgent: string) {
-  // Browser detection
   let browser = "Unknown";
   if (userAgent.includes("Firefox")) browser = "Firefox";
   else if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) browser = "Chrome";
@@ -27,7 +26,6 @@ function parseUserAgent(userAgent: string) {
   else if (userAgent.includes("Edg")) browser = "Edge";
   else if (userAgent.includes("Opera") || userAgent.includes("OPR")) browser = "Opera";
 
-  // OS detection
   let os = "Unknown";
   if (userAgent.includes("Windows")) os = "Windows";
   else if (userAgent.includes("Mac OS")) os = "macOS";
@@ -35,7 +33,6 @@ function parseUserAgent(userAgent: string) {
   else if (userAgent.includes("Android")) os = "Android";
   else if (userAgent.includes("iOS") || userAgent.includes("iPhone")) os = "iOS";
 
-  // Device type
   let deviceType = "Desktop";
   if (userAgent.includes("Mobile") || userAgent.includes("Android")) deviceType = "Mobile";
   else if (userAgent.includes("Tablet") || userAgent.includes("iPad")) deviceType = "Tablet";
@@ -47,7 +44,6 @@ export function useDeviceSessions() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch user sessions
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ["user-sessions", user?.id],
     queryFn: async () => {
@@ -65,7 +61,6 @@ export function useDeviceSessions() {
     enabled: !!user?.id,
   });
 
-  // Register current session
   const registerSessionMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not authenticated");
@@ -73,7 +68,6 @@ export function useDeviceSessions() {
       const userAgent = navigator.userAgent;
       const { browser, os, deviceType } = parseUserAgent(userAgent);
 
-      // Get IP and Geo data from external service
       let ipAddress = null;
       let location = null;
       try {
@@ -82,32 +76,31 @@ export function useDeviceSessions() {
         ipAddress = data.ip;
         location = `${data.city}, ${data.region}, ${data.country_name}`;
       } catch {
-        // Silent fail on IP fetch - non-critical
+        // Silent fail
       }
 
-      // Check if session already exists for this device
       const { data: existingSession } = await supabase
         .from("user_sessions")
         .select("id")
         .eq("user_id", user.id)
         .eq("browser", browser)
         .eq("os", os)
-        .eq("ip_address", ipAddress)
+        .eq("device_type", deviceType)
         .maybeSingle();
 
       if (existingSession) {
-        // Update existing session
         const { error } = await supabase
           .from("user_sessions")
           .update({
             last_active_at: new Date().toISOString(),
             is_current: true,
+            ip_address: ipAddress || undefined,
+            location: location || undefined
           })
           .eq("id", existingSession.id);
 
         if (error) throw error;
       } else {
-        // Create new session
         const { error } = await supabase.from("user_sessions").insert({
           user_id: user.id,
           device_name: `${browser} on ${os}`,
@@ -115,8 +108,9 @@ export function useDeviceSessions() {
           browser,
           os,
           ip_address: ipAddress,
+          location,
           is_current: true,
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         });
 
         if (error) throw error;
@@ -127,7 +121,6 @@ export function useDeviceSessions() {
     },
   });
 
-  // Revoke a session
   const revokeSessionMutation = useMutation({
     mutationFn: async (sessionId: string) => {
       const { error } = await supabase
@@ -147,7 +140,6 @@ export function useDeviceSessions() {
     },
   });
 
-  // Revoke all other sessions
   const revokeAllOtherSessionsMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not authenticated");
