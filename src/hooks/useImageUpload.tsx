@@ -7,22 +7,47 @@ interface UploadResult {
   path: string;
 }
 
+// Helper to resize image in client
+async function resizeImage(file: File, maxWidth: number = 1200): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Canvas to Blob failed'));
+        }, 'image/jpeg', 0.85); // 80% quality
+      };
+    };
+    reader.onerror = (e) => reject(e);
+  });
+}
+
 export function useImageUpload(bucket: string = "ocorrencias-fotos") {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const uploadImage = async (file: File): Promise<UploadResult | null> => {
     if (!file) return null;
-
-    // Validar tipo
     if (!file.type.startsWith("image/")) {
       toast.error("Apenas imagens são permitidas");
-      return null;
-    }
-
-    // Validar tamanho (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Imagem muito grande (máx. 5MB)");
       return null;
     }
 
@@ -30,36 +55,30 @@ export function useImageUpload(bucket: string = "ocorrencias-fotos") {
     setProgress(0);
 
     try {
-      const fileExt = file.name.split(".").pop();
+      const resizedBlob = await resizeImage(file);
+      const fileExt = "jpg"; // We forced jpeg in resize
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      setProgress(30);
+      setProgress(40);
 
       const { error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(filePath, file, {
+        .upload(filePath, resizedBlob, {
           cacheControl: "3600",
           upsert: false,
+          contentType: 'image/jpeg'
         });
 
       if (uploadError) throw uploadError;
+      setProgress(80);
 
-      setProgress(70);
-
-      const { data: urlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-
+      const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
       setProgress(100);
 
-      return {
-        url: urlData.publicUrl,
-        path: filePath,
-      };
+      return { url: urlData.publicUrl, path: filePath };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-      toast.error(`Erro no upload: ${errorMessage}`);
+      toast.error(`Erro no upload: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
       return null;
     } finally {
       setUploading(false);
@@ -69,35 +88,23 @@ export function useImageUpload(bucket: string = "ocorrencias-fotos") {
 
   const uploadMultiple = async (files: FileList): Promise<UploadResult[]> => {
     const results: UploadResult[] = [];
-    
     for (let i = 0; i < files.length; i++) {
       const result = await uploadImage(files[i]);
       if (result) results.push(result);
     }
-    
     return results;
   };
 
   const deleteImage = async (path: string): Promise<boolean> => {
     try {
-      const { error } = await supabase.storage
-        .from(bucket)
-        .remove([path]);
-
+      const { error } = await supabase.storage.from(bucket).remove([path]);
       if (error) throw error;
       return true;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-      toast.error(`Erro ao excluir: ${errorMessage}`);
+      toast.error("Erro ao excluir imagem");
       return false;
     }
   };
 
-  return {
-    uploadImage,
-    uploadMultiple,
-    deleteImage,
-    uploading,
-    progress,
-  };
+  return { uploadImage, uploadMultiple, deleteImage, uploading, progress };
 }
