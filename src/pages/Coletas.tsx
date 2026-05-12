@@ -3,7 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, Download, Loader2, LucideIcon, Building2 } from "lucide-react";
+import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, Download, Loader2, LucideIcon, Building2, Search, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
@@ -15,8 +15,10 @@ import { RealtimeBadge } from "@/components/common/RealtimeBadge";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
+import { PickupDialog } from "@/components/coletas/PickupDialog";
+import { PickupDetailsDialog } from "@/components/coletas/PickupDetailsDialog";
 
-type ColetaStatus = 'aguardando_liberacao' | 'solicitada' | 'em_transito' | 'chegou_expedicao' | 'conferencia_ok' | 'divergencia' | 'finalizada';
+export type ColetaStatus = 'aguardando_liberacao' | 'solicitada' | 'em_transito' | 'chegou_expedicao' | 'conferencia_ok' | 'divergencia' | 'finalizada';
 type ColetaTipo = 'lalamove' | 'transportadora';
 
 interface Coleta {
