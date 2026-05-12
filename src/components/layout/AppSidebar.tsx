@@ -6,7 +6,7 @@ import {
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
   Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award, Upload, Zap as ZapIcon, Webhook,
-  Code,
+  Code, Star, Coins
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -17,6 +17,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 const AIAssistant = lazy(() => import("@/components/ai/AIAssistant").then(m => ({ default: m.AIAssistant })));
 import { usePrefetch } from "@/hooks/usePrefetch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useGamification } from "@/hooks/useGamification";
+import { Progress } from "@/components/ui/progress";
 
 interface MenuSection {
   id: string;
