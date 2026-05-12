@@ -46,9 +46,13 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
       queryClient.invalidateQueries({ queryKey }); 
       clearSelection(); 
       toast.success(`${selectedIds.length} itens excluídos`); 
+      playSuccessSound();
       onSuccess?.(); 
     },
-    onError: () => toast.error('Erro ao excluir'),
+    onError: () => {
+      toast.error('Erro ao excluir');
+      playErrorSound();
+    },
     onSettled: () => setIsProcessing(false),
   });
 
@@ -62,9 +66,13 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
       queryClient.invalidateQueries({ queryKey }); 
       clearSelection(); 
       toast.success(`${selectedIds.length} itens atualizados`); 
+      playSuccessSound();
       onSuccess?.(); 
     },
-    onError: () => toast.error('Erro ao atualizar'),
+    onError: () => {
+      toast.error('Erro ao atualizar');
+      playErrorSound();
+    },
     onSettled: () => setIsProcessing(false),
   });
 
@@ -78,9 +86,13 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
       queryClient.invalidateQueries({ queryKey }); 
       clearSelection(); 
       toast.success(`${selectedIds.length} itens movidos para lixeira`); 
+      playSuccessSound();
       onSuccess?.(); 
     },
-    onError: () => toast.error('Erro ao mover para lixeira'),
+    onError: () => {
+      toast.error('Erro ao mover para lixeira');
+      playErrorSound();
+    },
     onSettled: () => setIsProcessing(false),
   });
 
@@ -94,9 +106,13 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
       queryClient.invalidateQueries({ queryKey }); 
       clearSelection(); 
       toast.success(`${selectedIds.length} itens restaurados`); 
+      playSuccessSound();
       onSuccess?.(); 
     },
-    onError: () => toast.error('Erro ao restaurar'),
+    onError: () => {
+      toast.error('Erro ao restaurar');
+      playErrorSound();
+    },
     onSettled: () => setIsProcessing(false),
   });
 
