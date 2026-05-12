@@ -79,6 +79,15 @@ serve(async (req) => {
       case 'generate': {
         // Generate report data based on type
         const report = await generateReportData(supabase, reportData.report_type, reportData.filters);
+        
+        // Send email if recipients are provided
+        if (reportData.recipients && reportData.recipients.length > 0) {
+          const resendApiKey = Deno.env.get("RESEND_API_KEY");
+          if (resendApiKey) {
+            await sendReportEmail(reportData.recipients, report, resendApiKey);
+          }
+        }
+
         return new Response(JSON.stringify({ success: true, data: report }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
