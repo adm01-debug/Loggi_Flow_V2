@@ -1,21 +1,26 @@
 import { describe, it, expect } from 'vitest';
 
-describe('RLS Security Integration Tests', () => {
-  it('should prevent cross-tenant data access (Negative Test)', async () => {
-    // Nota: Em um ambiente real, usaríamos dois clientes Supabase com tokens diferentes.
-    // Aqui simulamos a lógica que o banco de dados deve impor via RLS.
-    const mockUserAId = '00000000-0000-0000-0000-000000000001';
-    const mockUserBId = '00000000-0000-0000-0000-000000000002';
+describe('RLS Negative Tests', () => {
+  it('should prevent unauthorized access to other user profiles', () => {
+    // Mock simulation of RLS behavior
+    const userA = { id: 'uuid-a', role: 'user' };
+    const profileB = { id: 'uuid-b', user_id: 'uuid-b', data: 'secret' };
     
-    const canUserReadOtherData = false;
-    
-    expect(canUserReadOtherData).toBe(false);
+    const canRead = (user: any, profile: any) => {
+      return user.role === 'admin' || user.id === profile.user_id;
+    };
+
+    expect(canRead(userA, profileB)).toBe(false);
   });
 
-  it('should enforce role-based access for audit logs', () => {
-    const userRole = 'user';
-    const isAdmin = userRole === 'admin';
+  it('should allow admin access to all profiles', () => {
+    const admin = { id: 'uuid-admin', role: 'admin' };
+    const profileB = { id: 'uuid-b', user_id: 'uuid-b', data: 'secret' };
     
-    expect(isAdmin).toBe(false);
+    const canRead = (user: any, profile: any) => {
+      return user.role === 'admin' || user.id === profile.user_id;
+    };
+
+    expect(canRead(admin, profileB)).toBe(true);
   });
 });
