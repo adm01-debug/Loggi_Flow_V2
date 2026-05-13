@@ -75,7 +75,7 @@ export default function AlertasCusto() {
     created_at: string;
   }
 
-  const alertasList = useMemo(() => (alertas || []).map((a: AlertaRaw) => ({ 
+  const alertasList = useMemo(() => (alertas as any[] || []).map((a: AlertaRaw) => ({ 
     id: a.id, 
     nome: a.nome || a.name || 'Alerta', 
     tipo: a.tipo || a.type || 'valor_maximo', 
