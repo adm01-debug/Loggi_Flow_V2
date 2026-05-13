@@ -47,7 +47,7 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
               <div className="relative">
                 <div className={cn("w-20 h-20 rounded-full bg-gradient-to-br flex items-center justify-center mx-auto mb-2 shadow-lg ring-4 ring-background", podiumColors[pos])}>
                   {user.avatar ? (
-                    <img src={user.avatar} className="w-16 h-16 rounded-full object-cover" />
+                    <img src={user.avatar} alt={`Avatar de ${user.name}`} className="w-16 h-16 rounded-full object-cover" />
                   ) : (
                     <Icon className="w-8 h-8 text-white" />
                   )}
