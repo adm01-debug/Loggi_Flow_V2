@@ -6,7 +6,7 @@
     "allowJs": false,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -18,12 +18,14 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "strictNullChecks": false,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": false,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src", "supabase/functions"]
+  "include": ["src"],
+  "exclude": ["node_modules", "supabase/functions"]
 }

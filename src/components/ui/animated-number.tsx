@@ -1,26 +1,32 @@
 import * as React from "react";
 import { motion, useSpring, useTransform, AnimatePresence } from "framer-motion";
 
-interface AnimatedNumberProps {
+export interface AnimatedNumberProps {
   value: number;
   className?: string;
   precision?: number;
+  prefix?: string;
+  suffix?: string;
+  duration?: number;
+  formatValue?: (v: any) => any;
 }
 
 export const AnimatedNumber = React.memo(
-  ({ value, className, precision = 0 }: AnimatedNumberProps) => {
+  ({ value, className, precision = 0, prefix = "", suffix = "", formatValue }: AnimatedNumberProps) => {
     const spring = useSpring(0, {
       mass: 0.8,
       stiffness: 75,
       damping: 15,
     });
     
-    const displayValue = useTransform(spring, (current) => 
-      current.toLocaleString(undefined, {
+    const displayValue = useTransform(spring, (current) => {
+      const formatted = current.toLocaleString(undefined, {
         minimumFractionDigits: precision,
         maximumFractionDigits: precision,
-      })
-    );
+      });
+      const val = `${prefix}${formatted}${suffix}`;
+      return formatValue ? formatValue(current) : val;
+    });
 
     React.useEffect(() => {
       spring.set(value);
