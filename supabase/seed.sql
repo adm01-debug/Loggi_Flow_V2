@@ -1,58 +1,92 @@
--- seeds.sql: LogiFlow Demo Data for Onboarding
--- Part of Audit Dimension 4: Database (10/10)
+-- Seed data for LogiFlow (Promo Brindes)
+-- Dimension 4: Database - Onboarding / Dev Environment
+-- Created: 2026-05-13
 
--- Seed demo users (profiles)
--- Note: auth.users must be handled by Supabase Auth, but we can seed profiles
--- Assuming some IDs exist or using common ones for testing
+-- 1. Create Demo Users (requires Auth setup, but we add to profiles for frontend simulation)
+-- Note: Real auth users must be created via Supabase Auth API/Dashboard, 
+-- but these profiles linked to UUIDs allow testing RLS and UI.
 
--- Demo Carriers (Dimension 4: 10/10)
-INSERT INTO public.transportadoras (id, razao_social, nome_fantasia, cnpj, homologada, score_performance, prazo_medio_dias, api_disponivel)
+INSERT INTO public.profiles (id, email, full_name, avatar_url, cargo)
 VALUES 
-  ('a1b2c3d4-e5f6-4000-8000-000000000001', 'Lalamove Brazil LTDA', 'Lalamove', '12345678000101', true, 95, 1, true),
-  ('a1b2c3d4-e5f6-4000-8000-000000000002', 'Rodonaves Transportes e Encomendas', 'Rodonaves', '12345678000102', true, 88, 3, true),
-  ('a1b2c3d4-e5f6-4000-8000-000000000003', 'Empresa de Correios e Telegrafos', 'Correios', '12345678000103', true, 75, 5, false),
-  ('a1b2c3d4-e5f6-4000-8000-000000000004', 'Total Express Logistica', 'Total Express', '12345678000104', true, 92, 2, true),
-  ('a1b2c3d4-e5f6-4000-8000-000000000005', 'Jamef Transportes', 'Jamef', '12345678000105', true, 90, 4, true),
-  ('a1b2c3d4-e5f6-4000-8000-000000000006', 'Braspress Transportes Urgentes', 'Braspress', '12345678000106', true, 85, 3, false),
-  ('a1b2c3d4-e5f6-4000-8000-000000000007', 'Azul Cargo Express', 'Azul Cargo', '12345678000107', true, 98, 1, true),
-  ('a1b2c3d4-e5f6-4000-8000-000000000008', 'GFL Logistica', 'GFL', '12345678000108', true, 80, 2, true),
-  ('a1b2c3d4-e5f6-4000-8000-000000000009', 'Direct Log', 'Direct', '12345678000109', true, 78, 3, true),
-  ('a1b2c3d4-e5f6-4000-8000-000000000010', 'Planalto Encomendas', 'Planalto', '12345678000110', true, 82, 4, false)
-ON CONFLICT (id) DO UPDATE SET nome_fantasia = EXCLUDED.nome_fantasia;
+  ('00000000-0000-0000-0000-000000000001', 'admin@logiflow.com', 'Admin Master', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin', 'Diretor de Logística'),
+  ('00000000-0000-0000-0000-000000000002', 'operador1@logiflow.com', 'Carlos Operador', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos', 'Analista de Expedição'),
+  ('00000000-0000-0000-0000-000000000003', 'financeiro@logiflow.com', 'Ana Financeiro', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ana', 'Gerente Financeira'),
+  ('00000000-0000-0000-0000-000000000004', 'motorista1@logiflow.com', 'João Motorista', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Joao', 'Motorista Agregado'),
+  ('00000000-0000-0000-0000-000000000005', 'cliente@demo.com', 'Cliente VIP Ltda', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Cliente', 'Comprador')
+ON CONFLICT (id) DO NOTHING;
 
--- Demo Clients
-INSERT INTO public.clientes (id, razao_social, nome_fantasia, cnpj, endereco_completo, cidade, estado, cep)
+-- 2. Assign Roles
+INSERT INTO public.user_roles (user_id, role)
 VALUES 
-  (gen_random_uuid(), 'Cliente Alpha S.A.', 'Alpha Store', '11222333000199', 'Av. Paulista, 1000', 'São Paulo', 'SP', '01310100'),
-  (gen_random_uuid(), 'Distribuidora Beta LTDA', 'Beta Log', '44555666000188', 'Rua das Flores, 50', 'Rio de Janeiro', 'RJ', '20000000')
-ON CONFLICT DO NOTHING;
+  ('00000000-0000-0000-0000-000000000001', 'admin'),
+  ('00000000-0000-0000-0000-000000000002', 'operator'),
+  ('00000000-0000-0000-0000-000000000003', 'finance'),
+  ('00000000-0000-0000-0000-000000000004', 'driver')
+ON CONFLICT (user_id, role) DO NOTHING;
 
--- Demo Suppliers
-INSERT INTO public.fornecedores (id, razao_social, nome_fantasia, cnpj, endereco_completo, cidade, estado, cep)
+-- 3. Transportadoras (10 carriers)
+INSERT INTO public.transportadoras (id, razao_social, nome_fantasia, cnpj, homologada, api_disponivel, score_performance)
 VALUES 
-  (gen_random_uuid(), 'Fábrica de Brindes Premium', 'Promo Factory', '77888999000177', 'Via Industrial, 500', 'Curitiba', 'PR', '80000000')
-ON CONFLICT DO NOTHING;
+  (gen_random_uuid(), 'Lalamove Brasil LTDA', 'Lalamove', '12345678000101', true, true, 95),
+  (gen_random_uuid(), 'Rodonaves Transportes e Encomendas', 'Rodonaves', '98765432000199', true, true, 92),
+  (gen_random_uuid(), 'Correios - Empresa Brasileira de Correios e Telégrafos', 'Correios', '34028316000103', true, true, 85),
+  (gen_random_uuid(), 'Loggi Tecnologia LTDA', 'Loggi', '12345678000102', true, true, 88),
+  (gen_random_uuid(), 'Braspress Transportes Urgentes', 'Braspress', '12345678000103', true, false, 90),
+  (gen_random_uuid(), 'Jamef Transportes', 'Jamef', '12345678000104', true, false, 93),
+  (gen_random_uuid(), 'Azul Cargo Express', 'Azul Cargo', '12345678000105', true, true, 94),
+  (gen_random_uuid(), 'Total Express', 'Total Express', '12345678000106', true, true, 87),
+  (gen_random_uuid(), 'Jadlog Logística', 'Jadlog', '12345678000107', true, true, 89),
+  (gen_random_uuid(), 'Expresso São Miguel', 'São Miguel', '12345678000108', false, false, 75);
 
--- Demo Business Rules
-INSERT INTO public.business_rules (id, name, description, entity_type, trigger_event, is_active, priority, conditions, actions)
+-- 4. Entregas Demo (50 deliveries - partial list for brevity, logic follows)
+-- Using a loop in a temporary function to generate 50 rows
+DO $$
+DECLARE 
+    i INT;
+    t_id UUID;
+BEGIN
+    SELECT id INTO t_id FROM public.transportadoras LIMIT 1;
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.entregas (
+            id, 
+            cliente_id, 
+            transportadora_id, 
+            status, 
+            valor_frete, 
+            prazo_estimado,
+            data_postagem,
+            codigo_rastreio
+        )
+        VALUES (
+            gen_random_uuid(),
+            '00000000-0000-0000-0000-000000000005',
+            (SELECT id FROM public.transportadoras OFFSET (i % 10) LIMIT 1),
+            CASE 
+                WHEN i % 5 = 0 THEN 'pendente'
+                WHEN i % 5 = 1 THEN 'em_transito'
+                WHEN i % 5 = 2 THEN 'entregue'
+                WHEN i % 5 = 3 THEN 'cancelado'
+                ELSE 'devolvido'
+            END,
+            (random() * 500 + 50)::numeric(10,2),
+            current_date + (random() * 10 + 1)::int * interval '1 day',
+            current_date - (random() * 5)::int * interval '1 day',
+            'TRACK-' || lpad(i::text, 6, '0')
+        );
+    END LOOP;
+END $$;
+
+-- 5. Business Rules
+INSERT INTO public.business_rules (name, description, is_active, rule_type)
 VALUES 
-  (gen_random_uuid(), 'Alerta de Atraso Crítico', 'Notifica via WhatsApp quando atraso > 48h', 'entrega', 'on_update', true, 10, 
-   '[{"field": "status", "operator": "equals", "value": "atrasado"}]', 
-   '[{"type": "send_notification", "config": {"channel": "whatsapp"}}]')
-ON CONFLICT DO NOTHING;
+  ('Bloqueio Frete Caro', 'Bloquear cotações acima de R$ 500 sem aprovação gerente', true, 'validation'),
+  ('Prioridade Rodonaves', 'Sugerir Rodonaves para cargas acima de 100kg', true, 'optimization'),
+  ('Alerta Atraso', 'Notificar se entrega não for atualizada em 48h', true, 'notification')
+ON CONFLICT (name) DO NOTHING;
 
--- Demo Deliveries (50 records for stress testing and UI visualization)
--- We'll insert a few manually and use a loop-like structure for the rest if possible, 
--- but SQL seed usually prefers explicit rows for transparency.
-INSERT INTO public.entregas (id, numero_entrega, status, transportadora_id, cliente_id, valor_frete, previsao_entrega)
-SELECT 
-  gen_random_uuid(), 
-  'ENT-' || lpad(i::text, 5, '0'),
-  (ARRAY['pendente', 'em_transito', 'saiu_entrega', 'entregue', 'atrasado'])[floor(random() * 5 + 1)],
-  (SELECT id FROM public.transportadoras ORDER BY random() LIMIT 1),
-  (SELECT id FROM public.clientes ORDER BY random() LIMIT 1),
-  random() * 200 + 50,
-  now() + (i || ' days')::interval
-FROM generate_series(1, 50) s(i)
-ON CONFLICT DO NOTHING;
-
+-- 6. Rate Limit Rules
+INSERT INTO public.ip_access_rules (ip_address, rule_type, note)
+VALUES 
+  ('127.0.0.1', 'allow', 'Localhost access'),
+  ('192.168.1.1', 'allow', 'Office network')
+ON CONFLICT (ip_address) DO NOTHING;
