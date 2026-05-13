@@ -1,15 +1,15 @@
 # ADR 0002: Estratégia de Segurança RLS (Row Level Security)
 
-## Status
-Aceito (Meta 10/10)
+## Data: 2026-05-13
+## Status: Aceito
 
 ## Contexto
-Segurança de dados multitenant é crítica.
+O sistema armazena dados sensíveis de logística, clientes e faturamento de múltiplos usuários e transportadoras.
 
 ## Decisão
-- RLS habilitado em 100% das tabelas.
-- Uso de funções `SECURITY DEFINER` para checagem de roles (evitando recursão).
-- Auditoria via triggers automáticos em todas as mutações.
+- Implementar RLS em **todas** as tabelas do schema public.
+- Utilizar funções `SECURITY DEFINER` (ex: `has_role`) para evitar recursão infinita e centralizar lógica de permissão.
+- Bloquear acesso por padrão (Restrictive policies) e liberar granularmente por role.
 
 ## Consequências
-- Garantia de que usuários só acessam seus próprios registros ou registros permitidos por sua role.
+- Garantia de isolamento de dados no nível do banco de dados, protegendo contra falhas no frontend.
