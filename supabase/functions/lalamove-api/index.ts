@@ -1,6 +1,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { getCircuitBreaker } from '../_shared/circuitBreaker.ts'
 import { corsHeaders } from '../_shared/cors.ts'
+import { getRedisClient } from '../_shared/redis.ts'
+
 
 const LALAMOVE_API_KEY = Deno.env.get('LALAMOVE_API_KEY') || ''
 const LALAMOVE_API_SECRET = Deno.env.get('LALAMOVE_API_SECRET') || ''
