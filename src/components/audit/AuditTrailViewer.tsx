@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { History, Plus, Pencil, Trash2, User, Calendar, ChevronDown, ChevronUp, FileText, Package, Truck, Building2, Users, AlertTriangle, Loader2, ArrowUpDown } from "lucide-react";
+import { History, Plus, Pencil, Trash2, User, Calendar, ChevronDown, ChevronUp, FileText, Package, Truck, Building2, Users, AlertTriangle, Loader2, ArrowUpDown, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuditLogs, AuditLog, tableNameLabels, actionLabels } from "@/hooks/useAuditLogs";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "sonner";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
