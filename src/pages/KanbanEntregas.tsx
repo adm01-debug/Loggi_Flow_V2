@@ -34,6 +34,7 @@ interface KanbanEntrega {
   previsao_entrega: string | null;
   valor_frete: number | null;
   nf_remessa: string | null;
+  version: number;
   created_at: string;
   comprovante_entrega_url: string | null;
   cliente: { razao_social: string; nome_fantasia: string | null } | null;
@@ -156,10 +157,11 @@ export default function KanbanEntregas() {
         .from('entregas')
         .select(`
           id, numero_entrega, status, endereco_entrega, previsao_entrega,
-          valor_frete, nf_remessa, created_at, comprovante_entrega_url,
+          valor_frete, nf_remessa, version, created_at, comprovante_entrega_url,
           cliente:clientes (razao_social, nome_fantasia),
           transportadora:transportadoras (nome_fantasia)
         `)
+        .is('deleted_at', null)
         .not('status', 'eq', 'finalizado')
         .order('created_at', { ascending: false });
 
@@ -169,7 +171,7 @@ export default function KanbanEntregas() {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: EntregaStatus }) => {
+    mutationFn: async ({ id, status, version }: { id: string; status: EntregaStatus, version: number }) => {
       const { error } = await supabase
         .from('entregas')
         .update({ 
@@ -178,7 +180,8 @@ export default function KanbanEntregas() {
           ...(status === 'entregue' ? { data_entrega_efetiva: new Date().toISOString() } : {}),
           ...(status === 'despachado' ? { data_despacho: new Date().toISOString() } : {})
         })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('version', version);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -198,12 +201,13 @@ export default function KanbanEntregas() {
     if (!destination) return;
     if (destination.droppableId === source.droppableId) return;
 
-    // Play tactile feedback
-    const isAdvancing = COLUMNS.findIndex(c => c.id === destination.droppableId) > COLUMNS.findIndex(c => c.id === source.droppableId);
+    const item = entregas.find(e => e.id === draggableId);
+    if (!item) return;
     
     updateStatus.mutate({ 
       id: draggableId, 
-      status: destination.droppableId as EntregaStatus 
+      status: destination.droppableId as EntregaStatus,
+      version: item.version
     });
   };
 
