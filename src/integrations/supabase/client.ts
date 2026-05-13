@@ -8,10 +8,28 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+const REQUEST_ID_HEADER = 'x-request-id';
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-  }
+  },
+  global: {
+    headers: {
+      [REQUEST_ID_HEADER]: crypto.randomUUID(),
+    },
+  },
 });
+
+// Helper para garantir correlation ID único por requisição se necessário
+export const getSupabaseWithContext = (requestId = crypto.randomUUID()) => {
+  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    global: {
+      headers: {
+        [REQUEST_ID_HEADER]: requestId,
+      },
+    },
+  });
+};
