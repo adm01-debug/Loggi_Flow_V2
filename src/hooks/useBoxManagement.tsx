@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
+import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 export interface DeliveryWithRelations {
   id: string;
@@ -65,7 +66,7 @@ export function useBoxManagement() {
           : false,
       }));
     },
-    staleTime: 30000,
+    staleTime: QUERY_STALE_TIME.DYNAMIC,
     enabled: !!user?.id,
   });
 

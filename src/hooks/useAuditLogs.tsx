@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 export interface AuditLog {
   id: string;
@@ -70,7 +71,7 @@ export function useAuditLogs(filters: AuditLogFilters = {}) {
 
       return (data as AuditLog[]) || [];
     },
-    staleTime: 1000 * 60 * 1,
+    staleTime: QUERY_STALE_TIME.LOGS,
     enabled: !!user?.id,
   });
 }
