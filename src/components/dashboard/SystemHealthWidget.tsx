@@ -121,7 +121,7 @@ export function SystemHealthWidget() {
             </div>
           </div>
 
-          {healthData?.errors > 0 && (
+          {(healthData?.errors ?? 0) > 0 && (
             <div className="w-full flex items-center gap-2 text-[10px] bg-amber-50 text-amber-700 p-2 rounded border border-amber-200">
               <AlertTriangle className="h-3 w-3" />
               <span>Foram detectados erros nas últimas 24h. Verifique o painel de telemetria.</span>
