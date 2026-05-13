@@ -1,16 +1,16 @@
-# ADR 0003: Estratégia de Múltiplas Transportadoras e Gateways
+# ADR 0003: Multi-Carrier Integration Pattern
 
 ## Status
-Aceito
+Accepted
 
-## Contexto
-O LogiFlow deve orquestrar entregas usando Lalamove, Rodonaves e Melhor Envio simultaneamente.
+## Context
+LogiFlow integrates with multiple carriers (Lalamove, Rodonaves, Melhor Envio) with disparate APIs.
 
-## Decisões
-- **Abstração via Hooks:** Cada transportadora possui um hook e service dedicado (`useLalamove`, `useRodonaves`, etc.).
-- **Diferenciação de Fluxos:** Lalamove para entregas locais rápidas; Rodonaves para carga fracionada pesada; Melhor Envio para encomendas padrão.
-- **Idempotência:** Webhooks de status devem ser idempotentes para evitar duplicação de eventos.
+## Decision
+- Use a **Unified Interface** pattern via Edge Functions to normalize responses.
+- Implement specialized webhooks for each carrier that update a central `entregas` table.
+- Maintain carrier-specific configurations in a secure `transportadoras` table with RLS protection.
 
-## Consequências
-- Flexibilidade para adicionar novas transportadoras sem quebrar o sistema central.
-- Robustez no rastreamento.
+## Consequences
+- Simplified frontend consumption of tracking and quote data.
+- Isolated failure points for each integration.
