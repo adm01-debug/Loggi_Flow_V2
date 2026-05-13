@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 
 interface TrackingPoint {
   id: string;
@@ -170,7 +171,7 @@ export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
         deliveries,
       };
     },
-    staleTime: 1000 * 60 * 2,
+    staleTime: QUERY_STALE_TIME.DASHBOARD,
     enabled: !!user?.id,
   });
 };
