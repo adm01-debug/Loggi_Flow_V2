@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
+import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
 
 export interface Notification {
   id: string;

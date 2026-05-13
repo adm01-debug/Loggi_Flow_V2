@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 
 export interface NotificationPreferences {
   notifications_email: boolean;
@@ -83,7 +84,7 @@ export function useNotificationPreferences() {
       return data;
     },
     enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5,
+    staleTime: QUERY_STALE_TIME.USER,
   });
 
   const preferences: NotificationPreferences = dbPreferences

@@ -26,7 +26,7 @@ export function usePermissions() {
       return data as Permission[];
     },
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: QUERY_STALE_TIME.STATIC,
   });
 
   const hasPermission = (permissionCode: string): boolean => {
