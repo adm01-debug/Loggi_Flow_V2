@@ -3121,6 +3121,30 @@ export type Database = {
           },
         ]
       }
+      webhook_events_processed: {
+        Row: {
+          external_event_id: string
+          id: string
+          metadata: Json | null
+          processed_at: string
+          provider: string
+        }
+        Insert: {
+          external_event_id: string
+          id?: string
+          metadata?: Json | null
+          processed_at?: string
+          provider: string
+        }
+        Update: {
+          external_event_id?: string
+          id?: string
+          metadata?: Json | null
+          processed_at?: string
+          provider?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
