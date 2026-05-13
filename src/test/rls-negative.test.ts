@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 describe('RLS Negative Tests', () => {
   it('should prevent unauthorized access to other user profiles', () => {
     // Mock simulation of RLS behavior
-    const userA = { id: 'uuid-a', role: 'user' };
+    const userA: { id: string; role: string } = { id: 'uuid-a', role: 'user' };
     const profileB = { id: 'uuid-b', user_id: 'uuid-b', data: 'secret' };
     
     const canRead = (user: any, profile: any) => {
