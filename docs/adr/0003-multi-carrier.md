@@ -1,15 +1,16 @@
-# ADR 0003: Integração Multi-Carrier (Multi-Transportadora)
+# ADR 003: Multi-Carrier Integration Strategy
 
-## Data: 2026-05-13
-## Status: Aceito
+## Status
+Accepted
 
-## Contexto
-Necessidade de orquestrar múltiplos provedores de frete (Lalamove, Rodonaves, Melhor Envio) com regras de negócio distintas.
+## Context
+The system needs to support multiple carriers (Lalamove, Rodonaves, Melhor Envio) with different APIs.
 
-## Decisão
-- Criar uma camada de serviços (`src/integrations/`) que padroniza o input/output de cada transportadora.
-- Utilizar Edge Functions para processamento de webhooks e chamadas pesadas de API, garantindo segurança das chaves API.
-- Persistir eventos de rastreio em esquema unificado para visualização centralizada.
+## Decision
+- **Service Layer**: Implement carrier-specific logic in isolated services.
+- **Edge Functions**: Use Supabase Edge Functions for sensitive API calls and webhooks.
+- **Unified Interface**: Create a unified tracking and dispatch interface in the frontend that abstracts carrier differences.
 
-## Consequências
-- Facilidade em adicionar novos provedores sem alterar o core da interface de rastreamento.
+## Consequences
+- Easier to add new carriers.
+- Centralized tracking monitoring.
