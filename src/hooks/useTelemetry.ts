@@ -53,7 +53,7 @@ export function useTelemetry() {
     }
   };
 
-  const logError = (message: string, error?: any, category: string = 'frontend_error') => {
+  const logError = (message: string, error?: unknown, category: string = 'frontend_error') => {
     const stack_trace = error instanceof Error ? error.stack : JSON.stringify(error);
     logTelemetry({
       severity: 'error',

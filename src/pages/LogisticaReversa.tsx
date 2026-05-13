@@ -50,7 +50,7 @@ export default function LogisticaReversa() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const getStatusBadge = (status: LogisticaReversa['status']) => {
-    const variants: Record<LogisticaReversa['status'], { label: string, color: string, icon: any }> = {
+    const variants: Record<LogisticaReversa['status'], { label: string, color: string, icon: React.ElementType }> = {
       pendente: { label: "Pendente", color: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20", icon: Clock },
       aprovado: { label: "Aprovado", color: "bg-blue-500/10 text-blue-500 border-blue-500/20", icon: CheckCircle2 },
       em_transito: { label: "Em Trânsito", color: "bg-purple-500/10 text-purple-500 border-purple-500/20", icon: Truck },

@@ -228,7 +228,7 @@ export function useRecentAlerts() {
       /* 
       try {
         const { data: predictionsData } = await supabase.from('previsoes_atraso').select('*').eq('resolvido', false).limit(5);
-        predictionsData?.forEach((pred: any) => {
+        predictionsData?.forEach((pred: { risco: string }) => {
           alerts.push({
             id: `ia-pred-${pred.id}`,
             type: 'ia_previsao',

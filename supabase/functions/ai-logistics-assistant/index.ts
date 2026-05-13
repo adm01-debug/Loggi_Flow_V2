@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 
 // Moved API key check inside handler for better testability
@@ -14,6 +15,14 @@ export const handler = async (req: Request) => {
   }
 
   try {
+    const { allowed } = await checkRateLimit(req, 'ai-logistics-assistant', { maxRequests: 30 });
+    if (!allowed) {
+      return new Response(JSON.stringify({ success: false, message: "Muitas solicitações. Tente novamente em alguns minutos." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
     const message = body.message || body.prompt;
     const userId = body.userId;
@@ -28,7 +37,7 @@ export const handler = async (req: Request) => {
     }
 
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!lovableApiKey) throw new Error("API key not configured");
+    if (!lovableApiKey) throw new Error("Chave de API não configurada");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -99,7 +108,7 @@ export const handler = async (req: Request) => {
       }),
     });
 
-    if (!response.ok) throw new Error(`AI gateway error: ${response.status}`);
+    if (!response.ok) throw new Error(`Erro no gateway de IA: ${response.status}`);
     if (stream) return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
 
     const data = await response.json();
