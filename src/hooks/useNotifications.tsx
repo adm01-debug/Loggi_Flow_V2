@@ -41,8 +41,8 @@ export function useNotifications() {
       return data as Notification[];
     },
     enabled: !!user?.id,
-    staleTime: 15 * 1000,
-    refetchInterval: 15000, // Poll every 15s (table removed from Realtime for security)
+    staleTime: QUERY_STALE_TIME.DYNAMIC,
+    refetchInterval: QUERY_REFETCH_INTERVAL.NOTIFICATIONS,
   });
 
   // Mark as read mutation
