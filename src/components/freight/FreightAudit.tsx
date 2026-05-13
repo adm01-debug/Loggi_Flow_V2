@@ -10,6 +10,8 @@ import { formatCurrency } from '@/lib/formatters';
 import { useFreightQuotation } from '@/hooks/useFreightQuotation';
 import { toast } from 'sonner';
 import { Decimal } from 'decimal.js';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuditResult {
   status: 'success' | 'warning' | 'error';
@@ -21,6 +23,17 @@ interface AuditResult {
   transportadora?: string;
 }
 
+interface AuditLogRecord {
+  id: string;
+  table_name: string;
+  record_id: string;
+  action: string;
+  old_data: any;
+  new_data: any;
+  user_email: string;
+  created_at: string;
+}
+
 export function FreightAudit() {
   const { transportadoras, calculateQuotations } = useFreightQuotation();
   const [form, setForm] = useState({
@@ -30,6 +43,20 @@ export function FreightAudit() {
     valor_cobrado: '',
   });
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+
+  const { data: auditLogs, isLoading: isLoadingLogs } = useQuery({
+    queryKey: ['recent-audit-logs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data as AuditLogRecord[];
+    },
+    staleTime: 30000,
+  });
 
   const ESTADOS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
@@ -168,6 +195,27 @@ export function FreightAudit() {
           </CardContent>
         </Card>
       )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">Últimas Alterações (Audit Trail)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {auditLogs?.map((log) => (
+              <div key={log.id} className="flex justify-between items-center text-xs p-2 bg-muted/30 rounded border border-border/50">
+                <div className="flex flex-col">
+                  <span className="font-bold">{log.table_name.toUpperCase()} - {log.action}</span>
+                  <span className="text-muted-foreground">{log.user_email || 'Sistema'}</span>
+                </div>
+                <div className="text-right">
+                  <span className="block font-medium">ID: {log.record_id.slice(0, 8)}...</span>
+                  <span className="text-muted-foreground">{new Date(log.created_at).toLocaleString('pt-BR')}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
