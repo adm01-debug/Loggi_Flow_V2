@@ -1,38 +1,35 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+-- seeds.sql: LogiFlow Demo Data for Onboarding
+-- Part of Audit Dimension 4: Database (10/10)
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+-- Seed demo users (profiles)
+-- Note: auth.users must be handled by Supabase Auth, but we can seed profiles
+-- Assuming some IDs exist or using common ones for testing
 
-console.log("🌱 Iniciando seeding do banco de dados...");
+-- Demo Carriers
+INSERT INTO public.transportadoras (id, razao_social, nome_fantasia, cnpj, homologada, score_performance, prazo_medio_dias)
+VALUES 
+  (gen_random_uuid(), 'Lalamove Brazil LTDA', 'Lalamove', '12345678000101', true, 95, 1),
+  (gen_random_uuid(), 'Rodonaves Transportes e Encomendas', 'Rodonaves', '12345678000102', true, 88, 3),
+  (gen_random_uuid(), 'Empresa de Correios e Telegrafos', 'Correios', '12345678000103', true, 75, 5)
+ON CONFLICT DO NOTHING;
 
-const seedData = async () => {
-  // 1. Criar Regras de Negócio Iniciais
-  const businessRules = [
-    { key: 'SLA_ENTREGA_DIAS', value: { default: 3, express: 1 }, description: 'Prazo padrão de entrega por tipo de serviço' },
-    { key: 'FRETE_GRATIS_MINIMO', value: { value: 250.00 }, description: 'Valor mínimo para frete grátis' },
-    { key: 'POINTS_PER_SHIPMENT', value: { value: 10 }, description: 'Pontos ganhos por entrega finalizada' }
-  ];
+-- Demo Clients
+INSERT INTO public.clientes (id, razao_social, nome_fantasia, cnpj, endereco_completo, cidade, estado, cep)
+VALUES 
+  (gen_random_uuid(), 'Cliente Alpha S.A.', 'Alpha Store', '11222333000199', 'Av. Paulista, 1000', 'São Paulo', 'SP', '01310100'),
+  (gen_random_uuid(), 'Distribuidora Beta LTDA', 'Beta Log', '44555666000188', 'Rua das Flores, 50', 'Rio de Janeiro', 'RJ', '20000000')
+ON CONFLICT DO NOTHING;
 
-  for (const rule of businessRules) {
-    await supabase.from('business_rules_config').upsert(rule, { onConflict: 'key' });
-  }
+-- Demo Suppliers
+INSERT INTO public.fornecedores (id, razao_social, nome_fantasia, cnpj, endereco_completo, cidade, estado, cep)
+VALUES 
+  (gen_random_uuid(), 'Fábrica de Brindes Premium', 'Promo Factory', '77888999000177', 'Via Industrial, 500', 'Curitiba', 'PR', '80000000')
+ON CONFLICT DO NOTHING;
 
-  // 2. Criar Feature Flags
-  const flags = [
-    { key: 'NEW_DASHBOARD', is_enabled: true, description: 'Habilita novo dashboard v2' },
-    { key: 'AI_FREIGHT_SUGGESTIONS', is_enabled: false, description: 'Sugestões de frete via IA' },
-    { key: 'BETA_TESTER_PROGRAM', is_enabled: true, description: 'Acesso ao programa beta' }
-  ];
-
-  for (const flag of flags) {
-    await supabase.from('feature_flags').upsert(flag, { onConflict: 'key' });
-  }
-
-  console.log("✅ Seeding concluído com sucesso!");
-};
-
-seedData().catch(err => {
-  console.error("❌ Erro no seeding:", err);
-  Deno.exit(1);
-});
+-- Demo Business Rules
+INSERT INTO public.business_rules (id, name, description, entity_type, trigger_event, is_active, priority, conditions, actions)
+VALUES 
+  (gen_random_uuid(), 'Alerta de Atraso Crítico', 'Notifica via WhatsApp quando atraso > 48h', 'entrega', 'on_update', true, 10, 
+   '[{"field": "status", "operator": "equals", "value": "atrasado"}]', 
+   '[{"type": "send_notification", "config": {"channel": "whatsapp"}}]')
+ON CONFLICT DO NOTHING;
