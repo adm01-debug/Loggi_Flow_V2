@@ -183,7 +183,7 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
         
         return {
           ...entrega,
-          coordinates: baseCoords ? addRandomOffset(baseCoords) : null,
+          coordinates: baseCoords ? addRandomOffset(baseCoords) : undefined,
           geocoded: false,
         };
       });
