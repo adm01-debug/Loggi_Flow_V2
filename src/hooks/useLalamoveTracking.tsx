@@ -54,11 +54,11 @@ interface LocationHistory {
 interface TrackingHistoryRecord {
   id: string;
   lalamove_order_id: string;
-  driver_name: string;
+  driver_name: string | null;
   latitude: number;
   longitude: number;
   recorded_at: string;
-  order_status: string;
+  order_status: string | null;
 }
 
 export const useLalamoveTracking = (orderId: string | null, useSandbox = true, coletaId?: string) => {

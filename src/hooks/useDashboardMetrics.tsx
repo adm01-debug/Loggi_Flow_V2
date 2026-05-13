@@ -263,9 +263,9 @@ export function useTransportadoraPerformance() {
   return useQuery({
     queryKey: ['transportadora-performance', user?.id],
     queryFn: async () => {
-      const { data: transportadoras, error } = await supabase
+      const { data: transportadoras, error } = await (supabase
         .from('transportadoras')
-        .select('id, nome_fantasia, score_performance, prazo_medio_dias, homologada')
+        .select('id, nome_fantasia, score_performance, prazo_medio_dias, homologada') as any)
         .eq('homologada', true)
         .order('score_performance', { ascending: false })
         .limit(5);

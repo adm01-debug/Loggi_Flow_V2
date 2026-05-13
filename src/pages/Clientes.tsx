@@ -348,7 +348,7 @@ export default function Clientes() {
             columns={clienteCSVColumns}
             templateName="clientes_template"
             onImport={async (data) => {
-              const rows = data.map((d: z.infer<typeof clienteCSVSchema>) => ({
+              const rows = (data as any[]).map((d: any) => ({
                 razao_social: d.razao_social,
                 nome_fantasia: d.nome_fantasia || null,
                 cnpj: d.cnpj || null,

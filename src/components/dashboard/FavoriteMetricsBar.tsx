@@ -320,14 +320,14 @@ export function FavoriteMetricsBar() {
                             <div
                               className={cn(
                                 "flex items-center text-xs",
-                              data.changeType === "positive" && "text-success",
-                                data.changeType === "negative" && "text-destructive",
-                                data.changeType === "neutral" && "text-muted-foreground"
+                              data.changeType === ("positive" as string) && "text-success",
+                                data.changeType === ("negative" as string) && "text-destructive",
+                                data.changeType === ("neutral" as string) && "text-muted-foreground"
                               )}
                             >
-                              {data.changeType === "positive" ? (
+                              {data.changeType === ("positive" as string) ? (
                                 <TrendingUp className="h-3 w-3 mr-0.5" />
-                              ) : data.changeType === "negative" ? (
+                              ) : data.changeType === ("negative" as string) ? (
                                 <TrendingDown className="h-3 w-3 mr-0.5" />
                               ) : (
                                 <Minus className="h-3 w-3 mr-0.5" />

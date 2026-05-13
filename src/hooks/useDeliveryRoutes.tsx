@@ -178,12 +178,12 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
         }
 
         // Use fallback based on estado
-        const estado = entrega.cliente?.estado;
+        const estado = entrega.cliente?.estado || null;
         const baseCoords = getCoordinatesFromEstado(estado);
         
         return {
           ...entrega,
-          coordinates: baseCoords ? addRandomOffset(baseCoords) : null,
+          coordinates: baseCoords ? addRandomOffset(baseCoords) : undefined,
           geocoded: false,
         };
       });

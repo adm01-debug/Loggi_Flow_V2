@@ -45,10 +45,10 @@ export const useSLAAlerts = () => {
   const alerts = useMemo((): SLAAlertItem[] => {
     if (!entregas) return [];
 
-    return entregas.map((e) => {
+    return (entregas as any[]).map((e) => {
       const transportadora = e.transportadora as { nome_fantasia: string } | null;
       const cliente = e.cliente as { razao_social: string } | null;
-      const previsao = parseISO(e.previsao_entrega);
+      const previsao = parseISO(e.previsao_entrega || '');
       const now = new Date();
       const horasRestantes = differenceInHours(previsao, now);
       const atrasado = isPast(previsao);
@@ -63,7 +63,7 @@ export const useSLAAlerts = () => {
         id: e.id,
         numero_entrega: e.numero_entrega,
         status: e.status,
-        previsao_entrega: e.previsao_entrega,
+        previsao_entrega: e.previsao_entrega || '',
         transportadora_nome: transportadora?.nome_fantasia || null,
         cliente_nome: cliente?.razao_social || null,
         horas_restantes: horasRestantes,
@@ -81,7 +81,7 @@ export const useSLAAlerts = () => {
   const createNotification = useMutation({
     mutationFn: async (alert: SLAAlertItem) => {
       const { error } = await supabase.from('notifications').insert({
-        user_id: user!.id,
+        user_id: user?.id || "",
         title: alert.previsao_atraso ? '🚨 Entrega ATRASADA!' : '⚠️ SLA em risco!',
         message: `${alert.numero_entrega} — ${alert.transportadora_nome || 'N/A'} — ${
           alert.previsao_atraso

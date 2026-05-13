@@ -83,7 +83,7 @@ export function useImportData<T>(options: UseImportDataOptions<T>) {
           });
           
           // Normalizar headers
-          const normalized = jsonData.map((row: Record<string, unknown>) => {
+          const normalized = (jsonData as Record<string, any>[]).map((row) => {
             const newRow: Record<string, unknown> = {};
             Object.keys(row).forEach(key => {
               const normalizedKey = key.trim().toLowerCase().replace(/\s+/g, '_');
@@ -123,7 +123,7 @@ export function useImportData<T>(options: UseImportDataOptions<T>) {
               row: index + 2, // +2 porque linha 1 é header
               field: err.path.join('.'),
               message: err.message,
-              value: (row as Record<string, unknown>)[err.path[0] as string],
+              value: (row as any)[err.path[0] as string],
             });
           });
         }

@@ -189,13 +189,13 @@ export function useOnboarding() {
       if (data.masterAchievement) {
         setTimeout(() => {
           showAchievementNotification({
-            id: data.masterAchievement.id,
-            name: data.masterAchievement.name,
-            description: data.masterAchievement.description,
-            icon: data.masterAchievement.icon,
-            rarity: data.masterAchievement.rarity as "common" | "rare" | "epic" | "legendary",
-            xpReward: data.masterAchievement.xp_reward,
-            coinsReward: data.masterAchievement.coins_reward
+            id: data.masterAchievement!.id,
+            name: data.masterAchievement!.name,
+            description: data.masterAchievement!.description,
+            icon: data.masterAchievement!.icon,
+            rarity: data.masterAchievement!.rarity as "common" | "rare" | "epic" | "legendary",
+            xpReward: data.masterAchievement!.xp_reward,
+            coinsReward: data.masterAchievement!.coins_reward
           });
         }, 2000);
       }

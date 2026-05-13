@@ -35,7 +35,8 @@ export default function AdminTelemetriaPage() {
       const toDate = customDateTo ? new Date(customDateTo) : new Date(); toDate.setHours(23, 59, 59, 999);
       return { from: fromDate.toISOString(), to: toDate.toISOString() };
     }
-    const ms = { "1h": 3600000, "6h": 21600000, "24h": 86400000, "7d": 604800000 }[timeFilter] || 86400000;
+    const msMap: Record<string, number> = { "1h": 3600000, "6h": 21600000, "24h": 86400000, "7d": 604800000 };
+    const ms = msMap[timeFilter] || 86400000;
     return { from: new Date(now.getTime() - ms).toISOString(), to };
   };
 
