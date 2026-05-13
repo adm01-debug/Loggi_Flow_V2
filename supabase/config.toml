@@ -1,1 +1,13 @@
 project_id = "hgicfqjayrjurivtygqf"
+
+[functions.ai-logistics-assistant]
+verify_jwt = true
+import_map = "supabase/functions/import_map.json"
+
+[functions.predict-delays]
+verify_jwt = true
+import_map = "supabase/functions/import_map.json"
+
+[functions.smart-carrier-selection]
+verify_jwt = true
+import_map = "supabase/functions/import_map.json"
