@@ -1,9 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { log } from "../_shared/logger.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
 const LALAMOVE_SANDBOX_URL = 'https://rest.sandbox.lalamove.com';
 const LALAMOVE_PRODUCTION_URL = 'https://rest.lalamove.com';
@@ -87,22 +85,22 @@ serve(async (req) => {
     console.log(`Lalamove tracking action: ${action}, orderId: ${orderId}`);
 
     switch (action) {
-      case 'getOrderDetails': {
-        const response = await lalamoveRequest('GET', `/v3/orders/${orderId}`, undefined, useSandbox);
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Lalamove order error:', errorData);
-          return new Response(JSON.stringify({ error: errorData.message || 'Failed to get order details' }), {
-            status: response.status,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
+      case 'test':
+        return new Response(JSON.stringify({ status: 'ok' }), { headers: corsHeaders });
 
-        const orderData = await response.json();
-        console.log('Order details retrieved:', orderData.data?.orderId);
+      case 'getOrderDetails': {
+        const result = await withCircuitBreaker('lalamove-api', async () => {
+          const response = await lalamoveRequest('GET', `/v3/orders/${orderId}`, undefined, useSandbox);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to get order details');
+          }
+
+          return await response.json();
+        });
         
-        return new Response(JSON.stringify(orderData), {
+        return new Response(JSON.stringify(result), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -115,26 +113,23 @@ serve(async (req) => {
           });
         }
 
-        const response = await lalamoveRequest(
-          'GET', 
-          `/v3/orders/${orderId}/drivers/${driverId}`, 
-          undefined, 
-          useSandbox
-        );
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Lalamove driver error:', errorData);
-          return new Response(JSON.stringify({ error: errorData.message || 'Failed to get driver location' }), {
-            status: response.status,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
+        const result = await withCircuitBreaker('lalamove-api', async () => {
+          const response = await lalamoveRequest(
+            'GET', 
+            `/v3/orders/${orderId}/drivers/${driverId}`, 
+            undefined, 
+            useSandbox
+          );
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to get driver location');
+          }
 
-        const driverData = await response.json();
-        console.log('Driver location retrieved:', driverData.data?.driverId);
+          return await response.json();
+        });
         
-        return new Response(JSON.stringify(driverData), {
+        return new Response(JSON.stringify(result), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -146,10 +141,16 @@ serve(async (req) => {
         });
     }
   } catch (error: unknown) {
-    console.error('Lalamove tracking error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
+    const isCircuitOpen = message.includes('Circuit Breaker');
+    
+    log('ERROR', 'Lalamove tracking error', { error: message, action });
+    
+    return new Response(JSON.stringify({ 
+      error: message,
+      circuitOpen: isCircuitOpen
+    }), {
+      status: isCircuitOpen ? 503 : 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
