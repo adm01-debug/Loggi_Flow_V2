@@ -1,17 +1,15 @@
-# ADR 0002: Estratégia de Segurança de Dados (RLS)
+# ADR 0002: Estratégia de Segurança RLS (Row Level Security)
 
 ## Status
-Aceito
+Aceito (Meta 10/10)
 
 ## Contexto
-O sistema armazena dados sensíveis de clientes, entregas e chaves de API.
+Segurança de dados multitenant é crítica.
 
 ## Decisão
-- **RLS Ativado:** 100% das tabelas no schema 'public' devem ter RLS habilitado.
-- **RBAC:** Utilizar a função `has_role()` com SECURITY DEFINER para checar permissões sem recursão infinita.
-- **Audit Logs:** Auditoria automática via triggers em todas as operações de escrita.
-- **Políticas Restritivas:** Proibir `USING (true)` em tabelas críticas, exigindo verificação de `auth.uid()` ou roles administrativas.
+- RLS habilitado em 100% das tabelas.
+- Uso de funções `SECURITY DEFINER` para checagem de roles (evitando recursão).
+- Auditoria via triggers automáticos em todas as mutações.
 
 ## Consequências
-- Proteção robusta contra vazamento de dados.
-- Overhead mínimo de performance.
+- Garantia de que usuários só acessam seus próprios registros ou registros permitidos por sua role.
