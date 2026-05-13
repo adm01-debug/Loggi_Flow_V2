@@ -1,45 +1,60 @@
-# 🗺️ Diagrama de Entidade-Relacionamento (ER) — LogiFlow
+# ER Diagram - LogiFlow (Core Entities)
 
 ```mermaid
 erDiagram
-    profiles ||--o{ user_roles : has
-    profiles ||--o{ audit_logs : generates
-    profiles ||--o{ user_levels : progress
-    
-    entregas }o--|| clientes : ships_to
-    entregas }o--|| transportadoras : assigned_to
-    entregas ||--o{ ocorrencias : has
-    entregas ||--o{ delivery_receipts : verified_by
-    
-    coletas }o--|| fornecedores : from
-    coletas }o--|| transportadoras : assigned_to
-    coletas ||--o{ audit_logs : tracked
-    
-    transportadoras ||--o{ tabelas_frete : defines
-    
-    business_rules ||--o{ automation_logs : triggers
-    
-    %% Core Attributes
-    entregas {
+    PROFILES ||--o{ USER_ROLES : has
+    PROFILES {
         uuid id PK
-        text numero_entrega
-        text status
-        timestamp deleted_at
-        integer version
+        text email
+        text full_name
+        text cargo
     }
     
-    audit_logs {
+    TRANSPORTADORAS ||--o{ ENTREGAS : handles
+    TRANSPORTADORAS {
         uuid id PK
-        timestamp created_at PK
+        text nome_fantasia
+        text cnpj
+        boolean homologada
+        int score_performance
+    }
+    
+    CLIENTES ||--o{ ENTREGAS : receives
+    CLIENTES {
+        uuid id PK
+        text razao_social
+        text cnpj
+        text cep
+    }
+    
+    FORNECEDORES ||--o{ COLETAS : provides
+    FORNECEDORES {
+        uuid id PK
+        text razao_social
+        text cnpj
+    }
+    
+    ENTREGAS ||--o{ OCORRENCIAS : has
+    ENTREGAS {
+        uuid id PK
+        uuid transportadora_id FK
+        uuid cliente_id FK
+        text status
+        numeric valor_frete
+    }
+    
+    COLETAS ||--o{ RASTREAMENTO_HISTORICO : tracked_by
+    COLETAS {
+        uuid id PK
+        uuid fornecedor_id FK
+        text status
+    }
+    
+    AUDIT_LOGS {
+        uuid id PK
         text table_name
+        uuid user_id FK
         jsonb old_data
         jsonb new_data
     }
 ```
-
-## 📝 Notas de Arquitetura
-
-1.  **Partitioning:** A tabela `audit_logs` é particionada mensalmente por `created_at`.
-2.  **Soft Delete:** Campos `deleted_at` em tabelas operacionais impedem a perda de dados acidental.
-3.  **Concurrency:** O campo `version` em `entregas` e `coletas` permite Optimistic Locking via triggers.
-4.  **Security:** Todas as tabelas são blindadas via RLS nativo do Supabase.
