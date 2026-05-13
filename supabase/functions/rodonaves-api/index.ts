@@ -71,30 +71,35 @@ function buildQS(params: Record<string, string | number | boolean | undefined>):
 
 // Helper: authenticated GET
 async function apiGet(gateway: string, path: string, params: Record<string, string | number | boolean | undefined> = {}) {
-  const token = await getToken(gateway);
-  const qs = buildQS(params);
-  const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
-  return res.json();
+  return await rodonavesBreaker.execute(async () => {
+    const token = await getToken(gateway);
+    const qs = buildQS(params);
+    const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
+    return res.json();
+  });
 }
 
 // Helper: authenticated POST/PUT/DELETE
 async function apiMutate(gateway: string, method: string, path: string, body?: unknown, queryParams?: Record<string, string | number | boolean | undefined>) {
-  const token = await getToken(gateway);
-  const qs = queryParams ? buildQS(queryParams) : new URLSearchParams();
-  const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-  const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
-  const opts: RequestInit = { method, headers };
-  if (body) {
-    headers["Content-Type"] = "application/json";
-    opts.body = JSON.stringify(body);
-  }
-  const res = await fetch(url, opts);
-  if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return { raw: text }; }
+  return await rodonavesBreaker.execute(async () => {
+    const token = await getToken(gateway);
+    const qs = queryParams ? buildQS(queryParams) : new URLSearchParams();
+    const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
+    const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+    const opts: RequestInit = { method, headers };
+    if (body) {
+      headers["Content-Type"] = "application/json";
+      opts.body = JSON.stringify(body);
+    }
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
+    const text = await res.text();
+    try { return JSON.parse(text); } catch { return { raw: text }; }
+  });
 }
+
 
 // ==========================================
 // TRACKING GATEWAY ACTIONS
