@@ -10,6 +10,7 @@ interface UseDocumentUploadOptions {
 
 /**
  * Hook for uploading documents (comprovantes, NFs) to Supabase Storage.
+ * Includes magic-byte validation for security (Dimension 19).
  */
 export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
   const {
@@ -21,6 +22,35 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  // Magic byte validation for basic types
+  const validateMagicBytes = async (file: File): Promise<boolean> => {
+    const header = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = (e) => {
+        const arr = (new Uint8Array(e.target?.result as ArrayBuffer)).subarray(0, 4);
+        let header = "";
+        for (let i = 0; i < arr.length; i++) {
+          header += arr[i].toString(16);
+        }
+        resolve(header.toUpperCase());
+      };
+      reader.readAsArrayBuffer(file.slice(0, 4));
+    });
+
+    // Signatures: PDF: 25504446, PNG: 89504E47, JPEG: FFD8FF, WEBP: 52494646
+    const signatures: Record<string, string[]> = {
+      "application/pdf": ["25504446"],
+      "image/png": ["89504E47"],
+      "image/jpeg": ["FFD8FF", "FFD8FFE0", "FFD8FFE1"],
+      "image/webp": ["52494646"],
+    };
+
+    const type = file.type;
+    if (!signatures[type]) return true; // Fallback if type not in list
+
+    return signatures[type].some(sig => header.startsWith(sig));
+  };
+
   const upload = useCallback(
     async (file: File, folder: string): Promise<string | null> => {
       // Validate size
@@ -29,9 +59,16 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
         return null;
       }
 
-      // Validate type
+      // Validate type (MIME)
       if (allowedTypes.length > 0 && !allowedTypes.includes(file.type)) {
         toast.error("Tipo de arquivo não permitido. Use PDF, JPG ou PNG.");
+        return null;
+      }
+
+      // Validate Magic Bytes (Security)
+      const isValid = await validateMagicBytes(file);
+      if (!isValid) {
+        toast.error("Assinatura de arquivo inválida. O arquivo pode estar corrompido ou falsificado.");
         return null;
       }
 
