@@ -37,15 +37,20 @@ export function StatsCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      role="region"
+      aria-label={`Métrica: ${title}`}
     >
       <div className="flex items-center justify-between mb-3">
-        <div className={cn("p-2 rounded-lg", colorClasses[color])}>
+        <div className={cn("p-2 rounded-lg", colorClasses[color])} aria-hidden="true">
           <Icon className="w-5 h-5" />
         </div>
         {trend !== undefined && (
-          <div className={cn("flex items-center text-xs font-medium", trend >= 0 ? "text-success" : "text-destructive")}>
-            <span>{trend >= 0 ? "↑" : "↓"}</span>
-            <span className="ml-1">{Math.abs(trend)}%</span>
+          <div 
+            className={cn("flex items-center text-xs font-medium", trend >= 0 ? "text-success" : "text-destructive")}
+            aria-label={`Tendência: ${trend >= 0 ? "Aumento" : "Queda"} de ${Math.abs(trend)}%`}
+          >
+            <span aria-hidden="true">{trend >= 0 ? "↑" : "↓"}</span>
+            <span className="ml-1" aria-hidden="true">{Math.abs(trend)}%</span>
           </div>
         )}
       </div>
