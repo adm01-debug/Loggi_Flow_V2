@@ -70,6 +70,20 @@ serve(async (req) => {
     // POST /quotations - Criar cotação
     if (req.method === 'POST' && pathParts.includes('quotations')) {
       const body = await req.json()
+      
+      // Try cache first
+      const redis = getRedisClient();
+      const cacheKey = `lalamove_quote_${JSON.stringify(body.stops)}`;
+      if (redis) {
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+          console.log(`[Cache] Cache hit for ${cacheKey}`);
+          return new Response(JSON.stringify(cached), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Cache': 'HIT' },
+          });
+        }
+      }
+
       const result = await lalamoveRequest('POST', '/v3/quotations', {
         serviceType: body.vehicleType || 'MOTORCYCLE',
         language: 'pt_BR',
@@ -79,10 +93,16 @@ serve(async (req) => {
         })),
       })
       
+      // Store in cache
+      if (redis) {
+        await redis.set(cacheKey, result, { ex: 600 }); // 10 minutes
+      }
+
       return new Response(JSON.stringify(result), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Cache': 'MISS' },
+      });
     }
+
     
     // POST /orders - Criar pedido
     if (req.method === 'POST' && pathParts.includes('orders') && !pathParts.includes('cancel')) {
