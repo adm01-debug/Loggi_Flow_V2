@@ -36,7 +36,25 @@ serve(async (req: Request) => {
     console.log("Rodonaves webhook received:", JSON.stringify(payload));
 
     // Expected payload: { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, ... }
-    const { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, recebedor } = payload;
+    const { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, recebedor, event_id } = payload;
+
+    // Idempotency: use event_id or create one from unique fields
+    const finalEventId = event_id || `rodonaves-${nf_numero || codigo_rastreamento}-${status_code}-${data_evento}`;
+
+    // Idempotency check
+    const { data: existingEvent } = await supabaseAdmin
+      .from('webhook_events_processed')
+      .select('id')
+      .eq('event_id', finalEventId)
+      .eq('provider', 'rodonaves')
+      .maybeSingle();
+
+    if (existingEvent) {
+      console.log(`Webhook already processed (eventId: ${finalEventId}), skipping`);
+      return new Response(JSON.stringify({ success: true, message: "Already processed" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
 
     if (!nf_numero && !codigo_rastreamento) {
       return new Response(
@@ -99,8 +117,15 @@ serve(async (req: Request) => {
 
     console.log(`Entrega ${entrega.numero_entrega} updated to ${newStatus}`);
 
+    // Mark as processed
+    await supabaseAdmin.from('webhook_events_processed').insert({
+      event_id: finalEventId,
+      provider: 'rodonaves',
+      payload: payload
+    });
+
     return new Response(
-      JSON.stringify({ success: true, entrega_id: entrega.id, new_status: newStatus }),
+      JSON.stringify({ success: true, entrega_id: entrega.id, new_status: newStatus, event_id: finalEventId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
