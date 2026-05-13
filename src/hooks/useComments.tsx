@@ -52,13 +52,13 @@ export function useComments({ entityType, entityId }: UseCommentsOptions) {
         .in("id", userIds);
 
       const profilesMap = new Map(
-        (profiles || []).map((p) => [p.id, { email: p.email || "", full_name: p.full_name }])
+        (profiles || []).map((p) => [p.id, { email: p.email || "", full_name: p.full_name ?? undefined }])
       );
 
       return (data || []).map((comment) => ({
         ...comment,
         user: profilesMap.get(comment.user_id),
-      }));
+      })) as Comment[];
     },
     enabled: !!entityId,
   });
@@ -79,7 +79,7 @@ export function useComments({ entityType, entityId }: UseCommentsOptions) {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Comment;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });

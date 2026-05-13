@@ -18,6 +18,7 @@ export function RealtimeBadge({ isOnline = true, isSyncing = false, className }:
       const timer = setTimeout(() => setPulse(false), 2000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isSyncing]);
 
   return (

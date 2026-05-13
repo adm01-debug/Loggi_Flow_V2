@@ -143,7 +143,7 @@ export function Header() {
               <Avatar className="w-7 h-7 sm:w-8 sm:h-8 border-2 border-primary/20">
                 <AvatarImage src={profile?.avatar_url || ""} />
                 <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs sm:text-sm">
-                  {getInitials(profile?.full_name)}
+                  {getInitials(profile?.full_name ?? null)}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden lg:flex flex-col items-start">

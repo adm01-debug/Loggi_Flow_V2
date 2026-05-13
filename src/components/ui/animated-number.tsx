@@ -1,168 +1,94 @@
-import { forwardRef, useEffect, useState } from 'react';
-import { motion, useSpring, useTransform } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { motion, useSpring, useTransform, AnimatePresence } from "framer-motion";
 
-interface AnimatedNumberProps {
+export interface AnimatedNumberProps {
   value: number;
-  duration?: number;
-  formatValue?: (value: number) => string;
   className?: string;
+  precision?: number;
   prefix?: string;
   suffix?: string;
+  duration?: number;
+  formatValue?: (v: any) => any;
 }
 
-export const AnimatedNumber = forwardRef<HTMLSpanElement, AnimatedNumberProps>(
-  function AnimatedNumber(
-    { value, duration = 1, formatValue, className, prefix = '', suffix = '' },
-    ref
-  ) {
+export const AnimatedNumber = React.memo(
+  ({ value, className, precision = 0, prefix = "", suffix = "", formatValue }: AnimatedNumberProps) => {
     const spring = useSpring(0, {
-      mass: 1,
+      mass: 0.8,
       stiffness: 75,
       damping: 15,
-      duration: duration * 1000
+    });
+    
+    const displayValue = useTransform(spring, (current) => {
+      const formatted = current.toLocaleString(undefined, {
+        minimumFractionDigits: precision,
+        maximumFractionDigits: precision,
+      });
+      const val = `${prefix}${formatted}${suffix}`;
+      return formatValue ? formatValue(current) : val;
     });
 
-    const display = useTransform(spring, (current) => {
-      const rounded = Math.round(current);
-      if (formatValue) {
-        return formatValue(rounded);
-      }
-      return rounded.toLocaleString('pt-BR');
-    });
-
-    useEffect(() => {
+    React.useEffect(() => {
       spring.set(value);
-    }, [spring, value]);
+    }, [value, spring]);
 
     return (
-      <span ref={ref} className={cn("tabular-nums", className)}>
-        {prefix}
-        <motion.span>{display}</motion.span>
-        {suffix}
-      </span>
+      <motion.span className={className}>
+        {displayValue}
+      </motion.span>
     );
   }
 );
 
-AnimatedNumber.displayName = 'AnimatedNumber';
+AnimatedNumber.displayName = "AnimatedNumber";
 
-// Counter com efeito de flip
-interface FlipCounterProps {
-  value: number;
-  className?: string;
-}
-
-export function FlipCounter({ value, className }: FlipCounterProps) {
-  const [displayValue, setDisplayValue] = useState(value);
-  const [isFlipping, setIsFlipping] = useState(false);
-
-  useEffect(() => {
-    if (value !== displayValue) {
-      setIsFlipping(true);
-      const timer = setTimeout(() => {
-        setDisplayValue(value);
-        setIsFlipping(false);
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [value, displayValue]);
-
-  const digits = String(displayValue).padStart(2, '0').split('');
-
+// FlipCounter Component
+export const FlipCounter = ({ value, className }: { value: number; className?: string }) => {
   return (
-    <div className={cn("flex gap-0.5", className)}>
-      {digits.map((digit, index) => (
-        <motion.div
-          key={index}
-          animate={{
-            rotateX: isFlipping ? [0, -90, 0] : 0,
-            scale: isFlipping ? [1, 0.9, 1] : 1
-          }}
-          transition={{ duration: 0.3, delay: index * 0.05 }}
-          className="w-8 h-10 bg-gradient-to-b from-muted to-muted/80 rounded-md 
-                     flex items-center justify-center text-lg font-bold
-                     shadow-inner border border-border"
+    <div className={className}>
+      <AnimatePresence mode="popLayout">
+        <motion.span
+          key={value}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -20, opacity: 0 }}
+          transition={{ duration: 0.2 }}
         >
-          {digit}
-        </motion.div>
-      ))}
+          {value}
+        </motion.span>
+      </AnimatePresence>
     </div>
   );
-}
+};
 
-// Progress Ring animado
-interface AnimatedProgressRingProps {
-  value: number;
-  max?: number;
-  size?: number;
-  strokeWidth?: number;
-  className?: string;
-  showValue?: boolean;
-  color?: 'primary' | 'success' | 'warning' | 'destructive';
-}
-
-export function AnimatedProgressRing({
-  value,
-  max = 100,
-  size = 120,
-  strokeWidth = 8,
-  className,
-  showValue = true,
-  color = 'primary'
-}: AnimatedProgressRingProps) {
-  const percentage = Math.min((value / max) * 100, 100);
+// AnimatedProgressRing Component
+export const AnimatedProgressRing = ({ progress, size = 40, strokeWidth = 4, className }: { progress: number; size?: number; strokeWidth?: number; className?: string }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (percentage / 100) * circumference;
-
-  const colorClasses = {
-    primary: 'text-primary',
-    success: 'text-green-500',
-    warning: 'text-amber-500',
-    destructive: 'text-destructive'
-  };
+  const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className={cn("relative inline-flex items-center justify-center", className)}>
-      <svg width={size} height={size} className="-rotate-90">
-        {/* Background circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          className="text-muted"
-        />
-        {/* Progress circle */}
-        <motion.circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          className={colorClasses[color]}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          style={{
-            strokeDasharray: circumference
-          }}
-        />
-      </svg>
-      {showValue && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <AnimatedNumber
-            value={Math.round(percentage)}
-            suffix="%"
-            className="text-2xl font-bold"
-          />
-        </div>
-      )}
-    </div>
+    <svg width={size} height={size} className={className}>
+      <circle
+        className="text-muted stroke-current"
+        strokeWidth={strokeWidth}
+        fill="transparent"
+        r={radius}
+        cx={size / 2}
+        cy={size / 2}
+      />
+      <motion.circle
+        className="text-primary stroke-current"
+        strokeWidth={strokeWidth}
+        strokeDasharray={circumference}
+        initial={{ strokeDashoffset: circumference }}
+        animate={{ strokeDashoffset: offset }}
+        strokeLinecap="round"
+        fill="transparent"
+        r={radius}
+        cx={size / 2}
+        cy={size / 2}
+      />
+    </svg>
   );
-}
+};
