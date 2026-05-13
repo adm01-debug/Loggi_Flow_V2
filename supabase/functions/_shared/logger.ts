@@ -1,34 +1,33 @@
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
+export enum LogLevel {
+  INFO = 'INFO',
+  WARN = 'WARN',
+  ERROR = 'ERROR',
+  DEBUG = 'DEBUG'
+}
 
-export interface LogEntry {
+interface LogEntry {
   level: LogLevel;
-  msg: string;
+  message: string;
   requestId?: string;
-  correlationId?: string;
   userId?: string;
   meta?: Record<string, any>;
   timestamp: string;
 }
 
-/**
- * Standard structured logger for Edge Functions.
- * Supports correlation IDs for distributed tracing (Dimension 9 & 10).
- */
-export const log = (level: LogLevel, msg: string, meta?: Record<string, any>, req?: Request) => {
-  const correlationId = req?.headers.get('x-correlation-id') || req?.headers.get('x-request-id');
-  
-  const entry: LogEntry = {
-    level,
-    msg,
-    correlationId: correlationId || undefined,
-    meta,
-    timestamp: new Date().toISOString(),
+export const log = (entry: Omit<LogEntry, 'timestamp'>) => {
+  const fullEntry: LogEntry = {
+    ...entry,
+    timestamp: new Date().toISOString()
   };
   
-  if (level === 'ERROR') {
-    console.error(JSON.stringify(entry));
+  // Structured JSON log for log management systems
+  const logStr = JSON.stringify(fullEntry);
+  
+  if (entry.level === LogLevel.ERROR) {
+    console.error(logStr);
+  } else if (entry.level === LogLevel.WARN) {
+    console.warn(logStr);
   } else {
-    console.log(JSON.stringify(entry));
+    console.log(logStr);
   }
 };
-
