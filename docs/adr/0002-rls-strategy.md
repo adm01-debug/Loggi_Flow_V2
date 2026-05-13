@@ -1,16 +1,16 @@
-# ADR 002: RLS (Row Level Security) Strategy
+# ADR 0002: Estratégia de Segurança via RLS (Row Level Security)
 
 ## Status
-Accepted
+Aceito
 
-## Context
-Security and data isolation are critical for multi-tenant or multi-user logistics operations.
+## Contexto
+Necessidade de garantir isolamento de dados entre empresas, transportadoras e usuários administrativos no LogiFlow.
 
-## Decision
-- **Mandatory RLS**: All tables in the `public` schema must have RLS enabled.
-- **RBAC**: Use `auth.uid()` coupled with a `user_roles` table.
-- **Security Definer**: Use `SECURITY DEFINER` functions for role checking to avoid recursive policy loops.
+## Decisões
+- **RLS Ativado por Padrão:** Todas as tabelas no schema `public` devem ter RLS habilitado.
+- **Funções Security Definer:** Uso de funções auxiliares (`has_role`, `is_admin`) com `SECURITY DEFINER` para evitar recursão infinita e garantir performance nas políticas.
+- **RBAC:** Controle de acesso baseado em roles (Admin, Transportadora, Cliente, Financeiro).
 
-## Consequences
-- Data is secured at the database level.
-- Reduced risk of accidental data leakage in the frontend.
+## Consequências
+- Camada de segurança resiliente mesmo em caso de falha no frontend.
+- Auditoria simplificada.

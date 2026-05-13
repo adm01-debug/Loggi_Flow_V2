@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,31 +11,39 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  const startTime = Date.now()
+  let dbStatus = 'down'
+  let dbLatency = 0
+
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    )
-
-    // Check DB connection
-    const { error } = await supabaseClient.from('profiles').select('count', { count: 'exact', head: true })
-    
-    if (error) throw error
-
-    return new Response(
-      JSON.stringify({ status: 'healthy', timestamp: new Date().toISOString() }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
-    )
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ status: 'unhealthy', error: error.message }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
-    )
+    const { data, error } = await supabase.from('audit_logs').select('count', { count: 'exact', head: true })
+    if (!error) {
+      dbStatus = 'up'
+      dbLatency = Date.now() - startTime
+    }
+  } catch (err) {
+    console.error('Health check error:', err)
   }
+
+  const status = dbStatus === 'up' ? 200 : 503
+
+  return new Response(
+    JSON.stringify({
+      status: dbStatus === 'up' ? 'healthy' : 'unhealthy',
+      timestamp: new Date().toISOString(),
+      database: {
+        status: dbStatus,
+        latency_ms: dbLatency
+      },
+      environment: Deno.env.get('ENVIRONMENT') || 'production'
+    }),
+    { 
+      status, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    }
+  )
 })
