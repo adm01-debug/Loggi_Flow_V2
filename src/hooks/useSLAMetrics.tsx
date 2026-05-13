@@ -168,8 +168,8 @@ export function useSLAMetrics() {
       const temposEntrega = entregasConcluidas
         .filter(e => e.data_despacho && e.data_entrega_efetiva)
         .map(e => differenceInHours(
-          parseISO(e.data_entrega_efetiva),
-          parseISO(e.data_despacho)
+          parseISO(e.data_entrega_efetiva || ""),
+          parseISO(e.data_despacho || "")
         ));
       const tempoMedioEntrega = temposEntrega.length > 0
         ? temposEntrega.reduce((a, b) => a + b, 0) / temposEntrega.length
@@ -186,8 +186,8 @@ export function useSLAMetrics() {
       const temposColeta = coletasConcluidas
         .filter(c => c.created_at && c.data_efetiva_coleta)
         .map(c => differenceInHours(
-          parseISO(c.data_efetiva_coleta),
-          parseISO(c.created_at)
+          parseISO(c.data_efetiva_coleta || ""),
+          parseISO(c.created_at || "")
         ));
       const tempoMedioColeta = temposColeta.length > 0
         ? temposColeta.reduce((a, b) => a + b, 0) / temposColeta.length
@@ -291,8 +291,8 @@ export function useSLAMetrics() {
         const temposTransp = entregasTransp
           .filter(e => e.data_despacho && e.data_entrega_efetiva)
           .map(e => differenceInHours(
-            parseISO(e.data_entrega_efetiva),
-            parseISO(e.data_despacho)
+            parseISO(e.data_entrega_efetiva || ""),
+            parseISO(e.data_despacho || "")
           ));
         
         const taxa = entregasTransp.length > 0 

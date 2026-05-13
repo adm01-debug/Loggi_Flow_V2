@@ -21,7 +21,7 @@ export async function importCSV<T>(
         const success: T[] = [];
         const errors: { row: number; field: string; error: string }[] = [];
         
-        results.data.forEach((row: Record<string, unknown>, index: number) => {
+        results.data.forEach((row: any, index: number) => {
           try {
             const validated = schema.parse(row);
             success.push(validated);

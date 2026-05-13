@@ -281,7 +281,7 @@ export function useSLANotifications() {
 
       if (entregas) {
         for (const e of entregas) {
-          const alert = checkEntregaSLA(e);
+          const alert = checkEntregaSLA(e as any);
           if (alert) handleSLAAlert(alert.type, alert.message, alert.numero, 'entrega');
         }
       }
@@ -295,7 +295,7 @@ export function useSLANotifications() {
 
       if (coletas) {
         for (const c of coletas) {
-          const alert = checkColetaSLA(c);
+          const alert = checkColetaSLA(c as any);
           if (alert) handleSLAAlert(alert.type, alert.message, alert.numero, 'coleta');
         }
       }
