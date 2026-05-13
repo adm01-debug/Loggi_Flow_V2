@@ -2189,6 +2189,27 @@ export type Database = {
         }
         Relationships: []
       }
+      idempotency_keys: {
+        Row: {
+          id: string
+          idempotency_key: string
+          processed_at: string | null
+          provider: string
+        }
+        Insert: {
+          id?: string
+          idempotency_key: string
+          processed_at?: string | null
+          provider: string
+        }
+        Update: {
+          id?: string
+          idempotency_key?: string
+          processed_at?: string | null
+          provider?: string
+        }
+        Relationships: []
+      }
       ip_access_rules: {
         Row: {
           created_at: string
@@ -3320,6 +3341,39 @@ export type Database = {
         }
         Relationships: []
       }
+      system_adr: {
+        Row: {
+          consequences: string | null
+          context: string | null
+          created_at: string | null
+          decision: string | null
+          id: string
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          consequences?: string | null
+          context?: string | null
+          created_at?: string | null
+          decision?: string | null
+          id?: string
+          status: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          consequences?: string | null
+          context?: string | null
+          created_at?: string | null
+          decision?: string | null
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       tabelas_frete: {
         Row: {
           ativo: boolean
@@ -3970,6 +4024,7 @@ export type Database = {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json
       }
+      system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       xp_for_level: { Args: { lvl: number }; Returns: number }
     }
