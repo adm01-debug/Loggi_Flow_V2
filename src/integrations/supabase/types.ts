@@ -2774,6 +2774,276 @@ export type Database = {
           },
         ]
       }
+      rastreamento_historico_y2026m01: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m02: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m03: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m04: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m05: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m06: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
       rate_limit_logs: {
         Row: {
           blocked: boolean
