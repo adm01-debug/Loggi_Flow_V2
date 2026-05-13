@@ -26,7 +26,7 @@ export function RTEOrdersPanel() {
     });
   };
 
-  const orders = rte.ordersResult as { data?: Array<Record<string, unknown>> } | undefined;
+  const orders = rte.ordersResult as { data?: Array<Record<string, any>> } | undefined;
   const items = Array.isArray(orders?.data) ? orders.data : [];
 
   return (
@@ -37,10 +37,10 @@ export function RTEOrdersPanel() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div><Label>CNPJ Remetente *</Label><Input value={cnpj} onChange={e => setCnpj(e.target.value)} placeholder="00.000.000/0000-00" /></div>
-        <div><Label>Data Início *</Label><Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} /></div>
-        <div><Label>Data Fim *</Label><Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} /></div>
-        <div><Label>NF (opcional)</Label><Input value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} /></div>
+        <div><Label>CNPJ Remetente *</Label><Input value={cnpj} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCnpj(e.target.value)} placeholder="00.000.000/0000-00" /></div>
+        <div><Label>Data Início *</Label><Input type="date" value={startDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)} /></div>
+        <div><Label>Data Fim *</Label><Input type="date" value={endDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDate(e.target.value)} /></div>
+        <div><Label>NF (opcional)</Label><Input value={invoiceNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInvoiceNumber(e.target.value)} /></div>
       </div>
 
       <div className="flex items-center gap-3">
@@ -49,7 +49,7 @@ export function RTEOrdersPanel() {
         </Button>
         <div className="flex items-center gap-1">
           <Label className="text-xs">Pg:</Label>
-          <Input type="number" value={page} onChange={e => setPage(parseInt(e.target.value) || 1)} className="w-16 h-8" min={1} />
+          <Input type="number" value={page} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPage(parseInt(e.target.value) || 1)} className="w-16 h-8" min={1} />
         </div>
       </div>
 
