@@ -142,7 +142,7 @@ export default function Ranking() {
               <motion.div key={rankUser.id} className={cn("card-interactive flex items-center gap-4 transition-all", isCurrentUser && "ring-2 ring-primary/50 bg-primary/5")} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
                 <div className={cn("w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm", rankUser.rank === 1 ? "bg-gradient-to-br from-warning to-warning/80 text-warning-foreground" : rankUser.rank === 2 ? "bg-gradient-to-br from-muted-foreground/60 to-muted-foreground text-white" : rankUser.rank === 3 ? "bg-gradient-to-br from-warning/80 to-warning/60 text-warning-foreground" : "bg-muted")}>{rankUser.rank}</div>
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                  {rankUser.avatar ? <img src={rankUser.avatar} className="w-10 h-10 rounded-full object-cover" /> : <span className="text-lg font-bold text-primary">{rankUser.name.charAt(0)}</span>}
+                  {rankUser.avatar ? <img src={rankUser.avatar} alt={`Avatar de ${rankUser.name}`} className="w-10 h-10 rounded-full object-cover" /> : <span className="text-lg font-bold text-primary">{rankUser.name.charAt(0)}</span>}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2"><p className="font-semibold truncate">{rankUser.name}</p>{isCurrentUser && <Badge variant="secondary" className="text-xs">Você</Badge>}</div>
