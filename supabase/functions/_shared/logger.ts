@@ -4,15 +4,23 @@ export interface LogEntry {
   level: LogLevel;
   msg: string;
   requestId?: string;
+  correlationId?: string;
   userId?: string;
   meta?: Record<string, any>;
   timestamp: string;
 }
 
-export const log = (level: LogLevel, msg: string, meta?: Record<string, any>) => {
+/**
+ * Standard structured logger for Edge Functions.
+ * Supports correlation IDs for distributed tracing (Dimension 9 & 10).
+ */
+export const log = (level: LogLevel, msg: string, meta?: Record<string, any>, req?: Request) => {
+  const correlationId = req?.headers.get('x-correlation-id') || req?.headers.get('x-request-id');
+  
   const entry: LogEntry = {
     level,
     msg,
+    correlationId: correlationId || undefined,
     meta,
     timestamp: new Date().toISOString(),
   };
@@ -23,3 +31,4 @@ export const log = (level: LogLevel, msg: string, meta?: Record<string, any>) =>
     console.log(JSON.stringify(entry));
   }
 };
+
