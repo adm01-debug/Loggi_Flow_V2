@@ -30,8 +30,8 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
       const importResult = await importCSV(selectedFile, schema);
       setResult(importResult);
       setProgress(50);
-    } catch {
-      // Silent fail on CSV read error
+    } catch (err: any) {
+      toast.error(`Erro ao ler arquivo: ${err.message}`);
     } finally {
       setIsImporting(false);
     }
