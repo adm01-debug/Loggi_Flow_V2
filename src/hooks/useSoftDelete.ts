@@ -16,6 +16,15 @@ export function useSoftDelete(tableName: TableName, queryKeysToInvalidate: strin
         .eq("id", id);
 
       if (error) throw error;
+      
+      // Log auditing for soft delete
+      await supabase.from('audit_logs').insert({
+        table_name: tableName,
+        record_id: id,
+        action: 'UPDATE',
+        new_data: { status: 'deleted_at_set', timestamp: new Date().toISOString() },
+        user_id: (await supabase.auth.getUser()).data.user?.id
+      });
     },
     onSuccess: () => {
       queryKeysToInvalidate.forEach(key => queryClient.invalidateQueries({ queryKey: key }));
