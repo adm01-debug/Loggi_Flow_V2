@@ -3,6 +3,8 @@ import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { requireString, requireNumber, ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { getRedisClient } from "../_shared/redis.ts";
+
 
 // Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
