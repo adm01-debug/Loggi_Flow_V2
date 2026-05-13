@@ -14,7 +14,7 @@ describe('RLS Negative Tests', () => {
   });
 
   it('should allow admin access to all profiles', () => {
-    const admin = { id: 'uuid-admin', role: 'admin' };
+    const admin: { id: string; role: string } = { id: 'uuid-admin', role: 'admin' };
     const profileB = { id: 'uuid-b', user_id: 'uuid-b', data: 'secret' };
     
     const canRead = (user: any, profile: any) => {
