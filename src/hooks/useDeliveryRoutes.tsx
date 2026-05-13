@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCallback, useEffect, useState } from 'react';
+import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 
 export interface DeliveryRoute {
   id: string;
@@ -187,7 +188,7 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
         };
       });
     },
-    staleTime: 1000 * 60 * 2,
+    staleTime: QUERY_STALE_TIME.REALTIME,
     enabled: !!user?.id,
   });
 

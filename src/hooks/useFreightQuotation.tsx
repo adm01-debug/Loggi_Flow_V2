@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 
 export interface TabelaFrete {
   id: string;
@@ -63,7 +64,7 @@ export const useFreightQuotation = () => {
       if (error) throw error;
       return data as TabelaFrete[];
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_STALE_TIME.SEMI_STATIC,
     gcTime: 30 * 60 * 1000,
     enabled: !!user?.id,
   });
@@ -81,7 +82,7 @@ export const useFreightQuotation = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_STALE_TIME.STATIC,
     enabled: !!user?.id,
   });
 
