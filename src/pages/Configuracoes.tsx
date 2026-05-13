@@ -121,7 +121,7 @@ export default function Configuracoes() {
                   <div key={pref.key} className="flex items-center justify-between py-2">
                     <div><p className="font-medium">{pref.label}</p><p className="text-sm text-muted-foreground">Receber alertas via {pref.key}</p></div>
                     <Switch 
-                      checked={(preferences as Record<string, boolean>)?.[pref.key] ?? false} 
+                      checked={(preferences as any)?.[pref.key] ?? false} 
                       onCheckedChange={(v) => handleUpdatePreference(pref.key, v)} 
                       disabled={!isLoaded} 
                     />
