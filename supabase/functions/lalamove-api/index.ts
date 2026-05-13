@@ -1,14 +1,15 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { getCircuitBreaker } from '../_shared/circuitBreaker.ts'
+import { corsHeaders } from '../_shared/cors.ts'
 
 const LALAMOVE_API_KEY = Deno.env.get('LALAMOVE_API_KEY') || ''
 const LALAMOVE_API_SECRET = Deno.env.get('LALAMOVE_API_SECRET') || ''
 const LALAMOVE_BASE_URL = Deno.env.get('LALAMOVE_BASE_URL') || 'https://rest.lalamove.com'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const lalamoveBreaker = getCircuitBreaker('lalamove', {
+  failureThreshold: 5,
+  resetTimeout: 30000,
+})
 
 // Gerar assinatura HMAC para Lalamove
 async function generateSignature(method: string, path: string, timestamp: string, body: string = ''): Promise<string> {
@@ -29,28 +30,31 @@ async function generateSignature(method: string, path: string, timestamp: string
 
 // Fazer requisição para API Lalamove
 async function lalamoveRequest(method: string, path: string, body?: object) {
-  const timestamp = Date.now().toString()
-  const bodyStr = body ? JSON.stringify(body) : ''
-  const signature = await generateSignature(method, path, timestamp, bodyStr)
-  
-  const response = await fetch(`${LALAMOVE_BASE_URL}${path}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `hmac ${LALAMOVE_API_KEY}:${timestamp}:${signature}`,
-      'X-LLM-Country': 'BR',
-      'X-LLM-Market': 'BR_SAO',
-    },
-    body: body ? bodyStr : undefined,
+  return await lalamoveBreaker.execute(async () => {
+    const timestamp = Date.now().toString()
+    const bodyStr = body ? JSON.stringify(body) : ''
+    const signature = await generateSignature(method, path, timestamp, bodyStr)
+    
+    const response = await fetch(`${LALAMOVE_BASE_URL}${path}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `hmac ${LALAMOVE_API_KEY}:${timestamp}:${signature}`,
+        'X-LLM-Country': 'BR',
+        'X-LLM-Market': 'BR_SAO',
+      },
+      body: body ? bodyStr : undefined,
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Lalamove API error: ${response.status} - ${error}`)
+    }
+    
+    return response.json()
   })
-  
-  if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`Lalamove API error: ${response.status} - ${error}`)
-  }
-  
-  return response.json()
 }
+
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
