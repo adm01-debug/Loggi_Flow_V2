@@ -32,6 +32,7 @@ export { useDeviceSessions } from './useDeviceSessions';
 export { useSecurityEvents } from './useSecurityEvents';
 export { useSecurityPushNotifications } from './useSecurityPushNotifications';
 export { useRateLimitLogs } from './useRateLimitLogs';
+export { useFeatureFlags, useFeatureFlag } from './useFeatureFlags';
 
 // ============================================
 // CRUD Operations
