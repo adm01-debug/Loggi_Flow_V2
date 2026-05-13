@@ -1,17 +1,19 @@
-# ADR 0001: Escolha da Stack Tecnológica
+# ADR 001: Stack Choice
 
-## Data: 2026-05-13
-## Status: Aceito
+## Status
+Accepted
 
-## Contexto
-O projeto LogiFlow requer uma interface reativa, alta performance de entrega e integração com múltiplos provedores logísticos e de CRM.
+## Context
+LogiFlow is a logistics and transport management system that requires real-time updates, offline capabilities, and high reliability.
 
-## Decisão
-- **Frontend**: React 18 com Vite 5 para máxima performance de build e HMR.
-- **Estilização**: Tailwind CSS + shadcn/ui para consistência visual e velocidade de desenvolvimento.
-- **Gerenciamento de Estado**: React Query v5 para cache de servidor, reduzindo chamadas redundantes à API.
-- **Backend/DB**: Lovable Cloud (Supabase) pela facilidade de RLS, Edge Functions e escalabilidade PostgreSQL.
+## Decision
+We chose the following stack:
+- **Frontend**: React 18 + Vite + TypeScript (for type safety and performance).
+- **Styling**: TailwindCSS + shadcn/ui (for consistent, accessible, and fast UI development).
+- **Backend/DB**: Supabase (PostgreSQL, Auth, Storage, Edge Functions).
+- **State Management**: React Query (for server state) + React Context/Zustand (for client state).
 
-## Consequências
-- Curva de aprendizado moderada para novos desenvolvedores familiarizados com o ecossistema moderno de React.
-- Dependência de serviços gerenciados (Cloud-native), facilitando manutenção.
+## Consequences
+- High developer productivity.
+- Built-in scalability and security via RLS.
+- Strong type safety across the stack.
