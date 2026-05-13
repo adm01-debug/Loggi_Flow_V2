@@ -35,12 +35,12 @@ export const useLogisticaReversaReal = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as any[];
+      return data as unknown as LogisticaReversa[];
     },
   });
 
   const create = useMutation({
-    mutationFn: async (newItem: { motivo: string; [key: string]: any }) => {
+    mutationFn: async (newItem: Partial<LogisticaReversa> & { motivo: string }) => {
       const { data, error } = await supabase
         .from("logistica_reversa")
         .insert([newItem])
