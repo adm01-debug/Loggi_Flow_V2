@@ -1,5 +1,5 @@
 import * as React from "react";
-import { X, Trash2, Download, Tag, CheckCircle2 } from "lucide-react";
+import { X, Trash2, Download, Tag, CheckCircle2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
