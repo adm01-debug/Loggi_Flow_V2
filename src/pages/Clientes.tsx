@@ -94,9 +94,19 @@ export default function Clientes() {
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("clientes").select("*").order("razao_social");
+      const { data, error } = await supabase
+        .from("clientes")
+        .select("*")
+        .is("deleted_at", null)
+        .order("razao_social");
+      
       if (error) throw error;
-      const { data: entregas } = await supabase.from("entregas").select("cliente_id, status");
+      
+      const { data: entregas } = await supabase
+        .from("entregas")
+        .select("cliente_id, status")
+        .is("deleted_at", null);
+        
       return (data || []).map((c) => {
         const ec = entregas?.filter((e) => e.cliente_id === c.id) || [];
         const pend = ec.filter((e) => !["entregue", "finalizado"].includes(e.status)).length;
@@ -140,24 +150,24 @@ export default function Clientes() {
 
   const deleteMut = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("clientes").delete().eq("id", id);
+      const { error } = await supabase.from("clientes").update({ deleted_at: new Date().toISOString() }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgDel(false); setSel(null); toast.success("Cliente excluído!"); },
-    onError: (e) => toast.error("Erro ao excluir: " + e.message),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgDel(false); setSel(null); toast.success("Cliente movido para lixeira!"); },
+    onError: (e) => toast.error("Erro ao remover: " + e.message),
   });
 
   const bulkDeleteMut = useMutation({
     mutationFn: async (ids: string[]) => {
-      const { error } = await supabase.from("clientes").delete().in("id", ids);
+      const { error } = await supabase.from("clientes").update({ deleted_at: new Date().toISOString() }).in("id", ids);
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["clientes"] });
       clearSelection();
-      toast.success(`${selectedIds.length} cliente(s) excluído(s)!`);
+      toast.success(`${selectedIds.length} cliente(s) movidos para lixeira!`);
     },
-    onError: (e) => toast.error("Erro ao excluir: " + e.message),
+    onError: (e) => toast.error("Erro ao remover: " + e.message),
   });
 
   const openEdit = (c: Cliente) => {

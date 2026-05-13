@@ -61,9 +61,19 @@ export default function Fornecedores() {
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["fornecedores"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("fornecedores").select("*").order("razao_social");
+      const { data, error } = await supabase
+        .from("fornecedores")
+        .select("*")
+        .is("deleted_at", null)
+        .order("razao_social");
+      
       if (error) throw error;
-      const { data: coletas } = await supabase.from("coletas").select("fornecedor_id, status, created_at");
+      
+      const { data: coletas } = await supabase
+        .from("coletas")
+        .select("fornecedor_id, status, created_at")
+        .is("deleted_at", null);
+        
       return (data || []).map((f) => {
         const fc = coletas?.filter((c) => c.fornecedor_id === f.id) || [];
         const pend = fc.filter((c) => ["aguardando_liberacao","solicitada","em_transito"].includes(c.status)).length;
