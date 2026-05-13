@@ -83,8 +83,12 @@ export function StatsCardCompact({
   color = "primary",
 }: Omit<StatsCardProps, "trend" | "trendLabel" | "loading">) {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-      <div className={cn("p-2 rounded-lg", colorClasses[color])}>
+    <div 
+      className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+      role="group"
+      aria-label={`${title}: ${value}`}
+    >
+      <div className={cn("p-2 rounded-lg", colorClasses[color])} aria-hidden="true">
         <Icon className="w-4 h-4" />
       </div>
       <div>
