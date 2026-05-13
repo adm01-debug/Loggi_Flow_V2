@@ -6,6 +6,7 @@ import { importCSV, ImportResult, generateCSVTemplate, downloadCSV } from '@/lib
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { z } from 'zod';
+import { toast } from 'sonner';
 
 interface CSVImporterProps<T> {
   schema: z.ZodSchema<T>;
@@ -30,8 +31,8 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
       const importResult = await importCSV(selectedFile, schema);
       setResult(importResult);
       setProgress(50);
-    } catch {
-      // Silent fail on CSV read error
+    } catch (err: any) {
+      toast.error(`Erro ao ler arquivo: ${err.message}`);
     } finally {
       setIsImporting(false);
     }
