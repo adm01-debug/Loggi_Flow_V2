@@ -1,103 +1,74 @@
 /**
- * Simple Circuit Breaker Implementation
- * States: CLOSED, OPEN, HALF_OPEN
+ * Circuit Breaker pattern implementation for Edge Functions.
+ * Prevents cascading failures when external services are down.
  */
 
 export enum CircuitState {
-  CLOSED = "CLOSED",
-  OPEN = "OPEN",
-  HALF_OPEN = "HALF_OPEN",
+  CLOSED = "CLOSED",     // Normal operation
+  OPEN = "OPEN",         // Service is failing, stop requests
+  HALF_OPEN = "HALF_OPEN" // Service might be back, try one request
 }
 
-interface CircuitBreakerOptions {
-  failureThreshold: number; // Number of failures before opening the circuit
-  resetTimeout: number; // Time in ms before trying to close the circuit (HALF_OPEN)
-  onStateChange?: (state: CircuitState) => void;
+export interface CircuitOptions {
+  failureThreshold: number; // Max failures before opening
+  resetTimeoutMs: number;    // Time to stay OPEN before trying HALF_OPEN
 }
 
-export class CircuitBreaker {
-  private state: CircuitState = CircuitState.CLOSED;
-  private failures = 0;
-  private lastFailureTime = 0;
-  private options: CircuitBreakerOptions;
-
-  constructor(options: CircuitBreakerOptions) {
-    this.options = options;
-  }
-
-  public async execute<T>(fn: () => Promise<T>): Promise<T> {
-    this.evaluateState();
-
-    if (this.state === CircuitState.OPEN) {
-      throw new Error("Circuit breaker is OPEN");
-    }
-
-    try {
-      const result = await fn();
-      this.onSuccess();
-      return result;
-    } catch (error) {
-      this.onFailure();
-      throw error;
-    }
-  }
-
-  private evaluateState() {
-    if (this.state === CircuitState.OPEN) {
-      const now = Date.now();
-      if (now - this.lastFailureTime > this.options.resetTimeout) {
-        this.setState(CircuitState.HALF_OPEN);
-      }
-    }
-  }
-
-  private onSuccess() {
-    if (this.state === CircuitState.HALF_OPEN) {
-      this.setState(CircuitState.CLOSED);
-      this.failures = 0;
-    }
-  }
-
-  private onFailure() {
-    this.failures++;
-    this.lastFailureTime = Date.now();
-
-    if (this.state === CircuitState.CLOSED && this.failures >= this.options.failureThreshold) {
-      this.setState(CircuitState.OPEN);
-    } else if (this.state === CircuitState.HALF_OPEN) {
-      this.setState(CircuitState.OPEN);
-    }
-  }
-
-  private setState(newState: CircuitState) {
-    if (this.state !== newState) {
-      this.state = newState;
-      if (this.options.onStateChange) {
-        this.options.onStateChange(newState);
-      }
-    }
-  }
-
-  public getState(): CircuitState {
-    return this.state;
-  }
-}
-
-// Map to store circuit breakers for different services
-const breakers = new Map<string, CircuitBreaker>();
-
-export const getCircuitBreaker = (serviceName: string, options?: Partial<CircuitBreakerOptions>): CircuitBreaker => {
-  if (!breakers.has(serviceName)) {
-    breakers.set(
-      serviceName,
-      new CircuitBreaker({
-        failureThreshold: options?.failureThreshold ?? 5,
-        resetTimeout: options?.resetTimeout ?? 30000, // 30 seconds
-        onStateChange: (state) => {
-          console.log(`[CircuitBreaker] ${serviceName} state changed to ${state}`);
-        },
-      })
-    );
-  }
-  return breakers.get(serviceName)!;
+const DEFAULT_OPTIONS: CircuitOptions = {
+  failureThreshold: 3,
+  resetTimeoutMs: 30000, // 30 seconds
 };
+
+// Map to store state in-memory across Edge Function executions (transient)
+const registries = new Map<string, {
+  state: CircuitState;
+  failures: number;
+  lastFailureTime: number;
+}>();
+
+export async function withCircuitBreaker<T>(
+  name: string,
+  fn: () => Promise<T>,
+  options: CircuitOptions = DEFAULT_OPTIONS
+): Promise<T> {
+  const registry = registries.get(name) || {
+    state: CircuitState.CLOSED,
+    failures: 0,
+    lastFailureTime: 0
+  };
+
+  const now = Date.now();
+
+  // If OPEN, check if we can move to HALF_OPEN
+  if (registry.state === CircuitState.OPEN) {
+    if (now - registry.lastFailureTime > options.resetTimeoutMs) {
+      registry.state = CircuitState.HALF_OPEN;
+    } else {
+      throw new Error(`Circuit Breaker [${name}] is OPEN. Refusing request.`);
+    }
+  }
+
+  try {
+    const result = await fn();
+
+    // Success - reset circuit if not closed
+    if (registry.state !== CircuitState.CLOSED) {
+      registry.state = CircuitState.CLOSED;
+      registry.failures = 0;
+    }
+    
+    registries.set(name, registry);
+    return result;
+  } catch (error) {
+    registry.failures++;
+    registry.lastFailureTime = Date.now();
+
+    if (registry.failures >= options.failureThreshold || registry.state === CircuitState.HALF_OPEN) {
+      registry.state = CircuitState.OPEN;
+      console.error(`Circuit Breaker [${name}] transition to OPEN. Failure count: ${registry.failures}`);
+    }
+
+    registries.set(name, registry);
+    throw error;
+  }
+}

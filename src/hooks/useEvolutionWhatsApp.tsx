@@ -26,6 +26,7 @@ export const useEvolutionWhatsApp = () => {
         body: { action: 'send_text', data: params },
       });
       if (error) throw error;
+      if (data?.circuitOpen) throw new Error('Serviço WhatsApp temporariamente indisponível (Circuit Breaker)');
       if (!data?.success) throw new Error(data?.error || 'Erro ao enviar mensagem');
       return data;
     },

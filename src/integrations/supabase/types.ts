@@ -988,6 +988,7 @@ export type Database = {
           tipo_coleta: Database["public"]["Enums"]["coleta_tipo"]
           transportadora_id: string | null
           updated_at: string
+          version: number | null
         }
         Insert: {
           codigo_rastreamento?: string | null
@@ -1015,6 +1016,7 @@ export type Database = {
           tipo_coleta?: Database["public"]["Enums"]["coleta_tipo"]
           transportadora_id?: string | null
           updated_at?: string
+          version?: number | null
         }
         Update: {
           codigo_rastreamento?: string | null
@@ -1042,6 +1044,7 @@ export type Database = {
           tipo_coleta?: Database["public"]["Enums"]["coleta_tipo"]
           transportadora_id?: string | null
           updated_at?: string
+          version?: number | null
         }
         Relationships: [
           {
@@ -3123,24 +3126,24 @@ export type Database = {
       }
       webhook_events_processed: {
         Row: {
-          external_event_id: string
+          event_id: string
           id: string
-          metadata: Json | null
-          processed_at: string
+          payload: Json | null
+          processed_at: string | null
           provider: string
         }
         Insert: {
-          external_event_id: string
+          event_id: string
           id?: string
-          metadata?: Json | null
-          processed_at?: string
+          payload?: Json | null
+          processed_at?: string | null
           provider: string
         }
         Update: {
-          external_event_id?: string
+          event_id?: string
           id?: string
-          metadata?: Json | null
-          processed_at?: string
+          payload?: Json | null
+          processed_at?: string | null
           provider?: string
         }
         Relationships: []

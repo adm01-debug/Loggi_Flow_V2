@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 interface BoxGridProps {
   boxes: BoxData[];
   onBoxClick: (box: BoxData) => void;
-  onDrop: (boxNumber: number, deliveryId: string) => void;
+  onDrop: (boxNumber: number, deliveryId: string, version: number) => void;
   isLoading?: boolean;
 }
 
@@ -33,8 +33,9 @@ export function BoxGrid({ boxes, onBoxClick, onDrop, isLoading }: BoxGridProps) 
     if (isOccupied) return;
     
     const deliveryId = e.dataTransfer.getData("deliveryId");
+    const version = parseInt(e.dataTransfer.getData("version") || "0");
     if (deliveryId) {
-      onDrop(boxNumber, deliveryId);
+      onDrop(boxNumber, deliveryId, version);
     }
   };
 

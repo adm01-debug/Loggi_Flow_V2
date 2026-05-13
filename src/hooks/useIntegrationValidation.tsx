@@ -18,12 +18,16 @@ export function useIntegrationValidation() {
 
   const validateLalamove = useCallback(async (): Promise<IntegrationStatus> => {
     try {
-      const { error } = await supabase.functions.invoke('lalamove-tracking', {
+      const { data, error } = await supabase.functions.invoke('lalamove-tracking', {
         body: { action: 'test' },
       });
       
       if (error) {
         return { name: 'Lalamove', status: 'error', message: error.message };
+      }
+      
+      if (data?.circuitOpen) {
+        return { name: 'Lalamove', status: 'error', message: 'Circuit Breaker Ativo: Serviço temporariamente suspenso' };
       }
       
       return { name: 'Lalamove', status: 'connected', lastCheck: new Date() };

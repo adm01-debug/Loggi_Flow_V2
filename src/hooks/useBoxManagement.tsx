@@ -13,6 +13,7 @@ export interface DeliveryWithRelations {
   previsao_entrega: string | null;
   box_alocado: string | null;
   is_cross_docking: boolean;
+  version: number;
   cliente: {
     razao_social: string;
   } | null;
@@ -49,6 +50,7 @@ export function useBoxManagement() {
           previsao_entrega,
           box_alocado,
           is_cross_docking,
+          version,
           updated_at,
           cliente:clientes(razao_social),
           transportadora:transportadoras(nome_fantasia)
@@ -90,13 +92,14 @@ export function useBoxManagement() {
 
   // Allocate delivery to box
   const allocateMutation = useMutation({
-    mutationFn: async ({ boxNumber, deliveryId }: { boxNumber: number; deliveryId: string }) => {
+    mutationFn: async ({ boxNumber, deliveryId, version }: { boxNumber: number; deliveryId: string; version: number }) => {
       const boxId = boxNumber.toString().padStart(2, "0");
 
       const { error } = await supabase
         .from("entregas")
         .update({ box_alocado: boxId })
-        .eq("id", deliveryId);
+        .eq("id", deliveryId)
+        .eq("version", version);
 
       if (error) throw error;
     },
@@ -149,8 +152,8 @@ export function useBoxManagement() {
     },
   });
 
-  const allocateToBox = (boxNumber: number, deliveryId: string) => {
-    return allocateMutation.mutateAsync({ boxNumber, deliveryId });
+  const allocateToBox = (boxNumber: number, deliveryId: string, version: number) => {
+    return allocateMutation.mutateAsync({ boxNumber, deliveryId, version });
   };
 
   const removeFromBox = (boxNumber: number) => {

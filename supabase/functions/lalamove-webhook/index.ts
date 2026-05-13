@@ -1,10 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-lalamove-signature',
-};
+import { log } from "../_shared/logger.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -92,11 +89,27 @@ serve(async (req) => {
     }
 
     const webhookData = JSON.parse(payload);
-    const { eventType, data } = webhookData;
+    const { eventType, data, eventId } = webhookData;
+    const finalEventId = eventId || data?.orderId || crypto.randomUUID();
 
-    console.log(`Processing webhook event: ${eventType}`, data);
+    log('INFO', 'Processing Lalamove webhook', { eventType, eventId: finalEventId });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Idempotency check
+    const { data: existingEvent } = await supabase
+      .from('webhook_events_processed')
+      .select('id')
+      .eq('event_id', finalEventId)
+      .eq('provider', 'lalamove')
+      .maybeSingle();
+
+    if (existingEvent) {
+      log('INFO', 'Webhook already processed, skipping', { eventId: finalEventId });
+      return new Response(JSON.stringify({ success: true, message: 'Already processed' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     switch (eventType) {
       case 'ORDER_STATUS_CHANGED': {
@@ -204,16 +217,23 @@ serve(async (req) => {
       }
 
       default:
-        console.log(`Unhandled event type: ${eventType}`);
+        log('WARN', `Unhandled event type: ${eventType}`);
     }
+
+    // Mark as processed
+    await supabase.from('webhook_events_processed').insert({
+      event_id: finalEventId,
+      provider: 'lalamove',
+      payload: webhookData
+    });
 
     return new Response(JSON.stringify({ success: true, eventType }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error: unknown) {
-    console.error('Webhook processing error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
+    log('ERROR', 'Webhook processing error', { error: message });
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

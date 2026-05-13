@@ -42,6 +42,7 @@ const filterConfig: FilterConfig<BoxData> = {
 function PendingDeliveryCard({ delivery }: { delivery: DeliveryWithRelations }) {
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("deliveryId", delivery.id);
+    e.dataTransfer.setData("version", delivery.version.toString());
     e.dataTransfer.effectAllowed = "move";
   };
 
@@ -105,9 +106,9 @@ export default function GestaoBox() {
   const occupancyRate = boxes.length > 0 ? Math.round((occupiedCount / boxes.length) * 100) : 0;
 
   const handleBoxClick = (box: BoxData) => { setSelectedBox(box); setIsModalOpen(true); };
-  const handleDrop = async (boxNumber: number, deliveryId: string) => { 
+  const handleDrop = async (boxNumber: number, deliveryId: string, version: number) => { 
     playAction();
-    await allocateToBox(boxNumber, deliveryId); 
+    await allocateToBox(boxNumber, deliveryId, version); 
   };
   const handleRemoveFromBox = async (boxNumber: number) => { 
     playAction();
@@ -142,7 +143,7 @@ export default function GestaoBox() {
     if (delivery) {
       const freeBox = boxes.find(b => !b.isOccupied);
       if (freeBox) {
-        await allocateToBox(freeBox.number, delivery.id);
+        await allocateToBox(freeBox.number, delivery.id, delivery.version);
         setScanValue("");
       } else {
         toast.error("Nenhum box livre disponível");
@@ -169,7 +170,7 @@ export default function GestaoBox() {
 
     try {
       for (let i = 0; i < toAllocate; i++) {
-        await allocateToBox(freeBoxes[i].number, pendingDeliveries[i].id);
+        await allocateToBox(freeBoxes[i].number, pendingDeliveries[i].id, pendingDeliveries[i].version);
       }
       toast.success("Alocação inteligente concluída", { id: loadingToast });
     } catch (error) {

@@ -1,9 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { log } from "../_shared/logger.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -33,22 +31,25 @@ serve(async (req) => {
           );
         }
 
-        const response = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instance}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': EVOLUTION_API_KEY,
-          },
-          body: JSON.stringify({
-            number: phone.replace(/\D/g, ''),
-            text: message,
-          }),
-        });
+        const result = await withCircuitBreaker('whatsapp-api', async () => {
+          const response = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instance}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': EVOLUTION_API_KEY,
+            },
+            body: JSON.stringify({
+              number: phone.replace(/\D/g, ''),
+              text: message,
+            }),
+          });
 
-        const result = await response.json();
-        if (!response.ok) {
-          throw new Error(`Evolution API error [${response.status}]: ${JSON.stringify(result)}`);
-        }
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(`Evolution API error [${response.status}]: ${JSON.stringify(data)}`);
+          }
+          return data;
+        });
 
         return new Response(
           JSON.stringify({ success: true, data: result }),
@@ -121,11 +122,18 @@ serve(async (req) => {
         );
     }
   } catch (error) {
-    console.error('Evolution WhatsApp error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isCircuitOpen = errorMessage.includes('Circuit Breaker');
+    
+    log('ERROR', 'Evolution WhatsApp error', { error: errorMessage, action });
+    
     return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        success: false, 
+        error: errorMessage,
+        circuitOpen: isCircuitOpen
+      }),
+      { status: isCircuitOpen ? 503 : 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
