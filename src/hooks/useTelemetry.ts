@@ -17,12 +17,17 @@ export function useTelemetry() {
 
   const logTelemetry = async (log: TelemetryLog) => {
     try {
+      const requestId = crypto.randomUUID();
       const { error } = await supabase.from('telemetry_logs').insert({
         severity: log.severity,
         category: log.category,
         message: log.message,
         stack_trace: log.stack_trace,
-        metadata: log.metadata || {},
+        metadata: {
+          ...log.metadata,
+          requestId,
+          timestamp: new Date().toISOString()
+        },
         user_id: user?.id,
         url: log.url || window.location.href,
         device_info: {
@@ -34,19 +39,27 @@ export function useTelemetry() {
       });
 
       if (error) {
-        console.error('Failed to send telemetry:', error);
+        // Fallback to error_events if telemetry_logs fails
+        await supabase.from('error_events').insert({
+          user_id: user?.id,
+          error_message: log.message,
+          stack_trace: log.stack_trace,
+          severity: log.severity,
+          context: { ...log.metadata, requestId, source: 'telemetry_fallback' }
+        });
       }
     } catch (err) {
-      console.error('Telemetry error:', err);
+      console.error('Telemetry critical failure:', err);
     }
   };
 
   const logError = (message: string, error?: any, category: string = 'frontend_error') => {
+    const stack_trace = error instanceof Error ? error.stack : JSON.stringify(error);
     logTelemetry({
       severity: 'error',
       category,
       message,
-      stack_trace: error instanceof Error ? error.stack : JSON.stringify(error),
+      stack_trace,
       metadata: { error_details: error },
     });
   };

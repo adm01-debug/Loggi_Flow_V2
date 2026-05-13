@@ -1,10 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders } from "../_shared/cors.ts";
+import { log } from "../_shared/logger.ts";
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -84,7 +82,9 @@ export const handler = async (req: Request) => {
         if (reportData.recipients && reportData.recipients.length > 0) {
           const resendApiKey = Deno.env.get("RESEND_API_KEY");
           if (resendApiKey) {
-            await sendReportEmail(reportData.recipients, report, resendApiKey);
+            await withCircuitBreaker('resend-api', async () => {
+              await sendReportEmail(reportData.recipients, report, resendApiKey);
+            });
           }
         }
 

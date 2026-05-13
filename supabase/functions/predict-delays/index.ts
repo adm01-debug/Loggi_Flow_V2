@@ -2,6 +2,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
+
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
 export const handler = async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -141,28 +144,33 @@ Retorne um JSON array com as previsões (máximo 10 itens mais críticos):
 
 Retorne APENAS o JSON, sem markdown ou explicações.`;
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.0-flash',
-        messages: [
-          {
-            role: 'system',
-            content: 'Você é um especialista em logística que analisa dados e prevê atrasos. Sempre responda em JSON válido.',
-          },
-          { role: 'user', content: prompt },
-        ],
-        temperature: 0.3,
-      }),
+    const aiResponse = await withCircuitBreaker('ai-gateway', async () => {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.0-flash',
+          messages: [
+            {
+              role: 'system',
+              content: 'Você é um especialista em logística que analisa dados e prevê atrasos. Sempre responda em JSON válido.',
+            },
+            { role: 'user', content: prompt },
+          ],
+          temperature: 0.3,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`AI Gateway error: ${response.status}`);
+      }
+      return await response.json();
     });
 
-    if (!aiResponse.ok) throw new Error(`AI Gateway error: ${aiResponse.status}`);
-
-    const aiData = await aiResponse.json();
+    const aiData = aiResponse;
     const content = aiData.choices?.[0]?.message?.content || '[]';
     
     let predictions = [];

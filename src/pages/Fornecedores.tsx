@@ -61,9 +61,19 @@ export default function Fornecedores() {
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["fornecedores"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("fornecedores").select("*").order("razao_social");
+      const { data, error } = await supabase
+        .from("fornecedores")
+        .select("*")
+        .is("deleted_at", null)
+        .order("razao_social");
+      
       if (error) throw error;
-      const { data: coletas } = await supabase.from("coletas").select("fornecedor_id, status, created_at");
+      
+      const { data: coletas } = await supabase
+        .from("coletas")
+        .select("fornecedor_id, status, created_at")
+        .is("deleted_at", null);
+        
       return (data || []).map((f) => {
         const fc = coletas?.filter((c) => c.fornecedor_id === f.id) || [];
         const pend = fc.filter((c) => ["aguardando_liberacao","solicitada","em_transito"].includes(c.status)).length;
@@ -98,15 +108,21 @@ export default function Fornecedores() {
   });
 
   const deleteMut = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("fornecedores").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); setDlgDel(false); setSel(null); toast.success("Fornecedor excluído!"); },
-    onError: (e) => toast.error("Erro: " + e.message),
+    mutationFn: async (id: string) => { 
+      const { error } = await supabase.from("fornecedores").update({ deleted_at: new Date().toISOString() }).eq("id", id); 
+      if (error) throw error; 
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); setDlgDel(false); setSel(null); toast.success("Fornecedor movido para lixeira!"); },
+    onError: (e) => toast.error("Erro ao remover: " + e.message),
   });
 
   const bulkDeleteMut = useMutation({
-    mutationFn: async (ids: string[]) => { const { error } = await supabase.from("fornecedores").delete().in("id", ids); if (error) throw error; },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); clearSelection(); toast.success(`${selectedIds.length} fornecedor(es) excluído(s)!`); },
-    onError: (e) => toast.error("Erro: " + e.message),
+    mutationFn: async (ids: string[]) => { 
+      const { error } = await supabase.from("fornecedores").update({ deleted_at: new Date().toISOString() }).in("id", ids); 
+      if (error) throw error; 
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["fornecedores"] }); clearSelection(); toast.success(`${selectedIds.length} fornecedor(es) movidos para lixeira!`); },
+    onError: (e) => toast.error("Erro ao remover: " + e.message),
   });
 
   const openEdit = (f: Fornecedor) => { setSel(f); setForm({ razao_social: f.razao_social, nome_fantasia: f.nome_fantasia || "", cnpj: f.cnpj || "", endereco_completo: f.endereco_completo, cidade: f.cidade || "", estado: f.estado || "", cep: f.cep || "", contato_nome: f.contato_nome || "", contato_email: f.contato_email || "", contato_telefone: f.contato_telefone || "" }); setDlgEdit(true); };

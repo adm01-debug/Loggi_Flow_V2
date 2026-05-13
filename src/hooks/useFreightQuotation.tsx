@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { QUERY_STALE_TIME } from '@/lib/queryConfig';
+import { Decimal } from 'decimal.js';
 
 export interface TabelaFrete {
   id: string;
@@ -100,19 +101,26 @@ export const useFreightQuotation = () => {
 
     if (matchingTables.length === 0) return [];
 
-    const quotations: QuotationResult[] = matchingTables.map((t) => ({
-      transportadora_id: t.transportadora_id,
-      transportadora_nome: t.transportadora?.nome_fantasia || 'N/A',
-      score_performance: t.transportadora?.score_performance || 0,
-      valor_total: t.taxa_fixa + (t.preco_por_kg * request.peso_kg),
-      preco_por_kg: t.preco_por_kg,
-      taxa_fixa: t.taxa_fixa,
-      prazo_dias: t.prazo_dias,
-      regiao_destino: t.regiao_destino,
-      melhor_preco: false,
-      melhor_prazo: false,
-      melhor_custo_beneficio: false,
-    }));
+    const quotations: QuotationResult[] = matchingTables.map((t) => {
+      const precoPorKg = new Decimal(t.preco_por_kg);
+      const pesoKg = new Decimal(request.peso_kg);
+      const taxaFixa = new Decimal(t.taxa_fixa);
+      const valorTotal = taxaFixa.plus(precoPorKg.times(pesoKg)).toNumber();
+
+      return {
+        transportadora_id: t.transportadora_id,
+        transportadora_nome: t.transportadora?.nome_fantasia || 'N/A',
+        score_performance: t.transportadora?.score_performance || 0,
+        valor_total: valorTotal,
+        preco_por_kg: t.preco_por_kg,
+        taxa_fixa: t.taxa_fixa,
+        prazo_dias: t.prazo_dias,
+        regiao_destino: t.regiao_destino,
+        melhor_preco: false,
+        melhor_prazo: false,
+        melhor_custo_beneficio: false,
+      };
+    });
 
     // Sort by total value
     quotations.sort((a, b) => a.valor_total - b.valor_total);

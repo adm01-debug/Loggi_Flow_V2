@@ -50,6 +50,10 @@ export function useDelayPrediction() {
         throw new Error(data.error);
       }
 
+      if (data.circuitOpen) {
+        throw new Error('Circuit Breaker: O serviço de análise preditiva está temporariamente suspenso devido a falhas recorrentes.');
+      }
+
       setPredictions(data.predictions || []);
       setSummary(data.summary || null);
       setLastAnalyzed(data.analyzed_at);
@@ -84,6 +88,8 @@ export function useDelayPrediction() {
         toast.error('Limite de requisições excedido. Aguarde alguns minutos.');
       } else if (message.includes('402') || message.includes('Créditos')) {
         toast.error('Créditos de IA esgotados. Adicione créditos no workspace.');
+      } else if (message.includes('Circuit Breaker')) {
+        toast.error('Serviço de IA temporariamente indisponível (Resiliência Ativa)');
       } else {
         toast.error(`Erro na análise: ${message}`);
       }

@@ -22,6 +22,7 @@ interface Despacho {
   transportadora?: string;
   nf_remessa?: string | null;
   box_alocado?: string | null;
+  version: number;
   created_at: string;
 }
 
@@ -64,8 +65,9 @@ export default function Despachos() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("entregas")
-        .select("id, numero_entrega, status, nf_remessa, box_alocado, endereco_entrega, created_at, cliente:clientes(razao_social, nome_fantasia), transportadora:transportadoras(nome_fantasia)")
+        .select("id, numero_entrega, status, nf_remessa, box_alocado, version, endereco_entrega, created_at, cliente:clientes(razao_social, nome_fantasia), transportadora:transportadoras(nome_fantasia)")
         .in("status", ["pronto_despacho", "cotacao_frete", "nf_emitida", "despachado"])
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
@@ -79,6 +81,7 @@ export default function Despachos() {
         transportadora: (d.transportadora as Record<string, string>)?.nome_fantasia,
         nf_remessa: d.nf_remessa as string | undefined,
         box_alocado: d.box_alocado as string | undefined,
+        version: d.version as number,
         created_at: d.created_at as string,
       })) as Despacho[];
     },
@@ -114,14 +117,14 @@ export default function Despachos() {
       return;
     }
 
-    await supabase.from("entregas").update({ status: nextStatus as any }).eq("id", item.id);
+    await supabase.from("entregas").update({ status: nextStatus as any }).eq("id", item.id).eq("version", item.version);
     toast.success(`Movido para ${statusConfig[nextStatus]?.label || nextStatus}`);
     refetch();
   };
 
   const confirmDispatch = async () => {
     if (!confirmItem) return;
-    await supabase.from("entregas").update({ status: "despachado" as any, data_despacho: new Date().toISOString() }).eq("id", confirmItem.id);
+    await supabase.from("entregas").update({ status: "despachado" as any, data_despacho: new Date().toISOString() }).eq("id", confirmItem.id).eq("version", confirmItem.version);
     toast.success("Entrega despachada com sucesso!");
     setConfirmItem(null);
     refetch();
