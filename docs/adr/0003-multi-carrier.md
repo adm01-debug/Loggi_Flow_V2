@@ -1,15 +1,15 @@
-# ADR 0003: Integração Multi-Transportadoras
+# ADR 0003: Integração Multi-Carrier (Multi-Transportadora)
 
-## Status
-Aceito (Meta 10/10)
+## Data: 2026-05-13
+## Status: Aceito
 
 ## Contexto
-Necessidade de integrar Lalamove, Rodonaves e Melhor Envio simultaneamente.
+Necessidade de orquestrar múltiplos provedores de frete (Lalamove, Rodonaves, Melhor Envio) com regras de negócio distintas.
 
 ## Decisão
-- Abstração via Hooks Customizados (`useLalamove`, `useRodonaves`).
-- Webhooks centralizados com persistência de eventos para garantir idempotência.
-- Central de rastreio unificada.
+- Criar uma camada de serviços (`src/integrations/`) que padroniza o input/output de cada transportadora.
+- Utilizar Edge Functions para processamento de webhooks e chamadas pesadas de API, garantindo segurança das chaves API.
+- Persistir eventos de rastreio em esquema unificado para visualização centralizada.
 
 ## Consequências
-- Flexibilidade para adicionar novas transportadoras sem quebrar o core do sistema.
+- Facilidade em adicionar novos provedores sem alterar o core da interface de rastreamento.
