@@ -1,16 +1,15 @@
-# ADR 0003: Arquitetura Multi-Transportadora
+# ADR 0003: Integração Multi-Transportadoras
 
 ## Status
-Aceito
+Aceito (Meta 10/10)
 
 ## Contexto
-Necessidade de suportar múltiplos provedores logísticos (Lalamove, Rodonaves, Melhor Envio) com APIs distintas.
+Necessidade de integrar Lalamove, Rodonaves e Melhor Envio simultaneamente.
 
 ## Decisão
-- **Service Pattern:** Criar serviços isolados em `src/integrations/`.
-- **Hooks de Abstração:** Utilizar hooks como `useCarrierRates` para abstrair a complexidade da transportadora para a UI.
-- **Normalização:** Converter payloads de APIs externas para uma interface interna comum de 'Entrega' e 'Cotação'.
+- Abstração via Hooks Customizados (`useLalamove`, `useRodonaves`).
+- Webhooks centralizados com persistência de eventos para garantir idempotência.
+- Central de rastreio unificada.
 
 ## Consequências
-- Facilidade para adicionar novas transportadoras.
-- UI desacoplada das implementações específicas das APIs.
+- Flexibilidade para adicionar novas transportadoras sem quebrar o core do sistema.
