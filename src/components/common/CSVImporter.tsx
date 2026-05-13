@@ -40,8 +40,9 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
 
       setResult(importResult);
       setProgress(50);
-    } catch (err: any) {
-      toast.error(`Erro ao ler arquivo: ${err.message}`);
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(`Erro ao ler arquivo: ${error.message}`);
     } finally {
       setIsImporting(false);
     }
@@ -58,15 +59,16 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
           const jsonData = XLSX.utils.sheet_to_json(sheet);
           
           const success: T[] = [];
-          const errors: any[] = [];
+          const errors: { row: number; field: string; error: string }[] = [];
 
-          jsonData.forEach((row: any, index: number) => {
+          jsonData.forEach((row: unknown, index: number) => {
             try {
+              const rowData = row as Record<string, unknown>;
               // Normalize headers to snake_case if they aren't
-              const normalizedRow: any = {};
-              Object.keys(row).forEach(key => {
+              const normalizedRow: Record<string, unknown> = {};
+              Object.keys(rowData).forEach(key => {
                 const normKey = key.trim().toLowerCase().replace(/\s+/g, '_');
-                normalizedRow[normKey] = row[key];
+                normalizedRow[normKey] = rowData[key];
               });
 
               const validated = schema.parse(normalizedRow);
