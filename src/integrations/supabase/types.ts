@@ -2332,6 +2332,7 @@ export type Database = {
           status: string
           updated_at: string | null
           valor_estorno: number | null
+          version: number | null
         }
         Insert: {
           cliente_id?: string | null
@@ -2346,6 +2347,7 @@ export type Database = {
           status?: string
           updated_at?: string | null
           valor_estorno?: number | null
+          version?: number | null
         }
         Update: {
           cliente_id?: string | null
@@ -2360,6 +2362,7 @@ export type Database = {
           status?: string
           updated_at?: string | null
           valor_estorno?: number | null
+          version?: number | null
         }
         Relationships: [
           {
