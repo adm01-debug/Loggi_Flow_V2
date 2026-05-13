@@ -686,12 +686,35 @@ Deno.serve(async (req) => {
         const peso = requireNumber(params, "peso", { min: 0.01, max: 100000 });
         const volumes = requireNumber(params, "volumes", { min: 1, max: 10000 });
         const valorMercadoria = requireNumber(params, "valorMercadoria", { min: 0 });
+        
+        // Try cache first
+        const redis = getRedisClient();
+        const cacheKey = `rodonaves_quote_${cepOrigem}_${cepDestino}_${peso}_${volumes}_${valorMercadoria}`;
+        if (redis) {
+          const cached = await redis.get(cacheKey);
+          if (cached) {
+            console.log(`[Cache] Cache hit for ${cacheKey}`);
+            return corsResponse(cached, { 'X-Cache': 'HIT' });
+          }
+        }
+
         result = await simulateQuotation({
           cepOrigem, cepDestino, peso, volumes, valorMercadoria,
           cnpjRemetente: params.cnpjRemetente || cnpjDefault,
         });
+
+        // Store in cache
+        if (redis) {
+          await redis.set(cacheKey, result, { ex: 600 }); // 10 minutes
+        }
+        
+        // Return with cache miss header if we have result
+        if (result) {
+          return corsResponse(result, { 'X-Cache': 'MISS' });
+        }
         break;
       }
+
 
       case "generate-quotation": {
         result = await generateQuotation({ body: params.body });
