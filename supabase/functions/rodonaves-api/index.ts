@@ -2,6 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { requireString, requireNumber, ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 
 // Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
@@ -10,6 +11,12 @@ const DEADLINE_GATEWAY = "https://01wapi.rte.com.br";
 const PICKUP_GATEWAY = "https://pickup-apigateway.rte.com.br";
 const CUSTOMER_GATEWAY = "https://customer-apigateway.rte.com.br";
 const SELFATTENDANCE_GATEWAY = "https://01wapi.rte.com.br";
+
+const rodonavesBreaker = getCircuitBreaker('rodonaves', {
+  failureThreshold: 10,
+  resetTimeout: 60000, // 1 minute
+});
+
 
 // Token cache (in-memory per isolate)
 const tokenCache: Record<string, { token: string; expiresAt: number }> = {};
