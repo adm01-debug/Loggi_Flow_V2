@@ -1727,6 +1727,7 @@ export type Database = {
           user_id: string
           valor_cotado: number | null
           valor_mercadoria: number | null
+          version: number | null
           volumes: number | null
         }
         Insert: {
@@ -1748,6 +1749,7 @@ export type Database = {
           user_id: string
           valor_cotado?: number | null
           valor_mercadoria?: number | null
+          version?: number | null
           volumes?: number | null
         }
         Update: {
@@ -1769,6 +1771,7 @@ export type Database = {
           user_id?: string
           valor_cotado?: number | null
           valor_mercadoria?: number | null
+          version?: number | null
           volumes?: number | null
         }
         Relationships: [
