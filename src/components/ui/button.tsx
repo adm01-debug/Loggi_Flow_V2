@@ -99,6 +99,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       } else {
         setInternalState(loading || false);
       }
+      return undefined;
     }, [loading]);
 
     const createRipple = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
