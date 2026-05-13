@@ -2,6 +2,8 @@
   "imports": {
     "zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
     "@/schemas/": "./_shared/schemas/",
-    "@/shared/": "./_shared/"
+    "@/shared/": "./_shared/",
+    "redis": "https://esm.sh/@upstash/redis@1.25.0"
+
   }
 }
