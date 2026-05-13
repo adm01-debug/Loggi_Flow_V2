@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Users, MapPin, ListOrdered, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -102,15 +101,24 @@ export function RTECustomerManager() {
 
           <TabsContent value="search" className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Nome/Razão Social</Label><Input value={searchKey} onChange={e => setSearchKey(e.target.value)} placeholder="Buscar por nome..." /></div>
-              <div><Label>CNPJ/CPF</Label><Input value={searchTaxId} onChange={e => setSearchTaxId(e.target.value)} placeholder="00.000.000/0000-00" /></div>
+              <div>
+                <Label>Nome/Razão Social</Label>
+                <Input value={searchKey} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchKey(e.target.value)} placeholder="Buscar por nome..." />
+              </div>
+              <div>
+                <Label>CNPJ/CPF</Label>
+                <Input value={searchTaxId} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTaxId(e.target.value)} placeholder="00.000.000/0000-00" />
+              </div>
             </div>
             <div className="flex gap-2 flex-wrap">
               <Button onClick={handleSearch}><Search className="w-4 h-4 mr-2" />Buscar</Button>
               <Button variant="outline" onClick={handleSearchFull}><Users className="w-4 h-4 mr-2" />Busca Completa</Button>
             </div>
             <div className="flex gap-2 items-end border-t pt-3">
-              <div className="w-40"><Label>ID do Cliente</Label><Input value={searchById} onChange={e => setSearchById(e.target.value)} type="number" placeholder="Ex: 12345" /></div>
+              <div className="w-40">
+                <Label>ID do Cliente</Label>
+                <Input value={searchById} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchById(e.target.value)} type="number" placeholder="Ex: 12345" />
+              </div>
               <Button variant="outline" size="sm" onClick={() => { if (searchById) { /* getCustomerById */ } }}><Search className="w-3 h-3 mr-1" />Buscar por ID</Button>
             </div>
             {customers.length > 0 && (
@@ -131,15 +139,24 @@ export function RTECustomerManager() {
 
           <TabsContent value="list" className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Alterados desde *</Label><Input type="date" value={listDate} onChange={e => setListDate(e.target.value)} /></div>
-              <div><Label>Página</Label><Input type="number" value={listPage} onChange={e => setListPage(parseInt(e.target.value) || 1)} min={1} /></div>
+              <div>
+                <Label>Alterados desde *</Label>
+                <Input type="date" value={listDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setListDate(e.target.value)} />
+              </div>
+              <div>
+                <Label>Página</Label>
+                <Input type="number" value={listPage} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setListPage(parseInt(e.target.value) || 1)} min={1} />
+              </div>
             </div>
             <Button onClick={handleList}><ListOrdered className="w-4 h-4 mr-2" />Listar Clientes</Button>
           </TabsContent>
 
           <TabsContent value="addresses" className="space-y-4">
             <div className="flex gap-2 items-end">
-              <div className="flex-1"><Label>CNPJ/CPF do Cliente *</Label><Input value={addressTaxId} onChange={e => setAddressTaxId(e.target.value)} placeholder="00.000.000/0000-00" /></div>
+              <div className="flex-1">
+                <Label>CNPJ/CPF do Cliente *</Label>
+                <Input value={addressTaxId} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAddressTaxId(e.target.value)} placeholder="00.000.000/0000-00" />
+              </div>
               <Button onClick={handleListAddresses}><MapPin className="w-4 h-4 mr-2" />Buscar Endereços</Button>
               <Button variant="outline" onClick={() => setShowNewAddress(true)}><Plus className="w-4 h-4 mr-2" />Novo</Button>
             </div>
