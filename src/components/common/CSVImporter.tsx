@@ -40,8 +40,9 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
 
       setResult(importResult);
       setProgress(50);
-    } catch (err: any) {
-      toast.error(`Erro ao ler arquivo: ${err.message}`);
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(`Erro ao ler arquivo: ${error.message}`);
     } finally {
       setIsImporting(false);
     }
