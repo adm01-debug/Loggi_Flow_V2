@@ -202,45 +202,6 @@ export type Database = {
       audit_logs: {
         Row: {
           action: string
-          created_at: string
-          entity_id: string
-          entity_type: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          user_agent: string | null
-          user_id: string | null
-        }
-        Insert: {
-          action: string
-          created_at?: string
-          entity_id: string
-          entity_type: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          user_agent?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          action?: string
-          created_at?: string
-          entity_id?: string
-          entity_type?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          user_agent?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_old: {
-        Row: {
-          action: string
           changed_fields: string[] | null
           created_at: string
           id: string
@@ -289,468 +250,576 @@ export type Database = {
       audit_logs_y2026m01: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m02: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m03: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m04: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m05: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m06: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m07: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m08: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m09: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m10: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m11: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
       audit_logs_y2026m12: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string
-          entity_id: string
-          entity_type: string
           id: string
           ip_address: string | null
           new_data: Json | null
           old_data: Json | null
+          record_id: string
+          table_name: string
           user_agent: string | null
+          user_email: string | null
           user_id: string | null
+          user_name: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id: string
-          entity_type: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id: string
+          table_name: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string
-          entity_id?: string
-          entity_type?: string
           id?: string
           ip_address?: string | null
           new_data?: Json | null
           old_data?: Json | null
+          record_id?: string
+          table_name?: string
           user_agent?: string | null
+          user_email?: string | null
           user_id?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
