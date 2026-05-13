@@ -103,7 +103,7 @@ export default function Ranking() {
             <div className="relative flex items-center gap-4">
               <div className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground font-bold text-xl shadow-lg">{currentUserRank.rank}º</div>
               <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
-                {currentUserRank.avatar ? <img src={currentUserRank.avatar} className="w-12 h-12 rounded-full object-cover" /> : <span className="text-xl font-bold text-primary">{currentUserRank.name.charAt(0)}</span>}
+                {currentUserRank.avatar ? <img src={currentUserRank.avatar} alt={`Avatar de ${currentUserRank.name}`} className="w-12 h-12 rounded-full object-cover" /> : <span className="text-xl font-bold text-primary">{currentUserRank.name.charAt(0)}</span>}
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-lg">{currentUserRank.name} <Badge variant="secondary" className="ml-2">Você</Badge></p>
