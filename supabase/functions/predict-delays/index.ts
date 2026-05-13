@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
@@ -12,6 +13,14 @@ export const handler = async (req: Request) => {
   }
 
   try {
+    const { allowed, remaining } = await checkRateLimit(req, 'predict-delays', { maxRequests: 20 });
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
