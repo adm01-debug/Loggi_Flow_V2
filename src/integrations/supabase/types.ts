@@ -199,6 +199,39 @@ export type Database = {
         }
         Relationships: []
       }
+      architecture_decisions: {
+        Row: {
+          consequences: string | null
+          context: string | null
+          created_at: string | null
+          decision: string | null
+          id: string
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          consequences?: string | null
+          context?: string | null
+          created_at?: string | null
+          decision?: string | null
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          consequences?: string | null
+          context?: string | null
+          created_at?: string | null
+          decision?: string | null
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
