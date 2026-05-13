@@ -158,8 +158,8 @@ export function FreightAudit() {
                   </div>
                   <div>
                     <p className="text-xs uppercase text-muted-foreground font-semibold">Diferença</p>
-                    <p className={`text-xl font-bold ${auditResult.diff > 0 ? 'text-destructive' : 'text-success'}`}>
-                      {formatCurrency(auditResult.diff)} ({auditResult.diffPercent.toFixed(1)}%)
+                    <p className={`text-xl font-bold ${(auditResult.diff ?? 0) > 0 ? 'text-destructive' : 'text-success'}`}>
+                      {formatCurrency(auditResult.diff ?? 0)} ({(auditResult.diffPercent ?? 0).toFixed(1)}%)
                     </p>
                   </div>
                 </div>
