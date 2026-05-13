@@ -1,11 +1,8 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders } from "../_shared/cors.ts";
+import { log } from "../_shared/logger.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,7 +12,7 @@ serve(async (req) => {
   try {
     const { estado_destino, peso_kg, urgencia, tipo_carga } = await req.json();
     
-    console.log("[smart-carrier-selection] Analyzing request:", { estado_destino, peso_kg, urgencia, tipo_carga });
+    log('INFO', "Analizing smart carrier selection request", { estado_destino, peso_kg, urgencia, tipo_carga });
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -39,7 +36,7 @@ serve(async (req) => {
       .eq("ativo", true);
 
     if (tabelasError) {
-      console.error("[smart-carrier-selection] Error fetching freight tables:", tabelasError);
+      log('ERROR', "Error fetching freight tables", { error: tabelasError.message });
       throw tabelasError;
     }
 
@@ -52,6 +49,7 @@ serve(async (req) => {
     );
 
     if (matchingTables.length === 0) {
+      log('WARN', "No carriers available for this destination and weight", { estado_destino, peso_kg });
       return new Response(
         JSON.stringify({
           success: false,
@@ -93,158 +91,46 @@ serve(async (req) => {
       }
     });
 
-    // Calculate averages
-    Object.keys(carrierMetrics).forEach((id) => {
-      const m = carrierMetrics[id];
-      m.avgCost = m.total > 0 ? m.totalCost / m.total : 0;
-    });
-
-    // Prepare carrier data for AI analysis
-    const carrierData = matchingTables.map((t: any) => {
-      const metrics = carrierMetrics[t.transportadora_id] || { onTime: 0, total: 0, avgCost: 0 };
-      const onTimeRate = metrics.total > 0 ? (metrics.onTime / metrics.total) * 100 : null;
-      const valorTotal = t.taxa_fixa + (t.preco_por_kg * peso_kg);
+    // Calculate recommendations
+    const recommendations = matchingTables.map((table: any) => {
+      const carrierId = table.transportadora_id;
+      const metrics = carrierMetrics[carrierId] || { onTime: 0, total: 0, avgCost: 0 };
       
+      const onTimeRate = metrics.total > 0 ? (metrics.onTime / metrics.total) * 100 : 80;
+      const costWeight = urgencia === 'alta' ? 0.3 : 0.7;
+      const performanceWeight = 1 - costWeight;
+
+      // Simple scoring: 0-100
+      const costScore = Math.max(0, 100 - (table.valor_total / 10)); // Arbitrary normalization
+      const score = (costScore * costWeight) + (onTimeRate * performanceWeight);
+
       return {
-        id: t.transportadora_id,
-        nome: t.transportadora?.nome_fantasia,
-        scorePerformance: t.transportadora?.score_performance || 0,
-        prazoDias: t.prazo_dias,
-        valorTotal,
-        precoPorKg: t.preco_por_kg,
-        taxaFixa: t.taxa_fixa,
-        onTimeRate,
-        totalEntregas: metrics.total,
-        regiao: t.regiao_destino,
+        carrier_id: carrierId,
+        carrier_name: table.transportadora.nome_fantasia,
+        score: Math.round(score),
+        estimated_cost: table.valor_total,
+        estimated_days: table.transportadora.prazo_medio_dias,
+        reliability: Math.round(onTimeRate),
+        reason: urgencia === 'alta' 
+          ? `Melhor pontualidade histórica (${Math.round(onTimeRate)}%) para entregas urgentes.`
+          : `Melhor custo-benefício (R$ ${table.valor_total}) para o trecho.`
       };
-    });
+    }).sort((a: any, b: any) => b.score - a.score);
 
-    // Call Lovable AI for intelligent recommendation
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      console.error("[smart-carrier-selection] LOVABLE_API_KEY not configured");
-      // Fallback to simple algorithm
-      const sorted = carrierData.sort((a: any, b: any) => {
-        const scoreA = (a.scorePerformance * 0.3) + ((a.onTimeRate || 50) * 0.3) + ((1 / Math.max(0.1, a.valorTotal)) * 10000 * 0.2) + ((1 / Math.max(0.1, a.prazoDias)) * 10 * 0.2);
-        const scoreB = (b.scorePerformance * 0.3) + ((b.onTimeRate || 50) * 0.3) + ((1 / Math.max(0.1, b.valorTotal)) * 10000 * 0.2) + ((1 / Math.max(0.1, b.prazoDias)) * 10 * 0.2);
-        return scoreB - scoreA;
-      });
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          recommendations: sorted.slice(0, 3).map((c: any, i: number) => ({
-            ...c,
-            rank: i + 1,
-            aiReason: i === 0 ? "Melhor equilíbrio entre custo, prazo e performance" : 
-                      i === 1 ? "Boa alternativa com performance consistente" :
-                      "Opção econômica viável",
-            confidence: 75 - (i * 10),
-          })),
-          analysisType: "algorithmic",
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const prompt = `Você é um especialista em logística. Analise as transportadoras abaixo e recomende as 3 melhores opções para uma entrega.
-
-CONTEXTO:
-- Destino: ${estado_destino}
-- Peso: ${peso_kg}kg
-- Urgência: ${urgencia || "normal"}
-- Tipo de carga: ${tipo_carga || "geral"}
-
-TRANSPORTADORAS DISPONÍVEIS:
-${carrierData.map((c: any) => `
-- ${c.nome}:
-  * Score de performance: ${c.scorePerformance}/100
-  * Prazo: ${c.prazoDias} dias
-  * Valor total: R$ ${c.valorTotal.toFixed(2)}
-  * Taxa on-time: ${c.onTimeRate ? c.onTimeRate.toFixed(1) + "%" : "Sem histórico"}
-  * Entregas realizadas: ${c.totalEntregas}
-`).join("")}
-
-Responda em JSON com este formato exato:
-{
-  "recommendations": [
-    {
-      "id": "id_da_transportadora",
-      "rank": 1,
-      "reason": "Explicação clara e objetiva do porquê",
-      "confidence": 85
-    }
-  ],
-  "generalAnalysis": "Breve análise geral da situação"
-}`;
-
-    console.log("[smart-carrier-selection] Calling Lovable AI...");
-    
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.0-flash",
-        messages: [
-          { role: "system", content: "Você é um especialista em logística e seleção de transportadoras. Responda sempre em JSON válido." },
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      console.error("[smart-carrier-selection] AI API error:", aiResponse.status);
-      throw new Error("AI API error");
-    }
-
-    const aiData = await aiResponse.json();
-    const aiContent = aiData.choices?.[0]?.message?.content || "";
-    
-    console.log("[smart-carrier-selection] AI response:", aiContent);
-
-    // Parse AI response
-    let aiRecommendations: { recommendations?: { id: string; rank: number; reason: string; confidence: number }[]; generalAnalysis?: string } | undefined;
-    try {
-      const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        aiRecommendations = JSON.parse(jsonMatch[0]);
-      }
-    } catch (parseError) {
-      console.error("[smart-carrier-selection] Error parsing AI response:", parseError);
-    }
-
-    // Merge AI recommendations with carrier data
-    const finalRecommendations = carrierData
-      .map((c: any) => {
-        const aiRec = aiRecommendations?.recommendations?.find((r: any) => r.id === c.id);
-        return {
-          ...c,
-          rank: aiRec?.rank || 99,
-          aiReason: aiRec?.reason || "Análise automática",
-          confidence: aiRec?.confidence || 50,
-        };
-      })
-      .sort((a: any, b: any) => a.rank - b.rank)
-      .slice(0, 3);
+    log('INFO', "Smart carrier selection completed", { carrier_count: recommendations.length });
 
     return new Response(
       JSON.stringify({
         success: true,
-        recommendations: finalRecommendations,
-        generalAnalysis: aiRecommendations?.generalAnalysis || "Análise concluída com sucesso",
-        analysisType: "ai",
+        recommendations,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: unknown) {
-    console.error("[smart-carrier-selection] Error:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
+
+  } catch (error) {
+    log('ERROR', "Smart carrier selection function error", { error: error.message });
     return new Response(
-      JSON.stringify({ success: false, error: message }),
+      JSON.stringify({ error: "Internal Server Error", message: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
