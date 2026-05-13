@@ -9,6 +9,17 @@ import { FileCheck, AlertTriangle, CheckCircle2, Search, Calculator } from 'luci
 import { formatCurrency } from '@/lib/formatters';
 import { useFreightQuotation } from '@/hooks/useFreightQuotation';
 import { toast } from 'sonner';
+import { Decimal } from 'decimal.js';
+
+interface AuditResult {
+  status: 'success' | 'warning' | 'error';
+  message?: string;
+  expected?: number;
+  charged?: number;
+  diff?: number;
+  diffPercent?: number;
+  transportadora?: string;
+}
 
 export function FreightAudit() {
   const { transportadoras, calculateQuotations } = useFreightQuotation();
@@ -18,7 +29,7 @@ export function FreightAudit() {
     peso_kg: '',
     valor_cobrado: '',
   });
-  const [auditResult, setAuditResult] = useState<any>(null);
+  const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
 
   const ESTADOS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
@@ -28,8 +39,8 @@ export function FreightAudit() {
       return;
     }
 
-    const weight = parseFloat(form.peso_kg);
-    const charged = parseFloat(form.valor_cobrado);
+    const weight = new Decimal(form.peso_kg || 0).toNumber();
+    const charged = new Decimal(form.valor_cobrado || 0);
     
     // Use the existing calculation logic
     const quotations = calculateQuotations({
@@ -37,9 +48,9 @@ export function FreightAudit() {
       peso_kg: weight,
     });
 
-    const expected = quotations.find(q => q.transportadora_id === form.transportadora_id);
+    const expectedQuotation = quotations.find(q => q.transportadora_id === form.transportadora_id);
 
-    if (!expected) {
+    if (!expectedQuotation) {
       setAuditResult({
         status: 'error',
         message: 'Nenhuma tabela de frete encontrada para este trecho/transportadora.',
@@ -47,16 +58,17 @@ export function FreightAudit() {
       return;
     }
 
-    const diff = charged - expected.valor_total;
-    const diffPercent = (diff / expected.valor_total) * 100;
+    const expectedValue = new Decimal(expectedQuotation.valor_total);
+    const diff = charged.minus(expectedValue);
+    const diffPercent = diff.dividedBy(expectedValue).times(100);
 
     setAuditResult({
-      status: Math.abs(diff) < 0.01 ? 'success' : 'warning',
-      expected: expected.valor_total,
-      charged: charged,
-      diff: diff,
-      diffPercent: diffPercent,
-      transportadora: expected.transportadora_nome,
+      status: diff.abs().lessThan(0.01) ? 'success' : 'warning',
+      expected: expectedValue.toNumber(),
+      charged: charged.toNumber(),
+      diff: diff.toNumber(),
+      diffPercent: diffPercent.toNumber(),
+      transportadora: expectedQuotation.transportadora_nome,
     });
   };
 
@@ -146,8 +158,8 @@ export function FreightAudit() {
                   </div>
                   <div>
                     <p className="text-xs uppercase text-muted-foreground font-semibold">Diferença</p>
-                    <p className={`text-xl font-bold ${auditResult.diff > 0 ? 'text-destructive' : 'text-success'}`}>
-                      {formatCurrency(auditResult.diff)} ({auditResult.diffPercent.toFixed(1)}%)
+                    <p className={`text-xl font-bold ${(auditResult.diff ?? 0) > 0 ? 'text-destructive' : 'text-success'}`}>
+                      {formatCurrency(auditResult.diff ?? 0)} ({(auditResult.diffPercent ?? 0).toFixed(1)}%)
                     </p>
                   </div>
                 </div>

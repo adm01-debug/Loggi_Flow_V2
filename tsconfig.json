@@ -10,7 +10,8 @@
       ]
     },
     "skipLibCheck": true,
-    "strictNullChecks": false
+    "strictNullChecks": true,
+    "strict": false
   },
   "files": [],
   "references": [
