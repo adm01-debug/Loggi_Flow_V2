@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { differenceInHours, differenceInDays, parseISO, isAfter, isBefore, startOfDay, subDays } from "date-fns";
+import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 // Type definitions for joined data
 interface TransportadoraJoin {
@@ -393,7 +394,7 @@ export function useSLAMetrics() {
         tendenciaMensal,
       };
     },
-    staleTime: 1000 * 60 * 2,
+    staleTime: QUERY_STALE_TIME.DASHBOARD,
     refetchInterval: 1000 * 60 * 5,
     enabled: !!user?.id,
   });

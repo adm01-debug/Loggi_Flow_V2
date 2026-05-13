@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 
 type TableNames = keyof Database['public']['Tables'];
 
@@ -57,7 +58,7 @@ export function useSearch<T extends Record<string, unknown>>(
       return (data || []) as unknown as T[];
     },
     enabled: shouldSearch,
-    staleTime: 60000,
+    staleTime: QUERY_STALE_TIME.SEARCH,
   });
 
   const clearSearch = useCallback(() => setSearchTerm(''), []);
