@@ -28,7 +28,7 @@ export const handler = async (req: Request) => {
     }
 
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!lovableApiKey) throw new Error("API key not configured");
+    if (!lovableApiKey) throw new Error("Chave de API não configurada");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -99,7 +99,7 @@ export const handler = async (req: Request) => {
       }),
     });
 
-    if (!response.ok) throw new Error(`AI gateway error: ${response.status}`);
+    if (!response.ok) throw new Error(`Erro no gateway de IA: ${response.status}`);
     if (stream) return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
 
     const data = await response.json();

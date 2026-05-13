@@ -165,7 +165,7 @@ Retorne APENAS o JSON, sem markdown ou explicações.`;
       });
 
       if (!response.ok) {
-        throw new Error(`AI Gateway error: ${response.status}`);
+        throw new Error(`Erro no Gateway de IA: ${response.status}`);
       }
       return await response.json();
     });
