@@ -2,6 +2,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { requireString, requireNumber, ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { getRedisClient } from "../_shared/redis.ts";
+
 
 // Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
@@ -10,6 +13,12 @@ const DEADLINE_GATEWAY = "https://01wapi.rte.com.br";
 const PICKUP_GATEWAY = "https://pickup-apigateway.rte.com.br";
 const CUSTOMER_GATEWAY = "https://customer-apigateway.rte.com.br";
 const SELFATTENDANCE_GATEWAY = "https://01wapi.rte.com.br";
+
+const rodonavesBreaker = getCircuitBreaker('rodonaves', {
+  failureThreshold: 10,
+  resetTimeout: 60000, // 1 minute
+});
+
 
 // Token cache (in-memory per isolate)
 const tokenCache: Record<string, { token: string; expiresAt: number }> = {};
@@ -64,30 +73,35 @@ function buildQS(params: Record<string, string | number | boolean | undefined>):
 
 // Helper: authenticated GET
 async function apiGet(gateway: string, path: string, params: Record<string, string | number | boolean | undefined> = {}) {
-  const token = await getToken(gateway);
-  const qs = buildQS(params);
-  const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
-  return res.json();
+  return await rodonavesBreaker.execute(async () => {
+    const token = await getToken(gateway);
+    const qs = buildQS(params);
+    const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
+    return res.json();
+  });
 }
 
 // Helper: authenticated POST/PUT/DELETE
 async function apiMutate(gateway: string, method: string, path: string, body?: unknown, queryParams?: Record<string, string | number | boolean | undefined>) {
-  const token = await getToken(gateway);
-  const qs = queryParams ? buildQS(queryParams) : new URLSearchParams();
-  const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-  const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
-  const opts: RequestInit = { method, headers };
-  if (body) {
-    headers["Content-Type"] = "application/json";
-    opts.body = JSON.stringify(body);
-  }
-  const res = await fetch(url, opts);
-  if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return { raw: text }; }
+  return await rodonavesBreaker.execute(async () => {
+    const token = await getToken(gateway);
+    const qs = queryParams ? buildQS(queryParams) : new URLSearchParams();
+    const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
+    const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+    const opts: RequestInit = { method, headers };
+    if (body) {
+      headers["Content-Type"] = "application/json";
+      opts.body = JSON.stringify(body);
+    }
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
+    const text = await res.text();
+    try { return JSON.parse(text); } catch { return { raw: text }; }
+  });
 }
+
 
 // ==========================================
 // TRACKING GATEWAY ACTIONS
@@ -672,12 +686,35 @@ Deno.serve(async (req) => {
         const peso = requireNumber(params, "peso", { min: 0.01, max: 100000 });
         const volumes = requireNumber(params, "volumes", { min: 1, max: 10000 });
         const valorMercadoria = requireNumber(params, "valorMercadoria", { min: 0 });
+        
+        // Try cache first
+        const redis = getRedisClient();
+        const cacheKey = `rodonaves_quote_${cepOrigem}_${cepDestino}_${peso}_${volumes}_${valorMercadoria}`;
+        if (redis) {
+          const cached = await redis.get(cacheKey);
+          if (cached) {
+            console.log(`[Cache] Cache hit for ${cacheKey}`);
+            return corsResponse(cached, { 'X-Cache': 'HIT' });
+          }
+        }
+
         result = await simulateQuotation({
           cepOrigem, cepDestino, peso, volumes, valorMercadoria,
           cnpjRemetente: params.cnpjRemetente || cnpjDefault,
         });
+
+        // Store in cache
+        if (redis) {
+          await redis.set(cacheKey, result, { ex: 600 }); // 10 minutes
+        }
+        
+        // Return with cache miss header if we have result
+        if (result) {
+          return corsResponse(result, { 'X-Cache': 'MISS' });
+        }
         break;
       }
+
 
       case "generate-quotation": {
         result = await generateQuotation({ body: params.body });

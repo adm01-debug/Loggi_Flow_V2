@@ -1,0 +1,22 @@
+import { Redis } from "redis";
+
+const UPSTASH_REDIS_REST_URL = Deno.env.get("UPSTASH_REDIS_REST_URL");
+const UPSTASH_REDIS_REST_TOKEN = Deno.env.get("UPSTASH_REDIS_REST_TOKEN");
+
+let redisClient: Redis | null = null;
+
+export const getRedisClient = () => {
+  if (!UPSTASH_REDIS_REST_URL || !UPSTASH_REDIS_REST_TOKEN) {
+    console.warn("Redis credentials not configured. Cache will be disabled.");
+    return null;
+  }
+
+  if (!redisClient) {
+    redisClient = new Redis({
+      url: UPSTASH_REDIS_REST_URL,
+      token: UPSTASH_REDIS_REST_TOKEN,
+    });
+  }
+
+  return redisClient;
+};
