@@ -167,7 +167,7 @@ export function useIntegrationValidation() {
     } finally {
       setIsValidating(false);
     }
-  }, [validateLalamove, validateMapbox]);
+  }, [validateLalamove, validateMapbox, validateBitrix24, validateRodonaves, validateMelhorEnvio]);
 
   return {
     integrations,
