@@ -109,3 +109,14 @@ src/
 ## 📄 Licença
 
 MIT © Promo Brindes
+
+---
+
+## 📋 Auditoria e Relatórios
+
+Para garantir a transparência e integridade do sistema, mantemos relatórios de auditoria atualizados:
+
+- [📄 Relatório de Auditoria (Markdown)](./audit_report.md) - Versão técnica detalhada.
+- [📥 Relatório de Auditoria (PDF)](./audit_report.pdf) - Versão para exportação e apresentações.
+
+*Os relatórios são gerados automaticamente pelo nosso pipeline de CI/CD.*
