@@ -24,6 +24,8 @@ export interface DashboardMetrics {
   coletasAtrasadas: number;
   divergenciasAltas: number;
   lastSync: string;
+  totalVolume: number;
+  valorTotalFrete: number;
 }
 
 export interface RecentAlert {
