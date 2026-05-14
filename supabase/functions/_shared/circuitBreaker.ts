@@ -72,3 +72,12 @@ export async function withCircuitBreaker<T>(
     throw error;
   }
 }
+
+/**
+ * Functional interface to match some older uses
+ */
+export function getCircuitBreaker(name: string, options: CircuitOptions = DEFAULT_OPTIONS) {
+  return {
+    execute: <T>(fn: () => Promise<T>) => withCircuitBreaker(name, fn, options)
+  };
+}
