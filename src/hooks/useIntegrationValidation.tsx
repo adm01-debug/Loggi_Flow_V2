@@ -124,7 +124,7 @@ export function useIntegrationValidation() {
     } finally {
       setIsValidating(false);
     }
-  }, [validateLalamove, validateMapbox]);
+  }, [validateLalamove, validateMapbox, validateBitrix24, validateRodonaves, validateMelhorEnvio]);
 
   const validateSingle = useCallback(async (name: string) => {
     setIsValidating(true);
