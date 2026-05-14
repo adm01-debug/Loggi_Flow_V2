@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { format } from "date-fns";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,11 +38,11 @@ export default function Configuracoes() {
 
   const integrationsList = [
     { id: "supabase", name: "Supabase", icon: Database, status: "connected" },
-    { id: "bitrix24", name: "Bitrix24", icon: Link, status: integrations.find(i => i.name === "bitrix24")?.status || "unknown" },
-    { id: "lalamove", name: "Lalamove", icon: Globe, status: integrations.find(i => i.name === "lalamove")?.status || "unknown" },
+    { id: "bitrix24", name: "Bitrix24", icon: Link, status: integrations.find(i => i.name === "Bitrix24")?.status || "not_configured" },
+    { id: "lalamove", name: "Lalamove", icon: Globe, status: integrations.find(i => i.name === "Lalamove")?.status || "not_configured" },
     { id: "n8n", name: "n8n", icon: Settings, status: integrations.find(i => i.name === "n8n")?.status || "unknown" },
-    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: "connected" },
-    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: "connected" },
+    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: integrations.find(i => i.name === "Rodonaves")?.status || "not_configured" },
+    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: integrations.find(i => i.name === "Melhor Envio")?.status || "not_configured" },
   ];
 
   const handleValidateIntegration = (id: string) => {
@@ -100,13 +101,24 @@ export default function Configuracoes() {
               <div className="flex justify-end"><Button variant="outline" onClick={handleValidateAll} disabled={isValidating}><RefreshCw className={cn("w-4 h-4 mr-2", isValidating && "animate-spin")} />Validar Todas</Button></div>
               <div className="grid gap-4">{integrationsList.map((int) => {
                 const Icon = int.icon;
-                const isConnected = int.status === "connected";
+                const integrationData = integrations.find(i => i.name.toLowerCase() === int.name.toLowerCase() || i.name.toLowerCase() === int.id.toLowerCase());
+                const status = integrationData?.status || int.status;
+                const isConnected = status === "connected";
+                const isError = status === "error";
+                
                 return (
                   <div key={int.id} className="card-interactive flex items-center justify-between">
                     <div className="flex items-center gap-3"><div className={cn("p-2 rounded-lg", isConnected ? "bg-success/15" : "bg-muted")}><Icon className={cn("w-5 h-5", isConnected ? "text-success" : "text-muted-foreground")} /></div><div><p className="font-semibold">{int.name}</p><p className="text-sm text-muted-foreground">ID: {int.id}</p></div></div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={isConnected ? "default" : int.status === "error" ? "destructive" : "secondary"}>{isConnected ? <><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</> : int.status === "error" ? <><XCircle className="w-3 h-3 mr-1" />Erro</> : "Pendente"}</Badge>
-                      <Button variant="outline" size="sm" onClick={() => handleValidateIntegration(int.id)}>Testar</Button>
+                      <div className="text-right hidden sm:block">
+                        <Badge variant={isConnected ? "default" : isError ? "destructive" : "secondary"} className="mb-1">
+                          {isConnected ? <><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</> : isError ? <><XCircle className="w-3 h-3 mr-1" />Erro</> : "Pendente"}
+                        </Badge>
+                        {integrationData?.lastCheck && (
+                          <p className="text-[10px] text-muted-foreground">Check: {format(new Date(integrationData.lastCheck), 'HH:mm:ss')}</p>
+                        )}
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => handleValidateIntegration(int.id)} disabled={isValidating}>Testar</Button>
                     </div>
                   </div>
                 );

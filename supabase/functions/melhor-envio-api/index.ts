@@ -1,7 +1,14 @@
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
+import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { log } from "../_shared/logger.ts";
 
 const SANDBOX_URL = "https://sandbox.melhorenvio.com.br/api/v2";
 const PRODUCTION_URL = "https://melhorenvio.com.br/api/v2";
+
+const meBreaker = getCircuitBreaker('melhor-envio', {
+  failureThreshold: 5,
+  resetTimeoutMs: 60000, // 1 minute
+});
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -230,10 +237,17 @@ Deno.serve(async (req) => {
     }
 
 
-    const response = await fetch(url, {
-      method,
-      headers,
-      body: fetchBody,
+    const response = await meBreaker.execute(async () => {
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: fetchBody,
+      });
+
+      if (!res.ok && res.status >= 500) {
+        throw new Error(`ME API Server Error: ${res.status}`);
+      }
+      return res;
     });
 
     let data;
@@ -246,6 +260,7 @@ Deno.serve(async (req) => {
     }
 
     if (!response.ok) {
+      log({ level: 'WARN', message: `Melhor Envio API error: ${response.status}`, meta: { action, data } });
       return new Response(
         JSON.stringify({ 
           error: data.message || data.error || "API error", 
@@ -260,9 +275,15 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    const isBreaker = (error as Error).message.includes('Circuit Breaker');
+    log({ level: 'ERROR', message: `Melhor Envio function failure`, meta: { error: (error as Error).message } });
+    
     return new Response(
-      JSON.stringify({ error: (error as Error).message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ 
+        error: (error as Error).message,
+        circuitOpen: isBreaker 
+      }),
+      { status: isBreaker ? 503 : 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

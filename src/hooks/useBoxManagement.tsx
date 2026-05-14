@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,7 +38,7 @@ export function useBoxManagement() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: deliveries = [], isLoading } = useQuery({
+  const { data: deliveries = [], isLoading, refetch } = useQuery({
     queryKey: ["box-deliveries", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -71,6 +72,20 @@ export function useBoxManagement() {
     staleTime: QUERY_STALE_TIME.DYNAMIC,
     enabled: !!user?.id,
   });
+
+  // Enable realtime for boxes
+  useEffect(() => {
+    const channel = supabase
+      .channel('box-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'entregas' }, () => {
+        refetch();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   // Build box data
   const boxes: BoxData[] = Array.from({ length: TOTAL_BOXES }, (_, i) => {
