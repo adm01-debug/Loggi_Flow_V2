@@ -34,7 +34,14 @@ export function useRealtime<T = Record<string, unknown>>({
   const handleChange = useCallback(
     (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
       if (queryKey) {
+        // Multi-layered invalidation
         queryClient.invalidateQueries({ queryKey });
+        
+        // Specifically invalidate dashboard metrics if related tables change
+        if (["entregas", "coletas", "ocorrencias"].includes(table)) {
+          queryClient.invalidateQueries({ queryKey: ["dashboard-metrics"] });
+          queryClient.invalidateQueries({ queryKey: ["recent-alerts"] });
+        }
       }
 
       switch (payload.eventType) {
@@ -49,7 +56,7 @@ export function useRealtime<T = Record<string, unknown>>({
           break;
       }
     },
-    [queryKey, queryClient, onInsert, onUpdate, onDelete]
+    [queryKey, queryClient, onInsert, onUpdate, onDelete, table]
   );
 
   useEffect(() => {
