@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { RecentlyVisited } from "@/components/common/RecentlyVisited";
+import { supabase } from "@/integrations/supabase/client";
 
 // Lazy-load heavy notification components
 const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
