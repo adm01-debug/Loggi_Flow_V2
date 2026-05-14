@@ -139,6 +139,16 @@ export function useIntegrationValidation() {
         case 'mapbox':
           result = await validateMapbox();
           break;
+        case 'bitrix24':
+          result = await validateBitrix24();
+          break;
+        case 'rodonaves':
+          result = await validateRodonaves();
+          break;
+        case 'melhorenvio':
+        case 'melhor envio':
+          result = await validateMelhorEnvio();
+          break;
         default:
           throw new Error(`Unknown integration: ${name}`);
       }
