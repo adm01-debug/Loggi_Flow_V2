@@ -61,6 +61,42 @@ export function useIntegrationValidation() {
     }
   }, []);
 
+  const validateBitrix24 = useCallback(async (): Promise<IntegrationStatus> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('bitrix24-integration', {
+        body: { action: 'test-connection' },
+      });
+      if (error) return { name: 'Bitrix24', status: 'error', message: error.message };
+      return { name: 'Bitrix24', status: 'connected', lastCheck: new Date() };
+    } catch (e) {
+      return { name: 'Bitrix24', status: 'error', message: (e as Error).message };
+    }
+  }, []);
+
+  const validateRodonaves = useCallback(async (): Promise<IntegrationStatus> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('rodonaves-api', {
+        body: { action: 'cubage-factor', cnpjRemetente: 'test' }, // cubage is a safe test call
+      });
+      if (error) return { name: 'Rodonaves', status: 'error', message: error.message };
+      return { name: 'Rodonaves', status: 'connected', lastCheck: new Date() };
+    } catch (e) {
+      return { name: 'Rodonaves', status: 'error', message: (e as Error).message };
+    }
+  }, []);
+
+  const validateMelhorEnvio = useCallback(async (): Promise<IntegrationStatus> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('melhor-envio-api', {
+        body: { action: 'infoUsuario', useSandbox: true },
+      });
+      if (error) return { name: 'Melhor Envio', status: 'error', message: error.message };
+      return { name: 'Melhor Envio', status: 'connected', lastCheck: new Date() };
+    } catch (e) {
+      return { name: 'Melhor Envio', status: 'error', message: (e as Error).message };
+    }
+  }, []);
+
   const validateAll = useCallback(async () => {
     setIsValidating(true);
     
