@@ -1,7 +1,9 @@
-import { Activity, Database, Shield, Wifi } from "lucide-react";
+import { Activity, Database, Shield, Wifi, Clock } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export function LiveStatusBar() {
   const { isOnline } = useOnlineStatus();
@@ -27,6 +29,11 @@ export function LiveStatusBar() {
       icon: Activity,
       label: `${metrics?.alertasCriticos || 0} alertas`,
       status: (metrics?.alertasCriticos || 0) > 0 ? "warning" : "success",
+    },
+    {
+      icon: Clock,
+      label: metrics?.lastSync ? `Sinc: ${format(new Date(metrics.lastSync), 'HH:mm:ss')}` : 'Aguardando...',
+      status: metrics?.lastSync ? "success" : "warning",
     },
   ];
 
