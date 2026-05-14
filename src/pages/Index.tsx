@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect, useRef, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity } from "lucide-react";
+import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, ShieldCheck } from "lucide-react";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
@@ -26,6 +26,8 @@ import { format, subDays, eachDayOfInterval, startOfDay, endOfDay } from "date-f
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { runSystemSanityChecks } from "@/utils/systemTester";
+import { toast } from "sonner";
 
 // Isolated timer component to prevent full-page re-renders
 const RefreshTimer = memo(({ lastRefresh }: { lastRefresh: Date }) => {
