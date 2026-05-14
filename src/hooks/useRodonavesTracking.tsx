@@ -413,11 +413,8 @@ export function useRodonavesTracking() {
     validateCustomerForQuotation: validateCustomerQuotationMutation.mutate,
 
     // ===== SYNC =====
-    syncAll: syncMutation.mutate,
-    isSyncing: syncMutation.isPending,
-    syncResult: syncMutation.data,
-    // ===== SYNC =====
     syncAll,
     isSyncing: syncMutation.isPending,
+    syncResult: syncMutation.data,
   };
 }
