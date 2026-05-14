@@ -14,6 +14,9 @@ export function useIntegrationValidation() {
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([
     { name: 'Lalamove', status: 'not_configured' },
     { name: 'Mapbox', status: 'not_configured' },
+    { name: 'Bitrix24', status: 'not_configured' },
+    { name: 'Rodonaves', status: 'not_configured' },
+    { name: 'Melhor Envio', status: 'not_configured' },
   ]);
 
   const validateLalamove = useCallback(async (): Promise<IntegrationStatus> => {
