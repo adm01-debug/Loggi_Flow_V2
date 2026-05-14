@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { getCircuitBreaker } from '../_shared/circuitBreaker.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 import { getRedisClient } from '../_shared/redis.ts'
-
+import { log } from '../_shared/logger.ts'
 
 const LALAMOVE_API_KEY = Deno.env.get('LALAMOVE_API_KEY') || ''
 const LALAMOVE_API_SECRET = Deno.env.get('LALAMOVE_API_SECRET') || ''
@@ -10,8 +10,8 @@ const LALAMOVE_BASE_URL = Deno.env.get('LALAMOVE_BASE_URL') || 'https://rest.lal
 
 const lalamoveBreaker = getCircuitBreaker('lalamove', {
   failureThreshold: 5,
-  resetTimeout: 30000,
-})
+  resetTimeoutMs: 30000,
+});
 
 // Gerar assinatura HMAC para Lalamove
 async function generateSignature(method: string, path: string, timestamp: string, body: string = ''): Promise<string> {
@@ -49,8 +49,12 @@ async function lalamoveRequest(method: string, path: string, body?: object) {
     })
     
     if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`Lalamove API error: ${response.status} - ${error}`)
+      const errorText = await response.text()
+      // Only trigger breaker on 5xx or connection issues, handled by the loop if we throw
+      if (response.status >= 500) {
+        throw new Error(`Lalamove Server Error: ${response.status}`);
+      }
+      return { error: true, status: response.status, details: errorText };
     }
     
     return response.json()
@@ -75,27 +79,39 @@ serve(async (req) => {
       const redis = getRedisClient();
       const cacheKey = `lalamove_quote_${JSON.stringify(body.stops)}`;
       if (redis) {
-        const cached = await redis.get(cacheKey);
-        if (cached) {
-          console.log(`[Cache] Cache hit for ${cacheKey}`);
-          return new Response(JSON.stringify(cached), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Cache': 'HIT' },
-          });
+        try {
+          const cached = await redis.get(cacheKey);
+          if (cached) {
+            return new Response(JSON.stringify(cached), {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Cache': 'HIT' },
+            });
+          }
+        } catch (e) {
+          log({ level: 'WARN', message: 'Redis cache fail', meta: { error: e.message } });
         }
       }
 
       const result = await lalamoveRequest('POST', '/v3/quotations', {
         serviceType: body.vehicleType || 'MOTORCYCLE',
         language: 'pt_BR',
-        stops: body.stops.map((stop: any, i: number) => ({
+        stops: body.stops.map((stop: any) => ({
           coordinates: { lat: stop.lat.toString(), lng: stop.lng.toString() },
           address: stop.address,
         })),
       })
       
+      if (result.error) {
+        return new Response(JSON.stringify(result), {
+          status: result.status || 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       // Store in cache
       if (redis) {
-        await redis.set(cacheKey, result, { ex: 600 }); // 10 minutes
+        try {
+          await redis.set(cacheKey, result, { ex: 600 }); // 10 minutes
+        } catch (e) {}
       }
 
       return new Response(JSON.stringify(result), {
@@ -140,9 +156,11 @@ serve(async (req) => {
     })
     
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
+    const isBreaker = error.message.includes('Circuit Breaker');
+    log({ level: 'ERROR', message: `Lalamove function failure`, meta: { error: error.message } });
+    
+    return new Response(JSON.stringify({ error: error.message, circuitOpen: isBreaker }), {
+      status: isBreaker ? 503 : 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
