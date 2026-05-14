@@ -98,9 +98,17 @@ export function DelayPredictionPanel() {
 
         {/* Last analyzed timestamp */}
         {lastAnalyzed && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            Última análise: {format(new Date(lastAnalyzed), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              Última análise: {format(new Date(lastAnalyzed), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+            </div>
+            {isCached && (
+              <Badge variant="outline" className="text-[10px] h-5 gap-1 font-normal bg-primary/5 text-primary border-primary/20">
+                <Zap className="h-2.5 w-2.5" />
+                Cacheado
+              </Badge>
+            )}
           </div>
         )}
 
