@@ -34,8 +34,23 @@ export function Header() {
   const isHomePage = location.pathname === "/";
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('security_events').insert({
+        user_id: user?.id,
+        event_type: 'logout',
+        description: 'Logout manual realizado pelo usuário',
+        severity: 'low',
+        ip_address: 'client-side',
+        metadata: { timestamp: new Date().toISOString() }
+      });
+      await signOut();
+      navigate("/auth");
+    } catch (err) {
+      console.error('Logout error tracking:', err);
+      await signOut();
+      navigate("/auth");
+    }
   };
 
   const handleBack = () => {
