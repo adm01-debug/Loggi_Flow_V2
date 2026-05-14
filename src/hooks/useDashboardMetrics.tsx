@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { QUERY_KEYS } from "@/lib/queryKeys";
 import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
-import { differenceInHours, parseISO } from "date-fns";
+import { differenceInHours, parseISO, isAfter, isBefore, startOfDay, endOfDay, subDays } from "date-fns";
 
 export interface DashboardMetrics {
   totalColetas: number;
@@ -23,6 +23,9 @@ export interface DashboardMetrics {
   alertasCriticos: number;
   coletasAtrasadas: number;
   divergenciasAltas: number;
+  lastSync: string;
+  totalVolume: number;
+  valorTotalFrete: number;
 }
 
 export interface RecentAlert {
@@ -42,13 +45,13 @@ export function useDashboardMetrics() {
     queryFn: async (): Promise<DashboardMetrics> => {
       const { data: coletas, error: coletasError } = await supabase
         .from('coletas')
-        .select('id, status, divergencia_percentual, data_prevista_coleta, created_at, data_efetiva_coleta');
+        .select('id, status, divergencia_percentual, data_prevista_coleta, created_at, data_efetiva_coleta, qtd_volumes');
       
       if (coletasError) throw coletasError;
       
       const { data: entregas, error: entregasError } = await supabase
         .from('entregas')
-        .select('id, status, previsao_entrega, data_entrega_efetiva, created_at');
+        .select('id, status, previsao_entrega, data_entrega_efetiva, created_at, valor_frete');
       
       if (entregasError) throw entregasError;
       
@@ -121,6 +124,9 @@ export function useDashboardMetrics() {
       
       const alertasCriticos = coletasAtrasadas + coletasComDivergencia + (ocorrencias?.length || 0);
       
+      const totalVolume = coletas?.reduce((acc, c) => acc + (c.qtd_volumes || 0), 0) || 0;
+      const valorTotalFrete = entregas?.reduce((acc, e) => acc + (Number(e.valor_frete) || 0), 0) || 0;
+
       return {
         totalColetas,
         coletasPendentes,
@@ -146,6 +152,9 @@ export function useDashboardMetrics() {
         alertasCriticos,
         coletasAtrasadas,
         divergenciasAltas: coletasComDivergencia,
+        lastSync: new Date().toISOString(),
+        totalVolume,
+        valorTotalFrete,
       };
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,

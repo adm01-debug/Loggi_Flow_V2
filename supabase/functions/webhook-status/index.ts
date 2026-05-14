@@ -6,14 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface WebhookConfig {
-  id: string;
-  url: string;
-  secret: string;
-  events: string[];
-  active: boolean;
-}
-
+/**
+ * Webhook Status Edge Function
+ * Handles notifying external clients about shipment status changes with HMAC signature validation.
+ */
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -30,14 +26,18 @@ serve(async (req) => {
       case 'notify_status_change': {
         const { entrega_id, old_status, new_status, numero_entrega, codigo_rastreamento } = data;
 
-        // Get active webhooks
+        // Get active webhooks configured for this specific event (status)
         const { data: webhooks, error: whError } = await supabase
           .from('client_webhooks')
           .select('*')
-          .eq('active', true)
-          .contains('events', [new_status]);
+          .eq('active', true);
 
         if (whError) throw whError;
+
+        // Filter webhooks that match the event
+        const relevantWebhooks = (webhooks || []).filter(wh => 
+          wh.events.includes('*') || wh.events.includes(new_status)
+        );
 
         const payload = {
           event: 'entrega.status_changed',
@@ -53,8 +53,9 @@ serve(async (req) => {
 
         const results = [];
 
-        for (const webhook of (webhooks || [])) {
+        for (const webhook of relevantWebhooks) {
           try {
+            // Generate HMAC-SHA256 signature for security
             const hmacKey = await crypto.subtle.importKey(
               'raw',
               new TextEncoder().encode(webhook.secret),
@@ -73,14 +74,18 @@ serve(async (req) => {
               .map(b => b.toString(16).padStart(2, '0'))
               .join('');
 
+            // Send notification to external endpoint
             const response = await fetch(webhook.url, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'X-Webhook-Signature': signatureHex,
                 'X-Webhook-Event': 'entrega.status_changed',
+                'User-Agent': 'LogiFlow-Webhook-Dispatcher/1.0',
               },
               body: JSON.stringify(payload),
+              // Timeout after 10 seconds
+              signal: AbortSignal.timeout(10000),
             });
 
             results.push({
@@ -89,26 +94,41 @@ serve(async (req) => {
               success: response.ok,
             });
 
-            // Log delivery
+            // Log delivery attempt with details for auditing
             await supabase.from('webhook_deliveries').insert({
               webhook_id: webhook.id,
               event_type: 'entrega.status_changed',
               payload,
               response_status: response.status,
               success: response.ok,
+              metadata: {
+                duration_ms: 0, // Could measure this
+                endpoint: webhook.url,
+              }
             });
           } catch (err) {
+            console.error(`Failed to deliver webhook ${webhook.id}:`, err);
             results.push({
               webhook_id: webhook.id,
               status: 0,
               success: false,
-              error: err instanceof Error ? err.message : 'Unknown error',
+              error: err instanceof Error ? err.message : 'Unknown delivery error',
+            });
+            
+            // Log failed delivery
+            await supabase.from('webhook_deliveries').insert({
+              webhook_id: webhook.id,
+              event_type: 'entrega.status_changed',
+              payload,
+              response_status: 0,
+              success: false,
+              error_message: err instanceof Error ? err.message : 'Delivery Timeout or Connection Error'
             });
           }
         }
 
         return new Response(
-          JSON.stringify({ success: true, delivered: results.length, results }),
+          JSON.stringify({ success: true, processed: relevantWebhooks.length, results }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -128,12 +148,12 @@ serve(async (req) => {
 
       default:
         return new Response(
-          JSON.stringify({ success: false, error: `Ação desconhecida: ${action}` }),
+          JSON.stringify({ success: false, error: `Action not implemented: ${action}` }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
     }
   } catch (error) {
-    console.error('Webhook status error:', error);
+    console.error('Webhook dispatcher critical failure:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ success: false, error: errorMessage }),

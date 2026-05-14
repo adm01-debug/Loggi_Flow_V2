@@ -63,15 +63,19 @@ export function useAuditLogs(filters: AuditLogFilters = {}) {
         query = query.lte('created_at', filters.endDate);
       }
 
-      query = query.limit(filters.limit || 100);
+      query = query.limit(filters.limit || 500);
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('Failed to fetch audit logs:', error);
+        throw error;
+      }
 
       return (data as AuditLog[]) || [];
     },
     staleTime: QUERY_STALE_TIME.LOGS,
+    refetchOnWindowFocus: true,
     enabled: !!user?.id,
   });
 }

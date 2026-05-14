@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { RecentlyVisited } from "@/components/common/RecentlyVisited";
+import { supabase } from "@/integrations/supabase/client";
 
 // Lazy-load heavy notification components
 const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
@@ -34,8 +35,23 @@ export function Header() {
   const isHomePage = location.pathname === "/";
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('security_events').insert({
+        user_id: user?.id,
+        event_type: 'logout',
+        description: 'Logout manual realizado pelo usuário',
+        severity: 'low',
+        ip_address: 'client-side',
+        metadata: { timestamp: new Date().toISOString() }
+      });
+      await signOut();
+      navigate("/auth");
+    } catch (err) {
+      console.error('Logout error tracking:', err);
+      await signOut();
+      navigate("/auth");
+    }
   };
 
   const handleBack = () => {

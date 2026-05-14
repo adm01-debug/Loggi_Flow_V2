@@ -248,8 +248,21 @@ export function useRodonavesTracking() {
       const synced = data?.data?.synced || 0;
       toast.success(`${synced} entrega(s) atualizada(s) via Rodonaves`);
     },
-    onError: (err: Error) => toast.error(`Erro na sincronização: ${err.message}`),
+    onError: (err: Error) => {
+      console.error('Rodonaves sync error:', err);
+      toast.error(`Erro na sincronização: ${err.message}`);
+    },
   });
+
+  const syncAll = async (cnpjRemetente?: string) => {
+    const loader = toast.loading("Sincronizando com Rodonaves...");
+    try {
+      await syncMutation.mutateAsync(cnpjRemetente);
+      toast.dismiss(loader);
+    } catch (e) {
+      toast.dismiss(loader);
+    }
+  };
 
   return {
     // ===== TRACKING =====
@@ -400,7 +413,7 @@ export function useRodonavesTracking() {
     validateCustomerForQuotation: validateCustomerQuotationMutation.mutate,
 
     // ===== SYNC =====
-    syncAll: syncMutation.mutate,
+    syncAll,
     isSyncing: syncMutation.isPending,
     syncResult: syncMutation.data,
   };
