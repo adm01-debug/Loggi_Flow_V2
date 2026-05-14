@@ -23,6 +23,7 @@ export interface DashboardMetrics {
   alertasCriticos: number;
   coletasAtrasadas: number;
   divergenciasAltas: number;
+  lastSync: string;
 }
 
 export interface RecentAlert {
@@ -146,6 +147,7 @@ export function useDashboardMetrics() {
         alertasCriticos,
         coletasAtrasadas,
         divergenciasAltas: coletasComDivergencia,
+        lastSync: new Date().toISOString(),
       };
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
