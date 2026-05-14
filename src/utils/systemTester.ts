@@ -26,7 +26,7 @@ export const runSystemSanityChecks = async () => {
       name: "Edge Functions (Health)", 
       fn: async () => { 
         try {
-          const { data, error } = await supabase.functions.invoke('health'); 
+          const { data, error } = await supabase.functions.invoke('health-check'); 
           return !error && data?.status === 'healthy'; 
         } catch { return false; }
       } 
@@ -51,6 +51,13 @@ export const runSystemSanityChecks = async () => {
       fn: async () => {
         const { count, error } = await supabase.from('audit_logs').select('*', { count: 'exact', head: true }).limit(1);
         return !error && count !== null;
+      }
+    },
+    {
+      name: "MFA Infrastructure",
+      fn: async () => {
+        const { data, error } = await supabase.auth.mfa.listFactors();
+        return !error && !!data;
       }
     }
   ];
