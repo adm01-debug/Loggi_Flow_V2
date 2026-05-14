@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,8 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  Lightbulb
+  Lightbulb,
+  Zap
 } from 'lucide-react';
 import { useDelayPrediction, DelayPrediction } from '@/hooks/useDelayPrediction';
 import { format } from 'date-fns';
@@ -28,10 +29,18 @@ export function DelayPredictionPanel() {
     lastAnalyzed, 
     analyzeDelays,
     getRiskColor,
-    getRiskLabel 
+    getRiskLabel,
+    isCached
   } = useDelayPrediction();
   
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Tenta carregar predições em cache ao montar o componente
+    if (predictions.length === 0) {
+      analyzeDelays();
+    }
+  }, [analyzeDelays, predictions.length]);
 
   const toggleExpanded = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -89,9 +98,17 @@ export function DelayPredictionPanel() {
 
         {/* Last analyzed timestamp */}
         {lastAnalyzed && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            Última análise: {format(new Date(lastAnalyzed), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              Última análise: {format(new Date(lastAnalyzed), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+            </div>
+            {isCached && (
+              <Badge variant="outline" className="text-[10px] h-5 gap-1 font-normal bg-primary/5 text-primary border-primary/20">
+                <Zap className="h-2.5 w-2.5" />
+                Cacheado
+              </Badge>
+            )}
           </div>
         )}
 

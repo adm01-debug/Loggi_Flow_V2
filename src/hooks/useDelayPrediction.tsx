@@ -34,6 +34,7 @@ export function useDelayPrediction() {
   const [summary, setSummary] = useState<PredictionSummary | null>(null);
   const [lastAnalyzed, setLastAnalyzed] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isCached, setIsCached] = useState(false);
 
   const analyzeDelays = useCallback(async () => {
     setIsLoading(true);
@@ -57,6 +58,7 @@ export function useDelayPrediction() {
       setPredictions(data.predictions || []);
       setSummary(data.summary || null);
       setLastAnalyzed(data.analyzed_at);
+      setIsCached(!!data.cached);
 
       const criticos = data.summary?.criticos || 0;
       const altos = data.summary?.altos || 0;
@@ -126,6 +128,7 @@ export function useDelayPrediction() {
     summary,
     lastAnalyzed,
     error,
+    isCached,
     analyzeDelays,
     getRiskColor,
     getRiskLabel,

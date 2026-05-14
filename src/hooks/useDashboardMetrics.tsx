@@ -224,25 +224,30 @@ export function useRecentAlerts() {
       });
       
       // Integration with Delay Predictions (IA)
-      // IA-powered delay predictions integrated into alerts
-      /* 
       try {
-        const { data: predictionsData } = await supabase.from('previsoes_atraso').select('*').eq('resolvido', false).limit(5);
-        predictionsData?.forEach((pred: { risco: string }) => {
+        const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+        const { data: predictionsData } = await supabase
+          .from('ai_delay_predictions')
+          .select('*')
+          .gte('analyzed_at', sixHoursAgo)
+          .in('risco', ['alto', 'critico'])
+          .limit(5);
+
+        predictionsData?.forEach((pred: any) => {
+          const p = pred.prediction_data;
           alerts.push({
             id: `ia-pred-${pred.id}`,
             type: 'ia_previsao',
-            message: `IA prevê ${pred.probabilidade}% de atraso em ${pred.numero}`,
-            severity: pred.probabilidade > 80 ? 'error' : 'warning',
-            createdAt: pred.created_at,
-            entityId: pred.entidade_id,
-            entityType: pred.tipo === 'entrega' ? 'entrega' : 'coleta',
+            message: `IA prevê ${p.probabilidade_atraso}% de atraso em ${p.numero} (${p.tipo})`,
+            severity: p.risco === 'critico' ? 'error' : 'warning',
+            createdAt: pred.analyzed_at,
+            entityId: pred.entity_id,
+            entityType: pred.entity_type,
           });
         });
       } catch (e) {
         // Silent fail for predictions
       }
-      */
       
       return alerts.sort((a, b) => {
         const severityOrder = { error: 0, warning: 1, info: 2 };

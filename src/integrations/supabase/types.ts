@@ -116,6 +116,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_delay_predictions: {
+        Row: {
+          analyzed_at: string | null
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          prediction_data: Json
+          probabilidade_atraso: number
+          risco: string
+        }
+        Insert: {
+          analyzed_at?: string | null
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          prediction_data: Json
+          probabilidade_atraso: number
+          risco: string
+        }
+        Update: {
+          analyzed_at?: string | null
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          prediction_data?: Json
+          probabilidade_atraso?: number
+          risco?: string
+        }
+        Relationships: []
+      }
       alertas_custo: {
         Row: {
           ativo: boolean

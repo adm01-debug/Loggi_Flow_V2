@@ -13,7 +13,7 @@ export const handler = async (req: Request) => {
   }
 
   try {
-    const { allowed, remaining } = await checkRateLimit(req, 'predict-delays', { maxRequests: 20 });
+    const { allowed } = await checkRateLimit(req, 'predict-delays', { maxRequests: 20 });
     if (!allowed) {
       return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
         status: 429,
@@ -26,7 +26,43 @@ export const handler = async (req: Request) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    log('INFO', 'Iniciando predição de atrasos');
+    // 1. Check for recent cached predictions (last 6 hours)
+    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+    const { data: cachedPredictions } = await supabase
+      .from('ai_delay_predictions')
+      .select('*')
+      .gte('analyzed_at', sixHoursAgo);
+
+    if (cachedPredictions && cachedPredictions.length > 0) {
+      log('INFO', 'Returning cached predictions', { count: cachedPredictions.length });
+      
+      const predictions = cachedPredictions.map(p => ({
+        ...p.prediction_data,
+        risco: p.risco,
+        probabilidade_atraso: p.probabilidade_atraso,
+        analyzed_at: p.analyzed_at
+      }));
+
+      const summary = {
+        total_analisados: predictions.length,
+        criticos: predictions.filter((p: any) => p.risco === 'critico').length,
+        altos: predictions.filter((p: any) => p.risco === 'alto').length,
+        medios: predictions.filter((p: any) => p.risco === 'medio').length,
+        baixos: predictions.filter((p: any) => p.risco === 'baixo').length,
+      };
+
+      return new Response(JSON.stringify({ 
+        success: true, 
+        predictions, 
+        summary, 
+        analyzed_at: cachedPredictions[0].analyzed_at,
+        cached: true 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    log('INFO', 'Starting new delay prediction analysis');
 
     // Fetch active deliveries
     const { data: entregas, error: entregasError } = await supabase
@@ -118,40 +154,23 @@ export const handler = async (req: Request) => {
     };
 
     const now = new Date();
-    const prompt = `Você é um sistema de análise preditiva de logística. Analise os dados abaixo e preveja quais entregas/coletas têm maior probabilidade de atraso.
-
-DADOS ATUAIS (${now.toISOString()}):
-
-ENTREGAS EM ANDAMENTO:
-${JSON.stringify(entregasForAnalysis, null, 2)}
-
-COLETAS EM ANDAMENTO:
-${JSON.stringify(coletasForAnalysis, null, 2)}
-
-ESTATÍSTICAS HISTÓRICAS (últimos 30 dias):
-- Taxa de atraso histórica: ${delayRate.toFixed(1)}%
-- Ocorrências registradas: ${JSON.stringify(occurrenceStats)}
-
-REGRAS DE ANÁLISE:
-1. Entregas com previsão para hoje ou vencidas são CRÍTICAS
-2. Entregas há mais de 3 dias em trânsito têm risco ALTO
-3. Endereços em regiões distantes aumentam o risco
-4. Histórico de ocorrências da transportadora aumenta o risco
-5. Coletas pendentes há mais de 2 dias têm risco MÉDIO
-
-Retorne um JSON array com as previsões (máximo 10 itens mais críticos):
-[{
-  "id": "uuid",
-  "numero": "numero_entrega_ou_coleta",
-  "tipo": "entrega" ou "coleta",
-  "risco": "baixo" | "medio" | "alto" | "critico",
-  "probabilidade_atraso": 0-100,
-  "motivos": ["motivo1", "motivo2"],
-  "recomendacoes": ["acao1", "acao2"],
-  "horas_estimadas_atraso": numero
-}]
-
-Retorne APENAS o JSON, sem markdown ou explicações.`;
+    const prompt = `Analise os dados logísticos e preveja riscos de atraso:
+    DADOS: ${JSON.stringify({ 
+      entregas: entregasForAnalysis, 
+      coletas: coletasForAnalysis, 
+      stats: { delayRate: delayRate.toFixed(1), occurrences: occurrenceStats } 
+    })}
+    Retorne um JSON array (max 10 itens críticos):
+    [{
+      "id": "uuid",
+      "numero": "string",
+      "tipo": "entrega"|"coleta",
+      "risco": "baixo"|"medio"|"alto"|"critico",
+      "probabilidade_atraso": 0-100,
+      "motivos": ["string"],
+      "recomendacoes": ["string"],
+      "horas_estimadas_atraso": number
+    }]`;
 
     const aiResponse = await withCircuitBreaker('ai-gateway', async () => {
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -163,31 +182,37 @@ Retorne APENAS o JSON, sem markdown ou explicações.`;
         body: JSON.stringify({
           model: 'google/gemini-2.0-flash',
           messages: [
-            {
-              role: 'system',
-              content: 'Você é um especialista em logística que analisa dados e prevê atrasos. Sempre responda em JSON válido.',
-            },
+            { role: 'system', content: 'Especialista em logística preditiva. Retorne APENAS JSON.' },
             { role: 'user', content: prompt },
           ],
-          temperature: 0.3,
+          temperature: 0.2,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Erro no Gateway de IA: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`AI Gateway Error: ${response.status}`);
       return await response.json();
     });
 
-    const aiData = aiResponse;
-    const content = aiData.choices?.[0]?.message?.content || '[]';
-    
-    let predictions = [];
-    try {
-      const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      predictions = JSON.parse(cleanContent);
-    } catch (e) {
-      log('ERROR', 'Falha ao parsear resposta da IA', { content });
+    const content = aiResponse.choices?.[0]?.message?.content || '[]';
+    const cleanContent = content.replace(/```json\n?|```/g, '').trim();
+    const predictions = JSON.parse(cleanContent);
+
+    // 2. Cache new predictions
+    if (predictions.length > 0) {
+      const cacheData = predictions.map((p: any) => ({
+        entity_id: p.id,
+        entity_type: p.tipo,
+        risco: p.risco,
+        probabilidade_atraso: p.probabilidade_atraso,
+        prediction_data: p,
+        analyzed_at: now.toISOString()
+      }));
+
+      // Clear old cache first
+      await supabase.from('ai_delay_predictions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      const { error: cacheError } = await supabase.from('ai_delay_predictions').insert(cacheData);
+      if (cacheError) log('ERROR', 'Failed to cache predictions', cacheError);
     }
 
     const summary = {
@@ -199,12 +224,18 @@ Retorne APENAS o JSON, sem markdown ou explicações.`;
       taxa_atraso_historica: delayRate,
     };
 
-    return new Response(JSON.stringify({ success: true, predictions, summary, analyzed_at: now.toISOString() }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      predictions, 
+      summary, 
+      analyzed_at: now.toISOString(),
+      cached: false 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error) {
-    log('ERROR', 'Falha na predição de atrasos', { error: error.message });
+    log('ERROR', 'Predict-delays failure', { error: error.message });
     return new Response(JSON.stringify({ success: false, message: error.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
