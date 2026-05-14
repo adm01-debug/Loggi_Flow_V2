@@ -58,6 +58,7 @@ export function useDelayPrediction() {
       setPredictions(data.predictions || []);
       setSummary(data.summary || null);
       setLastAnalyzed(data.analyzed_at);
+      setIsCached(!!data.cached);
 
       const criticos = data.summary?.criticos || 0;
       const altos = data.summary?.altos || 0;
@@ -127,6 +128,7 @@ export function useDelayPrediction() {
     summary,
     lastAnalyzed,
     error,
+    isCached,
     analyzeDelays,
     getRiskColor,
     getRiskLabel,
