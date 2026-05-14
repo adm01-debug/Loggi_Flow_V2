@@ -172,21 +172,6 @@ export default function Index() {
           {/* Actions - Scrollable on mobile */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none animate-in fade-in duration-500 delay-100">
             <div className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></div>
-            <div className="shrink-0">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={async () => {
-                  const loader = toast.loading("Validando integridade do sistema...");
-                  await runSystemSanityChecks();
-                  toast.dismiss(loader);
-                }} 
-                className="h-9 w-9 sm:h-10 sm:w-10 text-success border-success/20 hover:bg-success/5" 
-                title="Auditoria de Sistema"
-              >
-                <ShieldCheck className="w-4 h-4" />
-              </Button>
-            </div>
             <div className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10" title="Atualizar dados"><RefreshCw className="w-4 h-4" /></Button></div>
             <div className="shrink-0"><RefreshTimer lastRefresh={lastRefresh} /></div>
             <div className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></div>
