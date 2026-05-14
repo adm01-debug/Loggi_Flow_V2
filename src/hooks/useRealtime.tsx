@@ -38,7 +38,7 @@ export function useRealtime<T = Record<string, unknown>>({
         queryClient.invalidateQueries({ queryKey });
         
         // Specifically invalidate dashboard metrics if related tables change
-        if (["entregas", "coletas", "ocorrencias"].includes(table)) {
+        if (["entregas", "coletas", "ocorrencias", "ai_delay_predictions"].includes(table)) {
           queryClient.invalidateQueries({ queryKey: ["dashboard-metrics"] });
           queryClient.invalidateQueries({ queryKey: ["recent-alerts"] });
         }
