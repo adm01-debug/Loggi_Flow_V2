@@ -37,11 +37,11 @@ export default function Configuracoes() {
 
   const integrationsList = [
     { id: "supabase", name: "Supabase", icon: Database, status: "connected" },
-    { id: "bitrix24", name: "Bitrix24", icon: Link, status: integrations.find(i => i.name === "bitrix24")?.status || "unknown" },
-    { id: "lalamove", name: "Lalamove", icon: Globe, status: integrations.find(i => i.name === "lalamove")?.status || "unknown" },
+    { id: "bitrix24", name: "Bitrix24", icon: Link, status: integrations.find(i => i.name === "Bitrix24")?.status || "not_configured" },
+    { id: "lalamove", name: "Lalamove", icon: Globe, status: integrations.find(i => i.name === "Lalamove")?.status || "not_configured" },
     { id: "n8n", name: "n8n", icon: Settings, status: integrations.find(i => i.name === "n8n")?.status || "unknown" },
-    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: "connected" },
-    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: "connected" },
+    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: integrations.find(i => i.name === "Rodonaves")?.status || "not_configured" },
+    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: integrations.find(i => i.name === "Melhor Envio")?.status || "not_configured" },
   ];
 
   const handleValidateIntegration = (id: string) => {
