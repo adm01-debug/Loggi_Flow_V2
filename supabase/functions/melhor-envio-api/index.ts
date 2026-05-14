@@ -1,7 +1,14 @@
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
+import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { log } from "../_shared/logger.ts";
 
 const SANDBOX_URL = "https://sandbox.melhorenvio.com.br/api/v2";
 const PRODUCTION_URL = "https://melhorenvio.com.br/api/v2";
+
+const meBreaker = getCircuitBreaker('melhor-envio', {
+  failureThreshold: 5,
+  resetTimeoutMs: 60000, // 1 minute
+});
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
