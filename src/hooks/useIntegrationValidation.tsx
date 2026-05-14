@@ -104,6 +104,9 @@ export function useIntegrationValidation() {
       const results = await Promise.all([
         validateLalamove(),
         validateMapbox(),
+        validateBitrix24(),
+        validateRodonaves(),
+        validateMelhorEnvio(),
       ]);
       
       setIntegrations(results);
