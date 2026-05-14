@@ -89,3 +89,27 @@ jobs:
         with:
           name: build
           path: dist/
+
+  generate-audit-pdf:
+    name: Generate Audit PDF
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Install md-to-pdf
+        run: npm install -g md-to-pdf
+        
+      - name: Generate PDF from Markdown
+        run: md-to-pdf audit_report.md
+        
+      - name: Commit and Push PDF
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add audit_report.pdf
+          git commit -m "docs: auto-generate audit_report.pdf [skip ci]" || echo "No changes to commit"
+          git push
+
