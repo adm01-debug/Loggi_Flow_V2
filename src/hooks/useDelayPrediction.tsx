@@ -34,6 +34,7 @@ export function useDelayPrediction() {
   const [summary, setSummary] = useState<PredictionSummary | null>(null);
   const [lastAnalyzed, setLastAnalyzed] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isCached, setIsCached] = useState(false);
 
   const analyzeDelays = useCallback(async () => {
     setIsLoading(true);
