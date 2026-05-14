@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,8 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  Lightbulb
+  Lightbulb,
+  Zap
 } from 'lucide-react';
 import { useDelayPrediction, DelayPrediction } from '@/hooks/useDelayPrediction';
 import { format } from 'date-fns';
@@ -28,10 +29,18 @@ export function DelayPredictionPanel() {
     lastAnalyzed, 
     analyzeDelays,
     getRiskColor,
-    getRiskLabel 
+    getRiskLabel,
+    isCached
   } = useDelayPrediction();
   
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Tenta carregar predições em cache ao montar o componente
+    if (predictions.length === 0) {
+      analyzeDelays();
+    }
+  }, [analyzeDelays, predictions.length]);
 
   const toggleExpanded = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
