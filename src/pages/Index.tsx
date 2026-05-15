@@ -72,26 +72,22 @@ export default function Index() {
   useRealtime({ table: "entregas", onInsert: () => { refetchMetrics(); refetchAlerts(); }, onUpdate: () => { refetchMetrics(); refetchAlerts(); } });
   useRealtime({ table: "coletas", onInsert: () => refetchMetrics(), onUpdate: () => refetchMetrics() });
 
-  const { data: weeklyChartData, refetch: refetchChart } = useQuery({
-    queryKey: ["dashboard-weekly", dateRange.from, dateRange.to],
+  const { data: combinedData, isLoading: combinedLoading } = useQuery({
+    queryKey: ["dashboard-data-combined", dateRange.from, dateRange.to],
     queryFn: async () => {
       if (!dateRange.from || !dateRange.to) return { coletas: [], entregas: [] };
+      const startDate = startOfDay(dateRange.from).toISOString();
+      const endDate = endOfDay(dateRange.to).toISOString();
+      
       const [{ data: coletas }, { data: entregas }] = await Promise.all([
-        supabase.from("coletas").select("created_at").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
-        supabase.from("entregas").select("created_at").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
-      ]);
-      return { coletas: coletas || [], entregas: entregas || [] };
-    },
-    staleTime: QUERY_STALE_TIME.DASHBOARD,
-  });
-
-  const { data: statusData } = useQuery({
-    queryKey: ["dashboard-status", dateRange.from, dateRange.to],
-    queryFn: async () => {
-      if (!dateRange.from || !dateRange.to) return { coletas: [], entregas: [] };
-      const [{ data: coletas }, { data: entregas }] = await Promise.all([
-        supabase.from("coletas").select("status").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
-        supabase.from("entregas").select("status").gte("created_at", startOfDay(dateRange.from).toISOString()).lte("created_at", endOfDay(dateRange.to).toISOString()),
+        supabase.from("coletas")
+          .select("status, created_at")
+          .gte("created_at", startDate)
+          .lte("created_at", endDate),
+        supabase.from("entregas")
+          .select("status, created_at")
+          .gte("created_at", startDate)
+          .lte("created_at", endDate),
       ]);
       return { coletas: coletas || [], entregas: entregas || [] };
     },
@@ -99,28 +95,37 @@ export default function Index() {
   });
 
   const chartData = useMemo(() => {
-    if (!weeklyChartData || !dateRange.from || !dateRange.to) return [];
+    if (!combinedData || !dateRange.from || !dateRange.to) return [];
     const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
     return days.map((day) => {
       const dayStr = format(day, "yyyy-MM-dd");
-      const coletas = weeklyChartData.coletas.filter((c) => format(new Date(c.created_at), "yyyy-MM-dd") === dayStr).length;
-      const entregas = weeklyChartData.entregas.filter((e) => format(new Date(e.created_at), "yyyy-MM-dd") === dayStr).length;
-      return { name: format(day, "EEE", { locale: ptBR }), coletas, entregas, total: coletas + entregas };
+      const coletasCount = combinedData.coletas.filter((c) => format(new Date(c.created_at), "yyyy-MM-dd") === dayStr).length;
+      const entregasCount = combinedData.entregas.filter((e) => format(new Date(e.created_at), "yyyy-MM-dd") === dayStr).length;
+      return { name: format(day, "EEE", { locale: ptBR }), coletas: coletasCount, entregas: entregasCount, total: coletasCount + entregasCount };
     });
-  }, [weeklyChartData, dateRange]);
+  }, [combinedData, dateRange.from, dateRange.to]);
 
   const statusStats = useMemo(() => {
-    if (!statusData) return { pendentes: 0, transito: 0, finalizadas: 0, problemas: 0 };
-    const coletasPendentes = statusData.coletas.filter((c) => ["aguardando_liberacao", "solicitada"].includes(c.status)).length;
-    const coletasTransito = statusData.coletas.filter((c) => c.status === "em_transito").length;
-    const coletasOk = statusData.coletas.filter((c) => ["conferencia_ok", "finalizada"].includes(c.status)).length;
-    const coletasProblema = statusData.coletas.filter((c) => c.status === "divergencia").length;
-    const entregasPendentes = statusData.entregas.filter((e) => ["aguardando_producao", "pronto_despacho", "cotacao_frete"].includes(e.status)).length;
-    const entregasTransito = statusData.entregas.filter((e) => ["em_transito", "despachado", "saiu_entrega"].includes(e.status)).length;
-    const entregasOk = statusData.entregas.filter((e) => ["entregue", "finalizado"].includes(e.status)).length;
-    const entregasProblema = statusData.entregas.filter((e) => e.status === "ocorrencia").length;
-    return { pendentes: coletasPendentes + entregasPendentes, transito: coletasTransito + entregasTransito, finalizadas: coletasOk + entregasOk, problemas: coletasProblema + entregasProblema };
-  }, [statusData]);
+    if (!combinedData) return { pendentes: 0, transito: 0, finalizadas: 0, problemas: 0 };
+    
+    let pendentes = 0, transito = 0, finalizadas = 0, problemas = 0;
+    
+    combinedData.coletas.forEach(c => {
+      if (["aguardando_liberacao", "solicitada"].includes(c.status)) pendentes++;
+      else if (c.status === "em_transito") transito++;
+      else if (["conferencia_ok", "finalizada"].includes(c.status)) finalizadas++;
+      else if (c.status === "divergencia") problemas++;
+    });
+    
+    combinedData.entregas.forEach(e => {
+      if (["aguardando_producao", "pronto_despacho", "cotacao_frete"].includes(e.status)) pendentes++;
+      else if (["em_transito", "despachado", "saiu_entrega"].includes(e.status)) transito++;
+      else if (["entregue", "finalizado"].includes(e.status)) finalizadas++;
+      else if (e.status === "ocorrencia") problemas++;
+    });
+    
+    return { pendentes, transito, finalizadas, problemas };
+  }, [combinedData]);
 
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
