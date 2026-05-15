@@ -3,7 +3,6 @@ import { History, Plus, Pencil, Trash2, User, Calendar, ChevronDown, ChevronUp, 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { motion, AnimatePresence } from "framer-motion";
 import { useAuditLogs, AuditLog, tableNameLabels, actionLabels } from "@/hooks/useAuditLogs";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
