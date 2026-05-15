@@ -75,8 +75,9 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
       }
       
       onSuccess();
-    } catch (error: any) {
-      toast({ title: "Erro na conferência", description: error.message, variant: "destructive" });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+      toast({ title: "Erro na conferência", description: errorMessage, variant: "destructive" });
     } finally {
       setLoading(false);
     }

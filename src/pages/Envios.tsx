@@ -23,6 +23,8 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+
 // Novos hooks e componentes
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -139,6 +141,7 @@ export default function Envios() {
   const [dlgDel, setDlgDel] = useState(false);
   const [sel, setSel] = useState<Entrega | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const { playSuccess, playAction, playError, playWhoosh } = useAudioFeedback();
 
   const { data: list = [], isLoading, error, refetch } = useQuery({
     queryKey: ["entregas"],
@@ -154,6 +157,11 @@ export default function Envios() {
 
   // Hooks integrados
   const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(list, filterConfig);
+  
+  const handleClearFilters = () => {
+    playWhoosh();
+    clearFilters();
+  };
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
@@ -167,8 +175,17 @@ export default function Envios() {
       const { error } = await supabase.from("entregas").insert({ numero_entrega: numero, cliente_id: d.cliente_id || null, endereco_entrega: d.endereco_entrega, contato_cliente: d.contato_cliente || null, tipo_frete: d.tipo_frete, transportadora_id: d.transportadora_id || null, previsao_entrega: d.previsao_entrega || null, observacoes: d.observacoes || null, status: "aguardando_producao" });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["entregas"] }); setDlgCreate(false); setForm(emptyForm); toast.success("Entrega criada!"); },
-    onError: (e) => toast.error("Erro: " + e.message),
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ["entregas"] }); 
+      setDlgCreate(false); 
+      setForm(emptyForm); 
+      playSuccess();
+      toast.success("Entrega criada!"); 
+    },
+    onError: (e) => {
+      playError();
+      toast.error("Erro: " + e.message);
+    },
   });
 
   const updateStatusMut = useMutation({
@@ -178,7 +195,11 @@ export default function Envios() {
       const { error } = await supabase.from("entregas").update(update).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["entregas"] }); toast.success("Status atualizado!"); },
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ["entregas"] }); 
+      playSuccess();
+      toast.success("Status atualizado!"); 
+    },
   });
 
   const deleteMut = useMutation({
@@ -268,7 +289,7 @@ export default function Envios() {
           onStatusChange={setStatus}
           statusOptions={filterConfig.status?.options}
           hasActiveFilters={hasActiveFilters}
-          onClearFilters={clearFilters}
+          onClearFilters={handleClearFilters}
           totalFiltered={totalFiltered}
           totalOriginal={totalOriginal}
         />

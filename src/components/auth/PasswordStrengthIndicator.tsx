@@ -107,9 +107,10 @@ export function PasswordStrengthIndicator({
           <span className="text-muted-foreground">Força da senha</span>
           <span className={cn(
             "font-medium",
-            analysis.level === "strong" ? "text-success" : 
-            analysis.level === "good" ? "text-warning" : 
-            analysis.level === "fair" ? "text-warning/70" : "text-destructive"
+            analysis.level === "strong" && "text-success",
+            analysis.level === "good" && "text-warning",
+            analysis.level === "fair" && "text-warning/70",
+            analysis.level === "weak" && "text-destructive"
           )}>
             {analysis.label}
           </span>
@@ -127,14 +128,21 @@ export function PasswordStrengthIndicator({
 
       {/* Criteria checklist */}
       <div className="grid grid-cols-1 gap-1">
-        {analysis.criteria.map((criterion, index) => (
-          <div
-            key={index}
-            className={cn(
-              "flex items-center gap-2 text-xs transition-colors",
-              criterion.met ? "text-success" : (criterion.required ? "text-destructive" : "text-muted-foreground")
-            )}
-          >
+        {analysis.criteria.map((criterion, index) => {
+          const textColor = criterion.met 
+            ? "text-success" 
+            : criterion.required 
+              ? "text-destructive" 
+              : "text-muted-foreground";
+
+          return (
+            <div
+              key={index}
+              className={cn(
+                "flex items-center gap-2 text-xs transition-colors",
+                textColor
+              )}
+            >
             {criterion.met ? (
               <Check className="h-3.5 w-3.5" />
             ) : (
@@ -146,8 +154,9 @@ export function PasswordStrengthIndicator({
                 <span className="ml-1 text-destructive">(obrigatório)</span>
               )}
             </span>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
 
       {/* Pwned password check */}
