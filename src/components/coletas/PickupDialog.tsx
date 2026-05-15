@@ -58,8 +58,9 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
         const date = pickup.data_prevista_coleta ? new Date(pickup.data_prevista_coleta).toISOString().split('T')[0] : "";
         reset({ ...pickup, data_prevista_coleta: date });
       } else {
+        const randomId = window.crypto.getRandomValues(new Uint32Array(1))[0] % 100000;
         reset({
-          numero_coleta: `COL-${Math.floor(Math.random() * 100000)}`,
+          numero_coleta: `COL-${randomId}`,
           fornecedor_id: "",
           endereco_coleta: "",
           tipo_coleta: "transportadora",
