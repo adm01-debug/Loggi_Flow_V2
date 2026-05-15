@@ -116,7 +116,7 @@ const adminItems = [
   { title: "Audit Trail", url: "/audit-trail", icon: History },
   { title: "Documentação API", url: "/api-docs", icon: Code },
 ];
-export function AppSidebar() {
+export const AppSidebar = React.memo(function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { isAdmin } = useAuth();
