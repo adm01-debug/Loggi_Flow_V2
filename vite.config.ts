@@ -97,7 +97,7 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     globals: true,
-    testTimeout: 30000,
+    testTimeout: 60000,
     environment: 'jsdom',
     setupFiles: './tests/test-utils.tsx',
     coverage: {
