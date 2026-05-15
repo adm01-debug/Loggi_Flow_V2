@@ -72,7 +72,7 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
         }
 
         if (coletas) {
-          (coletas as ColetaRaw[]).forEach((coleta) => {
+          (coletas as any[]).forEach((coleta) => {
             events.push({
               id: coleta.id,
               title: coleta.numero_coleta,
