@@ -31,8 +31,8 @@ export function PasswordStrengthIndicator({
       { label: "Mínimo 8 caracteres", met: password.length >= 8, required: true },
       { label: "Letra maiúscula", met: /[A-Z]/.test(password), required: false },
       { label: "Letra minúscula", met: /[a-z]/.test(password), required: false },
-      { label: "Número", met: /[0-9]/.test(password), required: false },
-      { label: "Caractere especial (!@#$%...)", met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password), required: true },
+      { label: "Número", met: /\d/.test(password), required: false },
+      { label: "Caractere especial (!@#$%...)", met: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password), required: true },
     ];
 
     const requiredCriteria = criteria.filter(c => c.required);
