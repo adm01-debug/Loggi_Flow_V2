@@ -129,7 +129,9 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                       <Info className="w-4 h-4" /> Origem / Fornecedor
                     </h3>
                     <div>
-                      <p className="font-bold">{(pickup.fornecedores as any)?.nome_fantasia || (pickup.fornecedores as any)?.razao_social}</p>
+                      <p className="font-bold">
+                        {pickup.fornecedores?.nome_fantasia || pickup.fornecedores?.razao_social || 'Não informado'}
+                      </p>
                       <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                         <MapPin className="w-3 h-3" /> {pickup.endereco_coleta}
                       </p>
@@ -142,7 +144,11 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                       <Truck className="w-4 h-4" /> Transporte
                     </h3>
                     <div>
-                      <p className="font-bold capitalize">{pickup.tipo_coleta === 'lalamove' ? 'Lalamove' : (pickup.transportadoras as any)?.nome_fantasia || 'Transportadora Tradicional'}</p>
+                      <p className="font-bold capitalize">
+                        {pickup.tipo_coleta === 'lalamove' 
+                          ? 'Lalamove' 
+                          : (pickup.transportadoras?.nome_fantasia || 'Transportadora Tradicional')}
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
                         Status: {statusConfig[pickup.status]?.label}
                       </p>
