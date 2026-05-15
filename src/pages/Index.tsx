@@ -69,8 +69,8 @@ export default function Index() {
     "chart-performance", "alerts-panel", "quick-actions"
   ]);
 
-  useRealtime({ table: "entregas", onInsert: () => { refetchMetrics(); refetchAlerts(); }, onUpdate: () => { refetchMetrics(); refetchAlerts(); } });
-  useRealtime({ table: "coletas", onInsert: () => refetchMetrics(), onUpdate: () => refetchMetrics() });
+  useRealtime({ table: "entregas", queryKey: ["dashboard-metrics", "recent-alerts"] });
+  useRealtime({ table: "coletas", queryKey: ["dashboard-metrics"] });
 
   const { data: combinedData, isLoading: combinedLoading, refetch: combinedRefetch } = useQuery({
     queryKey: ["dashboard-data-combined", dateRange.from, dateRange.to],
