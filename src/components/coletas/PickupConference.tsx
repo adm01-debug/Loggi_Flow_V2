@@ -8,8 +8,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 
+interface Pickup {
+  id: string;
+  qtd_recebida: number;
+  qtd_volumes: number;
+  peso_efetivo: number;
+  peso_estimado_kg: number;
+}
+
 interface PickupConferenceProps {
-  pickup: any;
+  pickup: Pickup;
   onSuccess: () => void;
 }
 
