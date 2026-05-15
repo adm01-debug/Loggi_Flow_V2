@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Loader2, Download } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { importExcel, getSheetNames } from '@/lib/excelImporter';
 import { ImportResult } from '@/lib/csvImporter';
 import { Alert, AlertDescription } from '@/components/ui/alert';

@@ -70,8 +70,7 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
 
           jsonData.forEach((row, index) => {
             try {
-              const normalizedRow = normalizeRow(row);
-              const validated = schema.parse(normalizedRow);
+              const validated = schema.parse(normalizeRow(row));
               success.push(validated);
             } catch (err) {
               if (err instanceof z.ZodError) {

@@ -68,7 +68,7 @@ export function StepProgress({
       {steps.map((step, index) => {
         const isCompleted = index < currentStep;
         const isCurrent = index === currentStep;
-        const isClickable = onStepClick && index <= currentStep;
+        const isClickable = !!onStepClick && index <= currentStep;
 
         return (
           <div
