@@ -17,7 +17,7 @@ export interface AchievementBadgeData {
   maxProgress?: number;
 }
 
-const rarityConfig = {
+export const rarityConfig = {
   common: {
     border: "border-muted-foreground/30",
     bg: "bg-muted/30",
