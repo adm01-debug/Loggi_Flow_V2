@@ -98,7 +98,8 @@ describe("Semantic Token Regression", () => {
     }
   });
 
-  describe("No console statements in src (excluding tests)", () => {
+  describe("Console hygiene", () => {
+    it("No console statements in src (excluding tests)", () => {
       const files = collectFiles("src").filter((f) => !f.includes("/test/"));
       const violations: string[] = [];
 
