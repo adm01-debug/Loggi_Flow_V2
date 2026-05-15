@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { Database } from "@/integrations/supabase/types";
 import { Coleta as Pickup } from "./types";
 import { PickupConference } from "./PickupConference";
 
@@ -69,7 +70,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
     const { error } = await supabase
       .from("coletas")
       .update({ 
-        status: newStatus,
+        status: newStatus as Database["public"]["Enums"]["coleta_status"],
         data_efetiva_coleta: newStatus === 'em_transito' ? new Date().toISOString() : pickup.data_efetiva_coleta
       })
       .eq("id", pickup.id);

@@ -9,7 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { Coleta as Pickup } from "./types";
+import { Coleta as Pickup, ColetaStatus, ColetaTipo } from "./types";
+import { Database } from "@/integrations/supabase/types";
+
+type ColetaInsert = Database["public"]["Tables"]["coletas"]["Insert"];
+type ColetaUpdate = Database["public"]["Tables"]["coletas"]["Update"];
 
 interface Fornecedor {
   id: string;
@@ -96,10 +100,10 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
       let error;
       if (pickup?.id) {
-        const { error: err } = await supabase.from("coletas").update(payload).eq("id", pickup.id);
+        const { error: err } = await supabase.from("coletas").update(payload as ColetaUpdate).eq("id", pickup.id);
         error = err;
       } else {
-        const { error: err } = await supabase.from("coletas").insert(payload);
+        const { error: err } = await supabase.from("coletas").insert(payload as ColetaInsert);
         error = err;
       }
 
