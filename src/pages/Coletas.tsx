@@ -86,7 +86,7 @@ export default function Coletas() {
                 </div>
                 <span className="truncate">Coletas</span>
               </h1>
-              <RealtimeBadge isSyncing={isSyncing} className="mt-1" />
+              <RealtimeBadge isSyncing={loading} className="mt-1" />
             </div>
             <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie coletas de fornecedores</p>
           </div>
@@ -223,7 +223,7 @@ export default function Coletas() {
       <PickupDialog 
         open={isDialogOpen} 
         onOpenChange={setIsDialogOpen} 
-        onSuccess={fetchData} 
+        onSuccess={refetch} 
         pickup={selectedPickup} 
       />
 
@@ -232,7 +232,7 @@ export default function Coletas() {
         onOpenChange={setIsDetailsOpen} 
         pickup={selectedPickup} 
         statusConfig={statusConfig} 
-        onStatusUpdate={fetchData} 
+        onStatusUpdate={refetch} 
       />
     </MainLayout>
   );
