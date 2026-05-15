@@ -66,7 +66,7 @@ export function AchievementNotificationContainer() {
                       key={i}
                       className="absolute w-1 h-1 rounded-full bg-xp/60"
                       initial={{ 
-                        x: Math.random() * 100 + "%", 
+                        x: `${(i * 17) % 100}%`, 
                         y: "100%",
                         opacity: 0 
                       }}
