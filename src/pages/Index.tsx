@@ -132,13 +132,20 @@ export default function Index() {
   // Auto-refresh every 2 minutes
   useEffect(() => {
     const autoRefresh = setInterval(() => {
-      refetchMetrics(); refetchAlerts(); refetchChart();
+      refetchMetrics(); 
+      refetchAlerts(); 
+      combinedRefetch();
       setLastRefresh(new Date());
     }, 120000);
     return () => clearInterval(autoRefresh);
-  }, [refetchMetrics, refetchAlerts, refetchChart]);
+  }, [refetchMetrics, refetchAlerts, combinedRefetch]);
 
-  const handleRefresh = () => { refetchMetrics(); refetchAlerts(); refetchChart(); setLastRefresh(new Date()); };
+  const handleRefresh = () => { 
+    refetchMetrics(); 
+    refetchAlerts(); 
+    combinedRefetch(); 
+    setLastRefresh(new Date()); 
+  };
   const handleDateRangeChange = (range: DateRange | undefined) => { if (range) setDateRange(range); };
 
   const widgetDefinitions: Record<string, { size: DashboardWidget["size"]; render: () => React.ReactNode }> = {
