@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 import { PickupConference } from "./PickupConference";
 
-interface Pickup {
+export interface Pickup {
   id: string;
   numero_coleta: string;
   status: string;
@@ -28,30 +28,34 @@ interface Pickup {
   transportadoras?: { nome_fantasia?: string } | null;
 }
 
+interface TimelineEvent {
+  id: string;
+  action: string;
+  created_at: string;
+  new_data?: {
+    status?: string;
+    qtd_recebida?: number;
+    peso_efetivo?: number;
+  };
+}
+
 interface PickupDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   pickup: Pickup | null;
-  statusConfig: Record<string, { label: string; color: string; icon: any }>;
+  statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }>;
   onStatusUpdate: () => void;
 }
 
 export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, onStatusUpdate }: PickupDetailsDialogProps) {
-  const [timeline, setTimeline] = useState<any[]>([]);
+  const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [loadingTimeline, setLoadingTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState("detalhes");
-  const { playSuccess, playAction, playWhoosh } = useAudioFeedback();
+  const { playSuccess, playWhoosh } = useAudioFeedback();
 
-  useEffect(() => {
-    if (open && pickup) {
-      fetchTimeline();
-    }
-  }, [open, pickup]);
-
-  const fetchTimeline = async () => {
+  const fetchTimeline = useCallback(async () => {
     if (!pickup) return;
     setLoadingTimeline(true);
-    // Fetch from audit_logs where table_name is coletas and record_id is pickup.id
     const { data } = await supabase
       .from("audit_logs")
       .select("*")
@@ -59,9 +63,15 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
       .eq("table_name", "coletas")
       .order("created_at", { ascending: false });
     
-    if (data) setTimeline(data);
+    if (data) setTimeline(data as TimelineEvent[]);
     setLoadingTimeline(false);
-  };
+  }, [pickup]);
+
+  useEffect(() => {
+    if (open && pickup) {
+      fetchTimeline();
+    }
+  }, [open, pickup, fetchTimeline]);
 
   if (!pickup) return null;
 
