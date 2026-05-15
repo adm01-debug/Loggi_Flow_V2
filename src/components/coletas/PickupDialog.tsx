@@ -132,7 +132,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status Inicial</Label>
-              <Select defaultValue={watch("status")} onValueChange={(val) => setValue("status", val)}>
+              <Select defaultValue={watch("status")} onValueChange={(val) => setValue("status", val as any)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
