@@ -147,7 +147,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
           <div className="space-y-2">
             <Label>Fornecedor</Label>
-            <Select defaultValue={watch("fornecedor_id")} onValueChange={(val) => setValue("fornecedor_id", val)}>
+            <Select defaultValue={watch("fornecedor_id") || undefined} onValueChange={(val) => setValue("fornecedor_id", val)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o fornecedor" />
               </SelectTrigger>
@@ -167,7 +167,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Tipo de Transporte</Label>
-              <Select defaultValue={watch("tipo_coleta")} onValueChange={(val) => setValue("tipo_coleta", val)}>
+              <Select defaultValue={watch("tipo_coleta")} onValueChange={(val) => setValue("tipo_coleta", val as any)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -180,7 +180,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
             {tipoColeta === "transportadora" && (
               <div className="space-y-2">
                 <Label>Transportadora</Label>
-                <Select defaultValue={watch("transportadora_id")} onValueChange={(val) => setValue("transportadora_id", val)}>
+                <Select defaultValue={watch("transportadora_id") || undefined} onValueChange={(val) => setValue("transportadora_id", val)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a transportadora" />
                   </SelectTrigger>
