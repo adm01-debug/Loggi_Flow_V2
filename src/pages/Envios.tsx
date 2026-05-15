@@ -23,6 +23,8 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+
 // Novos hooks e componentes
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
