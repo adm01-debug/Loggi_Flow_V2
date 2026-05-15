@@ -19,19 +19,19 @@ interface Pickup {
   status: string;
   endereco_coleta: string;
   tipo_coleta: string;
-  data_prevista_coleta: string;
-  qtd_volumes: number;
-  peso_estimado_kg: number;
-  observacoes: string;
-  data_efetiva_coleta: string;
-  fornecedores: { nome_fantasia?: string; razao_social?: string };
-  transportadoras: { nome_fantasia?: string };
+  data_prevista_coleta: string | null;
+  qtd_volumes: number | null;
+  peso_estimado_kg: number | null;
+  observacoes: string | null;
+  data_efetiva_coleta: string | null;
+  fornecedores?: { nome_fantasia?: string | null; razao_social?: string } | null;
+  transportadoras?: { nome_fantasia?: string } | null;
 }
 
 interface PickupDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  pickup: Pickup;
+  pickup: Pickup | null;
   statusConfig: Record<string, { label: string; color: string; icon: any }>;
   onStatusUpdate: () => void;
 }
@@ -49,6 +49,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
   }, [open, pickup]);
 
   const fetchTimeline = async () => {
+    if (!pickup) return;
     setLoadingTimeline(true);
     // Fetch from audit_logs where table_name is coletas and record_id is pickup.id
     const { data } = await supabase
