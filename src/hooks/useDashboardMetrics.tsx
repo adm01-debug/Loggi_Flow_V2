@@ -174,7 +174,7 @@ export function useRecentAlerts() {
         });
       });
       
-      predictionsRes.data?.forEach((pred: any) => {
+      predictionsRes.data?.forEach((pred: { id: string; prediction_data: any; analyzed_at: string; entity_id: string; entity_type: string }) => {
         const p = pred.prediction_data;
         alerts.push({
           id: `ia-pred-${pred.id}`,
