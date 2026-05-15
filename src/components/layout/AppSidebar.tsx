@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense, memo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Truck, Package, Building2, Send, BarChart3, Settings,
+  LayoutDashboard, Truck, Package, Building2, Send, BarChart3,
   Trophy, Zap, ChevronLeft, ChevronRight, Box, PackageSearch, History,
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
@@ -399,9 +399,9 @@ export const AppSidebar = memo(function AppSidebar() {
         size="icon"
         onClick={() => setCollapsed(!collapsed)}
         aria-label={collapsed ? "Expandir" : "Recolher"}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full shadow-lg border-2"
+        className="absolute -right-3 top-20 w-6 h-6 rounded-full shadow-lg border-2 bg-background"
       >
-        {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </Button>
     </aside>
   );

@@ -3,15 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, AlertTriangle, CheckCircle2, Search, Calculator } from 'lucide-react';
+import { FileCheck, AlertTriangle, CheckCircle2, Search } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatters';
 import { useFreightQuotation } from '@/hooks/useFreightQuotation';
 import { toast } from 'sonner';
 import { Decimal } from 'decimal.js';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 interface AuditResult {
   status: 'success' | 'warning' | 'error';
@@ -28,8 +28,8 @@ interface AuditLogRecord {
   table_name: string;
   record_id: string;
   action: string;
-  old_data: any;
-  new_data: any;
+  old_data: Json;
+  new_data: Json;
   user_email: string;
   created_at: string;
 }
@@ -44,7 +44,7 @@ export function FreightAudit() {
   });
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
 
-  const { data: auditLogs, isLoading: isLoadingLogs } = useQuery({
+  const { data: auditLogs } = useQuery({
     queryKey: ['recent-audit-logs'],
     queryFn: async () => {
       const { data, error } = await supabase

@@ -264,7 +264,9 @@ export function LinearProgress({
   className,
 }: LinearProgressProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
-  const heightClass = size === "sm" ? "h-1.5" : size === "md" ? "h-2.5" : "h-4";
+  let heightClass = "h-2.5";
+  if (size === "sm") heightClass = "h-1.5";
+  else if (size === "lg") heightClass = "h-4";
 
   return (
     <div className={cn("w-full", className)}>

@@ -275,7 +275,7 @@ export function FavoriteMetricsBar() {
           <AnimatePresence mode="popLayout">
             {favoriteMetrics.map((metric) => {
               const IconComponent = iconMap[metric.icon];
-              const data = (realMetricValues as any)[metric.id] || { value: "-", change: undefined, changeType: "neutral" as const };
+              const data = (realMetricValues as Record<string, { value: string | number; change?: number; changeType: string }>) [metric.id] || { value: "-", change: undefined, changeType: "neutral" as const };
 
               return (
                 <motion.div
@@ -317,14 +317,14 @@ export function FavoriteMetricsBar() {
                             <div
                               className={cn(
                                 "flex items-center text-xs",
-                                data.changeType === "positive" && "text-success",
-                                data.changeType === "negative" && "text-destructive",
-                                data.changeType === "neutral" && "text-muted-foreground"
+                                data.changeType === ("positive" as string) && "text-success",
+                                data.changeType === ("negative" as string) && "text-destructive",
+                                data.changeType === ("neutral" as string) && "text-muted-foreground"
                               )}
                             >
-                              {data.changeType === "positive" ? (
+                              {data.changeType === ("positive" as string) ? (
                                 <TrendingUp className="h-3 w-3 mr-0.5" />
-                              ) : data.changeType === "negative" ? (
+                              ) : data.changeType === ("negative" as string) ? (
                                 <TrendingDown className="h-3 w-3 mr-0.5" />
                               ) : (
                                 <Minus className="h-3 w-3 mr-0.5" />

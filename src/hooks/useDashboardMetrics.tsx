@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { QUERY_KEYS } from "@/lib/queryKeys";
 import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
-import { differenceInHours, parseISO, isAfter, isBefore, startOfDay, endOfDay, subDays } from "date-fns";
 
 export interface DashboardMetrics {
   totalColetas: number;
@@ -49,8 +48,23 @@ export function useDashboardMetrics() {
         throw error;
       }
       
-      const data = rpcData as Record<string, any>;
-      
+      const data = rpcData as {
+        totalColetas: number;
+        coletasPendentes: number;
+        coletasEmTransito: number;
+        coletasFinalizadas: number;
+        coletasComDivergencia: number;
+        totalEntregas: number;
+        entregasPendentes: number;
+        entregasEmTransito: number;
+        entregasFinalizadas: number;
+        entregasComOcorrencia: number;
+        otifRate: number;
+        totalVolume: number;
+        valorTotalFrete: number;
+        lastSync: string;
+      };
+
       return {
         totalColetas: data.totalColetas || 0,
         coletasPendentes: data.coletasPendentes || 0,
@@ -88,7 +102,6 @@ export function useRecentAlerts() {
       const now = new Date();
       const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString();
       
-      // Parallel execution of all alert-related queries
       const [coletasRes, entregasRes, predictionsRes] = await Promise.all([
         supabase
           .from('coletas')
@@ -159,16 +172,16 @@ export function useRecentAlerts() {
         });
       });
       
-      predictionsRes.data?.forEach((pred: any) => {
-        const p = pred.prediction_data;
+      predictionsRes.data?.forEach((pred) => {
+        const p = pred.prediction_data as any;
         alerts.push({
           id: `ia-pred-${pred.id}`,
           type: 'ia_previsao',
           message: `IA prevê ${p.probabilidade_atraso}% de atraso em ${p.numero} (${p.tipo})`,
           severity: p.risco === 'critico' ? 'error' : 'warning',
-          createdAt: pred.analyzed_at,
+          createdAt: pred.analyzed_at || new Date().toISOString(),
           entityId: pred.entity_id,
-          entityType: pred.entity_type,
+          entityType: pred.entity_type as 'coleta' | 'entrega',
         });
       });
       
@@ -193,16 +206,16 @@ export function useTransportadoraPerformance() {
   return useQuery({
     queryKey: ['transportadora-performance', user?.id],
     queryFn: async () => {
-      const { data: transportadoras, error } = await (supabase
+      const { data, error } = await supabase
         .from('transportadoras')
-        .select('id, nome_fantasia, score_performance, prazo_medio_dias, homologada') as any)
+        .select('id, nome_fantasia, score_performance, prazo_medio_dias, homologada')
         .eq('homologada', true)
         .order('score_performance', { ascending: false })
         .limit(5);
       
       if (error) throw error;
       
-      return transportadoras || [];
+      return (data || []) as any[];
     },
     staleTime: QUERY_STALE_TIME.STATIC,
     enabled: !!user?.id,
