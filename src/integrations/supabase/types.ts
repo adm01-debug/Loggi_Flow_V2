@@ -4008,6 +4008,7 @@ export type Database = {
           transportadora_id: string
         }[]
       }
+      get_dashboard_metrics: { Args: never; Returns: Json }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
         Returns: {
