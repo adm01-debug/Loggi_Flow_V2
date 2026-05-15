@@ -46,7 +46,6 @@ export function useDashboardMetrics() {
       const { data: rpcData, error } = await supabase.rpc('get_dashboard_metrics');
       
       if (error) {
-        console.error("Erro ao buscar métricas do dashboard:", error);
         throw error;
       }
       
