@@ -29,6 +29,15 @@ const rarityConfig = {
   },
 };
 
+function RarityBadge({ rarity, label }: { rarity: string, label: string }) {
+  let classes = "bg-muted text-muted-foreground";
+  if (rarity === "legendary") classes = "bg-xp/20 text-xp";
+  else if (rarity === "epic") classes = "bg-primary/20 text-primary";
+  else if (rarity === "rare") classes = "bg-info/20 text-info";
+  
+  return <span className={`text-xs px-2 py-0.5 rounded-full ${classes}`}>{label}</span>;
+}
+
 export function AchievementNotificationContainer() {
   const { notifications, dismissNotification } = useAchievementNotifications();
 
