@@ -151,7 +151,7 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
   );
 }
 
-function Info(props: any) {
+function InfoIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
