@@ -11,22 +11,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
-import { PickupConference } from "./PickupConference";
-
-export interface Pickup {
-  id: string;
-  numero_coleta: string;
-  status: string;
-  endereco_coleta: string;
-  tipo_coleta: string;
-  data_prevista_coleta: string | null;
-  qtd_volumes: number | null;
-  peso_estimado_kg: number | null;
-  observacoes: string | null;
-  data_efetiva_coleta: string | null;
-  fornecedores?: { nome_fantasia?: string | null; razao_social?: string } | null;
-  transportadoras?: { nome_fantasia?: string } | null;
-}
+import { Coleta as Pickup, ColetaStatus as PickupStatus } from "./types";
 
 interface TimelineEvent {
   id: string;
