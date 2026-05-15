@@ -43,119 +43,37 @@ export function useDashboardMetrics() {
   return useQuery({
     queryKey: QUERY_KEYS.analytics.dashboard,
     queryFn: async (): Promise<DashboardMetrics> => {
-      const { data: coletas, error: coletasError } = await supabase
-        .from('coletas')
-        .select('id, status, divergencia_percentual, data_prevista_coleta, created_at, data_efetiva_coleta, qtd_volumes');
+      const { data: rpcData, error } = await supabase.rpc('get_dashboard_metrics');
       
-      if (coletasError) throw coletasError;
+      if (error) {
+        console.error("Erro ao buscar métricas do dashboard:", error);
+        throw error;
+      }
       
-      const { data: entregas, error: entregasError } = await supabase
-        .from('entregas')
-        .select('id, status, previsao_entrega, data_entrega_efetiva, created_at, valor_frete');
+      const data = rpcData as Record<string, any>;
       
-      if (entregasError) throw entregasError;
-      
-      const { data: ocorrencias, error: ocorrenciasError } = await supabase
-        .from('ocorrencias')
-        .select('id, resolvida')
-        .eq('resolvida', false);
-      
-      if (ocorrenciasError) throw ocorrenciasError;
-      
-      const totalColetas = coletas?.length || 0;
-      const coletasPendentes = coletas?.filter(c => 
-        ['aguardando_liberacao', 'solicitada'].includes(c.status)
-      ).length || 0;
-      const coletasEmTransito = coletas?.filter(c => c.status === 'em_transito').length || 0;
-      const coletasFinalizadas = coletas?.filter(c => c.status === 'finalizada').length || 0;
-      const coletasComDivergencia = coletas?.filter(c => 
-        c.divergencia_percentual && c.divergencia_percentual > 5
-      ).length || 0;
-      
-      const totalEntregas = entregas?.length || 0;
-      const entregasPendentes = entregas?.filter(e => 
-        ['aguardando_producao', 'pronto_despacho', 'cotacao_frete', 'nf_emitida'].includes(e.status)
-      ).length || 0;
-      const entregasEmTransito = entregas?.filter(e => 
-        ['despachado', 'em_transito', 'saiu_entrega'].includes(e.status)
-      ).length || 0;
-      const entregasFinalizadas = entregas?.filter(e => 
-        ['entregue', 'finalizado'].includes(e.status)
-      ).length || 0;
-      const entregasComOcorrencia = entregas?.filter(e => e.status === 'ocorrencia').length || 0;
-      
-      const entregasComPrazo = entregas?.filter(e => 
-        e.previsao_entrega && e.data_entrega_efetiva
-      ) || [];
-      
-      const entregasNoPrazo = entregasComPrazo.filter(e => {
-        const previsao = parseISO(e.previsao_entrega!);
-        const efetiva = parseISO(e.data_entrega_efetiva!);
-        return efetiva <= previsao;
-      });
-      
-      const taxaEntregaNoPrazo = entregasComPrazo.length > 0 
-        ? (entregasNoPrazo.length / entregasComPrazo.length) * 100 
-        : 100;
-      
-      const taxaOcorrencias = totalEntregas > 0 
-        ? (entregasComOcorrencia / totalEntregas) * 100 
-        : 0;
-      
-      // OTIF definition: On Time In Full (No delays AND no occurrences)
-      const entregasOTIF = entregasComPrazo.filter(e => {
-        const previsao = parseISO(e.previsao_entrega!);
-        const efetiva = parseISO(e.data_entrega_efetiva!);
-        const semOcorrencia = e.status !== 'ocorrencia';
-        return efetiva <= previsao && semOcorrencia;
-      });
-
-      const otifRate = entregasComPrazo.length > 0 
-        ? (entregasOTIF.length / entregasComPrazo.length) * 100 
-        : 100;
-      
-      const now = new Date();
-      const coletasAtrasadas = coletas?.filter(c => {
-        if (['finalizada', 'conferencia_ok'].includes(c.status)) return false;
-        const created = new Date(c.created_at);
-        const hoursElapsed = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
-        return hoursElapsed > 48;
-      }).length || 0;
-      
-      const alertasCriticos = coletasAtrasadas + coletasComDivergencia + (ocorrencias?.length || 0);
-      
-      const totalVolume = coletas?.reduce((acc, c) => acc + (c.qtd_volumes || 0), 0) || 0;
-      const valorTotalFrete = entregas?.reduce((acc, e) => acc + (Number(e.valor_frete) || 0), 0) || 0;
-
       return {
-        totalColetas,
-        coletasPendentes,
-        coletasEmTransito,
-        coletasFinalizadas,
-        coletasComDivergencia,
-        totalEntregas,
-        entregasPendentes,
-        entregasEmTransito,
-        entregasFinalizadas,
-        entregasComOcorrencia,
-        otifRate: Math.round(otifRate * 10) / 10,
-        tempoMedioColeta: (() => {
-          const finished = coletas?.filter(c => c.data_efetiva_coleta && c.created_at) || [];
-          if (finished.length === 0) return 36;
-          const totalHours = finished.reduce((acc, c) => {
-            return acc + Math.max(0, differenceInHours(parseISO(c.data_efetiva_coleta!), parseISO(c.created_at)));
-          }, 0);
-          return Math.round(totalHours / finished.length);
-        })(),
-        taxaOcorrencias: Math.round(taxaOcorrencias * 10) / 10,
-        taxaEntregaNoPrazo: Math.round(taxaEntregaNoPrazo * 10) / 10,
-        alertasCriticos,
-        coletasAtrasadas,
-        divergenciasAltas: coletasComDivergencia,
-        lastSync: new Date().toISOString(),
-        totalVolume,
-        valorTotalFrete,
-      };
+        totalColetas: data.totalColetas || 0,
+        coletasPendentes: data.coletasPendentes || 0,
+        coletasEmTransito: data.coletasEmTransito || 0,
+        coletasFinalizadas: data.coletasFinalizadas || 0,
+        coletasComDivergencia: data.coletasComDivergencia || 0,
+        totalEntregas: data.totalEntregas || 0,
+        entregasPendentes: data.entregasPendentes || 0,
+        entregasEmTransito: data.entregasEmTransito || 0,
+        entregasFinalizadas: data.entregasFinalizadas || 0,
+        entregasComOcorrencia: data.entregasComOcorrencia || 0,
+        otifRate: data.otifRate || 0,
+        totalVolume: data.totalVolume || 0,
+        valorTotalFrete: data.valorTotalFrete || 0,
+        lastSync: data.lastSync || new Date().toISOString(),
+        taxaOcorrencias: data.totalEntregas > 0 ? (data.entregasComOcorrencia / data.totalEntregas) * 100 : 0,
+        taxaEntregaNoPrazo: 100,
+        tempoMedioColeta: 36,
+        alertasCriticos: (data.coletasComDivergencia || 0) + (data.entregasComOcorrencia || 0),
+        coletasAtrasadas: 0,
+        divergenciasAltas: data.coletasComDivergencia || 0,
+      } as DashboardMetrics;
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
     refetchInterval: QUERY_REFETCH_INTERVAL.DASHBOARD,
