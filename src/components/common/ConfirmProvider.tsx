@@ -57,21 +57,52 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     if (opts.countdown && opts.countdown > 0) {
       setCountdown(opts.countdown);
       countdownRef.current = setInterval(() => {
-        setCountdown(prev => { if (prev <= 1) { if (countdownRef.current) clearInterval(countdownRef.current); return 0; } return prev - 1; });
+        setCountdown(prev => {
+          if (prev <= 1) {
+            if (countdownRef.current) {
+              clearInterval(countdownRef.current);
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
     }
   }, [resetState]);
 
   const confirmDelete = useCallback((itemName: string, onConfirm: () => void | Promise<void>) => {
-    confirm({ title: "Confirmar exclusão", description: `Tem certeza que deseja excluir "${itemName}"? Esta ação não pode ser desfeita.`, confirmText: "Excluir", cancelText: "Cancelar", type: "danger", onConfirm });
+    confirm({
+      title: "Confirmar exclusão",
+      description: `Tem certeza que deseja excluir "${itemName}"? Esta ação não pode ser desfeita.`,
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+      type: "danger",
+      onConfirm
+    });
   }, [confirm]);
 
   const confirmCritical = useCallback((action: string, typingText: string, onConfirm: () => void | Promise<void>) => {
-    confirm({ title: "⚠️ Ação Crítica", description: `Você está prestes a ${action}. Esta é uma ação IRREVERSÍVEL. Para confirmar, digite "${typingText}" abaixo:`, confirmText: "Confirmar Permanentemente", cancelText: "Cancelar", type: "critical", requireTyping: typingText, countdown: 3, onConfirm });
+    confirm({
+      title: "⚠️ Ação Crítica",
+      description: `Você está prestes a ${action}. Esta é uma ação IRREVERSÍVEL. Para confirmar, digite "${typingText}" abaixo:`,
+      confirmText: "Confirmar Permanentemente",
+      cancelText: "Cancelar",
+      type: "critical",
+      requireTyping: typingText,
+      countdown: 3,
+      onConfirm
+    });
   }, [confirm]);
 
   const confirmQuick = useCallback((message: string, onConfirm: () => void | Promise<void>) => {
-    confirm({ title: "Confirmar", description: message, confirmText: "Sim", cancelText: "Não", type: "info", onConfirm });
+    confirm({
+      title: "Confirmar",
+      description: message,
+      confirmText: "Sim",
+      cancelText: "Não",
+      type: "info",
+      onConfirm
+    });
   }, [confirm]);
 
   const handleConfirm = async () => {
@@ -79,10 +110,20 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     if (options.requireTyping && typedValue !== options.requireTyping) return;
     if (countdown > 0) return;
     setIsLoading(true);
-    try { await options.onConfirm(); setIsOpen(false); resetState(); } finally { setIsLoading(false); }
+    try {
+      await options.onConfirm();
+      setIsOpen(false);
+      resetState();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleCancel = () => { options?.onCancel?.(); setIsOpen(false); resetState(); };
+  const handleCancel = () => {
+    options?.onCancel?.();
+    setIsOpen(false);
+    resetState();
+  };
 
   const config = options ? typeConfig[options.type || "warning"] : typeConfig.warning;
   const Icon = config.icon;
