@@ -223,8 +223,7 @@ export function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
                       <Input value={action.config.alert_message || ""} onChange={(e) => updateAction(action.id, { config: { ...action.config, alert_message: e.target.value } })} placeholder="Mensagem do alerta..." />
                     )}
                   </div>
-                );
-              })}
+                ))}
             </div>
           </div>
         </div>
