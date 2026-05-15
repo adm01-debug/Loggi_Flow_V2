@@ -129,11 +129,12 @@ export function PasswordStrengthIndicator({
       {/* Criteria checklist */}
       <div className="grid grid-cols-1 gap-1">
         {analysis.criteria.map((criterion, index) => {
-          const textColor = criterion.met 
-            ? "text-success" 
-            : criterion.required 
-              ? "text-destructive" 
-              : "text-muted-foreground";
+          let textColor = "text-muted-foreground";
+          if (criterion.met) {
+            textColor = "text-success";
+          } else if (criterion.required) {
+            textColor = "text-destructive";
+          }
 
           return (
             <div
@@ -161,27 +162,41 @@ export function PasswordStrengthIndicator({
 
       {/* Pwned password check */}
       <div className="pt-2 border-t border-border">
-        {isCheckingPwned ? (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            <span>Verificando vazamentos...</span>
-          </div>
-        ) : isPwned ? (
-          <div className="flex items-start gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded-md">
-            <ShieldAlert className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-medium">Senha comprometida!</p>
-              <p className="text-destructive/80">
-                Esta senha foi encontrada em {pwnedCount.toLocaleString()} vazamentos. Escolha outra.
-              </p>
-            </div>
-          </div>
-        ) : password.length >= 8 ? (
-          <div className="flex items-center gap-2 text-xs text-success">
-            <ShieldCheck className="h-3.5 w-3.5" />
-            <span>Senha não encontrada em vazamentos conhecidos</span>
-          </div>
-        ) : null}
+        {(() => {
+          if (isCheckingPwned) {
+            return (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>Verificando vazamentos...</span>
+              </div>
+            );
+          }
+          
+          if (isPwned) {
+            return (
+              <div className="flex items-start gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded-md">
+                <ShieldAlert className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Senha comprometida!</p>
+                  <p className="text-destructive/80">
+                    Esta senha foi encontrada em {pwnedCount.toLocaleString()} vazamentos. Escolha outra.
+                  </p>
+                </div>
+              </div>
+            );
+          }
+          
+          if (password.length >= 8) {
+            return (
+              <div className="flex items-center gap-2 text-xs text-success">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                <span>Senha não encontrada em vazamentos conhecidos</span>
+              </div>
+            );
+          }
+          
+          return null;
+        })()}
       </div>
     </div>
   );

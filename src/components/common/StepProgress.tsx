@@ -87,11 +87,11 @@ export function StepProgress({
                 className={cn(
                   "relative rounded-full flex items-center justify-center font-medium transition-all duration-300",
                   config.circle,
-                  isCompleted
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
-                    : isCurrent
-                    ? "bg-primary/20 text-primary border-2 border-primary"
-                    : "bg-muted text-muted-foreground border-2 border-border",
+                  (() => {
+                    if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
+                    if (isCurrent) return "bg-primary/20 text-primary border-2 border-primary";
+                    return "bg-muted text-muted-foreground border-2 border-border";
+                  })(),
                   isClickable && "cursor-pointer hover:scale-110",
                   !isClickable && "cursor-default"
                 )}

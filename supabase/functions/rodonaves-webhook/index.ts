@@ -33,7 +33,7 @@ serve(async (req: Request) => {
     });
 
     const payload = await req.json();
-    console.log("Rodonaves webhook received:", JSON.stringify(payload));
+    log.info("Rodonaves webhook received:", JSON.stringify(payload));
 
     // Expected payload: { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, ... }
     const { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, recebedor, event_id } = payload;
@@ -50,7 +50,7 @@ serve(async (req: Request) => {
       .maybeSingle();
 
     if (existingEvent) {
-      console.log(`Webhook already processed (eventId: ${finalEventId}), skipping`);
+      log.info(`Webhook already processed (eventId: ${finalEventId}), skipping`);
       return new Response(JSON.stringify({ success: true, message: "Already processed" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
@@ -85,7 +85,7 @@ serve(async (req: Request) => {
     const newStatus = mapRodonavesStatus(status_code?.toString() || "");
 
     if (!newStatus) {
-      console.log(`Unknown Rodonaves status code: ${status_code}`);
+      log.info(`Unknown Rodonaves status code: ${status_code}`);
       return new Response(
         JSON.stringify({ success: true, message: "Status code não mapeado, ignorado" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -115,7 +115,7 @@ serve(async (req: Request) => {
       }]);
     }
 
-    console.log(`Entrega ${entrega.numero_entrega} updated to ${newStatus}`);
+    log.info(`Entrega ${entrega.numero_entrega} updated to ${newStatus}`);
 
     // Mark as processed
     await supabaseAdmin.from('webhook_events_processed').insert({

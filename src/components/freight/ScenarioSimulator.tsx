@@ -7,14 +7,23 @@ import { Badge } from '@/components/ui/badge';
 import { SplitSquareVertical, Package } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatters';
 
+interface SimulationResult {
+  volumes: number;
+  results: {
+    transportadora_nome: string;
+    valor_total: number;
+    [key: string]: any;
+  }[];
+}
+
 interface ScenarioSimulatorProps {
   cargoData: any;
-  simulateScenario: (data: any, splitVolumes: number) => any[];
+  simulateScenario: (data: any, splitVolumes: number) => SimulationResult[];
 }
 
 export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimulatorProps) {
   const [volumes, setVolumes] = useState(2);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SimulationResult[]>([]);
 
   const handleSimulate = () => {
     if (!cargoData) return;
@@ -66,7 +75,7 @@ export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimul
                   <Package className="w-4 h-4 text-primary" />
                 </div>
                 <div className="space-y-2">
-                  {res.results.slice(0, 2).map((r: any, i: number) => (
+                  {res.results.slice(0, 2).map((r, i) => (
                     <div key={i} className="flex justify-between text-sm">
                       <span className="text-muted-foreground truncate">{r.transportadora_nome}</span>
                       <span className="font-bold">{formatCurrency(r.valor_total)}</span>

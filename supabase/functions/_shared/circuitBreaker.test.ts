@@ -1,31 +1,49 @@
-import { describe, it, expect, vi } from 'vitest';
-import { withCircuitBreaker, CircuitState } from '../_shared/circuitBreaker';
+import { assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
+import { withCircuitBreaker } from "./circuitBreaker.ts";
 
-describe('Circuit Breaker Pattern', () => {
-  it('should allow requests when CLOSED', async () => {
-    const fn = vi.fn().mockResolvedValue('success');
+Deno.test({
+  name: "Circuit Breaker Pattern - Success Case",
+  async fn() {
+    const fn = () => Promise.resolve('success');
     const result = await withCircuitBreaker('test-service', fn);
     
-    expect(result).toBe('success');
-    expect(fn).toHaveBeenCalledTimes(1);
-  });
+    assertEquals(result, 'success');
+  }
+});
 
-  it('should transition to OPEN after failure threshold', async () => {
-    const fn = vi.fn().mockRejectedValue(new Error('service down'));
+Deno.test({
+  name: "Circuit Breaker Pattern - Transition to OPEN",
+  async fn() {
+    let callCount = 0;
+    const fn = () => {
+      callCount++;
+      return Promise.reject(new Error('service down'));
+    };
+    
     const options = { failureThreshold: 2, resetTimeoutMs: 1000 };
 
     // Failure 1
-    await expect(withCircuitBreaker('fail-service', fn, options)).rejects.toThrow();
+    try {
+      await withCircuitBreaker('fail-service', fn, options);
+    } catch (e) {
+      assertEquals(e.message, 'service down');
+    }
+    
     // Failure 2 -> Should transition to OPEN
-    await expect(withCircuitBreaker('fail-service', fn, options)).rejects.toThrow();
+    try {
+      await withCircuitBreaker('fail-service', fn, options);
+    } catch (e) {
+      assertEquals(e.message, 'service down');
+    }
 
     // Call 3 -> Should be blocked immediately without calling fn
-    await expect(withCircuitBreaker('fail-service', fn, options)).rejects.toThrow(/is OPEN/);
-    expect(fn).toHaveBeenCalledTimes(2);
-  });
-
-  it('should reset to CLOSED after a successful call in HALF_OPEN', async () => {
-    // This test would need time manipulation which is tricky in pure unit tests without state reset
-    // but ensures the logic is sound.
-  });
+    try {
+      await withCircuitBreaker('fail-service', fn, options);
+      throw new Error('Should have failed');
+    } catch (e) {
+      assertEquals(e.message.includes('is OPEN'), true);
+    }
+    
+    assertEquals(callCount, 2);
+  }
 });

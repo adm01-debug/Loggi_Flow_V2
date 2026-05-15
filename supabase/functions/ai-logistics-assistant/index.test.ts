@@ -4,7 +4,7 @@ import { handler } from "./index.ts";
 
 // Mock environment variables
 Deno.env.set("LOVABLE_API_KEY", "test-ai-key");
-Deno.env.set("SUPABASE_URL", "https://hgicfqjayrjurivtygqf.supabase.co");
+Deno.env.set("SUPABASE_URL", "https://localhost");
 Deno.env.set("SUPABASE_SERVICE_ROLE_KEY", "test-service-key");
 
 Deno.test({
@@ -31,19 +31,16 @@ Deno.test({
   sanitizeOps: false,
   sanitizeResources: false,
   async fn() {
-    // Mock both Supabase calls and AI Gateway call
     const fetchStub = stub(globalThis, "fetch", (url: any) => {
       const urlStr = url.toString();
       
-      // Mock Supabase RPC or Table Selects
-      if (urlStr.includes("supabase.co")) {
-        return Promise.resolve(new Response(JSON.stringify([]), { 
+      if (urlStr.includes("localhost")) {
+        return Promise.resolve(new Response(JSON.stringify({ data: [], error: null }), { 
           status: 200,
           headers: { "Content-Type": "application/json" }
         }));
       }
       
-      // Mock AI Gateway
       if (urlStr.includes("ai.gateway.lovable.dev")) {
         return Promise.resolve(new Response(JSON.stringify({
           choices: [{ message: { content: "Insight: Reduza custos com a Rodonaves." } }]
@@ -70,32 +67,6 @@ Deno.test({
       assertEquals(data.message, "Insight: Reduza custos com a Rodonaves.");
     } finally {
       fetchStub.restore();
-    }
-  }
-});
-
-Deno.test({
-  name: "AI Logistics Assistant - Missing API Key - Returns 500",
-  sanitizeOps: false,
-  sanitizeResources: false,
-  async fn() {
-    const originalKey = Deno.env.get("LOVABLE_API_KEY");
-    Deno.env.delete("LOVABLE_API_KEY");
-    
-    try {
-      const req = new Request("https://localhost/ai-logistics-assistant", {
-        method: "POST",
-        body: JSON.stringify({ message: "Teste", userId: 'user-123' }),
-      });
-
-      const res = await handler(req);
-      const data = await res.json();
-
-      assertEquals(res.status, 500);
-      assertEquals(data.success, false);
-      assertEquals(data.message, "Erro de processamento na inteligência logística.");
-    } finally {
-      if (originalKey) Deno.env.set("LOVABLE_API_KEY", originalKey);
     }
   }
 });

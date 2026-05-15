@@ -16,14 +16,14 @@ import { toast } from "sonner";
  * Visual indicator of connection health and system integrity.
  */
 export function RealtimeStatus() {
-  const [status, setStatus] = useState<'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'JOINING'>('JOINING');
+  const [status, setStatus] = useState<string>('JOINING');
   const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
     const channel = supabase.channel('system-health-check');
     
     channel.subscribe((status) => {
-      setStatus(status as any);
+      setStatus(status);
     });
 
     return () => {

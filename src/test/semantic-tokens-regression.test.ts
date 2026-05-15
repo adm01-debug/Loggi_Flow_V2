@@ -98,16 +98,17 @@ describe("Semantic Token Regression", () => {
     }
   });
 
-  describe("No console statements in src (excluding tests)", () => {
-    it("production files have zero console.log/warn/error", () => {
+  describe("Console hygiene", () => {
+    it("No console statements in src (excluding tests)", () => {
       const files = collectFiles("src").filter((f) => !f.includes("/test/"));
       const violations: string[] = [];
 
       for (const file of files) {
         const content = readFileSync(file, "utf-8");
-        const matches = content.match(/console\.(log|warn|error)\b/g);
+        // Only error if it's not a commented out console log
+        const matches = content.match(/^(?!\s*\/\/).*(console\.(log|warn|error)\b)/gm);
         if (matches) {
-          violations.push(`${file}: ${matches.length} console statement(s)`);
+          violations.push(`${file}: ${matches.length} console statement(s) [${matches.join(' | ')}]`);
         }
       }
 

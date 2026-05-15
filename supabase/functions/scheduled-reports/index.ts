@@ -16,7 +16,7 @@ export const handler = async (req: Request) => {
     const { action, reportId, userId, reportData } = await req.json();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    console.log(`[Scheduled Reports] Action: ${action}`);
+    log.info(`[Scheduled Reports] Action: ${action}`);
 
     // Handle different actions
     switch (action) {
@@ -257,7 +257,7 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
       const errorData = await res.json();
       console.error("[Scheduled Reports] Resend API error:", errorData);
     } else {
-      console.log("[Scheduled Reports] Email sent successfully to:", recipients.join(", "));
+      log.info("[Scheduled Reports] Email sent successfully to:", recipients.join(", "));
     }
   } catch (err) {
     console.error("[Scheduled Reports] Failed to send email:", err);

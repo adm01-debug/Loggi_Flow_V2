@@ -22,7 +22,7 @@ async function getCountryFromIP(ip: string): Promise<GeoLocation | null> {
   try {
     // Skip geolocation for localhost/private IPs
     if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("192.168.") || ip.startsWith("10.") || ip.startsWith("172.")) {
-      console.log(`Skipping geolocation for private/local IP: ${ip}`);
+      log.info(`Skipping geolocation for private/local IP: ${ip}`);
       return null;
     }
 
@@ -43,7 +43,7 @@ async function getCountryFromIP(ip: string): Promise<GeoLocation | null> {
       };
     }
 
-    console.log(`Geolocation failed for IP ${ip}: ${data.message || "Unknown error"}`);
+    log.info(`Geolocation failed for IP ${ip}: ${data.message || "Unknown error"}`);
     return null;
   } catch (error) {
     console.error(`Error getting geolocation for IP ${ip}:`, error);
@@ -78,7 +78,7 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`Validating login for: ${email} from IP: ${ip_address}`);
+    log.info(`Validating login for: ${email} from IP: ${ip_address}`);
 
     // Check if IP is in blacklist
     if (ip_address) {
@@ -100,7 +100,7 @@ serve(async (req: Request) => {
               failure_reason: "IP bloqueado",
             });
 
-            console.log(`IP ${ip_address} is blacklisted`);
+            log.info(`IP ${ip_address} is blacklisted`);
             return new Response(
               JSON.stringify({ 
                 allowed: false, 
@@ -139,7 +139,7 @@ serve(async (req: Request) => {
             failure_reason: "IP não autorizado",
           });
 
-          console.log(`IP ${ip_address} is not whitelisted`);
+          log.info(`IP ${ip_address} is not whitelisted`);
           return new Response(
             JSON.stringify({ 
               allowed: false, 
@@ -182,7 +182,7 @@ serve(async (req: Request) => {
               failure_reason: `País bloqueado: ${geoLocation.country_name}`,
             });
 
-            console.log(`Access denied for country ${geoLocation.country_name} (${geoLocation.country_code})`);
+            log.info(`Access denied for country ${geoLocation.country_name} (${geoLocation.country_code})`);
             return new Response(
               JSON.stringify({ 
                 allowed: false, 
@@ -192,9 +192,9 @@ serve(async (req: Request) => {
             );
           }
           
-          console.log(`Country ${geoLocation.country_name} is allowed`);
+          log.info(`Country ${geoLocation.country_name} is allowed`);
         } else {
-          console.log(`Could not determine country for IP ${ip_address}, allowing access`);
+          log.info(`Could not determine country for IP ${ip_address}, allowing access`);
         }
       }
     }
@@ -238,7 +238,7 @@ serve(async (req: Request) => {
             failure_reason: `Bloqueado temporariamente (${failureCount} tentativas falhas)`,
           });
 
-          console.log(`IP ${ip_address} is temporarily blocked. ${failureCount} failures, ${remainingMinutes} min remaining`);
+          log.info(`IP ${ip_address} is temporarily blocked. ${failureCount} failures, ${remainingMinutes} min remaining`);
           
           return new Response(
             JSON.stringify({ 
@@ -251,12 +251,12 @@ serve(async (req: Request) => {
             { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         } else {
-          console.log(`Lockout period expired for IP ${ip_address}, allowing attempt`);
+          log.info(`Lockout period expired for IP ${ip_address}, allowing attempt`);
         }
       }
     }
 
-    console.log(`Login validation passed for: ${email}`);
+    log.info(`Login validation passed for: ${email}`);
     return new Response(
       JSON.stringify({ allowed: true }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }

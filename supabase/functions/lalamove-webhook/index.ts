@@ -71,8 +71,8 @@ serve(async (req) => {
     const signature = req.headers.get('x-lalamove-signature') || '';
     const isTestMode = req.headers.get('x-test-mode') === 'true';
     
-    console.log('Received Lalamove webhook:', payload);
-    console.log('Test mode:', isTestMode);
+    log.info('Received Lalamove webhook:', payload);
+    log.info('Test mode:', isTestMode);
 
     // Skip signature verification in test mode (internal testing only)
     if (!isTestMode) {
@@ -85,7 +85,7 @@ serve(async (req) => {
         });
       }
     } else {
-      console.log('Skipping signature verification (test mode)');
+      log.info('Skipping signature verification (test mode)');
     }
 
     const webhookData = JSON.parse(payload);
@@ -142,7 +142,7 @@ serve(async (req) => {
           }
         }
 
-        console.log(`Order ${orderId} status updated to: ${status}`);
+        log.info(`Order ${orderId} status updated to: ${status}`);
         break;
       }
 
@@ -164,7 +164,7 @@ serve(async (req) => {
           console.error('Error saving location:', locationError);
         }
 
-        console.log(`Driver ${driverId} location updated for order ${orderId}`);
+        log.info(`Driver ${driverId} location updated for order ${orderId}`);
         break;
       }
 
@@ -190,7 +190,7 @@ serve(async (req) => {
           console.error('Error saving driver assignment:', driverError);
         }
 
-        console.log(`Driver ${driver.name} assigned to order ${orderId}`);
+        log.info(`Driver ${driver.name} assigned to order ${orderId}`);
         break;
       }
 
@@ -212,7 +212,7 @@ serve(async (req) => {
           console.error('Error creating alert:', alertError);
         }
 
-        console.log(`Order ${orderId} ${eventType.toLowerCase()}: ${reason}`);
+        log.info(`Order ${orderId} ${eventType.toLowerCase()}: ${reason}`);
         break;
       }
 

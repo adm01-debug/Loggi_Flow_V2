@@ -57,7 +57,7 @@ async function lalamoveRequest(
   const signature = await generateSignature(apiSecret, timestamp, method, path, bodyStr);
   const token = `${apiKey}:${timestamp}:${signature}`;
 
-  console.log(`Making Lalamove request: ${method} ${path}`);
+  log.info(`Making Lalamove request: ${method} ${path}`);
 
   const response = await fetch(`${baseUrl}${path}`, {
     method,
@@ -82,7 +82,7 @@ serve(async (req) => {
   try {
     const { action, orderId, driverId, useSandbox = true } = await req.json();
 
-    console.log(`Lalamove tracking action: ${action}, orderId: ${orderId}`);
+    log.info(`Lalamove tracking action: ${action}, orderId: ${orderId}`);
 
     switch (action) {
       case 'test':

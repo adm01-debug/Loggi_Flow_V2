@@ -82,7 +82,7 @@ export function MapboxMap({
       map.current?.remove();
       map.current = null;
     };
-  }, [token]);
+  }, [token, center, zoom]);
 
   // Update markers
   useEffect(() => {

@@ -62,7 +62,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
         points={points}
       />
       <circle
-        cx={padding + ((data.length - 1) / (data.length - 1)) * (width - 2 * padding)}
+        cx={padding + (width - 2 * padding)}
         cy={height - padding - ((data[data.length - 1] - min) / range) * (height - 2 * padding)}
         r="3"
         fill={color}

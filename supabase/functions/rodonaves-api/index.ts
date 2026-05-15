@@ -693,7 +693,7 @@ Deno.serve(async (req) => {
         if (redis) {
           const cached = await redis.get(cacheKey);
           if (cached) {
-            console.log(`[Cache] Cache hit for ${cacheKey}`);
+            log.info(`[Cache] Cache hit for ${cacheKey}`);
             return corsResponse(cached, { 'X-Cache': 'HIT' });
           }
         }

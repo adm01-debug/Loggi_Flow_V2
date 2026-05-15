@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Edit, Trash2, ExternalLink } from "lucide-react";
+import { Edit, Trash2, ExternalLink } from "lucide-react";
 
 interface DetailField {
   label: string;
