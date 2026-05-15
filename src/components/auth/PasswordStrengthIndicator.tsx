@@ -128,14 +128,21 @@ export function PasswordStrengthIndicator({
 
       {/* Criteria checklist */}
       <div className="grid grid-cols-1 gap-1">
-        {analysis.criteria.map((criterion, index) => (
-          <div
-            key={index}
-            className={cn(
-              "flex items-center gap-2 text-xs transition-colors",
-              criterion.met ? "text-success" : (criterion.required ? "text-destructive" : "text-muted-foreground")
-            )}
-          >
+        {analysis.criteria.map((criterion, index) => {
+          const textColor = criterion.met 
+            ? "text-success" 
+            : criterion.required 
+              ? "text-destructive" 
+              : "text-muted-foreground";
+
+          return (
+            <div
+              key={index}
+              className={cn(
+                "flex items-center gap-2 text-xs transition-colors",
+                textColor
+              )}
+            >
             {criterion.met ? (
               <Check className="h-3.5 w-3.5" />
             ) : (
