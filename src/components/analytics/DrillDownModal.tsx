@@ -132,7 +132,8 @@ export function DrillDownModal({ open, onOpenChange, data, isLoading }: DrillDow
               ))}
             </TableBody>
           </Table>
-        ) : (
+        )}
+        {!isLoading && (!data?.items || data.items.length === 0) && (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             Nenhum registro encontrado
           </div>
