@@ -16,8 +16,8 @@ interface SimulationResult {
 }
 
 interface ScenarioSimulatorProps {
-  cargoData: Record<string, unknown> | null;
-  simulateScenario: (data: Record<string, unknown>, splitVolumes: number) => SimulationResult[];
+  cargoData: any;
+  simulateScenario: (data: any, splitVolumes: number) => SimulationResult[];
 }
 
 export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimulatorProps) {
