@@ -107,9 +107,10 @@ export function PasswordStrengthIndicator({
           <span className="text-muted-foreground">Força da senha</span>
           <span className={cn(
             "font-medium",
-            analysis.level === "strong" ? "text-success" : 
-            analysis.level === "good" ? "text-warning" : 
-            analysis.level === "fair" ? "text-warning/70" : "text-destructive"
+            analysis.level === "strong" && "text-success",
+            analysis.level === "good" && "text-warning",
+            analysis.level === "fair" && "text-warning/70",
+            analysis.level === "weak" && "text-destructive"
           )}>
             {analysis.label}
           </span>
