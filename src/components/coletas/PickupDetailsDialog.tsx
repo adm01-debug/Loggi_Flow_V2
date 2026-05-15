@@ -186,7 +186,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                   )}
                   {pickup.status === 'em_transito' && (
                     <Button onClick={() => updateStatus('chegou_expedicao')} variant="outline" className="border-primary/20 hover:bg-primary/5">
-                      <Building2 className="w-4 h-4 mr-2 text-primary" /> Receber na Expedição
+                      <Building2Icon className="w-4 h-4 mr-2 text-primary" /> Receber na Expedição
                     </Button>
                   )}
                   {(pickup.status === 'chegou_expedicao' || pickup.status === 'divergencia') && (
@@ -205,7 +205,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
             <TabsContent value="conferencia" className="pb-6">
               <PickupConference 
-                pickup={pickup} 
+                pickup={pickup as any} 
                 onSuccess={() => {
                   onStatusUpdate();
                   handleTabChange('detalhes');
@@ -258,7 +258,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
   );
 }
 
-function Building2(props: any) {
+function Building2Icon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
