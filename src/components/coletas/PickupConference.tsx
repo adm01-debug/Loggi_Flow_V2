@@ -2,16 +2,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Package, AlertTriangle, CheckCircle2, Loader2, Weight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 
+interface Pickup {
+  id: string;
+  qtd_recebida: number;
+  qtd_volumes: number;
+  peso_efetivo: number;
+  peso_estimado_kg: number;
+}
+
 interface PickupConferenceProps {
-  pickup: any;
+  pickup: Pickup;
   onSuccess: () => void;
 }
 
@@ -123,7 +129,7 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
 
       {!divergencia && (
         <div className="bg-muted/30 p-4 rounded-lg flex items-start gap-3">
-          <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <InfoIcon className="w-5 h-5 text-primary shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-semibold">Instruções de Conferência</p>
             <p className="text-muted-foreground">Verifique a integridade das embalagens e confirme se a quantidade e peso batem com o manifesto de coleta.</p>
@@ -145,7 +151,7 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
   );
 }
 
-function Info(props: any) {
+function InfoIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

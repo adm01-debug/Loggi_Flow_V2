@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, MapPin, Calendar, Clock, AlertTriangle, CheckCircle2, History, Info, ChevronRight, Zap, RefreshCw } from "lucide-react";
+import { Truck, Package, MapPin, Calendar, Clock, CheckCircle2, History, Info, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -13,11 +13,26 @@ import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 import { PickupConference } from "./PickupConference";
 
+interface Pickup {
+  id: string;
+  numero_coleta: string;
+  status: string;
+  endereco_coleta: string;
+  tipo_coleta: string;
+  data_prevista_coleta: string;
+  qtd_volumes: number;
+  peso_estimado_kg: number;
+  observacoes: string;
+  data_efetiva_coleta: string;
+  fornecedores: { nome_fantasia?: string; razao_social?: string };
+  transportadoras: { nome_fantasia?: string };
+}
+
 interface PickupDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  pickup: any;
-  statusConfig: any;
+  pickup: Pickup;
+  statusConfig: Record<string, { label: string; color: string; icon: any }>;
   onStatusUpdate: () => void;
 }
 
@@ -171,7 +186,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                   )}
                   {pickup.status === 'em_transito' && (
                     <Button onClick={() => updateStatus('chegou_expedicao')} variant="outline" className="border-primary/20 hover:bg-primary/5">
-                      <Building2 className="w-4 h-4 mr-2 text-primary" /> Receber na Expedição
+                      <Building2Icon className="w-4 h-4 mr-2 text-primary" /> Receber na Expedição
                     </Button>
                   )}
                   {(pickup.status === 'chegou_expedicao' || pickup.status === 'divergencia') && (
@@ -190,7 +205,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
             <TabsContent value="conferencia" className="pb-6">
               <PickupConference 
-                pickup={pickup} 
+                pickup={pickup as any} 
                 onSuccess={() => {
                   onStatusUpdate();
                   handleTabChange('detalhes');
@@ -243,7 +258,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
   );
 }
 
-function Building2(props: any) {
+function Building2Icon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

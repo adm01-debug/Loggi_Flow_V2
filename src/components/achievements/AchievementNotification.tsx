@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy, Star, Sparkles, X, Coins } from "lucide-react";
+import { Trophy, Star, X, Coins } from "lucide-react";
 import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
 
 const rarityConfig = {
@@ -29,6 +29,15 @@ const rarityConfig = {
   },
 };
 
+function RarityBadge({ rarity, label }: { rarity: string, label: string }) {
+  let classes = "bg-muted text-muted-foreground";
+  if (rarity === "legendary") classes = "bg-xp/20 text-xp";
+  else if (rarity === "epic") classes = "bg-primary/20 text-primary";
+  else if (rarity === "rare") classes = "bg-info/20 text-info";
+  
+  return <span className={`text-xs px-2 py-0.5 rounded-full ${classes}`}>{label}</span>;
+}
+
 export function AchievementNotificationContainer() {
   const { notifications, dismissNotification } = useAchievementNotifications();
 
@@ -57,7 +66,7 @@ export function AchievementNotificationContainer() {
                       key={i}
                       className="absolute w-1 h-1 rounded-full bg-xp/60"
                       initial={{ 
-                        x: Math.random() * 100 + "%", 
+                        x: `${(i * 17) % 100}%`, 
                         y: "100%",
                         opacity: 0 
                       }}
@@ -137,14 +146,7 @@ export function AchievementNotificationContainer() {
                       </span>
                     </div>
                     <div className="ml-auto">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        notification.rarity === "legendary" ? "bg-xp/20 text-xp" :
-                        notification.rarity === "epic" ? "bg-primary/20 text-primary" :
-                        notification.rarity === "rare" ? "bg-info/20 text-info" :
-                        "bg-muted text-muted-foreground"
-                      }`}>
-                        {config.label}
-                      </span>
+                      <RarityBadge rarity={notification.rarity} label={config.label} />
                     </div>
                   </motion.div>
                 </div>

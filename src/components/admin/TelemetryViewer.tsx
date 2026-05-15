@@ -7,7 +7,6 @@ import {
   Bug, 
   Clock, 
   Filter, 
-  Trash2, 
   ChevronDown,
   ExternalLink
 } from "lucide-react";
@@ -30,8 +29,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
 
 export function TelemetryViewer() {
   const [severityFilter, setSeverityFilter] = useState<string | null>(null);

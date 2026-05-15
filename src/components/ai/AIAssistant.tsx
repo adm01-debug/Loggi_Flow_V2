@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Bot, Send, Trash2, Sparkles, AlertCircle, TrendingUp, Zap, MessageSquare, PanelRightClose, PanelRightOpen, Terminal } from 'lucide-react';
+import { Bot, Send, Trash2, Sparkles, AlertCircle, TrendingUp, Zap, MessageSquare, PanelRightClose, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -28,6 +28,31 @@ export function AIAssistant() {
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleStreamData = useCallback((chunk: string, assistantContent: string) => {
+    const lines = chunk.split("\n");
+    let currentContent = assistantContent;
+    
+    for (const line of lines) {
+      if (line.startsWith("data: ")) {
+        const jsonStr = line.slice(6);
+        if (jsonStr === "[DONE]") break;
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) {
+            currentContent += content;
+            setMessages(prev => {
+              const newMessages = [...prev];
+              newMessages[newMessages.length - 1].content = currentContent;
+              return newMessages;
+            });
+          }
+        } catch { /* ignore chunk error */ }
+      }
+    }
+    return currentContent;
+  }, []);
 
   const streamChat = useCallback(async (
     userMessage: string,
@@ -63,32 +88,11 @@ export function AIAssistant() {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      
-      const chunk = decoder.decode(value);
-      const lines = chunk.split("\n");
-      
-      for (const line of lines) {
-        if (line.startsWith("data: ")) {
-          const jsonStr = line.slice(6);
-          if (jsonStr === "[DONE]") break;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              assistantContent += content;
-              setMessages(prev => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1].content = assistantContent;
-                return newMessages;
-              });
-            }
-          } catch (e) { /* ignore chunk error */ }
-        }
-      }
+      assistantContent = handleStreamData(decoder.decode(value), assistantContent);
     }
 
     return assistantContent;
-  }, [user?.id]);
+  }, [user?.id, handleStreamData]);
 
   const sendMessage = async (text?: string) => {
     const userMessage = text || input.trim();

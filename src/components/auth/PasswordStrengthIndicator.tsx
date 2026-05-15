@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Check, X, AlertTriangle, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Check, X, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -31,8 +31,8 @@ export function PasswordStrengthIndicator({
       { label: "Mínimo 8 caracteres", met: password.length >= 8, required: true },
       { label: "Letra maiúscula", met: /[A-Z]/.test(password), required: false },
       { label: "Letra minúscula", met: /[a-z]/.test(password), required: false },
-      { label: "Número", met: /[0-9]/.test(password), required: false },
-      { label: "Caractere especial (!@#$%...)", met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password), required: true },
+      { label: "Número", met: /\d/.test(password), required: false },
+      { label: "Caractere especial (!@#$%...)", met: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password), required: true },
     ];
 
     const requiredCriteria = criteria.filter(c => c.required);
@@ -105,15 +105,12 @@ export function PasswordStrengthIndicator({
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="text-muted-foreground">Força da senha</span>
-          <span
-            className={cn(
-              "font-medium",
-              analysis.level === "strong" && "text-success",
-              analysis.level === "good" && "text-warning",
-              analysis.level === "fair" && "text-warning/70",
-              analysis.level === "weak" && "text-destructive"
-            )}
-          >
+          <span className={cn(
+            "font-medium",
+            analysis.level === "strong" ? "text-success" : 
+            analysis.level === "good" ? "text-warning" : 
+            analysis.level === "fair" ? "text-warning/70" : "text-destructive"
+          )}>
             {analysis.label}
           </span>
         </div>
@@ -135,7 +132,7 @@ export function PasswordStrengthIndicator({
             key={index}
             className={cn(
               "flex items-center gap-2 text-xs transition-colors",
-              criterion.met ? "text-success" : criterion.required ? "text-destructive" : "text-muted-foreground"
+              criterion.met ? "text-success" : (criterion.required ? "text-destructive" : "text-muted-foreground")
             )}
           >
             {criterion.met ? (
