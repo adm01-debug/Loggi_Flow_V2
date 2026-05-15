@@ -8,6 +8,15 @@ export interface Step {
   description?: string;
 }
 
+interface StepConfig {
+  circle: string;
+  icon: string;
+  text: string;
+  line: string;
+  lineVertical: string;
+  gap: string;
+}
+
 interface StepProgressProps {
   steps: Step[];
   currentStep: number;
@@ -17,7 +26,7 @@ interface StepProgressProps {
   onStepClick?: (stepIndex: number) => void;
 }
 
-const sizeConfig = {
+const sizeConfig: Record<string, StepConfig> = {
   sm: {
     circle: "w-6 h-6",
     icon: "w-3 h-3",
@@ -57,7 +66,7 @@ const StepIndicator = ({
   isCurrent: boolean; 
   isClickable: boolean; 
   onStepClick?: (idx: number) => void;
-  config: any;
+  config: StepConfig;
 }) => {
   const getIndicatorStyle = () => {
     if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
@@ -65,7 +74,11 @@ const StepIndicator = ({
     return "bg-muted text-muted-foreground border-2 border-border";
   };
 
-  const statusLabel = isCompleted ? "Concluído" : isCurrent ? "Atual" : "Pendente";
+  const getStatusLabel = () => {
+    if (isCompleted) return "Concluído";
+    if (isCurrent) return "Atual";
+    return "Pendente";
+  };
 
   return (
     <motion.button
@@ -85,7 +98,7 @@ const StepIndicator = ({
       whileHover={isClickable ? { scale: 1.15 } : {}}
       whileTap={isClickable ? { scale: 0.95 } : {}}
       aria-current={isCurrent ? "step" : undefined}
-      aria-label={`${statusLabel}`}
+      aria-label={getStatusLabel()}
     >
       {isCompleted ? (
         <motion.div
@@ -119,7 +132,7 @@ export function StepProgress({
   size = "md",
   onStepClick,
 }: StepProgressProps) {
-  const config = sizeConfig[size];
+  const config = sizeConfig[size] || sizeConfig.md;
   const isHorizontal = variant === "horizontal";
 
   return (
@@ -137,8 +150,15 @@ export function StepProgress({
         const isCurrent = index === currentStep;
         const isClickable = !!onStepClick && index <= currentStep;
 
-        const connectorWidth = isHorizontal ? (isCompleted ? "100%" : "0%") : config.lineVertical;
-        const connectorHeight = !isHorizontal ? (isCompleted ? "100%" : "0%") : config.line;
+        let connectorWidth = config.lineVertical;
+        if (isHorizontal) {
+          connectorWidth = isCompleted ? "100%" : "0%";
+        }
+
+        let connectorHeight = config.line;
+        if (!isHorizontal) {
+          connectorHeight = isCompleted ? "100%" : "0%";
+        }
 
         return (
           <div
