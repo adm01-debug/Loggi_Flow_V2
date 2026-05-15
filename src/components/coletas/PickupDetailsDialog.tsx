@@ -31,7 +31,7 @@ interface Pickup {
 interface PickupDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  pickup: Pickup;
+  pickup: Pickup | null;
   statusConfig: Record<string, { label: string; color: string; icon: any }>;
   onStatusUpdate: () => void;
 }
