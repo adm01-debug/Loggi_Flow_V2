@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, FileText, AlertCircle, CheckCircle2, Loader2, Download, Table } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle2, Loader2, Download } from 'lucide-react';
 import { importCSV, ImportResult, generateCSVTemplate, downloadCSV } from '@/lib/csvImporter';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
@@ -17,7 +17,6 @@ interface CSVImporterProps<T> {
 }
 
 export function CSVImporter<T>({ schema, onImport, columns, templateName = 'template' }: CSVImporterProps<T>) {
-  const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<ImportResult<T> | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState(0);
