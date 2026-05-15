@@ -81,14 +81,13 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
     if (trans) setTransportadoras(trans);
   };
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: Partial<Pickup>) => {
     setLoading(true);
     try {
       const payload = {
         ...values,
         qtd_volumes: Number(values.qtd_volumes),
         peso_estimado_kg: Number(values.peso_estimado_kg),
-        // If empty string, set to null
         fornecedor_id: values.fornecedor_id || null,
         transportadora_id: values.transportadora_id || null,
         data_prevista_coleta: values.data_prevista_coleta || null,
@@ -96,10 +95,10 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
       let error;
       if (pickup?.id) {
-        const { error: err } = await supabase.from("coletas").update(payload).eq("id", pickup.id);
+        const { error: err } = await supabase.from("coletas").update(payload as any).eq("id", pickup.id);
         error = err;
       } else {
-        const { error: err } = await supabase.from("coletas").insert(payload);
+        const { error: err } = await supabase.from("coletas").insert(payload as any);
         error = err;
       }
 
@@ -108,7 +107,8 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
       toast({ title: pickup ? "Coleta atualizada" : "Coleta criada", description: "As informações foram salvas com sucesso." });
       onSuccess();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
