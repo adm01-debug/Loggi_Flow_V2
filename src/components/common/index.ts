@@ -49,7 +49,7 @@ export { StepProgress, LinearProgress } from './StepProgress';
 export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 
 // Bulk Actions
-export { BulkActions, useSelection } from './BulkActions';
+export { BulkActions } from './BulkActions';
 
 // Responsive
 export { ResponsiveTable } from './ResponsiveTable';
