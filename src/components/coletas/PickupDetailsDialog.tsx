@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Coleta, ColetaStatus } from "./types";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
   if (!pickup) return null;
 
-  const updateStatus = async (newStatus: string) => {
+  const updateStatus = async (newStatus: ColetaStatus) => {
     if (!pickup) return;
     
     const { error } = await supabase

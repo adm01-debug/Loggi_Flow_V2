@@ -116,8 +116,6 @@ const adminItems = [
   { title: "Audit Trail", url: "/audit-trail", icon: History },
   { title: "Documentação API", url: "/api-docs", icon: Code },
 ];
-
-
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
@@ -400,18 +398,10 @@ export function AppSidebar() {
         variant="outline"
         size="icon"
         onClick={() => setCollapsed(!collapsed)}
-        aria-label={collapsed ? "Expandir menu lateral" : "Recolher menu lateral"}
-        className={cn(
-          "absolute -right-3 top-20 w-6 h-6 rounded-full shadow-lg border-2",
-          "bg-card hover:bg-primary hover:text-primary-foreground hover:border-primary",
-          "transition-all duration-200"
-        )}
+        aria-label={collapsed ? "Expandir" : "Recolher"}
+        className="absolute -right-3 top-20 w-6 h-6 rounded-full shadow-lg border-2"
       >
-        {collapsed ? (
-          <ChevronRight className="w-3 h-3" />
-        ) : (
-          <ChevronLeft className="w-3 h-3" />
-        )}
+        {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
       </Button>
     </aside>
   );

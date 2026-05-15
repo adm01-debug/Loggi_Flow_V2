@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from "react";
+import { Component, ErrorInfo, ReactNode, useCallback, useState } from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -95,7 +95,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-import { useCallback, useState } from "react";
+
 
 export function useErrorHandler() {
   const [error, setError] = useState<Error | null>(null);
