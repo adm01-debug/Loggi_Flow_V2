@@ -13,11 +13,26 @@ import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 import { PickupConference } from "./PickupConference";
 
+interface Pickup {
+  id: string;
+  numero_coleta: string;
+  status: string;
+  endereco_coleta: string;
+  tipo_coleta: string;
+  data_prevista_coleta: string;
+  qtd_volumes: number;
+  peso_estimado_kg: number;
+  observacoes: string;
+  data_efetiva_coleta: string;
+  fornecedores: { nome_fantasia?: string; razao_social?: string };
+  transportadoras: { nome_fantasia?: string };
+}
+
 interface PickupDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  pickup: any;
-  statusConfig: any;
+  pickup: Pickup;
+  statusConfig: Record<string, { label: string; color: string; icon: any }>;
   onStatusUpdate: () => void;
 }
 
