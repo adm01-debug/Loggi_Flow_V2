@@ -131,7 +131,7 @@ export function FavoriteMetricsBar() {
       },
       "sla-cumprido": { 
         value: `${dashboardData?.taxaEntregaNoPrazo ?? 0}%`, 
-        change: slaData?.currentSLA ? Math.round(slaData.currentSLA) : undefined, 
+        change: slaData?.taxaOTIF ? Math.round(slaData.taxaOTIF) : undefined, 
         changeType: (dashboardData?.taxaEntregaNoPrazo ?? 0) > 90 ? "positive" as const : "negative" as const 
       },
       "custo-mensal": { 
