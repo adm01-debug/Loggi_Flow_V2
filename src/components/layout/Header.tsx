@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, memo } from "react";
 import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
 import { RealtimeStatus } from "@/components/common/RealtimeStatus";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -25,7 +25,7 @@ const SLANotificationSettings = lazy(() => import("@/components/notifications/SL
 const GlobalSearch = lazy(() => import("@/components/search/GlobalSearch").then(m => ({ default: m.GlobalSearch })));
 
 
-export function Header() {
+export const Header = memo(function Header() {
   const { profile, isAdmin, signOut } = useAuth();
   const { userLevel } = useGamification();
   const navigate = useNavigate();
@@ -193,4 +193,4 @@ export function Header() {
       </div>
     </header>
   );
-}
+});

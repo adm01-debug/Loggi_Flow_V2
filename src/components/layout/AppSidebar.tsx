@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, memo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Truck, Package, Building2, Send, BarChart3, Settings,
@@ -116,7 +116,7 @@ const adminItems = [
   { title: "Audit Trail", url: "/audit-trail", icon: History },
   { title: "Documentação API", url: "/api-docs", icon: Code },
 ];
-export function AppSidebar() {
+export const AppSidebar = memo(function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { isAdmin } = useAuth();
@@ -405,4 +405,4 @@ export function AppSidebar() {
       </Button>
     </aside>
   );
-}
+});

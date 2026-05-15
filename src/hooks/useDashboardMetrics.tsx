@@ -85,15 +85,30 @@ export function useRecentAlerts() {
   return useQuery({
     queryKey: ['recent-alerts', user?.id],
     queryFn: async (): Promise<RecentAlert[]> => {
-      const alerts: RecentAlert[] = [];
       const now = new Date();
+      const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString();
       
-      const { data: coletas } = await supabase
-        .from('coletas')
-        .select('id, numero_coleta, status, divergencia_percentual, created_at')
-        .not('status', 'in', '("finalizada","conferencia_ok")');
+      // Parallel execution of all alert-related queries
+      const [coletasRes, entregasRes, predictionsRes] = await Promise.all([
+        supabase
+          .from('coletas')
+          .select('id, numero_coleta, status, divergencia_percentual, created_at')
+          .not('status', 'in', '("finalizada","conferencia_ok")'),
+        supabase
+          .from('entregas')
+          .select('id, numero_entrega, status, created_at')
+          .eq('status', 'ocorrencia'),
+        supabase
+          .from('ai_delay_predictions')
+          .select('*')
+          .gte('analyzed_at', sixHoursAgo)
+          .in('risco', ['alto', 'critico'])
+          .limit(10)
+      ]);
       
-      coletas?.forEach(coleta => {
+      const alerts: RecentAlert[] = [];
+      
+      coletasRes.data?.forEach(coleta => {
         const created = new Date(coleta.created_at);
         const hoursElapsed = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
         
@@ -132,12 +147,7 @@ export function useRecentAlerts() {
         }
       });
       
-      const { data: entregas } = await supabase
-        .from('entregas')
-        .select('id, numero_entrega, status, created_at')
-        .eq('status', 'ocorrencia');
-      
-      entregas?.forEach(entrega => {
+      entregasRes.data?.forEach(entrega => {
         alerts.push({
           id: `ocorrencia-${entrega.id}`,
           type: 'ocorrencia',
@@ -149,39 +159,28 @@ export function useRecentAlerts() {
         });
       });
       
-      // Integration with Delay Predictions (IA)
-      try {
-        const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
-        const { data: predictionsData } = await supabase
-          .from('ai_delay_predictions')
-          .select('*')
-          .gte('analyzed_at', sixHoursAgo)
-          .in('risco', ['alto', 'critico'])
-          .limit(5);
-
-        predictionsData?.forEach((pred: any) => {
-          const p = pred.prediction_data;
-          alerts.push({
-            id: `ia-pred-${pred.id}`,
-            type: 'ia_previsao',
-            message: `IA prevê ${p.probabilidade_atraso}% de atraso em ${p.numero} (${p.tipo})`,
-            severity: p.risco === 'critico' ? 'error' : 'warning',
-            createdAt: pred.analyzed_at,
-            entityId: pred.entity_id,
-            entityType: pred.entity_type,
-          });
+      predictionsRes.data?.forEach((pred: any) => {
+        const p = pred.prediction_data;
+        alerts.push({
+          id: `ia-pred-${pred.id}`,
+          type: 'ia_previsao',
+          message: `IA prevê ${p.probabilidade_atraso}% de atraso em ${p.numero} (${p.tipo})`,
+          severity: p.risco === 'critico' ? 'error' : 'warning',
+          createdAt: pred.analyzed_at,
+          entityId: pred.entity_id,
+          entityType: pred.entity_type,
         });
-      } catch (e) {
-        // Silent fail for predictions
-      }
+      });
       
       return alerts.sort((a, b) => {
-        const severityOrder = { error: 0, warning: 1, info: 2 };
-        if (severityOrder[a.severity] !== severityOrder[b.severity]) {
-          return severityOrder[a.severity] - severityOrder[b.severity];
+        const severityOrder = { error: 0, warning: 1, info: 2 } as Record<string, number>;
+        const severityA = severityOrder[a.severity] ?? 2;
+        const severityB = severityOrder[b.severity] ?? 2;
+        if (severityA !== severityB) {
+          return severityA - severityB;
         }
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }).slice(0, 10);
+      }).slice(0, 15);
     },
     staleTime: QUERY_STALE_TIME.DYNAMIC,
     refetchInterval: QUERY_REFETCH_INTERVAL.NOTIFICATIONS,

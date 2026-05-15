@@ -45,29 +45,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserData = async (userId: string) => {
-    // Fetch profile
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
+    try {
+      // Fetch profile and roles in parallel
+      const [profileRes, rolesRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .maybeSingle(),
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userId)
+      ]);
 
-    if (profileData) {
-      setProfile(profileData);
+      if (profileRes.data) {
+        setProfile(profileRes.data);
+      }
+
+      if (rolesRes.data) {
+        setRoles(rolesRes.data.map((r: any) => r.role));
+      }
+
+      // Auto-update streak on login
+      updateUserStreak(userId);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
     }
-
-    // Fetch roles
-    const { data: rolesData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-
-    if (rolesData) {
-      setRoles(rolesData.map((r: UserRole) => r.role));
-    }
-
-    // Auto-update streak on login
-    updateUserStreak(userId);
   };
 
   useEffect(() => {

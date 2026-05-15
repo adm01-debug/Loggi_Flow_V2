@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +17,6 @@ import { Switch } from "@/components/ui/switch";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MaskedInput } from "@/components/ui/MaskedInput";
 
-// Novos imports
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
@@ -26,6 +26,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
+import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 interface Transportadora {
   id: string; razao_social: string; nome_fantasia: string; cnpj: string | null;
@@ -47,8 +48,6 @@ const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", contato_comer
 export default function Transportadoras() {
   const { toast } = useToast();
   const { exportToCSV, exportToJSON } = useExport();
-  const [list, setList] = useState<Transportadora[]>([]);
-  const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [selected, setSelected] = useState<Transportadora | null>(null);
@@ -56,34 +55,45 @@ export default function Transportadoras() {
   const [estadoFilter, setEstadoFilter] = useState("");
   const [ativaFilter, setAtivaFilter] = useState("");
 
+  const { data: list = [], isLoading: loading, refetch: fetchData } = useQuery({
+    queryKey: ["transportadoras-list"],
+    queryFn: async () => {
+      // Parallel fetch for transportadoras and their performance stats
+      const [tRes, statsRes] = await Promise.all([
+        supabase.from("transportadoras").select("*").order("nome_fantasia"),
+        supabase.rpc('get_carrier_performance_stats')
+      ]);
+      
+      if (tRes.error) throw tRes.error;
+      
+      const transportadoras = tRes.data || [];
+      const stats = statsRes.data || [];
+      
+      // Enriched data with stats from RPC
+      return transportadoras.map(t => {
+        const tStats = (stats as any[]).find(s => s.transportadora_id === t.id);
+        return { 
+          ...t, 
+          total_entregas: Number(tStats?.total_entregas || 0), 
+          entregas_sucesso: Number(tStats?.entregas_no_prazo || 0) 
+        };
+      }) as Transportadora[];
+    },
+    staleTime: QUERY_STALE_TIME.STATIC,
+  });
+
   // Apply custom filters
-  const filteredByCustom = list.filter(t => {
+  const filteredByCustom = useMemo(() => list.filter(t => {
     if (estadoFilter && !t.regioes_atendidas?.includes(estadoFilter)) return false;
     if (ativaFilter === "sim" && !t.homologada) return false;
     if (ativaFilter === "nao" && t.homologada) return false;
     return true;
-  });
+  }), [list, estadoFilter, ativaFilter]);
 
   const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByCustom, filterConfig);
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "nome_fantasia", defaultDirection: "asc" });
   const pagination = usePagination(sortedData, { initialPageSize: 12 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
-
-  useEffect(() => { fetchData(); }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.from("transportadoras").select("*").order("nome_fantasia");
-    if (data) {
-      const { data: entregas } = await supabase.from("entregas").select("transportadora_id, status");
-      const enriched = data.map(t => {
-        const tEntregas = entregas?.filter(e => e.transportadora_id === t.id) || [];
-        return { ...t, total_entregas: tEntregas.length, entregas_sucesso: tEntregas.filter(e => e.status === "entregue").length };
-      });
-      setList(enriched);
-    }
-    setLoading(false);
-  };
 
   const handleSubmit = async () => {
     const { error } = await supabase.from("transportadoras").insert({ 
@@ -252,8 +262,8 @@ export default function Transportadoras() {
             totalPages={pagination.totalPages} 
             pageSize={pagination.pageSize} 
             totalItems={sortedData.length}
-            startIndex={(pagination.currentPage - 1) * pagination.pageSize + 1}
-            endIndex={Math.min(pagination.currentPage * pagination.pageSize, sortedData.length)}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
             pageSizeOptions={[12, 24, 48]}
             onPageChange={pagination.setPage}
             onPageSizeChange={pagination.setPageSize}
@@ -265,22 +275,22 @@ export default function Transportadoras() {
             hasPrevPage={pagination.hasPrevPage}
           />
         )}
-
-        <Dialog open={editDialog} onOpenChange={setEditDialog}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate} disabled={!form.razao_social || !form.nome_fantasia}>Salvar</Button></DialogFooter></DialogContent></Dialog>
-
-        <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Excluir Transportadora</AlertDialogTitle>
-              <AlertDialogDescription>Tem certeza que deseja excluir esta transportadora? Esta ação não pode ser desfeita.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => deleteTarget && handleDelete(deleteTarget)}>Excluir</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader><AlertDialogTitle>Excluir Transportadora</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita. Isso excluirá permanentemente o registro.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => deleteTarget && handleDelete(deleteTarget)} className="bg-destructive text-destructive-foreground">Excluir</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={editDialog} onOpenChange={setEditDialog}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Editar Transportadora</DialogTitle></DialogHeader>
+          <FormFields />
+          <DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate}>Salvar Alterações</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }

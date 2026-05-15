@@ -3,6 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
+// Simple internal debounce function to avoid external dependencies
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
 type PostgresChangesEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
 
 interface UseRealtimeOptions<T> {
@@ -31,16 +40,21 @@ export function useRealtime<T = Record<string, unknown>>({
   const queryClient = useQueryClient();
   const channelRef = useRef<RealtimeChannel | null>(null);
 
+  // Optimized invalidation with debounce to prevent rapid-fire refetches
+  const debouncedInvalidate = useRef(
+    debounce((keys: string[]) => {
+      keys.forEach(key => queryClient.invalidateQueries({ queryKey: [key] }));
+    }, 1500)
+  ).current;
+
   const handleChange = useCallback(
     (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
       if (queryKey) {
-        // Multi-layered invalidation
         queryClient.invalidateQueries({ queryKey });
         
         // Specifically invalidate dashboard metrics if related tables change
         if (["entregas", "coletas", "ocorrencias", "ai_delay_predictions"].includes(table)) {
-          queryClient.invalidateQueries({ queryKey: ["dashboard-metrics"] });
-          queryClient.invalidateQueries({ queryKey: ["recent-alerts"] });
+          debouncedInvalidate(["dashboard-metrics", "recent-alerts"]);
         }
       }
 
