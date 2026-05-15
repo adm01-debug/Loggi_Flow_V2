@@ -10,7 +10,8 @@ import { toast } from "sonner";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
-import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { BulkActions } from "@/components/common/BulkActions";
+import { useSelection } from "@/hooks/useSelection";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
