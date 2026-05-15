@@ -129,7 +129,7 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
 
       {!divergencia && (
         <div className="bg-muted/30 p-4 rounded-lg flex items-start gap-3">
-          <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <InfoIcon className="w-5 h-5 text-primary shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-semibold">Instruções de Conferência</p>
             <p className="text-muted-foreground">Verifique a integridade das embalagens e confirme se a quantidade e peso batem com o manifesto de coleta.</p>
