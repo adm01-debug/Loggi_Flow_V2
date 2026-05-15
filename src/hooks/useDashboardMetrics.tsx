@@ -65,12 +65,7 @@ export function useDashboardMetrics() {
     refetchInterval: QUERY_REFETCH_INTERVAL.DASHBOARD,
     enabled: !!user?.id,
   });
-}
-    staleTime: QUERY_STALE_TIME.DASHBOARD,
-    refetchInterval: QUERY_REFETCH_INTERVAL.DASHBOARD,
-    enabled: !!user?.id,
-  });
-}
+
 
 export function useRecentAlerts() {
   const { user } = useAuth();
