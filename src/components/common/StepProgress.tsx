@@ -1,4 +1,4 @@
-import { Check, Circle } from "lucide-react";
+import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +70,12 @@ export function StepProgress({
         const isCurrent = index === currentStep;
         const isClickable = !!onStepClick && index <= currentStep;
 
+        const getIndicatorStyle = () => {
+          if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
+          if (isCurrent) return "bg-primary/20 text-primary border-2 border-primary";
+          return "bg-muted text-muted-foreground border-2 border-border";
+        };
+
         return (
           <div
             key={step.id}
@@ -79,7 +85,6 @@ export function StepProgress({
               config.gap
             )}
           >
-            {/* Step indicator */}
             <div className={cn("flex items-center", isHorizontal ? "" : "flex-col")}>
               <motion.button
                 onClick={() => isClickable && onStepClick?.(index)}
@@ -87,11 +92,7 @@ export function StepProgress({
                 className={cn(
                   "relative rounded-full flex items-center justify-center font-medium transition-all duration-300",
                   config.circle,
-                  (() => {
-                    if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
-                    if (isCurrent) return "bg-primary/20 text-primary border-2 border-primary";
-                    return "bg-muted text-muted-foreground border-2 border-border";
-                  })(),
+                  getIndicatorStyle(),
                   isClickable && "cursor-pointer hover:scale-110",
                   !isClickable && "cursor-default"
                 )}
@@ -116,7 +117,6 @@ export function StepProgress({
                   <span className={config.text}>{index + 1}</span>
                 )}
 
-                {/* Pulse animation for current step */}
                 {isCurrent && (
                   <motion.div
                     className="absolute inset-0 rounded-full border-2 border-primary"
@@ -127,7 +127,6 @@ export function StepProgress({
                 )}
               </motion.button>
 
-              {/* Step text (vertical) */}
               {!isHorizontal && (
                 <div className="ml-4 pb-8">
                   <p className={cn("font-medium", config.text, isCurrent && "text-primary")}>
@@ -142,7 +141,6 @@ export function StepProgress({
               )}
             </div>
 
-            {/* Connector line */}
             {index < steps.length - 1 && (
               <div
                 className={cn(
@@ -171,7 +169,6 @@ export function StepProgress({
               </div>
             )}
 
-            {/* Step text (horizontal) */}
             {isHorizontal && (
               <div className="hidden sm:block absolute -bottom-8 left-1/2 -translate-x-1/2 text-center w-24">
                 <p className={cn("font-medium truncate", config.text, isCurrent && "text-primary")}>
@@ -186,7 +183,6 @@ export function StepProgress({
   );
 }
 
-// Simple linear progress with percentage
 interface LinearProgressProps {
   value: number;
   max?: number;

@@ -1,0 +1,1091 @@
+
+> vite_react_shadcn_ts@0.0.0 lint
+> eslint .
+
+
+/dev-server/src/components/accessibility/LiveRegion.tsx
+  52:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  61:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/accessibility/ReducedMotion.tsx
+  59:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  64:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/achievements/AchievementBadge.tsx
+  21:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/box/BoxGrid.tsx
+  98:23  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/common/CSVImporter.tsx
+  71:41  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/dev-server/src/components/common/ConfirmDialog.tsx
+  62:27  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/common/ConfirmProvider.tsx
+   31:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  184:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/common/DataExporter.tsx
+  10:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/components/common/DateRangePicker.tsx
+   13:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  142:15  error    Extract this nested ternary operation into an independent statement                                                             sonarjs/no-nested-conditional
+
+/dev-server/src/components/common/EmptyState.tsx
+  123:14  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  123:39  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/dev-server/src/components/common/ErrorBoundary.tsx
+  100:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/common/StatusBadge.tsx
+   94:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+   99:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  104:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/common/StepProgress.tsx
+   68:32  error  Refactor this function to reduce its Cognitive Complexity from 24 to the 15 allowed  sonarjs/cognitive-complexity
+  106:76  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  164:44  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  165:46  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  215:49  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/dev-server/src/components/common/WidgetErrorBoundary.tsx
+  54:7  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/dev-server/src/components/dashboard/FavoriteMetricsBar.tsx
+   87:3   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-unused-vars')
+   88:17  error    Remove the declaration of the unused 'slaData' variable                                               sonarjs/no-unused-vars
+   88:17  error    Remove this useless assignment to variable "slaData"                                                  sonarjs/no-dead-store
+   97:11  error    Remove the declaration of the unused 'defaultData' variable                                           sonarjs/no-unused-vars
+   97:11  error    Remove this useless assignment to variable "defaultData"                                              sonarjs/no-dead-store
+  330:35  error    Extract this nested ternary operation into an independent statement                                   sonarjs/no-nested-conditional
+
+/dev-server/src/components/dashboard/KPICard.tsx
+   88:11  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+  180:19  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  183:43  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/dev-server/src/components/dashboard/QuickActions.tsx
+  35:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/dev-server/src/components/dashboard/SystemHealthWidget.tsx
+   4:10  error  Remove this unused import of 'Progress'                              sonarjs/unused-import
+  44:42  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/freight/AIFreightForecasting.tsx
+    5:10  error  Remove this unused import of 'LineChart'                             sonarjs/unused-import
+    5:21  error  Remove this unused import of 'Line'                                  sonarjs/unused-import
+  104:17  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/freight/FreightAudit.tsx
+   6:10  error  Remove this unused import of 'Badge'                           sonarjs/unused-import
+   8:58  error  Remove this unused import of 'Calculator'                      sonarjs/unused-import
+  31:13  error  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  32:13  error  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  47:39  error  Remove the declaration of the unused 'isLoadingLogs' variable  sonarjs/no-unused-vars
+  47:39  error  Remove this useless assignment to variable "isLoadingLogs"     sonarjs/no-dead-store
+
+/dev-server/src/components/freight/FreightTableManager.tsx
+  199:11  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/freight/NegotiationAssistant.tsx
+  4:48  error  Remove this unused import of 'Zap'  sonarjs/unused-import
+
+/dev-server/src/components/freight/ScenarioSimulator.tsx
+  15:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/components/freight/SmartCarrierSelector.tsx
+  15:3  error  Remove this unused import of 'TrendingUp'  sonarjs/unused-import
+
+/dev-server/src/components/freight/StrategySimulator.tsx
+   9:3   error  Remove this unused import of 'TrendingDown'  sonarjs/unused-import
+  11:3   error  Remove this unused import of 'ArrowRight'    sonarjs/unused-import
+  13:15  error  Remove this unused import of 'PieChartIcon'  sonarjs/unused-import
+  14:3   error  Remove this unused import of 'BarChart3'     sonarjs/unused-import
+  15:3   error  Remove this unused import of 'TrendingUp'    sonarjs/unused-import
+  16:3   error  Remove this unused import of 'Percent'       sonarjs/unused-import
+  26:3   error  Remove this unused import of 'Cell'          sonarjs/unused-import
+
+/dev-server/src/components/gamification/LevelUpModal.tsx
+   9:10  error  Remove this unused import of 'Sparkles'                        sonarjs/unused-import
+  14:22  error  Remove the declaration of the unused 'levelProgress' variable  sonarjs/no-unused-vars
+  14:22  error  Remove this useless assignment to variable "levelProgress"     sonarjs/no-dead-store
+
+/dev-server/src/components/integrations/WebhookManager.tsx
+  26:38  error  Remove the declaration of the unused 'isLoadingDeliveries' variable  sonarjs/no-unused-vars
+  26:38  error  Remove this useless assignment to variable "isLoadingDeliveries"     sonarjs/no-dead-store
+
+/dev-server/src/components/labels/MaterialLabelPrinter.tsx
+   15:27  error  Remove this unused import of 'FileText'                                              sonarjs/unused-import
+   15:37  error  Remove this unused import of 'Search'                                                sonarjs/unused-import
+  108:50  error  Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed  sonarjs/cognitive-complexity
+  148:17  error  Remove the declaration of the unused 'QRCodeCanvas' variable                         sonarjs/no-unused-vars
+  148:17  error  Remove this useless assignment to variable "QRCodeCanvas"                            sonarjs/no-dead-store
+  150:15  error  Remove the declaration of the unused 'canvas' variable                               sonarjs/no-unused-vars
+  150:15  error  Remove this useless assignment to variable "canvas"                                  sonarjs/no-dead-store
+  154:15  error  Remove the declaration of the unused 'root' variable                                 sonarjs/no-unused-vars
+  154:15  error  Remove this useless assignment to variable "root"                                    sonarjs/no-dead-store
+  157:17  error  Remove the declaration of the unused 'img' variable                                  sonarjs/no-unused-vars
+  157:17  error  Remove this useless assignment to variable "img"                                     sonarjs/no-dead-store
+  280:15  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/dev-server/src/components/layout/AppSidebar.tsx
+    4:64  error  Remove this unused import of 'Settings'                sonarjs/unused-import
+  401:1   error  File has too many lines (408). Maximum allowed is 400  max-lines
+
+/dev-server/src/components/layout/Header.tsx
+  50:7  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/dev-server/src/components/layout/MobileBottomNav.tsx
+  8:48  error  Remove this unused import of 'Search'  sonarjs/unused-import
+
+/dev-server/src/components/map/MapboxMap.tsx
+  1:39  error  Remove this unused import of 'useCallback'  sonarjs/unused-import
+
+/dev-server/src/components/melhorenvio/MECarrinhoPanel.tsx
+   21:23  error  Remove this unused import of 'formatCPFCNPJ'                                         sonarjs/unused-import
+   24:17  error  Refactor this function to reduce its Cognitive Complexity from 50 to the 15 allowed  sonarjs/cognitive-complexity
+   45:7   error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  152:15  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  154:15  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/dev-server/src/components/melhorenvio/MECartDialog.tsx
+  43:17  error  Refactor this function to reduce its Cognitive Complexity from 55 to the 15 allowed  sonarjs/cognitive-complexity
+  60:40  error  Refactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/components/melhorenvio/MECotacaoPanel.tsx
+  10:10  error  Remove this unused import of 'formatCEP'  sonarjs/unused-import
+
+/dev-server/src/components/melhorenvio/MEDetailDialog.tsx
+  12:10  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/components/melhorenvio/MEEtiquetasPanel.tsx
+   31:17  error  Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed  sonarjs/cognitive-complexity
+   45:7   error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  200:15  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  202:15  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/dev-server/src/components/melhorenvio/MELojasPanel.tsx
+   39:7   error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+   55:53  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  103:15  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  105:15  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/melhorenvio/METransportadorasPanel.tsx
+   40:11  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+   49:65  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+   69:17  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+   71:17  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  109:17  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  111:17  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/melhorenvio/MEUsuarioPanel.tsx
+  24:7  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/melhorenvio/MEWebhookPanel.tsx
+  2:29  error  Remove this unused import of 'CardHeader'  sonarjs/unused-import
+  2:41  error  Remove this unused import of 'CardTitle'   sonarjs/unused-import
+  8:55  error  Remove this unused import of 'RefreshCw'   sonarjs/unused-import
+
+/dev-server/src/components/notifications/BrowserNotificationPrompt.tsx
+  46:7  error  Either remove this useless object instantiation of "window.Notification" or use it  sonarjs/constructor-for-side-effects
+
+/dev-server/src/components/notifications/NotificationCenter.tsx
+    5:3   error  Remove this unused import of 'Check'                                 sonarjs/unused-import
+  230:32  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/notifications/SLANotificationSettings.tsx
+  65:17  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/notifications/UserNotificationCenter.tsx
+    6:3   error  Remove this unused import of 'Trash2'                                sonarjs/unused-import
+  249:19  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/onboarding/OnboardingChecklist.tsx
+   23:5   error  Remove the declaration of the unused 'completeStep' variable         sonarjs/no-unused-vars
+   23:5   error  Remove this useless assignment to variable "completeStep"            sonarjs/no-dead-store
+  144:29  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  155:29  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/onboarding/OnboardingWizard.tsx
+  39:13  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  50:15  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/onboarding/WelcomeModal.tsx
+  1:20  error  Remove this unused import of 'useEffect'  sonarjs/unused-import
+
+/dev-server/src/components/predictions/DelayPredictionPanel.tsx
+   10:3  error  Remove this unused import of 'TrendingUp'                            sonarjs/unused-import
+  160:9  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/pwa/InstallPrompt.tsx
+  137:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/pwa/UpdatePrompt.tsx
+  27:54  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/dev-server/src/components/reports/ScheduledReportsManager.tsx
+   38:75  error  Remove the declaration of the unused 'updateReport' variable         sonarjs/no-unused-vars
+   38:75  error  Remove this useless assignment to variable "updateReport"            sonarjs/no-dead-store
+  279:11  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/rewards/RewardPurchaseHistory.tsx
+  2:29  error  Remove this unused import of 'CardHeader'  sonarjs/unused-import
+  2:41  error  Remove this unused import of 'CardTitle'   sonarjs/unused-import
+
+/dev-server/src/components/rodonaves/RTEAdvancedQuotation.tsx
+  5:10  error  Remove this unused import of 'Textarea'  sonarjs/unused-import
+  8:32  error  Remove this unused import of 'Loader2'   sonarjs/unused-import
+
+/dev-server/src/components/rodonaves/RTECepAutoFill.tsx
+  5:27  error  Remove this unused import of 'MapPin'  sonarjs/unused-import
+
+/dev-server/src/components/rodonaves/RTECustomerManager.tsx
+   19:10  error  Remove the declaration of the unused 'showNewAddress' variable  sonarjs/no-unused-vars
+   19:10  error  Remove this useless assignment to variable "showNewAddress"     sonarjs/no-dead-store
+   21:46  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+   22:46  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+   35:7   error  Handle this exception or don't catch it at all                  sonarjs/no-ignored-exceptions
+   35:19  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+   50:7   error  Handle this exception or don't catch it at all                  sonarjs/no-ignored-exceptions
+   50:19  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+   66:7   error  Handle this exception or don't catch it at all                  sonarjs/no-ignored-exceptions
+   66:19  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+   81:7   error  Handle this exception or don't catch it at all                  sonarjs/no-ignored-exceptions
+   81:19  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  126:36  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+  165:39  error  Unexpected any. Specify a different type                        @typescript-eslint/no-explicit-any
+
+/dev-server/src/components/rodonaves/RTECustomerSync.tsx
+  8:55  error  Remove this unused import of 'MapPin'  sonarjs/unused-import
+
+/dev-server/src/components/rodonaves/RTEOrdersPanel.tsx
+  29:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/components/rodonaves/RTEPickupActions.tsx
+  20:10  error  Remove the declaration of the unused 'showCreate' variable     sonarjs/no-unused-vars
+  20:10  error  Remove this useless assignment to variable "showCreate"        sonarjs/no-dead-store
+  20:22  error  Remove the declaration of the unused 'setShowCreate' variable  sonarjs/no-unused-vars
+  20:22  error  Remove this useless assignment to variable "setShowCreate"     sonarjs/no-dead-store
+
+/dev-server/src/components/rodonaves/RTESelfAttendance.tsx
+  5:10  error  Remove this unused import of 'Badge'    sonarjs/unused-import
+  8:36  error  Remove this unused import of 'Loader2'  sonarjs/unused-import
+
+/dev-server/src/components/rodonaves/RTETrackingPanel.tsx
+    8:72  error  Remove this unused import of 'Truck'                                 sonarjs/unused-import
+   69:51  error  Unexpected any. Specify a different type                             @typescript-eslint/no-explicit-any
+   75:26  error  Unexpected any. Specify a different type                             @typescript-eslint/no-explicit-any
+   77:51  error  Unexpected any. Specify a different type                             @typescript-eslint/no-explicit-any
+  105:32  error  Unexpected any. Specify a different type                             @typescript-eslint/no-explicit-any
+  105:40  error  Unexpected any. Specify a different type                             @typescript-eslint/no-explicit-any
+  106:53  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  110:27  error  Unexpected any. Specify a different type                             @typescript-eslint/no-explicit-any
+
+/dev-server/src/components/scanner/QRScannerModal.tsx
+   7:3   error    Remove this unused import of 'X'                                                                                                       sonarjs/unused-import
+  30:10  error    Remove this unused import of 'cn'                                                                                                      sonarjs/unused-import
+  81:6   warning  React Hook useEffect has missing dependencies: 'startScanning' and 'stopScanning'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/dev-server/src/components/scanner/ScannerButton.tsx
+  2:10  error  Remove this unused import of 'QrCode'  sonarjs/unused-import
+
+/dev-server/src/components/search/GlobalSearch.tsx
+   4:3   error  Remove this unused import of 'Calculator'             sonarjs/unused-import
+   5:3   error  Remove this unused import of 'Calendar'               sonarjs/unused-import
+   6:3   error  Remove this unused import of 'CreditCard'             sonarjs/unused-import
+   7:3   error  Remove this unused import of 'Settings'               sonarjs/unused-import
+   8:3   error  Remove this unused import of 'Smile'                  sonarjs/unused-import
+  14:3   error  Remove this unused import of 'AlertCircle'            sonarjs/unused-import
+  19:3   error  Remove this unused import of 'Bot'                    sonarjs/unused-import
+  41:11  error  Remove the declaration of the unused 'user' variable  sonarjs/no-unused-vars
+  41:11  error  Remove this useless assignment to variable "user"     sonarjs/no-dead-store
+
+/dev-server/src/components/security/GeoBlockingPanel.tsx
+  235:15  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/security/MFAVerify.tsx
+  40:7  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/dev-server/src/components/security/PermissionGate.tsx
+    4:10  error    Remove this unused import of 'AlertTriangle'                                                                                    sonarjs/unused-import
+   17:17  error    Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed                                             sonarjs/cognitive-complexity
+   90:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  105:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/security/PermissionMatrix.tsx
+   11:20  error  Remove this unused import of 'useEffect'                          sonarjs/unused-import
+  233:55  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/dev-server/src/components/security/RateLimitDashboardPanel.tsx
+  11:3  error  Remove this unused import of 'RefreshCw'  sonarjs/unused-import
+
+/dev-server/src/components/security/SecurityNotificationSettings.tsx
+  1:10  error  Remove this unused import of 'useEffect'  sonarjs/unused-import
+
+/dev-server/src/components/security/SecurityOverviewPanel.tsx
+   90:13   error  Empty block statement                                                no-empty
+  122:100  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/security/SecurityScoreCard.tsx
+  52:74  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/security/SecurityStatsGrid.tsx
+  3:114  error  Remove this unused import of 'Clock'  sonarjs/unused-import
+
+/dev-server/src/components/security/TwoFactorSetup.tsx
+   45:10  error  Remove the declaration of the unused 'isDisabling' variable     sonarjs/no-unused-vars
+   45:10  error  Remove this useless assignment to variable "isDisabling"        sonarjs/no-dead-store
+   45:23  error  Remove the declaration of the unused 'setIsDisabling' variable  sonarjs/no-unused-vars
+   45:23  error  Remove this useless assignment to variable "setIsDisabling"     sonarjs/no-dead-store
+   56:11  error  Remove the declaration of the unused 'user' variable            sonarjs/no-unused-vars
+   56:11  error  Remove this useless assignment to variable "user"               sonarjs/no-dead-store
+  110:15  error  Remove the declaration of the unused 'data' variable            sonarjs/no-unused-vars
+  110:15  error  Remove this useless assignment to variable "data"               sonarjs/no-dead-store
+
+/dev-server/src/components/shipping/DeliveryReceiptUpload.tsx
+   3:10  error  Remove this unused import of 'Upload'           sonarjs/unused-import
+   3:18  error  Remove this unused import of 'X'                sonarjs/unused-import
+   3:31  error  Remove this unused import of 'CheckCircle2'     sonarjs/unused-import
+  56:21  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  74:7   error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+  74:21  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+/dev-server/src/components/transportadoras/RotaFormDialog.tsx
+  2:16  error  Remove this unused import of 'Edit'    sonarjs/unused-import
+  2:22  error  Remove this unused import of 'Trash2'  sonarjs/unused-import
+
+/dev-server/src/components/transportadoras/RotaResultsList.tsx
+  108:84  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/ui/animated-number.tsx
+  11:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/components/ui/avatar.tsx
+  283:44  error    Extract this nested ternary operation into an independent statement                                                             sonarjs/no-nested-conditional
+  294:3   warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/badge.tsx
+  158:40  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/button.tsx
+  114:57  error    Refactor this code to not nest functions more than 4 levels deep                                                                sonarjs/no-nested-functions
+  236:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/card.tsx
+  315:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/command.tsx
+  24:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/dev-server/src/components/ui/form.tsx
+  129:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/input.tsx
+   49:37  error    Extract this nested ternary operation into an independent statement                                                             sonarjs/no-nested-conditional
+  173:30  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/micro-interactions.tsx
+   34:55  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  401:1   error  File has too many lines (440). Maximum allowed is 400             max-lines
+
+/dev-server/src/components/ui/navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/sidebar.tsx
+  401:1   error    File has too many lines (637). Maximum allowed is 400                                                                           max-lines
+  536:26  error    Make sure that using this pseudorandom number generator is safe here                                                            sonarjs/pseudo-random
+  636:3   warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/skeleton.tsx
+  139:86  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/dev-server/src/components/ui/sonner.tsx
+  28:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/components/ui/table.tsx
+    2:43  error  Remove this unused import of 'Check'                                 sonarjs/unused-import
+    2:50  error  Remove this unused import of 'Minus'                                 sonarjs/unused-import
+  128:58  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/components/ui/tabs.tsx
+  5:10  error  Remove this unused import of 'motion'  sonarjs/unused-import
+
+/dev-server/src/components/ui/textarea.tsx
+  5:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/dev-server/src/components/ui/toggle.tsx
+  37:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/hooks/useAchievementNotifications.tsx
+  43:50  error    Refactor this code to not nest functions more than 4 levels deep                                                                sonarjs/no-nested-functions
+  62:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/hooks/useAnalytics.tsx
+  173:24  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  222:34  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  401:1   error  File has too many lines (422). Maximum allowed is 400                 max-lines
+
+/dev-server/src/hooks/useAuth.tsx
+   67:40  error    Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  167:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/hooks/useBusinessRuleEngine.tsx
+  55:120  error  Refactor this function to reduce its Cognitive Complexity from 30 to the 15 allowed  sonarjs/cognitive-complexity
+  69:77   error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+  87:71   error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/dev-server/src/hooks/useBusinessRules.tsx
+   1:10  error  Remove this unused import of 'useState'   sonarjs/unused-import
+  24:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/hooks/useConciliacao.tsx
+  178:47   error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  182:114  error  Unnecessary escape character: \-                                  no-useless-escape
+  207:61   error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  401:1    error  File has too many lines (412). Maximum allowed is 400             max-lines
+
+/dev-server/src/hooks/useCostAlerts.tsx
+  308:11  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/hooks/useCotacoesMulticanal.tsx
+  5:10  error  Remove this unused import of 'useEffect'  sonarjs/unused-import
+
+/dev-server/src/hooks/useDashboardMetrics.tsx
+    6:10  error  Remove this unused import of 'differenceInHours'  sonarjs/unused-import
+    6:29  error  Remove this unused import of 'parseISO'           sonarjs/unused-import
+    6:39  error  Remove this unused import of 'isAfter'            sonarjs/unused-import
+    6:48  error  Remove this unused import of 'isBefore'           sonarjs/unused-import
+    6:58  error  Remove this unused import of 'startOfDay'         sonarjs/unused-import
+    6:70  error  Remove this unused import of 'endOfDay'           sonarjs/unused-import
+    6:80  error  Remove this unused import of 'subDays'            sonarjs/unused-import
+   52:46  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  162:43  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  198:90  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+/dev-server/src/hooks/useDashboardWidgets.tsx
+  1:33  error  Remove this unused import of 'useEffect'  sonarjs/unused-import
+
+/dev-server/src/hooks/useDelayPrediction.tsx
+  39:46  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/hooks/useDeliveryRoutes.tsx
+   78:24  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+   79:24  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  116:5   error  Replace this if-then-else flow by a single return statement           sonarjs/prefer-single-boolean-return
+
+/dev-server/src/hooks/useDensity.ts
+  11:9   error  Remove this useless assignment to variable "padding"                                                     sonarjs/no-dead-store
+  12:9   error  Remove this useless assignment to variable "fontSize"                                                    sonarjs/no-dead-store
+  24:19  error  Review this redundant assignment: "padding" already holds the assigned value along all execution paths   sonarjs/no-redundant-assignments
+  25:20  error  Review this redundant assignment: "fontSize" already holds the assigned value along all execution paths  sonarjs/no-redundant-assignments
+
+/dev-server/src/hooks/useDocumentUpload.ts
+  80:53  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/dev-server/src/hooks/useDrillDown.tsx
+  35:69  error  Refactor this function to reduce its Cognitive Complexity from 29 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/hooks/useExecutiveMetrics.tsx
+  33:13  error  Remove the declaration of the unused 'months' variable  sonarjs/no-unused-vars
+
+/dev-server/src/hooks/useGlobalSearch.tsx
+    6:11  error  Remove this unused import of 'Zap'                      sonarjs/unused-import
+    6:16  error  Remove this unused import of 'Box'                      sonarjs/unused-import
+    6:53  error  Remove this unused import of 'Target'                   sonarjs/unused-import
+    6:61  error  Remove this unused import of 'CalendarDays'             sonarjs/unused-import
+    7:3   error  Remove this unused import of 'Calculator'               sonarjs/unused-import
+    7:15  error  Remove this unused import of 'DollarSign'               sonarjs/unused-import
+    7:42  error  Remove this unused import of 'Map'                      sonarjs/unused-import
+    7:47  error  Remove this unused import of 'Navigation'               sonarjs/unused-import
+    7:66  error  Remove this unused import of 'Bell'                     sonarjs/unused-import
+    8:14  error  Remove this unused import of 'Route'                    sonarjs/unused-import
+    8:21  error  Remove this unused import of 'Bot'                      sonarjs/unused-import
+    8:26  error  Remove this unused import of 'Cog'                      sonarjs/unused-import
+    8:31  error  Remove this unused import of 'KeyRound'                 sonarjs/unused-import
+    8:41  error  Remove this unused import of 'Award'                    sonarjs/unused-import
+    8:48  error  Remove this unused import of 'Upload'                   sonarjs/unused-import
+    8:56  error  Remove this unused import of 'Webhook'                  sonarjs/unused-import
+    8:65  error  Remove this unused import of 'TrendingUp'               sonarjs/unused-import
+    9:3   error  Remove this unused import of 'Activity'                 sonarjs/unused-import
+    9:13  error  Remove this unused import of 'Search'                   sonarjs/unused-import
+    9:21  error  Remove this unused import of 'List'                     sonarjs/unused-import
+    9:27  error  Remove this unused import of 'Smartphone'               sonarjs/unused-import
+    9:39  error  Remove this unused import of 'Info'                     sonarjs/unused-import
+  170:50  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  182:50  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/dev-server/src/hooks/useImageUpload.tsx
+   33:30  error  Refactor this code to not nest functions more than 4 levels deep      sonarjs/no-nested-functions
+   60:41  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  103:7   error  Handle this exception or don't catch it at all                        sonarjs/no-ignored-exceptions
+
+/dev-server/src/hooks/useImportData.ts
+   86:58  error  Unexpected any. Specify a different type                          @typescript-eslint/no-explicit-any
+   86:76  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  126:30  error  Unexpected any. Specify a different type                          @typescript-eslint/no-explicit-any
+
+/dev-server/src/hooks/useIntegrationValidation.tsx
+  66:15  error  Remove the declaration of the unused 'data' variable  sonarjs/no-unused-vars
+  66:15  error  Remove this useless assignment to variable "data"     sonarjs/no-dead-store
+  78:15  error  Remove the declaration of the unused 'data' variable  sonarjs/no-unused-vars
+  78:15  error  Remove this useless assignment to variable "data"     sonarjs/no-dead-store
+  90:15  error  Remove the declaration of the unused 'data' variable  sonarjs/no-unused-vars
+  90:15  error  Remove this useless assignment to variable "data"     sonarjs/no-dead-store
+
+/dev-server/src/hooks/useKPIBenchmark.tsx
+   4:55  error  Remove this unused import of 'parseISO'                                              sonarjs/unused-import
+  37:23  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/hooks/useKeyboardShortcuts.ts
+  1:21  error  Remove this unused import of 'useCallback'  sonarjs/unused-import
+
+/dev-server/src/hooks/useLalamoveTracking.tsx
+  300:52  error    Refactor this function to reduce its Cognitive Complexity from 32 to the 15 allowed                                                                                   sonarjs/cognitive-complexity
+  401:1   error    File has too many lines (489). Maximum allowed is 400                                                                                                                 max-lines
+  405:6   warning  React Hook useCallback has missing dependencies: 'addAlert', 'checkRouteDeviation', and 'saveLocationToDatabase'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useLogisticsCalendar.tsx
+  29:23  error  Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/hooks/useLogisticsCosts.tsx
+  4:36  error  Remove this unused import of 'subMonths'  sonarjs/unused-import
+
+/dev-server/src/hooks/useMFA.ts
+   72:7  error    Unnecessary catch clause                                                                                               no-useless-catch
+   72:7  error    Add logic to this catch clause or eliminate it and rethrow the exception automatically                                 sonarjs/no-useless-catch
+  110:7  error    Unnecessary catch clause                                                                                               no-useless-catch
+  110:7  error    Add logic to this catch clause or eliminate it and rethrow the exception automatically                                 sonarjs/no-useless-catch
+  115:6  warning  React Hook useCallback has a missing dependency: 'logSecurityEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  138:7  error    Unnecessary catch clause                                                                                               no-useless-catch
+  138:7  error    Add logic to this catch clause or eliminate it and rethrow the exception automatically                                 sonarjs/no-useless-catch
+  163:7  error    Unnecessary catch clause                                                                                               no-useless-catch
+  163:7  error    Add logic to this catch clause or eliminate it and rethrow the exception automatically                                 sonarjs/no-useless-catch
+  168:6  warning  React Hook useCallback has a missing dependency: 'logSecurityEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useNavigationHistory.tsx
+  81:6  warning  React Hook useEffect has missing dependencies: 'recentPages' and 'setRecentPages'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useNotificationPreferences.tsx
+   1:10  error    Remove this unused import of 'useState'                                                                                                                                                              sonarjs/unused-import
+   1:20  error    Remove this unused import of 'useEffect'                                                                                                                                                             sonarjs/unused-import
+  90:9   warning  The 'preferences' conditional could make the dependencies of useCallback Hook (at line 152) change on every render. To fix this, wrap the initialization of 'preferences' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useNotifications.tsx
+    1:10  error  Remove this unused import of 'useEffect'                                            sonarjs/unused-import
+    5:10  error  Remove this unused import of 'toast'                                                sonarjs/unused-import
+   26:10  error  Remove the declaration of the unused 'channel' variable                             sonarjs/no-unused-vars
+   26:10  error  Remove this useless assignment to variable "channel"                                sonarjs/no-dead-store
+   26:19  error  Remove the declaration of the unused 'setChannel' variable                          sonarjs/no-unused-vars
+   26:19  error  Remove this useless assignment to variable "setChannel"                             sonarjs/no-dead-store
+   27:11  error  Remove the declaration of the unused 'shouldShowNotification' variable              sonarjs/no-unused-vars
+   27:11  error  Remove this useless assignment to variable "shouldShowNotification"                 sonarjs/no-dead-store
+   27:35  error  Remove the declaration of the unused 'shouldShowBrowserNotification' variable       sonarjs/no-unused-vars
+   27:35  error  Remove this useless assignment to variable "shouldShowBrowserNotification"          sonarjs/no-dead-store
+   27:66  error  Remove the declaration of the unused 'preferences' variable                         sonarjs/no-unused-vars
+   27:66  error  Remove this useless assignment to variable "preferences"                            sonarjs/no-dead-store
+  113:7   error  Either remove this useless object instantiation of "window.Notification" or use it  sonarjs/constructor-for-side-effects
+
+/dev-server/src/hooks/useOnboarding.tsx
+  216:6  warning  React Hook useEffect has a missing dependency: 'initializeMutation'. Either include it or remove the dependency array                                                                                             react-hooks/exhaustive-deps
+  218:9  warning  The 'completedSteps' logical expression could make the dependencies of useCallback Hook (at line 225) change on every render. To fix this, wrap the initialization of 'completedSteps' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useOnlineStatus.tsx
+   7:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  48:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  94:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/hooks/usePushNotifications.tsx
+   69:13  error  Remove the declaration of the unused 'error' variable  sonarjs/no-unused-vars
+   69:13  error  Remove this useless assignment to variable "error"     sonarjs/no-dead-store
+  147:7   error  Handle this exception or don't catch it at all         sonarjs/no-ignored-exceptions
+
+/dev-server/src/hooks/useQRScanner.tsx
+   82:9  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free                                     @typescript-eslint/ban-ts-comment
+  141:6  warning  React Hook useCallback has a missing dependency: 'stopScanning'. Either include it or remove the dependency array                                       react-hooks/exhaustive-deps
+  236:6  warning  React Hook useEffect has missing dependencies: 'checkPermission', 'getCameras', and 'stopScanning'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useQuotationFlow.tsx
+  41:9  warning  The 'tabelasFrete' logical expression could make the dependencies of useMemo Hook (at line 68) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'tabelasFrete' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  42:9  warning  The 'transportadoras' logical expression could make the dependencies of useMemo Hook (at line 74) change on every render. To fix this, wrap the initialization of 'transportadoras' in its own useMemo() Hook                                   react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useRealtime.tsx
+    7:39  error    Unexpected any. Specify a different type                                                                                  @typescript-eslint/no-explicit-any
+    7:49  error    Unexpected any. Specify a different type                                                                                  @typescript-eslint/no-explicit-any
+   73:5   warning  React Hook useCallback has a missing dependency: 'debouncedInvalidate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  108:11  error    An interface declaring no members is equivalent to its supertype                                                          @typescript-eslint/no-empty-object-type
+
+/dev-server/src/hooks/useRodonavesTracking.tsx
+  261:7  error  Handle this exception or don't catch it at all         sonarjs/no-ignored-exceptions
+  401:1  error  File has too many lines (419). Maximum allowed is 400  max-lines
+
+/dev-server/src/hooks/useSLAAlerts.tsx
+    6:47  error    Remove this unused import of 'addHours'                                                                                sonarjs/unused-import
+   22:9   error    Remove the declaration of the unused 'queryClient' variable                                                            sonarjs/no-unused-vars
+   22:9   error    Remove this useless assignment to variable "queryClient"                                                               sonarjs/no-dead-store
+   48:25  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  122:6   warning  React Hook useEffect has a missing dependency: 'createNotification'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/dev-server/src/hooks/useSLAMetrics.tsx
+    4:29  error  Remove this unused import of 'differenceInDays'                      sonarjs/unused-import
+    4:76  error  Remove this unused import of 'startOfDay'                            sonarjs/unused-import
+  302:73  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  401:1   error  File has too many lines (401). Maximum allowed is 400                max-lines
+
+/dev-server/src/hooks/useSLANotifications.tsx
+  284:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  298:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/hooks/useScheduledReports.tsx
+    1:10  error  Remove this unused import of 'useState'   sonarjs/unused-import
+   17:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   33:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:84  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/hooks/useSmartAlerts.tsx
+   4:15  error  Remove this unused import of 'RealtimePostgresChangesPayload'         sonarjs/unused-import
+  34:32  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  50:21  error  Extract this nested ternary operation into an independent statement   sonarjs/no-nested-conditional
+
+/dev-server/src/hooks/useSoftDelete.ts
+  14:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/hooks/useSorting.ts
+  24:53  error  Unexpected any. Specify a different type                                             @typescript-eslint/no-explicit-any
+  70:42  error  Refactor this function to reduce its Cognitive Complexity from 30 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/hooks/useTelemetry.ts
+  11:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/hooks/useTimezone.tsx
+   2:10  error    Remove this unused import of 'format'                                                                                           sonarjs/unused-import
+  44:80  error    Update this function so that its implementation is not identical to the one on line 34                                          sonarjs/no-identical-functions
+  61:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  70:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  75:70  error    Update this function so that its implementation is not identical to the one on line 34                                          sonarjs/no-identical-functions
+  85:80  error    Update this function so that its implementation is not identical to the one on line 34                                          sonarjs/no-identical-functions
+  99:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/hooks/useTrackingAnalytics.tsx
+  53:79  error  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+
+/dev-server/src/hooks/useTransportadoraRotas.tsx
+  1:10  error  Remove this unused import of 'useState'  sonarjs/unused-import
+
+/dev-server/src/hooks/useWebAuthn.tsx
+  212:70  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+  401:1   error  File has too many lines (401). Maximum allowed is 400                                max-lines
+
+/dev-server/src/integrations/supabase/types.ts
+  401:1  error  File has too many lines (4267). Maximum allowed is 400  max-lines
+
+/dev-server/src/lib/csvImporter.ts
+  31:36  error  Unexpected any. Specify a different type                          @typescript-eslint/no-explicit-any
+  38:42  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/dev-server/src/lib/excelImporter.ts
+  29:42  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/dev-server/src/lib/formatters.ts
+  6:34  error  Replace this union type with a type alias  sonarjs/use-type-alias
+
+/dev-server/src/lib/queryKeys.ts
+  21:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/dev-server/src/lib/validations.ts
+  207:10  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+
+/dev-server/src/pages/AdminTelemetria.tsx
+  23:10  error  Remove the declaration of the unused 'activeTab' variable  sonarjs/no-unused-vars
+  23:10  error  Remove this useless assignment to variable "activeTab"     sonarjs/no-dead-store
+
+/dev-server/src/pages/AlertasCusto.tsx
+  11:65  error  Remove this unused import of 'TrendingUp'                         sonarjs/unused-import
+  41:5   error  Remove the declaration of the unused 'costCheckResults' variable  sonarjs/no-unused-vars
+  41:5   error  Remove this useless assignment to variable "costCheckResults"     sonarjs/no-dead-store
+  47:5   error  Remove the declaration of the unused 'markAllAsRead' variable     sonarjs/no-unused-vars
+  47:5   error  Remove this useless assignment to variable "markAllAsRead"        sonarjs/no-dead-store
+  50:19  error  Remove the declaration of the unused 'smartAlertsList' variable   sonarjs/no-unused-vars
+  50:19  error  Remove this useless assignment to variable "smartAlertsList"      sonarjs/no-dead-store
+  79:49  error  Unexpected any. Specify a different type                          @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/CalendarioLogistico.tsx
+    5:63  error  Remove this unused import of 'Clock'                                 sonarjs/unused-import
+    5:70  error  Remove this unused import of 'AlertTriangle'                         sonarjs/unused-import
+   24:9   error  Remove the declaration of the unused 'refetch' variable              sonarjs/no-unused-vars
+   24:9   error  Remove this useless assignment to variable "refetch"                 sonarjs/no-dead-store
+  126:23  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/CentralRastreamento.tsx
+    1:20  error  Remove this unused import of 'useMemo'                                               sonarjs/unused-import
+    6:29  error  Remove this unused import of 'CardHeader'                                            sonarjs/unused-import
+    6:41  error  Remove this unused import of 'CardTitle'                                             sonarjs/unused-import
+    7:16  error  Remove this unused import of 'TabsContent'                                           sonarjs/unused-import
+   18:30  error  Remove this unused import of 'DollarSign'                                            sonarjs/unused-import
+   18:42  error  Remove this unused import of 'TrendingDown'                                          sonarjs/unused-import
+   43:25  error  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+   46:41  error  Remove the declaration of the unused 'getStatusLabel' variable                       sonarjs/no-unused-vars
+   46:41  error  Remove this useless assignment to variable "getStatusLabel"                          sonarjs/no-dead-store
+   49:51  error  Remove the declaration of the unused 'predictions' variable                          sonarjs/no-unused-vars
+   49:51  error  Remove this useless assignment to variable "predictions"                             sonarjs/no-dead-store
+  187:17  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/Clientes.tsx
+   18:10  error  Remove this unused import of 'format'                              sonarjs/unused-import
+   19:10  error  Remove this unused import of 'ptBR'                                sonarjs/unused-import
+  132:71  error  Remove the declaration of the unused 'isAllSelected' variable      sonarjs/no-unused-vars
+  132:71  error  Remove this useless assignment to variable "isAllSelected"         sonarjs/no-dead-store
+  132:86  error  Remove the declaration of the unused 'isPartialSelected' variable  sonarjs/no-unused-vars
+  132:86  error  Remove this useless assignment to variable "isPartialSelected"     sonarjs/no-dead-store
+  362:37  error  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+  362:52  error  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/Coletas.tsx
+    7:128  error  Remove this unused import of 'Search'                  sonarjs/unused-import
+    7:136  error  Remove this unused import of 'Filter'                  sonarjs/unused-import
+   39:11   error  Remove the declaration of the unused 'toast' variable  sonarjs/no-unused-vars
+   39:11   error  Remove this useless assignment to variable "toast"     sonarjs/no-dead-store
+   94:87   error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  165:47   error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  165:89   error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/ConciliacaoAutomatica.tsx
+    1:20  error  Remove this unused import of 'useMemo'                       sonarjs/unused-import
+    6:10  error  Remove this unused import of 'Input'                         sonarjs/unused-import
+    7:10  error  Remove this unused import of 'Label'                         sonarjs/unused-import
+    9:10  error  Remove this unused import of 'Dialog'                        sonarjs/unused-import
+    9:18  error  Remove this unused import of 'DialogContent'                 sonarjs/unused-import
+    9:33  error  Remove this unused import of 'DialogFooter'                  sonarjs/unused-import
+    9:47  error  Remove this unused import of 'DialogHeader'                  sonarjs/unused-import
+    9:61  error  Remove this unused import of 'DialogTitle'                   sonarjs/unused-import
+   13:57  error  Remove this unused import of 'Clock'                         sonarjs/unused-import
+   14:48  error  Remove this unused import of 'Truck'                         sonarjs/unused-import
+   15:3   error  Remove this unused import of 'RefreshCw'                     sonarjs/unused-import
+   17:20  error  Remove this unused import of 'useMutation'                   sonarjs/unused-import
+   22:10  error  Remove this unused import of 'formatCurrency'                sonarjs/unused-import
+   43:9   error  Remove the declaration of the unused 'queryClient' variable  sonarjs/no-unused-vars
+   43:9   error  Remove this useless assignment to variable "queryClient"     sonarjs/no-dead-store
+  146:7   error  Handle this exception or don't catch it at all               sonarjs/no-ignored-exceptions
+
+/dev-server/src/pages/ConciliacaoFinanceira.tsx
+  120:112  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  121:106  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/Configuracoes.tsx
+  114:67   error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  115:100  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  136:48   error  Unexpected any. Specify a different type                             @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/Conquistas.tsx
+    6:16  error  Remove this unused import of 'TabsContent'                  sonarjs/unused-import
+    7:10  error  Remove this unused import of 'Button'                       sonarjs/unused-import
+   10:42  error  Remove this unused import of 'DbAchievement'                sonarjs/unused-import
+  163:23  error  Remove the declaration of the unused 'toggleSort' variable  sonarjs/no-unused-vars
+  163:23  error  Remove this useless assignment to variable "toggleSort"     sonarjs/no-dead-store
+  172:9   error  Remove the declaration of the unused 'SortIcon' variable    sonarjs/no-unused-vars
+  172:9   error  Remove this useless assignment to variable "SortIcon"       sonarjs/no-dead-store
+  173:43  error  Unexpected any. Specify a different type                    @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/CotacaoMultiCanal.tsx
+   67:42   error  Unexpected any. Specify a different type                                                                                    @typescript-eslint/no-explicit-any
+  120:23   error  Unexpected any. Specify a different type                                                                                    @typescript-eslint/no-explicit-any
+  122:34   error  Unexpected any. Specify a different type                                                                                    @typescript-eslint/no-explicit-any
+  169:7    error  Handle this exception or don't catch it at all                                                                              sonarjs/no-ignored-exceptions
+  213:73   error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+  214:100  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+  214:135  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+  214:185  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+
+/dev-server/src/pages/CustosDashboard.tsx
+  17:39  error    Remove this unused import of 'Legend'                                                                                                                                                          sonarjs/unused-import
+  29:9   warning  The 'endDate' logical expression could make the dependencies of useMemo Hook (at line 56) change on every render. To fix this, wrap the initialization of 'endDate' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/dev-server/src/pages/DashboardCotacoes.tsx
+  52:64   error  Remove the declaration of the unused 'selecionadas' variable                                                                sonarjs/no-unused-vars
+  52:64   error  Remove this useless assignment to variable "selecionadas"                                                                   sonarjs/no-dead-store
+  52:78   error  Remove the declaration of the unused 'isLoading' variable                                                                   sonarjs/no-unused-vars
+  52:78   error  Remove this useless assignment to variable "isLoading"                                                                      sonarjs/no-dead-store
+  69:122  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+
+/dev-server/src/pages/DashboardExecutivo.tsx
+    6:130  error  Remove this unused import of 'Bot'                     sonarjs/unused-import
+  401:1    error  File has too many lines (465). Maximum allowed is 400  max-lines
+
+/dev-server/src/pages/Despachos.tsx
+    1:20  error  Remove this unused import of 'useMemo'              sonarjs/unused-import
+    5:33  error  Remove this unused import of 'CheckCircle2'         sonarjs/unused-import
+    5:47  error  Remove this unused import of 'Plus'                 sonarjs/unused-import
+   60:9   error  Remove the declaration of the unused 'qc' variable  sonarjs/no-unused-vars
+   60:9   error  Remove this useless assignment to variable "qc"     sonarjs/no-dead-store
+  120:68  error  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  127:70  error  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/Envios.tsx
+    4:65   error  Remove this unused import of 'Edit'                                                                                         sonarjs/unused-import
+    4:85   error  Remove this unused import of 'Phone'                                                                                        sonarjs/unused-import
+    4:219  error  Remove this unused import of 'ScanLine'                                                                                     sonarjs/unused-import
+  140:10   error  Remove the declaration of the unused 'dlgEdit' variable                                                                     sonarjs/no-unused-vars
+  140:10   error  Remove this useless assignment to variable "dlgEdit"                                                                        sonarjs/no-dead-store
+  140:19   error  Remove the declaration of the unused 'setDlgEdit' variable                                                                  sonarjs/no-unused-vars
+  140:19   error  Remove this useless assignment to variable "setDlgEdit"                                                                     sonarjs/no-dead-store
+  145:24   error  Remove the declaration of the unused 'playAction' variable                                                                  sonarjs/no-unused-vars
+  145:24   error  Remove this useless assignment to variable "playAction"                                                                     sonarjs/no-dead-store
+  223:176  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+
+/dev-server/src/pages/FretesInternos.tsx
+    6:30   error  Remove this unused import of 'Package'                                                                                      sonarjs/unused-import
+   14:10   error  Remove this unused import of 'Select'                                                                                       sonarjs/unused-import
+   14:18   error  Remove this unused import of 'SelectContent'                                                                                sonarjs/unused-import
+   14:33   error  Remove this unused import of 'SelectItem'                                                                                   sonarjs/unused-import
+   14:45   error  Remove this unused import of 'SelectTrigger'                                                                                sonarjs/unused-import
+   14:60   error  Remove this unused import of 'SelectValue'                                                                                  sonarjs/unused-import
+  129:181  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+
+/dev-server/src/pages/GestaoBox.tsx
+   15:3   error  Remove this unused import of 'Search'                        sonarjs/unused-import
+   21:10  error  Remove this unused import of 'Pagination'                    sonarjs/unused-import
+   32:10  error  Remove this unused import of 'Tooltip'                       sonarjs/unused-import
+   32:19  error  Remove this unused import of 'TooltipContent'                sonarjs/unused-import
+   32:35  error  Remove this unused import of 'TooltipProvider'               sonarjs/unused-import
+   32:52  error  Remove this unused import of 'TooltipTrigger'                sonarjs/unused-import
+   83:11  error  Remove the declaration of the unused 'playSuccess' variable  sonarjs/no-unused-vars
+   83:11  error  Remove this useless assignment to variable "playSuccess"     sonarjs/no-dead-store
+   83:24  error  Remove the declaration of the unused 'playError' variable    sonarjs/no-unused-vars
+   83:24  error  Remove this useless assignment to variable "playError"       sonarjs/no-dead-store
+  130:7   error  Handle this exception or don't catch it at all               sonarjs/no-ignored-exceptions
+  177:7   error  Handle this exception or don't catch it at all               sonarjs/no-ignored-exceptions
+
+/dev-server/src/pages/GestaoRodonaves.tsx
+  13:63  error  Remove this unused import of 'MapPin'  sonarjs/unused-import
+
+/dev-server/src/pages/Index.tsx
+   1:40  error  Remove this unused import of 'useRef'                            sonarjs/unused-import
+   4:96  error  Remove this unused import of 'ShieldCheck'                       sonarjs/unused-import
+  29:10  error  Remove this unused import of 'runSystemSanityChecks'             sonarjs/unused-import
+  30:10  error  Remove this unused import of 'toast'                             sonarjs/unused-import
+  59:17  error  Remove the declaration of the unused 'metrics' variable          sonarjs/no-unused-vars
+  59:17  error  Remove this useless assignment to variable "metrics"             sonarjs/no-dead-store
+  75:42  error  Remove the declaration of the unused 'combinedLoading' variable  sonarjs/no-unused-vars
+  75:42  error  Remove this useless assignment to variable "combinedLoading"     sonarjs/no-dead-store
+
+/dev-server/src/pages/IntegracaoBitrix.tsx
+   12:3   error  Remove this unused import of 'AlertTriangle'                      sonarjs/unused-import
+   31:10  error  Remove the declaration of the unused 'isConfiguring' variable     sonarjs/no-unused-vars
+   31:10  error  Remove this useless assignment to variable "isConfiguring"        sonarjs/no-dead-store
+   31:25  error  Remove the declaration of the unused 'setIsConfiguring' variable  sonarjs/no-unused-vars
+   31:25  error  Remove this useless assignment to variable "setIsConfiguring"     sonarjs/no-dead-store
+   34:39  error  Remove the declaration of the unused 'isLoadingLogs' variable     sonarjs/no-unused-vars
+   34:39  error  Remove this useless assignment to variable "isLoadingLogs"        sonarjs/no-dead-store
+  289:24  error  Unexpected any. Specify a different type                          @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/InteligenciaFrete.tsx
+   1:10  error  Remove this unused import of 'useState'  sonarjs/unused-import
+   5:10  error  Remove this unused import of 'cn'        sonarjs/unused-import
+  10:60  error  Remove this unused import of 'Truck'     sonarjs/unused-import
+
+/dev-server/src/pages/KanbanEntregas.tsx
+    1:20  error  Remove this unused import of 'useCallback'    sonarjs/unused-import
+    1:33  error  Remove this unused import of 'useEffect'      sonarjs/unused-import
+    4:10  error  Remove this unused import of 'useAuth'        sonarjs/unused-import
+    6:10  error  Remove this unused import of 'Card'           sonarjs/unused-import
+    6:16  error  Remove this unused import of 'CardContent'    sonarjs/unused-import
+   11:39  error  Remove this unused import of 'AlertTriangle'  sonarjs/unused-import
+   12:13  error  Remove this unused import of 'DollarSign'     sonarjs/unused-import
+   12:50  error  Remove this unused import of 'Filter'         sonarjs/unused-import
+   13:3   error  Remove this unused import of 'Camera'         sonarjs/unused-import
+  192:20  error  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+/dev-server/src/pages/LogisticaReversa.tsx
+    9:3   error  Remove this unused import of 'ChevronRight'                          sonarjs/unused-import
+   34:3   error  Remove this unused import of 'CardDescription'                       sonarjs/unused-import
+  170:23  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/LojaRecompensas.tsx
+    6:16   error  Remove this unused import of 'TabsContent'                                                                                  sonarjs/unused-import
+   99:179  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+  154:54   error  Extract this nested ternary operation into an independent statement                                                         sonarjs/no-nested-conditional
+
+/dev-server/src/pages/MapaRotas.tsx
+  22:9  warning  The 'routes' logical expression could make the dependencies of useMemo Hook (at line 36) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'routes' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  23:9  error    Remove the declaration of the unused 'isLoading' variable                                                                                                                                                                           sonarjs/no-unused-vars
+  23:9  error    Remove this useless assignment to variable "isLoading"                                                                                                                                                                              sonarjs/no-dead-store
+
+/dev-server/src/pages/Notificacoes.tsx
+  76:108  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+
+/dev-server/src/pages/Ocorrencias.tsx
+  122:9    error  Remove the declaration of the unused 'handlePhotoUpload' variable                                                           sonarjs/no-unused-vars
+  122:9    error  Remove this useless assignment to variable "handlePhotoUpload"                                                              sonarjs/no-dead-store
+  143:179  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+
+/dev-server/src/pages/PainelOTIF.tsx
+    9:18   error  Remove this unused import of 'Clock'                                 sonarjs/unused-import
+    9:37   error  Remove this unused import of 'TrendingUp'                            sonarjs/unused-import
+   10:17   error  Remove this unused import of 'AlertTriangle'                         sonarjs/unused-import
+   17:90   error  Remove this unused import of 'RadialBarChart'                        sonarjs/unused-import
+   17:106  error  Remove this unused import of 'RadialBar'                             sonarjs/unused-import
+   17:117  error  Remove this unused import of 'Legend'                                sonarjs/unused-import
+   37:27   error  Remove the declaration of the unused 'isLoading' variable            sonarjs/no-unused-vars
+   37:27   error  Remove this useless assignment to variable "isLoading"               sonarjs/no-dead-store
+  167:130  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  193:89   error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/Profile.tsx
+   8:16  error  Remove this unused import of 'Mail'                        sonarjs/unused-import
+   8:22  error  Remove this unused import of 'Phone'                       sonarjs/unused-import
+   8:37  error  Remove this unused import of 'Shield'                      sonarjs/unused-import
+  14:10  error  Remove this unused import of 'cn'                          sonarjs/unused-import
+  17:26  error  Remove the declaration of the unused 'isLoading' variable  sonarjs/no-unused-vars
+  17:26  error  Remove this useless assignment to variable "isLoading"     sonarjs/no-dead-store
+
+/dev-server/src/pages/Ranking.tsx
+    7:24   error  Remove this unused import of 'TrendingUp'                            sonarjs/unused-import
+   29:11   error  Remove the declaration of the unused 'userLevel' variable            sonarjs/no-unused-vars
+   29:11   error  Remove this useless assignment to variable "userLevel"               sonarjs/no-dead-store
+   29:33   error  Remove the declaration of the unused 'gamificationLoading' variable  sonarjs/no-unused-vars
+   29:33   error  Remove this useless assignment to variable "gamificationLoading"     sonarjs/no-dead-store
+  132:143  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  132:167  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  143:208  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  143:308  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/RastreamentoMotorista.tsx
+   4:10  error    Remove this unused import of 'Badge'                                                                                                 sonarjs/unused-import
+   6:29  error    Remove this unused import of 'MapPin'                                                                                                sonarjs/unused-import
+   6:37  error    Remove this unused import of 'Clock'                                                                                                 sonarjs/unused-import
+  12:10  error    Remove this unused import of 'format'                                                                                                sonarjs/unused-import
+  13:10  error    Remove this unused import of 'ptBR'                                                                                                  sonarjs/unused-import
+  23:5   error    Remove the declaration of the unused 'stopTracking' variable                                                                         sonarjs/no-unused-vars
+  23:5   error    Remove this useless assignment to variable "stopTracking"                                                                            sonarjs/no-dead-store
+  61:6   warning  React Hook useEffect has a missing dependency: 'refetchDriverLocation'. Either include it or remove the dependency array             react-hooks/exhaustive-deps
+  67:6   warning  React Hook useEffect has missing dependencies: 'isTracking' and 'startTracking'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/dev-server/src/pages/RastreamentoPublico.tsx
+  57:38   error  Remove the declaration of the unused 'error' variable   sonarjs/no-unused-vars
+  57:38   error  Remove this useless assignment to variable "error"      sonarjs/no-dead-store
+  84:181  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/dev-server/src/pages/RelatorioPDF.tsx
+    5:10  error  Remove this unused import of 'Badge'                                 sonarjs/unused-import
+    9:32  error  Remove this unused import of 'BarChart3'                             sonarjs/unused-import
+   10:29  error  Remove this unused import of 'Clock'                                 sonarjs/unused-import
+   10:36  error  Remove this unused import of 'AlertTriangle'                         sonarjs/unused-import
+   10:51  error  Remove this unused import of 'Calendar'                              sonarjs/unused-import
+  119:7   error  Handle this exception or don't catch it at all                       sonarjs/no-ignored-exceptions
+  234:13  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/Relatorios.tsx
+    4:33   error  Remove this unused import of 'Clock'                                  sonarjs/unused-import
+    4:80   error  Remove this unused import of 'ArrowDownRight'                         sonarjs/unused-import
+    4:104  error  Remove this unused import of 'Users'                                  sonarjs/unused-import
+    4:111  error  Remove this unused import of 'Star'                                   sonarjs/unused-import
+    4:134  error  Remove this unused import of 'AlertCircle'                            sonarjs/unused-import
+    5:10   error  Remove this unused import of 'AreaChart'                              sonarjs/unused-import
+    5:21   error  Remove this unused import of 'Area'                                   sonarjs/unused-import
+    5:42   error  Remove this unused import of 'LineChart'                              sonarjs/unused-import
+    5:53   error  Remove this unused import of 'Line'                                   sonarjs/unused-import
+    7:10   error  Remove this unused import of 'Button'                                 sonarjs/unused-import
+   12:27   error  Remove this unused import of 'startOfWeek'                            sonarjs/unused-import
+   12:40   error  Remove this unused import of 'endOfWeek'                              sonarjs/unused-import
+   12:51   error  Remove this unused import of 'startOfMonth'                           sonarjs/unused-import
+   12:65   error  Remove this unused import of 'endOfMonth'                             sonarjs/unused-import
+   12:96   error  Remove this unused import of 'parseISO'                               sonarjs/unused-import
+  103:162  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  299:168  error  Extract this nested ternary operation into an independent statement   sonarjs/no-nested-conditional
+  299:204  error  Extract this nested ternary operation into an independent statement   sonarjs/no-nested-conditional
+
+/dev-server/src/pages/RotasTransportadoras.tsx
+   3:17  error  Remove this unused import of 'Plus'                         sonarjs/unused-import
+  18:38  error  Remove the declaration of the unused 'deleteRota' variable  sonarjs/no-unused-vars
+  18:38  error  Remove this useless assignment to variable "deleteRota"     sonarjs/no-dead-store
+
+/dev-server/src/pages/SLADashboard.tsx
+   7:17   error  Remove this unused import of 'TrendingUp'                            sonarjs/unused-import
+   7:66   error  Remove this unused import of 'Calendar'                              sonarjs/unused-import
+  12:10   error  Remove this unused import of 'format'                                sonarjs/unused-import
+  12:27   error  Remove this unused import of 'startOfDay'                            sonarjs/unused-import
+  12:39   error  Remove this unused import of 'endOfDay'                              sonarjs/unused-import
+  13:10   error  Remove this unused import of 'ptBR'                                  sonarjs/unused-import
+  61:198  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  61:274  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  61:408  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  67:119  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  75:119  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/Transportadoras.tsx
+    8:101  error  Remove this unused import of 'Globe'                                                                                        sonarjs/unused-import
+    8:108  error  Remove this unused import of 'Building2'                                                                                    sonarjs/unused-import
+    8:119  error  Remove this unused import of 'Clock'                                                                                        sonarjs/unused-import
+   13:10   error  Remove this unused import of 'Select'                                                                                       sonarjs/unused-import
+   13:18   error  Remove this unused import of 'SelectContent'                                                                                sonarjs/unused-import
+   13:33   error  Remove this unused import of 'SelectItem'                                                                                   sonarjs/unused-import
+   13:45   error  Remove this unused import of 'SelectTrigger'                                                                                sonarjs/unused-import
+   13:60   error  Remove this unused import of 'SelectValue'                                                                                  sonarjs/unused-import
+   74:34   error  Unexpected any. Specify a different type                                                                                    @typescript-eslint/no-explicit-any
+  170:183  error  This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally  sonarjs/no-unenclosed-multiline-block
+
+/dev-server/src/pages/admin-telemetria/TelemetryStatsCards.tsx
+  47:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/pages/admin-telemetria/TelemetryTable.tsx
+  58:13  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  87:87  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/aprovacao-reset/ResetRequestsTable.tsx
+  101:29  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/auth/AuthFormPanel.tsx
+  1:10  error  Remove this unused import of 'useState'  sonarjs/unused-import
+
+/dev-server/src/pages/auth/AuthHeroSection.tsx
+  5:10  error  Remove this unused import of 'FadeIn'  sonarjs/unused-import
+
+/dev-server/src/pages/auth/authUtils.ts
+  39:11   error  Empty block statement             no-empty
+  49:95   error  Unnecessary escape character: \[  no-useless-escape
+  49:112  error  Unnecessary escape character: \/  no-useless-escape
+
+/dev-server/src/pages/conciliacao/ConciliacaoExport.tsx
+   55:7  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+   56:7  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  127:9  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  128:9  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/conciliacao/ConciliacaoItensTable.tsx
+  54:11  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/pages/conciliacao/ConciliacaoList.tsx
+  28:11  error    Extract this nested ternary operation into an independent statement                                                             sonarjs/no-nested-conditional
+  79:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/pages/cotacao-multicanal/CotacaoSearchForm.tsx
+  118:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/dev-server/src/pages/ranking/RankingPodium.tsx
+  45:52  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+
+/dev-server/src/utils/celebrationSounds.ts
+  110:15  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/dev-server/tailwind.config.ts
+  293:13  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/dev-server/vite.config.ts
+  20:9  error  Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed  sonarjs/cognitive-complexity
+
+✖ 683 problems (627 errors, 56 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

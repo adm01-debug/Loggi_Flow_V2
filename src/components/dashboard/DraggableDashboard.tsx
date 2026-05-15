@@ -33,19 +33,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-type SortableWidgetSize = "small" | "medium" | "large" | "full";
+export type WidgetSize = "small" | "medium" | "large" | "full";
 
 interface SortableWidgetProps {
   id: string;
   children: ReactNode;
   isEditMode: boolean;
   onRemove: (id: string) => void;
-  size?: "small" | "medium" | "large" | "full";
+  size?: WidgetSize;
   isDragging?: boolean;
 }
 
+export interface DashboardWidget {
+  id: string;
+  size: WidgetSize;
+  render: () => React.ReactNode;
+}
+
 const SortableWidget = React.forwardRef<HTMLDivElement, SortableWidgetProps>(
-  ({ id, children, isEditMode, onRemove, size = "medium" as SortableWidgetSize, isDragging }, ref) => {
+  ({ id, children, isEditMode, onRemove, size = "medium", isDragging }, ref) => {
     const {
       attributes,
       listeners,
