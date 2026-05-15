@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Plus, Trash2, MapPin, Loader2, ArrowUpDown, ChevronUp, ChevronDown, Download, Upload } from 'lucide-react';
 import { Pagination } from '@/components/common/Pagination';
 import { FilterBar } from '@/components/common/FilterBar';
-import { BulkActions, useSelection } from '@/components/common/BulkActions';
+import { BulkActions } from '@/components/common/BulkActions';
+import { useSelection } from '@/hooks/useSelection';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { usePagination } from '@/hooks/usePagination';
