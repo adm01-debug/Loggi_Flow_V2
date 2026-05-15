@@ -48,7 +48,7 @@ export function Header() {
       await signOut();
       navigate("/auth");
     } catch (err) {
-      console.error('Logout error tracking:', err);
+      // Erro registrado via ErrorBoundary ou telemetria dedicada
       await signOut();
       navigate("/auth");
     }
