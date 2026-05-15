@@ -142,8 +142,8 @@ export function useUnifiedTracking() {
         .select(`
           id, numero_coleta, status, endereco_coleta, data_prevista_coleta,
           data_efetiva_coleta, codigo_rastreamento, tipo_coleta, transportadora_id,
-          transportadora:transportadoras(nome_fantasia),
-          fornecedor:fornecedores(razao_social)
+          transportadora:transportadoras!fk_coletas_transportadora(nome_fantasia),
+          fornecedor:fornecedores!fk_coletas_fornecedor(razao_social)
         `)
         .order('updated_at', { ascending: false })
         .limit(200);
