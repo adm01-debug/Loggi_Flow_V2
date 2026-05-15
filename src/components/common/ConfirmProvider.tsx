@@ -156,9 +156,21 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               <AlertDialogCancel onClick={handleCancel} disabled={isLoading}>{options?.cancelText || "Cancelar"}</AlertDialogCancel>
               <AlertDialogAction onClick={handleConfirm} disabled={isLoading || !canConfirm} className={cn(config.buttonClass, "min-w-[120px]")}>
                 <AnimatePresence mode="wait">
-                  {isLoading ? <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Processando...</motion.span>
-                    : countdown > 0 ? <motion.span key="countdown" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">Aguarde ({countdown}s)</motion.span>
-                    : <motion.span key="confirm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>{options?.confirmText || "Confirmar"}</motion.span>}
+                  {isLoading && (
+                    <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />Processando...
+                    </motion.span>
+                  )}
+                  {!isLoading && countdown > 0 && (
+                    <motion.span key="countdown" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
+                      Aguarde ({countdown}s)
+                    </motion.span>
+                  )}
+                  {!isLoading && countdown === 0 && (
+                    <motion.span key="confirm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                      {options?.confirmText || "Confirmar"}
+                    </motion.span>
+                  )}
                 </AnimatePresence>
               </AlertDialogAction>
             </AlertDialogFooter>
