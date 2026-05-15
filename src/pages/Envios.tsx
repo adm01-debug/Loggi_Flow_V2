@@ -141,6 +141,7 @@ export default function Envios() {
   const [dlgDel, setDlgDel] = useState(false);
   const [sel, setSel] = useState<Entrega | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const { playSuccess, playAction, playError, playWhoosh } = useAudioFeedback();
 
   const { data: list = [], isLoading, error, refetch } = useQuery({
     queryKey: ["entregas"],
