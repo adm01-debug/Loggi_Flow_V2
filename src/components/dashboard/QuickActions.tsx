@@ -32,7 +32,7 @@ const actions = [
   },
 ];
 
-interface QuickActionsProps extends React.HTMLAttributes<HTMLDivElement> {}
+type QuickActionsProps = React.HTMLAttributes<HTMLDivElement>;
 
 const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
   ({ className, ...props }, ref) => {

@@ -57,6 +57,17 @@ export function BoxGrid({ boxes, onBoxClick, onDrop, isLoading }: BoxGridProps) 
       {boxes.map((box, index) => {
         const isDragOver = dragOverBox === box.number && !box.isOccupied;
         
+        let bgColorClass = "bg-background border-dashed border-muted-foreground/20 hover:border-primary/50 hover:bg-primary/5";
+        if (box.isOccupied) {
+          if (box.isUrgent) {
+            bgColorClass = "bg-destructive/10 border-destructive hover:bg-destructive/20 shadow-sm";
+          } else if (box.isCrossDocking) {
+            bgColorClass = "bg-info/10 border-info hover:bg-info/20 shadow-sm";
+          } else {
+            bgColorClass = "bg-warning/10 border-warning hover:bg-warning/20 shadow-sm";
+          }
+        }
+
         return (
           <motion.div
             key={box.number}
@@ -69,9 +80,7 @@ export function BoxGrid({ boxes, onBoxClick, onDrop, isLoading }: BoxGridProps) 
             onDrop={(e) => handleDrop(e, box.number, box.isOccupied)}
             className={cn(
               "aspect-square rounded-xl border-2 p-2 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-1 relative overflow-hidden group",
-              box.isOccupied && box.isUrgent && "bg-destructive/10 border-destructive hover:bg-destructive/20 shadow-sm",
-              box.isOccupied && !box.isUrgent && (box.isCrossDocking ? "bg-info/10 border-info hover:bg-info/20 shadow-sm" : "bg-warning/10 border-warning hover:bg-warning/20 shadow-sm"),
-              !box.isOccupied && "bg-background border-dashed border-muted-foreground/20 hover:border-primary/50 hover:bg-primary/5",
+              bgColorClass,
               isDragOver && "ring-2 ring-primary ring-offset-2 ring-offset-background scale-105"
             )}
           >

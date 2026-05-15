@@ -7,7 +7,7 @@ import { exportToExcel } from '@/lib/excelImporter';
 
 interface DataExporterProps<T> { data: T[]; filename: string; columns?: { key: keyof T; label: string }[]; }
 
-export function DataExporter<T extends Record<string, any>>({ data, filename, columns }: DataExporterProps<T>) {
+export function DataExporter<T extends Record<string, unknown>>({ data, filename, columns }: DataExporterProps<T>) {
   const [isExporting, setIsExporting] = useState(false);
   const { exportToCSV, exportToJSON } = useExport();
 

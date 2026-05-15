@@ -97,6 +97,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         glow: 'after:bg-success/20',
         sparkColor: 'hsl(var(--success))',
         trendColor: 'text-success',
+        progressGradient: 'from-success to-success/80',
       },
       warning: {
         border: 'border-warning/40 hover:border-warning/60',
@@ -105,6 +106,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         glow: 'after:bg-warning/20',
         sparkColor: 'hsl(var(--warning))',
         trendColor: 'text-warning',
+        progressGradient: 'from-warning to-warning/80',
       },
       danger: {
         border: 'border-destructive/40 hover:border-destructive/60',
@@ -113,6 +115,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         glow: 'after:bg-destructive/20',
         sparkColor: 'hsl(var(--destructive))',
         trendColor: 'text-destructive',
+        progressGradient: 'from-destructive to-destructive/80',
       },
       neutral: {
         border: 'border-border hover:border-primary/40',
@@ -121,14 +124,25 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         glow: 'after:bg-primary/10',
         sparkColor: 'hsl(var(--primary))',
         trendColor: 'text-muted-foreground',
+        progressGradient: 'from-primary to-primary/80',
       },
     };
 
-    const config = statusConfig[status];
+    const config = statusConfig[status] || statusConfig.neutral;
     const progressPercent = target ? Math.min((numericValue / target) * 100, 100) : 0;
     
     // Calculate change percentage
     const changePercent = previousValue ? ((numericValue - previousValue) / previousValue * 100).toFixed(1) : null;
+
+    let trendBgClass = 'bg-muted text-muted-foreground';
+    let trendIcon = '';
+    if (trend === 'up') {
+      trendBgClass = 'bg-success/10 text-success';
+      trendIcon = '↑';
+    } else if (trend === 'down') {
+      trendBgClass = 'bg-destructive/10 text-destructive';
+      trendIcon = '↓';
+    }
 
     return (
       <motion.div
@@ -176,11 +190,9 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
               {(trendValue || changePercent !== null) && (
                 <div className={cn(
                   "flex items-center gap-1 text-sm font-bold px-2 py-0.5 rounded-full",
-                  trend === 'up' ? 'bg-success/10 text-success' : 
-                  trend === 'down' ? 'bg-destructive/10 text-destructive' : 
-                  'bg-muted text-muted-foreground'
+                  trendBgClass
                 )}>
-                  {trend === 'up' ? "↑" : trend === 'down' ? "↓" : ""}
+                  {trendIcon}
                   <span className="text-xs">{trendValue || `${changePercent}%`}</span>
                 </div>
               )}
@@ -216,11 +228,8 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                   animate={{ width: `${progressPercent}%` }}
                   transition={{ duration: 1.2, ease: [0.34, 1.56, 0.64, 1] }}
                   className={cn(
-                    "h-full rounded-full relative overflow-hidden",
-                    status === 'success' && "bg-gradient-to-r from-success to-success/80",
-                    status === 'warning' && "bg-gradient-to-r from-warning to-warning/80",
-                    status === 'danger' && "bg-gradient-to-r from-destructive to-destructive/80",
-                    status === 'neutral' && "bg-gradient-to-r from-primary to-primary/80",
+                    "h-full rounded-full relative overflow-hidden bg-gradient-to-r",
+                    config.progressGradient
                   )}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />

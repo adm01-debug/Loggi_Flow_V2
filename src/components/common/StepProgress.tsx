@@ -8,6 +8,15 @@ export interface Step {
   description?: string;
 }
 
+interface StepConfig {
+  circle: string;
+  icon: string;
+  text: string;
+  line: string;
+  lineVertical: string;
+  gap: string;
+}
+
 interface StepProgressProps {
   steps: Step[];
   currentStep: number;
@@ -17,7 +26,7 @@ interface StepProgressProps {
   onStepClick?: (stepIndex: number) => void;
 }
 
-const sizeConfig = {
+const sizeConfig: Record<string, StepConfig> = {
   sm: {
     circle: "w-6 h-6",
     icon: "w-3 h-3",
@@ -44,6 +53,77 @@ const sizeConfig = {
   },
 };
 
+const StepIndicator = ({ 
+  index, 
+  isCompleted, 
+  isCurrent, 
+  isClickable, 
+  onStepClick, 
+  config 
+}: { 
+  index: number; 
+  isCompleted: boolean; 
+  isCurrent: boolean; 
+  isClickable: boolean; 
+  onStepClick?: (idx: number) => void;
+  config: StepConfig;
+}) => {
+  const getIndicatorStyle = () => {
+    if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
+    if (isCurrent) return "bg-primary/20 text-primary border-2 border-primary";
+    return "bg-muted text-muted-foreground border-2 border-border";
+  };
+
+  const getStatusLabel = () => {
+    if (isCompleted) return "Concluído";
+    if (isCurrent) return "Atual";
+    return "Pendente";
+  };
+
+  return (
+    <motion.button
+      onClick={() => isClickable && onStepClick?.(index)}
+      disabled={!isClickable}
+      className={cn(
+        "relative rounded-full flex items-center justify-center font-medium transition-all duration-300",
+        config.circle,
+        getIndicatorStyle(),
+        isClickable && "cursor-pointer hover:scale-110",
+        !isClickable && "cursor-default"
+      )}
+      initial={false}
+      animate={{
+        scale: isCurrent ? 1.1 : 1,
+      }}
+      whileHover={isClickable ? { scale: 1.15 } : {}}
+      whileTap={isClickable ? { scale: 0.95 } : {}}
+      aria-current={isCurrent ? "step" : undefined}
+      aria-label={getStatusLabel()}
+    >
+      {isCompleted ? (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <Check className={config.icon} />
+        </motion.div>
+      ) : (
+        <span className={config.text}>{index + 1}</span>
+      )}
+
+      {isCurrent && (
+        <motion.div
+          className="absolute inset-0 rounded-full border-2 border-primary"
+          initial={{ scale: 1, opacity: 0.5 }}
+          animate={{ scale: 1.5, opacity: 0 }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+      )}
+    </motion.button>
+  );
+};
+
 export function StepProgress({
   steps,
   currentStep,
@@ -52,7 +132,7 @@ export function StepProgress({
   size = "md",
   onStepClick,
 }: StepProgressProps) {
-  const config = sizeConfig[size];
+  const config = sizeConfig[size] || sizeConfig.md;
   const isHorizontal = variant === "horizontal";
 
   return (
@@ -70,11 +150,15 @@ export function StepProgress({
         const isCurrent = index === currentStep;
         const isClickable = !!onStepClick && index <= currentStep;
 
-        const getIndicatorStyle = () => {
-          if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
-          if (isCurrent) return "bg-primary/20 text-primary border-2 border-primary";
-          return "bg-muted text-muted-foreground border-2 border-border";
-        };
+        let connectorWidth = config.lineVertical;
+        if (isHorizontal) {
+          connectorWidth = isCompleted ? "100%" : "0%";
+        }
+
+        let connectorHeight = config.line;
+        if (!isHorizontal) {
+          connectorHeight = isCompleted ? "100%" : "0%";
+        }
 
         return (
           <div
@@ -86,46 +170,14 @@ export function StepProgress({
             )}
           >
             <div className={cn("flex items-center", isHorizontal ? "" : "flex-col")}>
-              <motion.button
-                onClick={() => isClickable && onStepClick?.(index)}
-                disabled={!isClickable}
-                className={cn(
-                  "relative rounded-full flex items-center justify-center font-medium transition-all duration-300",
-                  config.circle,
-                  getIndicatorStyle(),
-                  isClickable && "cursor-pointer hover:scale-110",
-                  !isClickable && "cursor-default"
-                )}
-                initial={false}
-                animate={{
-                  scale: isCurrent ? 1.1 : 1,
-                }}
-                whileHover={isClickable ? { scale: 1.15 } : {}}
-                whileTap={isClickable ? { scale: 0.95 } : {}}
-                aria-current={isCurrent ? "step" : undefined}
-                aria-label={`${step.title} - ${isCompleted ? "Concluído" : isCurrent ? "Atual" : "Pendente"}`}
-              >
-                {isCompleted ? (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <Check className={config.icon} />
-                  </motion.div>
-                ) : (
-                  <span className={config.text}>{index + 1}</span>
-                )}
-
-                {isCurrent && (
-                  <motion.div
-                    className="absolute inset-0 rounded-full border-2 border-primary"
-                    initial={{ scale: 1, opacity: 0.5 }}
-                    animate={{ scale: 1.5, opacity: 0 }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  />
-                )}
-              </motion.button>
+              <StepIndicator 
+                index={index}
+                isCompleted={isCompleted}
+                isCurrent={isCurrent}
+                isClickable={isClickable}
+                onStepClick={onStepClick}
+                config={config}
+              />
 
               {!isHorizontal && (
                 <div className="ml-4 pb-8">
@@ -161,8 +213,8 @@ export function StepProgress({
                   )}
                   initial={{ width: 0, height: 0 }}
                   animate={{
-                    width: isHorizontal ? (isCompleted ? "100%" : "0%") : config.lineVertical,
-                    height: !isHorizontal ? (isCompleted ? "100%" : "0%") : config.line,
+                    width: connectorWidth,
+                    height: connectorHeight,
                   }}
                   transition={{ duration: 0.3, delay: 0.1 }}
                 />

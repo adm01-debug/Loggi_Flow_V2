@@ -21,6 +21,38 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const normalizeRow = (row: Record<string, unknown>): Record<string, unknown> => {
+    const normalizedRow: Record<string, unknown> = {};
+    Object.keys(row).forEach(key => {
+      const normKey = key.trim().toLowerCase().replace(/\s+/g, '_');
+      normalizedRow[normKey] = row[key];
+    });
+    return normalizedRow;
+  };
+
+  const processJsonData = (jsonData: Record<string, unknown>[]): ImportResult<T> => {
+    const success: T[] = [];
+    const errors: { row: number; field: string; error: string }[] = [];
+
+    jsonData.forEach((row, index) => {
+      try {
+        const validated = schema.parse(normalizeRow(row));
+        success.push(validated);
+      } catch (err) {
+        if (err instanceof z.ZodError) {
+          const rowErrors = err.errors.map(zErr => ({
+            row: index + 2,
+            field: zErr.path.join('.'),
+            error: zErr.message
+          }));
+          errors.push(...rowErrors);
+        }
+      }
+    });
+
+    return { success, errors, total: jsonData.length };
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
@@ -46,15 +78,6 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
     }
   };
 
-  const normalizeRow = (row: Record<string, unknown>): Record<string, unknown> => {
-    const normalizedRow: Record<string, unknown> = {};
-    Object.keys(row).forEach(key => {
-      const normKey = key.trim().toLowerCase().replace(/\s+/g, '_');
-      normalizedRow[normKey] = row[key];
-    });
-    return normalizedRow;
-  };
-
   const processExcel = async (file: File): Promise<ImportResult<T>> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -65,26 +88,7 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(sheet) as Record<string, unknown>[];
           
-          const success: T[] = [];
-          const errors: { row: number; field: string; error: string }[] = [];
-
-          jsonData.forEach((row, index) => {
-            try {
-              const validated = schema.parse(normalizeRow(row));
-              success.push(validated);
-            } catch (err) {
-              if (err instanceof z.ZodError) {
-                const rowErrors = err.errors.map(zErr => ({
-                  row: index + 2,
-                  field: zErr.path.join('.'),
-                  error: zErr.message
-                }));
-                errors.push(...rowErrors);
-              }
-            }
-          });
-
-          resolve({ success, errors, total: jsonData.length });
+          resolve(processJsonData(jsonData));
         } catch (err) {
           reject(err);
         }
