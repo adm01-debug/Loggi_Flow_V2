@@ -118,15 +118,18 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-2">
-        <label className="flex-1">
+        <div className="flex-1">
+          <label htmlFor="csv-upload" className="sr-only">Selecione o arquivo para importação</label>
           <Input 
+            id="csv-upload"
             type="file" 
             accept=".csv,.xlsx,.xls" 
             onChange={handleFileChange} 
             disabled={isImporting} 
-            className="cursor-pointer" 
+            className="cursor-pointer"
+            aria-describedby="csv-instructions"
           />
-        </label>
+        </div>
         {columns && (
           <Button variant="outline" onClick={handleDownloadTemplate}>
             <Download className="h-4 w-4 mr-2" />Template
