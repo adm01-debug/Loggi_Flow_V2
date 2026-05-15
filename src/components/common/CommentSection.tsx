@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Send, Trash2, Loader2, MessageSquare, User } from "lucide-react";
+import { Send, Trash2, Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
