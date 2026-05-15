@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,11 +17,12 @@ import { RealtimeBadge } from "@/components/common/RealtimeBadge";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
+import { useRealtime } from "@/hooks/useRealtime";
 import { PickupDialog } from "@/components/coletas/PickupDialog";
 import { PickupDetailsDialog } from "@/components/coletas/PickupDetailsDialog";
 
 import { Coleta, ColetaStatus } from "@/components/coletas/types";
-
+import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: LucideIcon }> = {
   aguardando_liberacao: { label: "Aguardando", color: "bg-muted text-muted-foreground", icon: Clock },
@@ -34,13 +36,27 @@ const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: L
 
 export default function Coletas() {
   const { exportToCSV } = useExport();
-  const [coletas, setColetas] = useState<Coleta[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isSyncing, setIsSyncing] = useState(false);
+  const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState<Coleta | null>(null);
   const { playAction } = useAudioFeedback();
+
+  const { data: coletas = [], isLoading: loading, refetch } = useQuery({
+    queryKey: ["coletas-list"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("coletas")
+        .select("*, fornecedores(razao_social, nome_fantasia), transportadoras(nome_fantasia)")
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      return data as unknown as Coleta[];
+    },
+    staleTime: QUERY_STALE_TIME.DYNAMIC,
+  });
+
+  useRealtime({ table: "coletas", queryKey: ["coletas-list"] });
 
   const filterConfig: FilterConfig<Coleta> = {
     search: { fields: ["numero_coleta", "endereco_coleta", "observacoes"], placeholder: "Buscar coletas..." },
@@ -51,30 +67,12 @@ export default function Coletas() {
   const { sortedData } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
 
-  useEffect(() => { 
-    fetchData(); 
-    const channel = supabase.channel('coletas-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'coletas' }, () => {
-        setIsSyncing(true);
-        fetchData().finally(() => setIsSyncing(false));
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    const { data } = await supabase.from("coletas").select("*, fornecedores(razao_social, nome_fantasia), transportadoras(nome_fantasia)").order("created_at", { ascending: false });
-    if (data) setColetas(data as any);
-    setLoading(false);
-  };
-
-  const stats = { 
+  const stats = useMemo(() => ({ 
     total: coletas.length, 
     aguardando: coletas.filter(c => c.status === "aguardando_liberacao").length, 
     transito: coletas.filter(c => c.status === "em_transito").length, 
     finalizadas: coletas.filter(c => c.status === "finalizada").length 
-  };
+  }), [coletas]);
 
   return (
     <MainLayout>
