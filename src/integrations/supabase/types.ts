@@ -1522,20 +1522,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "coletas_fornecedor_id_fkey"
-            columns: ["fornecedor_id"]
-            isOneToOne: false
-            referencedRelation: "fornecedores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "coletas_transportadora_id_fkey"
-            columns: ["transportadora_id"]
-            isOneToOne: false
-            referencedRelation: "transportadoras"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_coletas_fornecedor"
             columns: ["fornecedor_id"]
             isOneToOne: false
