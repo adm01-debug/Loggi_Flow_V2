@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Lock, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { AchievementBadgeData, rarityConfig } from "./AchievementBadge";
 
 interface CompactAchievementBadgeProps {
