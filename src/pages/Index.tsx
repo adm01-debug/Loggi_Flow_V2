@@ -72,7 +72,7 @@ export default function Index() {
   useRealtime({ table: "entregas", onInsert: () => { refetchMetrics(); refetchAlerts(); }, onUpdate: () => { refetchMetrics(); refetchAlerts(); } });
   useRealtime({ table: "coletas", onInsert: () => refetchMetrics(), onUpdate: () => refetchMetrics() });
 
-  const { data: combinedData, isLoading: combinedLoading } = useQuery({
+  const { data: combinedData, isLoading: combinedLoading, refetch: combinedRefetch } = useQuery({
     queryKey: ["dashboard-data-combined", dateRange.from, dateRange.to],
     queryFn: async () => {
       if (!dateRange.from || !dateRange.to) return { coletas: [], entregas: [] };
