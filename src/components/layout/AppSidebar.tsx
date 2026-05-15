@@ -405,4 +405,4 @@ export const AppSidebar = React.memo(function AppSidebar() {
       </Button>
     </aside>
   );
-}
+});
