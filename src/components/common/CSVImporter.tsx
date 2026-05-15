@@ -48,6 +48,15 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
     }
   };
 
+  const normalizeRow = (row: Record<string, unknown>): Record<string, unknown> => {
+    const normalizedRow: Record<string, unknown> = {};
+    Object.keys(row).forEach(key => {
+      const normKey = key.trim().toLowerCase().replace(/\s+/g, '_');
+      normalizedRow[normKey] = row[key];
+    });
+    return normalizedRow;
+  };
+
   const processExcel = async (file: File): Promise<ImportResult<T>> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -56,21 +65,14 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: 'array' });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          const jsonData = XLSX.utils.sheet_to_json(sheet) as Record<string, unknown>[];
           
           const success: T[] = [];
           const errors: { row: number; field: string; error: string }[] = [];
 
-          jsonData.forEach((row: unknown, index: number) => {
+          jsonData.forEach((row, index) => {
             try {
-              const rowData = row as Record<string, unknown>;
-              // Normalize headers to snake_case if they aren't
-              const normalizedRow: Record<string, unknown> = {};
-              Object.keys(rowData).forEach(key => {
-                const normKey = key.trim().toLowerCase().replace(/\s+/g, '_');
-                normalizedRow[normKey] = rowData[key];
-              });
-
+              const normalizedRow = normalizeRow(row);
               const validated = schema.parse(normalizedRow);
               success.push(validated);
             } catch (err) {
