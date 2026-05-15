@@ -4,54 +4,63 @@ type LogSeverity = 'info' | 'warning' | 'error' | 'critical';
 
 interface LogOptions {
   severity?: LogSeverity;
-  context?: Record<string, any>;
+  category?: string;
+  metadata?: Record<string, any>;
   userId?: string;
+  stackTrace?: string;
 }
 
 class Logger {
   async log(message: string, options: LogOptions = {}) {
-    const { severity = 'info', context = {}, userId } = options;
+    const { 
+      severity = 'info', 
+      category = 'general', 
+      metadata = {}, 
+      userId,
+      stackTrace 
+    } = options;
     
-    // In development, log to console
     if (import.meta.env.DEV) {
-      const colors = {
-        info: '\x1b[32m',
-        warning: '\x1b[33m',
-        error: '\x1b[31m',
-        critical: '\x1b[41m\x1b[37m',
-      };
-      console.log(`${colors[severity]}[${severity.toUpperCase()}]\x1b[0m ${message}`, context);
+      console.log(`[${severity.toUpperCase()}] ${message}`, { category, metadata });
     }
 
     try {
       await supabase.from('telemetry_logs').insert({
         message,
         severity,
-        context,
+        category,
+        metadata,
         user_id: userId,
-        source: 'frontend',
+        stack_trace: stackTrace,
+        url: window.location.href,
+        device_info: {
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          language: navigator.language
+        }
       });
     } catch (err) {
       console.error('Failed to send telemetry log:', err);
     }
   }
 
-  async error(error: Error | string, context: Record<string, any> = {}) {
+  async error(error: Error | string, category = 'error') {
     const message = typeof error === 'string' ? error : error.message;
-    const stack = error instanceof Error ? error.stack : undefined;
+    const stackTrace = error instanceof Error ? error.stack : undefined;
     
     await this.log(message, {
       severity: 'error',
-      context: { ...context, stack },
+      category,
+      stackTrace,
     });
   }
 
-  async info(message: string, context: Record<string, any> = {}) {
-    await this.log(message, { severity: 'info', context });
+  async info(message: string, category = 'info', metadata = {}) {
+    await this.log(message, { severity: 'info', category, metadata });
   }
 
-  async warn(message: string, context: Record<string, any> = {}) {
-    await this.log(message, { severity: 'warning', context });
+  async warn(message: string, category = 'warning', metadata = {}) {
+    await this.log(message, { severity: 'warning', category, metadata });
   }
 }
 
