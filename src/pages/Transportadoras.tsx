@@ -47,7 +47,7 @@ const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", contato_comer
 
 export default function Transportadoras() {
   const { toast } = useToast();
-  const { exportToCSV } = useExport();
+  const { exportToCSV, exportToJSON } = useExport();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [selected, setSelected] = useState<Transportadora | null>(null);
@@ -89,6 +89,11 @@ export default function Transportadoras() {
     if (ativaFilter === "nao" && t.homologada) return false;
     return true;
   }), [list, estadoFilter, ativaFilter]);
+
+  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(filteredByCustom, filterConfig);
+  const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "nome_fantasia", defaultDirection: "asc" });
+  const pagination = usePagination(sortedData, { initialPageSize: 12 });
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
 
   const handleSubmit = async () => {
     const { error } = await supabase.from("transportadoras").insert({ 
@@ -257,8 +262,8 @@ export default function Transportadoras() {
             totalPages={pagination.totalPages} 
             pageSize={pagination.pageSize} 
             totalItems={sortedData.length}
-            startIndex={(pagination.currentPage - 1) * pagination.pageSize + 1}
-            endIndex={Math.min(pagination.currentPage * pagination.pageSize, sortedData.length)}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
             pageSizeOptions={[12, 24, 48]}
             onPageChange={pagination.setPage}
             onPageSizeChange={pagination.setPageSize}
@@ -270,22 +275,22 @@ export default function Transportadoras() {
             hasPrevPage={pagination.hasPrevPage}
           />
         )}
-
-        <Dialog open={editDialog} onOpenChange={setEditDialog}><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Editar Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate} disabled={!form.razao_social || !form.nome_fantasia}>Salvar</Button></DialogFooter></DialogContent></Dialog>
-
-        <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Excluir Transportadora</AlertDialogTitle>
-              <AlertDialogDescription>Tem certeza que deseja excluir esta transportadora? Esta ação não pode ser desfeita.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => deleteTarget && handleDelete(deleteTarget)}>Excluir</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader><AlertDialogTitle>Excluir Transportadora</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita. Isso excluirá permanentemente o registro.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => deleteTarget && handleDelete(deleteTarget)} className="bg-destructive text-destructive-foreground">Excluir</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={editDialog} onOpenChange={setEditDialog}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Editar Transportadora</DialogTitle></DialogHeader>
+          <FormFields />
+          <DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate}>Salvar Alterações</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
