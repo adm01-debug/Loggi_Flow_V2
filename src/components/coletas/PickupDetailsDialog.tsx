@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
-import { Coleta as Pickup, ColetaStatus as PickupStatus } from "./types";
+import { Coleta as Pickup } from "./types";
 import { PickupConference } from "./PickupConference";
 
 
