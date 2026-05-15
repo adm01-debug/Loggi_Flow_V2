@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense, memo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Truck, Package, Building2, Send, BarChart3, Settings,
+  LayoutDashboard, Truck, Package, Building2, Send, BarChart3,
   Trophy, Zap, ChevronLeft, ChevronRight, Box, PackageSearch, History,
   Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
   Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
