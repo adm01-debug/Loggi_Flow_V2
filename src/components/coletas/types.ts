@@ -12,7 +12,9 @@ export interface Coleta {
   data_prevista_coleta: string | null;
   data_efetiva_coleta: string | null;
   qtd_volumes: number | null;
+  qtd_recebida?: number | null;
   peso_estimado_kg: number | null;
+  peso_efetivo?: number | null;
   codigo_rastreamento: string | null;
   status: ColetaStatus;
   observacoes: string | null;
