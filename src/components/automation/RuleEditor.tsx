@@ -190,9 +190,7 @@ export function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
               </Button>
             </div>
             <div className="space-y-3">
-              {actions.map((action) => {
-                const actionType = ACTION_TYPES.find((a) => a.value === action.type);
-                return (
+              {actions.map((action) => (
                   <div key={action.id} className="p-3 rounded-md border bg-background space-y-3">
                     <div className="flex items-center gap-2">
                       <Select value={action.type} onValueChange={(v) => updateAction(action.id, { type: v as ActionType, config: {} })}>
