@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Coleta, ColetaStatus } from "./types";
+import { ColetaStatus } from "./types";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -69,9 +69,9 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
     const { error } = await supabase
       .from("coletas")
       .update({ 
-        status: newStatus as any,
+        status: newStatus,
         data_efetiva_coleta: newStatus === 'em_transito' ? new Date().toISOString() : pickup.data_efetiva_coleta
-      } as any)
+      })
       .eq("id", pickup.id);
     
     if (!error) {
@@ -210,7 +210,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
             <TabsContent value="conferencia" className="pb-6">
               <PickupConference 
-                pickup={pickup as any} 
+                pickup={pickup} 
                 onSuccess={() => {
                   onStatusUpdate();
                   handleTabChange('detalhes');

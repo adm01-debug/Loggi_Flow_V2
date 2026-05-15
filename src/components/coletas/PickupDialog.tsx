@@ -96,10 +96,10 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
       let error;
       if (pickup?.id) {
-        const { error: err } = await supabase.from("coletas").update(payload as any).eq("id", pickup.id);
+        const { error: err } = await supabase.from("coletas").update(payload).eq("id", pickup.id);
         error = err;
       } else {
-        const { error: err } = await supabase.from("coletas").insert(payload as any);
+        const { error: err } = await supabase.from("coletas").insert(payload);
         error = err;
       }
 
@@ -133,7 +133,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status Inicial</Label>
-              <Select defaultValue={watch("status")} onValueChange={(val) => setValue("status", val as any)}>
+              <Select defaultValue={watch("status")} onValueChange={(val: ColetaStatus) => setValue("status", val)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
