@@ -19,7 +19,8 @@ import { MaskedInput } from "@/components/ui/MaskedInput";
 // Novos imports
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
-import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { BulkActions } from "@/components/common/BulkActions";
+import { useSelection } from "@/hooks/useSelection";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { usePagination } from "@/hooks/usePagination";

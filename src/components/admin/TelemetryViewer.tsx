@@ -131,19 +131,21 @@ export function TelemetryViewer() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {isLoading && (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
                   Carregando logs de telemetria...
                 </TableCell>
               </TableRow>
-            ) : logs?.length === 0 ? (
+            )}
+            {!isLoading && logs?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
                   Nenhum log encontrado.
                 </TableCell>
               </TableRow>
-            ) : (
+            )}
+            {!isLoading && logs && logs.length > 0 && (
               logs?.map((log) => (
                 <TableRow key={log.id} className="group">
                   <TableCell className="text-xs font-mono text-muted-foreground">

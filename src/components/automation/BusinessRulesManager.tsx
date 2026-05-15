@@ -27,9 +27,9 @@ export function BusinessRulesManager() {
         <Button onClick={handleCreate}><Plus className="h-4 w-4 mr-2" />Nova Regra</Button>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Carregando regras...</div>
-      ) : rules.length === 0 ? (
+      {isLoading && <div className="text-center py-8 text-muted-foreground">Carregando regras...</div>}
+      
+      {!isLoading && rules.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="py-8 text-center">
             <Zap className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
@@ -37,7 +37,9 @@ export function BusinessRulesManager() {
             <Button onClick={handleCreate}>Criar primeira regra</Button>
           </CardContent>
         </Card>
-      ) : (
+      )}
+
+      {!isLoading && rules.length > 0 && (
         <div className="space-y-3">
           <AnimatePresence>
             {rules.map((rule) => (

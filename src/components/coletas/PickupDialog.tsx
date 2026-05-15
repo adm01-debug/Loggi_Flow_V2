@@ -9,19 +9,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Coleta as Pickup } from "./types";
+
+interface Fornecedor {
+  id: string;
+  nome_fantasia: string | null;
+  razao_social: string;
+}
+
+interface Transportadora {
+  id: string;
+  nome_fantasia: string;
+}
 
 interface PickupDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
-  pickup?: any;
+  pickup?: Pickup | null;
 }
 
 export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [fornecedores, setFornecedores] = useState<any[]>([]);
-  const [transportadoras, setTransportadoras] = useState<any[]>([]);
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [transportadoras, setTransportadoras] = useState<Transportadora[]>([]);
 
   const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: pickup || {
@@ -46,8 +58,9 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
         const date = pickup.data_prevista_coleta ? new Date(pickup.data_prevista_coleta).toISOString().split('T')[0] : "";
         reset({ ...pickup, data_prevista_coleta: date });
       } else {
+        const randomId = window.crypto.getRandomValues(new Uint32Array(1))[0] % 100000;
         reset({
-          numero_coleta: `COL-${Math.floor(Math.random() * 100000)}`,
+          numero_coleta: `COL-${randomId}`,
           fornecedor_id: "",
           endereco_coleta: "",
           tipo_coleta: "transportadora",
@@ -69,14 +82,13 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
     if (trans) setTransportadoras(trans);
   };
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: Partial<Pickup>) => {
     setLoading(true);
     try {
       const payload = {
         ...values,
         qtd_volumes: Number(values.qtd_volumes),
         peso_estimado_kg: Number(values.peso_estimado_kg),
-        // If empty string, set to null
         fornecedor_id: values.fornecedor_id || null,
         transportadora_id: values.transportadora_id || null,
         data_prevista_coleta: values.data_prevista_coleta || null,
@@ -84,10 +96,10 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
       let error;
       if (pickup?.id) {
-        const { error: err } = await supabase.from("coletas").update(payload).eq("id", pickup.id);
+        const { error: err } = await supabase.from("coletas").update(payload as any).eq("id", pickup.id);
         error = err;
       } else {
-        const { error: err } = await supabase.from("coletas").insert(payload);
+        const { error: err } = await supabase.from("coletas").insert(payload as any);
         error = err;
       }
 
@@ -96,7 +108,8 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
       toast({ title: pickup ? "Coleta atualizada" : "Coleta criada", description: "As informações foram salvas com sucesso." });
       onSuccess();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
@@ -120,7 +133,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status Inicial</Label>
-              <Select defaultValue={watch("status")} onValueChange={(val) => setValue("status", val)}>
+              <Select defaultValue={watch("status")} onValueChange={(val) => setValue("status", val as any)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
@@ -135,7 +148,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
           <div className="space-y-2">
             <Label>Fornecedor</Label>
-            <Select defaultValue={watch("fornecedor_id")} onValueChange={(val) => setValue("fornecedor_id", val)}>
+            <Select defaultValue={watch("fornecedor_id") || undefined} onValueChange={(val) => setValue("fornecedor_id", val)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o fornecedor" />
               </SelectTrigger>
@@ -155,7 +168,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Tipo de Transporte</Label>
-              <Select defaultValue={watch("tipo_coleta")} onValueChange={(val) => setValue("tipo_coleta", val)}>
+              <Select defaultValue={watch("tipo_coleta")} onValueChange={(val) => setValue("tipo_coleta", val as any)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -168,7 +181,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
             {tipoColeta === "transportadora" && (
               <div className="space-y-2">
                 <Label>Transportadora</Label>
-                <Select defaultValue={watch("transportadora_id")} onValueChange={(val) => setValue("transportadora_id", val)}>
+                <Select defaultValue={watch("transportadora_id") || undefined} onValueChange={(val) => setValue("transportadora_id", val)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a transportadora" />
                   </SelectTrigger>

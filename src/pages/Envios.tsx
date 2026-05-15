@@ -28,7 +28,8 @@ import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 // Novos hooks e componentes
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
-import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { BulkActions } from "@/components/common/BulkActions";
+import { useSelection } from "@/hooks/useSelection";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";

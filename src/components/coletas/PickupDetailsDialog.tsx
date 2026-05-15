@@ -11,22 +11,9 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { Coleta as Pickup } from "./types";
 import { PickupConference } from "./PickupConference";
 
-export interface Pickup {
-  id: string;
-  numero_coleta: string;
-  status: string;
-  endereco_coleta: string;
-  tipo_coleta: string;
-  data_prevista_coleta: string | null;
-  qtd_volumes: number | null;
-  peso_estimado_kg: number | null;
-  observacoes: string | null;
-  data_efetiva_coleta: string | null;
-  fornecedores?: { nome_fantasia?: string | null; razao_social?: string } | null;
-  transportadoras?: { nome_fantasia?: string } | null;
-}
 
 interface TimelineEvent {
   id: string;
@@ -83,7 +70,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
       .update({ 
         status: newStatus as any,
         data_efetiva_coleta: newStatus === 'em_transito' ? new Date().toISOString() : pickup.data_efetiva_coleta
-      })
+      } as any)
       .eq("id", pickup.id);
     
     if (!error) {
@@ -232,11 +219,15 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
             <TabsContent value="historico" className="pb-6">
               <div className="space-y-4">
-                {loadingTimeline ? (
-                  <div className="flex justify-center py-8"><Clock className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-                ) : timeline.length > 0 ? (
+                {loadingTimeline && (
+                  <div className="flex justify-center py-8">
+                    <Clock className="w-6 h-6 animate-spin text-muted-foreground" />
+                  </div>
+                )}
+                
+                {!loadingTimeline && timeline.length > 0 && (
                   <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-muted">
-                    {timeline.map((event, idx) => (
+                    {timeline.map((event) => (
                       <div key={event.id} className="relative">
                         <div className="absolute -left-6 top-1 w-4 h-4 rounded-full bg-background border-2 border-primary flex items-center justify-center">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -263,7 +254,9 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                       </div>
                     ))}
                   </div>
-                ) : (
+                )}
+                
+                {!loadingTimeline && timeline.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">Nenhum histórico encontrado.</div>
                 )}
               </div>

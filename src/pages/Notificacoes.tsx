@@ -13,7 +13,8 @@ import { ptBR } from "date-fns/locale";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
-import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { BulkActions } from "@/components/common/BulkActions";
+import { useSelection } from "@/hooks/useSelection";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useRealtime } from "@/hooks/useRealtime";

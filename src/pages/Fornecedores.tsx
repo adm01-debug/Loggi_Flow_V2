@@ -20,7 +20,8 @@ import { ptBR } from "date-fns/locale";
 // Importar novos hooks e componentes
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
-import { BulkActions, useSelection } from "@/components/common/BulkActions";
+import { BulkActions } from "@/components/common/BulkActions";
+import { useSelection } from "@/hooks/useSelection";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
