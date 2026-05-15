@@ -86,9 +86,9 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
     previousValue, 
     className
   }, ref) => {
-    const numericValue = typeof value === 'number' ? value : parseInt(value.toString()) || 0;
+    const numericValue = typeof value === 'number' ? value : parseInt(String(value)) || 0;
     const animatedValue = useAnimatedCounter(numericValue);
-    
+
     const statusConfig = {
       success: {
         border: 'border-success/40 hover:border-success/60',

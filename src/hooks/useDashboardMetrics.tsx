@@ -49,8 +49,23 @@ export function useDashboardMetrics() {
         throw error;
       }
       
-      const data = rpcData as Record<string, any>;
-      
+      const data = rpcData as {
+        totalColetas: number;
+        coletasPendentes: number;
+        coletasEmTransito: number;
+        coletasFinalizadas: number;
+        coletasComDivergencia: number;
+        totalEntregas: number;
+        entregasPendentes: number;
+        entregasEmTransito: number;
+        entregasFinalizadas: number;
+        entregasComOcorrencia: number;
+        otifRate: number;
+        totalVolume: number;
+        valorTotalFrete: number;
+        lastSync: string;
+      };
+
       return {
         totalColetas: data.totalColetas || 0,
         coletasPendentes: data.coletasPendentes || 0,

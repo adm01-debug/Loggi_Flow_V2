@@ -40,12 +40,13 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
         success.push(validated);
       } catch (err) {
         if (err instanceof z.ZodError) {
-          const rowErrors = err.errors.map(zErr => ({
-            row: index + 2,
-            field: zErr.path.join('.'),
-            error: zErr.message
-          }));
-          errors.push(...rowErrors);
+          err.errors.forEach(zErr => {
+            errors.push({
+              row: index + 2,
+              field: zErr.path.join('.'),
+              error: zErr.message
+            });
+          });
         }
       }
     });

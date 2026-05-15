@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { EmptyState } from '@/components/common/EmptyState';
 import { LabelPreview, type LabelData } from './LabelPreview';
-import { QrCode, Printer, FileText, Search, Eye, Download, Loader2 } from 'lucide-react';
+import { QrCode, Printer, Eye, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EntregaRow {
