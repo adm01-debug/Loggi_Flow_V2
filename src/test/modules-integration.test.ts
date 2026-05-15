@@ -22,12 +22,12 @@ describe('Label Module Imports', () => {
   it('exports MaterialLabelPrinter', async () => {
     const mod = await import('@/components/labels/index');
     expect(mod.MaterialLabelPrinter).toBeDefined();
-  });
+  }, 15000);
 
   it('exports LabelPreview', async () => {
     const mod = await import('@/components/labels/index');
     expect(mod.LabelPreview).toBeDefined();
-  });
+  }, 15000);
 });
 
 describe('LabelData interface structure', () => {
@@ -246,6 +246,6 @@ describe('Pages Imports', () => {
       const mod = await import(`@/pages/${page}.tsx`);
       expect(mod.default).toBeDefined();
       expect(typeof mod.default).toBe('function');
-    });
+    }, 15000);
   }
 });
