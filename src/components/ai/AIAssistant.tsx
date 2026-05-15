@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Bot, Send, Trash2, Sparkles, AlertCircle, TrendingUp, Zap, MessageSquare, PanelRightClose, PanelRightOpen, Terminal } from 'lucide-react';
+import { Bot, Send, Trash2, Sparkles, AlertCircle, TrendingUp, Zap, MessageSquare, PanelRightClose, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
