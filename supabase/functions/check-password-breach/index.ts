@@ -35,7 +35,7 @@ serve(async (req: Request) => {
     const prefix = hash.substring(0, 5);
     const suffix = hash.substring(5);
 
-    console.log(`Checking password hash prefix: ${prefix}...`);
+    log.info(`Checking password hash prefix: ${prefix}...`);
 
     // Query HIBP API using k-anonymity model
     // This only sends the first 5 characters of the hash, protecting the actual password
@@ -69,7 +69,7 @@ serve(async (req: Request) => {
 
     const isPwned = pwnedCount > 0;
 
-    console.log(`Password check result: ${isPwned ? `PWNED (${pwnedCount} times)` : "SAFE"}`);
+    log.info(`Password check result: ${isPwned ? `PWNED (${pwnedCount} times)` : "SAFE"}`);
 
     return new Response(
       JSON.stringify({ 

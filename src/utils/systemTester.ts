@@ -62,7 +62,6 @@ export const runSystemSanityChecks = async () => {
     }
   ];
 
-  console.log("🚀 Iniciando auditoria Enterprise 10/10...");
   const results = [];
   
   for (const check of checks) {
@@ -84,7 +83,6 @@ export const runSystemSanityChecks = async () => {
     });
     console.group("❌ Falha na Integridade do Sistema");
     console.table(results);
-    console.log(`Tempo total: ${duration}ms`);
     console.groupEnd();
   } else {
     toast.success("Sistema 10/10 validado para produção!", {

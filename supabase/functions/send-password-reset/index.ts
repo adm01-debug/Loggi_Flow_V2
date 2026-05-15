@@ -73,7 +73,7 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`Processing password reset request: ${requestId}`);
+    log.info(`Processing password reset request: ${requestId}`);
 
     // Get the request details
     const { data: resetRequest, error: fetchError } = await supabaseAdmin
@@ -101,8 +101,8 @@ serve(async (req: Request) => {
     const origin = req.headers.get("origin") || "https://uwbpzfcysppwikfpnzok.lovableproject.com";
     const redirectTo = `${origin}/reset-password`;
 
-    console.log(`Sending password reset email to: ${resetRequest.email}`);
-    console.log(`Redirect URL: ${redirectTo}`);
+    log.info(`Sending password reset email to: ${resetRequest.email}`);
+    log.info(`Redirect URL: ${redirectTo}`);
 
     // Send the password reset email using admin API
     const { error: resetError } = await supabaseAdmin.auth.admin.generateLink({
@@ -135,7 +135,7 @@ serve(async (req: Request) => {
       console.error("Error updating request status:", updateError);
     }
 
-    console.log(`Password reset approved and email sent for request: ${requestId}`);
+    log.info(`Password reset approved and email sent for request: ${requestId}`);
 
     return new Response(
       JSON.stringify({ success: true, message: "Password reset email sent" }),

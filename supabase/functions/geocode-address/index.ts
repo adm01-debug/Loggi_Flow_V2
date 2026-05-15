@@ -36,7 +36,7 @@ serve(async (req) => {
     // Call Mapbox Geocoding API
     const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${mapboxToken}&country=BR&limit=1&language=pt`;
     
-    console.log(`Geocoding address: ${address}`);
+    log.info(`Geocoding address: ${address}`);
     
     const response = await fetch(geocodeUrl);
     
@@ -51,7 +51,7 @@ serve(async (req) => {
     const data = await response.json();
     
     if (!data.features || data.features.length === 0) {
-      console.log('No results found for address:', address);
+      log.info('No results found for address:', address);
       return new Response(
         JSON.stringify({ coordinates: null, message: 'Address not found' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -61,7 +61,7 @@ serve(async (req) => {
     const [lng, lat] = data.features[0].center;
     const placeName = data.features[0].place_name;
     
-    console.log(`Geocoded: ${address} -> ${lat}, ${lng}`);
+    log.info(`Geocoded: ${address} -> ${lat}, ${lng}`);
 
     return new Response(
       JSON.stringify({ 

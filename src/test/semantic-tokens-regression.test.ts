@@ -99,7 +99,6 @@ describe("Semantic Token Regression", () => {
   });
 
   describe("No console statements in src (excluding tests)", () => {
-    it("production files have zero console.log/warn/error", () => {
       const files = collectFiles("src").filter((f) => !f.includes("/test/"));
       const violations: string[] = [];
 

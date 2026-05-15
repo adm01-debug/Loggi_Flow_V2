@@ -46,7 +46,7 @@ serve(async (req: Request) => {
 
     const userAgent = event.user_agent || req.headers.get("user-agent") || null;
 
-    console.log(`Logging security event: ${event.event_type} - ${event.description}`);
+    log.info(`Logging security event: ${event.event_type} - ${event.description}`);
 
     const { data, error } = await supabaseAdmin.from("security_events").insert([{
       user_id: event.user_id || null,

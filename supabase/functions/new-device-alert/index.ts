@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { user_id, user_email, device_info, login_time }: NewDeviceAlertRequest = await req.json();
 
-    console.log(`Sending new device alert to ${user_email}`);
+    log.info(`Sending new device alert to ${user_email}`);
 
     const formattedDate = new Date(login_time).toLocaleString('pt-BR', {
       dateStyle: 'full',
@@ -160,7 +160,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     const emailResult = await emailResponse.json();
-    console.log("Email sent successfully:", emailResult);
+    log.info("Email sent successfully:", emailResult);
 
     // Log security event
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

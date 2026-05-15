@@ -41,7 +41,7 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`Logging login attempt for: ${email}, success: ${success}`);
+    log.info(`Logging login attempt for: ${email}, success: ${success}`);
 
     const { error } = await supabaseAdmin.from("login_attempts").insert({
       email,
