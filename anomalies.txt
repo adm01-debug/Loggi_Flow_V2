@@ -1,0 +1,140 @@
+src/utils/systemTester.ts:84:    console.group("❌ Falha na Integridade do Sistema");
+src/utils/systemTester.ts:85:    console.table(results);
+src/utils/systemTester.ts:86:    console.groupEnd();
+src/utils/systemTester.ts:92:    console.group("✅ Sistema Íntegro (10/10)");
+src/utils/systemTester.ts:93:    console.table(results);
+src/utils/systemTester.ts:94:    console.groupEnd();
+src/test/modules-integration.test.ts:6:  AnimatePresence: ({ children }: any) => children,
+src/test/modules-integration.test.ts:10:  ResponsiveContainer: ({ children }: any) => children,
+src/test/modules-integration.test.ts:11:  LineChart: ({ children }: any) => children,
+src/test/modules-integration.test.ts:12:  BarChart: ({ children }: any) => children,
+src/test/telemetry.test.tsx:7:  const MockResponsiveContainer = ({ children }: any) => <div data-testid="responsive-container">{children}</div>;
+src/test/telemetry.test.tsx:8:  const MockLineChart = ({ children }: any) => <div data-testid="line-chart">{children}</div>;
+src/test/telemetry.test.tsx:9:  const MockBarChart = ({ children }: any) => <div data-testid="bar-chart">{children}</div>;
+src/test/telemetry.test.tsx:10:  const MockPieChart = ({ children }: any) => <div data-testid="pie-chart">{children}</div>;
+src/test/telemetry.test.tsx:11:  const MockAreaChart = ({ children }: any) => <div data-testid="area-chart">{children}</div>;
+src/test/telemetry.test.tsx:12:  const MockPie = ({ children }: any) => <div>{children}</div>;
+src/test/telemetry.test.tsx:141:      // Create rows spread across many different hours
+src/test/telemetry.test.tsx:296:      // Unknown severity won't match any category, so pie might be empty
+src/test/rls/security.test.ts:9:    // In many RLS configurations, unauthorized access returns empty data instead of error
+src/pages/Despachos.tsx:120:    await supabase.from("entregas").update({ status: nextStatus as any }).eq("id", item.id).eq("version", item.version);
+src/pages/Despachos.tsx:127:    await supabase.from("entregas").update({ status: "despachado" as any, data_despacho: new Date().toISOString() }).eq("id", confirmItem.id).eq("version", confirmItem.version);
+src/hooks/useTelemetry.ts:11:  metadata?: Record<string, any>;
+src/hooks/useTelemetry.ts:52:      console.error('Telemetry critical failure:', err);
+src/test/semantic-tokens-regression.test.ts:80:  describe("No any types in production code", () => {
+src/test/semantic-tokens-regression.test.ts:90:      it(`${file} has no \`: any\` declarations`, () => {
+src/test/semantic-tokens-regression.test.ts:92:        const anyMatches = content.match(/:\s*any\b/g) || [];
+src/test/semantic-tokens-regression.test.ts:94:          anyMatches,
+src/test/semantic-tokens-regression.test.ts:95:          `Found ${anyMatches.length} \`: any\` in ${file}`
+src/test/rls-negative.test.ts:9:    const canRead = (user: any, profile: any) => {
+src/test/rls-negative.test.ts:20:    const canRead = (user: any, profile: any) => {
+src/pages/CotacaoMultiCanal.tsx:67:        const t = rota.transportadora as any;
+src/pages/CotacaoMultiCanal.tsx:120:        }).then((res: any) => {
+src/pages/CotacaoMultiCanal.tsx:122:            res.forEach((option: any) => {
+src/components/ui/animated-number.tsx:11:  formatValue?: (v: any) => any;
+src/test/useBusinessRuleEngine.test.ts:97:    expect(evaluateConditions([], { status: "anything" })).toBe(true);
+src/hooks/useSorting.ts:24:export function useSorting<T extends Record<string, any>>(
+src/lib/queryKeys.ts:21:      list: (filters: any) => ['logistics', 'entregas', 'list', filters] as const,
+src/lib/queryKeys.ts:26:      list: (filters: any) => ['logistics', 'coletas', 'list', filters] as const,
+src/lib/queryKeys.ts:30:      list: (filters: any) => ['logistics', 'transportadoras', 'list', filters] as const,
+src/lib/queryKeys.ts:62:    audit: (filters: any) => ['system', 'audit', filters] as const,
+src/pages/Conquistas.tsx:173:    const dir = getSortDirection(field as any); 
+src/components/melhorenvio/types.ts:11:  company?: {
+src/components/melhorenvio/types.ts:21:  company?: { id: number; name: string };
+src/components/melhorenvio/types.ts:36:export interface MECompany {
+src/components/melhorenvio/types.ts:45:  company?: { name: string };
+src/components/melhorenvio/types.ts:83:  company_document?: string;
+src/pages/Configuracoes.tsx:136:                      checked={(preferences as any)?.[pref.key] ?? false} 
+src/pages/Coletas.tsx:68:    if (data) setColetas(data as any);
+src/pages/Coletas.tsx:96:            <Button variant="outline" size="sm" onClick={() => exportToCSV(coletas as any, { filename: "coletas" })}>
+src/pages/Coletas.tsx:167:                          {(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}
+src/pages/Clientes.tsx:362:              const rows = (data as any[]).map((d: any) => ({
+src/components/melhorenvio/METransportadorasPanel.tsx:16:import type { MECompany, MEService, MEAgency } from './types';
+src/components/melhorenvio/METransportadorasPanel.tsx:22:  const [agencyCompany, setAgencyCompany] = useState('');
+src/components/melhorenvio/METransportadorasPanel.tsx:27:  const companies: MECompany[] = Array.isArray(listarTransportadoras.data) ? listarTransportadoras.data as MECompany[] : [];
+src/components/melhorenvio/METransportadorasPanel.tsx:32:    if (agencyCompany) params.company = agencyCompany;
+src/components/melhorenvio/METransportadorasPanel.tsx:129:                      <TableCell>{s.company?.name || '-'}</TableCell>
+src/components/melhorenvio/METransportadorasPanel.tsx:152:                <Input placeholder="Ex: 1" value={agencyCompany} onChange={(e) => setAgencyCompany(e.target.value)} />
+src/hooks/useSoftDelete.ts:14:        .from(tableName as any)
+src/hooks/useSoftDelete.ts:15:        .update({ deleted_at: new Date().toISOString() } as any)
+src/hooks/useSoftDelete.ts:34:      console.error(`Error soft deleting from ${tableName}:`, error);
+src/hooks/useSoftDelete.ts:42:        .from(tableName as any)
+src/hooks/useSoftDelete.ts:43:        .update({ deleted_at: null } as any)
+src/hooks/useSoftDelete.ts:53:      console.error(`Error restoring to ${tableName}:`, error);
+src/components/melhorenvio/MEQuoteResults.tsx:21:    name: `${r.company?.name || ''} - ${r.name}`,
+src/components/melhorenvio/MEQuoteResults.tsx:47:                    <p className="font-semibold text-sm">{r.company?.name || 'N/A'}</p>
+src/components/melhorenvio/MELojasPanel.tsx:67:      company_id: selectedStoreId,
+src/components/melhorenvio/MELojasPanel.tsx:79:    cadastrarTelefonesLoja.mutate({ company_id: selectedStoreId, phones: newPhone }, {
+src/components/melhorenvio/MELojasPanel.tsx:127:                    <TableCell className="font-mono text-xs">{s.document || s.company_document || '-'}</TableCell>
+src/hooks/useScheduledReports.tsx:17:  filters: Record<string, any>;
+src/hooks/useScheduledReports.tsx:33:  filters?: Record<string, any>;
+src/hooks/useScheduledReports.tsx:108:    mutationFn: async (reportData: { report_type: string; filters?: Record<string, any> }) => {
+src/hooks/useSLANotifications.tsx:284:          const alert = checkEntregaSLA(e as any);
+src/hooks/useSLANotifications.tsx:298:          const alert = checkColetaSLA(c as any);
+src/components/melhorenvio/MECotacaoPanel.tsx:21:  service: number; company: { id: number; name: string }; name: string; price: string;
+src/components/melhorenvio/MECotacaoPanel.tsx:58:    setCartDialog({ service: result.id, company: result.company ?? { id: 0, name: 'N/A' }, name: result.name, price: result.custom_price || result.price });
+src/lib/csvImporter.ts:31:        results.data.forEach((row: any, index: number) => {
+src/components/rodonaves/RTETrackingPanel.tsx:69:    const d = data as { data?: { Tracking?: Array<any> } };
+src/components/rodonaves/RTETrackingPanel.tsx:75:        {events.map((ev: any, i: number) => {
+src/components/rodonaves/RTETrackingPanel.tsx:77:          const status = (RODONAVES_STATUS_MAP as any)[code];
+src/components/rodonaves/RTETrackingPanel.tsx:105:    const d = data as { data?: any[] | any };
+src/components/rodonaves/RTETrackingPanel.tsx:110:        {items.map((item: any, i: number) => (
+src/components/shipping/DeliveryReceiptUpload.tsx:56:    } catch (error: any) {
+src/components/shipping/DeliveryReceiptUpload.tsx:74:    } catch (error: any) {
+src/components/rodonaves/RTEOrdersPanel.tsx:29:  const orders = rte.ordersResult as { data?: Array<Record<string, any>> } | undefined;
+src/lib/constants.ts:109:  company: "Promo Brindes",
+src/components/freight/FreightAudit.tsx:31:  old_data: any;
+src/components/freight/FreightAudit.tsx:32:  new_data: any;
+src/components/melhorenvio/MECartDialog.tsx:12:  company: { id: number; name: string };
+src/components/melhorenvio/MECartDialog.tsx:120:            <p><span className="text-muted-foreground">Serviço:</span> {cartDialog.company?.name} — {cartDialog.name}</p>
+src/components/rodonaves/RTECustomerManager.tsx:21:  const [customers, setCustomers] = useState<any[]>([]);
+src/components/rodonaves/RTECustomerManager.tsx:22:  const [addresses, setAddresses] = useState<any[]>([]);
+src/components/rodonaves/RTECustomerManager.tsx:35:    } catch (err: any) {
+src/components/rodonaves/RTECustomerManager.tsx:50:    } catch (err: any) {
+src/components/rodonaves/RTECustomerManager.tsx:66:    } catch (err: any) {
+src/components/rodonaves/RTECustomerManager.tsx:81:    } catch (err: any) {
+src/components/rodonaves/RTECustomerManager.tsx:126:                {customers.map((c: any, i: number) => (
+src/components/rodonaves/RTECustomerManager.tsx:165:                {addresses.map((addr: any, i: number) => (
+src/components/security/SecurityPushNotificationProvider.tsx:7:  // This is a utility component, it doesn't render anything
+src/components/melhorenvio/MECarrinhoPanel.tsx:185:                        <TableCell>{item.company?.name || '-'}</TableCell>
+src/components/security/PermissionGate.tsx:29:  // If not authenticated, don't show anything
+src/components/security/NewDeviceDetector.tsx:7:  // This is a utility component, it doesn't render anything
+src/components/freight/ScenarioSimulator.tsx:15:    [key: string]: any;
+src/components/freight/ScenarioSimulator.tsx:20:  cargoData: any;
+src/components/freight/ScenarioSimulator.tsx:21:  simulateScenario: (data: any, splitVolumes: number) => SimulationResult[];
+src/hooks/useSLAAlerts.tsx:48:    return (entregas as any[]).map((e) => {
+src/pages/KanbanEntregas.tsx:192:    onError: (err: any) => {
+src/pages/IntegracaoBitrix.tsx:289:function cn(...inputs: any[]) {
+src/hooks/useRodonavesTracking.tsx:202:  const cubageMutation = useRodonavesMutation<{ cnpjRemetente: string; companyId?: string }>('cubage-factor');
+src/components/dashboard/KPICard.test.tsx:10:    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+src/components/dashboard/KPICard.test.tsx:11:    p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
+src/components/dashboard/KPICard.test.tsx:12:    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+src/hooks/useNewDeviceDetection.tsx:106:      // Check if user has any devices registered (first login detection)
+src/hooks/useMelhorEnvio.tsx:169:    mutationFn: (params: { company?: string; state?: string; city?: string }) => api('listarAgencias', params),
+src/hooks/useMelhorEnvio.tsx:229:    mutationFn: (params: { company_id: string; address: Record<string, unknown> }) => api('cadastrarEnderecoLoja', params),
+src/hooks/useMelhorEnvio.tsx:235:    mutationFn: (company_id: string) => api('listarEnderecosLoja', { company_id }),
+src/hooks/useMelhorEnvio.tsx:239:    mutationFn: (params: { company_id: string; phones: Record<string, unknown> }) => api('cadastrarTelefonesLoja', params),
+src/hooks/useMelhorEnvio.tsx:245:    mutationFn: (company_id: string) => api('listarTelefonesLoja', { company_id }),
+src/pages/AlertasCusto.tsx:79:  const alertasList = useMemo(() => (alertas as any[] || []).map((a: AlertaRaw) => ({ 
+src/hooks/useBoxManagement.tsx:105:  // Pending deliveries (not allocated to any box)
+src/hooks/useDashboardMetrics.tsx:52:      const data = rpcData as Record<string, any>;
+src/hooks/useDashboardMetrics.tsx:162:        predictionsData?.forEach((pred: any) => {
+src/hooks/useDashboardMetrics.tsx:199:        .select('id, nome_fantasia, score_performance, prazo_medio_dias, homologada') as any)
+src/hooks/useImportData.ts:86:          const normalized = (jsonData as Record<string, any>[]).map((row) => {
+src/hooks/useImportData.ts:126:              value: (row as any)[err.path[0] as string],
+src/hooks/useBusinessRules.tsx:24:  config: Record<string, any>;
+src/pages/auth/AuthHeroSection.tsx:17:  { name: "Carlos Silva", role: "Gerente de Logística", company: "TransLog BR", avatar: "CS", content: "Reduzimos 40% do tempo de gestão com o LogiFlow. A gamificação transformou nossa equipe!", rating: 5 },
+src/pages/auth/AuthHeroSection.tsx:18:  { name: "Ana Beatriz", role: "Diretora de Operações", company: "Express Cargo", avatar: "AB", content: "A visibilidade em tempo real mudou completamente nossa operação. Recomendo demais!", rating: 5 },
+src/pages/auth/AuthHeroSection.tsx:19:  { name: "Roberto Mendes", role: "CEO", company: "FastShip", avatar: "RM", content: "ROI positivo em 3 meses. A melhor decisão que tomamos para nossa logística.", rating: 5 },
+src/pages/auth/AuthHeroSection.tsx:20:  { name: "Fernanda Costa", role: "Coordenadora", company: "LogiMaster", avatar: "FC", content: "Interface intuitiva e relatórios detalhados. Perfeito para gestão de frotas!", rating: 5 },
+src/pages/auth/AuthHeroSection.tsx:21:  { name: "Pedro Santos", role: "Diretor de TI", company: "RápidoLog", avatar: "PS", content: "Integração perfeita com nossos sistemas. Suporte excepcional!", rating: 5 },
+src/pages/auth/AuthHeroSection.tsx:76:          <p className="text-xs text-primary font-medium">{testimonial.company}</p>
+src/hooks/useFilters.ts:38:// Using a generic constraint that allows any object type
+src/components/common/DataExporter.tsx:10:export function DataExporter<T extends Record<string, any>>({ data, filename, columns }: DataExporterProps<T>) {
+src/components/coletas/PickupDialog.tsx:99:        const { error: err } = await supabase.from("coletas").update(payload as any).eq("id", pickup.id);
+src/components/coletas/PickupDialog.tsx:102:        const { error: err } = await supabase.from("coletas").insert(payload as any);
+src/components/coletas/PickupDialog.tsx:136:              <Select defaultValue={watch("status")} onValueChange={(val) => setValue("status", val as any)}>
+src/components/coletas/PickupDialog.tsx:171:              <Select defaultValue={watch("tipo_coleta")} onValueChange={(val) => setValue("tipo_coleta", val as any)}>
+src/components/coletas/PickupDetailsDialog.tsx:71:        status: newStatus as any,
+src/components/coletas/PickupDetailsDialog.tsx:73:      } as any)
+src/components/coletas/PickupDetailsDialog.tsx:212:                pickup={pickup as any} 
