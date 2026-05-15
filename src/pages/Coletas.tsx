@@ -13,6 +13,7 @@ import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
+import { VirtualizedList } from "@/components/common/VirtualizedList";
 import { RealtimeBadge } from "@/components/common/RealtimeBadge";
 import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
@@ -47,7 +48,7 @@ export default function Coletas() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("coletas")
-        .select("*, fornecedores(razao_social, nome_fantasia), transportadoras(nome_fantasia)")
+        .select("*, fornecedores!fk_coletas_fornecedor(razao_social, nome_fantasia), transportadoras!fk_coletas_transportadora(nome_fantasia)")
         .order("created_at", { ascending: false });
       
       if (error) throw error;
@@ -136,62 +137,70 @@ export default function Coletas() {
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {pagination.paginatedData.map(c => {
-              const Icon = statusConfig[c.status]?.icon || Package;
-              return (
-                <Card 
-                  key={c.id} 
-                  className="hover:shadow-md transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary group"
-                  onClick={() => { 
-                    playAction();
-                    setSelectedPickup(c); 
-                    setIsDetailsOpen(true); 
-                  }}
-                >
-                  <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className={cn("p-2.5 rounded-xl transition-colors", statusConfig[c.status]?.color)}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-lg">{c.numero_coleta}</p>
-                          <Badge variant="secondary" className="text-[10px] h-5 uppercase">
-                            {c.tipo_coleta}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground font-medium">
-                          {(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-8 flex-1">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="w-4 h-4 text-primary/60" /> 
-                        <span className="truncate max-w-[150px]">{c.endereco_coleta}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="w-4 h-4 text-primary/60" /> 
-                        {c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString() : '-'}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Package className="w-4 h-4 text-primary/60" /> 
-                        {c.qtd_volumes} vol
-                      </div>
-                    </div>
+          <div className="grid grid-cols-1 gap-4 min-h-[400px]">
+            {pagination.paginatedData.length > 0 ? (
+              <VirtualizedList
+                items={pagination.paginatedData}
+                estimateSize={120}
+                className="max-h-[70vh] rounded-xl pr-2"
+                renderItem={(c) => {
+                  const Icon = statusConfig[c.status]?.icon || Package;
+                  return (
+                    <div className="pb-4">
+                      <Card 
+                        key={c.id} 
+                        className="hover:shadow-md transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary group"
+                        onClick={() => { 
+                          playAction();
+                          setSelectedPickup(c); 
+                          setIsDetailsOpen(true); 
+                        }}
+                      >
+                        <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className={cn("p-2.5 rounded-xl transition-colors", statusConfig[c.status]?.color)}>
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-lg">{c.numero_coleta}</p>
+                                <Badge variant="secondary" className="text-[10px] h-5 uppercase">
+                                  {c.tipo_coleta}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground font-medium">
+                                {(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-8 flex-1">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <MapPin className="w-4 h-4 text-primary/60" /> 
+                              <span className="truncate max-w-[150px]">{c.endereco_coleta}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Calendar className="w-4 h-4 text-primary/60" /> 
+                              {c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString() : '-'}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Package className="w-4 h-4 text-primary/60" /> 
+                              {c.qtd_volumes} vol
+                            </div>
+                          </div>
 
-                    <div className="flex items-center gap-3">
-                      <Badge className={cn("px-3 py-1 capitalize", statusConfig[c.status]?.color)}>
-                        {statusConfig[c.status]?.label}
-                      </Badge>
+                          <div className="flex items-center gap-3">
+                            <Badge className={cn("px-3 py-1 capitalize", statusConfig[c.status]?.color)}>
+                              {statusConfig[c.status]?.label}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-            {pagination.paginatedData.length === 0 && (
+                  );
+                }}
+              />
+            ) : (
               <div className="text-center py-20 bg-muted/20 rounded-xl border-2 border-dashed">
                 <Package className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
                 <p className="text-muted-foreground font-medium">Nenhuma coleta encontrada</p>

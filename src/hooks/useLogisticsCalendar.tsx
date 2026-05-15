@@ -40,8 +40,8 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
             data_prevista_coleta,
             status,
             transportadora_id,
-            transportadoras (nome_fantasia),
-            fornecedores (razao_social)
+            transportadoras!fk_coletas_transportadora (nome_fantasia),
+            fornecedores!fk_coletas_fornecedor (razao_social)
           `)
           .not('data_prevista_coleta', 'is', null);
 
@@ -72,7 +72,7 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
         }
 
         if (coletas) {
-          (coletas as ColetaRaw[]).forEach((coleta) => {
+          (coletas as any[]).forEach((coleta) => {
             events.push({
               id: coleta.id,
               title: coleta.numero_coleta,

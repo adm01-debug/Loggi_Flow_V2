@@ -142,8 +142,8 @@ export function useUnifiedTracking() {
         .select(`
           id, numero_coleta, status, endereco_coleta, data_prevista_coleta,
           data_efetiva_coleta, codigo_rastreamento, tipo_coleta, transportadora_id,
-          transportadora:transportadoras(nome_fantasia),
-          fornecedor:fornecedores(razao_social)
+          transportadora:transportadoras!fk_coletas_transportadora(nome_fantasia),
+          fornecedor:fornecedores!fk_coletas_fornecedor(razao_social)
         `)
         .order('updated_at', { ascending: false })
         .limit(200);
@@ -162,7 +162,7 @@ export function useUnifiedTracking() {
     const result: UnifiedShipment[] = [];
 
     // Normalize entregas
-    (entregas || []).forEach((e) => {
+    (entregas || []).forEach((e: any) => {
       const t = e.transportadora as { nome_fantasia: string } | null;
       const c = e.cliente as { razao_social: string } | null;
       const atrasado = isAtrasado(e.previsao_entrega, e.status, e.data_entrega_efetiva);
@@ -192,7 +192,7 @@ export function useUnifiedTracking() {
     });
 
     // Normalize coletas
-    (coletas || []).forEach((c) => {
+    (coletas || []).forEach((c: any) => {
       const t = c.transportadora as { nome_fantasia: string } | null;
       const f = c.fornecedor as { razao_social: string } | null;
       const atrasado = isAtrasado(c.data_prevista_coleta, c.status, c.data_efetiva_coleta);
