@@ -62,7 +62,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
   if (!pickup) return null;
 
-  const updateStatus = async (newStatus: string) => {
+  const updateStatus = async (newStatus: ColetaStatus) => {
     if (!pickup) return;
     
     const { error } = await supabase

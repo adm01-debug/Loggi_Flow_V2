@@ -96,10 +96,10 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
       let error;
       if (pickup?.id) {
-        const { error: err } = await supabase.from("coletas").update(payload).eq("id", pickup.id);
+        const { error: err } = await supabase.from("coletas").update(payload as any).eq("id", pickup.id);
         error = err;
       } else {
-        const { error: err } = await supabase.from("coletas").insert(payload);
+        const { error: err } = await supabase.from("coletas").insert(payload as any);
         error = err;
       }
 
