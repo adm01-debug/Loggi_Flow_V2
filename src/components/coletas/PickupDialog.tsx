@@ -32,8 +32,8 @@ interface PickupDialogProps {
 export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [fornecedores, setFornecedores] = useState<any[]>([]);
-  const [transportadoras, setTransportadoras] = useState<any[]>([]);
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [transportadoras, setTransportadoras] = useState<Transportadora[]>([]);
 
   const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: pickup || {
