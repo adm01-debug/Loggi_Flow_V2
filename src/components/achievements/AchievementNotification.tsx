@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy, Star, Sparkles, X, Coins } from "lucide-react";
+import { Trophy, Star, X, Coins } from "lucide-react";
 import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
 
 const rarityConfig = {
