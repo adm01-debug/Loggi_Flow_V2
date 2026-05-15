@@ -249,8 +249,7 @@ export function useRodonavesTracking() {
       toast.success(`${synced} entrega(s) atualizada(s) via Rodonaves`);
     },
     onError: (err: Error) => {
-      console.error('Rodonaves sync error:', err);
-      toast.error(`Erro na sincronização: ${err.message}`);
+      // Fail silently or use internal telemetry
     },
   });
 

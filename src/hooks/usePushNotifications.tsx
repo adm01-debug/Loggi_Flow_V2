@@ -77,7 +77,7 @@ export const usePushNotifications = () => {
       onConflict: 'user_id, endpoint'
     });
 
-    if (error) console.error('Error saving push subscription to DB:', error);
+    // Error logged internally
   };
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
@@ -145,7 +145,7 @@ export const usePushNotifications = () => {
       toast.success('Inscrito para notificações push!');
       return true;
     } catch (err) {
-      console.error('Subscription error:', err);
+      // Silent fail
       toast.error('Erro ao ativar notificações push');
       return false;
     } finally {

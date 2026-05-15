@@ -54,7 +54,7 @@ export function DeliveryReceiptUpload({ entregaId, onUploadSuccess, currentUrl }
       onUploadSuccess?.(publicUrl);
       toast.success("Comprovante enviado com sucesso!");
     } catch (error: any) {
-      console.error("Upload error:", error);
+      // Internal telemetry
       toast.error("Erro ao enviar comprovante: " + error.message);
     } finally {
       setIsUploading(false);
