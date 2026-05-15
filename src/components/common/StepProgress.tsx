@@ -69,8 +69,12 @@ export function StepProgress({
         const isCompleted = index < currentStep;
         const isCurrent = index === currentStep;
         const isClickable = !!onStepClick && index <= currentStep;
-
-        return (
+        
+        const getIndicatorStyle = () => {
+          if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
+          if (isCurrent) return "bg-primary/20 text-primary border-2 border-primary";
+          return "bg-muted text-muted-foreground border-2 border-border";
+        };
           <div
             key={step.id}
             className={cn(
@@ -87,11 +91,7 @@ export function StepProgress({
                 className={cn(
                   "relative rounded-full flex items-center justify-center font-medium transition-all duration-300",
                   config.circle,
-                  (() => {
-                    if (isCompleted) return "bg-primary text-primary-foreground shadow-md shadow-primary/30";
-                    if (isCurrent) return "bg-primary/20 text-primary border-2 border-primary";
-                    return "bg-muted text-muted-foreground border-2 border-border";
-                  })(),
+                  getIndicatorStyle(),
                   isClickable && "cursor-pointer hover:scale-110",
                   !isClickable && "cursor-default"
                 )}
