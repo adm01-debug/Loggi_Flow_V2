@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { supabase } from '../src/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 
 // Simulação de Fuzzing para Webhooks e Campos de Entrada
 describe('Fuzz Testing & Data Integrity', () => {

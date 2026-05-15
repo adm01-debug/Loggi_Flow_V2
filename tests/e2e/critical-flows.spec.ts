@@ -42,7 +42,8 @@ test.describe('Fluxos Críticos do Sistema', () => {
   test('Deve verificar integridade do Dashboard Executivo', async ({ page }) => {
     await page.goto('/dashboard-executivo');
     await expect(page.locator('text=Visão Geral do Negócio')).toBeVisible();
-    await expect(page.locator('canvas')).toHaveCount.atLeast(1); // Gráficos renderizados
+    const count = await page.locator('canvas').count();
+    expect(count).toBeGreaterThan(0); // Gráficos renderizados
   });
 
   test('Deve validar painel de segurança e auditoria', async ({ page }) => {

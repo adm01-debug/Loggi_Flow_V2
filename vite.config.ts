@@ -92,7 +92,15 @@ export default defineConfig(({ mode }) => ({
     // Vendor chunks like mapbox are large but lazy-loaded; suppress warnings
     chunkSizeWarningLimit: 700,
   },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './tests/test-utils.tsx',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: ['node_modules/', 'tests/'],
+    },
   },
 }));
