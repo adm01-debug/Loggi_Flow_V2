@@ -1,4 +1,22 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// Desativar importações pesadas de UI para evitar timeouts em testes de integração de módulos
+vi.mock('framer-motion', () => ({
+  motion: { div: 'div' },
+  AnimatePresence: ({ children }: any) => children,
+}));
+
+vi.mock('recharts', () => ({
+  ResponsiveContainer: ({ children }: any) => children,
+  LineChart: ({ children }: any) => children,
+  BarChart: ({ children }: any) => children,
+  XAxis: () => null,
+  YAxis: () => null,
+  Tooltip: () => null,
+  CartesianGrid: () => null,
+  Line: () => null,
+  Bar: () => null,
+}));
 
 describe('Label Module Imports', () => {
   it('exports MaterialLabelPrinter', async () => {
