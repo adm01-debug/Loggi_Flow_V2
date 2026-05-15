@@ -124,6 +124,28 @@ export function DateRangePicker({
     }
   };
 
+  const renderLabel = () => {
+    if (!value?.from) return <span className="truncate">{placeholder}</span>;
+    
+    if (value.to) {
+      if (selectedPreset) {
+        return <span className="font-medium text-primary">{selectedPreset}</span>;
+      }
+      return (
+        <>
+          <span className="hidden sm:inline">
+            {format(value.from, "dd/MM/yyyy", { locale: ptBR })} - {format(value.to, "dd/MM/yyyy", { locale: ptBR })}
+          </span>
+          <span className="sm:hidden">
+            {format(value.from, "dd/MM", { locale: ptBR })} - {format(value.to, "dd/MM", { locale: ptBR })}
+          </span>
+        </>
+      );
+    }
+    
+    return <span>{format(value.from, "dd/MM/yyyy", { locale: ptBR })}</span>;
+  };
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover open={open} onOpenChange={setOpen}>
@@ -138,28 +160,9 @@ export function DateRangePicker({
             )}
           >
             <CalendarIcon className="mr-1.5 sm:mr-2 h-4 w-4 shrink-0 group-hover:text-primary transition-colors" />
-            {value?.from ? (
-              value.to ? (
-                <span className="truncate">
-                  {selectedPreset ? (
-                    <span className="font-medium text-primary">{selectedPreset}</span>
-                  ) : (
-                    <>
-                      <span className="hidden sm:inline">
-                        {format(value.from, "dd/MM/yyyy", { locale: ptBR })} - {format(value.to, "dd/MM/yyyy", { locale: ptBR })}
-                      </span>
-                      <span className="sm:hidden">
-                        {format(value.from, "dd/MM", { locale: ptBR })} - {format(value.to, "dd/MM", { locale: ptBR })}
-                      </span>
-                    </>
-                  )}
-                </span>
-              ) : (
-                <span className="truncate">{format(value.from, "dd/MM/yyyy", { locale: ptBR })}</span>
-              )
-            ) : (
-              <span className="truncate">{placeholder}</span>
-            )}
+            <span className="truncate flex-1">
+              {renderLabel()}
+            </span>
             {value ? (
               <X
                 className="ml-auto h-4 w-4 opacity-50 hover:opacity-100 shrink-0 hover:text-destructive transition-colors"
