@@ -154,8 +154,9 @@ export function PasswordStrengthIndicator({
                 <span className="ml-1 text-destructive">(obrigatório)</span>
               )}
             </span>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
 
       {/* Pwned password check */}
