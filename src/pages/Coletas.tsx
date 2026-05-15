@@ -19,17 +19,8 @@ import { useSorting } from "@/hooks/useSorting";
 import { PickupDialog } from "@/components/coletas/PickupDialog";
 import { PickupDetailsDialog } from "@/components/coletas/PickupDetailsDialog";
 
-export type ColetaStatus = 'aguardando_liberacao' | 'solicitada' | 'em_transito' | 'chegou_expedicao' | 'conferencia_ok' | 'divergencia' | 'finalizada';
-type ColetaTipo = 'lalamove' | 'transportadora';
+import { Coleta, ColetaStatus } from "@/components/coletas/types";
 
-interface Coleta {
-  id: string; numero_coleta: string; fornecedor_id: string | null; endereco_coleta: string; contato_coleta: string | null;
-  tipo_coleta: ColetaTipo; transportadora_id: string | null; data_prevista_coleta: string | null; data_efetiva_coleta: string | null;
-  qtd_volumes: number | null; peso_estimado_kg: number | null; codigo_rastreamento: string | null; status: ColetaStatus;
-  observacoes: string | null; created_at: string;
-  fornecedores?: { razao_social: string; nome_fantasia: string | null } | null;
-  transportadoras?: { nome_fantasia: string } | null;
-}
 
 const statusConfig: Record<ColetaStatus, { label: string; color: string; icon: LucideIcon }> = {
   aguardando_liberacao: { label: "Aguardando", color: "bg-muted text-muted-foreground", icon: Clock },
