@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { debounce } from "lodash";
 
 type PostgresChangesEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
 
@@ -31,16 +32,21 @@ export function useRealtime<T = Record<string, unknown>>({
   const queryClient = useQueryClient();
   const channelRef = useRef<RealtimeChannel | null>(null);
 
+  // Optimized invalidation with debounce to prevent rapid-fire refetches
+  const debouncedInvalidate = useRef(
+    debounce((keys: string[]) => {
+      keys.forEach(key => queryClient.invalidateQueries({ queryKey: [key] }));
+    }, 1000)
+  ).current;
+
   const handleChange = useCallback(
     (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
       if (queryKey) {
-        // Multi-layered invalidation
         queryClient.invalidateQueries({ queryKey });
         
         // Specifically invalidate dashboard metrics if related tables change
         if (["entregas", "coletas", "ocorrencias", "ai_delay_predictions"].includes(table)) {
-          queryClient.invalidateQueries({ queryKey: ["dashboard-metrics"] });
-          queryClient.invalidateQueries({ queryKey: ["recent-alerts"] });
+          debouncedInvalidate(["dashboard-metrics", "recent-alerts"]);
         }
       }
 
