@@ -44,7 +44,7 @@ interface KanbanEntrega {
 const COLUMNS = [
   { id: 'pronto_despacho', title: 'Pronto Despacho', icon: Package, color: 'text-info', bgColor: 'bg-info/5' },
   { id: 'nf_emitida', title: 'NF Emitida', icon: FileText, color: 'text-primary', bgColor: 'bg-primary/5' },
-  { id: 'despachado', title: 'Despachado', icon: Send, color: 'text-indigo-500', bgColor: 'bg-indigo-50/50' },
+  { id: 'despachado', title: 'Despachado', icon: Send, color: 'text-primary', bgColor: 'bg-primary/5' },
   { id: 'em_transito', title: 'Em Trânsito', icon: Truck, color: 'text-warning', bgColor: 'bg-warning/5' },
   { id: 'entregue', title: 'Entregue', icon: CheckCircle2, color: 'text-success', bgColor: 'bg-success/5' },
 ] as const;

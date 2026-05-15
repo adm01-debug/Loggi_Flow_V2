@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FreightAudit } from './FreightAudit';
 import React from 'react';
+import { createWrapper } from '../../../tests/test-utils';
 import { toast } from 'sonner';
 
 // Mock the hook
@@ -35,7 +36,7 @@ vi.mock('sonner', () => ({
 
 describe('FreightAudit', () => {
   it('renders correctly', () => {
-    render(<FreightAudit />);
+    render(<FreightAudit />, { wrapper: createWrapper() });
     expect(screen.getByText('Auditoria Manual de Frete')).toBeInTheDocument();
   });
 
@@ -43,7 +44,7 @@ describe('FreightAudit', () => {
   // We'll focus on the logic triggering the audit results.
   
   it('shows error toast if fields are empty', () => {
-    render(<FreightAudit />);
+    render(<FreightAudit />, { wrapper: createWrapper() });
     const auditButton = screen.getByText('Auditar Lançamento');
     fireEvent.click(auditButton);
     expect(toast.error).toHaveBeenCalledWith('Preencha todos os campos para auditoria');
