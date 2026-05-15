@@ -30,20 +30,27 @@ export function SystemHealthWidget() {
 
       const slowQueries = performanceData?.filter(d => d.severity === 'very_slow').length || 0;
 
-      // 3. Simple health calculation (placeholder logic)
+      // 3. Simple health calculation
       let score = 100;
       score -= (errorCount || 0) * 5; // -5 points per error
       score -= (slowQueries) * 2;    // -2 points per slow query
       if (avgDuration > 500) score -= 10;
       
+      let status = 'optimal';
+      if (score <= 70) {
+        status = 'concerning';
+      } else if (score <= 90) {
+        status = 'good';
+      }
+
       return {
         score: Math.max(0, score),
         errors: errorCount || 0,
         avgLatency: Math.round(avgDuration),
-        status: score > 90 ? 'optimal' : score > 70 ? 'good' : 'concerning'
+        status: status as 'optimal' | 'good' | 'concerning'
       };
     },
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 60000,
   });
 
   if (isLoading) {
