@@ -46,7 +46,7 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
         .update({
           qtd_recebida: Number(qtdRecebida),
           peso_efetivo: Number(pesoEfetivo),
-          status: status as any,
+          status: status as ColetaStatus,
           data_recebimento: new Date().toISOString(),
           divergencia_percentual: pickup.peso_estimado_kg ? (Math.abs(Number(pesoEfetivo) - pickup.peso_estimado_kg) / pickup.peso_estimado_kg) * 100 : 0
         })
