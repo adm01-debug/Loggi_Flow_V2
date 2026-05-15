@@ -219,11 +219,15 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
             <TabsContent value="historico" className="pb-6">
               <div className="space-y-4">
-                {loadingTimeline ? (
-                  <div className="flex justify-center py-8"><Clock className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-                ) : timeline.length > 0 ? (
+                {loadingTimeline && (
+                  <div className="flex justify-center py-8">
+                    <Clock className="w-6 h-6 animate-spin text-muted-foreground" />
+                  </div>
+                )}
+                
+                {!loadingTimeline && timeline.length > 0 && (
                   <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-muted">
-                    {timeline.map((event, idx) => (
+                    {timeline.map((event) => (
                       <div key={event.id} className="relative">
                         <div className="absolute -left-6 top-1 w-4 h-4 rounded-full bg-background border-2 border-primary flex items-center justify-center">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -250,7 +254,9 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                       </div>
                     ))}
                   </div>
-                ) : (
+                )}
+                
+                {!loadingTimeline && timeline.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">Nenhum histórico encontrado.</div>
                 )}
               </div>
