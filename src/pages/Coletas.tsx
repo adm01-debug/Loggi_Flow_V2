@@ -47,7 +47,7 @@ export default function Coletas() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("coletas")
-        .select("*, fornecedores(razao_social, nome_fantasia), transportadoras(nome_fantasia)")
+        .select("*, fornecedores!fk_coletas_fornecedor(razao_social, nome_fantasia), transportadoras!fk_coletas_transportadora(nome_fantasia)")
         .order("created_at", { ascending: false });
       
       if (error) throw error;
