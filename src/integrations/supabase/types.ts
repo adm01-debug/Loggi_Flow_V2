@@ -1535,6 +1535,20 @@ export type Database = {
             referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_coletas_fornecedor"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_coletas_transportadora"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
         ]
       }
       comments: {
@@ -4064,6 +4078,8 @@ export type Database = {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       xp_for_level: { Args: { lvl: number }; Returns: number }
