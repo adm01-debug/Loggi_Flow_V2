@@ -137,14 +137,7 @@ export function AchievementNotificationContainer() {
                       </span>
                     </div>
                     <div className="ml-auto">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        notification.rarity === "legendary" ? "bg-xp/20 text-xp" :
-                        notification.rarity === "epic" ? "bg-primary/20 text-primary" :
-                        notification.rarity === "rare" ? "bg-info/20 text-info" :
-                        "bg-muted text-muted-foreground"
-                      }`}>
-                        {config.label}
-                      </span>
+                      <RarityBadge rarity={notification.rarity} label={config.label} />
                     </div>
                   </motion.div>
                 </div>
