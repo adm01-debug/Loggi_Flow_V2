@@ -190,7 +190,11 @@ export default function Envios() {
       const { error } = await supabase.from("entregas").update(update).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["entregas"] }); toast.success("Status atualizado!"); },
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ["entregas"] }); 
+      playSuccess();
+      toast.success("Status atualizado!"); 
+    },
   });
 
   const deleteMut = useMutation({
