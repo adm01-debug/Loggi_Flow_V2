@@ -172,7 +172,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Tipo de Transporte</Label>
-              <Select defaultValue={watch("tipo_coleta")} onValueChange={(val) => setValue("tipo_coleta", val as any)}>
+              <Select defaultValue={watch("tipo_coleta")} onValueChange={(val: ColetaTipo) => setValue("tipo_coleta", val)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
