@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Lock, Zap, Coins, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { CompactAchievementBadge } from "./CompactAchievementBadge";
 
 export interface AchievementBadgeData {
   id: string;
