@@ -9,12 +9,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Coleta as Pickup } from "./types";
+
+interface Fornecedor {
+  id: string;
+  nome_fantasia: string | null;
+  razao_social: string;
+}
+
+interface Transportadora {
+  id: string;
+  nome_fantasia: string;
+}
 
 interface PickupDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
-  pickup?: any;
+  pickup?: Pickup | null;
 }
 
 export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDialogProps) {
