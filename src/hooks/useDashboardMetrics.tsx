@@ -50,10 +50,23 @@ export function useDashboardMetrics() {
         throw error;
       }
       
-      const data = rpcData as any;
+      const data = rpcData as Record<string, any>;
       
       return {
-        ...data,
+        totalColetas: data.totalColetas || 0,
+        coletasPendentes: data.coletasPendentes || 0,
+        coletasEmTransito: data.coletasEmTransito || 0,
+        coletasFinalizadas: data.coletasFinalizadas || 0,
+        coletasComDivergencia: data.coletasComDivergencia || 0,
+        totalEntregas: data.totalEntregas || 0,
+        entregasPendentes: data.entregasPendentes || 0,
+        entregasEmTransito: data.entregasEmTransito || 0,
+        entregasFinalizadas: data.entregasFinalizadas || 0,
+        entregasComOcorrencia: data.entregasComOcorrencia || 0,
+        otifRate: data.otifRate || 0,
+        totalVolume: data.totalVolume || 0,
+        valorTotalFrete: data.valorTotalFrete || 0,
+        lastSync: data.lastSync || new Date().toISOString(),
         taxaOcorrencias: data.totalEntregas > 0 ? (data.entregasComOcorrencia / data.totalEntregas) * 100 : 0,
         taxaEntregaNoPrazo: 100,
         tempoMedioColeta: 36,
