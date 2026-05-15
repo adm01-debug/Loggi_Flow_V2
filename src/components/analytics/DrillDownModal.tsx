@@ -85,11 +85,12 @@ export function DrillDownModal({ open, onOpenChange, data, isLoading }: DrillDow
 
       {/* Table */}
       <ScrollArea className="h-[400px]">
-        {isLoading ? (
+        {isLoading && (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
-        ) : data?.items && data.items.length > 0 ? (
+        )}
+        {!isLoading && data?.items && data.items.length > 0 && (
           <Table>
             <TableHeader>
               <TableRow>
