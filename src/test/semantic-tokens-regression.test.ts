@@ -108,7 +108,7 @@ describe("Semantic Token Regression", () => {
         // Only error if it's not a commented out console log
         const matches = content.match(/^(?!\s*\/\/).*(console\.(log|warn|error)\b)/gm);
         if (matches) {
-          violations.push(`${file}: ${matches.length} console statement(s)`);
+          violations.push(`${file}: ${matches.length} console statement(s) [${matches.join(' | ')}]`);
         }
       }
 
