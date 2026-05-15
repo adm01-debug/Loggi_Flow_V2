@@ -68,9 +68,9 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
     const { error } = await supabase
       .from("coletas")
       .update({ 
-        status: newStatus as any,
+        status: newStatus,
         data_efetiva_coleta: newStatus === 'em_transito' ? new Date().toISOString() : pickup.data_efetiva_coleta
-      } as any)
+      })
       .eq("id", pickup.id);
     
     if (!error) {
