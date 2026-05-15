@@ -49,7 +49,7 @@ export default function AdminADR() {
 
   const createMutation = useMutation({
     mutationFn: async (adr: Partial<ADR>) => {
-      const { error } = await supabase.from("architecture_decisions").insert(adr);
+      const { error } = await supabase.from("architecture_decisions").insert(adr as any);
       if (error) throw error;
     },
     onSuccess: () => {
