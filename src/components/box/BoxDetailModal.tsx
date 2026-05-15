@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { BoxData } from "@/hooks/useBoxManagement";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -39,8 +38,9 @@ interface BoxDetailModalProps {
 }
 
 export function BoxDetailModal({ box, isOpen, onClose, onRemove, onToggleCrossDocking }: BoxDetailModalProps) {
+  const audioFeedback = useAudioFeedback();
   if (!box) return null;
-  const { playWhoosh, playToggle } = useAudioFeedback();
+  const { playWhoosh, playToggle } = audioFeedback;
 
   const delivery = box.delivery;
 
