@@ -289,7 +289,7 @@ export default function Envios() {
           onStatusChange={setStatus}
           statusOptions={filterConfig.status?.options}
           hasActiveFilters={hasActiveFilters}
-          onClearFilters={clearFilters}
+          onClearFilters={handleClearFilters}
           totalFiltered={totalFiltered}
           totalOriginal={totalOriginal}
         />
