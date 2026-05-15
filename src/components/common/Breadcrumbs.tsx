@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ChevronRight, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -101,7 +102,7 @@ const routeCategories: Record<string, { label: string; path: string }> = {
   "/automacao-regras": { label: "Administração", path: "/configuracoes" },
 };
 
-export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
+export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
   const location = useLocation();
   
   // Auto-generate breadcrumbs from route if items not provided
@@ -193,4 +194,4 @@ export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsPr
       </ol>
     </motion.nav>
   );
-}
+});
