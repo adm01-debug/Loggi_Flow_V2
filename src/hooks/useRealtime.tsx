@@ -2,7 +2,15 @@ import { useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { debounce } from "lodash";
+
+// Simple internal debounce function to avoid external dependencies
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
 
 type PostgresChangesEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
 
@@ -36,7 +44,7 @@ export function useRealtime<T = Record<string, unknown>>({
   const debouncedInvalidate = useRef(
     debounce((keys: string[]) => {
       keys.forEach(key => queryClient.invalidateQueries({ queryKey: [key] }));
-    }, 1000)
+    }, 1500)
   ).current;
 
   const handleChange = useCallback(
