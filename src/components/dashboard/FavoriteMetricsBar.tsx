@@ -84,7 +84,6 @@ export function FavoriteMetricsBar() {
 
   // Data fetching
   const { data: dashboardData } = useDashboardMetrics();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: slaData } = useSLAMetrics();
   const { userLevel } = useGamification();
   
@@ -94,8 +93,6 @@ export function FavoriteMetricsBar() {
   const { summary: costSummary } = useLogisticsCosts(startDate, endDate);
 
   const realMetricValues = useMemo(() => {
-    const defaultData = { value: "-", change: undefined, changeType: "neutral" as const };
-    
     return {
       "coletas-pendentes": { 
         value: dashboardData?.coletasPendentes ?? 0, 
@@ -134,7 +131,7 @@ export function FavoriteMetricsBar() {
       },
       "sla-cumprido": { 
         value: `${dashboardData?.taxaEntregaNoPrazo ?? 0}%`, 
-        change: undefined, 
+        change: slaData?.currentSLA ? Math.round(slaData.currentSLA) : undefined, 
         changeType: (dashboardData?.taxaEntregaNoPrazo ?? 0) > 90 ? "positive" as const : "negative" as const 
       },
       "custo-mensal": { 
@@ -158,7 +155,7 @@ export function FavoriteMetricsBar() {
         changeType: "positive" as const 
       },
     };
-  }, [dashboardData, costSummary, userLevel]);
+  }, [dashboardData, costSummary, userLevel, slaData]);
 
 
   if (favorites.length === 0 && !isEditMode) {
@@ -278,7 +275,7 @@ export function FavoriteMetricsBar() {
           <AnimatePresence mode="popLayout">
             {favoriteMetrics.map((metric) => {
               const IconComponent = iconMap[metric.icon];
-              const data = realMetricValues[metric.id as keyof typeof realMetricValues] || { value: "-", change: undefined, changeType: "neutral" as const };
+              const data = (realMetricValues as any)[metric.id] || { value: "-", change: undefined, changeType: "neutral" as const };
 
               return (
                 <motion.div
@@ -320,14 +317,14 @@ export function FavoriteMetricsBar() {
                             <div
                               className={cn(
                                 "flex items-center text-xs",
-                              data.changeType === ("positive" as string) && "text-success",
-                                data.changeType === ("negative" as string) && "text-destructive",
-                                data.changeType === ("neutral" as string) && "text-muted-foreground"
+                                data.changeType === "positive" && "text-success",
+                                data.changeType === "negative" && "text-destructive",
+                                data.changeType === "neutral" && "text-muted-foreground"
                               )}
                             >
-                              {data.changeType === ("positive" as string) ? (
+                              {data.changeType === "positive" ? (
                                 <TrendingUp className="h-3 w-3 mr-0.5" />
-                              ) : data.changeType === ("negative" as string) ? (
+                              ) : data.changeType === "negative" ? (
                                 <TrendingDown className="h-3 w-3 mr-0.5" />
                               ) : (
                                 <Minus className="h-3 w-3 mr-0.5" />
