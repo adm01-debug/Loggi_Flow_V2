@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { BoxData } from "@/hooks/useBoxManagement";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
