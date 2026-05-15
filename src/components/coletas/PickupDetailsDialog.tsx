@@ -49,6 +49,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
   }, [open, pickup]);
 
   const fetchTimeline = async () => {
+    if (!pickup) return;
     setLoadingTimeline(true);
     // Fetch from audit_logs where table_name is coletas and record_id is pickup.id
     const { data } = await supabase
