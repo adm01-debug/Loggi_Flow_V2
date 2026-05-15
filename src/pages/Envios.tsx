@@ -157,6 +157,11 @@ export default function Envios() {
 
   // Hooks integrados
   const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(list, filterConfig);
+  
+  const handleClearFilters = () => {
+    playWhoosh();
+    clearFilters();
+  };
   const { sortedData, toggleSort, getSortDirection } = useSorting(filteredData, { defaultKey: "created_at", defaultDirection: "desc" });
   const pagination = usePagination(sortedData, { initialPageSize: 10 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
