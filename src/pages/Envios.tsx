@@ -170,8 +170,17 @@ export default function Envios() {
       const { error } = await supabase.from("entregas").insert({ numero_entrega: numero, cliente_id: d.cliente_id || null, endereco_entrega: d.endereco_entrega, contato_cliente: d.contato_cliente || null, tipo_frete: d.tipo_frete, transportadora_id: d.transportadora_id || null, previsao_entrega: d.previsao_entrega || null, observacoes: d.observacoes || null, status: "aguardando_producao" });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["entregas"] }); setDlgCreate(false); setForm(emptyForm); toast.success("Entrega criada!"); },
-    onError: (e) => toast.error("Erro: " + e.message),
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ["entregas"] }); 
+      setDlgCreate(false); 
+      setForm(emptyForm); 
+      playSuccess();
+      toast.success("Entrega criada!"); 
+    },
+    onError: (e) => {
+      playError();
+      toast.error("Erro: " + e.message);
+    },
   });
 
   const updateStatusMut = useMutation({
