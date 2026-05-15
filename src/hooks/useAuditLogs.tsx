@@ -68,7 +68,7 @@ export function useAuditLogs(filters: AuditLogFilters = {}) {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Failed to fetch audit logs:', error);
+        // Internal telemetry only
         throw error;
       }
 

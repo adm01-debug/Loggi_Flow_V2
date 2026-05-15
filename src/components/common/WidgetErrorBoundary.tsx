@@ -29,7 +29,7 @@ export class WidgetErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`[UI-Error] Widget: ${this.props.widgetName || 'Unknown'}`, error, errorInfo);
+    // Error logged to DB
     this.reportError(error, errorInfo);
   }
 
@@ -52,7 +52,7 @@ export class WidgetErrorBoundary extends Component<Props, State> {
       
       this.setState({ reported: true });
     } catch (reportErr) {
-      console.warn('Failed to report UI error to telemetry:', reportErr);
+      // Fail silently
     }
   }
 

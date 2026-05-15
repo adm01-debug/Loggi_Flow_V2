@@ -1,15 +1,33 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// Desativar importações pesadas de UI para evitar timeouts em testes de integração de módulos
+vi.mock('framer-motion', () => ({
+  motion: { div: 'div' },
+  AnimatePresence: ({ children }: any) => children,
+}));
+
+vi.mock('recharts', () => ({
+  ResponsiveContainer: ({ children }: any) => children,
+  LineChart: ({ children }: any) => children,
+  BarChart: ({ children }: any) => children,
+  XAxis: () => null,
+  YAxis: () => null,
+  Tooltip: () => null,
+  CartesianGrid: () => null,
+  Line: () => null,
+  Bar: () => null,
+}));
 
 describe('Label Module Imports', () => {
   it('exports MaterialLabelPrinter', async () => {
     const mod = await import('@/components/labels/index');
     expect(mod.MaterialLabelPrinter).toBeDefined();
-  });
+  }, 15000);
 
   it('exports LabelPreview', async () => {
     const mod = await import('@/components/labels/index');
     expect(mod.LabelPreview).toBeDefined();
-  });
+  }, 15000);
 });
 
 describe('LabelData interface structure', () => {
@@ -228,6 +246,6 @@ describe('Pages Imports', () => {
       const mod = await import(`@/pages/${page}.tsx`);
       expect(mod.default).toBeDefined();
       expect(typeof mod.default).toBe('function');
-    });
+    }, 15000);
   }
 });

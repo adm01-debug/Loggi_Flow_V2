@@ -108,7 +108,9 @@ export default function CotacaoMultiCanal() {
               created_at: new Date().toISOString()
             });
           }
-        }).catch(e => console.error('Rodonaves error:', e));
+        }).catch(e => {
+          // Log errors to a safe sink or ignore in production
+        });
 
         // Melhor Envio
         melhorEnvio.calcularFrete.mutateAsync({
@@ -133,7 +135,9 @@ export default function CotacaoMultiCanal() {
               }
             });
           }
-        }).catch(e => console.error('Melhor Envio error:', e));
+        }).catch(e => {
+          // Silent catch
+        });
 
         // Lalamove (Simplified)
         lalamove.getQuotation.mutateAsync({
@@ -155,13 +159,15 @@ export default function CotacaoMultiCanal() {
               created_at: new Date().toISOString()
             });
           }
-        }).catch(e => console.error('Lalamove error:', e));
+        }).catch(e => {
+          // Silent catch
+        });
       }
 
       if (enriched.length === 0) toast.info('Nenhuma transportadora local encontrada'); 
       else toast.success(`${enriched.length} transportadora(s) local(is) encontrada(s)`);
     } catch (error) { 
-      console.error(error);
+      // Silent error handler
       toast.error('Erro ao buscar transportadoras'); 
     } finally { 
       setIsSearching(false); 

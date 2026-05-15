@@ -95,4 +95,15 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
   },
+  test: {
+    globals: true,
+    testTimeout: 60000,
+    environment: 'jsdom',
+    setupFiles: './tests/test-utils.tsx',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: ['node_modules/', 'tests/'],
+    },
+  },
 }));

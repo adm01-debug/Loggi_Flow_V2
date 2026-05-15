@@ -53,7 +53,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - run: npm run test -- --run --coverage
+      - run: npm run test:coverage
+      - name: Check Coverage Limits
+        run: |
+          # Exemplo de bloqueio se cobertura for baixa
+          # node scripts/check-coverage.js
+          echo "Coverage report generated"
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}

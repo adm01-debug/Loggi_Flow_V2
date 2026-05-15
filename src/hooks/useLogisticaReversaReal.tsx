@@ -55,7 +55,7 @@ export const useLogisticaReversaReal = () => {
       toast.success("Solicitação de logística reversa criada com sucesso!");
     },
     onError: (error) => {
-      console.error("Erro ao criar logística reversa:", error);
+      // Silent fail
       toast.error("Erro ao criar solicitação.");
     },
   });
