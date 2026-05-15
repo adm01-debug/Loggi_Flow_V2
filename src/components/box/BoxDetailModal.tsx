@@ -50,15 +50,13 @@ export function BoxDetailModal({ box, isOpen, onClose, onRemove, onToggleCrossDo
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm ${
-                box.isOccupied
-                  ? box.isUrgent
-                    ? "bg-destructive/20 text-destructive border border-destructive/30"
-                    : box.isCrossDocking
-                      ? "bg-info/20 text-info border border-info/30"
-                      : "bg-warning/20 text-warning border border-warning/30"
-                  : "bg-success/20 text-success border border-success/30"
-              }`}
+              className={cn(
+                "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm",
+                box.isOccupied && box.isUrgent && "bg-destructive/20 text-destructive border border-destructive/30",
+                box.isOccupied && !box.isUrgent && box.isCrossDocking && "bg-info/20 text-info border border-info/30",
+                box.isOccupied && !box.isUrgent && !box.isCrossDocking && "bg-warning/20 text-warning border border-warning/30",
+                !box.isOccupied && "bg-success/20 text-success border border-success/30"
+              )}
             >
               {box.number.toString().padStart(2, "0")}
             </div>
