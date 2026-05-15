@@ -81,13 +81,6 @@
    97:11  error    Remove this useless assignment to variable "defaultData"                                              sonarjs/no-dead-store
   330:35  error    Extract this nested ternary operation into an independent statement                                   sonarjs/no-nested-conditional
 
-/dev-server/src/components/dashboard/KPICard.test.tsx
-  10:35  error  Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
-  11:33  error  Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
-  12:36  error  Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
-  47:13  error  Remove the declaration of the unused 'container' variable  sonarjs/no-unused-vars
-  47:13  error  Remove this useless assignment to variable "container"     sonarjs/no-dead-store
-
 /dev-server/src/components/dashboard/KPICard.tsx
   180:19  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
 
@@ -1102,89 +1095,15 @@
 /dev-server/src/pages/ranking/RankingPodium.tsx
   45:52  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
 
-/dev-server/src/test/auth-race-condition.test.ts
-  1:32  error  Remove this unused import of 'vi'  sonarjs/unused-import
-
-/dev-server/src/test/design-improvements.test.ts
-   49:61  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   49:71  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   49:82  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   56:61  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   64:65  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   64:73  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   64:83  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   65:76  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   65:84  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   65:94  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   76:62  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   76:72  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   76:83  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   83:61  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-   83:70  error  Replace this character class by the character itself    sonarjs/single-char-in-character-classes
-  401:1   error  File has too many lines (1172). Maximum allowed is 400  max-lines
-
-/dev-server/src/test/modules-integration.test.ts
-   6:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  10:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  11:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  12:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-
-/dev-server/src/test/semantic-tokens-regression.test.ts
-    8:3   error  Simplify this regular expression to reduce its complexity from 22 to the 20 allowed                                               sonarjs/regex-complexity
-  109:39  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
-
-/dev-server/src/test/telemetry.test.tsx
-    1:36  error  Remove this unused import of 'beforeEach'                                    sonarjs/unused-import
-    7:50  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
-    8:40  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
-    9:39  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
-   10:39  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
-   11:40  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
-   12:34  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
-  401:1   error  File has too many lines (947). Maximum allowed is 400                        max-lines
-  626:14  error  Review this usage of "rows" as it can only be empty here                     sonarjs/no-empty-collection
-  627:14  error  Review this usage of "rows" as it can only be empty here                     sonarjs/no-empty-collection
-  628:14  error  Review this usage of "rows" as it can only be empty here                     sonarjs/no-empty-collection
-  771:14  error  Correct one of the identical sub-expressions on both sides of operator ">="  sonarjs/no-identical-expressions
-
-/dev-server/src/test/useLocalStorage.test.ts
-  1:32  error  Remove this unused import of 'vi'  sonarjs/unused-import
-
-/dev-server/src/test/utils-comprehensive.test.ts
-  10:23  error  Unexpected constant truthiness on the left-hand side of a `&&` expression  no-constant-binary-expression
-  10:23  error  Refactor the code to avoid using this boolean literal                      sonarjs/no-redundant-boolean
-
-/dev-server/src/test/validationHelpers.test.ts
-  2:49  error  Remove this unused import of 'formatCNPJ'  sonarjs/unused-import
-
-/dev-server/src/test/validations-comprehensive.test.ts
-  2:59   error  Remove this unused import of 'fornecedorSchema'  sonarjs/unused-import
-  2:126  error  Remove this unused import of 'ocorrenciaSchema'  sonarjs/unused-import
-
-/dev-server/src/utils/celebrationSounds.test.ts
-  46:1  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
-
 /dev-server/src/utils/celebrationSounds.ts
   110:15  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
 
 /dev-server/tailwind.config.ts
   293:13  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
 
-/dev-server/tests/integration/edge-functions.test.ts
-  22:35  error  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
-  45:35  error  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
-  59:35  error  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
-  66:5   error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
-
-/dev-server/tests/integration/fuzzing.test.ts
-  24:15  error  Remove the declaration of the unused 'data' variable  sonarjs/no-unused-vars
-  24:15  error  Remove this useless assignment to variable "data"     sonarjs/no-dead-store
-  24:67  error  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
-  36:28  error  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
-
 /dev-server/vite.config.ts
   20:9  error  Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed  sonarjs/cognitive-complexity
 
-✖ 748 problems (692 errors, 56 warnings)
+✖ 693 problems (637 errors, 56 warnings)
   0 errors and 1 warning potentially fixable with the `--fix` option.
 
