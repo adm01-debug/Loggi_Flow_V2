@@ -70,7 +70,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
       .update({ 
         status: newStatus as any,
         data_efetiva_coleta: newStatus === 'em_transito' ? new Date().toISOString() : pickup.data_efetiva_coleta
-      })
+      } as any)
       .eq("id", pickup.id);
     
     if (!error) {
