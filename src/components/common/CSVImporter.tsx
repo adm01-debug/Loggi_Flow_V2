@@ -99,7 +99,7 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
     try {
       await onImport(result.success);
       setProgress(100);
-      setTimeout(() => { setFile(null); setResult(null); setProgress(0); }, 2000);
+      setTimeout(() => { setResult(null); setProgress(0); }, 2000);
     } catch {
       // Silent fail on import error
     } finally {
