@@ -1,5 +1,5 @@
 import * as React from "react";
-import { X, Trash2, Download, Tag, CheckCircle2, RotateCcw } from "lucide-react";
+import { X, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -40,36 +40,35 @@ export function BulkActions({
     >
       <div className="flex items-center gap-2">
         <CheckCircle2 className="h-5 w-5 text-primary" />
-        <span className="font-medium">
+        <span className="font-medium text-sm">
           {selectedIds.length} de {totalCount} selecionado(s)
         </span>
       </div>
 
       <div className="flex items-center gap-2 ml-auto">
         {onSelectAll && selectedIds.length < totalCount && (
-          <Button variant="ghost" size="sm" onClick={onSelectAll}>
+          <Button variant="ghost" size="sm" onClick={onSelectAll} className="text-xs">
             Selecionar todos
           </Button>
         )}
 
         {actions.length <= 3 ? (
-          // Mostrar botões inline se poucos
           actions.map((action) => (
             <Button
               key={action.id}
               variant={action.variant === "destructive" ? "destructive" : "outline"}
               size="sm"
               onClick={() => action.onClick(selectedIds)}
+              className="text-xs h-8"
             >
-              {action.icon && <action.icon className="h-4 w-4 mr-2" />}
+              {action.icon && <action.icon className="h-3.5 w-3.5 mr-1.5" />}
               {action.label}
             </Button>
           ))
         ) : (
-          // Dropdown se muitas ações
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="text-xs h-8">
                 Ações
               </Button>
             </DropdownMenuTrigger>
@@ -82,10 +81,11 @@ export function BulkActions({
                   <DropdownMenuItem
                     onClick={() => action.onClick(selectedIds)}
                     className={cn(
+                      "text-xs",
                       action.variant === "destructive" && "text-destructive"
                     )}
                   >
-                    {action.icon && <action.icon className="h-4 w-4 mr-2" />}
+                    {action.icon && <action.icon className="h-3.5 w-3.5 mr-1.5" />}
                     {action.label}
                   </DropdownMenuItem>
                 </React.Fragment>
@@ -94,49 +94,12 @@ export function BulkActions({
           </DropdownMenu>
         )}
 
-        <Button variant="ghost" size="icon" onClick={onClearSelection}>
+        <Button variant="ghost" size="icon" onClick={onClearSelection} className="h-8 w-8">
           <X className="h-4 w-4" />
         </Button>
       </div>
     </div>
   );
-}
-
-// Hook para gerenciar seleção
-export function useSelection<T extends { id: string }>(items: T[]) {
-  const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-
-  const toggle = React.useCallback((id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  }, []);
-
-  const selectAll = React.useCallback(() => {
-    setSelectedIds(items.map((item) => item.id));
-  }, [items]);
-
-  const clearSelection = React.useCallback(() => {
-    setSelectedIds([]);
-  }, []);
-
-  const isSelected = React.useCallback(
-    (id: string) => selectedIds.includes(id),
-    [selectedIds]
-  );
-
-  const isAllSelected = selectedIds.length === items.length && items.length > 0;
-  const isPartialSelected = selectedIds.length > 0 && !isAllSelected;
-
-  return {
-    selectedIds,
-    toggle,
-    selectAll,
-    clearSelection,
-    isSelected,
-    isAllSelected,
-    isPartialSelected,
-  };
 }
 
 export default BulkActions;
