@@ -16,13 +16,13 @@ interface RealtimeBadgeProps {
  */
 export function RealtimeBadge({ isSyncing = false, className }: RealtimeBadgeProps) {
   const [pulse, setPulse] = useState(false);
-  const [status, setStatus] = useState<'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'JOINING'>('JOINING');
+  const [status, setStatus] = useState<string>('JOINING');
 
   useEffect(() => {
     const channel = supabase.channel('presence-health');
     
     channel.subscribe((status) => {
-      setStatus(status as any);
+      setStatus(status);
     });
 
     return () => {
