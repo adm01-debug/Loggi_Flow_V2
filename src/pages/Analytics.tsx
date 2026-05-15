@@ -26,13 +26,13 @@ export default function Analytics() {
   const benchmarkData = kpiBenchmarkResult.data;
   const trackingData = trackingResult.data;
 
-  const stats = {
+  const stats = useMemo(() => ({
     totalDeliveries: summaryMetrics?.totalEntregas || 0,
     onTimeRate: summaryMetrics?.onTimeRate ?? 0,
     avgDeliveryTime: summaryMetrics?.avgDeliveryTime ?? 0,
     totalRevenue: (summaryMetrics?.avgCost ?? 0) * (summaryMetrics?.totalEntregas || 0),
     growthRate: summaryMetrics?.entregasGrowth || 0,
-  };
+  }), [summaryMetrics]);
 
 
   const handleDateRangeChange = (range: DayPickerDateRange | undefined) => {
@@ -131,6 +131,11 @@ export default function Analytics() {
                 ))}
               </div>
             )}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+              <PerformanceChart />
+              <DistributionChart />
+            </div>
           </TabsContent>
 
           <TabsContent value="benchmark" className="space-y-4">
