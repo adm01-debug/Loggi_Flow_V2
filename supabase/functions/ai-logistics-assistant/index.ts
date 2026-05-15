@@ -4,8 +4,32 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
+// Type definitions for contextual data
+interface Transportadora {
+  id: string;
+  nome_fantasia: string;
+  score_performance: number;
+  score_frete: number;
+  score_pontualidade: number;
+  homologada: boolean;
+}
 
-// Moved API key check inside handler for better testability
+interface Entrega {
+  id: string;
+  status: string;
+  previsao_entrega: string | null;
+  endereco_entrega: string;
+  transportadoras: { nome_fantasia: string } | null;
+  valor_frete?: number;
+  created_at?: string;
+}
+
+interface Ocorrencia {
+  tipo_ocorrencia: string;
+  gravidade: string;
+  status: string;
+}
+
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -25,7 +49,6 @@ export const handler = async (req: Request) => {
 
     const body = await req.json();
     const message = body.message || body.prompt;
-    const userId = body.userId;
     const conversationHistory = body.conversationHistory || [];
     const stream = body.stream || false;
 
@@ -43,27 +66,33 @@ export const handler = async (req: Request) => {
 
     // Fetch rich contextual data for Elite analysis
     const [
-      { data: transportadoras },
-      { data: entregasAtivas },
-      { data: custosRecentes },
-      { data: ocorrenciasAbertas },
-      { data: slaStats, error: slaError }
+      resTransportadoras,
+      resEntregasAtivas,
+      resCustosRecentes,
+      resOcorrenciasAbertas,
+      resSlaStats
     ] = await Promise.all([
       supabase.from('transportadoras').select('id, nome_fantasia, score_performance, score_frete, score_pontualidade, homologada').eq('homologada', true).order('score_performance', { ascending: false }).limit(10),
       supabase.from('entregas').select('id, status, previsao_entrega, endereco_entrega, transportadoras(nome_fantasia)').in('status', ['despachado', 'em_transito', 'saiu_entrega']).limit(50),
       supabase.from('entregas').select('valor_frete, created_at').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
       supabase.from('ocorrencias').select('tipo_ocorrencia, gravidade, status').eq('status', 'aberta'),
-      supabase.rpc('get_carrier_performance_stats').catch(() => ({ data: null, error: true }))
+      supabase.rpc('get_carrier_performance_stats')
     ]);
+
+    const transportadoras = (resTransportadoras.data as Transportadora[]) || [];
+    const entregasAtivas = (resEntregasAtivas.data as Entrega[]) || [];
+    const custosRecentes = (resCustosRecentes.data as Entrega[]) || [];
+    const ocorrenciasAbertas = (resOcorrenciasAbertas.data as Ocorrencia[]) || [];
+    const slaError = resSlaStats.error;
 
     if (slaError) console.warn("Aviso: Falha ao carregar estatísticas de performance via RPC.");
 
     // Manual SLA calc fallback
-    const totalFrete = custosRecentes?.reduce((acc, curr) => acc + (Number(curr.valor_frete) || 0), 0) || 0;
+    const totalFrete = custosRecentes.reduce((acc: number, curr: Entrega) => acc + (Number(curr.valor_frete) || 0), 0);
     const now = new Date();
-    const emAtraso = entregasAtivas?.filter(e => e.previsao_entrega && new Date(e.previsao_entrega) < now).length || 0;
+    const emAtraso = entregasAtivas.filter((e: Entrega) => e.previsao_entrega && new Date(e.previsao_entrega) < now).length;
     
-    // Simulate "Traffic/Weather" context (In a real app, this would come from an API)
+    // Simulate "Traffic/Weather" context
     const contextAmbiental = {
       clima: "Instável na região Sul (risco de lentidão na BR-101)",
       trafego: "Alto fluxo nas saídas de Curitiba e São Paulo devido a obras",
@@ -74,11 +103,11 @@ export const handler = async (req: Request) => {
     Seu objetivo é fornecer INSIGHTS PROATIVOS e PREVISÕES DE ATRASO com precisão cirúrgica.
 
     DADOS OPERACIONAIS EM TEMPO REAL:
-    - Entregas em Trânsito: ${entregasAtivas?.length || 0}
+    - Entregas em Trânsito: ${entregasAtivas.length}
     - Entregas com Risco de Atraso (Previsão Vencida): ${emAtraso}
-    - Ocorrências Críticas Abertas: ${ocorrenciasAbertas?.filter(o => o.gravidade === 'alta').length || 0}
+    - Ocorrências Críticas Abertas: ${ocorrenciasAbertas.filter((o: Ocorrencia) => o.gravidade === 'alta').length}
     - Custo Logístico (30 dias): R$ ${totalFrete.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-    - Top Transportadoras (Performance): ${transportadoras?.slice(0,3).map(t => t.nome_fantasia).join(', ')}
+    - Top Transportadoras (Performance): ${transportadoras.slice(0,3).map((t: Transportadora) => t.nome_fantasia).join(', ')}
 
     CONTEXTO EXTERNO:
     - Clima: ${contextAmbiental.clima}
