@@ -12,6 +12,7 @@ interface SimulationResult {
   results: {
     transportadora_nome: string;
     valor_total: number;
+    [key: string]: any;
   }[];
 }
 
