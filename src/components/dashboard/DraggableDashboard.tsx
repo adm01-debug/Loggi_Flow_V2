@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useCallback, forwardRef } from "react";
+import React, { ReactNode, useState, useCallback } from "react";
 import {
   DndContext,
   closestCenter,
@@ -33,6 +33,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
+type SortableWidgetSize = "small" | "medium" | "large" | "full";
+
 interface SortableWidgetProps {
   id: string;
   children: ReactNode;
@@ -43,7 +45,7 @@ interface SortableWidgetProps {
 }
 
 const SortableWidget = React.forwardRef<HTMLDivElement, SortableWidgetProps>(
-  ({ id, children, isEditMode, onRemove, size = "medium", isDragging }, ref) => {
+  ({ id, children, isEditMode, onRemove, size = "medium" as SortableWidgetSize, isDragging }, ref) => {
     const {
       attributes,
       listeners,
