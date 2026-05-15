@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
 interface SkeletonProps {
   className?: string;
@@ -20,24 +19,10 @@ export function Skeleton({ className, shimmer = true, variant = 'default' }: Ske
       className={cn(
         "relative bg-muted/60 overflow-hidden",
         variantClasses[variant],
-        !shimmer && "animate-pulse",
+        shimmer ? "after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:animate-shimmer" : "animate-pulse",
         className
       )}
-    >
-      {shimmer && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          initial={{ x: "-100%" }}
-          animate={{ x: "100%" }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "linear",
-            repeatDelay: 0.5
-          }}
-        />
-      )}
-    </div>
+    />
   );
 }
 
