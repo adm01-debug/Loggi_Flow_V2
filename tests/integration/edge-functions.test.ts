@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
 import { supabase } from '@/integrations/supabase/client';
-import { createWrapper } from './test-utils';
+import { createWrapper } from '../test-utils';
 
 vi.mock('../src/integrations/supabase/client', () => ({
   supabase: {
