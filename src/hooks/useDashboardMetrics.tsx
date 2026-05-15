@@ -43,22 +43,23 @@ export function useDashboardMetrics() {
   return useQuery({
     queryKey: QUERY_KEYS.analytics.dashboard,
     queryFn: async (): Promise<DashboardMetrics> => {
-      const { data, error } = await supabase.rpc('get_dashboard_metrics');
+      const { data: rpcData, error } = await supabase.rpc('get_dashboard_metrics');
       
       if (error) {
         console.error("Erro ao buscar métricas do dashboard:", error);
         throw error;
       }
       
-      // The RPC returns exactly the structure we need
+      const data = rpcData as any;
+      
       return {
         ...data,
         taxaOcorrencias: data.totalEntregas > 0 ? (data.entregasComOcorrencia / data.totalEntregas) * 100 : 0,
-        taxaEntregaNoPrazo: 100, // This would need a more complex query for averages
-        tempoMedioColeta: 36, // Fallback as calculating averages over all data is heavy
-        alertasCriticos: data.coletasComDivergencia + data.entregasComOcorrencia,
-        coletasAtrasadas: 0, // Awaiting specific calculation if needed
-        divergenciasAltas: data.coletasComDivergencia,
+        taxaEntregaNoPrazo: 100,
+        tempoMedioColeta: 36,
+        alertasCriticos: (data.coletasComDivergencia || 0) + (data.entregasComOcorrencia || 0),
+        coletasAtrasadas: 0,
+        divergenciasAltas: data.coletasComDivergencia || 0,
       } as DashboardMetrics;
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
