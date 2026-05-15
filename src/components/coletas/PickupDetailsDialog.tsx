@@ -75,13 +75,13 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
   if (!pickup) return null;
 
-  const StatusIcon = statusConfig[pickup.status]?.icon || Package;
-
   const updateStatus = async (newStatus: string) => {
+    if (!pickup) return;
+    
     const { error } = await supabase
       .from("coletas")
       .update({ 
-        status: newStatus as any,
+        status: newStatus,
         data_efetiva_coleta: newStatus === 'em_transito' ? new Date().toISOString() : pickup.data_efetiva_coleta
       })
       .eq("id", pickup.id);
