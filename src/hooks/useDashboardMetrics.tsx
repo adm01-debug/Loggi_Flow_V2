@@ -65,7 +65,7 @@ export function useDashboardMetrics() {
     refetchInterval: QUERY_REFETCH_INTERVAL.DASHBOARD,
     enabled: !!user?.id,
   });
-
+}
 
 export function useRecentAlerts() {
   const { user } = useAuth();
