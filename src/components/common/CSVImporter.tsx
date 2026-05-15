@@ -24,7 +24,6 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
-    setFile(selectedFile);
     setIsImporting(true);
     setProgress(10);
     try {
