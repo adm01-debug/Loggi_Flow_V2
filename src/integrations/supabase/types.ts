@@ -4023,6 +4023,17 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_monthly_analytics: {
+        Args: { end_date: string; start_date: string }
+        Returns: {
+          coletas_count: number
+          custo_total: number
+          entregas_count: number
+          month_label: string
+          ocorrencias_count: number
+          sla_atingido: number
+        }[]
+      }
       get_public_tracking: {
         Args: { p_code: string }
         Returns: {
