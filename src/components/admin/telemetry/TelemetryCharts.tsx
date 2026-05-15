@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line,
+  ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 import { BarChart3, PieChart as PieIcon, TrendingUp, Timer, Database } from "lucide-react";
 
