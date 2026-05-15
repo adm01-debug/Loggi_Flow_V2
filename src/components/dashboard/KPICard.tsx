@@ -180,20 +180,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                   trend === 'down' ? 'bg-destructive/10 text-destructive' : 
                   'bg-muted text-muted-foreground'
                 )}>
-                  {trend === 'up' && (
-                    <motion.span 
-                      initial={{ y: 5 }} 
-                      animate={{ y: 0 }}
-                      className="text-xs"
-                    >↑</motion.span>
-                  )}
-                  {trend === 'down' && (
-                    <motion.span 
-                      initial={{ y: -5 }} 
-                      animate={{ y: 0 }}
-                      className="text-xs"
-                    >↓</motion.span>
-                  )}
+                  {trend === 'up' ? "↑" : trend === 'down' ? "↓" : ""}
                   <span className="text-xs">{trendValue || `${changePercent}%`}</span>
                 </div>
               )}
