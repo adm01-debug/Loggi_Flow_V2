@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { cn } from "@/lib/utils";
 import { subDays } from "date-fns";
 import { DateRange as DayPickerDateRange } from "react-day-picker";
+import { PerformanceChart, DistributionChart } from "@/components/analytics/AnalyticsCharts";
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState<DayPickerDateRange | undefined>({ 
