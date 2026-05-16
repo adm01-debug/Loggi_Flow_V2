@@ -248,20 +248,20 @@ export const AppSidebar = memo(function AppSidebar() {
                       "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group/item relative",
                       collapsed ? "justify-center" : "ml-2",
                       isActive(item.url)
-                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground"
+                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02]"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground hover:translate-x-1"
                     )}
                   >
                     {/* Active indicator pill */}
                     {isActive(item.url) && !collapsed && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-primary-foreground/60" />
+                      <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-primary-foreground/60" />
                     )}
                     <item.icon className={cn(
-                      "w-4 h-4 flex-shrink-0 transition-transform duration-200",
-                      !isActive(item.url) && "group-hover/item:scale-110"
+                      "w-4 h-4 flex-shrink-0 transition-transform duration-300",
+                      isActive(item.url) ? "scale-110" : "group-hover/item:scale-110"
                     )} />
                     {!collapsed && (
-                      <span className="text-sm font-medium">{item.title}</span>
+                      <span className="text-sm font-medium tracking-tight">{item.title}</span>
                     )}
                   </NavLink>
                 </div>

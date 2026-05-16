@@ -1,5 +1,5 @@
 import { lazy, Suspense, memo } from "react";
-import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut } from "lucide-react";
+import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut, ChevronRight } from "lucide-react";
 import { RealtimeStatus } from "@/components/common/RealtimeStatus";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import { useGamification } from "@/hooks/useGamification";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { RecentlyVisited } from "@/components/common/RecentlyVisited";
 import { supabase } from "@/integrations/supabase/client";
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Lazy-load heavy notification components
 const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
