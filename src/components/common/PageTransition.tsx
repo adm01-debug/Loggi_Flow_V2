@@ -1,10 +1,11 @@
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { ReactNode, useRef, useEffect } from "react";
+import { ReactNode, useMemo } from "react";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 
 interface PageTransitionProps {
   children: ReactNode;
-  mode?: "fade" | "slide" | "scale" | "slideUp";
+  mode?: "fade" | "slide" | "scale" | "slideUp" | "directional";
 }
 
 const variants: Record<string, Variants> = {
@@ -18,46 +19,58 @@ const variants: Record<string, Variants> = {
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -20 },
   },
-  slideBack: {
-    initial: { opacity: 0, x: -20 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 20 },
-  },
   scale: {
     initial: { opacity: 0, scale: 0.95 },
     animate: { opacity: 1, scale: 1 },
     exit: { opacity: 0, scale: 1.05 },
   },
   slideUp: {
-    initial: { opacity: 0, y: 20 },
+    initial: { opacity: 0, y: 15 },
     animate: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -10 },
   },
 };
 
-export function PageTransition({ children, mode = "slideUp" }: PageTransitionProps) {
+export function PageTransition({ children, mode = "directional" }: PageTransitionProps) {
   const location = useLocation();
-  const historyLengthRef = useRef(window.history.length);
+  const { direction } = useNavigationHistory();
   
-  // Detect navigation direction
-  useEffect(() => {
-    historyLengthRef.current = window.history.length;
-  }, [location.pathname]);
+  const directionalVariants = useMemo(() => {
+    const isBack = direction === "back";
+    return {
+      initial: { 
+        opacity: 0, 
+        x: isBack ? -30 : 30,
+        filter: "blur(4px)" 
+      },
+      animate: { 
+        opacity: 1, 
+        x: 0,
+        filter: "blur(0px)" 
+      },
+      exit: { 
+        opacity: 0, 
+        x: isBack ? 30 : -30,
+        filter: "blur(4px)"
+      },
+    };
+  }, [direction]);
 
-  const variant = variants[mode];
+  const activeVariants = mode === "directional" ? directionalVariants : variants[mode];
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={location.pathname}
         initial="initial"
         animate="animate"
         exit="exit"
-        variants={variant}
+        variants={activeVariants}
         transition={{
-          duration: 0.25,
-          ease: [0.25, 0.1, 0.25, 1],
+          duration: 0.35,
+          ease: [0.22, 1, 0.36, 1], // Custom cubic-bezier for "apple-like" smoothness
         }}
+        className="w-full h-full origin-top"
       >
         {children}
       </motion.div>

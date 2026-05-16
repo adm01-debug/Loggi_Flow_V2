@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { ChevronRight, Home, Copy, Check, History as HistoryIcon } from "lucide-react";
+import { ChevronRight, Home, Copy, Check, History as HistoryIcon, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -145,100 +145,140 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
 
   return (
     <motion.nav
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       aria-label="Breadcrumb"
-      className={cn("flex items-center justify-between text-sm overflow-x-auto scrollbar-none gap-4 bg-accent/30 p-1.5 rounded-lg border border-border/50", className)}
+      className={cn(
+        "flex items-center justify-between text-sm overflow-hidden gap-4",
+        "bg-background/40 backdrop-blur-md p-1.5 rounded-xl border border-white/10 shadow-sm",
+        className
+      )}
     >
-      <ol className="flex items-center gap-1 flex-nowrap min-w-0">
-        {showHome && (
-          <li className="flex items-center shrink-0">
-            <Link
-              to="/"
-              className={cn(
-                "flex items-center gap-1 px-2 py-1 rounded-md transition-all duration-200",
-                "text-muted-foreground hover:text-primary hover:bg-primary/10",
-                "focus:outline-none focus:ring-2 focus:ring-primary/20",
-                "active:scale-95"
-              )}
-              aria-label="Ir para Dashboard"
-            >
-              <Home className="w-4 h-4" />
-              <span className="sr-only sm:not-sr-only font-bold text-xs uppercase tracking-tight">Início</span>
-            </Link>
-          </li>
-        )}
-
-        {breadcrumbItems.map((item, index) => {
-          const isLast = index === breadcrumbItems.length - 1;
-          
-          return (
-            <li key={index} className="flex items-center shrink-0 min-w-0">
-              <ChevronRight className="w-4 h-4 text-muted-foreground/30 mx-0.5 sm:mx-1 shrink-0" />
-              
-              {item.path && !isLast ? (
-                <Link
-                  to={item.path}
-                  className={cn(
-                    "flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200",
-                    "text-muted-foreground hover:text-primary hover:bg-primary/10",
-                    "font-medium truncate max-w-[120px] sm:max-w-none active:scale-95"
-                  )}
-                >
-                  {item.icon}
-                  <span className="truncate">{item.label}</span>
-                </Link>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className={cn(
-                        "flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200",
-                        "text-primary bg-primary/10 border border-primary/20 font-bold hover:bg-primary/20 shadow-sm",
-                        "truncate max-w-[150px] sm:max-w-none group active:scale-95"
-                      )}
-                      aria-current="page"
-                    >
-                      {item.icon}
-                      <span className="truncate">{item.label}</span>
-                      <ChevronRight className="w-3.5 h-3.5 opacity-50 rotate-90 ml-0.5 transition-transform group-data-[state=open]:rotate-[-90deg]" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-64 border-2 border-primary/5 shadow-lg">
-                    <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                      <HistoryIcon className="w-3 h-3" />
-                      Histórico Recente
-                    </div>
-                    <DropdownMenuSeparator />
-                    {recentPages.length > 0 ? (
-                      recentPages.slice(0, 8).map((page, pIdx) => (
-                        <DropdownMenuItem key={`${page.path}-${pIdx}`} asChild>
-                          <Link to={page.path} className="flex flex-col items-start gap-0.5 py-2 px-3 cursor-pointer hover:bg-primary/5">
-                            <span className="font-bold text-sm text-foreground">{page.label}</span>
-                            <span className="text-[10px] text-muted-foreground truncate w-full opacity-70">{page.path}</span>
-                          </Link>
-                        </DropdownMenuItem>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-xs text-muted-foreground italic">Histórico vazio</div>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 px-1">
+        <ol className="flex items-center gap-1 flex-nowrap shrink-0">
+          {showHome && (
+            <li className="flex items-center">
+              <Link
+                to="/"
+                className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
+                  "text-muted-foreground hover:text-primary hover:bg-primary/10 hover:shadow-inner",
+                  "focus:outline-none focus:ring-2 focus:ring-primary/20",
+                  "active:scale-90"
+                )}
+                aria-label="Ir para Dashboard"
+              >
+                <Home className="w-4 h-4" />
+              </Link>
             </li>
-          );
-        })}
-      </ol>
+          )}
 
-      <button
-        onClick={handleCopyLink}
-        className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all text-[10px] font-bold uppercase tracking-wider border border-border/50 bg-background/50 active:scale-95"
-        title="Copiar link desta página"
-      >
-        {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-        <span className="hidden sm:inline">Compartilhar</span>
-      </button>
+          {breadcrumbItems.map((item, index) => {
+            const isLast = index === breadcrumbItems.length - 1;
+            
+            return (
+              <li key={index} className="flex items-center shrink-0">
+                <div className="flex items-center justify-center w-4 h-4 text-muted-foreground/30">
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+                
+                {item.path && !isLast ? (
+                  <Link
+                    to={item.path}
+                    className={cn(
+                      "px-2.5 py-1.5 rounded-lg transition-all duration-300",
+                      "text-muted-foreground hover:text-primary hover:bg-primary/10 hover:shadow-sm",
+                      "font-medium whitespace-nowrap active:scale-95 text-xs"
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={cn(
+                          "flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-300",
+                          "bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/10",
+                          "whitespace-nowrap group active:scale-95 text-xs"
+                        )}
+                        aria-current="page"
+                      >
+                        <span>{item.label}</span>
+                        <ChevronDown className="w-3 h-3 opacity-70 transition-transform group-data-[state=open]:rotate-180" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent 
+                      align="start" 
+                      className="w-64 p-2 border-2 border-primary/5 shadow-2xl animate-in zoom-in-95 duration-200"
+                    >
+                      <div className="px-2 py-1.5 mb-1">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Histórico de Navegação</span>
+                      </div>
+                      <DropdownMenuSeparator className="opacity-50" />
+                      <div className="max-h-[300px] overflow-y-auto pr-1">
+                        {recentPages.length > 0 ? (
+                          recentPages.map((page, pIdx) => (
+                            <DropdownMenuItem key={`${page.path}-${pIdx}`} asChild>
+                              <Link 
+                                to={page.path} 
+                                className="flex flex-col items-start gap-0.5 py-2.5 px-3 rounded-md cursor-pointer transition-colors hover:bg-primary/10 group/item"
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <span className="font-bold text-sm text-foreground group-hover/item:text-primary transition-colors">{page.label}</span>
+                                  {page.path === location.pathname && (
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                  )}
+                                </div>
+                                <span className="text-[10px] text-muted-foreground truncate w-full font-mono opacity-60">
+                                  {page.path}
+                                </span>
+                              </Link>
+                            </DropdownMenuItem>
+                          ))
+                        ) : (
+                          <div className="py-8 text-center text-xs text-muted-foreground/50 italic">
+                            Sem histórico disponível
+                          </div>
+                        )}
+                      </div>
+                      <DropdownMenuSeparator className="opacity-50" />
+                      <DropdownMenuItem asChild>
+                        <Link to="/audit-trail" className="flex items-center gap-2 py-2 px-3 text-xs font-semibold text-primary/80">
+                          <HistoryIcon className="w-3.5 h-3.5" />
+                          <span>Ver Audit Trail Completo</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+      <div className="flex items-center gap-1.5 pr-1">
+        <button
+          onClick={handleCopyLink}
+          className={cn(
+            "flex items-center gap-2 px-3 py-1.5 rounded-lg",
+            "text-muted-foreground hover:text-foreground hover:bg-white/10",
+            "transition-all text-[10px] font-bold uppercase tracking-widest border border-white/5 bg-white/5 active:scale-95"
+          )}
+          title="Compartilhar link seguro"
+        >
+          {copied ? (
+            <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }}>
+              <Check className="w-3.5 h-3.5 text-green-500" />
+            </motion.div>
+          ) : (
+            <Copy className="w-3.5 h-3.5" />
+          )}
+          <span className="hidden md:inline">Compartilhar</span>
+        </button>
+      </div>
     </motion.nav>
   );
 });

@@ -1,6 +1,7 @@
 import { Component, ErrorInfo, ReactNode, useCallback, useState } from "react";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { AlertTriangle, RefreshCw, Home, ChevronLeft, ShieldAlert, LifeBuoy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 interface Props {
   children: ReactNode;
@@ -25,9 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ error, errorInfo });
-    
-    // Here you could send to an error tracking service like Sentry
-    // logErrorToService(error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   handleReset = () => {
@@ -36,6 +35,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
   handleReload = () => {
     window.location.reload();
+  };
+
+  handleGoBack = () => {
+    window.history.back();
+    setTimeout(() => {
+      this.handleReset();
+    }, 100);
   };
 
   handleGoHome = () => {
@@ -49,44 +55,86 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4">
-          <div className="max-w-md w-full text-center">
-            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8 text-destructive" />
+        <div className="min-h-[80vh] flex items-center justify-center bg-background/50 backdrop-blur-sm p-6 rounded-2xl border border-destructive/20 shadow-2xl shadow-destructive/5 m-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="max-w-xl w-full text-center"
+          >
+            <div className="relative inline-block mb-8">
+              <div className="absolute inset-0 bg-destructive/20 blur-3xl rounded-full scale-150 animate-pulse" />
+              <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-destructive/20 to-destructive/5 flex items-center justify-center mx-auto border border-destructive/30 shadow-inner">
+                <ShieldAlert className="w-12 h-12 text-destructive" />
+              </div>
             </div>
             
-            <h1 className="text-2xl font-bold text-foreground mb-2">
-              Ops! Algo deu errado
+            <h1 className="text-3xl font-black text-foreground mb-4 tracking-tight">
+              Recuperação de Falha Crítica
             </h1>
             
-            <p className="text-muted-foreground mb-6">
-              Ocorreu um erro inesperado. Nossa equipe foi notificada e está trabalhando para resolver.
+            <p className="text-lg text-muted-foreground mb-10 max-w-md mx-auto leading-relaxed">
+              O LogiFlow encontrou uma instabilidade nesta página. Não se preocupe, seus dados estão seguros.
             </p>
 
-            {process.env.NODE_ENV === "development" && this.state.error && (
-              <div className="bg-muted rounded-lg p-4 mb-6 text-left overflow-auto max-h-40">
-                <p className="font-mono text-xs text-destructive mb-2">
-                  {this.state.error.toString()}
-                </p>
-                {this.state.errorInfo && (
-                  <pre className="font-mono text-xs text-muted-foreground whitespace-pre-wrap">
-                    {this.state.errorInfo.componentStack}
-                  </pre>
-                )}
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button onClick={this.handleReset} variant="outline" className="gap-2">
-                <RefreshCw className="w-4 h-4" />
-                Tentar Novamente
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+              <Button 
+                onClick={this.handleReset} 
+                variant="outline" 
+                className="h-14 gap-3 text-base border-primary/20 hover:bg-primary/5 transition-all"
+              >
+                <RefreshCw className="w-5 h-5" />
+                <span>Tentar Restaurar</span>
               </Button>
-              <Button onClick={this.handleGoHome} className="gap-2">
-                <Home className="w-4 h-4" />
-                Ir para Início
+              <Button 
+                onClick={this.handleGoBack} 
+                variant="outline" 
+                className="h-14 gap-3 text-base"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span>Voltar ao Seguro</span>
               </Button>
             </div>
-          </div>
+
+            <div className="flex flex-col items-center gap-6">
+              <Button onClick={this.handleGoHome} className="h-12 px-10 gap-2 rounded-full shadow-lg shadow-primary/25">
+                <Home className="w-4 h-4" />
+                Painel Principal
+              </Button>
+
+              <div className="flex items-center gap-4 text-xs text-muted-foreground pt-6 border-t w-full justify-center">
+                <div className="flex items-center gap-1">
+                  <LifeBuoy className="w-3 h-3" />
+                  <span>Suporte Notificado</span>
+                </div>
+                <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+                <span>ID do Erro: {Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
+              </div>
+            </div>
+
+            {process.env.NODE_ENV === "development" && this.state.error && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mt-12 bg-zinc-950 rounded-xl p-6 text-left border border-white/10 shadow-2xl overflow-hidden"
+              >
+                <div className="flex items-center gap-2 mb-3 text-destructive font-mono text-xs uppercase tracking-widest">
+                  <div className="w-2 h-2 rounded-full bg-destructive animate-ping" />
+                  <span>Debug Console</span>
+                </div>
+                <div className="overflow-auto max-h-60 scrollbar-hide">
+                  <p className="font-mono text-sm text-destructive-foreground/90 mb-4 font-bold">
+                    {this.state.error.toString()}
+                  </p>
+                  {this.state.errorInfo && (
+                    <pre className="font-mono text-[11px] text-zinc-500 whitespace-pre-wrap leading-relaxed">
+                      {this.state.errorInfo.componentStack}
+                    </pre>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
         </div>
       );
     }
