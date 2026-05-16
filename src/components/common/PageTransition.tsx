@@ -74,8 +74,8 @@ export function PageTransition({ children, mode = "directional" }: PageTransitio
         exit="exit"
         variants={activeVariants}
         transition={{
-          duration: 0.35,
-          ease: [0.22, 1, 0.36, 1], // Custom cubic-bezier for "apple-like" smoothness
+          duration: 0.5,
+          ease: [0.16, 1, 0.3, 1], // iOS-style quintic ease-out
         }}
         className="w-full h-full origin-top"
       >
