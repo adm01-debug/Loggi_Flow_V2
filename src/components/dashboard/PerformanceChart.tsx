@@ -63,13 +63,23 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
     const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
       if (active && payload && payload.length) {
         return (
-          <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
-            <p className="text-sm font-medium text-foreground">{label}</p>
-            {payload.map((entry: TooltipPayloadEntry, index: number) => (
-              <p key={index} className="text-sm text-muted-foreground">
-                {entry.name}: <span className="font-semibold text-foreground">{entry.value}</span>
-              </p>
-            ))}
+          <div className="bg-background/90 backdrop-blur-2xl border-2 border-primary/20 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.3)] min-w-[150px]">
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-3 border-b border-white/5 pb-2 italic">{label}</p>
+            <div className="space-y-2">
+              {payload.map((entry: TooltipPayloadEntry, index: number) => (
+                <div key={index} className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                    <span className="text-[10px] font-black text-foreground/80 uppercase tracking-wider">{entry.name}:</span>
+                  </div>
+                  <span className="text-xs font-black text-primary tabular-nums">{entry.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 pt-2 border-t border-white/5 flex items-center gap-1.5">
+              <div className="w-1 h-1 rounded-full bg-success animate-pulse" />
+              <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">Verificado Nexus</span>
+            </div>
           </div>
         );
       }
