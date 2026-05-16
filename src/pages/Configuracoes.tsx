@@ -22,6 +22,15 @@ export default function Configuracoes() {
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
+  const integrations = integrationValidation?.integrations || [];
+  const isValidating = integrationValidation?.isValidating || false;
+  const validateAll = integrationValidation?.validateAll;
+  const validateSingle = integrationValidation?.validateSingle;
+
+  const preferences = notificationPrefs?.preferences || {};
+  const updatePreference = notificationPrefs?.updatePreference;
+  const isLoaded = notificationPrefs?.isLoaded ?? true;
+
   useConfirmExit(isDirty);
 
   const handleSave = async () => { 
