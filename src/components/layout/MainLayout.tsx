@@ -46,22 +46,12 @@ export function MainLayout({ children }: MainLayoutProps) {
       }
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && e.key === "ArrowLeft") {
-        if (location.pathname !== "/") {
-          navigate(-1);
-        }
-      }
-    };
-
     window.addEventListener("touchstart", handleTouchStart);
     window.addEventListener("touchend", handleTouchEnd);
-    window.addEventListener("keydown", handleKeyDown);
     
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
-      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [navigate, location]);
 
