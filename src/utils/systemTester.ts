@@ -59,6 +59,13 @@ export const runSystemSanityChecks = async () => {
         const { data, error } = await supabase.auth.mfa.listFactors();
         return !error && !!data;
       }
+    },
+    {
+      name: "Storage Cloud (Assets)",
+      fn: async () => {
+        const { data, error } = await supabase.storage.listBuckets();
+        return !error && !!data;
+      }
     }
   ];
 

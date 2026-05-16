@@ -17,13 +17,18 @@ import { toast } from "sonner";
  */
 export function RealtimeStatus() {
   const [status, setStatus] = useState<string>('JOINING');
+  const [latency, setLatency] = useState<number | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
+    const start = Date.now();
     const channel = supabase.channel('system-health-check');
     
     channel.subscribe((status) => {
       setStatus(status);
+      if (status === 'SUBSCRIBED') {
+        setLatency(Date.now() - start);
+      }
     });
 
     return () => {
@@ -47,7 +52,7 @@ export function RealtimeStatus() {
           color: "text-green-500",
           text: "Enterprise On",
           bg: "bg-green-500/10",
-          desc: "Sincronização 10/10 ativa"
+          desc: `Sincronização 10/10 ativa ${latency ? `(${latency}ms)` : ''}`
         };
       case 'JOINING':
         return {
@@ -87,7 +92,7 @@ export function RealtimeStatus() {
                   <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-green-500 animate-ping" />
                 )}
               </div>
-              <span className={cn("hidden lg:inline", info.color)}>{info.text}</span>
+              <span className={cn("hidden lg:inline", info.color)}>{info.text}{latency && status === 'SUBSCRIBED' ? ` • ${latency}ms` : ''}</span>
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom">

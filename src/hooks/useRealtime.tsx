@@ -43,7 +43,16 @@ export function useRealtime<T = Record<string, unknown>>({
   // Optimized invalidation with debounce to prevent rapid-fire refetches
   const debouncedInvalidate = useRef(
     debounce((keys: string[]) => {
+      // Always invalidate the specific keys first
       keys.forEach(key => queryClient.invalidateQueries({ queryKey: [key] }));
+      
+      // Force refresh for core dashboard components if relevant
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      
+      // Provide haptic feedback if supported for real-time updates
+      if ('vibrate' in navigator) {
+        navigator.vibrate(5);
+      }
     }, 1500)
   ).current;
 
