@@ -24,12 +24,8 @@ export function PageHeader({ title, description, icon: Icon, iconClassName, acti
       className="flex flex-col gap-4 mb-8"
     >
       <div className="flex flex-col gap-3">
-        {/* Back button row */}
-        {showBack && (
-          <div className="flex items-center gap-2 md:hidden">
-            <PageBackButton fallbackPath={backFallback} />
-          </div>
-        )}
+        {/* Back button row handled by MainLayout */}
+
         
         {/* Title row */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between group">

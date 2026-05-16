@@ -93,9 +93,10 @@ export function MainLayout({ children }: MainLayoutProps) {
           >
             <div className="max-w-[1600px] mx-auto w-full">
               <nav aria-label="Navegação breadcrumb" className="flex items-center gap-3 mb-4 animate-in fade-in slide-in-from-left-2 duration-300">
-                <PageBackButton className="hidden md:flex" />
+                <PageBackButton className="md:flex" />
                 <Breadcrumbs className="flex-1" />
               </nav>
+
 
           
           <Suspense fallback={null}>

@@ -31,9 +31,10 @@ export function PageBackButton({
         size="sm"
         onClick={goBack}
         className={cn(
-          "gap-2 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all font-bold uppercase tracking-wider text-[11px] group active:scale-95 px-3 py-2 h-auto rounded-lg border border-border/50",
+          "gap-2 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all font-bold uppercase tracking-wider text-[11px] group active:scale-95 px-3 py-1.5 h-auto rounded-lg border border-border/50 bg-background/50 backdrop-blur-sm",
           className
         )}
+
         aria-label="Voltar à página anterior"
       >
         <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
