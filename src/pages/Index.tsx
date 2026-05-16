@@ -13,7 +13,7 @@ import { TransportadoraRanking } from "@/components/dashboard/TransportadoraRank
 import { XPProgressBar } from "@/components/dashboard/XPProgressBar";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { DelayPredictionPanel } from "@/components/predictions/DelayPredictionPanel";
-import { IntelligentLogisticsWidget } from "@/components/dashboard/IntelligentLogisticsWidget";
+import { IntelligentLogisticsWidget, LogisticsMapWidget } from "@/components/dashboard";
 import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/DraggableDashboard";
 import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
 import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
