@@ -94,7 +94,7 @@ export function AuthForgotPassword({ onBack }: AuthForgotPasswordProps) {
         </Card>
       </FadeIn>
       
-      <div className="absolute bottom-4 left-0 right-0 px-8 text-center pointer-events-none">
+      <div className="relative w-full max-w-md px-4 text-center pointer-events-none">
         <motion.p 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
