@@ -86,7 +86,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div className="flex-1 flex overflow-hidden">
           <main 
             id="main-content" 
-            className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 scroll-smooth overscroll-contain" 
+            className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 scroll-smooth overscroll-contain bg-gradient-to-tr from-background via-background to-primary/5" 
             tabIndex={-1}
             role="main"
             aria-label="Conteúdo principal"
