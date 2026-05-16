@@ -52,7 +52,7 @@ export function AuthFormPanel({
   handleLogin, handleSignup, onForgotPassword, onPasswordStrengthChange,
 }: AuthFormPanelProps) {
   return (
-    <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-4 sm:p-6 md:p-8 relative z-10 min-h-[100dvh] lg:min-h-0">
+    <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-4 sm:p-6 md:p-8 relative z-10 min-h-[100dvh]">
       <FadeIn direction="up" duration={0.6} className="w-full max-w-md">
         <Card className="shadow-2xl border-border/50 backdrop-blur-xl bg-card/95 overflow-hidden mx-auto">
           {/* Mobile logo */}
@@ -186,6 +186,21 @@ export function AuthFormPanel({
           </CardContent>
         </Card>
       </FadeIn>
+      
+      <div className="absolute bottom-4 left-0 right-0 px-8 text-center pointer-events-none">
+        <motion.p 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          transition={{ delay: 1, duration: 1 }}
+          className="text-[10px] leading-relaxed text-muted-foreground/60 max-w-sm mx-auto"
+        >
+          Este sistema é propriedade intelectual exclusiva da Brasil Marcas, sendo protegido pela Lei nº 9.609/98 e demais normas aplicáveis. É proibida sua reprodução, cópia, modificação, distribuição ou uso não autorizado.
+          <br />
+          <span className="font-medium mt-1 inline-block">
+            © 2026 LogiFlow Todos os direitos reservados.
+          </span>
+        </motion.p>
+      </div>
     </div>
   );
 }
