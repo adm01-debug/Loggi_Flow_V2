@@ -155,7 +155,7 @@ export const AppSidebar = memo(function AppSidebar() {
         <div 
           className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30 animate-[sidebar-logo_4s_ease-in-out_infinite]"
         >
-          <Box className="w-6 h-6 text-primary-foreground" />
+          <Truck className="w-6 h-6 text-primary-foreground" />
         </div>
         {!collapsed && (
           <div 
