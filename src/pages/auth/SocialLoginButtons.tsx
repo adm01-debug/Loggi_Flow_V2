@@ -28,7 +28,7 @@ export function SocialLoginButtons({ isLoading }: { isLoading: boolean }) {
         <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
         <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Ou continue com</span></div>
       </div>
-      <Button type="button" variant="outline" className="w-full h-11 hover:bg-muted/50 transition-all hover:scale-[1.02] active:scale-[0.98] gap-3" onClick={handleGoogleLogin} disabled={isLoading || socialLoading}>
+      <Button type="button" variant="outline" className="w-full h-12 hover:bg-muted/50 transition-all hover:scale-[1.03] active:scale-[0.97] gap-3 border-2 font-bold rounded-xl shadow-sm" onClick={handleGoogleLogin} disabled={isLoading || socialLoading}>
         {socialLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

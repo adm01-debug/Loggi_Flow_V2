@@ -39,28 +39,29 @@ export function AnimatedBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
+        className="absolute w-[800px] h-[800px] rounded-full opacity-30 blur-[120px]"
         style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)", top: "-20%", right: "-10%" }}
-        animate={{ scale: [1, 1.1, 1], x: [0, 20, 0], y: [0, -20, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute w-[500px] h-[500px] rounded-full opacity-10 blur-3xl"
-        style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)", bottom: "-15%", left: "-5%" }}
-        animate={{ scale: [1, 1.2, 1], x: [0, -15, 0], y: [0, 15, 0] }}
+        animate={{ scale: [1, 1.2, 1], x: [0, 40, 0], y: [0, -40, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      {[...Array(8)].map((_, i) => (
-        <Floating key={i} duration={4 + i * 0.5} distance={20 + i * 3}>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.07 }} transition={{ delay: i * 0.15 }} className="absolute" style={{ left: `${5 + i * 12}%`, top: `${15 + (i % 4) * 20}%` }}>
-            {i % 4 === 0 && <Truck className="w-10 h-10 text-primary" />}
-            {i % 4 === 1 && <Package className="w-8 h-8 text-primary" />}
-            {i % 4 === 2 && <MapPin className="w-9 h-9 text-primary" />}
-            {i % 4 === 3 && <Truck className="w-7 h-7 text-primary" />}
+      <motion.div
+        className="absolute w-[700px] h-[700px] rounded-full opacity-20 blur-[100px]"
+        style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)", bottom: "-15%", left: "-5%" }}
+        animate={{ scale: [1, 1.3, 1], x: [0, -30, 0], y: [0, 30, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {[...Array(12)].map((_, i) => (
+        <Floating key={i} duration={3 + i * 0.4} distance={30 + i * 5}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.12 }} transition={{ delay: i * 0.1 }} className="absolute" style={{ left: `${5 + (i * 8.5)}%`, top: `${10 + (i % 5) * 18}%` }}>
+            {i % 4 === 0 && <Truck className="w-12 h-12 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
+            {i % 4 === 1 && <Package className="w-10 h-10 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
+            {i % 4 === 2 && <MapPin className="w-11 h-11 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
+            {i % 4 === 3 && <Zap className="w-9 h-9 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
           </motion.div>
         </Floating>
       ))}
-      <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
+      <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: `linear-gradient(hsl(var(--primary)) 1.5px, transparent 1.5px), linear-gradient(90deg, hsl(var(--primary)) 1.5px, transparent 1.5px)`, backgroundSize: "80px 80px" }} />
+      <div className="absolute inset-0 bg-gradient-to-tr from-background via-transparent to-background/50" />
     </div>
   );
 }
@@ -112,22 +113,30 @@ export function AuthHeroSection() {
   return (
     <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col justify-between p-8 xl:p-12 relative z-10">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-        <div className="flex items-center gap-3 mb-2">
-          <motion.div whileHover={{ rotate: [0, -10, 10, 0], scale: 1.05 }} transition={{ duration: 0.5 }} className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
-            <Truck className="w-6 h-6 text-primary-foreground" />
+        <div className="flex items-center gap-4 mb-4">
+          <motion.div 
+            whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }} 
+            transition={{ duration: 0.5, type: "spring" }} 
+            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 flex items-center justify-center shadow-[0_10px_30px_rgba(var(--primary-rgb),0.5)] border border-white/20"
+          >
+            <Truck className="w-8 h-8 text-white animate-pulse" />
           </motion.div>
-          <span className="font-display text-2xl font-bold">LogiFlow</span>
+          <div>
+            <span className="font-display text-3xl font-black tracking-tighter uppercase italic">LogiFlow</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] bg-primary/10 px-2 py-0.5 rounded-full">Enterprise Edition</span>
+            </div>
+          </div>
         </div>
-        <p className="text-muted-foreground">Logística Gamificada • Resultados Reais</p>
       </motion.div>
 
       <div className="flex-1 flex flex-col justify-center max-w-xl">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="space-y-6">
-          <h1 className="text-4xl xl:text-5xl font-display font-bold leading-tight">
-            Transforme sua <span className="gradient-text">logística</span> em uma experiência <span className="gradient-text">gamificada</span>
+          <h1 className="text-5xl xl:text-7xl font-display font-black leading-tight tracking-tighter">
+            A Logística <br/> <span className="gradient-text">Redefinida</span> <br/> pela <span className="gradient-text">IA</span>
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Aumente a produtividade da sua equipe em até 40% com rastreamento em tempo real, analytics avançados e sistema de recompensas que motiva e engaja.
+          <p className="text-xl text-muted-foreground leading-relaxed font-medium">
+            O futuro da gestão logística chegou. <span className="text-primary font-bold">LogiFlow</span> une gamificação de elite e inteligência artificial para performance 10/10.
           </p>
           <div className="grid grid-cols-2 gap-4 pt-4">
             {features.map((feature, i) => (
