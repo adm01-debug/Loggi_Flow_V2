@@ -183,23 +183,29 @@ export function FavoriteMetricsBar() {
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Pin className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Métricas Fixadas</span>
-            <Badge variant="secondary" className="text-xs">
+    <Card className="relative overflow-hidden group border-none bg-transparent p-[1px] rounded-[1.5rem] shadow-2xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-white/5 to-white/10 rounded-[1.5rem]" />
+      <div className="relative bg-black/90 backdrop-blur-3xl rounded-[1.4rem] p-5">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Pin className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <span className="text-xs font-black uppercase tracking-[0.2em] italic bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">MÉTRICAS FIXADAS</span>
+              <p className="text-[9px] font-bold text-primary/60 uppercase tracking-tighter">CONFIGURAÇÃO DE ELITE</p>
+            </div>
+            <Badge variant="secondary" className="text-[10px] font-black bg-primary text-white border-none px-2 rounded-full h-5">
               {favorites.length}
             </Badge>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {isEditMode && (
               <>
                 <Popover open={isAddMenuOpen} onOpenChange={setIsAddMenuOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-1" />
+                    <Button variant="outline" size="sm" className="h-9 px-4 text-[10px] font-black uppercase tracking-widest bg-white/5 border-white/10 hover:bg-primary hover:text-white rounded-full transition-all">
+                      <Plus className="h-4 w-4 mr-2" />
                       Adicionar
                     </Button>
                   </PopoverTrigger>
@@ -257,15 +263,22 @@ export function FavoriteMetricsBar() {
             <Button
               variant={isEditMode ? "default" : "ghost"}
               size="sm"
+              className={cn(
+                "h-9 px-4 text-[10px] font-black uppercase tracking-widest rounded-full transition-all",
+                isEditMode ? "bg-primary text-white shadow-[0_0_15px_rgba(234,56,76,0.4)]" : "bg-white/5 text-white/60 hover:text-primary hover:bg-primary/10"
+              )}
               onClick={toggleEditMode}
             >
               {isEditMode ? (
                 <>
-                  <CheckCircle className="h-4 w-4 mr-1" />
+                  <CheckCircle className="h-4 w-4 mr-2" />
                   Concluir
                 </>
               ) : (
-                <Settings className="h-4 w-4" />
+                <>
+                  <Settings className="h-4 w-4 mr-2" />
+                  EDITAR
+                </>
               )}
             </Button>
           </div>
@@ -290,29 +303,34 @@ export function FavoriteMetricsBar() {
                     <TooltipTrigger asChild>
                       <div
                         className={cn(
-                          "relative p-3 rounded-lg border bg-card transition-all",
-                          isEditMode && "ring-2 ring-primary/20 cursor-move",
-                          "hover:shadow-md"
+                          "relative p-4 rounded-2xl border transition-all duration-300 overflow-hidden",
+                          "bg-gradient-to-br from-white/10 to-white/5 border-white/10",
+                          isEditMode ? "ring-2 ring-primary/40 cursor-move" : "hover:border-primary/40 hover:shadow-xl hover:-translate-y-1",
+                          "group/metric"
                         )}
                       >
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover/metric:opacity-100 transition-opacity" />
+                        
                         {isEditMode && (
                           <button
                             onClick={() => toggleFavorite(metric.id)}
-                            className="absolute -top-2 -right-2 p-1 rounded-full bg-destructive text-destructive-foreground shadow-md hover:bg-destructive/90 transition-colors"
+                            className="absolute -top-1 -right-1 p-1.5 rounded-full bg-primary text-white shadow-xl hover:scale-110 transition-transform z-20"
                           >
                             <X className="h-3 w-3" />
                           </button>
                         )}
-                        <div className="flex items-center gap-2 mb-2">
-                          {IconComponent && (
-                            <IconComponent className={cn("h-4 w-4", metric.color)} />
-                          )}
-                          <span className="text-xs text-muted-foreground truncate">
+                        <div className="flex items-center gap-2 mb-3 relative z-10">
+                          <div className={cn("p-1.5 rounded-lg bg-white/5 border border-white/10 group-hover/metric:bg-primary/20 group-hover/metric:border-primary/30 transition-colors")}>
+                            {IconComponent && (
+                              <IconComponent className={cn("h-4 w-4", metric.color)} />
+                            )}
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-tighter text-white/50 group-hover/metric:text-white/80 truncate transition-colors">
                             {metric.label}
                           </span>
                         </div>
-                        <div className="flex items-end justify-between">
-                          <span className="text-lg font-bold">{data.value}</span>
+                        <div className="flex items-end justify-between relative z-10">
+                          <span className="text-xl font-black italic tracking-tighter text-white drop-shadow-sm">{data.value}</span>
                           {data.change !== undefined && (
                             <div
                               className={cn(
