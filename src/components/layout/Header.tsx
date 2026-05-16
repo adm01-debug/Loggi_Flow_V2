@@ -17,6 +17,7 @@ import { useGamification } from "@/hooks/useGamification";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { RecentlyVisited } from "@/components/common/RecentlyVisited";
 import { supabase } from "@/integrations/supabase/client";
+import { hapticFeedback } from "@/utils/haptics";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -90,7 +91,10 @@ export const Header = memo(function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={goBack}
+                  onClick={() => {
+                    hapticFeedback('light');
+                    goBack();
+                  }}
                   disabled={!canGoBack}
                   className={cn(
                     "h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground transition-all duration-200",

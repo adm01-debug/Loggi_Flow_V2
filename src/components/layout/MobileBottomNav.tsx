@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
+import { hapticFeedback } from "@/utils/haptics";
 
 interface NavItem {
   icon: React.ElementType;
@@ -104,6 +105,7 @@ export function MobileBottomNav() {
           {/* Dynamic Mobile Back/Home Button */}
           <button
             onClick={() => {
+              hapticFeedback('medium');
               if (canGoBack) {
                 goBack();
               } else {
@@ -138,6 +140,7 @@ export function MobileBottomNav() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={() => hapticFeedback('light')}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 py-2 px-1 relative",
                   "transition-all duration-300",
