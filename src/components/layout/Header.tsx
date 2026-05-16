@@ -186,7 +186,7 @@ export const Header = memo(function Header() {
           </span>
         </div>
 
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-streak/10 border border-streak/20 transition-all hover:bg-streak/20">
+        <div className="hidden lg:flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-streak/10 border border-streak/20 transition-all hover:scale-105 hover:bg-streak/20 shadow-lg shadow-streak/5">
           <Flame className="w-4 h-4 text-streak animate-bounce" />
           <span className="text-sm font-bold text-streak">
             {userLevel?.streak_days || 0} dias
