@@ -7,8 +7,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug, Info } from "lucide-react";
+import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug, Info, Rocket } from "lucide-react";
 import { TelemetryCharts } from "@/components/admin/telemetry/TelemetryCharts";
+import { DORAMetrics } from "@/components/admin/DORAMetrics";
 import { TelemetryStatsCards } from "./admin-telemetria/TelemetryStatsCards";
 import { TelemetryTopOffenders } from "./admin-telemetria/TelemetryTopOffenders";
 import { TelemetryTable, type TelemetryRow } from "./admin-telemetria/TelemetryTable";
@@ -122,6 +123,10 @@ export default function AdminTelemetriaPage() {
               <Bug className="h-4 w-4" />
               Aplicação & Erros
             </TabsTrigger>
+            <TabsTrigger value="devops" className="gap-2">
+              <Rocket className="h-4 w-4" />
+              DevOps (DORA)
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="database" className="space-y-6">
@@ -173,6 +178,9 @@ export default function AdminTelemetriaPage() {
               </div>
               <TelemetryViewer />
             </div>
+          </TabsContent>
+          <TabsContent value="devops" className="space-y-6">
+            <DORAMetrics />
           </TabsContent>
         </Tabs>
       </div>
