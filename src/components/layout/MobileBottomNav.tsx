@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 
 interface NavItem {
   icon: React.ElementType;
@@ -82,13 +83,8 @@ const moreCategories: NavCategory[] = [
 export function MobileBottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { goBack, canGoBack } = useNavigationHistory();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-
-  const handleLongPressBack = (e: React.MouseEvent | React.TouchEvent) => {
-    // Basic back button behavior for the first icon if it were a back button
-    // But since we have a global back button in header, let's make the "Home" icon 
-    // smarter on mobile.
-  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -105,7 +101,38 @@ export function MobileBottomNav() {
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-around h-16 px-2">
-          {mainNavItems.map((item) => {
+          {/* Dynamic Mobile Back/Home Button */}
+          <button
+            onClick={() => {
+              if (canGoBack) {
+                goBack();
+              } else {
+                navigate("/");
+              }
+            }}
+            className={cn(
+              "flex flex-col items-center justify-center flex-1 py-2 px-1 relative transition-all duration-300 active:scale-90",
+              !canGoBack && location.pathname === "/" ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            <motion.div
+              animate={{
+                scale: location.pathname === "/" ? 1.1 : 1,
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              {canGoBack ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <LayoutDashboard className={cn("w-5 h-5", location.pathname === "/" ? "text-primary" : "text-muted-foreground")} />
+              )}
+            </motion.div>
+            <span className="text-[10px] mt-1 font-bold uppercase tracking-tighter">
+              {canGoBack ? "Voltar" : "Início"}
+            </span>
+          </button>
+
+          {mainNavItems.slice(1).map((item) => {
             const active = isActive(item.path);
             return (
               <NavLink
@@ -149,7 +176,7 @@ export function MobileBottomNav() {
 
                 <span
                   className={cn(
-                    "text-[10px] mt-1 font-medium transition-colors",
+                    "text-[10px] mt-1 font-bold uppercase tracking-tighter transition-colors",
                     active ? "text-primary" : "text-muted-foreground"
                   )}
                 >

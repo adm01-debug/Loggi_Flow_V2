@@ -1,5 +1,5 @@
-import { useEffect, useCallback, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect, useCallback, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
@@ -11,7 +11,7 @@ interface VisitedPage {
 }
 
 // Route labels for display
-const routeLabels: Record<string, string> = {
+export const routeLabels: Record<string, string> = {
   "/": "Dashboard",
   "/analytics": "Analytics",
   "/sla-dashboard": "Dashboard SLA",
@@ -53,14 +53,16 @@ const routeLabels: Record<string, string> = {
   "/audit-trail": "Audit Trail",
 };
 
-const MAX_RECENT = 8;
+const MAX_RECENT = 12;
 
 export function useNavigationHistory() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [recentPages, setRecentPages] = useLocalStorage<VisitedPage[]>("recent-pages", []);
+  const [historyStack, setHistoryStack] = useState<string[]>([]);
   const prevPathRef = useRef(location.pathname);
-  const directionRef = useRef<"forward" | "back">("forward");
+  const directionRef = useRef<"forward" | "back" | "none">("none");
 
   useEffect(() => {
     const currentPath = location.pathname;
@@ -70,9 +72,20 @@ export function useNavigationHistory() {
 
     const label = routeLabels[currentPath] || currentPath.split("/").pop() || "Página";
     
-    // Determine direction
-    const prevIndex = recentPages.findIndex(p => p.path === currentPath);
-    directionRef.current = prevIndex >= 0 ? "back" : "forward";
+    // Detect navigation direction by comparing with the stack
+    setHistoryStack(prev => {
+      const isGoingBack = prev.length > 1 && prev[prev.length - 2] === currentPath;
+      
+      if (isGoingBack) {
+        directionRef.current = "back";
+        return prev.slice(0, -1);
+      } else {
+        directionRef.current = prevPathRef.current === currentPath ? "none" : "forward";
+        // Avoid adding the same path multiple times in a row
+        if (prev[prev.length - 1] === currentPath) return prev;
+        return [...prev, currentPath];
+      }
+    });
     
     setRecentPages(prev => {
       const filtered = prev.filter(p => p.path !== currentPath);
@@ -102,10 +115,20 @@ export function useNavigationHistory() {
     return routeLabels[path] || path.split("/").pop() || "Página";
   }, []);
 
+  const goBack = useCallback(() => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
+
   return {
     recentPages,
     currentLabel: getPageLabel(location.pathname),
     direction: directionRef.current,
     getPageLabel,
+    goBack,
+    canGoBack: historyStack.length > 1 || location.pathname !== "/",
   };
 }

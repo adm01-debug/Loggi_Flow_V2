@@ -1,8 +1,8 @@
 import { ArrowLeft } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 
 interface PageBackButtonProps {
   fallbackPath?: string;
@@ -12,44 +12,32 @@ interface PageBackButtonProps {
 }
 
 export function PageBackButton({ 
-  fallbackPath = "/", 
   label = "Voltar", 
   className,
   showLabel = true 
 }: PageBackButtonProps) {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { goBack, canGoBack } = useNavigationHistory();
 
-  // Don't show on home page
-  if (location.pathname === "/") return null;
-
-  const handleBack = () => {
-    if (window.history.length > 2) {
-      navigate(-1);
-    } else {
-      navigate(fallbackPath);
-    }
-  };
+  if (!canGoBack) return null;
 
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
       <Button
         variant="ghost"
         size="sm"
-        onClick={handleBack}
+        onClick={goBack}
         className={cn(
-          "gap-1.5 text-muted-foreground hover:text-foreground transition-colors",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+          "gap-2 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all font-bold uppercase tracking-wider text-[10px] group active:scale-95",
           className
         )}
         aria-label="Voltar à página anterior"
       >
-        <ArrowLeft className="w-4 h-4" />
-        {showLabel && <span className="hidden sm:inline">{label}</span>}
+        <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+        {showLabel && <span>{label}</span>}
       </Button>
     </motion.div>
   );

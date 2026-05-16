@@ -9,6 +9,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
 import { useGlobalShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
@@ -100,16 +101,23 @@ PageLoader.displayName = "PageLoader";
 
 function AppRoutes() {
   const location = useLocation();
+  const { direction } = useNavigationHistory();
   useGlobalShortcuts();
   
+  // Animation direction logic
+  const isBack = direction === "back";
+  
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={location.pathname}
-        initial={{ opacity: 0, x: 10 }}
+        initial={{ opacity: 0, x: isBack ? -20 : 20 }}
         animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.2, ease: "easeInOut" }}
+        exit={{ opacity: 0, x: isBack ? 20 : -20 }}
+        transition={{ 
+          duration: 0.25, 
+          ease: [0.25, 0.1, 0.25, 1.0] 
+        }}
         className="w-full h-full"
       >
         <Routes location={location}>
