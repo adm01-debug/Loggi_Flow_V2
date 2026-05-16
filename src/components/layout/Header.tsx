@@ -19,6 +19,7 @@ import { RecentlyVisited } from "@/components/common/RecentlyVisited";
 import { supabase } from "@/integrations/supabase/client";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 // Lazy-load heavy notification components
 const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
