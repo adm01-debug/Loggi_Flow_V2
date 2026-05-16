@@ -128,6 +128,10 @@ export default function AdminTelemetriaPage() {
               <Rocket className="h-4 w-4" />
               DevOps (DORA)
             </TabsTrigger>
+            <TabsTrigger value="incidents" className="gap-2">
+              <ShieldAlert className="h-4 w-4" />
+              Incidentes
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="database" className="space-y-6">
