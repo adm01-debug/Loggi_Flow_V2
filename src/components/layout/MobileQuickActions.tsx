@@ -1,4 +1,4 @@
-import { Plus, QrCode, Truck, Package, X } from "lucide-react";
+import { Plus, QrCode, Truck, Package, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,14 +57,16 @@ export const MobileQuickActions = () => {
 
       <Button
         size="icon"
-        className="w-16 h-16 rounded-full shadow-2xl bg-primary text-primary-foreground transition-transform active:scale-90 border-4 border-background"
+        className="w-16 h-16 rounded-full shadow-2xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground transition-all active:scale-90 border-4 border-background group"
         onClick={() => setIsOpen(!isOpen)}
       >
         <motion.div
           animate={{ rotate: isOpen ? 45 : 0 }}
           transition={{ type: "spring", stiffness: 200 }}
+          className="relative"
         >
           {isOpen ? <X className="w-8 h-8" /> : <Plus className="w-8 h-8" />}
+          {!isOpen && <Sparkles className="w-3 h-3 absolute -top-1 -right-1 text-white animate-pulse" />}
         </motion.div>
       </Button>
 
