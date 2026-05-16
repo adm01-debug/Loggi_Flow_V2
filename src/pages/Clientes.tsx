@@ -398,6 +398,8 @@ export default function Clientes() {
           />
         </ImportDialogContent>
       </ImportDialog>
+      </div>
+    </PageTransition>
     </MainLayout>
   );
 }
