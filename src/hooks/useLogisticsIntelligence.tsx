@@ -37,7 +37,7 @@ export function useLogisticsIntelligence() {
       });
     }
 
-    if (metrics && metrics.ocorrencias_ativas > 5) {
+    if (metrics && metrics.entregasComOcorrencia > 5) {
       list.push({
         id: 'opt-2',
         title: 'Ajuste de Fluxo de Expedição',
