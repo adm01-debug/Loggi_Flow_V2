@@ -7,6 +7,7 @@ import { MobileQuickActions } from "./MobileQuickActions";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { ScrollRestoration } from "@/components/common/ScrollRestoration";
 import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
+import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
