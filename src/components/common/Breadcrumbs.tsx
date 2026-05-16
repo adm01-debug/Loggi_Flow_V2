@@ -207,7 +207,7 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-64 border-2 border-primary/5 shadow-lg">
                     <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                      <History className="w-3 h-3" />
+                      <HistoryIcon className="w-3 h-3" />
                       Histórico Recente
                     </div>
                     <DropdownMenuSeparator />
