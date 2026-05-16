@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar, ArrowUpDown, ChevronUp, ChevronDown, Upload } from "lucide-react";
+import { Users, Plus, Phone, MapPin, Package, MoreVertical, Eye, Edit, Trash2, Clock, Loader2, AlertCircle, User, FileText, Calendar, ArrowUpDown, ChevronUp, ChevronDown, Upload, Copy } from "lucide-react";
 import { z } from "zod";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -345,12 +345,55 @@ export default function Clientes() {
                   className="mt-1"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-lg truncate">{c.nome_fantasia || c.razao_social}</p>
+                  <p 
+                    className="font-semibold text-lg truncate cursor-pointer hover:text-primary transition-colors flex items-center gap-1"
+                    onClick={() => {
+                      const text = c.nome_fantasia || c.razao_social;
+                      navigator.clipboard.writeText(text);
+                      toast.success(`Copiado: ${text}`);
+                    }}
+                    title="Clique para copiar"
+                  >
+                    {c.nome_fantasia || c.razao_social}
+                    <Copy className="w-3 h-3 opacity-50" />
+                  </p>
                   {c.nome_fantasia && <p className="text-xs text-muted-foreground truncate">{c.razao_social}</p>}
                 </div>
                 <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(c); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => openEdit(c)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(c); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
               </div>
-              <div className="space-y-2 text-sm">{c.cnpj && <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /><span className="font-mono">{fmtCNPJ(c.cnpj)}</span></div>}{c.contato_nome && <div className="flex items-center gap-2"><User className="w-4 h-4 text-muted-foreground" />{c.contato_nome}</div>}{c.contato_telefone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-4 h-4" />{c.contato_telefone}</div>}<div className="flex items-start gap-2 text-muted-foreground"><MapPin className="w-4 h-4 mt-0.5" /><div><p className="line-clamp-2">{c.endereco_completo}</p>{c.cidade && <p className="font-medium text-foreground">{c.cidade} - {c.estado}</p>}</div></div>{c.horario_entrega && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4" /><span>{c.horario_entrega}</span></div>}</div>
+              <div className="space-y-2 text-sm">
+                {c.cnpj && (
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors group"
+                    onClick={() => {
+                      navigator.clipboard.writeText(c.cnpj!);
+                      toast.success(`CNPJ ${fmtCNPJ(c.cnpj!)} copiado`);
+                    }}
+                    title="Copiar CNPJ"
+                  >
+                    <FileText className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-mono">{fmtCNPJ(c.cnpj)}</span>
+                    <Copy className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+                  </div>
+                )}
+                {c.contato_nome && <div className="flex items-center gap-2"><User className="w-4 h-4 text-muted-foreground" />{c.contato_nome}</div>}
+                {c.contato_telefone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-4 h-4" />{c.contato_telefone}</div>}
+                <div className="flex items-start gap-2 text-muted-foreground">
+                  <MapPin className="w-4 h-4 mt-0.5" />
+                  <div 
+                    className="cursor-pointer hover:text-primary transition-colors group"
+                    onClick={() => {
+                      navigator.clipboard.writeText(c.endereco_completo);
+                      toast.success("Endereço copiado");
+                    }}
+                    title="Copiar endereço"
+                  >
+                    <p className="line-clamp-2">{c.endereco_completo}</p>
+                    {c.cidade && <p className="font-medium text-foreground flex items-center gap-1">{c.cidade} - {c.estado} <Copy className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" /></p>}
+                  </div>
+                </div>
+                {c.horario_entrega && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4" /><span>{c.horario_entrega}</span></div>}
+              </div>
               <div className="flex items-center justify-between mt-4 pt-4 border-t"><div className="flex items-center gap-2"><Package className="w-4 h-4 text-muted-foreground" /><span className="font-medium">{c.total_entregas || 0}</span>{(c.entregas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{c.entregas_pendentes} pend.</Badge>}</div></div>
               </div>
             </StaggeredItem>
