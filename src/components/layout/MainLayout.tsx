@@ -86,13 +86,13 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div className="flex-1 flex overflow-hidden">
           <main 
             id="main-content" 
-            className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 scroll-smooth overscroll-contain" 
+            className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 scroll-smooth overscroll-contain bg-gradient-to-tr from-background via-background to-primary/5" 
             tabIndex={-1}
             role="main"
             aria-label="Conteúdo principal"
           >
             <div className="max-w-[1600px] mx-auto w-full">
-              <nav aria-label="Navegação breadcrumb" className="flex items-center gap-3 mb-4 animate-in fade-in slide-in-from-left-2 duration-300">
+              <nav aria-label="Navegação breadcrumb" className="flex items-center gap-4 mb-8 animate-in fade-in slide-in-from-left-4 duration-500 ease-out-expo">
                 <PageBackButton className="md:flex" />
                 <Breadcrumbs className="flex-1" />
               </nav>

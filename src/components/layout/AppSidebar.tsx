@@ -151,21 +151,21 @@ export const AppSidebar = memo(function AppSidebar() {
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
+      <div className="flex items-center gap-4 p-6 border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar via-sidebar to-transparent">
         <div 
-          className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30 animate-[sidebar-logo_4s_ease-in-out_infinite]"
+          className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_20px_rgba(var(--primary-rgb),0.4)] border border-white/20 animate-[sidebar-logo_4s_ease-in-out_infinite]"
         >
-          <Truck className="w-6 h-6 text-primary-foreground" />
+          <Truck className="w-7 h-7 text-white" />
         </div>
         {!collapsed && (
           <div 
-            className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-200"
+            className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500 ease-out-expo"
           >
-            <span className="font-display font-bold text-xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <span className="font-display font-black text-2xl tracking-tighter uppercase italic bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
               LogiFlow
             </span>
-            <span className="text-[10px] text-muted-foreground font-medium tracking-wide uppercase">
-              Logística Gamificada
+            <span className="text-[10px] text-primary font-black tracking-[0.3em] uppercase opacity-70">
+              Nexus Edition
             </span>
           </div>
         )}
@@ -245,11 +245,11 @@ export const AppSidebar = memo(function AppSidebar() {
                     to={item.url}
                     onMouseEnter={() => prefetch(item.url)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group/item relative",
+                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-500 group/item relative overflow-hidden",
                       collapsed ? "justify-center" : "ml-2",
                       isActive(item.url)
-                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02]"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground hover:translate-x-1"
+                        ? "bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-white shadow-[0_10px_20px_rgba(var(--primary-rgb),0.3)] scale-[1.05]"
+                        : "text-sidebar-foreground hover:bg-primary/10 hover:text-primary hover:translate-x-2"
                     )}
                   >
                     {/* Active indicator pill */}

@@ -40,21 +40,25 @@ export function PageTransition({ children, mode = "directional" }: PageTransitio
     return {
       initial: { 
         opacity: 0, 
-        x: isBack ? -40 : 40,
-        scale: 0.98,
-        filter: "blur(8px)" 
+        x: isBack ? -60 : 60,
+        scale: 0.95,
+        filter: "blur(12px)",
+        rotateY: isBack ? -5 : 5
       },
       animate: { 
         opacity: 1, 
         x: 0,
         scale: 1,
-        filter: "blur(0px)" 
+        filter: "blur(0px)",
+        rotateY: 0
       },
       exit: { 
         opacity: 0, 
-        x: isBack ? 40 : -40,
-        scale: 0.98,
-        filter: "blur(8px)"
+        x: isBack ? 60 : -60,
+        scale: 0.95,
+        filter: "blur(12px)",
+        rotateY: isBack ? 5 : -5,
+        zIndex: 0
       },
     };
   }, [direction]);
@@ -70,8 +74,8 @@ export function PageTransition({ children, mode = "directional" }: PageTransitio
         exit="exit"
         variants={activeVariants}
         transition={{
-          duration: 0.35,
-          ease: [0.22, 1, 0.36, 1], // Custom cubic-bezier for "apple-like" smoothness
+          duration: 0.5,
+          ease: [0.16, 1, 0.3, 1], // iOS-style quintic ease-out
         }}
         className="w-full h-full origin-top"
       >
