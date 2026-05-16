@@ -56,7 +56,7 @@ export function AnimatedBackground() {
             {i % 4 === 0 && <Truck className="w-10 h-10 text-primary" />}
             {i % 4 === 1 && <Package className="w-8 h-8 text-primary" />}
             {i % 4 === 2 && <MapPin className="w-9 h-9 text-primary" />}
-            {i % 4 === 3 && <Box className="w-7 h-7 text-primary" />}
+            {i % 4 === 3 && <Truck className="w-7 h-7 text-primary" />}
           </motion.div>
         </Floating>
       ))}
