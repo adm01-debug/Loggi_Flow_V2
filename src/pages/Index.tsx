@@ -65,6 +65,15 @@ export default function Index() {
   const { userLevel } = useGamification();
   const { isEditMode, toggleEditMode, resetLayout, getAvailableWidgetsToAdd, addWidget } = useDashboardWidgets();
 
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Bom dia");
+    else if (hour < 18) setGreeting("Boa tarde");
+    else setGreeting("Boa noite");
+  }, []);
+
   const [dateRange, setDateRange] = useState<DateRange>({ from: subDays(new Date(), 6), to: new Date() });
 
   const [widgetOrder, setWidgetOrder] = useLocalStorage<string[]>("dashboard-widget-order", [
@@ -183,7 +192,9 @@ export default function Index() {
                 </div>
                 <span className="truncate">Dashboard</span>
               </h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1">Visão geral das operações logísticas</p>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                <span className="font-semibold text-primary">{greeting}!</span> Visão geral das operações logísticas
+              </p>
             </div>
             
             {/* Actions - Scrollable on mobile */}
