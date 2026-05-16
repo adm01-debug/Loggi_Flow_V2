@@ -1,4 +1,4 @@
-import { LucideIcon, SearchX, Database, Truck, Bell, Users, AlertCircle, Inbox, Calendar, Plus } from "lucide-react";
+import { LucideIcon, SearchX, Database, Truck, Bell, Users, AlertCircle, Inbox, Calendar, Plus, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
