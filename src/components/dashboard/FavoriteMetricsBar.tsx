@@ -399,7 +399,7 @@ export function FavoriteMetricsBar() {
             </Popover>
           )}
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 }
