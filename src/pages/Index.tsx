@@ -77,7 +77,7 @@ export default function Index() {
   const [dateRange, setDateRange] = useState<DateRange>({ from: subDays(new Date(), 6), to: new Date() });
 
   const [widgetOrder, setWidgetOrder] = useLocalStorage<string[]>("dashboard-widget-order", [
-    "xp-progress", "kpi-pendentes", "kpi-transito", "kpi-finalizadas", "kpi-problemas",
+    "xp-progress", "logistics-map", "kpi-pendentes", "kpi-transito", "kpi-finalizadas", "kpi-problemas",
     "intelligence-widget", "alerts-panel", "chart-performance", "quick-actions"
   ]);
 
