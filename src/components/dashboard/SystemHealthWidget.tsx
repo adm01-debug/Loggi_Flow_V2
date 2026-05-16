@@ -71,80 +71,129 @@ export function SystemHealthWidget() {
   };
 
   return (
-    <Card className="relative overflow-hidden group border-none bg-transparent p-[1px] rounded-[1.5rem] shadow-2xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-white/5 to-white/10 rounded-[1.5rem]" />
-      <div className="relative h-full bg-black/90 backdrop-blur-3xl rounded-[1.4rem] p-5">
-        <CardHeader className="p-0 mb-6">
-          <CardTitle className="text-sm font-black flex items-center gap-2 uppercase tracking-[0.2em] italic bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
-            <Activity className="h-4 w-4 text-primary animate-pulse" />
-            NEXUS CORE HEALTH
+    <Card className="relative overflow-hidden group border-none bg-transparent p-[1px] rounded-[2rem] shadow-2xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-white/5 to-white/10 rounded-[2rem]" />
+      <div className="relative h-full bg-black/90 backdrop-blur-3xl rounded-[1.9rem] p-6">
+        {/* Decorative Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+        
+        <CardHeader className="p-0 mb-8 relative z-10">
+          <CardTitle className="text-xs font-black flex items-center justify-between uppercase tracking-[0.3em] italic">
+            <div className="flex items-center gap-2 bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
+              <Activity className="h-4 w-4 text-primary animate-pulse" />
+              NEXUS CORE HEALTH
+            </div>
+            <div className="px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-[9px] text-primary not-italic">
+              LIVE MONITOR
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
-          <div className="flex flex-col items-center justify-center space-y-6">
+        
+        <CardContent className="p-0 relative z-10">
+          <div className="flex flex-col items-center justify-center space-y-8">
             <div className="relative flex items-center justify-center group/score">
-              {/* Pulse effect */}
-              <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
+              {/* Radial Glow */}
+              <div className={cn(
+                "absolute inset-0 rounded-full blur-[40px] opacity-30 transition-all duration-1000",
+                healthData?.status === 'optimal' ? 'bg-green-500' : 
+                healthData?.status === 'good' ? 'bg-blue-500' : 'bg-amber-500'
+              )} />
               
-              <svg className="w-28 h-28 transform -rotate-90 relative z-10">
+              <svg className="w-32 h-32 transform -rotate-90 relative z-10 drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]">
                 <circle
-                  cx="56"
-                  cy="56"
-                  r="48"
+                  cx="64"
+                  cy="64"
+                  r="58"
                   stroke="currentColor"
-                  strokeWidth="6"
+                  strokeWidth="8"
                   fill="transparent"
                   className="text-white/5"
                 />
                 <circle
-                  cx="56"
-                  cy="56"
-                  r="48"
+                  cx="64"
+                  cy="64"
+                  r="58"
                   stroke="currentColor"
-                  strokeWidth="6"
+                  strokeWidth="8"
                   fill="transparent"
-                  strokeDasharray={301.6}
-                  strokeDashoffset={301.6 - (301.6 * (healthData?.score || 0)) / 100}
+                  strokeDasharray={364.4}
+                  strokeDashoffset={364.4 - (364.4 * (healthData?.score || 0)) / 100}
                   strokeLinecap="round"
-                  className={cn("transition-all duration-1000 drop-shadow-[0_0_8px_rgba(234,56,76,0.5)]", getStatusColor(healthData?.status || ''))}
+                  className={cn(
+                    "transition-all duration-1000",
+                    getStatusColor(healthData?.status || '')
+                  )}
+                />
+                {/* Internal Decorative Ring */}
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="48"
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth="1"
+                  fill="transparent"
+                  strokeDasharray="4 4"
                 />
               </svg>
+              
               <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-                <span className="text-3xl font-black italic text-white drop-shadow-lg">{healthData?.score}</span>
-                <span className="text-[9px] uppercase font-black tracking-widest text-primary">SCORE</span>
+                <div className="relative">
+                  <span className="text-4xl font-black italic text-white tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+                    {healthData?.score}
+                  </span>
+                  <span className="absolute -right-4 top-0 text-[10px] font-black text-primary">%</span>
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", 
+                    healthData?.status === 'optimal' ? 'bg-green-500' : 
+                    healthData?.status === 'good' ? 'bg-blue-500' : 'bg-amber-500'
+                  )} />
+                  <span className="text-[10px] uppercase font-black tracking-[0.2em] text-white/40">OPERATIONAL</span>
+                </div>
               </div>
             </div>
 
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-primary/30 transition-colors">
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center border border-green-500/20">
-                <ShieldCheck className="h-4 w-4 text-green-500" />
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="group/metric flex flex-col gap-2 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center border border-green-500/20 group-hover/metric:scale-110 transition-transform">
+                    <ShieldCheck className="h-5 w-5 text-green-500" />
+                  </div>
+                  <div className="text-[10px] font-black text-green-500 bg-green-500/10 px-1.5 rounded uppercase">SAFE</div>
+                </div>
+                <div>
+                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-0.5">Telemetry Errors</span>
+                  <span className="text-xl font-black text-white italic tabular-nums">{healthData?.errors}</span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[9px] text-white/50 uppercase font-black tracking-tighter">Erros 24h</span>
-                <span className="text-sm font-black text-white italic">{healthData?.errors}</span>
+
+              <div className="group/metric flex flex-col gap-2 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover/metric:scale-110 transition-transform">
+                    <Zap className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div className="text-[10px] font-black text-blue-500 bg-blue-500/10 px-1.5 rounded uppercase">FAST</div>
+                </div>
+                <div>
+                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-0.5">Avg Latency</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-black text-white italic tabular-nums">{healthData?.avgLatency}</span>
+                    <span className="text-[10px] font-black text-white/40">ms</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-primary/30 transition-colors">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                <Zap className="h-4 w-4 text-blue-500" />
+
+            {(healthData?.errors ?? 0) > 0 && (
+              <div className="w-full flex items-center gap-3 text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary p-4 rounded-2xl border border-primary/30 animate-pulse relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                <AlertTriangle className="h-5 w-5 shrink-0" />
+                <span className="relative z-10">CRITICAL ANOMALIES DETECTED IN THE OPERATIONAL CORE</span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[9px] text-white/50 uppercase font-black tracking-tighter">Latência</span>
-                <span className="text-sm font-black text-white italic">{healthData?.avgLatency}ms</span>
-              </div>
-            </div>
+            )}
           </div>
-
-          {(healthData?.errors ?? 0) > 0 && (
-            <div className="w-full flex items-center gap-3 text-[9px] font-black uppercase tracking-tighter bg-primary/10 text-primary p-3 rounded-xl border border-primary/20 animate-pulse">
-              <AlertTriangle className="h-4 w-4 shrink-0" />
-              <span>Anomalias detectadas no núcleo operacional.</span>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </div>
-  </Card>
+        </CardContent>
+      </div>
+    </Card>
   );
 }
