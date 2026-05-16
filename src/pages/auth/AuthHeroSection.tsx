@@ -124,11 +124,11 @@ export function AuthHeroSection() {
 
       <div className="flex-1 flex flex-col justify-center max-w-xl">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="space-y-6">
-          <h1 className="text-4xl xl:text-5xl font-display font-bold leading-tight">
-            Transforme sua <span className="gradient-text">logística</span> em uma experiência <span className="gradient-text">gamificada</span>
+          <h1 className="text-5xl xl:text-7xl font-display font-black leading-tight tracking-tighter">
+            A Logística <br/> <span className="gradient-text">Redefinida</span> <br/> pela <span className="gradient-text">IA</span>
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Aumente a produtividade da sua equipe em até 40% com rastreamento em tempo real, analytics avançados e sistema de recompensas que motiva e engaja.
+          <p className="text-xl text-muted-foreground leading-relaxed font-medium">
+            O futuro da gestão logística chegou. <span className="text-primary font-bold">LogiFlow</span> une gamificação de elite e inteligência artificial para performance 10/10.
           </p>
           <div className="grid grid-cols-2 gap-4 pt-4">
             {features.map((feature, i) => (
