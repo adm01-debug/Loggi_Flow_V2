@@ -104,8 +104,8 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
     const statusConfig = {
       success: {
         border: 'border-success/40 hover:border-success/60',
-        bg: 'bg-gradient-to-br from-success/10 via-success/5 to-transparent',
-        iconBg: 'bg-success/15 text-success ring-2 ring-success/20',
+        bg: 'bg-gradient-to-br from-success/15 via-success/5 to-transparent',
+        iconBg: 'bg-success/20 text-success ring-4 ring-success/10 shadow-[0_0_20px_rgba(34,197,94,0.3)]',
         glow: 'after:bg-success/20',
         sparkColor: 'hsl(var(--success))',
         trendColor: 'text-success',
@@ -113,8 +113,8 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
       },
       warning: {
         border: 'border-warning/40 hover:border-warning/60',
-        bg: 'bg-gradient-to-br from-warning/10 via-warning/5 to-transparent',
-        iconBg: 'bg-warning/15 text-warning ring-2 ring-warning/20',
+        bg: 'bg-gradient-to-br from-warning/15 via-warning/5 to-transparent',
+        iconBg: 'bg-warning/20 text-warning ring-4 ring-warning/10 shadow-[0_0_20px_rgba(234,179,8,0.3)]',
         glow: 'after:bg-warning/20',
         sparkColor: 'hsl(var(--warning))',
         trendColor: 'text-warning',
@@ -122,17 +122,17 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
       },
       danger: {
         border: 'border-destructive/40 hover:border-destructive/60',
-        bg: 'bg-gradient-to-br from-destructive/10 via-destructive/5 to-transparent',
-        iconBg: 'bg-destructive/15 text-destructive ring-2 ring-destructive/20',
+        bg: 'bg-gradient-to-br from-destructive/15 via-destructive/5 to-transparent',
+        iconBg: 'bg-destructive/20 text-destructive ring-4 ring-destructive/10 shadow-[0_0_20px_rgba(239,68,68,0.3)]',
         glow: 'after:bg-destructive/20',
         sparkColor: 'hsl(var(--destructive))',
         trendColor: 'text-destructive',
         progressGradient: 'from-destructive to-destructive/80',
       },
       neutral: {
-        border: 'border-border hover:border-primary/40',
-        bg: 'bg-gradient-to-br from-card/80 via-card/50 to-card-elevated/80 backdrop-blur-xl',
-        iconBg: 'bg-primary/10 text-primary ring-2 ring-primary/20',
+        border: 'border-border/60 hover:border-primary/40',
+        bg: 'bg-gradient-to-br from-card via-card/50 to-card-elevated backdrop-blur-2xl',
+        iconBg: 'bg-primary/15 text-primary ring-4 ring-primary/10 shadow-[0_0_20px_rgba(var(--primary),0.2)]',
         glow: 'after:bg-primary/10',
         sparkColor: 'hsl(var(--primary))',
         trendColor: 'text-muted-foreground',
@@ -165,9 +165,9 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className={cn(
-          "group relative rounded-xl sm:rounded-2xl border-2 p-3 sm:p-5 transition-all duration-300 overflow-hidden cursor-default touch-manipulation",
-          "hover:shadow-xl hover:shadow-foreground/5",
-          "after:absolute after:inset-0 after:rounded-xl sm:after:rounded-2xl after:opacity-0 after:blur-2xl after:transition-opacity after:duration-500",
+          "group relative rounded-2xl sm:rounded-3xl border-2 p-4 sm:p-6 transition-all duration-500 overflow-hidden cursor-default touch-manipulation shadow-lg",
+          "hover:shadow-2xl hover:translate-y-[-6px]",
+          "after:absolute after:inset-0 after:rounded-3xl after:opacity-0 after:blur-3xl after:transition-opacity after:duration-700",
           "hover:after:opacity-100",
           config.border,
           config.bg,
@@ -213,12 +213,12 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
 
           {/* Content */}
           <div className="space-y-0.5 sm:space-y-1">
-            <p className="text-xs sm:text-sm font-medium text-muted-foreground tracking-wide uppercase">
+            <p className="text-[10px] sm:text-xs font-black text-muted-foreground/60 tracking-widest uppercase">
               {title}
             </p>
             <motion.p 
               key={animatedValue}
-              className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold tracking-tight bg-clip-text"
+              className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tighter bg-clip-text drop-shadow-sm"
             >
               {typeof value === 'string' && value.includes('R$') ? value : animatedValue}
             </motion.p>

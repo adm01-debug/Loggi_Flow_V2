@@ -185,19 +185,21 @@ export default function Index() {
         <div className="space-y-4 md:space-y-6">
           {/* Header with responsive layout */}
           <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="animate-in slide-in-from-left-4 duration-500">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 shadow-inner">
-                  <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary animate-pulse" />
+            <div className="animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                  <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-white animate-pulse" />
                 </div>
-                <span className="truncate">Dashboard</span>
-                <kbd className="hidden lg:flex pointer-events-none h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-50 ml-2">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
+                <div className="flex flex-col">
+                  <span className="truncate drop-shadow-sm">LogiFlow Dashboard</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">{greeting}! Operação em escala.</span>
+                    <kbd className="hidden lg:flex pointer-events-none h-5 select-none items-center gap-1 rounded border border-primary/20 bg-primary/5 px-1.5 font-mono text-[9px] font-black text-primary opacity-70">
+                      <span className="text-[10px]">⌘</span>K
+                    </kbd>
+                  </div>
+                </div>
               </h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1">
-                <span className="font-semibold text-primary">{greeting}!</span> Visão geral das operações logísticas
-              </p>
             </div>
             
             {/* Actions - Scrollable on mobile */}
