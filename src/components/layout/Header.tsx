@@ -80,27 +80,76 @@ export const Header = memo(function Header() {
     <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header gap-2 sm:gap-4">
       {/* Mobile: Back button + Page title | Desktop: Global Search */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        {/* Universal Back Button + Page Title */}
+        {/* Universal Back Button + Page Title with Dropdown */}
         <div className="flex items-center gap-1 min-w-0">
           {!isHomePage && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBack}
-              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-              aria-label={prevPage ? `Voltar para ${prevPage.label}` : "Voltar"}
-              title={prevPage ? `Voltar para ${prevPage.label}` : "Voltar (ou Alt + ←)"}
-            >
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleBack}
+                    className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+                    aria-label={prevPage ? `Voltar para ${prevPage.label}` : "Voltar"}
+                  >
+                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="flex flex-col items-center gap-1">
+                  <p className="text-xs font-medium">Voltar para {prevPage?.label || "Início"}</p>
+                  <kbd className="pointer-events-none inline-flex h-4 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[9px] font-medium opacity-100">
+                    Alt + ←
+                  </kbd>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
-          <span className="text-sm sm:text-base font-semibold truncate text-foreground ml-1">
-            {currentLabel}
-          </span>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="flex items-center gap-1 px-1.5 h-8 sm:h-9 hover:bg-accent/50 transition-colors group"
+              >
+                <span className="text-sm sm:text-base font-semibold truncate text-foreground">
+                  {currentLabel}
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64 max-h-[70vh] overflow-y-auto">
+              <DropdownMenuLabel className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-2 py-1.5">
+                Páginas Visitadas
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {recentPages.length > 0 ? (
+                recentPages.map((page, idx) => (
+                  <DropdownMenuItem 
+                    key={`${page.path}-${idx}`} 
+                    onClick={() => navigate(page.path)}
+                    className={cn(
+                      "flex flex-col items-start gap-0.5 px-3 py-2 cursor-pointer",
+                      location.pathname === page.path && "bg-accent"
+                    )}
+                  >
+                    <span className="font-medium text-sm">{page.label}</span>
+                    <span className="text-[10px] text-muted-foreground truncate w-full">
+                      {page.path}
+                    </span>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <div className="p-4 text-center text-xs text-muted-foreground">
+                  Histórico vazio
+                </div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        {/* Desktop: Search - Slightly shifted for back button */}
-        <div className="hidden md:block flex-1 max-w-sm lg:max-w-md ml-4">
+        {/* Desktop: Search */}
+        <div className="hidden md:block flex-1 max-w-[280px] lg:max-w-md ml-4">
           <Suspense fallback={<div className="h-9 w-full rounded-md bg-muted animate-pulse" />}>
             <GlobalSearch />
           </Suspense>
