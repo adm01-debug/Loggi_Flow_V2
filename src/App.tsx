@@ -108,7 +108,7 @@ function AppRoutes() {
   const isBack = direction === "back";
   
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait">
       <motion.div
         key={location.pathname}
         initial={{ opacity: 0, x: isBack ? -20 : 20 }}

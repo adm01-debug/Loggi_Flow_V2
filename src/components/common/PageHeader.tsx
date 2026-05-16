@@ -28,7 +28,6 @@ export function PageHeader({ title, description, icon: Icon, iconClassName, acti
         {showBack && (
           <div className="flex items-center gap-2">
             <PageBackButton fallbackPath={backFallback} />
-            <div className="h-4 w-[1px] bg-border/50 mx-1 hidden sm:block" />
           </div>
         )}
         
