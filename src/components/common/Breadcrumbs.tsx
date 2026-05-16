@@ -3,8 +3,15 @@ import { ChevronRight, Home, Copy, Check } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface BreadcrumbItem {
   label: string;
@@ -106,6 +113,8 @@ const routeCategories: Record<string, { label: string; path: string }> = {
 
 export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
   const location = useLocation();
+  const { recentPages } = useNavigationHistory();
+  const [copied, setCopied] = useState(false);
   const [copied, setCopied] = useState(false);
   
   const handleCopyLink = () => {
@@ -184,19 +193,34 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                   <span className="truncate">{item.label}</span>
                 </Link>
               ) : (
-                <span
-                  className={cn(
-                    "flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-md",
-                    isLast 
-                      ? "font-medium text-foreground bg-accent/50" 
-                      : "text-muted-foreground",
-                    "truncate max-w-[150px] sm:max-w-none"
-                  )}
-                  aria-current={isLast ? "page" : undefined}
-                >
-                  {item.icon}
-                  <span className="truncate">{item.label}</span>
-                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className={cn(
+                        "flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-md transition-all duration-200",
+                        "text-foreground bg-accent/50 font-medium hover:bg-accent",
+                        "truncate max-w-[150px] sm:max-w-none"
+                      )}
+                      aria-current="page"
+                    >
+                      {item.icon}
+                      <span className="truncate">{item.label}</span>
+                      <ChevronRight className="w-3 h-3 opacity-50 rotate-90 ml-0.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Histórico Recente
+                    </div>
+                    {recentPages.slice(0, 5).map((page) => (
+                      <DropdownMenuItem key={page.path} asChild>
+                        <Link to={page.path} className="flex items-center gap-2 cursor-pointer">
+                          <span className="truncate">{page.label}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </li>
           );
