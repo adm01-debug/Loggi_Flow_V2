@@ -205,9 +205,9 @@ export default function Clientes() {
 
   return (
     <MainLayout>
-      <PageTransition>
-        <div className="space-y-6">
-          <PageHeader
+      <div className="space-y-6">
+        <PageHeader
+
             title="Clientes"
             description="Gerencie sua base de clientes e acompanhe as entregas destinadas a eles."
             icon={Users}
@@ -398,8 +398,7 @@ export default function Clientes() {
           />
         </ImportDialogContent>
       </ImportDialog>
-        </div>
-      </PageTransition>
+      </div>
     </MainLayout>
   );
 }
