@@ -90,8 +90,9 @@ export function MainLayout({ children }: MainLayoutProps) {
             role="main"
             aria-label="Conteúdo principal"
           >
-          <nav aria-label="Navegação breadcrumb">
-            <Breadcrumbs className="mb-4" />
+          <nav aria-label="Navegação breadcrumb" className="flex items-center gap-3 mb-4">
+            <PageBackButton className="hidden md:flex" />
+            <Breadcrumbs className="flex-1" />
           </nav>
           
           <Suspense fallback={null}>
