@@ -11,3 +11,4 @@ export { TransportadoraRanking } from './TransportadoraRanking';
 export { WidgetPicker } from './WidgetPicker';
 export { XPProgressBar } from './XPProgressBar';
 export { LiveStatusBar } from './LiveStatusBar';
+export { LogisticsMapWidget } from './LogisticsMapWidget';
