@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { Stepper } from "@/components/ui/stepper";
+import { Progress } from "@/components/ui/progress";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -151,7 +153,23 @@ export default function ImportacaoMassa() {
           <p className="text-muted-foreground mt-1">Importe dados via CSV ou Excel com validação automática</p>
         </div>
 
-        <Tabs defaultValue="entregas">
+        <Card className="mb-6 overflow-hidden border-primary/20">
+          <CardContent className="p-0">
+            <Stepper steps={importSteps} currentStep={currentStep} className="px-6 py-8" />
+            
+            {isImporting && (
+              <div className="px-6 pb-6 animate-in fade-in duration-500">
+                <div className="flex justify-between text-sm mb-2 font-medium">
+                  <span className="text-primary">Processando registros...</span>
+                  <span>{importProgress.toFixed(0)}%</span>
+                </div>
+                <Progress value={importProgress} className="h-2" />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="entregas" onValueChange={() => setCurrentStep(1)}>
           <TabsList className="grid grid-cols-4 w-full max-w-lg">
             {entities.map((e) => (
               <TabsTrigger key={e.id} value={e.id} className="flex items-center gap-2">
