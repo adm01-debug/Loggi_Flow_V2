@@ -17,6 +17,7 @@ import { toast } from "sonner";
  */
 export function RealtimeStatus() {
   const [status, setStatus] = useState<string>('JOINING');
+  const [latency, setLatency] = useState<number | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
