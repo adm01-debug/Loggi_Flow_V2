@@ -48,6 +48,11 @@ export function useRealtime<T = Record<string, unknown>>({
       
       // Force refresh for core dashboard components if relevant
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      
+      // Provide haptic feedback if supported for real-time updates
+      if ('vibrate' in navigator) {
+        navigator.vibrate(5);
+      }
     }, 1500)
   ).current;
 
