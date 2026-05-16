@@ -1,5 +1,5 @@
-import { lazy, Suspense, memo } from "react";
-import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut, ChevronRight } from "lucide-react";
+import { lazy, Suspense, memo, useEffect } from "react";
+import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut, ChevronRight, History } from "lucide-react";
 import { RealtimeStatus } from "@/components/common/RealtimeStatus";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -33,11 +33,22 @@ export const Header = memo(function Header() {
   const { userLevel } = useGamification();
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentLabel, recentPages } = useNavigationHistory();
+  const { currentLabel, recentPages, goBack, canGoBack } = useNavigationHistory();
   
   const prevPage = recentPages.length > 1 ? recentPages[1] : null;
 
   const isHomePage = location.pathname === "/";
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === "ArrowLeft") {
+        goBack();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [goBack]);
 
   const handleSignOut = async () => {
     try {
@@ -53,17 +64,8 @@ export const Header = memo(function Header() {
       await signOut();
       navigate("/auth");
     } catch (err) {
-      // Erro registrado via ErrorBoundary ou telemetria dedicada
       await signOut();
       navigate("/auth");
-    }
-  };
-
-  const handleBack = () => {
-    if (window.history.length > 2) {
-      navigate(-1);
-    } else {
-      navigate("/");
     }
   };
 
@@ -79,33 +81,36 @@ export const Header = memo(function Header() {
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm gap-2 sm:gap-4 transition-all duration-300">
-      {/* Mobile: Back button + Page title | Desktop: Global Search */}
+      {/* Left side: Back button + Page title with History */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        {/* Universal Back Button + Page Title with Dropdown */}
         <div className="flex items-center gap-1 min-w-0">
-          {!isHomePage && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleBack}
-                    className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-                    aria-label={prevPage ? `Voltar para ${prevPage.label}` : "Voltar"}
-                  >
-                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </Button>
-                </TooltipTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={goBack}
+                  disabled={!canGoBack}
+                  className={cn(
+                    "h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground transition-all duration-200",
+                    canGoBack ? "hover:text-primary hover:bg-primary/10 active:scale-90" : "opacity-30 cursor-not-allowed"
+                  )}
+                  aria-label={prevPage ? `Voltar para ${prevPage.label}` : "Voltar"}
+                >
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              {canGoBack && (
                 <TooltipContent side="bottom" className="flex flex-col items-center gap-1">
                   <p className="text-xs font-medium">Voltar para {prevPage?.label || "Início"}</p>
                   <kbd className="pointer-events-none inline-flex h-4 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[9px] font-medium opacity-100">
                     Alt + ←
                   </kbd>
                 </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
+              )}
+            </Tooltip>
+          </TooltipProvider>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -113,15 +118,16 @@ export const Header = memo(function Header() {
                 variant="ghost" 
                 className="flex items-center gap-1 px-1.5 h-8 sm:h-9 hover:bg-accent/50 transition-colors group"
               >
-                <span className="text-sm sm:text-base font-semibold truncate text-foreground">
+                <span className="text-sm sm:text-base font-bold truncate text-foreground tracking-tight">
                   {currentLabel}
                 </span>
                 <ChevronRight className="w-3.5 h-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-64 max-h-[70vh] overflow-y-auto">
-              <DropdownMenuLabel className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-2 py-1.5">
-                Páginas Visitadas
+              <DropdownMenuLabel className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-2 py-1.5 flex items-center gap-2">
+                <History className="w-3 h-3" />
+                Histórico de Navegação
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               {recentPages.length > 0 ? (
@@ -130,19 +136,19 @@ export const Header = memo(function Header() {
                     key={`${page.path}-${idx}`} 
                     onClick={() => navigate(page.path)}
                     className={cn(
-                      "flex flex-col items-start gap-0.5 px-3 py-2 cursor-pointer",
-                      location.pathname === page.path && "bg-accent"
+                      "flex flex-col items-start gap-0.5 px-3 py-2 cursor-pointer transition-colors",
+                      location.pathname === page.path ? "bg-primary/10 text-primary" : "hover:bg-accent"
                     )}
                   >
-                    <span className="font-medium text-sm">{page.label}</span>
-                    <span className="text-[10px] text-muted-foreground truncate w-full">
+                    <span className="font-semibold text-sm">{page.label}</span>
+                    <span className="text-[10px] text-muted-foreground truncate w-full opacity-70">
                       {page.path}
                     </span>
                   </DropdownMenuItem>
                 ))
               ) : (
-                <div className="p-4 text-center text-xs text-muted-foreground">
-                  Histórico vazio
+                <div className="p-4 text-center text-xs text-muted-foreground italic">
+                  Nenhuma página visitada recentemente
                 </div>
               )}
             </DropdownMenuContent>
@@ -160,28 +166,25 @@ export const Header = memo(function Header() {
       {/* Center - Realtime Status */}
       <RealtimeStatus />
 
-      {/* Gamification Stats - Compact on tablet */}
+      {/* Gamification Stats */}
       <div className="hidden md:flex items-center gap-2 lg:gap-4">
-        {/* XP */}
-        <div className="flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full bg-primary/10 border border-primary/20">
+        <div className="flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full bg-primary/10 border border-primary/20 transition-all hover:bg-primary/20">
           <Zap className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-primary" />
-          <span className="text-xs lg:text-sm font-semibold text-primary">
+          <span className="text-xs lg:text-sm font-bold text-primary">
             {userLevel?.total_xp?.toLocaleString() || 0}
           </span>
         </div>
 
-        {/* Coins */}
-        <div className="flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full bg-coins/10 border border-coins/20">
+        <div className="flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full bg-coins/10 border border-coins/20 transition-all hover:bg-coins/20">
           <Coins className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-coins" />
-          <span className="text-xs lg:text-sm font-semibold text-coins">
+          <span className="text-xs lg:text-sm font-bold text-coins">
             {userLevel?.coins?.toLocaleString() || 0}
           </span>
         </div>
 
-        {/* Streak - Hidden on tablet, visible on desktop */}
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-streak/10 border border-streak/20">
-          <Flame className="w-4 h-4 text-streak animate-pulse" />
-          <span className="text-sm font-semibold text-streak">
+        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-streak/10 border border-streak/20 transition-all hover:bg-streak/20">
+          <Flame className="w-4 h-4 text-streak animate-bounce" />
+          <span className="text-sm font-bold text-streak">
             {userLevel?.streak_days || 0} dias
           </span>
         </div>
@@ -189,59 +192,52 @@ export const Header = memo(function Header() {
 
       {/* Right Side */}
       <div className="flex items-center gap-1 sm:gap-2">
-        {/* Recently Visited */}
         <div className="hidden sm:block">
           <RecentlyVisited />
         </div>
 
         <Suspense fallback={null}>
-          {/* SLA Notification Settings - Hidden on mobile */}
           <div className="hidden sm:block">
             <SLANotificationSettings />
           </div>
-          
-          {/* System Alerts */}
           <NotificationCenter />
-          
-          {/* User Notifications */}
           <UserNotificationCenter />
         </Suspense>
 
-        {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 hover:bg-accent h-9 sm:h-10">
-              <Avatar className="w-7 h-7 sm:w-8 sm:h-8 border-2 border-primary/20">
+            <Button variant="ghost" className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 hover:bg-accent h-9 sm:h-10 rounded-full sm:rounded-md">
+              <Avatar className="w-7 h-7 sm:w-8 sm:h-8 border-2 border-primary/20 ring-2 ring-transparent transition-all group-hover:ring-primary/20">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs sm:text-sm">
+                <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs sm:text-sm">
                   {getInitials(profile?.full_name ?? null)}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden lg:flex flex-col items-start">
-                <span className="text-sm font-medium truncate max-w-[100px]">
+              <div className="hidden lg:flex flex-col items-start leading-tight">
+                <span className="text-sm font-bold truncate max-w-[100px]">
                   {profile?.full_name || "Usuário"}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-tighter opacity-70">
                   {isAdmin ? "Admin" : profile?.cargo || "Operador"}
                 </span>
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-56 mt-1 border-2 border-primary/5">
+            <DropdownMenuLabel className="font-bold text-xs">Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/perfil")}>
-              <User className="w-4 h-4 mr-2" />
+            <DropdownMenuItem onClick={() => navigate("/perfil")} className="font-medium">
+              <User className="w-4 h-4 mr-2 text-primary" />
               Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/conquistas")}>
-              <Trophy className="w-4 h-4 mr-2" />
+            <DropdownMenuItem onClick={() => navigate("/conquistas")} className="font-medium">
+              <Trophy className="w-4 h-4 mr-2 text-primary" />
               Minhas Conquistas
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+            <DropdownMenuItem onClick={handleSignOut} className="text-destructive font-bold focus:bg-destructive/10 focus:text-destructive">
               <LogOut className="w-4 h-4 mr-2" />
-              Sair
+              Sair do Sistema
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
