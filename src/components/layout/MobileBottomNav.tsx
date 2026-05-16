@@ -140,6 +140,7 @@ export function MobileBottomNav() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={() => hapticFeedback('light')}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 py-2 px-1 relative",
                   "transition-all duration-300",
