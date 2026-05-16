@@ -2,7 +2,6 @@ import { useState } from "react";
 import { 
   Bell, 
   X, 
-  Check, 
   CheckCheck,
   Trash2,
   AlertTriangle,
@@ -11,6 +10,7 @@ import {
   Info,
   Package,
   Truck,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSmartAlerts, SystemAlert } from "@/hooks/useSmartAlerts";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,61 +69,84 @@ export function NotificationCenter() {
       case 'error':
         return {
           bg: 'bg-destructive/10',
-          border: 'border-destructive/30',
+          border: 'border-destructive/20',
           icon: 'text-destructive',
-          dot: 'bg-destructive',
+          dot: 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]',
+          glow: 'bg-destructive/5',
         };
       case 'warning':
         return {
           bg: 'bg-warning/10',
-          border: 'border-warning/30',
+          border: 'border-warning/20',
           icon: 'text-warning',
-          dot: 'bg-warning',
+          dot: 'bg-warning shadow-[0_0_8px_rgba(245,158,11,0.5)]',
+          glow: 'bg-warning/5',
         };
       default:
         return {
-          bg: 'bg-info/10',
-          border: 'border-info/30',
-          icon: 'text-info',
-          dot: 'bg-info',
+          bg: 'bg-primary/10',
+          border: 'border-primary/20',
+          icon: 'text-primary',
+          dot: 'bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]',
+          glow: 'bg-primary/5',
         };
     }
   };
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative"
-        >
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-destructive text-destructive-foreground rounded-full"
-            >
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </motion.span>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={cn(
+                  "relative h-9 w-9 sm:h-10 sm:w-10 rounded-full transition-all duration-300",
+                  isOpen ? "bg-accent" : "hover:bg-accent/50",
+                  unreadCount > 0 && "after:content-[''] after:absolute after:inset-0 after:rounded-full after:animate-ping after:bg-destructive/20 after:pointer-events-none"
+                )}
+                aria-label="Alertas do sistema"
+              >
+                <Bell className={cn("h-5 w-5 transition-transform", isOpen && "scale-110")} />
+                <AnimatePresence>
+                  {unreadCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black bg-destructive text-destructive-foreground rounded-full ring-2 ring-background z-10"
+                    >
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          {!isOpen && (
+            <TooltipContent side="bottom" className="font-bold text-[10px] uppercase tracking-wider">
+              Alertas Operacionais
+            </TooltipContent>
           )}
-        </Button>
-      </PopoverTrigger>
+        </Tooltip>
+      </TooltipProvider>
+
       <PopoverContent 
-        className="w-[380px] p-0" 
+        className="w-[380px] p-0 border-2 border-primary/5 shadow-2xl overflow-hidden rounded-2xl animate-in zoom-in-95 duration-200" 
         align="end"
-        sideOffset={8}
+        sideOffset={12}
       >
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary" />
-            <h3 className="font-display font-semibold">Notificações</h3>
-            {unreadCount > 0 && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-destructive text-destructive-foreground rounded-full">
-                {unreadCount} nova{unreadCount > 1 ? 's' : ''}
-              </span>
-            )}
+        <div className="flex items-center justify-between p-4 bg-gradient-to-br from-accent/50 to-background border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Bell className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex flex-col">
+              <h3 className="font-bold text-sm tracking-tight">Alertas do Sistema</h3>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">Central Operacional</p>
+            </div>
           </div>
           <div className="flex items-center gap-1">
             {unreadCount > 0 && (
@@ -130,121 +154,148 @@ export function NotificationCenter() {
                 variant="ghost"
                 size="sm"
                 onClick={markAllAsRead}
-                className="h-8 text-xs"
+                className="h-8 text-[10px] font-bold uppercase tracking-wider hover:bg-primary/5 text-primary"
               >
-                <CheckCheck className="h-3.5 w-3.5 mr-1" />
-                Marcar lidas
+                <CheckCheck className="h-3.5 w-3.5 mr-1.5" />
+                Lidas
               </Button>
             )}
-            {alerts.length > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={clearAllAlerts}
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-accent"
+              onClick={() => setIsOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        <ScrollArea className="h-[400px]">
+        <ScrollArea className="h-[420px] bg-background/50">
           {alerts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-                <Bell className="w-8 h-8 text-muted-foreground" />
+            <div className="flex flex-col items-center justify-center py-20 px-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+                <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent flex items-center justify-center border border-primary/10">
+                  <CheckCheck className="w-10 h-10 text-primary opacity-50" />
+                </div>
               </div>
-              <p className="font-medium text-foreground">Tudo tranquilo!</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Você não tem notificações pendentes
+              <p className="font-bold text-base text-foreground tracking-tight">Status: Nominal</p>
+              <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-[200px]">
+                Nenhuma divergência operacional detectada no momento.
               </p>
             </div>
           ) : (
-            <AnimatePresence mode="popLayout">
-              {alerts.map((alert, index) => {
-                const AlertIcon = getAlertIcon(alert.type);
-                const EntityIcon = getEntityIcon(alert.entityType);
-                const styles = getSeverityStyles(alert.severity);
+            <div className="divide-y divide-border/30">
+              <AnimatePresence mode="popLayout" initial={false}>
+                {alerts.map((alert, index) => {
+                  const AlertIcon = getAlertIcon(alert.type);
+                  const EntityIcon = getEntityIcon(alert.entityType);
+                  const styles = getSeverityStyles(alert.severity);
 
-                return (
-                  <motion.div
-                    key={alert.id}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{ delay: index * 0.03 }}
-                    className={cn(
-                      "relative p-4 border-b border-border transition-colors",
-                      !alert.read && "bg-muted/30",
-                      "hover:bg-muted/50 cursor-pointer"
-                    )}
-                    onClick={() => {
-                      if (!alert.read) markAsRead(alert.id);
-                    }}
-                  >
-                    {/* Unread indicator */}
-                    {!alert.read && (
-                      <span className={cn(
-                        "absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full",
-                        styles.dot
-                      )} />
-                    )}
+                  return (
+                    <motion.div
+                      key={alert.id}
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+                      className={cn(
+                        "group relative p-4 transition-all duration-300",
+                        !alert.read ? cn("bg-muted/10", styles.glow) : "hover:bg-muted/30",
+                        "cursor-pointer overflow-hidden border-l-4",
+                        !alert.read ? (alert.severity === 'error' ? 'border-l-destructive' : alert.severity === 'warning' ? 'border-l-warning' : 'border-l-primary') : 'border-l-transparent'
+                      )}
+                      onClick={() => {
+                        if (!alert.read) markAsRead(alert.id);
+                      }}
+                    >
+                      <div className="flex gap-4">
+                        <div className={cn(
+                          "flex items-center justify-center w-11 h-11 rounded-xl shrink-0 transition-transform group-hover:scale-105",
+                          styles.bg,
+                          "border border-white/10"
+                        )}>
+                          <AlertIcon className={cn("w-5 h-5", styles.icon)} />
+                        </div>
 
-                    <div className="flex gap-3 ml-3">
-                      <div className={cn(
-                        "flex items-center justify-center w-10 h-10 rounded-lg shrink-0",
-                        styles.bg
-                      )}>
-                        <AlertIcon className={cn("w-5 h-5", styles.icon)} />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">
-                              {alert.title}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
-                              {alert.message}
-                            </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className={cn(
+                                "text-sm tracking-tight",
+                                !alert.read ? "font-bold text-foreground" : "font-medium text-muted-foreground"
+                              )}>
+                                {alert.title}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                                {alert.message}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 rounded-lg shrink-0 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                clearAlert(alert.id);
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              clearAlert(alert.id);
-                            }}
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
 
-                        <div className="flex items-center gap-3 mt-2">
-                          {alert.entityType && (
-                            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <EntityIcon className="w-3 h-3" />
-                              {alert.entityType === 'coleta' ? 'Coleta' : 
-                               alert.entityType === 'entrega' ? 'Entrega' : 'Ocorrência'}
-                            </span>
-                          )}
-                          <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(alert.createdAt, { 
-                              addSuffix: true, 
-                              locale: ptBR 
-                            })}
-                          </span>
+                          <div className="flex items-center justify-between mt-3">
+                            <div className="flex items-center gap-3">
+                              {alert.entityType && (
+                                <span className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-muted/50 px-2 py-0.5 rounded-md">
+                                  <EntityIcon className="w-3 h-3" />
+                                  {alert.entityType === 'coleta' ? 'Coleta' : 
+                                   alert.entityType === 'entrega' ? 'Entrega' : 'Ocorrência'}
+                                </span>
+                              )}
+                              <span className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground opacity-60">
+                                <Clock className="w-2.5 h-2.5" />
+                                {formatDistanceToNow(alert.createdAt, { 
+                                  addSuffix: true, 
+                                  locale: ptBR 
+                                })}
+                              </span>
+                            </div>
+                            
+                            {!alert.read && (
+                              <div className={cn("w-2 h-2 rounded-full animate-pulse", styles.dot)} />
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
           )}
         </ScrollArea>
+        
+        <div className="p-3 bg-muted/20 border-t border-border/50 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-[10px] font-bold uppercase tracking-wider hover:bg-background/50 h-8"
+            onClick={clearAllAlerts}
+            disabled={alerts.length === 0}
+          >
+            Limpar Todos
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-[10px] font-bold uppercase tracking-wider hover:bg-background/50 h-8 gap-2"
+          >
+            <Settings className="w-3 h-3" />
+            Configurações
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );
