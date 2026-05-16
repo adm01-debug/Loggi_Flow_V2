@@ -17,6 +17,7 @@ import { useGamification } from "@/hooks/useGamification";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { RecentlyVisited } from "@/components/common/RecentlyVisited";
 import { supabase } from "@/integrations/supabase/client";
+import { hapticFeedback } from "@/utils/haptics";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
