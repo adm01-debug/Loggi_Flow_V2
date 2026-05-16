@@ -29,16 +29,40 @@ export function MainLayout({ children }: MainLayoutProps) {
   const location = useLocation();
 
   useEffect(() => {
+    let touchStartX = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const deltaX = touchEndX - touchStartX;
+      
+      // Swipe from left to right (at least 100px) and starting near the edge (0-50px)
+      if (deltaX > 100 && touchStartX < 50) {
+        if (location.pathname !== "/") {
+          navigate(-1);
+        }
+      }
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Alt + ArrowLeft to go back
       if (e.altKey && e.key === "ArrowLeft") {
         if (location.pathname !== "/") {
           navigate(-1);
         }
       }
     };
+
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [navigate, location]);
 
   return (
