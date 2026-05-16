@@ -178,6 +178,7 @@ export default function AdminTelemetriaPage() {
               </div>
               <TelemetryViewer />
             </div>
+          </TabsContent>
           <TabsContent value="devops" className="space-y-6">
             <DORAMetrics />
           </TabsContent>
