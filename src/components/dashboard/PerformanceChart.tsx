@@ -190,18 +190,63 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
     return (
       <motion.div
         ref={ref}
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className={cn("card-base", className)}
+        className={cn(
+          "relative rounded-[2.5rem] border-2 p-6 sm:p-8 transition-all duration-500 overflow-hidden shadow-2xl bg-card/40 backdrop-blur-3xl group/chart",
+          "border-primary/10 hover:border-primary/30 hover:shadow-primary/5",
+          className
+        )}
       >
-        <div className="mb-3 sm:mb-4">
-          <h3 className="font-display font-semibold text-base sm:text-lg">{title}</h3>
-          {subtitle && (
-            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">{subtitle}</p>
-          )}
+        {/* Abstract Background Design */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
+        <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-[100px] group-hover/chart:bg-primary/10 transition-colors duration-700" />
+        
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-1.5 h-6 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+              <h3 className="font-display font-black text-2xl tracking-tighter uppercase italic text-foreground leading-none">
+                {title}
+              </h3>
+            </div>
+            {subtitle && (
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] ml-4 italic">
+                {subtitle}
+              </p>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-3 bg-background/40 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/5 shadow-inner">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-[9px] font-black text-foreground uppercase tracking-widest">Live Nexus Data</span>
+            </div>
+          </div>
         </div>
-        <div className="w-full overflow-x-auto">
+
+        <div className="w-full relative min-h-[250px] group/viz">
+          {/* Glass Overlay for Chart Area */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none rounded-3xl" />
           {renderChart()}
+        </div>
+        
+        <div className="mt-6 flex items-center justify-between">
+          <div className="flex gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-sm bg-primary border border-white/10" />
+              <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">{dataKey}</span>
+            </div>
+            {secondaryDataKey && (
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-sm bg-success border border-white/10" />
+                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">{secondaryDataKey}</span>
+              </div>
+            )}
+          </div>
+          <div className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.3em]">
+            Algoritmo Nexus v2.4
+          </div>
         </div>
       </motion.div>
     );
