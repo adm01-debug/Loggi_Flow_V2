@@ -77,9 +77,9 @@ export function RealtimeStatus() {
         <Tooltip>
           <TooltipTrigger asChild>
             <div className={cn(
-              "flex items-center gap-2 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all border cursor-help shadow-sm",
+              "flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all border cursor-help shadow-sm active:scale-95",
               info.bg,
-              "border-transparent"
+              "border-border/10 hover:border-border/30"
             )}>
               <div className="relative">
                 <Icon className={cn("h-3 w-3", info.color)} />
