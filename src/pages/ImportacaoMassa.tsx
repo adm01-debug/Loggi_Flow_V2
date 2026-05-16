@@ -99,8 +99,22 @@ interface ImportStats {
 
 export default function ImportacaoMassa() {
   const [history, setHistory] = useState<ImportStats[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const importSteps = [
+    { title: "Seleção", description: "Escolha o tipo de dados" },
+    { title: "Upload", description: "Envie seu arquivo" },
+    { title: "Processamento", description: "Importando para o sistema" },
+    { title: "Finalizado", description: "Veja os resultados" },
+  ];
 
   const handleImport = async (entity: ImportEntity, data: Record<string, unknown>[]) => {
+    setIsImporting(true);
+    setImportProgress(0);
+    setCurrentStep(2); // Processamento
+
     let successCount = 0;
     let errorCount = 0;
     const batchSize = 50;
@@ -108,11 +122,15 @@ export default function ImportacaoMassa() {
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
       const { error } = await supabase.from(entity).insert(batch as never[]);
+      
       if (error) {
         errorCount += batch.length;
       } else {
         successCount += batch.length;
       }
+      
+      const progress = Math.min(((i + batchSize) / data.length) * 100, 100);
+      setImportProgress(progress);
     }
 
     const stat: ImportStats = {
@@ -123,6 +141,9 @@ export default function ImportacaoMassa() {
       timestamp: new Date(),
     };
     setHistory((h) => [stat, ...h]);
+    setIsImporting(false);
+    setImportProgress(100);
+    setCurrentStep(3); // Finalizado
 
     if (errorCount === 0) {
       toast.success(`${successCount} registros importados com sucesso!`);
@@ -131,6 +152,9 @@ export default function ImportacaoMassa() {
     } else {
       toast.error(`Falha ao importar ${errorCount} registros`);
     }
+
+    // Reset step after some time
+    setTimeout(() => setCurrentStep(0), 5000);
   };
 
   const entities: { id: ImportEntity; label: string; icon: React.ElementType }[] = [
