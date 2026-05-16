@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Zap, Truck, Package } from "lucide-react";
+import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Zap, Truck, Package, Palette } from "lucide-react";
+import { PreferencePanel } from "@/features/preferences";
 import { useIntegrationValidation } from "@/hooks/useIntegrationValidation";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
@@ -102,6 +103,7 @@ export default function Configuracoes() {
           <Tabs defaultValue="integrations">
             <TabsList>
               <TabsTrigger value="integrations"><Link className="w-4 h-4 mr-2" />Integrações</TabsTrigger>
+              <TabsTrigger value="preferences"><Palette className="w-4 h-4 mr-2" />Personalização</TabsTrigger>
               <TabsTrigger value="automation"><Zap className="w-4 h-4 mr-2" />Automações</TabsTrigger>
               <TabsTrigger value="notifications"><Bell className="w-4 h-4 mr-2" />Notificações</TabsTrigger>
               <TabsTrigger value="security"><Shield className="w-4 h-4 mr-2" />Segurança</TabsTrigger>
@@ -132,6 +134,11 @@ export default function Configuracoes() {
                   </div>
                 );
               })}</div>
+            </TabsContent>
+            <TabsContent value="preferences" className="space-y-4">
+              <div className="card-base p-6">
+                <PreferencePanel />
+              </div>
             </TabsContent>
             <TabsContent value="automation" className="space-y-4">
               <BusinessRulesManager />

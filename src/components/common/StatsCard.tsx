@@ -38,7 +38,7 @@ export function StatsCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       role="region"
-      aria-label={`Métrica: ${title}`}
+      aria-label={`Métrica: ${title}. Valor: ${value}${trend !== undefined ? `. Tendência: ${trend}%` : ''}`}
     >
       <div className="flex items-center justify-between mb-3">
         <div className={cn("p-2 rounded-lg", colorClasses[color])} aria-hidden="true">

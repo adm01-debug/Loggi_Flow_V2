@@ -89,7 +89,48 @@
     --border: 214 32% 91%;
     --input: 214 32% 91%;
   }
+  
+  /* HIGH CONTRAST MODE */
+  .high-contrast {
+    --border: 0 0% 100%;
+    --muted-foreground: 215 20% 95%;
+    --foreground: 0 0% 100%;
+    --background: 0 0% 0%;
+  }
+
+  .high-contrast.light {
+    --border: 0 0% 0%;
+    --muted-foreground: 215 16% 10%;
+    --foreground: 0 0% 0%;
+    --background: 0 0% 100%;
+  }
 }
+
+/* ACCESSIBILITY & DENSITY UTILITIES */
+@layer utilities {
+  .reduced-motion * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .font-dyslexic {
+    font-family: 'OpenDyslexic', sans-serif !important;
+  }
+}
+
+:root {
+  --font-scale: 1.0;
+  --ui-padding: 1rem;
+}
+
+body {
+  font-size: calc(var(--base-font-size, 0.875rem) * var(--font-scale));
+}
+
+.p-4 { padding: var(--ui-padding) !important; }
+.md\:p-6 { padding: calc(var(--ui-padding) * 1.5) !important; }
 
 @layer base {
   * {
