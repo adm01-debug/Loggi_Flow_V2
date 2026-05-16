@@ -122,7 +122,7 @@ export const Header = memo(function Header() {
                 variant="ghost" 
                 className="flex items-center gap-1 px-1.5 h-8 sm:h-9 hover:bg-accent/50 transition-colors group"
               >
-                <span className="text-sm sm:text-base font-bold truncate text-foreground tracking-tight">
+                <span className="text-base sm:text-xl font-black truncate text-foreground tracking-tighter uppercase italic">
                   {currentLabel}
                 </span>
                 <ChevronRight className="w-3.5 h-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
