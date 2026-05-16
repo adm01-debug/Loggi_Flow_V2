@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, Activity, Terminal, Layers, Maximize2, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PerformanceChartProps {
   title: string;
