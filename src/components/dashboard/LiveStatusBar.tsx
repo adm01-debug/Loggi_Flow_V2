@@ -3,6 +3,7 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function LiveStatusBar() {
