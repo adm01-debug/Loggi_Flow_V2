@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useConfirmExit } from "@/hooks/useConfirmExit";
 import { format } from "date-fns";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ export default function Configuracoes() {
   };
 
   const handleUpdatePreference = (key: string, value: boolean) => {
+    setIsDirty(true);
     if (updatePreference) {
       // Map UI keys to actual preference keys
       const keyMap: Record<string, keyof import('@/hooks/useNotificationPreferences').NotificationPreferences> = {
@@ -82,7 +84,10 @@ export default function Configuracoes() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-muted"><Settings className="w-6 h-6 text-muted-foreground" /></div>Configurações</h1><p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p></div>
-          <Button onClick={handleSave} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
+          <div className="flex items-center gap-2">
+            {isDirty && <Badge variant="outline" className="text-warning border-warning animate-pulse">Alterações não salvas</Badge>}
+            <Button onClick={handleSave} disabled={saving || !isDirty}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
+          </div>
         </div>
         <OnboardingTooltip
           id="configuracoes-tabs"
