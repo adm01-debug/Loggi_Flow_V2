@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  LayoutDashboard, Package, Truck, Trophy, Menu, X,
+import { ArrowLeft, LayoutDashboard, Package, Truck, Trophy, Menu, X,
   BarChart3, Settings, Bell, DollarSign, Calculator,
   Users, Shield, Map, Send, Box, AlertTriangle,
   PackageSearch, Target, Building2, FileCheck, Search,
@@ -124,7 +123,7 @@ export function MobileBottomNav() {
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               {canGoBack ? (
-                <X className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" />
               ) : (
                 <LayoutDashboard className={cn("w-5 h-5", location.pathname === "/" ? "text-primary" : "text-muted-foreground")} />
               )}

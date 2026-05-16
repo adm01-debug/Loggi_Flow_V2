@@ -5,6 +5,7 @@ import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { MobileQuickActions } from "./MobileQuickActions";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { PageBackButton } from "@/components/common/PageBackButton";
 import { ScrollRestoration } from "@/components/common/ScrollRestoration";
 import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 import { ScrollToTop } from "@/components/common/ScrollToTop";
@@ -85,13 +86,14 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div className="flex-1 flex overflow-hidden">
           <main 
             id="main-content" 
-            className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 scroll-smooth overscroll-contain animate-in fade-in duration-700" 
+            className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 scroll-smooth overscroll-contain" 
             tabIndex={-1}
             role="main"
             aria-label="Conteúdo principal"
           >
-          <nav aria-label="Navegação breadcrumb">
-            <Breadcrumbs className="mb-4" />
+          <nav aria-label="Navegação breadcrumb" className="flex items-center gap-3 mb-4">
+            <PageBackButton className="hidden md:flex" />
+            <Breadcrumbs className="flex-1" />
           </nav>
           
           <Suspense fallback={null}>

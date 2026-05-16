@@ -40,18 +40,21 @@ export function PageTransition({ children, mode = "directional" }: PageTransitio
     return {
       initial: { 
         opacity: 0, 
-        x: isBack ? -30 : 30,
-        filter: "blur(4px)" 
+        x: isBack ? -40 : 40,
+        scale: 0.98,
+        filter: "blur(8px)" 
       },
       animate: { 
         opacity: 1, 
         x: 0,
+        scale: 1,
         filter: "blur(0px)" 
       },
       exit: { 
         opacity: 0, 
-        x: isBack ? 30 : -30,
-        filter: "blur(4px)"
+        x: isBack ? 40 : -40,
+        scale: 0.98,
+        filter: "blur(8px)"
       },
     };
   }, [direction]);
