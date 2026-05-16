@@ -2,6 +2,8 @@ import { useMemo, useState, useEffect, useRef, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, ShieldCheck } from "lucide-react";
+import { PageTransition } from "@/components/common/PageTransition";
+
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
@@ -170,51 +172,53 @@ export default function Index() {
 
   return (
     <MainLayout>
-      <div className="space-y-4 md:space-y-6">
-        {/* Header with responsive layout */}
-        <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="animate-in slide-in-from-left-4 duration-500">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+      <PageTransition>
+        <div className="space-y-4 md:space-y-6">
+          {/* Header with responsive layout */}
+          <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="animate-in slide-in-from-left-4 duration-500">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                  <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                </div>
+                <span className="truncate">Dashboard</span>
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">Visão geral das operações logísticas</p>
+            </div>
+            
+            {/* Actions - Scrollable on mobile */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none animate-in fade-in duration-500 delay-100">
+              <div className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></div>
+              <div className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10" title="Atualizar dados"><RefreshCw className="w-4 h-4" /></Button></div>
+              <div className="shrink-0"><RefreshTimer lastRefresh={lastRefresh} /></div>
+              <div className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></div>
+              {isEditMode && (
+                <>
+                  <div className="shrink-0"><WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} /></div>
+                  <div className="shrink-0"><Button variant="outline" size="sm" onClick={resetLayout} className="whitespace-nowrap"><RotateCcw className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Resetar</span></Button></div>
+                </>
+              )}
+              <div className="shrink-0">
+                <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode} className="whitespace-nowrap">
+                  <Settings2 className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">{isEditMode ? "Salvar" : "Personalizar"}</span>
+                </Button>
               </div>
-              <span className="truncate">Dashboard</span>
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">Visão geral das operações logísticas</p>
-          </div>
-          
-          {/* Actions - Scrollable on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none animate-in fade-in duration-500 delay-100">
-            <div className="shrink-0"><DateRangePicker value={dateRange} onChange={handleDateRangeChange} /></div>
-            <div className="shrink-0"><Button variant="outline" size="icon" onClick={handleRefresh} className="h-9 w-9 sm:h-10 sm:w-10" title="Atualizar dados"><RefreshCw className="w-4 h-4" /></Button></div>
-            <div className="shrink-0"><RefreshTimer lastRefresh={lastRefresh} /></div>
-            <div className="shrink-0"><div className="h-6 w-px bg-border hidden sm:block" /></div>
-            {isEditMode && (
-              <>
-                <div className="shrink-0"><WidgetPicker availableWidgets={getAvailableWidgetsToAdd()} onAddWidget={addWidget} /></div>
-                <div className="shrink-0"><Button variant="outline" size="sm" onClick={resetLayout} className="whitespace-nowrap"><RotateCcw className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Resetar</span></Button></div>
-              </>
-            )}
-            <div className="shrink-0">
-              <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode} className="whitespace-nowrap">
-                <Settings2 className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">{isEditMode ? "Salvar" : "Personalizar"}</span>
-              </Button>
             </div>
           </div>
-        </div>
-        
-        <div className="animate-in fade-in duration-500 delay-150">
-          <LiveStatusBar />
-        </div>
+          
+          <div className="animate-in fade-in duration-500 delay-150">
+            <LiveStatusBar />
+          </div>
 
-        <div className="animate-in fade-in duration-500 delay-200">
-          <FavoriteMetricsBar />
+          <div className="animate-in fade-in duration-500 delay-200">
+            <FavoriteMetricsBar />
+          </div>
+          
+          <div className="animate-in fade-in duration-500 delay-300">
+            <DraggableDashboard widgets={widgets} isEditMode={isEditMode} onReorder={handleReorder} onRemove={handleRemove} />
+          </div>
         </div>
-        
-        <div className="animate-in fade-in duration-500 delay-300">
-          <DraggableDashboard widgets={widgets} isEditMode={isEditMode} onReorder={handleReorder} onRemove={handleRemove} />
-        </div>
-      </div>
+      </PageTransition>
     </MainLayout>
   );
 }
