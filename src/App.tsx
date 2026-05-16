@@ -100,10 +100,8 @@ PageLoader.displayName = "PageLoader";
 
 function AppRoutes() {
   const location = useLocation();
-  const { useGlobalShortcuts } = lazy(() => import("@/hooks/useKeyboardShortcuts").then(m => ({ default: m.useGlobalShortcuts }))) as any;
+  useGlobalShortcuts();
   
-  // We need to use the hook, but lazy loading hooks is tricky.
-  // I'll just import it normally.
   return (
     <AnimatePresence mode="wait">
       <motion.div
