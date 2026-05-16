@@ -205,7 +205,9 @@ export default function Clientes() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <PageTransition>
+        <div className="space-y-6">
+
 
 
 
@@ -408,7 +410,8 @@ export default function Clientes() {
           />
         </ImportDialogContent>
       </ImportDialog>
-      </div>
+        </div>
+      </PageTransition>
     </MainLayout>
   );
 }
