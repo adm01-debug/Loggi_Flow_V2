@@ -113,13 +113,21 @@ export function AuthHeroSection() {
   return (
     <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col justify-between p-8 xl:p-12 relative z-10">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-        <div className="flex items-center gap-3 mb-2">
-          <motion.div whileHover={{ rotate: [0, -10, 10, 0], scale: 1.05 }} transition={{ duration: 0.5 }} className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
-            <Truck className="w-6 h-6 text-primary-foreground" />
+        <div className="flex items-center gap-4 mb-4">
+          <motion.div 
+            whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }} 
+            transition={{ duration: 0.5, type: "spring" }} 
+            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 flex items-center justify-center shadow-[0_10px_30px_rgba(var(--primary-rgb),0.5)] border border-white/20"
+          >
+            <Truck className="w-8 h-8 text-white animate-pulse" />
           </motion.div>
-          <span className="font-display text-2xl font-bold">LogiFlow</span>
+          <div>
+            <span className="font-display text-3xl font-black tracking-tighter uppercase italic">LogiFlow</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] bg-primary/10 px-2 py-0.5 rounded-full">Enterprise Edition</span>
+            </div>
+          </div>
         </div>
-        <p className="text-muted-foreground">Logística Gamificada • Resultados Reais</p>
       </motion.div>
 
       <div className="flex-1 flex flex-col justify-center max-w-xl">
