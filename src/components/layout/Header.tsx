@@ -30,7 +30,9 @@ export const Header = memo(function Header() {
   const { userLevel } = useGamification();
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentLabel } = useNavigationHistory();
+  const { currentLabel, recentPages } = useNavigationHistory();
+  
+  const prevPage = recentPages.length > 1 ? recentPages[1] : null;
 
   const isHomePage = location.pathname === "/";
 
@@ -76,26 +78,27 @@ export const Header = memo(function Header() {
     <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header gap-2 sm:gap-4">
       {/* Mobile: Back button + Page title | Desktop: Global Search */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        {/* Mobile back + title */}
-        <div className="flex items-center gap-1 md:hidden min-w-0">
+        {/* Universal Back Button + Page Title */}
+        <div className="flex items-center gap-1 min-w-0">
           {!isHomePage && (
             <Button
               variant="ghost"
               size="icon"
               onClick={handleBack}
-              className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
-              aria-label="Voltar"
+              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+              aria-label={prevPage ? `Voltar para ${prevPage.label}` : "Voltar"}
+              title={prevPage ? `Voltar para ${prevPage.label}` : "Voltar (ou Alt + ←)"}
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           )}
-          <span className="text-sm font-semibold truncate text-foreground">
+          <span className="text-sm sm:text-base font-semibold truncate text-foreground ml-1">
             {currentLabel}
           </span>
         </div>
 
-        {/* Desktop: Search */}
-        <div className="hidden md:block flex-1 max-w-sm lg:max-w-md">
+        {/* Desktop: Search - Slightly shifted for back button */}
+        <div className="hidden md:block flex-1 max-w-sm lg:max-w-md ml-4">
           <Suspense fallback={<div className="h-9 w-full rounded-md bg-muted animate-pulse" />}>
             <GlobalSearch />
           </Suspense>

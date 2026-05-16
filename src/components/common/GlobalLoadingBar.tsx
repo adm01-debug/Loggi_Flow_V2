@@ -27,12 +27,14 @@ export const GlobalLoadingBar = () => {
       className={`fixed top-0 left-0 right-0 z-[9999] h-[3px] bg-primary/10 transition-opacity duration-300 ${isNavigating ? 'opacity-100' : 'opacity-0'}`}
     >
       <div
-        className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)] transition-all ease-in-out"
+        className="h-full bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.8)] transition-all ease-in-out relative overflow-hidden"
         style={{ 
           width: isNavigating ? "70%" : "100%",
           transitionDuration: isNavigating ? "800ms" : "300ms"
         }}
-      />
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
+      </div>
     </div>
   );
 };
