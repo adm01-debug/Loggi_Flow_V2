@@ -114,7 +114,7 @@ export function AuthHeroSection() {
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <div className="flex items-center gap-3 mb-2">
           <motion.div whileHover={{ rotate: [0, -10, 10, 0], scale: 1.05 }} transition={{ duration: 0.5 }} className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
-            <Box className="w-6 h-6 text-primary-foreground" />
+            <Truck className="w-6 h-6 text-primary-foreground" />
           </motion.div>
           <span className="font-display text-2xl font-bold">LogiFlow</span>
         </div>
