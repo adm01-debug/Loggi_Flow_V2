@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw, QrCode, Copy, Check } from "lucide-react";
-import { MaterialLabelPrinter } from "@/components/labels";
+import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw, QrCode, Copy, Check, Printer } from "lucide-react";
+import { MaterialLabelPrinter, LabelPreview, type LabelData } from "@/components/labels";
 import { useRodonavesTracking } from "@/hooks/useRodonavesTracking";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
 import { DocumentUploadField } from "@/components/common/DocumentUploadField";
@@ -141,6 +141,8 @@ export default function Envios() {
   const [dlgView, setDlgView] = useState(false);
   const [dlgDel, setDlgDel] = useState(false);
   const [sel, setSel] = useState<Entrega | null>(null);
+  const [previewLabel, setPreviewLabel] = useState<LabelData | null>(null);
+  const [printMode, setPrintMode] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const { playSuccess, playAction, playError, playWhoosh } = useAudioFeedback();
 
@@ -217,6 +219,29 @@ export default function Envios() {
   const handleClienteChange = (id: string) => {
     const cliente = clientes.find(c => c.id === id);
     if (cliente) setForm({ ...form, cliente_id: id, endereco_entrega: cliente.endereco_completo || "", contato_cliente: cliente.contato_telefone || "" });
+  };
+
+  const handlePrintLabel = (e: Entrega) => {
+    const labelData: LabelData = {
+      id: e.id,
+      codigo: e.numero_entrega,
+      descricao: e.nf_remessa ? `NF ${e.nf_remessa}` : e.numero_entrega,
+      nfRemessa: e.nf_remessa || undefined,
+      cliente: e.cliente?.nome_fantasia || e.cliente?.razao_social || undefined,
+      destino: e.endereco_entrega,
+      dataDespacho: e.created_at,
+      transportadora: e.transportadora?.nome_fantasia || undefined,
+      status: e.status,
+    };
+    setPreviewLabel(labelData);
+  };
+
+  const handleConfirmPrint = () => {
+    setPrintMode(true);
+    setTimeout(() => {
+      window.print();
+      setPrintMode(false);
+    }, 500);
   };
 
   const stats = { total: list.length, transito: list.filter(e => ["em_transito", "saiu_entrega"].includes(e.status)).length, entregues: list.filter(e => e.status === "entregue").length, ocorrencias: list.filter(e => e.status === "ocorrencia").length };
@@ -341,7 +366,7 @@ export default function Envios() {
                   <div className="flex items-center gap-4">{e.previsao_entrega && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{format(new Date(e.previsao_entrega), "dd/MM", { locale: ptBR })}</span>}{e.transportadora && <span className="flex items-center gap-1"><Truck className="w-3 h-3" />{e.transportadora.nome_fantasia}</span>}</div>
                 </div>
               </div>
-              <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(e); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuSeparator />{e.status === "aguardando_producao" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "pronto_despacho" })}>Pronto Despacho</DropdownMenuItem>}{e.status === "despachado" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "em_transito" })}>Em Trânsito</DropdownMenuItem>}{e.status === "em_transito" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "entregue" })}>Marcar Entregue</DropdownMenuItem>}<DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(e); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+              <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(e); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => handlePrintLabel(e)}><Printer className="w-4 h-4 mr-2" />Etiqueta</DropdownMenuItem><DropdownMenuSeparator />{e.status === "aguardando_producao" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "pronto_despacho" })}>Pronto Despacho</DropdownMenuItem>}{e.status === "despachado" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "em_transito" })}>Em Trânsito</DropdownMenuItem>}{e.status === "em_transito" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "entregue" })}>Marcar Entregue</DropdownMenuItem>}<DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(e); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             </div>
           </div>
         ); })}</div>}
@@ -372,6 +397,31 @@ export default function Envios() {
         <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>{sel?.numero_entrega}</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><div className="flex items-center gap-2"><Badge className={statusConfig[sel.status].color}>{statusConfig[sel.status].label}</Badge></div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Cliente</p><p>{sel.cliente?.nome_fantasia || sel.cliente?.razao_social || "-"}</p></div><div><p className="text-sm text-muted-foreground">Transportadora</p><p>{sel.transportadora?.nome_fantasia || "-"}</p></div></div><div><p className="text-sm text-muted-foreground">Endereço</p><p>{sel.endereco_entrega}</p></div>{sel.observacoes && <div><p className="text-sm text-muted-foreground">Observações</p><p>{sel.observacoes}</p></div>}<div className="grid grid-cols-2 gap-4"><DocumentUploadField value={sel.comprovante_entrega_url} onChange={async (url) => { await supabase.from("entregas").update({ comprovante_entrega_url: url }).eq("id", sel.id); refetch(); }} folder={`entregas/${sel.id}/comprovantes`} label="Comprovante de Entrega" /><DocumentUploadField value={sel.nf_remessa_url} onChange={async (url) => { await supabase.from("entregas").update({ nf_remessa_url: url }).eq("id", sel.id); refetch(); }} folder={`entregas/${sel.id}/nf`} label="NF Remessa" /></div><RodonavesActions entrega={sel} /></div>}</DialogContent></Dialog>
 
         <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir entrega?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+
+        {/* Modal de Impressão de Etiqueta Individual */}
+        <Dialog open={!!previewLabel} onOpenChange={() => setPreviewLabel(null)}>
+          <DialogContent className="max-w-fit">
+            <DialogHeader>
+              <DialogTitle>Imprimir Etiqueta — 10×15cm</DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-center py-4">
+              {previewLabel && <LabelPreview data={previewLabel} />}
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setPreviewLabel(null)}>Fechar</Button>
+              <Button onClick={handleConfirmPrint}>
+                <Printer className="w-4 h-4 mr-1" /> Imprimir
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Estilo e Conteúdo para Impressão */}
+        {printMode && previewLabel && (
+          <div className="fixed inset-0 z-[9999] bg-white">
+            <LabelPreview data={previewLabel} showBorder={false} />
+          </div>
+        )}
       </div>
     </MainLayout>
   );
