@@ -78,7 +78,7 @@ export const Header = memo(function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-card/80 backdrop-blur-md border-b border-border shadow-header gap-2 sm:gap-4">
+    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm gap-2 sm:gap-4 transition-all duration-300">
       {/* Mobile: Back button + Page title | Desktop: Global Search */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
         {/* Universal Back Button + Page Title with Dropdown */}
