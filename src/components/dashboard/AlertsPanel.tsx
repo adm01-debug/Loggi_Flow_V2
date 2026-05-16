@@ -151,74 +151,77 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                 return (
                   <motion.div
                     key={alert.id}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                    exit={{ opacity: 0, scale: 0.95, x: 30 }}
                     transition={{ 
                       type: "spring",
-                      stiffness: 400,
-                      damping: 30,
-                      delay: index * 0.05 
+                      stiffness: 500,
+                      damping: 35,
+                      delay: index * 0.08 
                     }}
                     className={cn(
-                      "relative p-5 rounded-2xl border-2 mb-4 cursor-pointer transition-all duration-300 group overflow-hidden",
+                      "relative p-6 rounded-2xl border-2 mb-5 cursor-pointer transition-all duration-500 group overflow-hidden",
                       styles.container,
-                      "hover:shadow-2xl hover:translate-x-2 hover:border-opacity-100 border-opacity-30",
-                      alert.severity === 'error' ? "border-destructive/40 bg-destructive/5" : "border-warning/40 bg-warning/5"
+                      "hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] hover:-translate-y-1 hover:translate-x-1 hover:border-opacity-100 border-opacity-20",
+                      alert.severity === 'error' ? "border-destructive/50 bg-destructive/10" : "border-warning/50 bg-warning/10"
                     )}
                     onClick={() => onViewDetails?.(alert)}
                   >
-                    {/* Glossy overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50 pointer-events-none" />
+                    {/* Brilho de varredura (Sweep animation) */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
                     
-                    <div className="relative z-10 flex items-start gap-5">
+                    <div className="relative z-10 flex items-start gap-6">
                       <div className={cn(
-                        "flex items-center justify-center w-12 h-12 rounded-xl shrink-0 shadow-lg border-b-4 transition-transform group-hover:scale-110 group-hover:rotate-3",
+                        "flex items-center justify-center w-14 h-14 rounded-2xl shrink-0 shadow-2xl border-2 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6",
                         styles.icon,
-                        alert.severity === 'error' ? "border-destructive-foreground/20" : "border-warning-foreground/20"
+                        alert.severity === 'error' ? "border-destructive/40 shadow-destructive/20" : "border-warning/40 shadow-warning/20"
                       )}>
-                        <Icon className="w-6 h-6" />
+                        <Icon className="w-7 h-7" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className={cn(
-                            "px-3 py-1 text-[10px] font-black rounded-full uppercase tracking-widest border shadow-sm",
-                            alert.severity === 'error' ? "bg-destructive text-white border-destructive-foreground/20" : "bg-warning text-warning-foreground border-warning-foreground/10"
-                          )}>
-                            {getTypeLabel(alert.type)}
-                          </span>
-                          <div className="flex items-center gap-1 bg-background/40 backdrop-blur-sm px-2 py-0.5 rounded-md border border-border/20">
-                            <Clock className="w-3 h-3 text-muted-foreground" />
-                            <span className="text-[10px] font-black text-foreground tabular-nums tracking-tighter">
-                              {new Date(alert.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className={cn(
+                              "px-3 py-1 text-[10px] font-black rounded-lg uppercase tracking-[0.2em] border shadow-lg",
+                              alert.severity === 'error' ? "bg-destructive text-white border-white/20" : "bg-warning text-black border-black/10"
+                            )}>
+                              {getTypeLabel(alert.type)}
+                            </span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-border/40" />
+                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic opacity-60">Priority {alert.severity === 'error' ? '01' : '02'}</span>
+                          </div>
+                          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/5">
+                            <Clock className="w-3.5 h-3.5 text-primary/70" />
+                            <span className="text-[11px] font-black text-foreground tabular-nums tracking-widest italic">
+                              {new Date(alert.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                             </span>
                           </div>
                         </div>
-                        <h4 className="text-base font-black text-foreground leading-tight tracking-tight group-hover:text-primary transition-colors">
+                        <h4 className="text-lg font-black text-foreground leading-tight tracking-tight group-hover:text-primary transition-colors italic">
                           {alert.message}
                         </h4>
-                        <div className="flex items-center gap-3 mt-3">
-                          <div className="flex items-center gap-1.5">
-                            <div className={cn("w-2 h-2 rounded-full", alert.severity === 'error' ? "bg-destructive animate-pulse" : "bg-warning")} />
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                              Prioridade: <span className={alert.severity === 'error' ? "text-destructive" : "text-warning"}>{alert.severity === 'error' ? 'CRÍTICA' : 'MÉDIA'}</span>
+                        <div className="flex items-center gap-4 mt-4">
+                          <div className="flex items-center gap-2 px-3 py-1 bg-background/40 rounded-full border border-white/5">
+                            <div className={cn("w-2 h-2 rounded-full", alert.severity === 'error' ? "bg-destructive animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" : "bg-warning")} />
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+                              Status: <span className={alert.severity === 'error' ? "text-destructive" : "text-warning"}>{alert.severity === 'error' ? 'CRITICAL_FAILURE' : 'PENDING_ACTION'}</span>
                             </p>
                           </div>
-                          <div className="h-1 w-1 rounded-full bg-border" />
-                          <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Protocolo: 24-{index+102}</p>
+                          <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em] italic">NX-{index+102}-SRV</p>
                         </div>
                       </div>
                       {onDismiss && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive hover:text-white rounded-xl shadow-lg"
+                          className="h-10 w-10 shrink-0 opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive hover:text-white rounded-2xl shadow-2xl border border-white/5 group-hover:rotate-12"
                           onClick={(e) => {
                             e.stopPropagation();
                             onDismiss(alert.id);
                           }}
                         >
-                          <X className="w-5 h-5" />
+                          <X className="w-6 h-6" />
                         </Button>
                       )}
                     </div>
