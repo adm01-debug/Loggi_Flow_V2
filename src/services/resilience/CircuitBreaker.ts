@@ -35,7 +35,7 @@ class CircuitBreaker {
     } catch (error) {
       if (attempt < this.config.maxRetries) {
         const delay = this.config.retryDelay * Math.pow(2, attempt); // Exponential backoff
-        await new Promise(res => setTimeout(r, delay));
+        await new Promise(res => setTimeout(res, delay));
         return this.retry(fn, attempt + 1);
       }
       throw error;
