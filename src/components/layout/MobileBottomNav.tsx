@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
+import { hapticFeedback } from "@/utils/haptics";
 
 interface NavItem {
   icon: React.ElementType;
