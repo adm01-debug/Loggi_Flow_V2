@@ -81,7 +81,7 @@ export const Header = memo(function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm gap-2 sm:gap-4 transition-all duration-300">
+    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-20 px-3 sm:px-10 bg-background/60 backdrop-blur-3xl border-b border-primary/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] gap-2 sm:gap-6 transition-all duration-500">
       {/* Left side: Back button + Page title with History */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <div className="flex items-center gap-1 min-w-0">
