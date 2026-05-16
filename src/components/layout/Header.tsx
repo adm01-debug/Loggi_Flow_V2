@@ -172,7 +172,7 @@ export const Header = memo(function Header() {
 
       {/* Gamification Stats */}
       <div className="hidden md:flex items-center gap-2 lg:gap-4">
-        <div className="flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full bg-primary/10 border border-primary/20 transition-all hover:bg-primary/20">
+        <div className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl bg-primary/10 border border-primary/20 transition-all hover:scale-105 hover:bg-primary/20 shadow-lg shadow-primary/5">
           <Zap className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-primary" />
           <span className="text-xs lg:text-sm font-bold text-primary">
             {userLevel?.total_xp?.toLocaleString() || 0}
