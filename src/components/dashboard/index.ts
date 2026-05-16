@@ -12,3 +12,5 @@ export { WidgetPicker } from './WidgetPicker';
 export { XPProgressBar } from './XPProgressBar';
 export { LiveStatusBar } from './LiveStatusBar';
 export { LogisticsMapWidget } from './LogisticsMapWidget';
+export { IntelligentLogisticsWidget } from './IntelligentLogisticsWidget';
+export { SystemHealthWidget } from './SystemHealthWidget';
