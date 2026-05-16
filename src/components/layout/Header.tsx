@@ -91,7 +91,10 @@ export const Header = memo(function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={goBack}
+                  onClick={() => {
+                    hapticFeedback('light');
+                    goBack();
+                  }}
                   disabled={!canGoBack}
                   className={cn(
                     "h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground transition-all duration-200",
