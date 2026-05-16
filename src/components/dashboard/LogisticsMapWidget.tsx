@@ -1,5 +1,5 @@
 import * as React from "react";
-import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, GeolocateControl } from "react-map-gl";
+import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, GeolocateControl } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,9 +7,7 @@ import { MapPin, Truck, Package, Activity, Navigation2, Satellite } from "lucide
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-// Note: In a production app, the token should be in environment variables
-// For demonstration/setup, we'll use a placeholder or handle the empty token state
-const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ"; // Standard public token for dev
+const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
 
 interface DeliveryLocation {
   id: string;
@@ -93,7 +91,6 @@ export function LogisticsMapWidget() {
                   anchor="bottom"
                 >
                   <div className="group/marker cursor-pointer relative">
-                    {/* Ripple effect */}
                     <div className={cn(
                       "absolute -inset-4 rounded-full animate-ping opacity-20",
                       loc.status === "em_transito" ? "bg-primary" : 
@@ -109,7 +106,6 @@ export function LogisticsMapWidget() {
                        loc.status === "entregue" ? <Package className="w-5 h-5" /> : <MapPin className="w-5 h-5" />}
                     </div>
 
-                    {/* Infobox on hover */}
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 group-hover/marker:opacity-100 transition-opacity pointer-events-none z-50">
                       <div className="bg-black/90 border border-white/20 backdrop-blur-xl p-3 rounded-2xl shadow-2xl min-w-[200px]">
                         <p className="text-[10px] font-black uppercase text-primary tracking-widest mb-1">{loc.vehicle}</p>
@@ -130,7 +126,6 @@ export function LogisticsMapWidget() {
               ))}
             </Map>
 
-            {/* Floating Stats Overlay */}
             <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
               <div className="bg-black/60 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-2xl">
                 <div className="flex items-center gap-3 mb-2">
@@ -148,3 +143,4 @@ export function LogisticsMapWidget() {
     </Card>
   );
 }
+
