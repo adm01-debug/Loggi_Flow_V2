@@ -179,7 +179,7 @@ export const Header = memo(function Header() {
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full bg-coins/10 border border-coins/20 transition-all hover:bg-coins/20">
+        <div className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl bg-coins/10 border border-coins/20 transition-all hover:scale-105 hover:bg-coins/20 shadow-lg shadow-coins/5">
           <Coins className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-coins" />
           <span className="text-xs lg:text-sm font-bold text-coins">
             {userLevel?.coins?.toLocaleString() || 0}
