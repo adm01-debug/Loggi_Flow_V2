@@ -159,92 +159,110 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
     return (
       <motion.div
         ref={ref}
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        whileHover={{ y: -4, scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ 
+          y: -10, 
+          scale: 1.02,
+          transition: { type: "spring", stiffness: 400, damping: 25 }
+        }}
         className={cn(
-          "group relative rounded-2xl sm:rounded-3xl border-2 p-4 sm:p-6 transition-all duration-500 overflow-hidden cursor-default touch-manipulation shadow-lg",
-          "hover:shadow-2xl hover:translate-y-[-6px]",
-          "after:absolute after:inset-0 after:rounded-3xl after:opacity-0 after:blur-3xl after:transition-opacity after:duration-700",
-          "hover:after:opacity-100",
+          "group relative rounded-[2rem] border-2 p-6 transition-all duration-500 overflow-hidden cursor-default shadow-xl",
+          "hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]",
           config.border,
           config.bg,
-          config.glow,
           className
         )}
       >
-        {/* Animated gradient border effect */}
-        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-          <div className="absolute inset-[-1px] rounded-2xl bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-shimmer" />
+        {/* Animated Background Mesh */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse delay-700" />
         </div>
 
-        <div className="relative z-10">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-3 sm:mb-4">
+        {/* Glossy Reflection */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+        <div className="relative z-10 h-full flex flex-col justify-between">
+          <div className="flex items-start justify-between mb-6">
             <motion.div 
-              whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-              transition={{ duration: 0.4 }}
+              whileHover={{ rotate: 15, scale: 1.2 }}
               className={cn(
-                "flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl transition-all duration-300",
-                "group-hover:shadow-lg",
+                "flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 shadow-lg border-b-4",
                 config.iconBg
               )}
             >
-              <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Icon className="w-7 h-7" />
             </motion.div>
             
-            <div className="flex flex-col items-end gap-1">
+            <div className="flex flex-col items-end gap-2">
               {sparklineData && sparklineData.length > 1 && (
-                <Sparkline data={sparklineData} color={config.sparkColor} />
+                <div className="bg-background/20 backdrop-blur-md p-1.5 rounded-xl border border-white/5">
+                  <Sparkline data={sparklineData} color={config.sparkColor} />
+                </div>
               )}
               {(trendValue || changePercent !== null) && (
-                <div className={cn(
-                  "flex items-center gap-1 text-sm font-bold px-2 py-0.5 rounded-full",
-                  trendBgClass
-                )}>
-                  {trendIcon}
-                  <span className="text-xs">{trendValue || `${changePercent}%`}</span>
-                </div>
+                <motion.div 
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  className={cn(
+                    "flex items-center gap-1.5 text-[10px] font-black px-3 py-1 rounded-full border shadow-sm uppercase tracking-widest",
+                    trendBgClass,
+                    trend === 'up' ? "border-success/20" : trend === 'down' ? "border-destructive/20" : "border-border/20"
+                  )}
+                >
+                  <span className="text-sm leading-none">{trendIcon}</span>
+                  <span>{trendValue || `${changePercent}%`}</span>
+                </motion.div>
               )}
             </div>
           </div>
 
-          {/* Content */}
-          <div className="space-y-0.5 sm:space-y-1">
-            <p className="text-[10px] sm:text-xs font-black text-muted-foreground/60 tracking-widest uppercase">
-              {title}
-            </p>
-            <motion.p 
-              key={animatedValue}
-              className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tighter bg-clip-text drop-shadow-sm"
-            >
-              {typeof value === 'string' && value.includes('R$') ? value : animatedValue}
-            </motion.p>
+          <div className="space-y-1 mt-auto">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-3 bg-primary rounded-full" />
+              <p className="text-[10px] font-black text-muted-foreground/60 tracking-[0.2em] uppercase">
+                {title}
+              </p>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <motion.p 
+                key={animatedValue}
+                className="text-4xl lg:text-5xl font-display font-black tracking-tighter tabular-nums"
+              >
+                {typeof value === 'string' && value.includes('R$') 
+                  ? <span className="text-foreground">{value}</span>
+                  : <span className="bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text">{animatedValue}</span>
+                }
+              </motion.p>
+              {status !== 'neutral' && (
+                <div className={cn("w-2 h-2 rounded-full mb-2 animate-pulse", 
+                  status === 'success' ? 'bg-success' : status === 'warning' ? 'bg-warning' : 'bg-destructive'
+                )} />
+              )}
+            </div>
             {subtitle && (
-              <p className="text-[10px] sm:text-xs text-muted-foreground/80 font-medium">{subtitle}</p>
+              <p className="text-[11px] text-muted-foreground/80 font-bold uppercase tracking-tight italic">{subtitle}</p>
             )}
           </div>
 
-          {/* Progress bar */}
           {target && (
-            <div className="mt-3 sm:mt-5">
-              <div className="flex justify-between text-[10px] sm:text-xs text-muted-foreground mb-1.5 sm:mb-2 font-medium">
-                <span>{progressPercent.toFixed(0)}% atingido</span>
-                <span>Meta: {target}</span>
+            <div className="mt-8 relative pt-4 border-t border-white/5">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">{progressPercent.toFixed(0)}% PERFORMANCE</span>
+                <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md border border-primary/20">META: {target}</span>
               </div>
-              <div className="h-1.5 sm:h-2 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
+              <div className="h-2.5 bg-black/20 rounded-full overflow-hidden backdrop-blur-md border border-white/5 p-[1px]">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 1.2, ease: [0.34, 1.56, 0.64, 1] }}
+                  transition={{ duration: 1.5, ease: [0.34, 1.56, 0.64, 1] }}
                   className={cn(
-                    "h-full rounded-full relative overflow-hidden bg-gradient-to-r",
+                    "h-full rounded-full relative overflow-hidden bg-gradient-to-r shadow-[0_0_15px_rgba(var(--primary),0.5)]",
                     config.progressGradient
                   )}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+                  <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] animate-shimmer" />
                 </motion.div>
               </div>
             </div>
