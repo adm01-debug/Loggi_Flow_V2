@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { ChevronRight, Home, Copy, Check } from "lucide-react";
+import { ChevronRight, Home, Copy, Check, History as HistoryIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
