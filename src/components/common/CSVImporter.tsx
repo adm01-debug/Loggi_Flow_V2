@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
+import { cn } from '@/lib/utils';
 
 interface CSVImporterProps<T> {
   schema: z.ZodSchema<T>;
