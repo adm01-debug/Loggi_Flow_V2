@@ -78,13 +78,14 @@ export function MainLayout({ children }: MainLayoutProps) {
       
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main 
-          id="main-content" 
-          className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 scroll-smooth overscroll-contain" 
-          tabIndex={-1}
-          role="main"
-          aria-label="Conteúdo principal"
-        >
+        <div className="flex-1 flex overflow-hidden">
+          <main 
+            id="main-content" 
+            className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 scroll-smooth overscroll-contain animate-in fade-in duration-700" 
+            tabIndex={-1}
+            role="main"
+            aria-label="Conteúdo principal"
+          >
           <nav aria-label="Navegação breadcrumb">
             <Breadcrumbs className="mb-4" />
           </nav>
@@ -97,6 +98,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             {children}
           </Suspense>
         </main>
+      </div>
       </div>
       
       <MobileBottomNav />

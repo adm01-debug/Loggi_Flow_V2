@@ -10,7 +10,7 @@
     --font-display: 'Outfit', system-ui, sans-serif;
 
     /* ===== BASE - Dark Theme as Default ===== */
-    --background: 220 20% 7%;
+    --background: 220 20% 6%;
     --foreground: 210 40% 98%;
 
     /* ===== CARDS ===== */
@@ -118,7 +118,7 @@
     --table-padding: 1rem;
 
     /* ===== SIDEBAR ===== */
-    --sidebar-background: 220 20% 7%;
+    --sidebar-background: 220 20% 6%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 25 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -152,6 +152,9 @@
     --z-tooltip: 700;
     --z-toast: 800;
     --z-max: 9999;
+    --header-height: 4rem;
+    --sidebar-width: 18rem;
+    --sidebar-collapsed-width: 4.5rem;
   }
 
   /* Light mode - proper high-contrast light theme */
@@ -722,6 +725,16 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ===== UX PREMIUM ENHANCEMENTS ===== */
+.premium-blur {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.card-kanban-item {
+  @apply bg-card/60 backdrop-blur-sm border-2 border-transparent hover:border-primary/30 transition-all duration-300;
 }
 
 /* ===== ACCESSIBILITY MODES ===== */

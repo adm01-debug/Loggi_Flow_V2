@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { motion, Reorder, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -190,27 +191,58 @@ export default function Despachos() {
                       <p className="text-xs text-muted-foreground text-center py-6">Nenhum item</p>
                     )}
                     {items.map((item) => (
-                      <div key={item.id} className="card-interactive p-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-mono text-xs text-muted-foreground">{item.numero_entrega}</span>
-                          {validTransitions[col] && (
-                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveToNext(item)}>
-                              <ArrowRight className="w-4 h-4" />
-                            </Button>
-                          )}
+                      <motion.div 
+                        key={item.id} 
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        whileHover={{ y: -2 }}
+                        className="card-interactive p-3 border-2 hover:border-primary/40 group/card relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="font-mono text-[10px] font-bold text-muted-foreground/70 bg-muted px-1.5 py-0.5 rounded uppercase tracking-wider">
+                              #{item.numero_entrega.slice(-6)}
+                            </span>
+                            {validTransitions[col] && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 rounded-full bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all shadow-sm" 
+                                onClick={() => moveToNext(item)}
+                                title={`Mover para ${statusConfig[validTransitions[col]]?.label}`}
+                              >
+                                <ArrowRight className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                          <p className="font-bold text-sm truncate text-foreground group-hover/card:text-primary transition-colors">{item.cliente}</p>
+                          <p className="text-[11px] text-muted-foreground truncate leading-relaxed mt-0.5">{item.destino}</p>
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {item.transportadora && (
+                              <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tighter border-primary/20 bg-primary/5">
+                                <Truck className="w-2.5 h-2.5 mr-1" /> {item.transportadora}
+                              </Badge>
+                            )}
+                            {item.box_alocado && (
+                              <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-tighter">
+                                📦 BOX {item.box_alocado}
+                              </Badge>
+                            )}
+                            {item.nf_remessa ? (
+                              <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-tighter bg-success/20 text-success border-success/20">
+                                NF OK
+                              </Badge>
+                            ) : col !== "pronto_despacho" && (
+                              <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-tighter bg-destructive/10 text-destructive border-destructive/20 animate-pulse">
+                                SEM NF
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                        <p className="font-medium text-sm truncate">{item.cliente}</p>
-                        <p className="text-xs text-muted-foreground truncate">{item.destino}</p>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {item.transportadora && <Badge variant="outline" className="text-xs">{item.transportadora}</Badge>}
-                          {item.box_alocado && <Badge variant="secondary" className="text-xs">📦 {item.box_alocado}</Badge>}
-                          {item.nf_remessa ? (
-                            <Badge variant="secondary" className="text-xs bg-success/20 text-success">NF ✓</Badge>
-                          ) : col !== "pronto_despacho" && (
-                            <Badge variant="secondary" className="text-xs bg-destructive/20 text-destructive">Sem NF</Badge>
-                          )}
-                        </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>

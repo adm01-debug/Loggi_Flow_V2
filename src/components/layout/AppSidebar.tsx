@@ -146,8 +146,8 @@ export const AppSidebar = memo(function AppSidebar() {
   return (
     <aside
       className={cn(
-        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300",
-        collapsed ? "w-[72px]" : "w-72"
+        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 ease-in-out z-50",
+        collapsed ? "w-[var(--sidebar-collapsed-width)]" : "w-[var(--sidebar-width)]"
       )}
     >
       {/* Logo */}
@@ -399,7 +399,7 @@ export const AppSidebar = memo(function AppSidebar() {
         size="icon"
         onClick={() => setCollapsed(!collapsed)}
         aria-label={collapsed ? "Expandir" : "Recolher"}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full shadow-lg border-2 bg-background"
+        className="absolute -right-3 top-20 w-6 h-6 rounded-full shadow-lg border-2 bg-background z-[60] hover:scale-110 active:scale-95 transition-transform"
       >
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </Button>

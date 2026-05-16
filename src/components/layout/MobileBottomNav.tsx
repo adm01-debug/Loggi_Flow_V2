@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { useState, useMemo } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Package, Truck, Trophy, Menu, X,
@@ -81,7 +81,14 @@ const moreCategories: NavCategory[] = [
 
 export function MobileBottomNav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+
+  const handleLongPressBack = (e: React.MouseEvent | React.TouchEvent) => {
+    // Basic back button behavior for the first icon if it were a back button
+    // But since we have a global back button in header, let's make the "Home" icon 
+    // smarter on mobile.
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -91,7 +98,7 @@ export function MobileBottomNav() {
       <nav
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50 md:hidden",
-          "bg-card/95 backdrop-blur-lg border-t border-border",
+          "bg-background/80 backdrop-blur-xl border-t border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]",
           "pb-[env(safe-area-inset-bottom)]"
         )}
         role="navigation"
@@ -106,8 +113,9 @@ export function MobileBottomNav() {
                 to={item.path}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 py-2 px-1 relative",
-                  "transition-all duration-200",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-lg"
+                  "transition-all duration-300",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-lg",
+                  "active:scale-90"
                 )}
                 aria-current={active ? "page" : undefined}
               >
