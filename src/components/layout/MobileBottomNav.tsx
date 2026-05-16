@@ -115,7 +115,7 @@ export function MobileBottomNav() {
                   {active && (
                     <motion.div
                       layoutId="bottomNavIndicator"
-                      className="absolute inset-x-2 top-0 h-0.5 bg-primary rounded-full"
+                      className="absolute inset-x-2 top-0 h-1 bg-gradient-to-r from-primary to-primary-glow rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"
                       initial={{ opacity: 0, scaleX: 0 }}
                       animate={{ opacity: 1, scaleX: 1 }}
                       exit={{ opacity: 0, scaleX: 0 }}
