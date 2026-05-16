@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-export type EmptyStateVariant = "search" | "data" | "delivery" | "notifications" | "users" | "error" | "inbox" | "calendar" | "default";
+export type EmptyStateVariant = "search" | "data" | "delivery" | "notifications" | "users" | "error" | "inbox" | "calendar" | "default" | "location";
 
 interface EmptyStateProps {
   variant?: EmptyStateVariant;
