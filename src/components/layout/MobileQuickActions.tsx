@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { QRScannerModal } from "@/components/scanner/QRScannerModal";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const MobileQuickActions = () => {
   const [isOpen, setIsOpen] = useState(false);
