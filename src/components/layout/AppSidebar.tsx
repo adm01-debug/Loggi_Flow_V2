@@ -245,11 +245,11 @@ export const AppSidebar = memo(function AppSidebar() {
                     to={item.url}
                     onMouseEnter={() => prefetch(item.url)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group/item relative",
+                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-500 group/item relative overflow-hidden",
                       collapsed ? "justify-center" : "ml-2",
                       isActive(item.url)
-                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02]"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground hover:translate-x-1"
+                        ? "bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-white shadow-[0_10px_20px_rgba(var(--primary-rgb),0.3)] scale-[1.05]"
+                        : "text-sidebar-foreground hover:bg-primary/10 hover:text-primary hover:translate-x-2"
                     )}
                   >
                     {/* Active indicator pill */}
