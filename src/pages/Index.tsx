@@ -11,6 +11,7 @@ import { TransportadoraRanking } from "@/components/dashboard/TransportadoraRank
 import { XPProgressBar } from "@/components/dashboard/XPProgressBar";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { DelayPredictionPanel } from "@/components/predictions/DelayPredictionPanel";
+import { IntelligentLogisticsWidget } from "@/components/dashboard/IntelligentLogisticsWidget";
 import { DraggableDashboard, DashboardWidget } from "@/components/dashboard/DraggableDashboard";
 import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
 import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
@@ -66,7 +67,7 @@ export default function Index() {
 
   const [widgetOrder, setWidgetOrder] = useLocalStorage<string[]>("dashboard-widget-order", [
     "xp-progress", "kpi-pendentes", "kpi-transito", "kpi-finalizadas", "kpi-problemas",
-    "chart-performance", "alerts-panel", "quick-actions"
+    "intelligence-widget", "alerts-panel", "chart-performance", "quick-actions"
   ]);
 
   useRealtime({ table: "entregas", queryKey: ["dashboard-metrics", "recent-alerts"] });
@@ -154,6 +155,7 @@ export default function Index() {
     "kpi-transito": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Trânsito"><KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" /></WidgetErrorBoundary> },
     "kpi-finalizadas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Finalizadas"><KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" /></WidgetErrorBoundary> },
     "kpi-problemas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Problemas"><KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" /></WidgetErrorBoundary> },
+    "intelligence-widget": { size: "large", render: () => <WidgetErrorBoundary widgetName="Inteligência"><IntelligentLogisticsWidget /></WidgetErrorBoundary> },
     "chart-performance": { size: "large", render: () => <WidgetErrorBoundary widgetName="Gráfico Performance"><PerformanceChart title="Movimentação" subtitle="Coletas vs Entregas" data={chartData} dataKey="coletas" secondaryDataKey="entregas" /></WidgetErrorBoundary> },
     "alerts-panel": { size: "large", render: () => <WidgetErrorBoundary widgetName="Alertas"><AlertsPanel alerts={alerts} isLoading={alertsLoading} /></WidgetErrorBoundary> },
     "quick-actions": { size: "full", render: () => <WidgetErrorBoundary widgetName="Ações Rápidas"><QuickActions /></WidgetErrorBoundary> },

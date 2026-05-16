@@ -105,6 +105,14 @@ export const AVAILABLE_WIDGETS: WidgetDefinition[] = [
     minSize: { w: 6, h: 3 },
     category: "chart",
   },
+  {
+    id: "intelligence-widget",
+    title: "Inteligência Operacional",
+    description: "Saúde operacional e otimizações IA",
+    defaultSize: { w: 6, h: 4 },
+    minSize: { w: 4, h: 4 },
+    category: "action",
+  },
 ];
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
@@ -113,9 +121,10 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { i: "kpi-transito", x: 3, y: 2, w: 3, h: 2 },
   { i: "kpi-finalizadas", x: 6, y: 2, w: 3, h: 2 },
   { i: "kpi-problemas", x: 9, y: 2, w: 3, h: 2 },
-  { i: "chart-performance", x: 0, y: 4, w: 8, h: 4 },
-  { i: "alerts-panel", x: 8, y: 4, w: 4, h: 4 },
-  { i: "quick-actions", x: 0, y: 8, w: 12, h: 2 },
+  { i: "intelligence-widget", x: 0, y: 4, w: 6, h: 4 },
+  { i: "alerts-panel", x: 6, y: 4, w: 6, h: 4 },
+  { i: "chart-performance", x: 0, y: 8, w: 12, h: 4 },
+  { i: "quick-actions", x: 0, y: 12, w: 12, h: 2 },
 ];
 
 export function useDashboardWidgets() {
