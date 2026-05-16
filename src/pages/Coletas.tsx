@@ -170,48 +170,48 @@ export default function Coletas() {
                     <div className="pb-4">
                       <Card 
                         key={c.id} 
-                        className="hover:shadow-md transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary group"
+                        className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary"
                         onClick={() => { 
                           playAction();
                           setSelectedPickup(c); 
                           setIsDetailsOpen(true); 
                         }}
                       >
-                        <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className={cn("p-2.5 rounded-xl transition-colors", statusConfig[c.status]?.color)}>
-                              <Icon className="w-5 h-5" />
+                        <CardContent className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                          <div className="flex items-center gap-5 flex-1">
+                            <div className={cn("p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500", statusConfig[c.status]?.color)}>
+                              <Icon className="w-6 h-6" />
                             </div>
                             <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-bold text-lg">{c.numero_coleta}</p>
-                                <Badge variant="secondary" className="text-[10px] h-5 uppercase">
+                              <div className="flex items-center gap-3">
+                                <p className="font-black text-xl tracking-tighter uppercase italic">{c.numero_coleta}</p>
+                                <Badge variant="secondary" className="text-[10px] h-5 font-black uppercase tracking-widest px-2 bg-primary/5 text-primary border-primary/10">
                                   {c.tipo_coleta}
                                 </Badge>
                               </div>
-                              <p className="text-sm text-muted-foreground font-medium">
+                              <p className="text-sm text-muted-foreground font-bold uppercase tracking-tight mt-0.5">
                                 {(c.fornecedores as any)?.nome_fantasia || (c.fornecedores as any)?.razao_social}
                               </p>
                             </div>
                           </div>
                           
-                          <div className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-8 flex-1">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <MapPin className="w-4 h-4 text-primary/60" /> 
-                              <span className="truncate max-w-[150px]">{c.endereco_coleta}</span>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 flex-[2] bg-sidebar-accent/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm">
+                            <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                              <div className="p-2 rounded-lg bg-background shadow-sm"><MapPin className="w-4 h-4 text-primary" /></div>
+                              <span className="truncate max-w-[150px] uppercase text-[11px] tracking-tight">{c.endereco_coleta}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Calendar className="w-4 h-4 text-primary/60" /> 
-                              {c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString() : '-'}
+                            <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                              <div className="p-2 rounded-lg bg-background shadow-sm"><Calendar className="w-4 h-4 text-primary" /></div>
+                              <span className="uppercase text-[11px] tracking-tight">{c.data_prevista_coleta ? new Date(c.data_prevista_coleta).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : '-'}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Package className="w-4 h-4 text-primary/60" /> 
-                              {c.qtd_volumes} vol
+                            <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                              <div className="p-2 rounded-lg bg-background shadow-sm"><Package className="w-4 h-4 text-primary" /></div>
+                              <span className="uppercase text-[11px] tracking-tight">{c.qtd_volumes} VOLUMES</span>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-3">
-                            <Badge className={cn("px-3 py-1 capitalize", statusConfig[c.status]?.color)}>
+                          <div className="flex items-center gap-4">
+                            <Badge className={cn("px-4 py-1.5 font-black uppercase tracking-widest text-[10px] rounded-xl shadow-sm", statusConfig[c.status]?.color)}>
                               {statusConfig[c.status]?.label}
                             </Badge>
                           </div>
