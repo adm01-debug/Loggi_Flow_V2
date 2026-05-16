@@ -121,51 +121,81 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-2">
+    <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
           <label htmlFor="csv-upload" className="sr-only">Selecione o arquivo para importação</label>
-          <Input 
-            id="csv-upload"
-            type="file" 
-            accept=".csv,.xlsx,.xls" 
-            onChange={handleFileChange} 
-            disabled={isImporting} 
-            className="cursor-pointer"
-            aria-describedby="csv-instructions"
-          />
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-primary/0 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+            <Input 
+              id="csv-upload"
+              type="file" 
+              accept=".csv,.xlsx,.xls" 
+              onChange={handleFileChange} 
+              disabled={isImporting} 
+              className="relative cursor-pointer bg-card/50 hover:bg-card transition-colors border-dashed border-2"
+              aria-describedby="csv-instructions"
+            />
+          </div>
         </div>
         {columns && (
-          <Button variant="outline" onClick={handleDownloadTemplate}>
+          <Button variant="outline" onClick={handleDownloadTemplate} className="hover-lift-sm">
             <Download className="h-4 w-4 mr-2" />Template
           </Button>
         )}
       </div>
-      {isImporting && <Progress value={progress} />}
+
+      <div id="csv-instructions" className="text-[10px] text-muted-foreground bg-muted/30 p-2 rounded border border-border/50">
+        <p className="font-semibold uppercase tracking-wider mb-1">Dicas de Importação:</p>
+        <ul className="list-disc list-inside space-y-0.5">
+          <li>Use formatos .CSV ou .XLSX (Excel)</li>
+          <li>Garanta que as colunas obrigatórias estão preenchidas</li>
+          <li>Datas devem seguir o padrão AAAA-MM-DD</li>
+        </ul>
+      </div>
+
+      {isImporting && (
+        <div className="space-y-2">
+          <div className="flex justify-between text-[10px] font-bold uppercase text-primary">
+            <span>Processando arquivo</span>
+            <span>{progress}%</span>
+          </div>
+          <Progress value={progress} className="h-1.5" />
+        </div>
+      )}
+
       {result && (
-        <>
-          <Alert variant={result.errors.length > 0 ? 'destructive' : 'default'}>
+        <div className="animate-in zoom-in-95 duration-300 space-y-3">
+          <Alert variant={result.errors.length > 0 ? 'destructive' : 'default'} className={cn(
+            "border-2",
+            result.errors.length === 0 ? "bg-success/5 border-success/20" : "bg-destructive/5 border-destructive/20"
+          )}>
             {result.errors.length === 0 ? (
-              <><CheckCircle2 className="h-4 w-4" /><AlertDescription>{result.success.length} registros válidos</AlertDescription></>
+              <><CheckCircle2 className="h-4 w-4 text-success" /><AlertDescription className="text-success font-medium">{result.success.length} registros válidos e prontos para importação</AlertDescription></>
             ) : (
-              <><AlertCircle className="h-4 w-4" /><AlertDescription>{result.success.length} válidos, {result.errors.length} erros</AlertDescription></>
+              <><AlertCircle className="h-4 w-4" /><AlertDescription className="font-medium">{result.success.length} válidos, {result.errors.length} erros detectados</AlertDescription></>
             )}
           </Alert>
+          
           {result.errors.length > 0 && (
-            <div className="max-h-40 overflow-y-auto border rounded p-2 text-sm">
+            <div className="max-h-40 overflow-y-auto border-2 rounded-lg p-3 text-xs bg-muted/20 font-mono">
+              <p className="font-bold text-destructive mb-2 uppercase tracking-tight">Relatório de Erros:</p>
               {result.errors.slice(0, 10).map((err, i) => (
-                <div key={i} className="text-destructive">Linha {err.row}, "{err.field}": {err.error}</div>
+                <div key={i} className="text-destructive border-b border-destructive/10 py-1 last:border-0">
+                  <span className="font-bold">Linha {err.row}:</span> Campo <code className="bg-destructive/10 px-1 rounded">"{err.field}"</code> {err.error}
+                </div>
               ))}
-              {result.errors.length > 10 && <div className="text-muted-foreground mt-2">+ {result.errors.length - 10} erros...</div>}
+              {result.errors.length > 10 && <div className="text-muted-foreground mt-2 font-sans italic">+ {result.errors.length - 10} erros ocultos...</div>}
             </div>
           )}
+          
           {result.success.length > 0 && (
-            <Button onClick={handleConfirmImport} disabled={isImporting} className="w-full">
-              {isImporting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
-              Importar {result.success.length} Registros
+            <Button onClick={handleConfirmImport} disabled={isImporting} variant="premium" className="w-full h-12">
+              {isImporting ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Upload className="h-5 w-5 mr-2" />}
+              Finalizar Importação de {result.success.length} Itens
             </Button>
           )}
-        </>
+        </div>
       )}
     </div>
   );
