@@ -75,7 +75,10 @@ export function PreferencePanel() {
                   key={d.id}
                   variant={preferences.density === d.id ? "default" : "outline"}
                   className="flex-col h-20 gap-2 text-[10px] font-bold uppercase"
-                  onClick={() => updatePreference('density', d.id as any)}
+                  onClick={() => {
+                    hapticFeedback('medium');
+                    updatePreference('density', d.id as any);
+                  }}
                 >
                   <d.icon className="w-5 h-5" />
                   {d.label}
