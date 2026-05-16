@@ -12,41 +12,71 @@ export const MobileQuickActions = () => {
   const navigate = useNavigate();
 
   const actions = [
-    { icon: <Package className="w-5 h-5" />, label: "Novo Despacho", path: "/despachos" },
-    { icon: <Truck className="w-5 h-5" />, label: "Nova Coleta", path: "/coletas" },
-    { icon: <QrCode className="w-5 h-5" />, label: "Escanear QR", onClick: () => { setIsScannerOpen(true); setIsOpen(false); } },
+    { 
+      icon: <Package className="w-5 h-5 text-primary" />, 
+      label: "Novo Despacho", 
+      path: "/despachos",
+      color: "bg-primary/10"
+    },
+    { 
+      icon: <Truck className="w-5 h-5 text-info" />, 
+      label: "Nova Coleta", 
+      path: "/coletas",
+      color: "bg-info/10"
+    },
+    { 
+      icon: <QrCode className="w-5 h-5 text-warning" />, 
+      label: "Escanear QR", 
+      onClick: () => { setIsScannerOpen(true); setIsOpen(false); },
+      color: "bg-warning/10"
+    },
+    { 
+      icon: <Sparkles className="w-5 h-5 text-xp" />, 
+      label: "AIAssistant", 
+      onClick: () => { navigate("/configuracoes"); setIsOpen(false); }, // Placeholder or trigger sheet
+      color: "bg-xp/10"
+    },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-24 right-6 z-[60]">
+    <div className="md:hidden fixed bottom-[90px] right-6 z-[60]">
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop for mobile focus */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[-1]"
+              className="fixed inset-0 bg-background/80 backdrop-blur-md z-[-1]"
             />
-            <div className="flex flex-col-reverse items-end gap-3 mb-4">
+            <div className="flex flex-col-reverse items-end gap-4 mb-5">
               {actions.map((action, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.5, y: 20 }}
-                  transition={{ delay: i * 0.05 }}
+                  initial={{ opacity: 0, scale: 0.5, x: 20, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.5, x: 20, y: 20 }}
+                  transition={{ 
+                    type: "spring",
+                    damping: 20,
+                    stiffness: 300,
+                    delay: i * 0.05 
+                  }}
                 >
                   <Button
                     size="lg"
-                    variant="secondary"
-                    className="rounded-full shadow-lg flex items-center gap-2 pr-5 bg-background border-2 border-primary/20 h-14"
+                    variant="outline"
+                    className={cn(
+                      "rounded-2xl shadow-xl flex items-center gap-3 pr-6 h-16 border-2 group transition-all active:scale-95",
+                      "bg-background hover:bg-accent",
+                    )}
                     onClick={() => action.onClick ? action.onClick() : navigate(action.path!)}
                   >
-                    <span className="text-sm font-medium">{action.label}</span>
-                    {action.icon}
+                    <div className={cn("p-2.5 rounded-xl transition-transform group-hover:scale-110", action.color)}>
+                      {action.icon}
+                    </div>
+                    <span className="text-sm font-bold tracking-tight">{action.label}</span>
                   </Button>
                 </motion.div>
               ))}
@@ -55,27 +85,47 @@ export const MobileQuickActions = () => {
         )}
       </AnimatePresence>
 
-      <Button
-        size="icon"
-        className="w-16 h-16 rounded-full shadow-2xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground transition-all active:scale-90 border-4 border-background group"
-        onClick={() => setIsOpen(!isOpen)}
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.9 }}
       >
-        <motion.div
-          animate={{ rotate: isOpen ? 45 : 0 }}
-          transition={{ type: "spring", stiffness: 200 }}
-          className="relative"
+        <Button
+          size="icon"
+          className={cn(
+            "w-18 h-18 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] transition-all border-4 border-background group",
+            isOpen 
+              ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
+              : "bg-primary text-primary-foreground hover:bg-primary/90"
+          )}
+          style={{ width: '72px', height: '72px' }}
+          onClick={() => setIsOpen(!isOpen)}
         >
-          {isOpen ? <X className="w-8 h-8" /> : <Plus className="w-8 h-8" />}
-          {!isOpen && <Sparkles className="w-3 h-3 absolute -top-1 -right-1 text-white animate-pulse" />}
-        </motion.div>
-      </Button>
+          <div className="relative">
+            {isOpen ? (
+              <X className="w-8 h-8" />
+            ) : (
+              <>
+                <Plus className="w-9 h-9" />
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="absolute -top-2 -right-2 bg-xp text-white p-1 rounded-full border-2 border-background"
+                >
+                  <Sparkles className="w-3 h-3" />
+                </motion.div>
+              </>
+            )}
+          </div>
+        </Button>
+      </motion.div>
 
       <QRScannerModal 
         open={isScannerOpen} 
         onOpenChange={setIsScannerOpen} 
         onScan={(result) => {
-          toast.success(`Código lido: ${result.text}`);
-          // Lógica adicional de roteamento baseada no QR pode ser adicionada aqui
+          toast.success(`Código lido: ${result.text}`, {
+            icon: <QrCode className="w-4 h-4" />
+          });
         }}
       />
     </div>
