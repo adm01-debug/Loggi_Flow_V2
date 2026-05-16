@@ -10,6 +10,7 @@ interface Shortcut {
 }
 
 const shortcuts: Shortcut[] = [
+  { keys: ["Alt", "←"], description: "Voltar para tela anterior", category: "Navegação" },
   { keys: ["Ctrl", "K"], description: "Abrir busca global", category: "Navegação" },
   { keys: ["Ctrl", "B"], description: "Toggle sidebar", category: "Navegação" },
   { keys: ["Ctrl", "/"], description: "Mostrar atalhos", category: "Ajuda" },
