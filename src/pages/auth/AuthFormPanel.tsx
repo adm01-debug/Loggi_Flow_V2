@@ -52,7 +52,7 @@ export function AuthFormPanel({
   handleLogin, handleSignup, onForgotPassword, onPasswordStrengthChange,
 }: AuthFormPanelProps) {
   return (
-    <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-4 sm:p-6 md:p-8 relative z-10 min-h-[100dvh]">
+    <div className="w-full lg:w-1/2 xl:w-[45%] flex flex-col items-center justify-center gap-4 p-4 sm:p-6 md:p-8 relative z-10 min-h-[100dvh]">
       <FadeIn direction="up" duration={0.6} className="w-full max-w-md">
         <Card className="shadow-2xl border-border/50 backdrop-blur-xl bg-card/95 overflow-hidden mx-auto">
           {/* Mobile logo */}
