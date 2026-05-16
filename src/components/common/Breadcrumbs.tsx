@@ -1,6 +1,8 @@
 import { memo } from "react";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home, Copy, Check } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -104,6 +106,14 @@ const routeCategories: Record<string, { label: string; path: string }> = {
 
 export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
   const location = useLocation();
+  const [copied, setCopied] = useState(false);
+  
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    toast.success("Link copiado para a área de transferência!");
+    setTimeout(() => setCopied(false), 2000);
+  };
   
   // Auto-generate breadcrumbs from route if items not provided
   const breadcrumbItems: BreadcrumbItem[] = items || (() => {
@@ -133,7 +143,7 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       aria-label="Breadcrumb"
-      className={cn("flex items-center text-sm overflow-x-auto scrollbar-none", className)}
+      className={cn("flex items-center justify-between text-sm overflow-x-auto scrollbar-none gap-4", className)}
     >
       <ol className="flex items-center gap-1 flex-nowrap min-w-0">
         {showHome && (
@@ -192,6 +202,15 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
           );
         })}
       </ol>
+
+      <button
+        onClick={handleCopyLink}
+        className="shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors text-xs font-medium border border-border/50"
+        title="Copiar link desta página"
+      >
+        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+        <span className="hidden sm:inline">Compartilhar</span>
+      </button>
     </motion.nav>
   );
 });
