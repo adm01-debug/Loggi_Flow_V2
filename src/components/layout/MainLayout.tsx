@@ -95,6 +95,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <MobileBottomNav />
       <MobileQuickActions />
       <LevelUpModal />
+      <ScrollToTop />
       
       <Suspense fallback={null}>
         <InstallPrompt />
