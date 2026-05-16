@@ -123,6 +123,10 @@ export default function AdminTelemetriaPage() {
               <Bug className="h-4 w-4" />
               Aplicação & Erros
             </TabsTrigger>
+            <TabsTrigger value="devops" className="gap-2">
+              <Rocket className="h-4 w-4" />
+              DevOps (DORA)
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="database" className="space-y-6">
