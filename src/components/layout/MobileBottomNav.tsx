@@ -186,8 +186,9 @@ export function MobileBottomNav() {
                 </span>
               </button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl overflow-y-auto">
-              <div className="py-2 space-y-5">
+            <SheetContent side="bottom" className="h-[75vh] rounded-t-3xl overflow-hidden flex flex-col p-0 border-t-2 border-primary/20">
+              <div className="w-12 h-1.5 bg-muted rounded-full mx-auto my-3 shrink-0" />
+              <div className="flex-1 overflow-y-auto px-4 pb-10">
                 {moreCategories.map((cat) => (
                   <div key={cat.title}>
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
