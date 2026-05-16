@@ -374,47 +374,104 @@ export default function Envios() {
 
         {isLoading && <SkeletonTable rows={5} cols={5} />}
 
-        {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((e, i) => { const config = statusConfig[e.status]; const StatusIcon = config.icon; return (
-          <div key={e.id} className={`card-interactive animate-fade-in ${isSelected(e.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 30}ms` }}>
-            <div className="flex items-start gap-3">
-              <Checkbox checked={isSelected(e.id)} onCheckedChange={() => toggle(e.id)} className="mt-1" />
-              <div className={cn("p-2 rounded-lg", config.color)}><StatusIcon className="w-5 h-5" /></div>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span 
-                    className="font-semibold cursor-pointer hover:text-primary transition-colors flex items-center gap-1"
-                    onClick={() => {
-                      navigator.clipboard.writeText(e.numero_entrega);
-                      toast.success(`Copiado: ${e.numero_entrega}`);
-                    }}
-                    title="Clique para copiar"
-                  >
-                    {e.numero_entrega}
-                    <Copy className="w-3 h-3 opacity-50 group-hover:opacity-100" />
-                  </span>
-                  <Badge className={config.color}>{config.label}</Badge>
-                  {e.nf_remessa && (
-                    <Badge 
-                      variant="outline" 
-                      className="cursor-pointer hover:bg-accent transition-colors flex items-center gap-1"
-                      onClick={() => {
-                        navigator.clipboard.writeText(e.nf_remessa!);
-                        toast.success(`NF ${e.nf_remessa} copiada`);
-                      }}
-                      title="Clique para copiar NF"
-                    >
-                      NF {e.nf_remessa}
-                      <Copy className="w-2.5 h-2.5 opacity-50" />
-                    </Badge>
-                  )}
+        {!isLoading && <div className="grid grid-cols-1 gap-4">{pagination.paginatedData.map((e, i) => { const config = statusConfig[e.status]; const StatusIcon = config.icon; return (
+          <div 
+            key={e.id} 
+            className={cn(
+              "group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4",
+              isSelected(e.id) ? 'ring-2 ring-primary bg-primary/5' : ''
+            )}
+            style={{ animationDelay: `${i * 30}ms` }}
+          >
+            <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-start gap-5 flex-1">
+                <Checkbox checked={isSelected(e.id)} onCheckedChange={() => toggle(e.id)} className="mt-4 rounded-md h-5 w-5 border-2" />
+                <div className={cn("p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500", config.color)}>
+                  <StatusIcon className="w-6 h-6" />
                 </div>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  {e.cliente && <div className="flex items-center gap-1"><User className="w-3 h-3" />{e.cliente.nome_fantasia || e.cliente.razao_social}</div>}
-                  <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /><span className="truncate">{e.endereco_entrega}</span></div>
-                  <div className="flex items-center gap-4">{e.previsao_entrega && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{format(new Date(e.previsao_entrega), "dd/MM", { locale: ptBR })}</span>}{e.transportadora && <span className="flex items-center gap-1"><Truck className="w-3 h-3" />{e.transportadora.nome_fantasia}</span>}</div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-1.5">
+                    <span 
+                      className="font-black text-xl tracking-tighter uppercase italic cursor-pointer hover:text-primary transition-colors flex items-center gap-2 group/code"
+                      onClick={() => {
+                        navigator.clipboard.writeText(e.numero_entrega);
+                        toast.success(`Copiado: ${e.numero_entrega}`);
+                      }}
+                    >
+                      {e.numero_entrega}
+                      <Copy className="w-4 h-4 opacity-0 group-hover/code:opacity-100 transition-opacity" />
+                    </span>
+                    <Badge className={cn("px-4 py-1.5 font-black uppercase tracking-widest text-[10px] rounded-xl shadow-sm", config.color)}>
+                      {config.label}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {e.cliente && (
+                      <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight text-foreground/80">
+                        <User className="w-4 h-4 text-primary" />
+                        {e.cliente.nome_fantasia || e.cliente.razao_social}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-tight">
+                      <MapPin className="w-4 h-4 text-primary/60" />
+                      <span className="truncate max-w-[250px]">{e.endereco_entrega}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(e); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => handlePrintLabel(e)}><Printer className="w-4 h-4 mr-2" />Etiqueta</DropdownMenuItem><DropdownMenuSeparator />{e.status === "aguardando_producao" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "pronto_despacho" })}>Pronto Despacho</DropdownMenuItem>}{e.status === "despachado" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "em_transito" })}>Em Trânsito</DropdownMenuItem>}{e.status === "em_transito" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "entregue" })}>Marcar Entregue</DropdownMenuItem>}<DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(e); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-6 lg:gap-10 flex-[1.5] bg-sidebar-accent/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm">
+                <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                  <div className="p-2 rounded-lg bg-background shadow-sm"><Calendar className="w-4 h-4 text-primary" /></div>
+                  <span className="uppercase text-[11px] tracking-tight">
+                    {e.previsao_entrega ? format(new Date(e.previsao_entrega), "dd MMM", { locale: ptBR }) : 'S/ PREVISÃO'}
+                  </span>
+                </div>
+                {e.transportadora && (
+                  <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                    <div className="p-2 rounded-lg bg-background shadow-sm"><Truck className="w-4 h-4 text-primary" /></div>
+                    <span className="uppercase text-[11px] tracking-tight truncate max-w-[120px]">{e.transportadora.nome_fantasia}</span>
+                  </div>
+                )}
+                {e.nf_remessa && (
+                  <div 
+                    className="flex items-center gap-3 text-sm font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      navigator.clipboard.writeText(e.nf_remessa!);
+                      toast.success(`NF ${e.nf_remessa} copiada`);
+                    }}
+                  >
+                    <div className="p-2 rounded-lg bg-primary/10 shadow-sm"><FileText className="w-4 h-4" /></div>
+                    <span className="uppercase text-[11px] font-black tracking-widest">NF {e.nf_remessa}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 ml-auto">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-primary/10 hover:text-primary transition-all">
+                      <MoreVertical className="w-5 h-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-2 border-primary/5 shadow-2xl">
+                    <DropdownMenuItem className="rounded-xl h-11 font-bold gap-2" onClick={() => { setSel(e); setDlgView(true); }}>
+                      <Eye className="w-4 h-4 text-primary" /> Ver Detalhes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="rounded-xl h-11 font-bold gap-2" onClick={() => handlePrintLabel(e)}>
+                      <Printer className="w-4 h-4 text-primary" /> Imprimir Etiqueta
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="my-2" />
+                    {e.status === "aguardando_producao" && <DropdownMenuItem className="rounded-xl h-11 font-bold bg-primary/5 text-primary" onClick={() => updateStatusMut.mutate({ id: e.id, status: "pronto_despacho" })}>Pronto Despacho</DropdownMenuItem>}
+                    {e.status === "despachado" && <DropdownMenuItem className="rounded-xl h-11 font-bold bg-warning/5 text-warning" onClick={() => updateStatusMut.mutate({ id: e.id, status: "em_transito" })}>Em Trânsito</DropdownMenuItem>}
+                    {e.status === "em_transito" && <DropdownMenuItem className="rounded-xl h-11 font-bold bg-success/5 text-success" onClick={() => updateStatusMut.mutate({ id: e.id, status: "entregue" })}>Confirmar Entrega</DropdownMenuItem>}
+                    <DropdownMenuSeparator className="my-2" />
+                    <DropdownMenuItem className="rounded-xl h-11 font-bold text-destructive hover:bg-destructive/5" onClick={() => { setSel(e); setDlgDel(true); }}>
+                      <Trash2 className="w-4 h-4 mr-2" /> Excluir Registro
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         ); })}</div>}
