@@ -179,6 +179,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <NavigationProgressBar />
           <Suspense fallback={<PageLoader />}>
             <LazyProviders>
               <AppRoutes />
