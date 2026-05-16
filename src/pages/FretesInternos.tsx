@@ -18,6 +18,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { PageHeader } from "@/components/common/PageHeader";
+import { StatsCard } from "@/components/common/StatsCard";
+import { PageTransition } from "@/components/common/PageTransition";
+
 
 // Novos imports
 import { Pagination } from "@/components/common/Pagination";
@@ -141,18 +145,26 @@ export default function FretesInternos() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>Fretes Internos</h1><p className="text-muted-foreground mt-1">Gerencie movimentações internas</p></div>
-          <Button onClick={() => { setForm(emptyForm); setIsCreateOpen(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
-        </div>
+      <PageTransition>
+        <div className="space-y-6">
+          <PageHeader
+            title="Fretes Internos"
+            description="Gerencie as movimentações e transportes internos entre suas unidades."
+            icon={Truck}
+            actions={
+              <Button onClick={() => { setForm(emptyForm); setIsCreateOpen(true); }} size="sm" className="gap-2">
+                <Plus className="w-4 h-4" />Novo
+              </Button>
+            }
+          />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pendentes}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.transito}</p><p className="text-xs text-muted-foreground">Em Trânsito</p></div>
-          <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregues}</p><p className="text-xs text-muted-foreground">Entregues</p></div>
-        </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatsCard title="Total" value={stats.total} icon={Truck} color="primary" />
+            <StatsCard title="Pendentes" value={stats.pendentes} icon={Clock} color="warning" />
+            <StatsCard title="Em Trânsito" value={stats.transito} icon={Truck} color="info" />
+            <StatsCard title="Entregues" value={stats.entregues} icon={CheckCircle2} color="success" />
+          </div>
+
 
         <FilterBar 
           search={filters.search}

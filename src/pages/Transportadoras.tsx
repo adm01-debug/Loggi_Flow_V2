@@ -16,6 +16,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MaskedInput } from "@/components/ui/MaskedInput";
+import { PageHeader } from "@/components/common/PageHeader";
+import { StatsCard } from "@/components/common/StatsCard";
+import { PageTransition } from "@/components/common/PageTransition";
+
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -191,35 +195,60 @@ export default function Transportadoras() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+      <PageTransition>
+        <div className="space-y-6">
+          <PageHeader
+            title="Transportadoras"
+            description="Gerencie suas transportadoras parceiras e acompanhe a performance de cada uma em tempo real."
+            icon={Truck}
+            actions={
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download className="w-4 h-4 mr-2" />Exportar
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
+                <OnboardingTooltip
+                  id="transportadoras-nova-btn"
+                  title="Cadastre uma transportadora"
+                  description="Adicione transportadoras parceiras para gerenciar seus fretes. Compare performance e custos entre elas."
+                  position="left"
+                >
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Plus className="w-4 h-4 mr-2" />Nova
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Nova Transportadora</DialogTitle>
+                      </DialogHeader>
+                      <FormFields />
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+                        <Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </OnboardingTooltip>
               </div>
-              <span className="truncate">Transportadoras</span>
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie suas transportadoras</p>
-          </div>
-          <div className="flex gap-2">
-            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
-            <OnboardingTooltip
-              id="transportadoras-nova-btn"
-              title="Cadastre uma transportadora"
-              description="Adicione transportadoras parceiras para gerenciar seus fretes. Compare performance e custos entre elas."
-              position="left"
-            >
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button></DialogFooter></DialogContent></Dialog>
-            </OnboardingTooltip>
-          </div>
-        </div>
+            }
+          />
 
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ativas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ativas</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><TrendingUp className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregas</p></div>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <StatsCard title="Total" value={stats.total} icon={Truck} color="primary" />
+            <StatsCard title="Ativas" value={stats.ativas} icon={CheckCircle2} color="success" />
+            <StatsCard title="Entregas" value={stats.entregas} icon={TrendingUp} color="info" />
+          </div>
+
 
         <FilterBar 
           search={filters.search} 
