@@ -71,70 +71,80 @@ export function SystemHealthWidget() {
   };
 
   return (
-    <Card className="overflow-hidden border-none shadow-lg bg-gradient-to-br from-background to-muted/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Activity className="h-4 w-4 text-primary" />
-          Saúde do Sistema
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col items-center justify-center space-y-4 py-2">
-          <div className="relative flex items-center justify-center">
-            <svg className="w-24 h-24 transform -rotate-90">
-              <circle
-                cx="48"
-                cy="48"
-                r="40"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="transparent"
-                className="text-muted/20"
-              />
-              <circle
-                cx="48"
-                cy="48"
-                r="40"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="transparent"
-                strokeDasharray={251.2}
-                strokeDashoffset={251.2 - (251.2 * (healthData?.score || 0)) / 100}
-                strokeLinecap="round"
-                className={cn("transition-all duration-1000", getStatusColor(healthData?.status || ''))}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold">{healthData?.score}</span>
-              <span className="text-[10px] uppercase font-semibold text-muted-foreground">Score</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 w-full">
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-background/50 border">
-              <ShieldCheck className="h-4 w-4 text-green-500" />
-              <div className="flex flex-col">
-                <span className="text-[10px] text-muted-foreground uppercase">Erros 24h</span>
-                <span className="text-sm font-bold">{healthData?.errors}</span>
+    <Card className="relative overflow-hidden group border-none bg-transparent p-[1px] rounded-[1.5rem] shadow-2xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-white/5 to-white/10 rounded-[1.5rem]" />
+      <div className="relative h-full bg-black/90 backdrop-blur-3xl rounded-[1.4rem] p-5">
+        <CardHeader className="p-0 mb-6">
+          <CardTitle className="text-sm font-black flex items-center gap-2 uppercase tracking-[0.2em] italic bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
+            <Activity className="h-4 w-4 text-primary animate-pulse" />
+            NEXUS CORE HEALTH
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="flex flex-col items-center justify-center space-y-6">
+            <div className="relative flex items-center justify-center group/score">
+              {/* Pulse effect */}
+              <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
+              
+              <svg className="w-28 h-28 transform -rotate-90 relative z-10">
+                <circle
+                  cx="56"
+                  cy="56"
+                  r="48"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="transparent"
+                  className="text-white/5"
+                />
+                <circle
+                  cx="56"
+                  cy="56"
+                  r="48"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="transparent"
+                  strokeDasharray={301.6}
+                  strokeDashoffset={301.6 - (301.6 * (healthData?.score || 0)) / 100}
+                  strokeLinecap="round"
+                  className={cn("transition-all duration-1000 drop-shadow-[0_0_8px_rgba(234,56,76,0.5)]", getStatusColor(healthData?.status || ''))}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+                <span className="text-3xl font-black italic text-white drop-shadow-lg">{healthData?.score}</span>
+                <span className="text-[9px] uppercase font-black tracking-widest text-primary">SCORE</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-background/50 border">
-              <Zap className="h-4 w-4 text-blue-500" />
+
+          <div className="grid grid-cols-2 gap-3 w-full">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-primary/30 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center border border-green-500/20">
+                <ShieldCheck className="h-4 w-4 text-green-500" />
+              </div>
               <div className="flex flex-col">
-                <span className="text-[10px] text-muted-foreground uppercase">Latência</span>
-                <span className="text-sm font-bold">{healthData?.avgLatency}ms</span>
+                <span className="text-[9px] text-white/50 uppercase font-black tracking-tighter">Erros 24h</span>
+                <span className="text-sm font-black text-white italic">{healthData?.errors}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-primary/30 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                <Zap className="h-4 w-4 text-blue-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] text-white/50 uppercase font-black tracking-tighter">Latência</span>
+                <span className="text-sm font-black text-white italic">{healthData?.avgLatency}ms</span>
               </div>
             </div>
           </div>
 
           {(healthData?.errors ?? 0) > 0 && (
-            <div className="w-full flex items-center gap-2 text-[10px] bg-amber-50 text-amber-700 p-2 rounded border border-amber-200">
-              <AlertTriangle className="h-3 w-3" />
-              <span>Foram detectados erros nas últimas 24h. Verifique o painel de telemetria.</span>
+            <div className="w-full flex items-center gap-3 text-[9px] font-black uppercase tracking-tighter bg-primary/10 text-primary p-3 rounded-xl border border-primary/20 animate-pulse">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span>Anomalias detectadas no núcleo operacional.</span>
             </div>
           )}
         </div>
       </CardContent>
-    </Card>
+    </div>
+  </Card>
   );
 }
