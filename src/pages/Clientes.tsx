@@ -420,7 +420,6 @@ export default function Clientes() {
           />
         </ImportDialogContent>
       </ImportDialog>
-      </div>
     </MainLayout>
   );
 }
