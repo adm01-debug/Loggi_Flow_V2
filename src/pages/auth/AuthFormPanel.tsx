@@ -54,7 +54,7 @@ export function AuthFormPanel({
   return (
     <div className="w-full lg:w-1/2 xl:w-[45%] flex flex-col items-center justify-center gap-4 p-4 sm:p-6 md:p-8 relative z-10 min-h-[100dvh]">
       <FadeIn direction="up" duration={0.6} className="w-full max-w-md">
-        <Card className="shadow-2xl border-border/50 backdrop-blur-xl bg-card/95 overflow-hidden mx-auto">
+        <Card className="shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-primary/20 backdrop-blur-3xl bg-card/80 overflow-hidden mx-auto rounded-3xl">
           {/* Mobile logo */}
           <div className="lg:hidden text-center pt-6 pb-2">
             <div className="inline-flex items-center gap-2 mb-1">
@@ -132,7 +132,7 @@ export function AuthFormPanel({
                         </div>
                       </StaggerItem>
                       <StaggerItem>
-                        <Button type="submit" className="w-full h-12 font-semibold text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]" disabled={isLoading}>
+                        <Button type="submit" className="w-full h-12 font-black text-base uppercase tracking-widest shadow-[0_10px_20px_rgba(var(--primary-rgb),0.3)] hover:shadow-primary/50 transition-all hover:scale-[1.03] active:scale-[0.97] rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80" disabled={isLoading}>
                           {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Entrando...</> : "Entrar"}
                         </Button>
                       </StaggerItem>
@@ -175,7 +175,7 @@ export function AuthFormPanel({
                       {errors.signup_password && <p className="text-sm text-destructive">{errors.signup_password}</p>}
                       <PasswordStrengthIndicator password={signupPassword} onStrengthChange={onPasswordStrengthChange} />
                     </div>
-                    <Button type="submit" className="w-full h-12 font-semibold text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]" disabled={isLoading}>
+                    <Button type="submit" className="w-full h-12 font-black text-base uppercase tracking-widest shadow-[0_10px_20px_rgba(var(--primary-rgb),0.3)] hover:shadow-primary/50 transition-all hover:scale-[1.03] active:scale-[0.97] rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80" disabled={isLoading}>
                       {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Criando conta...</> : "Criar Conta Gratuita"}
                     </Button>
                     <SocialLoginButtons isLoading={isLoading} />
@@ -192,12 +192,14 @@ export function AuthFormPanel({
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           transition={{ delay: 1, duration: 1 }}
-          className="text-[10px] leading-relaxed text-muted-foreground/60 max-w-sm mx-auto"
+          className="text-[11px] leading-relaxed text-muted-foreground/50 max-w-md mx-auto font-medium"
         >
-          Este sistema é propriedade intelectual exclusiva da Brasil Marcas, sendo protegido pela Lei nº 9.609/98 e demais normas aplicáveis. É proibida sua reprodução, cópia, modificação, distribuição ou uso não autorizado.
+          Este sistema é propriedade intelectual exclusiva da <span className="text-foreground/70 font-bold uppercase tracking-wider">Brasil Marcas</span>.
           <br />
-          <span className="font-medium mt-1 inline-block">
-            © 2026 LogiFlow Todos os direitos reservados.
+          Protegido pela Lei nº 9.609/98. Uso estritamente profissional e autorizado.
+          <br />
+          <span className="font-black mt-2 inline-block text-[12px] text-primary/60 tracking-widest uppercase">
+            © 2026 LogiFlow • Rumo à Excelência 10/10
           </span>
         </motion.p>
       </div>
