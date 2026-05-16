@@ -105,6 +105,7 @@ export function MobileBottomNav() {
           {/* Dynamic Mobile Back/Home Button */}
           <button
             onClick={() => {
+              hapticFeedback('medium');
               if (canGoBack) {
                 goBack();
               } else {
