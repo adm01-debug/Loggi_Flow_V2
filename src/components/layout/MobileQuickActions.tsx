@@ -18,7 +18,7 @@ export const MobileQuickActions = () => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-24 right-6 z-50">
+    <div className="md:hidden fixed bottom-24 right-6 z-[60]">
       <AnimatePresence>
         {isOpen && (
           <>

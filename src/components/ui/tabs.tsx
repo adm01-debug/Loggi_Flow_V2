@@ -2,7 +2,7 @@ import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Tabs = TabsPrimitive.Root;
 
@@ -95,9 +95,7 @@ TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> & { animated?: boolean }
->(({ className, animated = false, children, ...props }, ref) => {
-  // Simplified TabsContent - animation should be handled externally with AnimatePresence
-  // Setting animated=false by default to prevent duplicate key issues
+>(({ className, animated = true, children, ...props }, ref) => {
   return (
     <TabsPrimitive.Content
       ref={ref}
@@ -107,7 +105,16 @@ const TabsContent = React.forwardRef<
       )}
       {...props}
     >
-      {children}
+      {animated ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+        >
+          {children}
+        </motion.div>
+      ) : children}
     </TabsPrimitive.Content>
   );
 });
