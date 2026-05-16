@@ -30,7 +30,9 @@ export const Header = memo(function Header() {
   const { userLevel } = useGamification();
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentLabel } = useNavigationHistory();
+  const { currentLabel, recentPages } = useNavigationHistory();
+  
+  const prevPage = recentPages.length > 1 ? recentPages[1] : null;
 
   const isHomePage = location.pathname === "/";
 
@@ -84,8 +86,8 @@ export const Header = memo(function Header() {
               size="icon"
               onClick={handleBack}
               className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-              aria-label="Voltar para a tela anterior"
-              title="Voltar (ou Alt + ←)"
+              aria-label={prevPage ? `Voltar para ${prevPage.label}` : "Voltar"}
+              title={prevPage ? `Voltar para ${prevPage.label}` : "Voltar (ou Alt + ←)"}
             >
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
