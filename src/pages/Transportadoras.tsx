@@ -304,7 +304,8 @@ export default function Transportadoras() {
             hasPrevPage={pagination.hasPrevPage}
           />
         )}
-      </div>
+        </div>
+      </PageTransition>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
