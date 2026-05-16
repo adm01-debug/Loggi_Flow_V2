@@ -135,6 +135,11 @@ export default function Configuracoes() {
                 );
               })}</div>
             </TabsContent>
+            <TabsContent value="preferences" className="space-y-4">
+              <div className="card-base p-6">
+                <PreferencePanel />
+              </div>
+            </TabsContent>
             <TabsContent value="automation" className="space-y-4">
               <BusinessRulesManager />
             </TabsContent>
