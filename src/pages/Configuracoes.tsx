@@ -103,6 +103,7 @@ export default function Configuracoes() {
           <Tabs defaultValue="integrations">
             <TabsList>
               <TabsTrigger value="integrations"><Link className="w-4 h-4 mr-2" />Integrações</TabsTrigger>
+              <TabsTrigger value="preferences"><Palette className="w-4 h-4 mr-2" />Personalização</TabsTrigger>
               <TabsTrigger value="automation"><Zap className="w-4 h-4 mr-2" />Automações</TabsTrigger>
               <TabsTrigger value="notifications"><Bell className="w-4 h-4 mr-2" />Notificações</TabsTrigger>
               <TabsTrigger value="security"><Shield className="w-4 h-4 mr-2" />Segurança</TabsTrigger>
