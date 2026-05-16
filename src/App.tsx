@@ -9,6 +9,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
 import { useGlobalShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
