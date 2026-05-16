@@ -89,24 +89,32 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
     }
 
     return (
-      <div ref={ref} className={cn("card-base overflow-hidden border-2 shadow-2xl bg-gradient-to-br from-card via-card/95 to-background backdrop-blur-3xl group/panel", className)} {...props}>
-        {/* Decorative elements */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-warning/10 rounded-full blur-[100px] pointer-events-none group-hover/panel:bg-warning/20 transition-colors duration-700" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-destructive/10 rounded-full blur-[100px] pointer-events-none" />
+      <div ref={ref} className={cn("card-base overflow-hidden border-2 shadow-[0_0_80px_-20px_rgba(0,0,0,0.6)] bg-gradient-to-br from-card via-card/95 to-background backdrop-blur-3xl group/panel relative", className)} {...props}>
+        {/* Camadas Táticas de Background */}
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-warning/15 rounded-full blur-[120px] pointer-events-none group-hover/panel:bg-warning/25 transition-all duration-1000" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-destructive/10 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="relative z-10 flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-warning/20 to-warning/5 border border-warning/20 shadow-inner group/icon overflow-hidden">
-              <AlertTriangle className="w-6 h-6 text-warning animate-pulse" />
-              <div className="absolute inset-0 bg-gradient-to-t from-warning/10 to-transparent opacity-0 group-hover/icon:opacity-100 transition-opacity" />
+        <div className="relative z-10 flex items-center justify-between mb-8">
+          <div className="flex items-center gap-5">
+            <div className="relative group/icon">
+              <div className="absolute inset-0 bg-warning/20 blur-xl rounded-full animate-pulse" />
+              <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-warning/30 to-warning/5 border border-warning/30 shadow-[inset_0_0_20px_rgba(234,179,8,0.1)] overflow-hidden">
+                <AlertTriangle className="w-7 h-7 text-warning drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-warning/20 to-transparent opacity-0 group-hover/icon:opacity-100 transition-opacity" />
+              </div>
             </div>
             <div>
-              <h3 className="font-display font-black text-2xl tracking-tighter uppercase leading-none italic">
-                Nexus <span className="text-warning">Alerts</span>
+              <h3 className="font-display font-black text-3xl tracking-tighter uppercase leading-none italic group-hover/panel:translate-x-1 transition-transform">
+                Nexus <span className="text-warning drop-shadow-[0_0_10px_rgba(234,179,8,0.3)]">Terminal</span>
               </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="flex h-1.5 w-1.5 rounded-full bg-warning animate-ping" />
-                <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Tempo Real</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex gap-0.5">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-3 h-1 bg-warning/40 rounded-full" />
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-black italic">Monitor de Protocolos</p>
               </div>
             </div>
           </div>
@@ -114,10 +122,11 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="flex flex-col items-end"
+              className="flex flex-col items-end relative"
             >
-              <div className="bg-destructive text-white px-3 py-1 rounded-lg border-b-4 border-destructive-foreground/30 font-black text-sm shadow-lg shadow-destructive/20 transform -rotate-2">
-                {alerts.length} CRÍTICOS
+              <div className="absolute inset-0 bg-destructive/20 blur-lg rounded-lg" />
+              <div className="relative bg-destructive text-white px-5 py-2 rounded-xl border-b-[6px] border-destructive-foreground/40 font-black text-sm shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform cursor-help">
+                {alerts.length} INTERRUPÇÕES
               </div>
             </motion.div>
           )}
