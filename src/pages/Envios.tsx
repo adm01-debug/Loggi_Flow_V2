@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw, QrCode } from "lucide-react";
+import { Send, Plus, MapPin, Clock, Package, MoreVertical, Eye, Edit, Trash2, User, Phone, CheckCircle2, Truck, AlertCircle, AlertTriangle, FileText, DollarSign, Calendar, Loader2, ArrowUpDown, ChevronUp, ChevronDown, ScanLine, LucideIcon, FileDown, RefreshCw, QrCode, Copy, Check } from "lucide-react";
 import { MaterialLabelPrinter } from "@/components/labels";
 import { useRodonavesTracking } from "@/hooks/useRodonavesTracking";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
@@ -307,7 +307,34 @@ export default function Envios() {
               <Checkbox checked={isSelected(e.id)} onCheckedChange={() => toggle(e.id)} className="mt-1" />
               <div className={cn("p-2 rounded-lg", config.color)}><StatusIcon className="w-5 h-5" /></div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1"><span className="font-semibold">{e.numero_entrega}</span><Badge className={config.color}>{config.label}</Badge>{e.nf_remessa && <Badge variant="outline">NF {e.nf_remessa}</Badge>}</div>
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <span 
+                    className="font-semibold cursor-pointer hover:text-primary transition-colors flex items-center gap-1"
+                    onClick={() => {
+                      navigator.clipboard.writeText(e.numero_entrega);
+                      toast.success(`Copiado: ${e.numero_entrega}`);
+                    }}
+                    title="Clique para copiar"
+                  >
+                    {e.numero_entrega}
+                    <Copy className="w-3 h-3 opacity-50 group-hover:opacity-100" />
+                  </span>
+                  <Badge className={config.color}>{config.label}</Badge>
+                  {e.nf_remessa && (
+                    <Badge 
+                      variant="outline" 
+                      className="cursor-pointer hover:bg-accent transition-colors flex items-center gap-1"
+                      onClick={() => {
+                        navigator.clipboard.writeText(e.nf_remessa!);
+                        toast.success(`NF ${e.nf_remessa} copiada`);
+                      }}
+                      title="Clique para copiar NF"
+                    >
+                      NF {e.nf_remessa}
+                      <Copy className="w-2.5 h-2.5 opacity-50" />
+                    </Badge>
+                  )}
+                </div>
                 <div className="text-sm text-muted-foreground space-y-1">
                   {e.cliente && <div className="flex items-center gap-1"><User className="w-3 h-3" />{e.cliente.nome_fantasia || e.cliente.razao_social}</div>}
                   <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /><span className="truncate">{e.endereco_entrega}</span></div>
