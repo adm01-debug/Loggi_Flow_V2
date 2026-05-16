@@ -29,6 +29,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  useUserPreferences(); // Applies global styles and classes based on stored preferences
 
   useEffect(() => {
     let touchStartX = 0;
