@@ -119,7 +119,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
       },
       neutral: {
         border: 'border-border hover:border-primary/40',
-        bg: 'bg-gradient-to-br from-card via-card to-card-elevated',
+        bg: 'bg-gradient-to-br from-card/80 via-card/50 to-card-elevated/80 backdrop-blur-xl',
         iconBg: 'bg-primary/10 text-primary ring-2 ring-primary/20',
         glow: 'after:bg-primary/10',
         sparkColor: 'hsl(var(--primary))',
