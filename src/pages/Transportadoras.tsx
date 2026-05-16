@@ -16,6 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MaskedInput } from "@/components/ui/MaskedInput";
+import { PageHeader } from "@/components/common/PageHeader";
+import { StatsCard } from "@/components/common/StatsCard";
+import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/common/PageTransition";
+
+
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -191,35 +196,67 @@ export default function Transportadoras() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+      <PageTransition>
+        <div className="space-y-6">
+          <PageHeader
+            title="Transportadoras"
+            description="Gerencie suas transportadoras parceiras e acompanhe a performance de cada uma em tempo real."
+            icon={Truck}
+            actions={
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download className="w-4 h-4 mr-2" />Exportar
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
+                <OnboardingTooltip
+                  id="transportadoras-nova-btn"
+                  title="Cadastre uma transportadora"
+                  description="Adicione transportadoras parceiras para gerenciar seus fretes. Compare performance e custos entre elas."
+                  position="left"
+                >
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Plus className="w-4 h-4 mr-2" />Nova
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Nova Transportadora</DialogTitle>
+                      </DialogHeader>
+                      <FormFields />
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+                        <Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </OnboardingTooltip>
               </div>
-              <span className="truncate">Transportadoras</span>
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie suas transportadoras</p>
-          </div>
-          <div className="flex gap-2">
-            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Exportar</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem><DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
-            <OnboardingTooltip
-              id="transportadoras-nova-btn"
-              title="Cadastre uma transportadora"
-              description="Adicione transportadoras parceiras para gerenciar seus fretes. Compare performance e custos entre elas."
-              position="left"
-            >
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Nova</Button></DialogTrigger><DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Nova Transportadora</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button></DialogFooter></DialogContent></Dialog>
-            </OnboardingTooltip>
-          </div>
-        </div>
+            }
+          />
 
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ativas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ativas</p></div>
-          <div className="stat-card text-center p-3 sm:p-4"><TrendingUp className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregas}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregas</p></div>
-        </div>
+          <StaggeredContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <StaggeredItem>
+              <StatsCard title="Total" value={stats.total} icon={Truck} color="primary" />
+            </StaggeredItem>
+            <StaggeredItem>
+              <StatsCard title="Ativas" value={stats.ativas} icon={CheckCircle2} color="success" />
+            </StaggeredItem>
+            <StaggeredItem>
+              <StatsCard title="Entregas" value={stats.entregas} icon={TrendingUp} color="info" />
+            </StaggeredItem>
+          </StaggeredContent>
+
+
 
         <FilterBar 
           search={filters.search} 
@@ -241,8 +278,10 @@ export default function Transportadoras() {
 
         {loading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!loading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{pagination.paginatedData.map((t, i) => (
-          <div key={t.id} className={`card-interactive animate-fade-in ${isSelected(t.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 30}ms` }}>
+        {!loading && <StaggeredContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{pagination.paginatedData.map((t, i) => (
+          <StaggeredItem key={t.id}>
+            <div className={`card-interactive animate-fade-in ${isSelected(t.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 30}ms` }}>
+
             <div className="flex items-start gap-3 mb-3">
               <Checkbox checked={isSelected(t.id)} onCheckedChange={() => toggle(t.id)} />
               <div className="flex-1"><p className="font-semibold">{t.nome_fantasia}</p><p className="text-xs text-muted-foreground">{t.razao_social}</p></div>
@@ -251,8 +290,10 @@ export default function Transportadoras() {
             </div>
             <div className="space-y-1 text-sm text-muted-foreground">{t.contato_comercial && <div className="flex items-center gap-1"><Phone className="w-3 h-3" />{t.contato_comercial}</div>}{t.email_comercial && <div className="flex items-center gap-1"><Mail className="w-3 h-3" />{t.email_comercial}</div>}{t.regioes_atendidas && t.regioes_atendidas.length > 0 && <div className="flex items-center gap-1"><MapPin className="w-3 h-3" />{t.regioes_atendidas.slice(0, 3).join(", ")}{t.regioes_atendidas.length > 3 && ` +${t.regioes_atendidas.length - 3}`}</div>}</div>
             <div className="flex items-center justify-between mt-3 pt-3 border-t"><div className="flex items-center gap-1">{[1,2,3,4,5].map(s => <Star key={s} className={`w-4 h-4 ${s <= (t.score_performance || 0) / 20 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />)}</div><span className="text-sm font-medium">{t.total_entregas || 0} entregas</span></div>
-          </div>
-        ))}</div>}
+            </div>
+          </StaggeredItem>
+        ))}</StaggeredContent>}
+
 
         {!loading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Truck className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma transportadora</p></div>}
         
@@ -275,7 +316,8 @@ export default function Transportadoras() {
             hasPrevPage={pagination.hasPrevPage}
           />
         )}
-      </div>
+        </div>
+      </PageTransition>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>

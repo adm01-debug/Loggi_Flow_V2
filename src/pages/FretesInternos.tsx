@@ -18,6 +18,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { PageHeader } from "@/components/common/PageHeader";
+import { StatsCard } from "@/components/common/StatsCard";
+import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/common/PageTransition";
+
+
 
 // Novos imports
 import { Pagination } from "@/components/common/Pagination";
@@ -141,18 +146,27 @@ export default function FretesInternos() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Truck className="w-6 h-6 text-primary" /></div>Fretes Internos</h1><p className="text-muted-foreground mt-1">Gerencie movimentações internas</p></div>
-          <Button onClick={() => { setForm(emptyForm); setIsCreateOpen(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
-        </div>
+      <PageTransition>
+        <div className="space-y-6">
+          <PageHeader
+            title="Fretes Internos"
+            description="Gerencie as movimentações e transportes internos entre suas unidades."
+            icon={Truck}
+            actions={
+              <Button onClick={() => { setForm(emptyForm); setIsCreateOpen(true); }} size="sm" className="gap-2">
+                <Plus className="w-4 h-4" />Novo
+              </Button>
+            }
+          />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pendentes}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.transito}</p><p className="text-xs text-muted-foreground">Em Trânsito</p></div>
-          <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregues}</p><p className="text-xs text-muted-foreground">Entregues</p></div>
-        </div>
+          <StaggeredContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StaggeredItem><StatsCard title="Total" value={stats.total} icon={Truck} color="primary" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Pendentes" value={stats.pendentes} icon={Clock} color="warning" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Em Trânsito" value={stats.transito} icon={Truck} color="info" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Entregues" value={stats.entregues} icon={CheckCircle2} color="success" /></StaggeredItem>
+          </StaggeredContent>
+
+
 
         <FilterBar 
           search={filters.search}
@@ -173,8 +187,10 @@ export default function FretesInternos() {
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((f, i) => { const config = statusConfig[f.status]; const StatusIcon = config.icon; return (
-          <div key={f.id} className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+        {!isLoading && <StaggeredContent className="space-y-3">{pagination.paginatedData.map((f, i) => { const config = statusConfig[f.status]; const StatusIcon = config.icon; return (
+          <StaggeredItem key={f.id}>
+            <div className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+
             <div className="flex items-start gap-3">
               <Checkbox checked={isSelected(f.id)} onCheckedChange={() => toggle(f.id)} className="mt-1" />
               <div className={cn("p-2 rounded-lg", config.color)}><StatusIcon className="w-5 h-5" /></div>
@@ -184,8 +200,10 @@ export default function FretesInternos() {
               </div>
               <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSelected(f); setIsViewOpen(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => openEdit(f)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuSeparator />{f.status === "pendente" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: f.id, status: "em_transito" })}>Iniciar Trânsito</DropdownMenuItem>}{f.status === "em_transito" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: f.id, status: "entregue" })}>Marcar Entregue</DropdownMenuItem>}<DropdownMenuItem className="text-destructive" onClick={() => { setSelected(f); setIsDeleteOpen(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             </div>
-          </div>
-        ); })}</div>}
+            </div>
+          </StaggeredItem>
+        ); })}</StaggeredContent>}
+
 
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Truck className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum frete</p></div>}
         {!isLoading && sortedData.length > 0 && (
@@ -212,7 +230,8 @@ export default function FretesInternos() {
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}><DialogContent className="max-w-lg"><DialogHeader><DialogTitle>Editar Frete</DialogTitle></DialogHeader><FormFields /><DialogFooter><Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancelar</Button><Button onClick={() => selected && updateMut.mutate({ id: selected.id, data: form })} disabled={!form.origem || !form.destino || updateMut.isPending}>{updateMut.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar</Button></DialogFooter></DialogContent></Dialog>
         <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>Detalhes do Frete</DialogTitle></DialogHeader>{selected && <Tabs defaultValue="detalhes"><TabsList className="w-full"><TabsTrigger value="detalhes" className="flex-1">Detalhes</TabsTrigger><TabsTrigger value="historico" className="flex-1">Histórico</TabsTrigger></TabsList><TabsContent value="detalhes" className="space-y-4 pt-4"><div className="flex items-center gap-3"><Badge className={statusConfig[selected.status].color}>{statusConfig[selected.status].label}</Badge>{selected.xp_reward > 0 && <Badge variant="outline" className="gap-1"><Star className="w-3 h-3 text-yellow-500" />{selected.xp_reward} XP</Badge>}</div><div className="grid grid-cols-2 gap-4"><div><p className="text-sm text-muted-foreground">Origem</p><p className="font-medium">{selected.origem}</p></div><div><p className="text-sm text-muted-foreground">Destino</p><p className="font-medium">{selected.destino}</p></div><div><p className="text-sm text-muted-foreground">Motorista</p><p>{selected.motorista || "-"}</p></div><div><p className="text-sm text-muted-foreground">Itens</p><p>{selected.quantidade_itens}</p></div></div>{selected.observacoes && <div><p className="text-sm text-muted-foreground">Observações</p><p>{selected.observacoes}</p></div>}</TabsContent><TabsContent value="historico" className="pt-4"><Timeline events={history} /></TabsContent></Tabs>}</DialogContent></Dialog>
         <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir frete?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => selected && deleteMut.mutate(selected.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
-      </div>
+        </div>
+      </PageTransition>
     </MainLayout>
   );
 }

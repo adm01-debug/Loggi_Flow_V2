@@ -16,6 +16,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageHeader } from "@/components/common/PageHeader";
+import { StatsCard } from "@/components/common/StatsCard";
+import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/common/PageTransition";
+
 
 // Importar novos hooks e componentes
 import { Pagination } from "@/components/common/Pagination";
@@ -151,18 +155,26 @@ export default function Fornecedores() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Building2 className="w-6 h-6 text-primary" /></div>Fornecedores</h1><p className="text-muted-foreground mt-1">Gerencie seus fornecedores</p></div>
-          <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
-        </div>
+      <PageTransition>
+        <div className="space-y-6">
+          <PageHeader
+            title="Fornecedores"
+            description="Gerencie sua base de fornecedores e acompanhe as solicitações de coleta."
+            icon={Building2}
+            actions={
+              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} size="sm" className="gap-2">
+                <Plus className="w-4 h-4" />Novo
+              </Button>
+            }
+          />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Building2 className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><Package className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.com}</p><p className="text-xs text-muted-foreground">Com Coletas</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pend}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-          <div className="stat-card text-center"><TrendingUp className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.tot}</p><p className="text-xs text-muted-foreground">Total Coletas</p></div>
-        </div>
+          <StaggeredContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StaggeredItem><StatsCard title="Total" value={stats.total} icon={Building2} color="primary" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Com Coletas" value={stats.com} icon={Package} color="success" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Pendentes" value={stats.pend} icon={Clock} color="warning" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Total Coletas" value={stats.tot} icon={TrendingUp} color="info" /></StaggeredItem>
+          </StaggeredContent>
+
 
         <FilterBar
           search={filters.search}
@@ -197,9 +209,11 @@ export default function Fornecedores() {
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {!isLoading && <StaggeredContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pagination.paginatedData.map((f, i) => (
-            <div key={f.id} className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+            <StaggeredItem key={f.id}>
+              <div className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+
               <div className="flex items-start gap-3 mb-4">
                 <Checkbox checked={isSelected(f.id)} onCheckedChange={() => toggle(f.id)} className="mt-1" />
                 <div className="flex-1 min-w-0"><p className="font-semibold text-lg truncate">{f.nome_fantasia || f.razao_social}</p>{f.nome_fantasia && <p className="text-xs text-muted-foreground truncate">{f.razao_social}</p>}</div>
@@ -207,9 +221,11 @@ export default function Fornecedores() {
               </div>
               <div className="space-y-2 text-sm">{f.cnpj && <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /><span className="font-mono">{fmtCNPJ(f.cnpj)}</span></div>}{f.contato_nome && <div className="flex items-center gap-2"><User className="w-4 h-4 text-muted-foreground" />{f.contato_nome}</div>}{f.contato_telefone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-4 h-4" />{f.contato_telefone}</div>}<div className="flex items-start gap-2 text-muted-foreground"><MapPin className="w-4 h-4 mt-0.5" /><div><p className="line-clamp-2">{f.endereco_completo}</p>{f.cidade && <p className="font-medium text-foreground">{f.cidade} - {f.estado}</p>}</div></div></div>
               <div className="flex items-center justify-between mt-4 pt-4 border-t"><div className="flex items-center gap-2"><Package className="w-4 h-4 text-muted-foreground" /><span className="font-medium">{f.total_coletas || 0}</span>{(f.coletas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{f.coletas_pendentes} pend.</Badge>}</div>{f.ultima_coleta && <span className="text-xs text-muted-foreground">{format(new Date(f.ultima_coleta), "dd/MM/yy", { locale: ptBR })}</span>}</div>
-            </div>
+              </div>
+            </StaggeredItem>
           ))}
-        </div>}
+        </StaggeredContent>}
+
 
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Building2 className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum fornecedor</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
 
@@ -238,6 +254,7 @@ export default function Fornecedores() {
         <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>Detalhes do Fornecedor</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><p className="text-lg font-semibold">{sel.nome_fantasia || sel.razao_social}</p>{sel.cnpj && <p className="font-mono">{fmtCNPJ(sel.cnpj)}</p>}<div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p></div><div><p className="text-muted-foreground">Cidade/UF</p><p>{sel.cidade} - {sel.estado}</p></div></div>{sel.contato_nome && <div className="text-sm"><p className="text-muted-foreground">Contato</p><p>{sel.contato_nome} - {sel.contato_telefone}</p></div>}</div>}</DialogContent></Dialog>
         <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir fornecedor?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
+    </PageTransition>
     </MainLayout>
   );
 }

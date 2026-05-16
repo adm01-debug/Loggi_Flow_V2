@@ -17,6 +17,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { PageHeader } from "@/components/common/PageHeader";
+import { StatsCard } from "@/components/common/StatsCard";
+import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/common/PageTransition";
+
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -202,37 +206,69 @@ export default function Clientes() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display text-foreground flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10"><Users className="w-6 h-6 text-primary" /></div>Clientes</h1><p className="text-muted-foreground mt-1">Gerencie seus clientes</p></div>
-          <OnboardingTooltip
-            id="clientes-novo-btn"
-            title="Cadastre seu primeiro cliente"
-            description="Clique aqui para adicionar um novo cliente. Você ganhará XP ao completar o cadastro!"
-            position="left"
-          >
-            <div className="flex gap-2">
-              <RTECustomerSync onCustomerFound={(data) => {
-                setForm({
-                  ...emptyForm,
-                  razao_social: (data.Name as string) || '',
-                  nome_fantasia: (data.TradeName as string) || '',
-                  cnpj: (data.TaxIdRegistration as string) || '',
-                  endereco_completo: (data.Address as string) || '',
-                });
-                setDlgCreate(true);
-              }} />
-              <Button variant="outline" onClick={() => setDlgImport(true)} className="gap-2"><Upload className="w-4 h-4" />Importar CSV</Button>
-              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
-            </div>
-          </OnboardingTooltip>
-        </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><Users className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><Package className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.com}</p><p className="text-xs text-muted-foreground">Com Entregas</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pend}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-          <div className="stat-card text-center"><Package className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.tot}</p><p className="text-xs text-muted-foreground">Total Entregas</p></div>
-        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <PageHeader
+
+            title="Clientes"
+            description="Gerencie sua base de clientes e acompanhe as entregas destinadas a eles."
+            icon={Users}
+            actions={
+              <OnboardingTooltip
+                id="clientes-novo-btn"
+                title="Cadastre seu primeiro cliente"
+                description="Clique aqui para adicionar um novo cliente. Você ganhará XP ao completar o cadastro!"
+                position="left"
+              >
+                <div className="flex gap-2">
+                  <RTECustomerSync onCustomerFound={(data) => {
+                    setForm({
+                      ...emptyForm,
+                      razao_social: (data.Name as string) || '',
+                      nome_fantasia: (data.TradeName as string) || '',
+                      cnpj: (data.TaxIdRegistration as string) || '',
+                      endereco_completo: (data.Address as string) || '',
+                    });
+                    setDlgCreate(true);
+                  }} />
+                  <Button variant="outline" size="sm" onClick={() => setDlgImport(true)} className="gap-2">
+                    <Upload className="w-4 h-4" />Importar
+                  </Button>
+                  <Button size="sm" onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2">
+                    <Plus className="w-4 h-4" />Novo
+                  </Button>
+                </div>
+              </OnboardingTooltip>
+            }
+          />
+
+          <StaggeredContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StaggeredItem><StatsCard title="Total" value={stats.total} icon={Users} color="primary" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Com Entregas" value={stats.com} icon={Package} color="success" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Pendentes" value={stats.pend} icon={Clock} color="warning" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Total Entregas" value={stats.tot} icon={Package} color="info" /></StaggeredItem>
+          </StaggeredContent>
+
 
         {/* Barra de Filtros */}
         <OnboardingTooltip
@@ -297,9 +333,11 @@ export default function Clientes() {
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {!isLoading && <StaggeredContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pagination.paginatedData.map((c, i) => (
-            <div key={c.id} className={`card-interactive animate-fade-in ${isSelected(c.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+            <StaggeredItem key={c.id}>
+              <div className={`card-interactive animate-fade-in ${isSelected(c.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+
               <div className="flex items-start gap-3 mb-4">
                 <Checkbox
                   checked={isSelected(c.id)}
@@ -314,9 +352,11 @@ export default function Clientes() {
               </div>
               <div className="space-y-2 text-sm">{c.cnpj && <div className="flex items-center gap-2"><FileText className="w-4 h-4 text-muted-foreground" /><span className="font-mono">{fmtCNPJ(c.cnpj)}</span></div>}{c.contato_nome && <div className="flex items-center gap-2"><User className="w-4 h-4 text-muted-foreground" />{c.contato_nome}</div>}{c.contato_telefone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-4 h-4" />{c.contato_telefone}</div>}<div className="flex items-start gap-2 text-muted-foreground"><MapPin className="w-4 h-4 mt-0.5" /><div><p className="line-clamp-2">{c.endereco_completo}</p>{c.cidade && <p className="font-medium text-foreground">{c.cidade} - {c.estado}</p>}</div></div>{c.horario_entrega && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4" /><span>{c.horario_entrega}</span></div>}</div>
               <div className="flex items-center justify-between mt-4 pt-4 border-t"><div className="flex items-center gap-2"><Package className="w-4 h-4 text-muted-foreground" /><span className="font-medium">{c.total_entregas || 0}</span>{(c.entregas_pendentes || 0) > 0 && <Badge variant="outline" className="bg-warning/10 text-warning">{c.entregas_pendentes} pend.</Badge>}</div></div>
-            </div>
+              </div>
+            </StaggeredItem>
           ))}
-        </div>}
+        </StaggeredContent>}
+
 
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Users className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum cliente</p><Button variant="outline" className="mt-4" onClick={() => setDlgCreate(true)}>Cadastrar</Button></div>}
 
@@ -380,6 +420,7 @@ export default function Clientes() {
           />
         </ImportDialogContent>
       </ImportDialog>
+      </div>
     </MainLayout>
   );
 }
