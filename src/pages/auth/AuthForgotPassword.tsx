@@ -46,7 +46,7 @@ export function AuthForgotPassword({ onBack }: AuthForgotPasswordProps) {
   };
 
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center bg-background p-4 relative overflow-hidden">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center gap-4 bg-background p-4 relative overflow-hidden">
       <AnimatedBackground />
       <FadeIn>
         <Card className="w-full max-w-md shadow-2xl border-border/50 backdrop-blur-xl bg-card/95">
