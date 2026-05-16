@@ -20,7 +20,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatsCard } from "@/components/common/StatsCard";
-import { PageTransition } from "@/components/common/PageTransition";
+import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/common/PageTransition";
+
 
 
 // Novos imports
@@ -158,12 +159,13 @@ export default function FretesInternos() {
             }
           />
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatsCard title="Total" value={stats.total} icon={Truck} color="primary" />
-            <StatsCard title="Pendentes" value={stats.pendentes} icon={Clock} color="warning" />
-            <StatsCard title="Em Trânsito" value={stats.transito} icon={Truck} color="info" />
-            <StatsCard title="Entregues" value={stats.entregues} icon={CheckCircle2} color="success" />
-          </div>
+          <StaggeredContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StaggeredItem><StatsCard title="Total" value={stats.total} icon={Truck} color="primary" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Pendentes" value={stats.pendentes} icon={Clock} color="warning" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Em Trânsito" value={stats.transito} icon={Truck} color="info" /></StaggeredItem>
+            <StaggeredItem><StatsCard title="Entregues" value={stats.entregues} icon={CheckCircle2} color="success" /></StaggeredItem>
+          </StaggeredContent>
+
 
 
         <FilterBar 
@@ -185,8 +187,10 @@ export default function FretesInternos() {
 
         {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((f, i) => { const config = statusConfig[f.status]; const StatusIcon = config.icon; return (
-          <div key={f.id} className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+        {!isLoading && <StaggeredContent className="space-y-3">{pagination.paginatedData.map((f, i) => { const config = statusConfig[f.status]; const StatusIcon = config.icon; return (
+          <StaggeredItem key={f.id}>
+            <div className={`card-interactive animate-fade-in ${isSelected(f.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 50}ms` }}>
+
             <div className="flex items-start gap-3">
               <Checkbox checked={isSelected(f.id)} onCheckedChange={() => toggle(f.id)} className="mt-1" />
               <div className={cn("p-2 rounded-lg", config.color)}><StatusIcon className="w-5 h-5" /></div>
@@ -196,8 +200,10 @@ export default function FretesInternos() {
               </div>
               <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSelected(f); setIsViewOpen(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => openEdit(f)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuSeparator />{f.status === "pendente" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: f.id, status: "em_transito" })}>Iniciar Trânsito</DropdownMenuItem>}{f.status === "em_transito" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: f.id, status: "entregue" })}>Marcar Entregue</DropdownMenuItem>}<DropdownMenuItem className="text-destructive" onClick={() => { setSelected(f); setIsDeleteOpen(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             </div>
-          </div>
-        ); })}</div>}
+            </div>
+          </StaggeredItem>
+        ); })}</StaggeredContent>}
+
 
         {!isLoading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Truck className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhum frete</p></div>}
         {!isLoading && sortedData.length > 0 && (
