@@ -33,6 +33,9 @@ import { useSorting } from "@/hooks/useSorting";
 import { CSVImporter } from "@/components/common/CSVImporter";
 import { Dialog as ImportDialog, DialogContent as ImportDialogContent, DialogHeader as ImportDialogHeader, DialogTitle as ImportDialogTitle } from "@/components/ui/dialog";
 import { RTECustomerSync } from "@/components/rodonaves/RTECustomerSync";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
+import { SkeletonTable } from "@/components/ui/skeleton";
 
 const clienteCSVSchema = z.object({
   razao_social: z.string().min(1),
@@ -95,6 +98,8 @@ export default function Clientes() {
   const [sel, setSel] = useState<Cliente | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [dlgImport, setDlgImport] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
 
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["clientes"],
@@ -140,7 +145,14 @@ export default function Clientes() {
       const { error } = await supabase.from("clientes").insert({ razao_social: d.razao_social, nome_fantasia: d.nome_fantasia || null, cnpj: d.cnpj || null, endereco_completo: d.endereco_completo, cidade: d.cidade || null, estado: d.estado || null, cep: d.cep || null, contato_nome: d.contato_nome || null, contato_email: d.contato_email || null, contato_telefone: d.contato_telefone || null, horario_entrega: d.horario_entrega || null, restricoes_entrega: d.restricoes_entrega || null });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clientes"] }); setDlgCreate(false); setForm(emptyForm); toast.success("Cliente cadastrado!"); },
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ["clientes"] }); 
+      setDlgCreate(false); 
+      setForm(emptyForm); 
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
+      toast.success("Cliente cadastrado!"); 
+    },
     onError: (e) => toast.error("Erro ao cadastrar: " + e.message),
   });
 
@@ -205,6 +217,7 @@ export default function Clientes() {
 
   return (
     <MainLayout>
+      {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} gravity={0.3} />}
       <div className="space-y-6">
 
 
@@ -331,7 +344,7 @@ export default function Clientes() {
           />
         )}
 
-        {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
+        {isLoading && <SkeletonTable rows={6} cols={4} />}
 
         {!isLoading && <StaggeredContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pagination.paginatedData.map((c, i) => (
