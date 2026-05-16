@@ -41,11 +41,14 @@ export function PreferencePanel() {
         <div className="grid gap-6">
           <div className="space-y-3">
             <Label className="text-xs text-muted-foreground uppercase font-black">Tema do Sistema</Label>
-            <Tabs 
-              value={preferences.theme} 
-              onValueChange={(v: any) => updatePreference('theme', v)}
-              className="w-full"
-            >
+          <Tabs 
+            value={preferences.theme} 
+            onValueChange={(v: any) => {
+              hapticFeedback('light');
+              updatePreference('theme', v);
+            }}
+            className="w-full"
+          >
               <TabsList className="grid grid-cols-3 w-full h-12 p-1 bg-muted/50 border border-white/5">
                 <TabsTrigger value="light" className="gap-2">
                   <Sun className="w-4 h-4" /> <span className="hidden sm:inline">Claro</span>
