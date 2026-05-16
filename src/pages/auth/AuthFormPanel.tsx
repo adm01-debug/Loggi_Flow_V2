@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Box, Loader2, Mail, Lock, User, Shield, Eye, EyeOff, Clock } from "lucide-react";
+import { Truck, Loader2, Mail, Lock, User, Shield, Eye, EyeOff, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,7 +59,7 @@ export function AuthFormPanel({
           <div className="lg:hidden text-center pt-6 pb-2">
             <div className="inline-flex items-center gap-2 mb-1">
               <motion.div whileHover={{ rotate: [0, -10, 10, 0] }} className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md shadow-primary/30">
-                <Box className="w-5 h-5 text-primary-foreground" />
+                <Truck className="w-5 h-5 text-primary-foreground" />
               </motion.div>
               <span className="font-display text-xl font-bold">LogiFlow</span>
             </div>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Box, Loader2, Lock, CheckCircle } from "lucide-react";
+import { Truck, Loader2, Lock, CheckCircle } from "lucide-react";
 import { z } from "zod";
 
 const resetSchema = z.object({
@@ -148,7 +148,7 @@ export default function ResetPassword() {
       <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-2xl bg-primary glow-primary">
-            <Box className="w-8 h-8 text-primary-foreground" />
+            <Truck className="w-8 h-8 text-primary-foreground" />
           </div>
           <div>
             <CardTitle className="text-2xl font-display">Nova Senha</CardTitle>
