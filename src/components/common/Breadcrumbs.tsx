@@ -115,7 +115,6 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
   const location = useLocation();
   const { recentPages } = useNavigationHistory();
   const [copied, setCopied] = useState(false);
-  const [copied, setCopied] = useState(false);
   
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
