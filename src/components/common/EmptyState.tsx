@@ -28,6 +28,7 @@ const variantConfig: Record<EmptyStateVariant, { icon: LucideIcon; color: string
   inbox: { icon: Inbox, color: "text-muted-foreground" },
   calendar: { icon: Calendar, color: "text-info" },
   default: { icon: Plus, color: "text-primary" },
+  location: { icon: MapPin, color: "text-primary" },
 };
 
 export function EmptyState({
