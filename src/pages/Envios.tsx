@@ -260,18 +260,23 @@ export default function Envios() {
     <MainLayout>
       {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} gravity={0.3} />}
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                <Send className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                <Send className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
               </div>
-              <span className="truncate">Envios</span>
+              <div className="flex flex-col">
+                <span className="truncate drop-shadow-sm">Envios</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Expedição Nexus</span>
+                </div>
+              </div>
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie entregas aos clientes</p>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Controle total de saídas, entregas ao cliente final e logística de última milha.</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant={showLabels ? "default" : "outline"} onClick={() => setShowLabels(!showLabels)} className="gap-2">
+          <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
+            <Button variant={showLabels ? "default" : "outline"} size="lg" onClick={() => setShowLabels(!showLabels)} className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 transition-all">
               <QrCode className="w-4 h-4" />
               <span className="hidden sm:inline">Etiquetas</span>
             </Button>
@@ -286,6 +291,7 @@ export default function Envios() {
                 }
               }}
               variant="outline"
+              className="h-12 w-12 rounded-xl border-2"
             />
             <OnboardingTooltip
               id="envios-novo-btn"
@@ -293,7 +299,9 @@ export default function Envios() {
               description="Registre uma nova entrega e acompanhe todo o ciclo de envio. Ganhe XP a cada entrega finalizada!"
               position="left"
             >
-              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+              <Button size="lg" onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all">
+                <Plus className="w-5 h-5" /> Novo Envio
+              </Button>
             </OnboardingTooltip>
           </div>
         </div>
@@ -307,11 +315,43 @@ export default function Envios() {
           position="bottom"
           delay={1500}
         >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="stat-card text-center p-3 sm:p-4"><Send className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregues}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregues</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><AlertTriangle className="w-5 h-5 text-destructive mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ocorrencias}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ocorrências</p></div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <Send className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums">{stats.total}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Total Geral</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-warning/10 text-warning group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-warning">{stats.transito}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Em Trânsito</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-success/10 text-success group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-success">{stats.entregues}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Entregues</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-destructive/10 text-destructive group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-destructive">{stats.ocorrencias}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Ocorrências</p>
+            </div>
           </div>
         </OnboardingTooltip>
 
@@ -334,47 +374,104 @@ export default function Envios() {
 
         {isLoading && <SkeletonTable rows={5} cols={5} />}
 
-        {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((e, i) => { const config = statusConfig[e.status]; const StatusIcon = config.icon; return (
-          <div key={e.id} className={`card-interactive animate-fade-in ${isSelected(e.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 30}ms` }}>
-            <div className="flex items-start gap-3">
-              <Checkbox checked={isSelected(e.id)} onCheckedChange={() => toggle(e.id)} className="mt-1" />
-              <div className={cn("p-2 rounded-lg", config.color)}><StatusIcon className="w-5 h-5" /></div>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span 
-                    className="font-semibold cursor-pointer hover:text-primary transition-colors flex items-center gap-1"
-                    onClick={() => {
-                      navigator.clipboard.writeText(e.numero_entrega);
-                      toast.success(`Copiado: ${e.numero_entrega}`);
-                    }}
-                    title="Clique para copiar"
-                  >
-                    {e.numero_entrega}
-                    <Copy className="w-3 h-3 opacity-50 group-hover:opacity-100" />
-                  </span>
-                  <Badge className={config.color}>{config.label}</Badge>
-                  {e.nf_remessa && (
-                    <Badge 
-                      variant="outline" 
-                      className="cursor-pointer hover:bg-accent transition-colors flex items-center gap-1"
-                      onClick={() => {
-                        navigator.clipboard.writeText(e.nf_remessa!);
-                        toast.success(`NF ${e.nf_remessa} copiada`);
-                      }}
-                      title="Clique para copiar NF"
-                    >
-                      NF {e.nf_remessa}
-                      <Copy className="w-2.5 h-2.5 opacity-50" />
-                    </Badge>
-                  )}
+        {!isLoading && <div className="grid grid-cols-1 gap-4">{pagination.paginatedData.map((e, i) => { const config = statusConfig[e.status]; const StatusIcon = config.icon; return (
+          <div 
+            key={e.id} 
+            className={cn(
+              "group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4",
+              isSelected(e.id) ? 'ring-2 ring-primary bg-primary/5' : ''
+            )}
+            style={{ animationDelay: `${i * 30}ms` }}
+          >
+            <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-start gap-5 flex-1">
+                <Checkbox checked={isSelected(e.id)} onCheckedChange={() => toggle(e.id)} className="mt-4 rounded-md h-5 w-5 border-2" />
+                <div className={cn("p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500", config.color)}>
+                  <StatusIcon className="w-6 h-6" />
                 </div>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  {e.cliente && <div className="flex items-center gap-1"><User className="w-3 h-3" />{e.cliente.nome_fantasia || e.cliente.razao_social}</div>}
-                  <div className="flex items-center gap-1"><MapPin className="w-3 h-3" /><span className="truncate">{e.endereco_entrega}</span></div>
-                  <div className="flex items-center gap-4">{e.previsao_entrega && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{format(new Date(e.previsao_entrega), "dd/MM", { locale: ptBR })}</span>}{e.transportadora && <span className="flex items-center gap-1"><Truck className="w-3 h-3" />{e.transportadora.nome_fantasia}</span>}</div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-1.5">
+                    <span 
+                      className="font-black text-xl tracking-tighter uppercase italic cursor-pointer hover:text-primary transition-colors flex items-center gap-2 group/code"
+                      onClick={() => {
+                        navigator.clipboard.writeText(e.numero_entrega);
+                        toast.success(`Copiado: ${e.numero_entrega}`);
+                      }}
+                    >
+                      {e.numero_entrega}
+                      <Copy className="w-4 h-4 opacity-0 group-hover/code:opacity-100 transition-opacity" />
+                    </span>
+                    <Badge className={cn("px-4 py-1.5 font-black uppercase tracking-widest text-[10px] rounded-xl shadow-sm", config.color)}>
+                      {config.label}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {e.cliente && (
+                      <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight text-foreground/80">
+                        <User className="w-4 h-4 text-primary" />
+                        {e.cliente.nome_fantasia || e.cliente.razao_social}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-tight">
+                      <MapPin className="w-4 h-4 text-primary/60" />
+                      <span className="truncate max-w-[250px]">{e.endereco_entrega}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => { setSel(e); setDlgView(true); }}><Eye className="w-4 h-4 mr-2" />Ver</DropdownMenuItem><DropdownMenuItem onClick={() => handlePrintLabel(e)}><Printer className="w-4 h-4 mr-2" />Etiqueta</DropdownMenuItem><DropdownMenuSeparator />{e.status === "aguardando_producao" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "pronto_despacho" })}>Pronto Despacho</DropdownMenuItem>}{e.status === "despachado" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "em_transito" })}>Em Trânsito</DropdownMenuItem>}{e.status === "em_transito" && <DropdownMenuItem onClick={() => updateStatusMut.mutate({ id: e.id, status: "entregue" })}>Marcar Entregue</DropdownMenuItem>}<DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => { setSel(e); setDlgDel(true); }}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-6 lg:gap-10 flex-[1.5] bg-sidebar-accent/30 p-4 rounded-2xl border border-border/50 backdrop-blur-sm">
+                <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                  <div className="p-2 rounded-lg bg-background shadow-sm"><Calendar className="w-4 h-4 text-primary" /></div>
+                  <span className="uppercase text-[11px] tracking-tight">
+                    {e.previsao_entrega ? format(new Date(e.previsao_entrega), "dd MMM", { locale: ptBR }) : 'S/ PREVISÃO'}
+                  </span>
+                </div>
+                {e.transportadora && (
+                  <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                    <div className="p-2 rounded-lg bg-background shadow-sm"><Truck className="w-4 h-4 text-primary" /></div>
+                    <span className="uppercase text-[11px] tracking-tight truncate max-w-[120px]">{e.transportadora.nome_fantasia}</span>
+                  </div>
+                )}
+                {e.nf_remessa && (
+                  <div 
+                    className="flex items-center gap-3 text-sm font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      navigator.clipboard.writeText(e.nf_remessa!);
+                      toast.success(`NF ${e.nf_remessa} copiada`);
+                    }}
+                  >
+                    <div className="p-2 rounded-lg bg-primary/10 shadow-sm"><FileText className="w-4 h-4" /></div>
+                    <span className="uppercase text-[11px] font-black tracking-widest">NF {e.nf_remessa}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 ml-auto">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-primary/10 hover:text-primary transition-all">
+                      <MoreVertical className="w-5 h-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-2 border-primary/5 shadow-2xl">
+                    <DropdownMenuItem className="rounded-xl h-11 font-bold gap-2" onClick={() => { setSel(e); setDlgView(true); }}>
+                      <Eye className="w-4 h-4 text-primary" /> Ver Detalhes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="rounded-xl h-11 font-bold gap-2" onClick={() => handlePrintLabel(e)}>
+                      <Printer className="w-4 h-4 text-primary" /> Imprimir Etiqueta
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="my-2" />
+                    {e.status === "aguardando_producao" && <DropdownMenuItem className="rounded-xl h-11 font-bold bg-primary/5 text-primary" onClick={() => updateStatusMut.mutate({ id: e.id, status: "pronto_despacho" })}>Pronto Despacho</DropdownMenuItem>}
+                    {e.status === "despachado" && <DropdownMenuItem className="rounded-xl h-11 font-bold bg-warning/5 text-warning" onClick={() => updateStatusMut.mutate({ id: e.id, status: "em_transito" })}>Em Trânsito</DropdownMenuItem>}
+                    {e.status === "em_transito" && <DropdownMenuItem className="rounded-xl h-11 font-bold bg-success/5 text-success" onClick={() => updateStatusMut.mutate({ id: e.id, status: "entregue" })}>Confirmar Entrega</DropdownMenuItem>}
+                    <DropdownMenuSeparator className="my-2" />
+                    <DropdownMenuItem className="rounded-xl h-11 font-bold text-destructive hover:bg-destructive/5" onClick={() => { setSel(e); setDlgDel(true); }}>
+                      <Trash2 className="w-4 h-4 mr-2" /> Excluir Registro
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         ); })}</div>}
