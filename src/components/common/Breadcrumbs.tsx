@@ -113,7 +113,7 @@ const routeCategories: Record<string, { label: string; path: string }> = {
 
 export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
   const location = useLocation();
-  const { recentPages } = useNavigationHistory();
+  const { recentPages, getPageLabel } = useNavigationHistory();
   const [copied, setCopied] = useState(false);
   
   const handleCopyLink = () => {
@@ -123,19 +123,16 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
     setTimeout(() => setCopied(false), 2000);
   };
   
-  // Auto-generate breadcrumbs from route if items not provided
   const breadcrumbItems: BreadcrumbItem[] = items || (() => {
     const result: BreadcrumbItem[] = [];
     const currentPath = location.pathname;
     
-    // Add category as clickable link
     const category = routeCategories[currentPath];
     if (category && category.path !== currentPath) {
       result.push({ label: category.label, path: category.path });
     }
     
-    // Add current page (no link — it's the active page)
-    const label = routeLabels[currentPath] || currentPath.split("/").pop() || "Página";
+    const label = getPageLabel(currentPath);
     result.push({ label });
     
     return result;
@@ -149,9 +146,9 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
     <motion.nav
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       aria-label="Breadcrumb"
-      className={cn("flex items-center justify-between text-sm overflow-x-auto scrollbar-none gap-4", className)}
+      className={cn("flex items-center justify-between text-sm overflow-x-auto scrollbar-none gap-4 bg-accent/30 p-1.5 rounded-lg border border-border/50", className)}
     >
       <ol className="flex items-center gap-1 flex-nowrap min-w-0">
         {showHome && (
@@ -160,13 +157,14 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
               to="/"
               className={cn(
                 "flex items-center gap-1 px-2 py-1 rounded-md transition-all duration-200",
-                "text-muted-foreground hover:text-foreground hover:bg-accent",
-                "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                "text-muted-foreground hover:text-primary hover:bg-primary/10",
+                "focus:outline-none focus:ring-2 focus:ring-primary/20",
+                "active:scale-95"
               )}
               aria-label="Ir para Dashboard"
             >
               <Home className="w-4 h-4" />
-              <span className="sr-only sm:not-sr-only">Início</span>
+              <span className="sr-only sm:not-sr-only font-bold text-xs uppercase tracking-tight">Início</span>
             </Link>
           </li>
         )}
@@ -176,16 +174,15 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
           
           return (
             <li key={index} className="flex items-center shrink-0 min-w-0">
-              <ChevronRight className="w-4 h-4 text-muted-foreground/50 mx-0.5 sm:mx-1 shrink-0" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground/30 mx-0.5 sm:mx-1 shrink-0" />
               
               {item.path && !isLast ? (
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-md transition-all duration-200",
-                    "text-muted-foreground hover:text-foreground hover:bg-accent",
-                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                    "truncate max-w-[120px] sm:max-w-none"
+                    "flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200",
+                    "text-muted-foreground hover:text-primary hover:bg-primary/10",
+                    "font-medium truncate max-w-[120px] sm:max-w-none active:scale-95"
                   )}
                 >
                   {item.icon}
@@ -196,28 +193,35 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                   <DropdownMenuTrigger asChild>
                     <button
                       className={cn(
-                        "flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-md transition-all duration-200",
-                        "text-primary bg-primary/10 border border-primary/20 font-semibold hover:bg-primary/20",
-                        "truncate max-w-[150px] sm:max-w-none"
+                        "flex items-center gap-1.5 px-2 py-1 rounded-md transition-all duration-200",
+                        "text-primary bg-primary/10 border border-primary/20 font-bold hover:bg-primary/20 shadow-sm",
+                        "truncate max-w-[150px] sm:max-w-none group active:scale-95"
                       )}
                       aria-current="page"
                     >
                       {item.icon}
                       <span className="truncate">{item.label}</span>
-                      <ChevronRight className="w-3 h-3 opacity-50 rotate-90 ml-0.5" />
+                      <ChevronRight className="w-3.5 h-3.5 opacity-50 rotate-90 ml-0.5 transition-transform group-data-[state=open]:rotate-[-90deg]" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <DropdownMenuContent align="start" className="w-64 border-2 border-primary/5 shadow-lg">
+                    <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                      <History className="w-3 h-3" />
                       Histórico Recente
                     </div>
-                    {recentPages.slice(0, 5).map((page) => (
-                      <DropdownMenuItem key={page.path} asChild>
-                        <Link to={page.path} className="flex items-center gap-2 cursor-pointer">
-                          <span className="truncate">{page.label}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
+                    <DropdownMenuSeparator />
+                    {recentPages.length > 0 ? (
+                      recentPages.slice(0, 8).map((page, pIdx) => (
+                        <DropdownMenuItem key={`${page.path}-${pIdx}`} asChild>
+                          <Link to={page.path} className="flex flex-col items-start gap-0.5 py-2 px-3 cursor-pointer hover:bg-primary/5">
+                            <span className="font-bold text-sm text-foreground">{page.label}</span>
+                            <span className="text-[10px] text-muted-foreground truncate w-full opacity-70">{page.path}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-xs text-muted-foreground italic">Histórico vazio</div>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
@@ -228,10 +232,10 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
 
       <button
         onClick={handleCopyLink}
-        className="shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors text-xs font-medium border border-border/50"
+        className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all text-[10px] font-bold uppercase tracking-wider border border-border/50 bg-background/50 active:scale-95"
         title="Copiar link desta página"
       >
-        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+        {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
         <span className="hidden sm:inline">Compartilhar</span>
       </button>
     </motion.nav>
