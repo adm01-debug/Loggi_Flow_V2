@@ -40,21 +40,25 @@ export function PageTransition({ children, mode = "directional" }: PageTransitio
     return {
       initial: { 
         opacity: 0, 
-        x: isBack ? -40 : 40,
-        scale: 0.98,
-        filter: "blur(8px)" 
+        x: isBack ? -60 : 60,
+        scale: 0.95,
+        filter: "blur(12px)",
+        rotateY: isBack ? -5 : 5
       },
       animate: { 
         opacity: 1, 
         x: 0,
         scale: 1,
-        filter: "blur(0px)" 
+        filter: "blur(0px)",
+        rotateY: 0
       },
       exit: { 
         opacity: 0, 
-        x: isBack ? 40 : -40,
-        scale: 0.98,
-        filter: "blur(8px)"
+        x: isBack ? 60 : -60,
+        scale: 0.95,
+        filter: "blur(12px)",
+        rotateY: isBack ? 5 : -5,
+        zIndex: 0
       },
     };
   }, [direction]);
