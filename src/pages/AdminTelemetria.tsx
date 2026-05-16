@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug, Info, Rocket } from "lucide-react";
+import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug, Info, Rocket, ShieldAlert } from "lucide-react";
 import { TelemetryCharts } from "@/components/admin/telemetry/TelemetryCharts";
 import { DORAMetrics } from "@/components/admin/DORAMetrics";
 import { PostMortemDashboard } from "@/features/incidents/components/PostMortemDashboard";
