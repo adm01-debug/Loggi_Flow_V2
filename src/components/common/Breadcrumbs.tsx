@@ -197,7 +197,7 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                     <button
                       className={cn(
                         "flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-md transition-all duration-200",
-                        "text-foreground bg-accent/50 font-medium hover:bg-accent",
+                        "text-primary bg-primary/10 border border-primary/20 font-semibold hover:bg-primary/20",
                         "truncate max-w-[150px] sm:max-w-none"
                       )}
                       aria-current="page"

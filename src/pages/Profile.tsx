@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useConfirmExit } from "@/hooks/useConfirmExit";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,15 @@ export default function Profile() {
   const { uploadImage, uploading } = useImageUpload("avatars");
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ full_name: profile?.full_name || user?.user_metadata?.full_name || "", phone: user?.user_metadata?.phone || "" });
+  const isDirty = form.full_name !== (profile?.full_name || user?.user_metadata?.full_name || "");
+
+  useConfirmExit(isDirty);
+
+  useEffect(() => {
+    if (profile?.full_name) {
+      setForm(prev => ({ ...prev, full_name: profile.full_name }));
+    }
+  }, [profile]);
 
   const handleSave = async () => { 
     if (!user) return;
@@ -53,7 +63,10 @@ export default function Profile() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10"><User className="w-6 h-6 text-primary" /></div>Meu Perfil</h1><p className="text-muted-foreground mt-1">Gerencie suas informações</p></div>
-          <Button onClick={handleSave} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
+          <div className="flex items-center gap-2">
+            {isDirty && <Badge variant="outline" className="text-warning border-warning animate-pulse">Alterações não salvas</Badge>}
+            <Button onClick={handleSave} disabled={saving || !isDirty}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
+          </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="card-base p-6 text-center">

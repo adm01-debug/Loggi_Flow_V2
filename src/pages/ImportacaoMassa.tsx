@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { Stepper } from "@/components/ui/stepper";
+import { Progress } from "@/components/ui/progress";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -97,8 +99,22 @@ interface ImportStats {
 
 export default function ImportacaoMassa() {
   const [history, setHistory] = useState<ImportStats[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const importSteps = [
+    { title: "Seleção", description: "Escolha o tipo de dados" },
+    { title: "Upload", description: "Envie seu arquivo" },
+    { title: "Processamento", description: "Importando para o sistema" },
+    { title: "Finalizado", description: "Veja os resultados" },
+  ];
 
   const handleImport = async (entity: ImportEntity, data: Record<string, unknown>[]) => {
+    setIsImporting(true);
+    setImportProgress(0);
+    setCurrentStep(2); // Processamento
+
     let successCount = 0;
     let errorCount = 0;
     const batchSize = 50;
@@ -106,11 +122,15 @@ export default function ImportacaoMassa() {
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
       const { error } = await supabase.from(entity).insert(batch as never[]);
+      
       if (error) {
         errorCount += batch.length;
       } else {
         successCount += batch.length;
       }
+      
+      const progress = Math.min(((i + batchSize) / data.length) * 100, 100);
+      setImportProgress(progress);
     }
 
     const stat: ImportStats = {
@@ -121,6 +141,9 @@ export default function ImportacaoMassa() {
       timestamp: new Date(),
     };
     setHistory((h) => [stat, ...h]);
+    setIsImporting(false);
+    setImportProgress(100);
+    setCurrentStep(3); // Finalizado
 
     if (errorCount === 0) {
       toast.success(`${successCount} registros importados com sucesso!`);
@@ -129,6 +152,9 @@ export default function ImportacaoMassa() {
     } else {
       toast.error(`Falha ao importar ${errorCount} registros`);
     }
+
+    // Reset step after some time
+    setTimeout(() => setCurrentStep(0), 5000);
   };
 
   const entities: { id: ImportEntity; label: string; icon: React.ElementType }[] = [
@@ -151,7 +177,23 @@ export default function ImportacaoMassa() {
           <p className="text-muted-foreground mt-1">Importe dados via CSV ou Excel com validação automática</p>
         </div>
 
-        <Tabs defaultValue="entregas">
+        <Card className="mb-6 overflow-hidden border-primary/20">
+          <CardContent className="p-0">
+            <Stepper steps={importSteps} currentStep={currentStep} className="px-6 py-8" />
+            
+            {isImporting && (
+              <div className="px-6 pb-6 animate-in fade-in duration-500">
+                <div className="flex justify-between text-sm mb-2 font-medium">
+                  <span className="text-primary">Processando registros...</span>
+                  <span>{importProgress.toFixed(0)}%</span>
+                </div>
+                <Progress value={importProgress} className="h-2" />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="entregas" onValueChange={() => setCurrentStep(1)}>
           <TabsList className="grid grid-cols-4 w-full max-w-lg">
             {entities.map((e) => (
               <TabsTrigger key={e.id} value={e.id} className="flex items-center gap-2">

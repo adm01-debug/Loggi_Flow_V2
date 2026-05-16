@@ -1,6 +1,8 @@
 import { useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
 
 interface VisitedPage {
   path: string;
@@ -55,6 +57,7 @@ const MAX_RECENT = 8;
 
 export function useNavigationHistory() {
   const location = useLocation();
+  const { user } = useAuth();
   const [recentPages, setRecentPages] = useLocalStorage<VisitedPage[]>("recent-pages", []);
   const prevPathRef = useRef(location.pathname);
   const directionRef = useRef<"forward" | "back">("forward");
@@ -77,8 +80,23 @@ export function useNavigationHistory() {
       return [newEntry, ...filtered].slice(0, MAX_RECENT);
     });
 
+    // Track page view in security_events for audit/UX analytics
+    const trackPageView = async () => {
+      if (user?.id) {
+        await supabase.from("security_events").insert({
+          user_id: user.id,
+          event_type: "page_view",
+          description: `Visualizou: ${label}`,
+          severity: "low",
+          ip_address: "client-side",
+          metadata: { path: currentPath, label, timestamp: new Date().toISOString() }
+        });
+      }
+    };
+    trackPageView();
+
     prevPathRef.current = currentPath;
-  }, [location.pathname]);
+  }, [location.pathname, user?.id]);
 
   const getPageLabel = useCallback((path: string) => {
     return routeLabels[path] || path.split("/").pop() || "Página";
