@@ -15,10 +15,12 @@ const XPProgressBar = React.forwardRef<HTMLDivElement, XPProgressBarProps>(
     return (
       <div
         ref={ref}
-        className={cn("card-elevated p-3 sm:p-4 space-y-2 sm:space-y-3", className)}
+        className={cn("card-elevated p-3 sm:p-4 space-y-2 sm:space-y-3 relative overflow-hidden group", className)}
         {...props}
       >
-        <div className="flex items-center justify-between gap-2">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-xp/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-xp/10 transition-colors duration-500" />
+        
+        <div className="flex items-center justify-between gap-2 relative z-10">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-xp to-primary glow-primary shrink-0">
               <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
@@ -38,11 +40,11 @@ const XPProgressBar = React.forwardRef<HTMLDivElement, XPProgressBarProps>(
           </div>
         </div>
 
-        <div className="space-y-1.5 sm:space-y-2">
+        <div className="space-y-1.5 sm:space-y-2 relative z-10">
           <div className="xp-bar">
             <div
-              className="xp-bar-fill relative overflow-hidden"
-              style={{ width: `${progress}%` }}
+              className="xp-bar-fill relative overflow-hidden shadow-[0_0_15px_rgba(var(--xp-rgb),0.5)]"
+              style={{ width: `${progress}%`, transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/20 to-transparent animate-shimmer" />
             </div>

@@ -52,7 +52,18 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   }).join(' ');
   
   return (
-    <svg width={width} height={height} className="opacity-60">
+    <svg width={width} height={height} className="overflow-visible">
+      <defs>
+        <linearGradient id={`gradient-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={color} stopOpacity="0.4" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path
+        d={`M ${points} L ${padding + (width - 2 * padding)},${height} L ${padding},${height} Z`}
+        fill={`url(#gradient-${color})`}
+        className="opacity-40"
+      />
       <polyline
         fill="none"
         stroke={color}
@@ -60,13 +71,14 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
         points={points}
+        className="drop-shadow-[0_0_2px_rgba(0,0,0,0.2)]"
       />
       <circle
         cx={padding + (width - 2 * padding)}
         cy={height - padding - ((data[data.length - 1] - min) / range) * (height - 2 * padding)}
         r="3"
         fill={color}
-        className="animate-pulse"
+        className="animate-pulse shadow-lg"
       />
     </svg>
   );
@@ -119,7 +131,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
       },
       neutral: {
         border: 'border-border hover:border-primary/40',
-        bg: 'bg-gradient-to-br from-card via-card to-card-elevated',
+        bg: 'bg-gradient-to-br from-card/80 via-card/50 to-card-elevated/80 backdrop-blur-xl',
         iconBg: 'bg-primary/10 text-primary ring-2 ring-primary/20',
         glow: 'after:bg-primary/10',
         sparkColor: 'hsl(var(--primary))',

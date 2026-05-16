@@ -65,6 +65,15 @@ export default function Index() {
   const { userLevel } = useGamification();
   const { isEditMode, toggleEditMode, resetLayout, getAvailableWidgetsToAdd, addWidget } = useDashboardWidgets();
 
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Bom dia");
+    else if (hour < 18) setGreeting("Boa tarde");
+    else setGreeting("Boa noite");
+  }, []);
+
   const [dateRange, setDateRange] = useState<DateRange>({ from: subDays(new Date(), 6), to: new Date() });
 
   const [widgetOrder, setWidgetOrder] = useLocalStorage<string[]>("dashboard-widget-order", [
@@ -178,12 +187,17 @@ export default function Index() {
           <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
             <div className="animate-in slide-in-from-left-4 duration-500">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                  <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 shadow-inner">
+                  <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-primary animate-pulse" />
                 </div>
                 <span className="truncate">Dashboard</span>
+                <kbd className="hidden lg:flex pointer-events-none h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-50 ml-2">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
               </h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1">Visão geral das operações logísticas</p>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                <span className="font-semibold text-primary">{greeting}!</span> Visão geral das operações logísticas
+              </p>
             </div>
             
             {/* Actions - Scrollable on mobile */}

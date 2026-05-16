@@ -24,6 +24,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 
 // Novos hooks e componentes
 import { Pagination } from "@/components/common/Pagination";
@@ -35,6 +37,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 import { useRealtime } from "@/hooks/useRealtime";
+import { SkeletonTable } from "@/components/ui/skeleton";
 
 type EntregaStatus = "aguardando_producao" | "pronto_despacho" | "cotacao_frete" | "nf_emitida" | "despachado" | "em_transito" | "saiu_entrega" | "entregue" | "ocorrencia" | "finalizado";
 type FreteType = "cif" | "fob" | "cortesia";
@@ -143,6 +146,8 @@ export default function Envios() {
   const [sel, setSel] = useState<Entrega | null>(null);
   const [previewLabel, setPreviewLabel] = useState<LabelData | null>(null);
   const [printMode, setPrintMode] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
   const [form, setForm] = useState(emptyForm);
   const { playSuccess, playAction, playError, playWhoosh } = useAudioFeedback();
 
@@ -183,6 +188,8 @@ export default function Envios() {
       setDlgCreate(false); 
       setForm(emptyForm); 
       playSuccess();
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
       toast.success("Entrega criada!"); 
     },
     onError: (e) => {
@@ -251,6 +258,7 @@ export default function Envios() {
 
   return (
     <MainLayout>
+      {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} gravity={0.3} />}
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
@@ -324,7 +332,7 @@ export default function Envios() {
 
         {selectedIds.length > 0 && <BulkActions selectedIds={selectedIds} totalCount={pagination.paginatedData.length} onClearSelection={clearSelection} onSelectAll={selectAll} actions={[{ id: "entregue", label: "Marcar Entregue", icon: CheckCircle2, onClick: (ids) => bulkUpdateStatus(ids, "entregue") }]} />}
 
-        {isLoading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
+        {isLoading && <SkeletonTable rows={5} cols={5} />}
 
         {!isLoading && <div className="space-y-3">{pagination.paginatedData.map((e, i) => { const config = statusConfig[e.status]; const StatusIcon = config.icon; return (
           <div key={e.id} className={`card-interactive animate-fade-in ${isSelected(e.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 30}ms` }}>
