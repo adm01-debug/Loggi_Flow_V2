@@ -186,6 +186,21 @@ export function AuthFormPanel({
           </CardContent>
         </Card>
       </FadeIn>
+      
+      <div className="absolute bottom-4 left-0 right-0 px-8 text-center pointer-events-none">
+        <motion.p 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          transition={{ delay: 1, duration: 1 }}
+          className="text-[10px] leading-relaxed text-muted-foreground/60 max-w-sm mx-auto"
+        >
+          Este sistema é propriedade intelectual exclusiva da Brasil Marcas, sendo protegido pela Lei nº 9.609/98 e demais normas aplicáveis. É proibida sua reprodução, cópia, modificação, distribuição ou uso não autorizado.
+          <br />
+          <span className="font-medium mt-1 inline-block">
+            © 2026 LogiFlow Todos os direitos reservados.
+          </span>
+        </motion.p>
+      </div>
     </div>
   );
 }
