@@ -21,10 +21,14 @@ export function RealtimeStatus() {
   const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
+    const start = Date.now();
     const channel = supabase.channel('system-health-check');
     
     channel.subscribe((status) => {
       setStatus(status);
+      if (status === 'SUBSCRIBED') {
+        setLatency(Date.now() - start);
+      }
     });
 
     return () => {
