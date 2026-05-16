@@ -9,7 +9,8 @@ export { PageTransition } from './PageTransition';
 
 // Loading & States
 export { LoadingSpinner } from './LoadingSpinner';
-export { EmptyState, EmptyStatePresets } from './EmptyState';
+export { EmptyState } from './EmptyState';
+export { EmptyStatePresets } from './EmptyStatePresets';
 export { ErrorBoundary } from './ErrorBoundary';
 export { WidgetErrorBoundary } from './WidgetErrorBoundary';
 
