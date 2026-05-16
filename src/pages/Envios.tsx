@@ -260,18 +260,23 @@ export default function Envios() {
     <MainLayout>
       {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} gravity={0.3} />}
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                <Send className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                <Send className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
               </div>
-              <span className="truncate">Envios</span>
+              <div className="flex flex-col">
+                <span className="truncate drop-shadow-sm">Envios</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Expedição Nexus</span>
+                </div>
+              </div>
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">Gerencie entregas aos clientes</p>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Controle total de saídas, entregas ao cliente final e logística de última milha.</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant={showLabels ? "default" : "outline"} onClick={() => setShowLabels(!showLabels)} className="gap-2">
+          <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
+            <Button variant={showLabels ? "default" : "outline"} size="lg" onClick={() => setShowLabels(!showLabels)} className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 transition-all">
               <QrCode className="w-4 h-4" />
               <span className="hidden sm:inline">Etiquetas</span>
             </Button>
@@ -286,6 +291,7 @@ export default function Envios() {
                 }
               }}
               variant="outline"
+              className="h-12 w-12 rounded-xl border-2"
             />
             <OnboardingTooltip
               id="envios-novo-btn"
@@ -293,7 +299,9 @@ export default function Envios() {
               description="Registre uma nova entrega e acompanhe todo o ciclo de envio. Ganhe XP a cada entrega finalizada!"
               position="left"
             >
-              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Novo</Button>
+              <Button size="lg" onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all">
+                <Plus className="w-5 h-5" /> Novo Envio
+              </Button>
             </OnboardingTooltip>
           </div>
         </div>
@@ -307,11 +315,43 @@ export default function Envios() {
           position="bottom"
           delay={1500}
         >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="stat-card text-center p-3 sm:p-4"><Send className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.total}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Total</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><Truck className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.transito}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Em Trânsito</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.entregues}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Entregues</p></div>
-            <div className="stat-card text-center p-3 sm:p-4"><AlertTriangle className="w-5 h-5 text-destructive mx-auto mb-2" /><p className="text-xl sm:text-2xl font-bold">{stats.ocorrencias}</p><p className="text-[10px] sm:text-xs text-muted-foreground">Ocorrências</p></div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <Send className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums">{stats.total}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Total Geral</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-warning/10 text-warning group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-warning">{stats.transito}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Em Trânsito</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-success/10 text-success group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-success">{stats.entregues}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Entregues</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-destructive/10 text-destructive group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-destructive">{stats.ocorrencias}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Ocorrências</p>
+            </div>
           </div>
         </OnboardingTooltip>
 
