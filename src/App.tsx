@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
+import { useGlobalShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
@@ -98,6 +100,7 @@ PageLoader.displayName = "PageLoader";
 
 function AppRoutes() {
   const location = useLocation();
+  useGlobalShortcuts();
   
   return (
     <AnimatePresence mode="wait">
@@ -178,6 +181,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <NavigationProgressBar />
           <Suspense fallback={<PageLoader />}>
             <LazyProviders>
               <AppRoutes />

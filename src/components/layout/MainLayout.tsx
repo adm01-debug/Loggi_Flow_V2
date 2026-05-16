@@ -7,6 +7,7 @@ import { MobileQuickActions } from "./MobileQuickActions";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { ScrollRestoration } from "@/components/common/ScrollRestoration";
 import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
+import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
@@ -46,22 +47,12 @@ export function MainLayout({ children }: MainLayoutProps) {
       }
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && e.key === "ArrowLeft") {
-        if (location.pathname !== "/") {
-          navigate(-1);
-        }
-      }
-    };
-
     window.addEventListener("touchstart", handleTouchStart);
     window.addEventListener("touchend", handleTouchEnd);
-    window.addEventListener("keydown", handleKeyDown);
     
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
-      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [navigate, location]);
 
@@ -104,6 +95,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <MobileBottomNav />
       <MobileQuickActions />
       <LevelUpModal />
+      <ScrollToTop />
       
       <Suspense fallback={null}>
         <InstallPrompt />
