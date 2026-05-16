@@ -187,6 +187,9 @@ export default function AdminTelemetriaPage() {
           <TabsContent value="devops" className="space-y-6">
             <DORAMetrics />
           </TabsContent>
+          <TabsContent value="incidents" className="space-y-6">
+            <PostMortemDashboard />
+          </TabsContent>
         </Tabs>
       </div>
     </MainLayout>
