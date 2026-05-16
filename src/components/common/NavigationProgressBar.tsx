@@ -2,11 +2,13 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import nprogress from "nprogress";
 
-// Configure nprogress
+// Configure nprogress for premium feel
 nprogress.configure({ 
   showSpinner: false,
-  trickleSpeed: 200,
-  minimum: 0.08
+  trickleSpeed: 150,
+  minimum: 0.1,
+  easing: 'ease',
+  speed: 400
 });
 
 export function NavigationProgressBar() {
@@ -15,16 +17,16 @@ export function NavigationProgressBar() {
   useEffect(() => {
     nprogress.start();
     
-    // Finish after a small delay to simulate loading or until component mounts
+    // Smooth completion
     const timer = setTimeout(() => {
       nprogress.done();
-    }, 100);
+    }, 150);
 
     return () => {
       clearTimeout(timer);
       nprogress.done();
     };
-  }, [location.pathname]);
+  }, [location.pathname, location.search]); // Trigger on query param changes too
 
   return null;
 }
