@@ -105,6 +105,14 @@ export const AVAILABLE_WIDGETS: WidgetDefinition[] = [
     minSize: { w: 6, h: 3 },
     category: "chart",
   },
+  {
+    id: "intelligence-widget",
+    title: "Inteligência Operacional",
+    description: "Saúde operacional e otimizações IA",
+    defaultSize: { w: 6, h: 4 },
+    minSize: { w: 4, h: 4 },
+    category: "action",
+  },
 ];
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
