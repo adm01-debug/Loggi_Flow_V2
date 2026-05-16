@@ -32,19 +32,30 @@ export function MainLayout({ children }: MainLayoutProps) {
   useEffect(() => {
     let touchStartX = 0;
     const handleTouchStart = (e: TouchEvent) => {
+      // Ignore if touching elements that should handle their own gestures
+      if ((e.target as HTMLElement).closest('[data-no-swipe], .no-swipe')) return;
       touchStartX = e.touches[0].clientX;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
+      if (touchStartX === 0) return;
+      
       const touchEndX = e.changedTouches[0].clientX;
       const deltaX = touchEndX - touchStartX;
+      const deltaY = Math.abs(e.changedTouches[0].clientY - (e.target as any).dataset?.touchStartY || 0);
       
-      // Swipe from left to right (at least 100px) and starting near the edge (0-50px)
-      if (deltaX > 100 && touchStartX < 50) {
+      // Vertical scroll check to avoid accidental back navigation while scrolling
+      if (deltaY > 50) return;
+
+      // Swipe from left to right (at least 120px) and starting near the edge (0-40px)
+      if (deltaX > 120 && touchStartX < 40) {
         if (location.pathname !== "/") {
+          // Provide haptic feedback if supported
+          if ('vibrate' in navigator) navigator.vibrate(10);
           navigate(-1);
         }
       }
+      touchStartX = 0;
     };
 
     window.addEventListener("touchstart", handleTouchStart);
