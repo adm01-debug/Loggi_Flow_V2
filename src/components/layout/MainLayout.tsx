@@ -5,6 +5,7 @@ import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { MobileQuickActions } from "./MobileQuickActions";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { PageBackButton } from "@/components/common/PageBackButton";
 import { ScrollRestoration } from "@/components/common/ScrollRestoration";
 import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 import { ScrollToTop } from "@/components/common/ScrollToTop";
