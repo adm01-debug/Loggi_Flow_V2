@@ -24,6 +24,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { hapticFeedback } from "@/utils/haptics";
 
 export function PreferencePanel() {
   const { preferences, updatePreference, updateAccessibility } = useUserPreferences();
