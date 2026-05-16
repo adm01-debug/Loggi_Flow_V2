@@ -39,28 +39,29 @@ export function AnimatedBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
+        className="absolute w-[800px] h-[800px] rounded-full opacity-30 blur-[120px]"
         style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)", top: "-20%", right: "-10%" }}
-        animate={{ scale: [1, 1.1, 1], x: [0, 20, 0], y: [0, -20, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute w-[500px] h-[500px] rounded-full opacity-10 blur-3xl"
-        style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)", bottom: "-15%", left: "-5%" }}
-        animate={{ scale: [1, 1.2, 1], x: [0, -15, 0], y: [0, 15, 0] }}
+        animate={{ scale: [1, 1.2, 1], x: [0, 40, 0], y: [0, -40, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      {[...Array(8)].map((_, i) => (
-        <Floating key={i} duration={4 + i * 0.5} distance={20 + i * 3}>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.07 }} transition={{ delay: i * 0.15 }} className="absolute" style={{ left: `${5 + i * 12}%`, top: `${15 + (i % 4) * 20}%` }}>
-            {i % 4 === 0 && <Truck className="w-10 h-10 text-primary" />}
-            {i % 4 === 1 && <Package className="w-8 h-8 text-primary" />}
-            {i % 4 === 2 && <MapPin className="w-9 h-9 text-primary" />}
-            {i % 4 === 3 && <Truck className="w-7 h-7 text-primary" />}
+      <motion.div
+        className="absolute w-[700px] h-[700px] rounded-full opacity-20 blur-[100px]"
+        style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)", bottom: "-15%", left: "-5%" }}
+        animate={{ scale: [1, 1.3, 1], x: [0, -30, 0], y: [0, 30, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {[...Array(12)].map((_, i) => (
+        <Floating key={i} duration={3 + i * 0.4} distance={30 + i * 5}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.12 }} transition={{ delay: i * 0.1 }} className="absolute" style={{ left: `${5 + (i * 8.5)}%`, top: `${10 + (i % 5) * 18}%` }}>
+            {i % 4 === 0 && <Truck className="w-12 h-12 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
+            {i % 4 === 1 && <Package className="w-10 h-10 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
+            {i % 4 === 2 && <MapPin className="w-11 h-11 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
+            {i % 4 === 3 && <Zap className="w-9 h-9 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />}
           </motion.div>
         </Floating>
       ))}
-      <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`, backgroundSize: "60px 60px" }} />
+      <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: `linear-gradient(hsl(var(--primary)) 1.5px, transparent 1.5px), linear-gradient(90deg, hsl(var(--primary)) 1.5px, transparent 1.5px)`, backgroundSize: "80px 80px" }} />
+      <div className="absolute inset-0 bg-gradient-to-tr from-background via-transparent to-background/50" />
     </div>
   );
 }
