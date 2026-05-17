@@ -81,7 +81,7 @@ serve(async (req) => {
     // 4. Update the quote if cotacao_id is provided
     if (cotacao_id && (price !== null || days !== null)) {
       await supabaseClient
-        .from('cotacoes_frete')
+        .from('cotacoes_multicanal')
         .update({
           valor_cotado: price,
           prazo_dias: days,
