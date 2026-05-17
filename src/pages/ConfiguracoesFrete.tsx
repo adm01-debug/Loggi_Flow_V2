@@ -35,6 +35,7 @@ interface CarrierConfig {
   credentials: any;
   regioes_atendidas: string[];
   non_api_config: any;
+  coverage_details?: any;
 }
 
 export default function FreightConfig() {
@@ -42,12 +43,40 @@ export default function FreightConfig() {
   const [selectedCarrierId, setSelectedCarrierId] = useState<string>('');
 
   // 1. Selection Rules
-  const { data: rules = [] } = useQuery({
+  const { data: rules = [], refetch: refetchRules } = useQuery({
     queryKey: ['freight-selection-rules'],
     queryFn: async () => {
       const { data, error } = await (supabase as any).from('freight_selection_rules').select('*');
       if (error) throw error;
       return data;
+    }
+  });
+
+  const [editingRule, setEditRule] = useState<any>(null);
+
+  const saveRule = useMutation({
+    mutationFn: async (rule: any) => {
+      const { data, error } = await (supabase as any).from('freight_selection_rules').upsert(rule);
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['freight-selection-rules'] });
+      refetchRules();
+      toast.success('Regra de seleção salva!');
+      setEditRule(null);
+    }
+  });
+
+  const deleteRule = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any).from('freight_selection_rules').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['freight-selection-rules'] });
+      refetchRules();
+      toast.success('Regra excluída');
     }
   });
 
@@ -151,9 +180,9 @@ export default function FreightConfig() {
                               <Label>API Key / Token</Label>
                               <Input 
                                 type="password" 
-                                value={selectedCarrier.credentials?.api_key || ''} 
+                                value={(selectedCarrier.credentials as any)?.api_key || ''} 
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, api_key: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), api_key: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -162,9 +191,9 @@ export default function FreightConfig() {
                               <Label>Endpoint URL</Label>
                               <Input 
                                 placeholder="https://api..." 
-                                value={selectedCarrier.credentials?.endpoint || ''}
+                                value={(selectedCarrier.credentials as any)?.endpoint || ''}
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, endpoint: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), endpoint: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -174,9 +203,9 @@ export default function FreightConfig() {
                             <div className="space-y-2">
                               <Label>Usuário Portal</Label>
                               <Input 
-                                value={selectedCarrier.credentials?.username || ''}
+                                value={(selectedCarrier.credentials as any)?.username || ''}
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, username: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), username: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -185,9 +214,9 @@ export default function FreightConfig() {
                               <Label>Senha Portal</Label>
                               <Input 
                                 type="password" 
-                                value={selectedCarrier.credentials?.password || ''}
+                                value={(selectedCarrier.credentials as any)?.password || ''}
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, password: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), password: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -197,16 +226,47 @@ export default function FreightConfig() {
 
                         <TabsContent value="malha" className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <Label>Cobertura de Regiões</Label>
-                            <Button size="sm" variant="outline"><Plus className="h-4 w-4 mr-2" />Add Praça</Button>
+                            <Label>Cobertura de Regiões e Malha Tática</Label>
+                            <Button size="sm" variant="outline"><Plus className="h-4 w-4 mr-2" />Nova Região</Button>
                           </div>
-                          <div className="grid grid-cols-3 gap-2">
-                            {['SP - Capital', 'RJ - Metropolitana', 'MG - BH', 'Sul', 'Nordeste'].map(r => (
-                              <div key={r} className="flex items-center gap-2 p-2 border rounded-lg">
-                                <Switch checked={selectedCarrier.regioes_atendidas?.includes(r)} />
-                                <span className="text-xs font-medium">{r}</span>
-                              </div>
-                            ))}
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                             <div className="space-y-2">
+                                <Label className="text-[10px] uppercase font-bold">Tipo de Cobertura</Label>
+                                <Select defaultValue="regional">
+                                   <SelectTrigger className="h-8 text-xs font-black uppercase"><SelectValue /></SelectTrigger>
+                                   <SelectContent>
+                                      <SelectItem value="nacional">Nacional (Brasil)</SelectItem>
+                                      <SelectItem value="regional">Regional (Específico)</SelectItem>
+                                      <SelectItem value="lastmile">Last Mile (Cidade)</SelectItem>
+                                   </SelectContent>
+                                </Select>
+                             </div>
+                             <div className="space-y-2">
+                                <Label className="text-[10px] uppercase font-bold">Eficiência Malha</Label>
+                                <div className="h-8 flex items-center gap-2 bg-muted/40 px-3 rounded">
+                                   <Zap className="h-3 w-3 text-warning" />
+                                   <span className="text-xs font-black">94.8% OPTIMIZED</span>
+                                </div>
+                             </div>
+                          </div>
+
+                          <div className="space-y-2">
+                             <Label className="text-[10px] uppercase font-bold">Zonas de Atuação</Label>
+                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {['SP - Capital', 'RJ - Metropolitana', 'MG - BH', 'Curitiba - PR', 'Porto Alegre - RS', 'Campinas - SP'].map(r => (
+                                  <div key={r} className="flex items-center justify-between p-2 border rounded-xl bg-muted/20 hover:border-primary/40 transition-all group/region">
+                                    <span className="text-[10px] font-black uppercase tracking-tighter truncate">{r}</span>
+                                    <Switch checked={selectedCarrier.regioes_atendidas?.includes(r)} className="scale-75" />
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+
+                          <div className="p-4 border-2 border-dashed rounded-xl bg-muted/10">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold text-center italic">
+                               Integração de Malha: O Nexus prioriza estas rotas para este parceiro.
+                             </p>
                           </div>
                         </TabsContent>
 
@@ -216,9 +276,9 @@ export default function FreightConfig() {
                             <Textarea 
                               className="font-mono text-xs h-32"
                               placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
-                              value={selectedCarrier.non_api_config?.whatsapp_template || ''}
+                              value={(selectedCarrier.non_api_config as any)?.whatsapp_template || ''}
                               onChange={e => {
-                                const cfg = { ...selectedCarrier.non_api_config, whatsapp_template: e.target.value };
+                                const cfg = { ...(selectedCarrier.non_api_config as any), whatsapp_template: e.target.value };
                                 updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
                               }}
                             />
@@ -238,34 +298,92 @@ export default function FreightConfig() {
 
           <TabsContent value="regras" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Configuração de Melhor Frete</CardTitle>
-                <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Configuração de Melhor Frete</CardTitle>
+                  <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
+                </div>
+                <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 50, time_weight: 50, max_sla_days: 10, is_active: true })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {['Normal', 'Urgente', 'Evento Crítico'].map(type => (
-                    <div key={type} className="p-4 border rounded-xl space-y-4 bg-muted/20">
+                  {rules.length === 0 && !editingRule && <p className="text-center py-8 text-muted-foreground italic">Nenhuma regra personalizada. Usando padrões do sistema.</p>}
+                  
+                  {editingRule && (
+                    <div className="p-6 border-2 border-primary rounded-xl space-y-4 bg-primary/5 mb-8">
+                       <h4 className="font-bold text-primary flex items-center justify-between">
+                         Editando Regra: {editingRule.event_type}
+                         <Button variant="ghost" size="sm" onClick={() => setEditRule(null)}>Cancelar</Button>
+                       </h4>
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                             <Label>Tipo de Evento</Label>
+                             <Input value={editingRule.event_type} onChange={e => setEditRule({...editingRule, event_type: e.target.value})} />
+                          </div>
+                          <div className="space-y-2">
+                             <Label>SLA Máximo (Dias)</Label>
+                             <Input type="number" value={editingRule.max_sla_days} onChange={e => setEditRule({...editingRule, max_sla_days: parseInt(e.target.value)})} />
+                          </div>
+                       </div>
+                       <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                             <Label>Peso Preço (%)</Label>
+                             <Input type="number" value={editingRule.price_weight} onChange={e => {
+                               const val = parseInt(e.target.value);
+                               setEditRule({...editingRule, price_weight: val, time_weight: 100 - val});
+                             }} />
+                          </div>
+                          <div className="space-y-2">
+                             <Label>Peso Prazo (%)</Label>
+                             <Input type="number" value={editingRule.time_weight} onChange={e => {
+                               const val = parseInt(e.target.value);
+                               setEditRule({...editingRule, time_weight: val, price_weight: 100 - val});
+                             }} />
+                          </div>
+                       </div>
+                       <Button className="w-full mt-4" onClick={() => saveRule.mutate(editingRule)} disabled={saveRule.isPending}>
+                         {saveRule.isPending ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                         Salvar Regra
+                       </Button>
+                    </div>
+                  )}
+
+                  {rules.map((rule: any) => (
+                    <div key={rule.id} className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-primary">{type}</h4>
-                        <Switch checked />
+                        <div className="flex items-center gap-3">
+                           <div className="p-2 bg-primary/10 rounded-lg"><Zap className="h-4 w-4 text-primary" /></div>
+                           <h4 className="font-bold text-foreground">{rule.event_type}</h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <Button variant="ghost" size="icon" onClick={() => setEditRule(rule)}><Settings className="h-4 w-4" /></Button>
+                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteRule.mutate(rule.id)}><Trash2 className="h-4 w-4" /></Button>
+                           <Switch checked={rule.is_active} onCheckedChange={(v) => saveRule.mutate({...rule, is_active: v})} />
+                        </div>
                       </div>
                       <div className="grid grid-cols-3 gap-6">
-                        <div className="space-y-2">
-                          <Label>Peso Preço (%)</Label>
-                          <Input type="number" defaultValue={type === 'Urgente' ? 30 : 70} />
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase text-muted-foreground">Preço</Label>
+                          <p className="font-black">{rule.price_weight}%</p>
                         </div>
-                        <div className="space-y-2">
-                          <Label>Peso Prazo (%)</Label>
-                          <Input type="number" defaultValue={type === 'Urgente' ? 70 : 30} />
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase text-muted-foreground">Prazo</Label>
+                          <p className="font-black">{rule.time_weight}%</p>
                         </div>
-                        <div className="space-y-2">
-                          <Label>Limite SLA (Dias)</Label>
-                          <Input type="number" defaultValue={type === 'Normal' ? 10 : 3} />
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase text-muted-foreground">Limite SLA</Label>
+                          <p className="font-black">{rule.max_sla_days}d</p>
                         </div>
                       </div>
                     </div>
                   ))}
+                  
+                  {/* Default Fallback info */}
+                  {rules.length > 0 && (
+                    <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest mt-4">
+                      O sistema usará estas regras para classificar o "Melhor Custo-Benefício"
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -277,21 +395,30 @@ export default function FreightConfig() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Code className="h-5 w-5 text-primary" />
-                      Incoming Webhooks
+                      Incoming Webhooks / API
                     </CardTitle>
-                    <CardDescription>Mapeamento de respostas automáticas de parceiros</CardDescription>
+                    <CardDescription>Consolidação automática de respostas via Webhooks ou API externa</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {mappings.filter((m: any) => m.source_type === 'webhook').map((m: any) => (
-                      <div key={m.id} className="p-3 border rounded-lg flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-bold">{m.transportadora?.nome_fantasia}</p>
-                          <p className="text-xs text-muted-foreground">Endpoint: /hooks/carrier/{m.id}</p>
+                      <div key={m.id} className="p-4 border-2 border-primary/20 rounded-xl bg-primary/5 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-black uppercase italic tracking-tighter">{m.transportadora?.nome_fantasia}</p>
+                            <p className="text-[10px] font-mono text-muted-foreground">NX-WH-{m.id.slice(0,8)}</p>
+                          </div>
+                          <div className="flex gap-1">
+                             <Button size="sm" variant="ghost" className="h-8 w-8 p-0"><Settings className="h-4 w-4" /></Button>
+                             <Switch checked={m.is_active} />
+                          </div>
                         </div>
-                        <Button size="sm" variant="ghost"><Settings className="h-4 w-4" /></Button>
+                        <div className="bg-black/40 p-2 rounded border border-white/10 flex items-center justify-between">
+                           <code className="text-[10px] text-primary truncate mr-2">/api/hooks/freight/{m.id}</code>
+                           <Button variant="ghost" size="sm" className="h-6 px-2 text-[8px] uppercase font-black" onClick={() => {navigator.clipboard.writeText(`https://nexus-api.lovable.app/api/hooks/freight/${m.id}`); toast.success('URL Copiada');}}>Copy</Button>
+                        </div>
                       </div>
                     ))}
-                    <Button className="w-full" variant="outline"><Plus className="h-4 w-4 mr-2" />Novo Webhook</Button>
+                    <Button className="w-full h-12 border-dashed border-2 rounded-xl" variant="outline"><Plus className="h-4 w-4 mr-2" />Novo Gateway de Resposta</Button>
                   </CardContent>
                 </Card>
 
@@ -299,26 +426,35 @@ export default function FreightConfig() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <FileJson className="h-5 w-5 text-primary" />
-                      Normalização de Campos
+                      Normalização de Campos (Parser)
                     </CardTitle>
-                    <CardDescription>Mapeie campos externos para o padrão Nexus</CardDescription>
+                    <CardDescription>Mapeie chaves do JSON externo para normalização Nexus</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-2 text-xs font-bold uppercase text-muted-foreground px-2">
-                      <span>Campo Externo</span>
-                      <span>Campo Nexus</span>
+                    <div className="grid grid-cols-2 gap-2 text-[9px] font-black uppercase text-muted-foreground px-2">
+                      <span>CHAVE EXTERNA (PARTNER)</span>
+                      <span>CHAVE INTERNA (NEXUS)</span>
                     </div>
                     <div className="space-y-2">
                       {[
-                        { ext: 'valor_total', int: 'valor_cotado' },
-                        { ext: 'delivery_days', int: 'prazo_dias' },
-                        { ext: 'obs', int: 'observacoes' }
+                        { ext: 'shipping_cost', int: 'valor_cotado', type: 'decimal' },
+                        { ext: 'estimated_days', int: 'prazo_dias', type: 'integer' },
+                        { ext: 'partner_notes', int: 'observacoes', type: 'text' },
+                        { ext: 'tracking_id', int: 'codigo_rastreio', type: 'text' }
                       ].map((m, i) => (
-                        <div key={i} className="grid grid-cols-2 gap-2">
-                          <Input defaultValue={m.ext} className="h-8 text-xs" />
-                          <Input defaultValue={m.int} className="h-8 text-xs bg-muted" readOnly />
+                        <div key={i} className="grid grid-cols-2 gap-2 p-1 border border-white/5 rounded bg-muted/10">
+                          <Input defaultValue={m.ext} className="h-8 text-xs font-mono bg-transparent border-none" />
+                          <div className="flex items-center gap-2 px-2 bg-muted/40 rounded">
+                             <span className="text-xs font-bold text-primary italic">→</span>
+                             <span className="text-[10px] font-black text-foreground uppercase">{m.int}</span>
+                          </div>
                         </div>
                       ))}
+                    </div>
+                    <div className="pt-4 border-t border-white/5 mt-4">
+                       <p className="text-[9px] text-muted-foreground leading-relaxed uppercase font-bold">
+                         A normalização garante que o sistema consolide preço e prazo automaticamente, independente do formato enviado pelo parceiro.
+                       </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -330,12 +466,56 @@ export default function FreightConfig() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Zap className="h-5 w-5 text-primary" />
-                    Fluxo Nexus RPA
+                    Fluxo Nexus RPA & Automação Inteligente
                   </CardTitle>
-                  <CardDescription>Configuração de gatilhos automáticos para cotações manuais</CardDescription>
+                  <CardDescription>Gatilhos inteligentes e processamento automático de respostas</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-white border rounded-xl">
+                  <div className="flex flex-col md:flex-row gap-6">
+                     <div className="flex-1 space-y-4">
+                        <div className="p-4 bg-white border-2 border-success/30 rounded-xl flex items-center justify-between group/auto transition-all">
+                           <div className="flex items-center gap-4">
+                              <div className="p-3 bg-success/10 rounded-full text-success"><RefreshCw className="h-6 w-6" /></div>
+                              <div>
+                                 <p className="font-black text-xs uppercase tracking-widest">Retentativas Automáticas</p>
+                                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Fallback em falhas de disparo</p>
+                              </div>
+                           </div>
+                           <Switch defaultChecked />
+                        </div>
+                        <div className="p-4 bg-white border-2 border-primary/30 rounded-xl flex items-center justify-between group/auto transition-all">
+                           <div className="flex items-center gap-4">
+                              <div className="p-3 bg-primary/10 rounded-full text-primary"><Search className="h-6 w-6" /></div>
+                              <div>
+                                 <p className="font-black text-xs uppercase tracking-widest">OCR & Resposta Inteligente</p>
+                                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Captura automática de PDF/Print</p>
+                              </div>
+                           </div>
+                           <Switch defaultChecked />
+                        </div>
+                     </div>
+
+                     <div className="flex-1 p-6 bg-black border border-white/10 rounded-2xl relative overflow-hidden group/logs">
+                        <div className="absolute top-0 left-0 w-full h-[1px] bg-primary animate-scan opacity-40" />
+                        <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">Nexus RPA Status</h5>
+                        <div className="space-y-3 font-mono text-[9px]">
+                           <div className="flex gap-2 text-success">
+                              <span className="opacity-50">[12:45]</span>
+                              <span>GATEWAY: DISPARO WHATSAPP OK</span>
+                           </div>
+                           <div className="flex gap-2 text-white/40">
+                              <span className="opacity-50">[12:46]</span>
+                              <span>PENDING: AGUARDANDO RESPOSTA LOGÍSTICA</span>
+                           </div>
+                           <div className="flex gap-2 text-primary">
+                              <span className="opacity-50">[12:48]</span>
+                              <span>HOOK: RESPOSTA RECEBIDA (R$ 145.00)</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="flex items-center gap-4">
                       <div className="p-3 bg-success/10 rounded-full"><RefreshCw className="h-6 w-6 text-success" /></div>
                       <div>

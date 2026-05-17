@@ -60,7 +60,7 @@ export function FreightAudit() {
 
   const ESTADOS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
-  const handleAudit = () => {
+  const handleAudit = async () => {
     if (!form.transportadora_id || !form.estado_destino || !form.peso_kg || !form.valor_cobrado) {
       toast.error('Preencha todos os campos para auditoria');
       return;
@@ -70,12 +70,12 @@ export function FreightAudit() {
     const charged = new Decimal(form.valor_cobrado || 0);
     
     // Use the existing calculation logic
-    const quotations = calculateQuotations({
+    const quotations = await calculateQuotations({
       estado_destino: form.estado_destino,
       peso_kg: weight,
     });
 
-    const expectedQuotation = quotations.find(q => q.transportadora_id === form.transportadora_id);
+    const expectedQuotation = (quotations || []).find((q: any) => q.transportadora_id === form.transportadora_id);
 
     if (!expectedQuotation) {
       setAuditResult({
