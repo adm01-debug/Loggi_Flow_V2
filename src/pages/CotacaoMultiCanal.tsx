@@ -332,7 +332,7 @@ export default function CotacaoMultiCanal() {
         >
           <div className="flex gap-2">
             {cotacoes.length > 0 && <DataExporter data={exportData} filename="nexus-cotacoes" />}
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => setCoverageDialog(true)}>
               <Map className="w-4 h-4" /> Visualizar Malha
             </Button>
           </div>
