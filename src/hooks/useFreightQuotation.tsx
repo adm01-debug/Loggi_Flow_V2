@@ -88,15 +88,28 @@ export const useFreightQuotation = () => {
   });
 
   // Calculate quotations
-  const calculateQuotations = (request: QuotationRequest): QuotationResult[] => {
+  const calculateQuotations = async (request: QuotationRequest & { event_type?: string }): Promise<QuotationResult[]> => {
     if (!tabelasFrete || tabelasFrete.length === 0) return [];
+
+    // Fetch selection rules for specific event type if provided
+    const { data: selectionRules } = await (supabase as any)
+      .from('freight_selection_rules')
+      .select('*')
+      .eq('event_type', request.event_type || 'Normal')
+      .eq('is_active', true)
+      .maybeSingle();
+
+    const priceWeight = selectionRules?.price_weight ? parseFloat(selectionRules.price_weight) / 100 : 0.6;
+    const timeWeight = selectionRules?.time_weight ? parseFloat(selectionRules.time_weight) / 100 : 0.4;
+    const maxSla = selectionRules?.max_sla_days || 30;
 
     const matchingTables = tabelasFrete.filter(
       (t) =>
         t.estado_destino === request.estado_destino &&
         request.peso_kg >= t.peso_min_kg &&
         request.peso_kg < t.peso_max_kg &&
-        t.transportadora?.homologada
+        t.transportadora?.homologada &&
+        t.prazo_dias <= maxSla
     );
 
     if (matchingTables.length === 0) return [];
@@ -122,45 +135,43 @@ export const useFreightQuotation = () => {
       };
     });
 
-    // Sort by total value
-    quotations.sort((a, b) => a.valor_total - b.valor_total);
-
     // Mark best options
     if (quotations.length > 0) {
-      // Best price
       const minPrice = Math.min(...quotations.map((q) => q.valor_total));
-      quotations.forEach((q) => {
-        if (q.valor_total === minPrice) q.melhor_preco = true;
-      });
+      quotations.forEach((q) => { if (q.valor_total === minPrice) q.melhor_preco = true; });
 
-      // Best deadline
       const minPrazo = Math.min(...quotations.map((q) => q.prazo_dias));
-      quotations.forEach((q) => {
-        if (q.prazo_dias === minPrazo) q.melhor_prazo = true;
-      });
+      quotations.forEach((q) => { if (q.prazo_dias === minPrazo) q.melhor_prazo = true; });
 
-      // Best cost-benefit (weighted: 60% price, 40% performance score)
-      const maxScore = Math.max(...quotations.map((q) => q.score_performance));
-      const maxPrice = Math.max(...quotations.map((q) => q.valor_total));
+      const maxScore = Math.max(...quotations.map((q) => q.score_performance), 1);
+      const maxPrice = Math.max(...quotations.map((q) => q.valor_total), 1);
+      const maxTime = Math.max(...quotations.map((q) => q.prazo_dias), 1);
       
-      let bestCostBenefitScore = -Infinity;
-      let bestCostBenefitIndex = 0;
+      let bestCompositeScore = -Infinity;
+      let bestCompositeIndex = 0;
       
       quotations.forEach((q, index) => {
+        // Normalize price (lower is better, so 1 - norm)
         const normalizedPrice = 1 - (q.valor_total / maxPrice);
-        const normalizedScore = maxScore > 0 ? q.score_performance / maxScore : 0;
-        const costBenefitScore = (normalizedPrice * 0.6) + (normalizedScore * 0.4);
+        // Normalize time (lower is better, so 1 - norm)
+        const normalizedTime = 1 - (q.prazo_dias / maxTime);
+        // Performance score (higher is better)
+        const normalizedScore = q.score_performance / maxScore;
         
-        if (costBenefitScore > bestCostBenefitScore) {
-          bestCostBenefitScore = costBenefitScore;
-          bestCostBenefitIndex = index;
+        // Composite score using weights from DB or defaults
+        // Logic: (Price * Wp) + (Time * Wt) + (Performance * 0.1)
+        const compositeScore = (normalizedPrice * priceWeight) + (normalizedTime * timeWeight) + (normalizedScore * 0.1);
+        
+        if (compositeScore > bestCompositeScore) {
+          bestCompositeScore = compositeScore;
+          bestCompositeIndex = index;
         }
       });
       
-      quotations[bestCostBenefitIndex].melhor_custo_beneficio = true;
+      quotations[bestCompositeIndex].melhor_custo_beneficio = true;
     }
 
-    return quotations;
+    return quotations.sort((a, b) => a.valor_total - b.valor_total);
   };
 
   // Add freight table entry
