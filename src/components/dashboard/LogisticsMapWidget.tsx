@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { 
   MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, 
-  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink
+  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
