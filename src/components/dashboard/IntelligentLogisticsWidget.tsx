@@ -11,7 +11,10 @@ import {
   ChevronRight, 
   Sparkles,
   HeartPulse,
-  Lightbulb
+  Brain,
+  Cpu,
+  Fingerprint,
+  Radio
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLogisticsIntelligence } from "@/hooks/useLogisticsIntelligence";
@@ -27,120 +30,171 @@ export function IntelligentLogisticsWidget() {
   const { healthScore, optimizations } = useLogisticsIntelligence();
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return "text-success border-success/30 bg-success/5";
-    if (score >= 70) return "text-warning border-warning/30 bg-warning/5";
-    return "text-destructive border-destructive/30 bg-destructive/5";
+    if (score >= 90) return "text-success border-success/30 bg-success/10 shadow-[0_0_15px_rgba(34,197,94,0.3)]";
+    if (score >= 70) return "text-warning border-warning/30 bg-warning/10 shadow-[0_0_15px_rgba(234,179,8,0.3)]";
+    return "text-destructive border-destructive/30 bg-destructive/10 shadow-[0_0_15px_rgba(239,68,68,0.3)]";
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 90) return "Saudável";
-    if (score >= 70) return "Atenção";
-    return "Crítico";
+    if (score >= 90) return "Supremacia Operacional";
+    if (score >= 70) return "Monitoramento Tático";
+    return "Intervenção Crítica";
   };
 
   return (
-    <Card className="relative overflow-hidden group border-none bg-transparent p-[2px] rounded-[2rem] shadow-2xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-white/5 to-primary/10 rounded-[2rem]" />
-      <div className="relative h-full bg-black/90 backdrop-blur-3xl rounded-[1.9rem] p-6 sm:p-8">
-        <CardHeader className="p-0 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner">
-                <Activity className="h-6 w-6 text-primary" />
+    <Card className="relative overflow-hidden group border-none bg-transparent p-[2px] rounded-[2.5rem] shadow-2xl h-full min-h-[700px]">
+      {/* Bio-Organic Neural Network Effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(234,56,76,0.15),transparent_70%)] animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[2.5rem]" />
+      
+      <div className="relative h-full bg-black/95 backdrop-blur-[50px] rounded-[2.4rem] p-8 flex flex-col border border-white/5">
+        
+        {/* Scanning Header Line */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 animate-scan" />
+
+        <CardHeader className="p-0 mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="relative group/icon">
+                <div className="absolute -inset-2 bg-primary/20 rounded-2xl blur-lg group-hover/icon:bg-primary/40 transition-all duration-500" />
+                <div className="relative p-4 rounded-2xl bg-black border border-primary/40 shadow-[0_0_20px_rgba(234,56,76,0.3)] group-hover/icon:scale-110 group-hover/icon:rotate-6 transition-all">
+                  <Brain className="h-8 w-8 text-primary animate-pulse" />
+                </div>
               </div>
               <div>
-                <CardTitle className="text-2xl font-black italic tracking-tighter bg-gradient-to-br from-white via-white to-white/60 bg-clip-text text-transparent uppercase">
-                  Nexus Intelligence
+                <CardTitle className="text-3xl font-black italic tracking-tighter bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent uppercase leading-tight">
+                  Neural Core <span className="text-primary italic">X9</span>
                 </CardTitle>
-                <CardDescription className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">
-                  Métricas de Saúde Operacional
+                <CardDescription className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/70 mt-1 flex items-center gap-2">
+                  <Radio className="w-3 h-3 animate-ping" /> Sincronização Bio-Digital Ativa
                 </CardDescription>
               </div>
             </div>
-            <Badge variant="outline" className={cn("font-black uppercase tracking-widest px-4 py-1.5 rounded-full border-2", getScoreColor(healthScore))}>
-              {getScoreLabel(healthScore)}
-            </Badge>
+            <div className="flex flex-col items-end">
+              <Badge variant="outline" className={cn("font-black text-[10px] uppercase tracking-[0.2em] px-6 py-2.5 rounded-full border-2 transition-all duration-700", getScoreColor(healthScore))}>
+                {getScoreLabel(healthScore)}
+              </Badge>
+              <span className="text-[8px] font-black text-white/30 uppercase mt-2 tracking-widest flex items-center gap-1">
+                <Cpu className="w-2 h-2" /> Kernel: 2.0.Nexus
+              </span>
+            </div>
           </div>
         </CardHeader>
 
-        <CardContent className="p-0 space-y-10">
-          {/* Health Score */}
-          <div className="relative p-6 rounded-[1.5rem] bg-white/5 border border-white/10 overflow-hidden group/score">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover/score:opacity-100 transition-opacity duration-500" />
-            <div className="space-y-4 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                    <HeartPulse className="h-5 w-5 text-primary" />
+        <CardContent className="p-0 flex-1 flex flex-col space-y-12">
+          {/* Advanced Health Matrix */}
+          <div className="relative p-8 rounded-[2rem] bg-gradient-to-br from-white/5 to-transparent border border-white/10 overflow-hidden group/score shadow-inner">
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-[100px] group-hover/score:bg-primary/20 transition-all duration-1000" />
+            <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-[100px]" />
+            
+            <div className="space-y-6 relative z-10">
+              <div className="flex items-end justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center border border-primary/30 shadow-[inset_0_0_10px_rgba(234,56,76,0.2)]">
+                    <HeartPulse className="h-7 w-7 text-primary" />
                   </div>
                   <div>
-                    <span className="text-xs font-black uppercase tracking-[0.2em] text-white/70">Health Score Global</span>
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold mt-0.5 tracking-tighter">
-                      OTIF • RISCOS • OCORRÊNCIAS
-                    </p>
+                    <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white/80">Eficiência de Rede</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex gap-1">
+                        {[1,2,3,4,5].map(i => (
+                          <div key={i} className={cn("w-1 h-3 rounded-full", i <= 4 ? "bg-primary shadow-[0_0_5px_rgba(234,56,76,0.5)]" : "bg-white/10")} />
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-primary uppercase font-black tracking-tighter">
+                        OTIF • SLA • LATÊNCIA
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-4xl font-black text-primary italic leading-none drop-shadow-[0_0_15px_rgba(234,56,76,0.3)]">{healthScore}%</span>
+                  <div className="relative inline-block">
+                    <span className="text-6xl font-black text-white italic tracking-tighter leading-none drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">{healthScore}</span>
+                    <span className="text-2xl font-black text-primary italic ml-1">%</span>
+                  </div>
                 </div>
               </div>
-              <div className="relative">
-                <Progress value={healthScore} className="h-3 bg-white/5 rounded-full border border-white/5" />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent blur-sm -z-10" />
+              
+              <div className="relative pt-2">
+                <div className="flex justify-between text-[8px] font-black text-white/30 uppercase mb-2 tracking-widest px-1">
+                  <span>0%</span>
+                  <span>Setor Operacional</span>
+                  <span>100%</span>
+                </div>
+                <div className="h-4 w-full bg-black/40 rounded-full border border-white/10 p-[2px] relative overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${healthScore}%` }}
+                    transition={{ duration: 1.5, ease: "circOut" }}
+                    className="h-full rounded-full bg-gradient-to-r from-primary/40 via-primary to-primary/60 relative"
+                  >
+                    <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[pulse_2s_linear_infinite]" />
+                  </motion.div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Optimizations */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3 px-1">
-              <div className="w-2 h-6 bg-primary rounded-full shadow-[0_0_10px_rgba(234,56,76,0.5)]" />
-              <div className="text-sm font-black uppercase tracking-[0.3em] text-white">
-                IA: OTIMIZAÇÕES RECOMENDADAS
+          {/* Intelligent Insights Feed */}
+          <div className="flex-1 space-y-8">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-4">
+                <div className="w-3 h-8 bg-primary rounded-full shadow-[0_0_15px_rgba(234,56,76,0.6)] animate-pulse" />
+                <div className="text-base font-black uppercase tracking-[0.4em] text-white italic">
+                  Neural Insights
+                </div>
               </div>
+              <Badge className="bg-white/5 text-[8px] font-black text-white/40 border-white/10 uppercase py-1 px-3">
+                {optimizations.length} Pendentes
+              </Badge>
             </div>
             
-            <div className="grid gap-4">
+            <div className="grid gap-5">
               <AnimatePresence mode="popLayout">
                 {optimizations.map((opt, i) => {
                   const Icon = iconMap[opt.icon] || Zap;
                   return (
                     <motion.div
                       key={opt.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="group/opt relative p-5 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-primary/30 transition-all cursor-pointer overflow-hidden shadow-lg"
+                      initial={{ opacity: 0, x: -30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.15, type: "spring", stiffness: 100 }}
+                      className="group/opt relative p-6 rounded-3xl border border-white/5 bg-gradient-to-r from-white/5 to-transparent hover:from-primary/10 hover:to-primary/5 hover:border-primary/40 transition-all duration-500 cursor-pointer shadow-xl"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover/opt:opacity-100 transition-opacity" />
-                      
-                      <div className="flex items-start gap-4 relative z-10">
-                        <div className="p-3 rounded-xl bg-primary/10 text-primary border border-primary/20 group-hover/opt:scale-110 group-hover/opt:rotate-3 transition-transform">
-                          <Icon className="h-5 w-5" />
+                      <div className="flex items-start gap-6 relative z-10">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-primary/20 blur-md rounded-2xl group-hover/opt:scale-150 transition-transform" />
+                          <div className="relative p-4 rounded-2xl bg-black text-primary border border-primary/20 group-hover/opt:bg-primary group-hover/opt:text-white transition-all duration-500 shadow-2xl">
+                            <Icon className="h-6 w-6" />
+                          </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <h4 className="font-black text-base italic tracking-tight uppercase group-hover/opt:text-primary transition-colors">{opt.title}</h4>
+                          <div className="flex items-center justify-between gap-3 mb-2">
+                            <h4 className="font-black text-lg italic tracking-tighter uppercase group-hover/opt:text-primary transition-colors duration-300">{opt.title}</h4>
                             <Badge 
-                              variant="secondary" 
                               className={cn(
-                                "text-[9px] h-5 px-3 uppercase font-black border-none",
-                                opt.impact === 'Alta' ? "bg-primary text-white shadow-[0_0_10px_rgba(234,56,76,0.4)]" : "bg-white/10 text-white/70"
+                                "text-[9px] h-6 px-4 uppercase font-black border-none tracking-widest",
+                                opt.impact === 'Alta' ? "bg-primary text-white shadow-[0_0_20px_rgba(234,56,76,0.5)]" : "bg-white/10 text-white/60"
                               )}
                             >
-                              {opt.impact} IMPACTO
+                              Impacto {opt.impact}
                             </Badge>
                           </div>
-                          <p className="text-xs text-white/60 leading-relaxed line-clamp-2 font-medium">
+                          <p className="text-[13px] text-white/50 leading-relaxed font-medium group-hover/opt:text-white/80 transition-colors">
                             {opt.description}
                           </p>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="mt-4 h-9 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary hover:text-white border border-primary/30 rounded-full gap-2 transition-all"
-                          >
-                            Implementar Estratégia <ChevronRight className="h-3 w-3" />
-                          </Button>
+                          <div className="mt-5 flex items-center justify-between">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-10 px-6 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary hover:text-white border-2 border-primary/20 rounded-full gap-3 transition-all active:scale-95"
+                            >
+                              Iniciar Processamento <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            <div className="flex items-center gap-2 opacity-0 group-hover/opt:opacity-100 transition-opacity">
+                              <span className="text-[9px] font-black text-primary uppercase">Alpha 1.0</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -150,19 +204,23 @@ export function IntelligentLogisticsWidget() {
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/20 via-primary/5 to-transparent border border-primary/30 flex items-center justify-between group/footer hover:scale-[1.02] transition-transform shadow-xl">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">
-                <Sparkles className="h-5 w-5 text-primary" />
+          {/* Hyper-Visual Footer CTA */}
+          <div className="relative p-6 rounded-[2rem] bg-black border-2 border-primary/30 overflow-hidden group/footer hover:border-primary transition-all duration-700 shadow-[0_0_40px_rgba(234,56,76,0.1)]">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent animate-shimmer" />
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/footer:rotate-[360deg] transition-transform duration-1000">
+                  <Fingerprint className="h-7 w-7 text-primary animate-pulse" />
+                </div>
+                <div>
+                  <span className="text-xs font-black text-white uppercase tracking-[0.3em]">IA Consciência Ativa</span>
+                  <p className="text-[10px] font-bold text-primary/70 uppercase tracking-tighter mt-1">Sincronize sua biometria para autorizar otimizações</p>
+                </div>
               </div>
-              <div>
-                <span className="text-xs font-black text-white uppercase tracking-widest">IA EM TEMPO REAL</span>
-                <p className="text-[10px] font-bold text-primary/80 uppercase">Nova oportunidade identificada</p>
-              </div>
+              <Button size="lg" className="w-full sm:w-auto h-12 px-10 text-[11px] font-black bg-primary text-white hover:bg-white hover:text-primary rounded-full shadow-[0_0_30px_rgba(234,56,76,0.5)] uppercase tracking-[0.2em] transition-all group-hover/footer:px-12">
+                SINCRONIZAR AGORA
+              </Button>
             </div>
-            <Button size="sm" className="h-10 px-6 text-[10px] font-black bg-primary text-white hover:bg-primary/80 rounded-full shadow-[0_0_20px_rgba(234,56,76,0.4)] uppercase tracking-widest">
-              REVISAR AGORA
-            </Button>
           </div>
         </CardContent>
       </div>
