@@ -15,7 +15,7 @@ interface HistoryEntry {
 
 interface QuotationHistoryProps {
   history: HistoryEntry[];
-  onReuse: (data: CargoData) => void;
+  onReuse: (data: CargoData) => Promise<void>;
 }
 
 export function QuotationHistory({ history, onReuse }: QuotationHistoryProps) {
@@ -49,7 +49,7 @@ export function QuotationHistory({ history, onReuse }: QuotationHistoryProps) {
             <div className="text-right shrink-0">
               <p className="text-sm text-muted-foreground">{entry.results.length} opções</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => onReuse(entry.data)}>
+            <Button variant="ghost" size="sm" onClick={async () => await onReuse(entry.data)}>
               <RotateCcw className="w-4 h-4 mr-1" />Recotar
             </Button>
           </div>
