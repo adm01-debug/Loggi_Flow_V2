@@ -27,7 +27,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
       return initialAlerts.filter(alert => {
         // Mocking delta calculation for demonstration if not present
         // In a real scenario, this would come from the backend/hook
-        const delta = (alert as any).delta || (Math.random() * 20); 
+        const delta = (alert as any).delta || (Number(alert.id.charCodeAt(0)) % 20); 
         return delta >= threshold;
       });
     }, [initialAlerts, threshold]);
@@ -206,7 +206,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                   {alerts.map((alert, index) => {
                     const Icon = getAlertIcon(alert.type);
                     const styles = getSeverityStyles(alert.severity);
-                    const delta = (alert as any).delta || (Math.random() * 20 + 5); 
+                    const delta = (alert as any).delta || (Number(alert.id.charCodeAt(0)) % 20 + 5); 
 
                     return (
                       <motion.div
