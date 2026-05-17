@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 // Simple internal debounce function to avoid external dependencies
-function debounce<T extends (...args: unknown[]) => unknown>(func: T, wait: number): (...args: Parameters<T>) => void {
+function debounce<T extends (...args: any[]) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
