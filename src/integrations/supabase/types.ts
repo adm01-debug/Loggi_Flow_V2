@@ -1748,12 +1748,14 @@ export type Database = {
           destino_estado: string
           expires_at: string
           id: string
+          normalization_data: Json | null
           observacoes: string | null
           origem_cidade: string | null
           origem_estado: string
           peso_kg: number | null
           prazo_dias: number | null
           responded_at: string | null
+          retry_count: number | null
           status: string
           transportadora_id: string
           updated_at: string
@@ -1762,6 +1764,7 @@ export type Database = {
           valor_mercadoria: number | null
           version: number | null
           volumes: number | null
+          workflow_logs: Json | null
         }
         Insert: {
           canal: string
@@ -1770,12 +1773,14 @@ export type Database = {
           destino_estado: string
           expires_at?: string
           id?: string
+          normalization_data?: Json | null
           observacoes?: string | null
           origem_cidade?: string | null
           origem_estado: string
           peso_kg?: number | null
           prazo_dias?: number | null
           responded_at?: string | null
+          retry_count?: number | null
           status?: string
           transportadora_id: string
           updated_at?: string
@@ -1784,6 +1789,7 @@ export type Database = {
           valor_mercadoria?: number | null
           version?: number | null
           volumes?: number | null
+          workflow_logs?: Json | null
         }
         Update: {
           canal?: string
@@ -1792,12 +1798,14 @@ export type Database = {
           destino_estado?: string
           expires_at?: string
           id?: string
+          normalization_data?: Json | null
           observacoes?: string | null
           origem_cidade?: string | null
           origem_estado?: string
           peso_kg?: number | null
           prazo_dias?: number | null
           responded_at?: string | null
+          retry_count?: number | null
           status?: string
           transportadora_id?: string
           updated_at?: string
@@ -1806,6 +1814,7 @@ export type Database = {
           valor_mercadoria?: number | null
           version?: number | null
           volumes?: number | null
+          workflow_logs?: Json | null
         }
         Relationships: [
           {
@@ -2060,6 +2069,74 @@ export type Database = {
           nome_fantasia?: string | null
           razao_social?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      freight_integration_mappings: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          mapping_config: Json
+          source_type: string
+          transportadora_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          mapping_config: Json
+          source_type: string
+          transportadora_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          mapping_config?: Json
+          source_type?: string
+          transportadora_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freight_integration_mappings_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      freight_selection_rules: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          is_active: boolean | null
+          max_sla_days: number | null
+          price_weight: number | null
+          time_weight: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          id?: string
+          is_active?: boolean | null
+          max_sla_days?: number | null
+          price_weight?: number | null
+          time_weight?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          is_active?: boolean | null
+          max_sla_days?: number | null
+          price_weight?: number | null
+          time_weight?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -3578,13 +3655,16 @@ export type Database = {
           api_disponivel: boolean | null
           cnpj: string
           contato_comercial: string
+          coverage_details: Json | null
           created_at: string
+          credentials: Json | null
           data_homologacao: string | null
           deleted_at: string | null
           email_comercial: string
           homologada: boolean | null
           id: string
           nome_fantasia: string
+          non_api_config: Json | null
           observacoes: string | null
           prazo_medio_dias: number | null
           razao_social: string
@@ -3599,13 +3679,16 @@ export type Database = {
           api_disponivel?: boolean | null
           cnpj: string
           contato_comercial: string
+          coverage_details?: Json | null
           created_at?: string
+          credentials?: Json | null
           data_homologacao?: string | null
           deleted_at?: string | null
           email_comercial: string
           homologada?: boolean | null
           id?: string
           nome_fantasia: string
+          non_api_config?: Json | null
           observacoes?: string | null
           prazo_medio_dias?: number | null
           razao_social: string
@@ -3620,13 +3703,16 @@ export type Database = {
           api_disponivel?: boolean | null
           cnpj?: string
           contato_comercial?: string
+          coverage_details?: Json | null
           created_at?: string
+          credentials?: Json | null
           data_homologacao?: string | null
           deleted_at?: string | null
           email_comercial?: string
           homologada?: boolean | null
           id?: string
           nome_fantasia?: string
+          non_api_config?: Json | null
           observacoes?: string | null
           prazo_medio_dias?: number | null
           razao_social?: string

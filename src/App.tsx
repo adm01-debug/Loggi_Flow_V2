@@ -66,6 +66,7 @@ const GestaoWebhooks = lazy(() => import("./pages/GestaoWebhooks"));
 const IntegracaoBitrix = lazy(() => import("./pages/IntegracaoBitrix"));
 const LogisticaReversa = lazy(() => import("./pages/LogisticaReversa"));
 const AdminADR = lazy(() => import("./pages/AdminADR"));
+const ConfiguracoesFrete = lazy(() => import("./pages/ConfiguracoesFrete"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load non-critical providers
@@ -173,6 +174,7 @@ function AppRoutes() {
           <Route path="/webhooks" element={<ProtectedRoute requiredRole="admin"><GestaoWebhooks /></ProtectedRoute>} />
           <Route path="/bitrix24" element={<ProtectedRoute requiredRole="admin"><IntegracaoBitrix /></ProtectedRoute>} />
           <Route path="/admin/adr" element={<ProtectedRoute requiredRole="admin"><AdminADR /></ProtectedRoute>} />
+          <Route path="/config-frete" element={<ProtectedRoute><ConfiguracoesFrete /></ProtectedRoute>} />
           <Route path="/rastrear" element={<RastreamentoPublico />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />

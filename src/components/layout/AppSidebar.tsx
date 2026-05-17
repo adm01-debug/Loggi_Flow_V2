@@ -82,9 +82,10 @@ const menuSections: MenuSection[] = [
       { title: "Rastreamento Motorista", url: "/rastreamento-motorista", icon: Navigation },
        { title: "Rodonaves RTE", url: "/gestao-rodonaves", icon: Truck },
        { title: "Melhor Envio", url: "/melhor-envio", icon: Package },
-       { title: "Bitrix24 CRM", url: "/bitrix24", icon: Building2 },
-     ],
-   },
+        { title: "Bitrix24 CRM", url: "/bitrix24", icon: Building2 },
+        { title: "Config Nexus", url: "/config-frete", icon: Cog },
+      ],
+    },
   {
     id: "entities",
     title: "Cadastros",

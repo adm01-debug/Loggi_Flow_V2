@@ -12,7 +12,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EmptyState } from '@/components/common/EmptyState';
 import { StatsCard } from '@/components/common/StatsCard';
-import { Clock, CheckCircle2, AlertTriangle, Truck, MessageCircle, Mail, Globe, Timer, FileText, TrendingDown, RefreshCw, Zap, AlertCircle, Award, Send } from 'lucide-react';
+import { Clock, CheckCircle2, AlertTriangle, Truck, MessageCircle, Mail, Globe, Timer, FileText, TrendingDown, RefreshCw, Zap, AlertCircle, Award, Send, History, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 import { useCotacoesMulticanal, type CotacaoMulticanal } from '@/hooks/useCotacoesMulticanal';
 import { isPast, differenceInHours, differenceInMinutes } from 'date-fns';
 import { TrechoComparativo } from './dashboard-cotacoes/TrechoComparativo';
@@ -38,12 +39,18 @@ function CanalBadge({ canal }: { canal: string }) {
   }
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, retryCount }: { status: string; retryCount?: number }) {
   switch (status) {
     case 'respondido': return <Badge className="bg-success/10 text-success border-success/20 gap-1"><CheckCircle2 className="w-3 h-3" />Respondido</Badge>;
-    case 'pendente': return <Badge variant="secondary" className="gap-1"><Clock className="w-3 h-3" />Pendente</Badge>;
+    case 'pendente': return (
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="gap-1"><Clock className="w-3 h-3" />Pendente</Badge>
+        {retryCount && retryCount > 0 && <span className="text-[10px] text-muted-foreground font-bold">Try: {retryCount}</span>}
+      </div>
+    );
     case 'expirado': return <Badge variant="destructive" className="gap-1"><AlertCircle className="w-3 h-3" />Expirado</Badge>;
     case 'selecionado': return <Badge className="bg-primary/10 text-primary border-primary/20 gap-1"><Award className="w-3 h-3" />Selecionado</Badge>;
+    case 'falhou': return <Badge variant="destructive" className="gap-1"><AlertTriangle className="w-3 h-3" />Falhou</Badge>;
     default: return null;
   }
 }
@@ -53,6 +60,7 @@ export default function DashboardCotacoes() {
   const [tab, setTab] = useState('ativas');
   const [filterCanal, setFilterCanal] = useState<string>('all');
   const [respondDialog, setRespondDialog] = useState(false);
+  const [logsDialog, setLogsDialog] = useState(false);
   const [selectedCotacao, setSelectedCotacao] = useState<CotacaoMulticanal | null>(null);
   const [respValor, setRespValor] = useState('');
   const [respPrazo, setRespPrazo] = useState('');
@@ -151,12 +159,13 @@ export default function DashboardCotacoes() {
                         <TableCell className="font-medium">{cotacao.transportadora?.nome_fantasia || 'N/A'}</TableCell>
                         <TableCell><span className="font-mono text-xs">{cotacao.origem_estado} → {cotacao.destino_estado}</span></TableCell>
                         <TableCell><CanalBadge canal={cotacao.canal} /></TableCell>
-                        <TableCell><StatusBadge status={cotacao.status} /></TableCell>
+                        <TableCell><StatusBadge status={cotacao.status} retryCount={cotacao.retry_count} /></TableCell>
                         <TableCell>{cotacao.valor_cotado ? <span className="font-semibold">R$ {cotacao.valor_cotado.toFixed(2)}</span> : <span className="text-muted-foreground">—</span>}</TableCell>
                         <TableCell>{cotacao.prazo_dias ? `${cotacao.prazo_dias}d` : '—'}</TableCell>
                         <TableCell><TimeRemaining expiresAt={cotacao.expires_at} /></TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" title="Ver Logs" onClick={() => { setSelectedCotacao(cotacao); setLogsDialog(true); }}><History className="w-3.5 h-3.5" /></Button>
                             {cotacao.status === 'pendente' && (
                               <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => { setSelectedCotacao(cotacao); setRespondDialog(true); }}><Send className="w-3 h-3" /> Registrar</Button>
                             )}
@@ -189,6 +198,44 @@ export default function DashboardCotacoes() {
               <Button variant="outline" onClick={() => setRespondDialog(false)}>Cancelar</Button>
               <Button onClick={handleRespond} disabled={!respValor}>Registrar Resposta</Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={logsDialog} onOpenChange={setLogsDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle className="flex items-center gap-2"><History className="w-5 h-5 text-primary" /> Histórico & Auditoria</DialogTitle></DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                <span className="text-xs font-bold uppercase text-muted-foreground">Status Atual</span>
+                <StatusBadge status={selectedCotacao?.status || ''} retryCount={selectedCotacao?.retry_count} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase font-black text-muted-foreground">Workflow Logs</Label>
+                <div className="border rounded-lg divide-y bg-black/5">
+                  {(selectedCotacao?.workflow_logs && selectedCotacao.workflow_logs.length > 0) ? (
+                    selectedCotacao.workflow_logs.map((log: any, i: number) => (
+                      <div key={i} className="p-3 text-xs flex items-start gap-3">
+                        <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary" />
+                        <div>
+                          <p className="font-bold text-foreground">{log.action}</p>
+                          <p className="text-muted-foreground">{log.timestamp}</p>
+                          {log.details && <p className="mt-1 text-[10px] font-mono opacity-70">{log.details}</p>}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center text-muted-foreground italic text-xs">
+                      [Simulado] Cotação enviada via {selectedCotacao?.canal}. Aguardando gateway.
+                    </div>
+                  )}
+                </div>
+              </div>
+              {selectedCotacao?.status === 'pendente' && (
+                <Button variant="outline" className="w-full gap-2 text-xs" onClick={() => toast.info('Retentativa disparada!')}>
+                  <RotateCcw className="w-3.5 h-3.5" /> Forçar Retentativa
+                </Button>
+              )}
+            </div>
           </DialogContent>
         </Dialog>
       </div>
