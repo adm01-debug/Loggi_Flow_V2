@@ -216,9 +216,19 @@ export default function Index() {
                   <div className="shrink-0"><Button variant="outline" size="sm" onClick={resetLayout} className="whitespace-nowrap"><RotateCcw className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Resetar</span></Button></div>
                 </>
               )}
+              </div>
               <div className="shrink-0">
-                <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode} className="whitespace-nowrap">
-                  <Settings2 className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">{isEditMode ? "Salvar" : "Personalizar"}</span>
+                <Button 
+                  variant={performanceMode ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setPerformanceMode(!performanceMode)} 
+                  className={cn(
+                    "whitespace-nowrap transition-all duration-500",
+                    performanceMode ? "bg-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]" : ""
+                  )}
+                >
+                  <Zap className={cn("w-4 h-4 sm:mr-2", performanceMode && "fill-current animate-pulse")} />
+                  <span className="hidden sm:inline">{performanceMode ? "Performance ON" : "Modo Performance"}</span>
                 </Button>
               </div>
             </div>
