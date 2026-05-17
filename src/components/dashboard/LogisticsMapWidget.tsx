@@ -138,6 +138,19 @@ export function LogisticsMapWidget() {
                 {mapStyle.includes("dark") ? <Satellite className="w-3 h-3 text-primary" /> : <Activity className="w-3 h-3 text-primary" />}
                 {mapStyle.includes("dark") ? "Satélite" : "Tático"}
               </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowLayers(!showLayers)}
+                className={cn(
+                  "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
+                  showLayers ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" : "bg-white/5"
+                )}
+              >
+                <Layers className="w-3 h-3" />
+                Camadas
+              </Button>
             </div>
           </div>
         </CardHeader>
