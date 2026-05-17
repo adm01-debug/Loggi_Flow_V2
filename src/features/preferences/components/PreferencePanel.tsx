@@ -8,7 +8,9 @@ import {
   Minimize, 
   Eye,
   Type,
-  Move
+  Move,
+  Zap,
+  Volume2
 } from "lucide-react";
 import { useUserPreferences } from "../hooks/useUserPreferences";
 import { Button } from "@/components/ui/button";
