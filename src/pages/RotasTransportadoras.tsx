@@ -112,6 +112,9 @@ export default function RotasTransportadoras() {
             isLoading={isLoading}
           />
         </TabsContent>
+        <TabsContent value="importar" className="space-y-6">
+          <BulkRouteImport />
+        </TabsContent>
       </Tabs>
     </MainLayout>
   );
