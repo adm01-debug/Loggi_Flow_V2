@@ -158,10 +158,9 @@ export function PreferencePanel() {
         </div>
       </div>
 
-      {/* Gamification Section */}
       <div className="space-y-4 pt-6 border-t border-white/5">
         <div className="flex items-center gap-2 mb-2">
-          <Move className="w-4 h-4 text-primary" />
+          <Zap className="w-4 h-4 text-primary" />
           <h4 className="text-sm font-bold uppercase tracking-widest">Gamificação</h4>
         </div>
 
