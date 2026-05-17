@@ -109,6 +109,7 @@ export function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
                     <SelectItem value="coleta">Coleta</SelectItem>
                     <SelectItem value="entrega">Entrega</SelectItem>
                     <SelectItem value="ocorrencia">Ocorrência</SelectItem>
+                    <SelectItem value="frete">Cotação de Frete</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
