@@ -14,6 +14,7 @@ import { ptBR } from "date-fns/locale";
 import { DrillDownModal } from "@/components/analytics/DrillDownModal";
 import { useDrillDown } from "@/hooks/useDrillDown";
 import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
+import { toast } from "sonner";
 
 type Period = "7d" | "30d" | "90d" | "12m";
 
