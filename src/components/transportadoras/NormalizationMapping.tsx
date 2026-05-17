@@ -79,7 +79,7 @@ export function NormalizationMapping({ carrierId, initialConfig, onSave }: Norma
               <SelectContent>
                 <SelectItem value="regex">Somente Regex (Rápido)</SelectItem>
                 <SelectItem value="ai_extraction">Inteligência Artificial (Preciso)</SelectItem>
-                <SelectItem value="hybrid">Híbrido (Regex -> IA)</SelectItem>
+                <SelectItem value="hybrid">Híbrido (Regex → IA)</SelectItem>
               </SelectContent>
             </Select>
           </div>
