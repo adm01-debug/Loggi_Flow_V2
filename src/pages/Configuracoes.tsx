@@ -146,7 +146,7 @@ export default function Configuracoes() {
             </TabsContent>
             <TabsContent value="notifications" className="space-y-4">
               <div className="card-base p-4 space-y-4">
-                {[{ key: "email", label: "Notificações por Email" }, { key: "push", label: "Notificações Push" }, { key: "sms", label: "Notificações SMS" }, { key: "slack", label: "Integração Slack" }].map((pref) => (
+                {[{ key: "email", label: "Notificações por Email" }, { key: "push", label: "Notificações Push" }, { key: "whatsapp", label: "Notificações WhatsApp" }, { key: "sms", label: "Notificações SMS" }, { key: "slack", label: "Integração Slack" }].map((pref) => (
                   <div key={pref.key} className="flex items-center justify-between py-2">
                     <div><p className="font-medium">{pref.label}</p><p className="text-sm text-muted-foreground">Receber alertas via {pref.key}</p></div>
                     <Switch 
