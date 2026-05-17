@@ -178,11 +178,30 @@ export const AppSidebar = memo(function AppSidebar() {
         <div className="px-4 py-3 border-b border-sidebar-border/50 bg-sidebar-accent/30">
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
-              <div className="p-1 rounded bg-xp/20">
-                <Star className="w-3 h-3 text-xp fill-xp" />
-              </div>
+              {userLevel?.rank ? (
+                <div 
+                  className="p-1 rounded flex items-center justify-center"
+                  style={{ backgroundColor: `${userLevel.rank.color}20` }}
+                  title={userLevel.rank.name}
+                >
+                  <Star className="w-3 h-3 fill-current" style={{ color: userLevel.rank.color }} />
+                </div>
+              ) : (
+                <div className="p-1 rounded bg-xp/20">
+                  <Star className="w-3 h-3 text-xp fill-xp" />
+                </div>
+              )}
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nível {levelProgress.currentLevel}</span>
             </div>
+            {userLevel?.rank && (
+              <Badge 
+                variant="outline" 
+                className="text-[8px] px-1 h-3.5 border-none font-black uppercase tracking-tighter"
+                style={{ backgroundColor: `${userLevel.rank.color}15`, color: userLevel.rank.color }}
+              >
+                {userLevel.rank.name}
+              </Badge>
+            )}
             <span className="text-[10px] font-bold text-xp">{Math.round(levelProgress.progress)}%</span>
           </div>
           <Progress value={levelProgress.progress} className="h-1 bg-xp/10" />
