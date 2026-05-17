@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Route, Plus, Truck } from 'lucide-react';
+import { Route, Plus, Truck, Upload } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RotaSearchFilter } from '@/components/transportadoras/RotaSearchFilter';
 import { RotaResultsList } from '@/components/transportadoras/RotaResultsList';
 import { RotaFormDialog } from '@/components/transportadoras/RotaFormDialog';
+import { BulkRouteImport } from '@/components/transportadoras/BulkRouteImport';
 import { useTransportadoraRotas, RotaFilter, TransportadoraRota } from '@/hooks/useTransportadoraRotas';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
