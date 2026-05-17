@@ -127,23 +127,36 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
         </div>
       </div>
 
-      {/* Bitrix Sync Indicator */}
-      <div className="bg-[#2fc6f6]/5 border border-[#2fc6f6]/20 rounded-2xl p-4 flex items-center justify-between group/bitrix">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center">
-            <Building2 className="w-4 h-4 text-[#2fc6f6]" />
+      {/* Bitrix Sync Indicator & Details */}
+      <div className="bg-[#2fc6f6]/5 border border-[#2fc6f6]/20 rounded-2xl p-4 space-y-3 group/bitrix">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center">
+              <Building2 className="w-4 h-4 text-[#2fc6f6]" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-[#2fc6f6] uppercase tracking-widest">Sincronismo Bitrix24</p>
+              <p className="text-[9px] font-bold text-white/40 uppercase">SPA ID: {shipment.id.split('-')[0]} • Status: Ativo</p>
+            </div>
+          </div>
+          <button 
+            onClick={onOpenBitrix}
+            className="p-2 rounded-full hover:bg-[#2fc6f6]/10 text-[#2fc6f6] transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#2fc6f6]/10">
+          <div>
+            <p className="text-[8px] font-bold text-white/20 uppercase">Responsável</p>
+            <p className="text-[10px] font-black text-white/80 uppercase">Agente Nexus Alpha</p>
           </div>
           <div>
-            <p className="text-[10px] font-black text-[#2fc6f6] uppercase tracking-widest">Sincronismo Bitrix24</p>
-            <p className="text-[9px] font-bold text-white/40 uppercase">SPA ID: 1234 • Status: Conectado</p>
+            <p className="text-[8px] font-bold text-white/20 uppercase">Última Sinc.</p>
+            <p className="text-[10px] font-black text-white/80 uppercase">Agora mesmo</p>
           </div>
         </div>
-        <button 
-          onClick={onOpenBitrix}
-          className="p-2 rounded-full hover:bg-[#2fc6f6]/10 text-[#2fc6f6] transition-colors"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </button>
       </div>
 
       {/* Mission Timeline */}

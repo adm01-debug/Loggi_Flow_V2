@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { 
   MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, 
-  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2, RefreshCw
+  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2, RefreshCw, Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,8 @@ export function LogisticsMapWidget() {
                            (statusFilter === "delayed" && s.atrasado) ||
                            (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status)) ||
                            (statusFilter === "pending" && ["aguardando_producao", "pronto_despacho", "pendente"].includes(s.status)) ||
-                           (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status));
+                           (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status)) ||
+                           (statusFilter === "high_variance" && (s.atrasado || (s.valorFrete && s.valorFrete > 500)));
 
       const matchesType = typeFilter === "all" || s.tipo === typeFilter;
 
@@ -109,7 +110,8 @@ export function LogisticsMapWidget() {
                   { id: 'all', label: 'TODOS', icon: Activity },
                   { id: 'in_transit', label: 'TRÂNSITO', icon: Truck },
                   { id: 'delayed', label: 'ATRASADOS', icon: AlertTriangle },
-                  { id: 'completed', label: 'OK', icon: CheckCircle2 }
+                  { id: 'completed', label: 'OK', icon: CheckCircle2 },
+                  { id: 'high_variance', label: 'VARIAÇÃO', icon: Star }
                 ].map((f) => (
                   <button
                     key={f.id}
@@ -173,10 +175,10 @@ export function LogisticsMapWidget() {
                 onClick={() => setShowPerformance(!showPerformance)}
                 className={cn(
                   "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
-                  showPerformance ? "bg-primary border-primary" : "bg-white/5"
+                  showPerformance ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" : "bg-white/5"
                 )}
               >
-                <Gauge className="w-3 h-3" />
+                <Gauge className={cn("w-3 h-3", showPerformance && "animate-spin-slow")} />
                 Performance
               </Button>
 
@@ -187,7 +189,16 @@ export function LogisticsMapWidget() {
                   setIsExporting(true);
                   setTimeout(() => {
                     setIsExporting(false);
-                    toast.success("Relatório Auditoria Gerado!");
+                    const csvContent = "data:text/csv;charset=utf-8,ID,Numero,Status,Tipo,Valor,Atrasado\n" + 
+                      shipments.slice(0, 10).map(s => `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.atrasado}`).join("\n");
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `auditoria_nexus_${new Date().toISOString().slice(0,10)}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    toast.success("Relatório Auditoria Nexus Gerado (CSV)!");
                   }, 1500);
                 }}
                 disabled={isExporting}
@@ -215,6 +226,72 @@ export function LogisticsMapWidget() {
 
         <CardContent className="p-4 flex-1 flex flex-col md:flex-row gap-4 relative overflow-hidden">
           <AnimatePresence>
+            {showPerformance && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="absolute inset-4 z-[60] bg-black/95 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl overflow-hidden"
+              >
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">Nexus Performance Engine</h3>
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2">Métricas táticas em tempo real</p>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => setShowPerformance(false)} className="rounded-full text-white/40 hover:text-white">
+                    <X className="w-6 h-6" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+                    <div className="flex items-center gap-3 mb-4 text-primary">
+                      <Zap className="w-5 h-5" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Velocidade de Fluxo</span>
+                    </div>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">94.2%</p>
+                    <p className="text-[10px] font-bold text-success uppercase mt-2">↑ 2.4% vs ontem</p>
+                  </div>
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+                    <div className="flex items-center gap-3 mb-4 text-primary">
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Taxa de Conclusão</span>
+                    </div>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">98.8%</p>
+                    <p className="text-[10px] font-bold text-success uppercase mt-2">Nominal</p>
+                  </div>
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+                    <div className="flex items-center gap-3 mb-4 text-primary">
+                      <Clock className="w-5 h-5" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">SLA Médio</span>
+                    </div>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">1.4d</p>
+                    <p className="text-[10px] font-bold text-white/40 uppercase mt-2">Meta: 2.0d</p>
+                  </div>
+                </div>
+
+                <div className="h-[300px] w-full bg-white/5 rounded-[2rem] border border-white/10 p-6">
+                  <PerformanceChart 
+                    title="Análise de Vazão Logística" 
+                    subtitle="Volume de remessas vs Capacidade de processamento"
+                    data={[
+                      { name: '00h', v: 12, c: 80 },
+                      { name: '04h', v: 8, c: 80 },
+                      { name: '08h', v: 45, c: 90 },
+                      { name: '12h', v: 82, c: 95 },
+                      { name: '16h', v: 65, c: 90 },
+                      { name: '20h', v: 30, c: 85 },
+                      { name: '23h', v: 15, c: 80 },
+                    ]}
+                    dataKey="v"
+                    secondaryDataKey="c"
+                    xAxisKey="name"
+                    className="border-none bg-transparent p-0 shadow-none rounded-none"
+                  />
+                </div>
+              </motion.div>
+            )}
+
             {showLayers && (
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -256,6 +333,7 @@ export function LogisticsMapWidget() {
                         { id: 'completed', label: 'Sucesso', icon: CheckCircle2 },
                         { id: 'delayed', label: 'Atraso', icon: AlertTriangle },
                         { id: 'problems', label: 'Crítico', icon: AlertTriangle },
+                        { id: 'high_variance', label: 'Variação', icon: Star },
                       ].map((f) => (
                         <button
                           key={f.id}
@@ -447,8 +525,11 @@ export function LogisticsMapWidget() {
                 >
                   <div className="group/marker cursor-pointer relative">
                     {/* Variational Alert Rings */}
-                    {s.atrasado && (
-                      <div className="absolute -inset-8 rounded-full bg-destructive/20 animate-ping" />
+                    {(s.atrasado || (s.valorFrete && s.valorFrete > 500)) && (
+                      <div className={cn(
+                        "absolute -inset-8 rounded-full animate-ping",
+                        s.atrasado ? "bg-destructive/30" : "bg-primary/30"
+                      )} />
                     )}
                     <div className={cn(
                       "absolute -inset-4 rounded-full animate-ping opacity-20",
@@ -464,6 +545,8 @@ export function LogisticsMapWidget() {
                     )}>
                       {s.atrasado ? (
                         <AlertTriangle className="w-5 h-5 animate-bounce" />
+                      ) : (s.valorFrete && s.valorFrete > 500) ? (
+                        <Star className="w-5 h-5 animate-pulse text-primary fill-primary" />
                       ) : s.tipo === 'entrega' ? (
                         <Truck className="w-5 h-5" />
                       ) : (
@@ -476,7 +559,10 @@ export function LogisticsMapWidget() {
                       <div className="bg-black/90 border-2 border-primary/30 backdrop-blur-xl p-4 rounded-2xl shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] min-w-[220px]">
                         <div className="flex justify-between items-start mb-2">
                           <p className="text-[10px] font-black uppercase text-primary tracking-widest">{s.numero}</p>
-                          {s.atrasado && <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce">ATRASADO</Badge>}
+                          <div className="flex gap-1">
+                            {s.atrasado && <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce uppercase">Atraso</Badge>}
+                            {(s.valorFrete && s.valorFrete > 500) && <Badge className="bg-primary text-[8px] font-black px-1 h-4 animate-pulse uppercase">Variação</Badge>}
+                          </div>
                         </div>
                         <p className="text-sm font-black text-white mb-1 uppercase tracking-tighter italic">{s.cliente || 'CLIENTE NÃO INFORMADO'}</p>
                         <p className="text-[9px] font-bold text-white/50 mb-3 uppercase tracking-widest">{s.transportadora}</p>
