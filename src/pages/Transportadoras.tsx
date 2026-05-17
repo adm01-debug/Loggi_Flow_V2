@@ -210,10 +210,11 @@ export default function Transportadoras() {
 
   const FormFields = () => (
     <Tabs defaultValue="geral" className="w-full">
-      <TabsList className="grid w-full grid-cols-4 mb-4">
+      <TabsList className="grid w-full grid-cols-5 mb-4">
         <TabsTrigger value="geral">Geral</TabsTrigger>
         <TabsTrigger value="api">API</TabsTrigger>
         <TabsTrigger value="automacao">Automação</TabsTrigger>
+        <TabsTrigger value="mapeamento">Integração</TabsTrigger>
         <TabsTrigger value="cobertura">Cobertura</TabsTrigger>
       </TabsList>
       
