@@ -3,14 +3,16 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Navigation, Truck, MapPin, Clock, Phone, RefreshCw, Loader2, Radio } from "lucide-react";
+import { Navigation, Truck, MapPin, Clock, Phone, RefreshCw, Loader2, Radio, Info } from "lucide-react";
 import { useLalamoveTracking } from "@/hooks/useLalamoveTracking";
 import { useRealtime } from "@/hooks/useRealtime";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
 
 export default function RastreamentoMotorista() {
   const [selectedOrder, setSelectedOrder] = useState<string>("");
@@ -85,8 +87,61 @@ export default function RastreamentoMotorista() {
         </div>
         {selectedOrder ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 card-base p-4 min-h-[400px] flex items-center justify-center bg-muted/50">
-              {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : <div className="text-center text-muted-foreground"><Navigation className="w-16 h-16 mx-auto mb-4 opacity-30" /><p>Mapa de rastreamento</p><p className="text-sm">Integração Lalamove</p>{location.lat !== 0 && <p className="text-xs mt-2">Lat: {location.lat}, Lng: {location.lng}</p>}</div>}
+            <div className="lg:col-span-2 card-base p-0 min-h-[500px] overflow-hidden relative border-none bg-black">
+              {isLoading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted/20 backdrop-blur-sm z-10">
+                  <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                </div>
+              ) : location.lat !== 0 ? (
+                <Map
+                  initialViewState={{
+                    latitude: location.lat,
+                    longitude: location.lng,
+                    zoom: 14
+                  }}
+                  style={{ width: '100%', height: '100%' }}
+                  mapStyle="mapbox://styles/mapbox/dark-v11"
+                  mapboxAccessToken={MAPBOX_TOKEN}
+                >
+                  <Marker latitude={location.lat} longitude={location.lng} anchor="bottom">
+                    <div className="relative">
+                      <div className="absolute -inset-4 bg-primary/20 rounded-full animate-ping" />
+                      <div className="relative p-2 rounded-full bg-primary border-2 border-white shadow-lg">
+                        <Truck className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                  </Marker>
+                  <NavigationControl position="top-right" />
+                  
+                  {/* Overlay Informativo */}
+                  <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-xl border border-white/10 p-3 rounded-xl z-20 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                        <Radio className="w-4 h-4 text-primary animate-pulse" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-primary uppercase tracking-widest">Sinal de Telemetria Ativo</p>
+                        <p className="text-xs font-bold text-white uppercase truncate max-w-[150px] md:max-w-none">
+                          Lat: {location.lat.toFixed(5)} • Lng: {location.lng.toFixed(5)}
+                        </p>
+                      </div>
+                    </div>
+                    {isLive && (
+                      <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 animate-pulse uppercase text-[10px] font-black">
+                        LIVE
+                      </Badge>
+                    )}
+                  </div>
+                </Map>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-4">
+                  <Navigation className="w-16 h-16 opacity-20" />
+                  <div className="text-center">
+                    <p className="font-bold uppercase tracking-widest text-sm">Aguardando coordenadas...</p>
+                    <p className="text-xs opacity-50">Integração Lalamove API 2.0</p>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="space-y-4">
               <div className="card-base p-4">
