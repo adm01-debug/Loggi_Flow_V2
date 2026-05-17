@@ -579,34 +579,6 @@ export function LogisticsMapWidget() {
       </div>
 
       <Sheet open={showMission} onOpenChange={setShowMission}>
-        <SheetContent className="sm:max-w-xl bg-black/95 border-primary/20 backdrop-blur-3xl overflow-y-auto">
-          <SheetHeader className="mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Box className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <SheetTitle className="text-2xl font-black italic tracking-tighter text-white uppercase">
-                  Dossiê de Missão
-                </SheetTitle>
-                <SheetDescription className="text-primary font-black uppercase text-[10px] tracking-widest">
-                  Nexus Intelligence Archive • Protocolo {selectedShipment?.numero}
-                </SheetDescription>
-              </div>
-            </div>
-          </SheetHeader>
-          
-          {selectedShipment && (
-            <MissionDetail 
-              shipment={selectedShipment} 
-              onOpenBitrix={() => {
-                window.open('https://bitrix24.com', '_blank');
-              }}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
-      <Sheet open={showMission} onOpenChange={setShowMission}>
         <SheetContent side="right" className="w-full sm:w-[540px] bg-black/95 backdrop-blur-3xl border-l border-white/10 p-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
           <ScrollArea className="h-full">
@@ -620,7 +592,7 @@ export function LogisticsMapWidget() {
                     Dossiê de Missão
                   </SheetTitle>
                   <SheetDescription className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2">
-                    Célula de Inteligência Nexus
+                    Célula de Inteligência Nexus Protocolo {selectedShipment?.numero}
                   </SheetDescription>
                 </div>
               </div>
@@ -630,7 +602,10 @@ export function LogisticsMapWidget() {
               {selectedShipment && (
                 <MissionDetail 
                   shipment={selectedShipment} 
-                  onOpenBitrix={() => toast.info("Sincronizando com Bitrix24...")}
+                  onOpenBitrix={() => {
+                    toast.info("Sincronizando com Bitrix24...");
+                    window.open('https://bitrix24.com', '_blank');
+                  }}
                 />
               )}
             </div>
