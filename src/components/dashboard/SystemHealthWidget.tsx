@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, ShieldCheck, Zap, AlertTriangle } from "lucide-react";
+import { Activity, ShieldCheck, Zap, AlertTriangle, Cpu, Radio, Fingerprint, Database } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function SystemHealthWidget() {
   const { data: healthData, isLoading } = useQuery({
@@ -32,8 +34,8 @@ export function SystemHealthWidget() {
 
       // 3. Simple health calculation
       let score = 100;
-      score -= (errorCount || 0) * 5; // -5 points per error
-      score -= (slowQueries) * 2;    // -2 points per slow query
+      score -= (errorCount || 0) * 5; 
+      score -= (slowQueries) * 2;    
       if (avgDuration > 500) score -= 10;
       
       let status = 'optimal';
@@ -55,144 +57,184 @@ export function SystemHealthWidget() {
 
   if (isLoading) {
     return (
-      <Card className="animate-pulse h-[200px]">
-        <CardContent className="h-full bg-muted/20" />
+      <Card className="h-[400px] rounded-[2.5rem] bg-black/40 border-white/10 animate-pulse overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-white/5 to-transparent" />
       </Card>
     );
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'optimal': return 'text-green-500';
-      case 'good': return 'text-blue-500';
-      case 'concerning': return 'text-amber-500';
-      default: return 'text-red-500';
+      case 'optimal': return 'text-success';
+      case 'good': return 'text-primary';
+      case 'concerning': return 'text-warning';
+      default: return 'text-destructive';
+    }
+  };
+
+  const getStatusGlow = (status: string) => {
+    switch (status) {
+      case 'optimal': return 'bg-success shadow-[0_0_30px_rgba(34,197,94,0.4)]';
+      case 'good': return 'bg-primary shadow-[0_0_30px_rgba(234,56,76,0.4)]';
+      case 'concerning': return 'bg-warning shadow-[0_0_30px_rgba(234,179,8,0.4)]';
+      default: return 'bg-destructive shadow-[0_0_30px_rgba(239,68,68,0.4)]';
     }
   };
 
   return (
-    <Card className="relative overflow-hidden group border-none bg-transparent p-[1px] rounded-[2rem] shadow-2xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-white/5 to-white/10 rounded-[2rem]" />
-      <div className="relative h-full bg-black/90 backdrop-blur-3xl rounded-[1.9rem] p-6">
-        {/* Decorative Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+    <Card className="relative overflow-hidden group border-none bg-transparent p-[2px] rounded-[2.5rem] shadow-2xl h-full">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[2.5rem]" />
+      <div className="relative h-full bg-black/95 backdrop-blur-[50px] rounded-[2.4rem] p-8 border border-white/5 flex flex-col">
         
-        <CardHeader className="p-0 mb-8 relative z-10">
-          <CardTitle className="text-xs font-black flex items-center justify-between uppercase tracking-[0.3em] italic">
-            <div className="flex items-center gap-2 bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
-              <Activity className="h-4 w-4 text-primary animate-pulse" />
-              NEXUS CORE HEALTH
+        {/* Scanning Line Effect */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent animate-scan" />
+
+        <CardHeader className="p-0 mb-10 relative z-10">
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                <Cpu className="h-5 w-5 text-primary animate-pulse" />
+              </div>
+              <div className="flex flex-col">
+                 <span className="text-white font-black italic tracking-tighter text-xl uppercase italic leading-none">Nexus Health</span>
+                 <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mt-1 flex items-center gap-1.5"><Radio className="w-2 h-2 text-success animate-ping" /> Real-time Core Diagnostic</span>
+              </div>
             </div>
-            <div className="px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-[9px] text-primary not-italic">
-              LIVE MONITOR
+            <div className="flex flex-col items-end">
+               <div className={cn("px-4 py-1.5 rounded-full border-2 text-[10px] font-black uppercase tracking-widest bg-black shadow-inner", getStatusColor(healthData?.status || ''))}>
+                 {healthData?.status}
+               </div>
+               <span className="text-[8px] font-black text-white/20 uppercase mt-2 tracking-widest">Protocol: 0.1.Elite</span>
             </div>
           </CardTitle>
         </CardHeader>
         
-        <CardContent className="p-0 relative z-10">
-          <div className="flex flex-col items-center justify-center space-y-8">
+        <CardContent className="p-0 relative z-10 flex-1 flex flex-col">
+          <div className="flex flex-col items-center justify-center space-y-12 flex-1">
             <div className="relative flex items-center justify-center group/score">
+              {/* Complex Rotating Rings */}
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 w-48 h-48 border-2 border-dashed border-white/5 rounded-full" 
+              />
+              <motion.div 
+                animate={{ rotate: -360 }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 w-[200px] h-[200px] border border-white/10 rounded-full" 
+              />
+              
               {/* Radial Glow */}
               <div className={cn(
-                "absolute inset-0 rounded-full blur-[40px] opacity-30 transition-all duration-1000",
-                healthData?.status === 'optimal' ? 'bg-green-500' : 
-                healthData?.status === 'good' ? 'bg-blue-500' : 'bg-amber-500'
+                "absolute inset-0 rounded-full blur-[60px] opacity-20 transition-all duration-1000",
+                healthData?.status === 'optimal' ? 'bg-success' : 
+                healthData?.status === 'good' ? 'bg-primary' : 'bg-warning'
               )} />
               
-              <svg className="w-32 h-32 transform -rotate-90 relative z-10 drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]">
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="58"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  fill="transparent"
-                  className="text-white/5"
-                />
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="58"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  fill="transparent"
-                  strokeDasharray={364.4}
-                  strokeDashoffset={364.4 - (364.4 * (healthData?.score || 0)) / 100}
-                  strokeLinecap="round"
-                  className={cn(
-                    "transition-all duration-1000",
-                    getStatusColor(healthData?.status || '')
-                  )}
-                />
-                {/* Internal Decorative Ring */}
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="48"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth="1"
-                  fill="transparent"
-                  strokeDasharray="4 4"
-                />
-              </svg>
-              
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-                <div className="relative">
-                  <span className="text-4xl font-black italic text-white tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-                    {healthData?.score}
-                  </span>
-                  <span className="absolute -right-4 top-0 text-[10px] font-black text-primary">%</span>
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", 
-                    healthData?.status === 'optimal' ? 'bg-green-500' : 
-                    healthData?.status === 'good' ? 'bg-blue-500' : 'bg-amber-500'
-                  )} />
-                  <span className="text-[10px] uppercase font-black tracking-[0.2em] text-white/40">OPERATIONAL</span>
+              <div className="relative p-2 rounded-full border-4 border-white/5 shadow-2xl">
+                <svg className="w-40 h-40 transform -rotate-90 relative z-10">
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="72"
+                    stroke="currentColor"
+                    strokeWidth="10"
+                    fill="transparent"
+                    className="text-white/5"
+                  />
+                  <motion.circle
+                    initial={{ strokeDashoffset: 452.4 }}
+                    animate={{ strokeDashoffset: 452.4 - (452.4 * (healthData?.score || 0)) / 100 }}
+                    transition={{ duration: 2, ease: "circOut" }}
+                    cx="80"
+                    cy="80"
+                    r="72"
+                    stroke="currentColor"
+                    strokeWidth="10"
+                    fill="transparent"
+                    strokeDasharray={452.4}
+                    strokeLinecap="round"
+                    className={cn(
+                      "transition-all duration-1000 filter drop-shadow-[0_0_12px_currentColor]",
+                      getStatusColor(healthData?.status || '')
+                    )}
+                  />
+                </svg>
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+                  <div className="relative flex items-baseline">
+                    <span className="text-6xl font-black italic text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] tabular-nums">
+                      {healthData?.score}
+                    </span>
+                    <span className="text-xl font-black text-primary italic ml-1">%</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2 px-4 py-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-md">
+                    <div className={cn("w-2 h-2 rounded-full", getStatusGlow(healthData?.status || ''))} />
+                    <span className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60">Operação Ativa</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 w-full">
-              <div className="group/metric flex flex-col gap-2 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center border border-green-500/20 group-hover/metric:scale-110 transition-transform">
-                    <ShieldCheck className="h-5 w-5 text-green-500" />
+            <div className="grid grid-cols-2 gap-6 w-full">
+              <div className="group/metric relative p-6 rounded-3xl border-2 transition-all duration-500 overflow-hidden bg-gradient-to-br from-white/5 to-transparent border-white/5 hover:border-success/40">
+                <div className="absolute inset-0 bg-success/5 opacity-0 group-hover/metric:opacity-100 transition-opacity" />
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <div className="w-12 h-12 rounded-2xl bg-black border border-success/40 flex items-center justify-center shadow-lg group-hover/metric:scale-110 transition-transform">
+                    <Database className="h-6 w-6 text-success" />
                   </div>
-                  <div className="text-[10px] font-black text-green-500 bg-green-500/10 px-1.5 rounded uppercase">SAFE</div>
+                  <Badge variant="outline" className="text-[8px] font-black text-success border-success/40 bg-success/5">STABLE_CORE</Badge>
                 </div>
-                <div>
-                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-0.5">Telemetry Errors</span>
-                  <span className="text-xl font-black text-white italic tabular-nums">{healthData?.errors}</span>
+                <div className="relative z-10">
+                  <span className="text-[10px] text-white/40 uppercase font-black tracking-[0.3em] block mb-1">Telemetry Erros</span>
+                  <div className="flex items-baseline gap-2">
+                     <span className="text-3xl font-black text-white italic tabular-nums leading-none">{healthData?.errors}</span>
+                     <span className="text-[9px] font-bold text-white/20 uppercase">Units</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="group/metric flex flex-col gap-2 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover/metric:scale-110 transition-transform">
-                    <Zap className="h-5 w-5 text-blue-500" />
+              <div className="group/metric relative p-6 rounded-3xl border-2 transition-all duration-500 overflow-hidden bg-gradient-to-br from-white/5 to-transparent border-white/5 hover:border-primary/40">
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/metric:opacity-100 transition-opacity" />
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <div className="w-12 h-12 rounded-2xl bg-black border border-primary/40 flex items-center justify-center shadow-lg group-hover/metric:scale-110 transition-transform">
+                    <Activity className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="text-[10px] font-black text-blue-500 bg-blue-500/10 px-1.5 rounded uppercase">FAST</div>
+                  <Badge variant="outline" className="text-[8px] font-black text-primary border-primary/40 bg-primary/5">ULTRA_LOW</Badge>
                 </div>
-                <div>
-                  <span className="text-[10px] text-white/40 uppercase font-black tracking-widest block mb-0.5">Avg Latency</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-black text-white italic tabular-nums">{healthData?.avgLatency}</span>
-                    <span className="text-[10px] font-black text-white/40">ms</span>
+                <div className="relative z-10">
+                  <span className="text-[10px] text-white/40 uppercase font-black tracking-[0.3em] block mb-1">Méd Latência</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-white italic tabular-nums leading-none">{healthData?.avgLatency}</span>
+                    <span className="text-[9px] font-bold text-white/20 uppercase italic">ms</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {(healthData?.errors ?? 0) > 0 && (
-              <div className="w-full flex items-center gap-3 text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary p-4 rounded-2xl border border-primary/30 animate-pulse relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-                <AlertTriangle className="h-5 w-5 shrink-0" />
-                <span className="relative z-10">CRITICAL ANOMALIES DETECTED IN THE OPERATIONAL CORE</span>
-              </div>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] bg-destructive/10 text-destructive p-5 rounded-[2rem] border-2 border-destructive/30 animate-pulse relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(239,68,68,0.1)_25%,transparent_25%,transparent_50%,rgba(239,68,68,0.1)_50%,rgba(239,68,68,0.1)_75%,transparent_75%,transparent)] bg-[length:20px_20px]" />
+                <AlertTriangle className="h-6 w-6 shrink-0 filter drop-shadow-[0_0_10px_currentColor]" />
+                <span className="relative z-10 italic">Ativar Protocolo de Contenção: Anomalias Detectadas no Core Operacional</span>
+              </motion.div>
             )}
           </div>
         </CardContent>
+
+        <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between opacity-30 group-hover:opacity-100 transition-opacity duration-700">
+           <div className="flex items-center gap-3">
+              <Fingerprint className="w-4 h-4 text-white" />
+              <span className="text-[9px] font-black text-white uppercase tracking-[0.4em]">Audit_Sec_Verify</span>
+           </div>
+           <div className="flex gap-1">
+              {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-3 bg-primary/40 rounded-full" />)}
+           </div>
+        </div>
       </div>
     </Card>
   );
