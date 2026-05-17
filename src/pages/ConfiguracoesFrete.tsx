@@ -466,12 +466,56 @@ export default function FreightConfig() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Zap className="h-5 w-5 text-primary" />
-                    Fluxo Nexus RPA
+                    Fluxo Nexus RPA & Automação Inteligente
                   </CardTitle>
-                  <CardDescription>Configuração de gatilhos automáticos para cotações manuais</CardDescription>
+                  <CardDescription>Gatilhos inteligentes e processamento automático de respostas</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-white border rounded-xl">
+                  <div className="flex flex-col md:flex-row gap-6">
+                     <div className="flex-1 space-y-4">
+                        <div className="p-4 bg-white border-2 border-success/30 rounded-xl flex items-center justify-between group/auto transition-all">
+                           <div className="flex items-center gap-4">
+                              <div className="p-3 bg-success/10 rounded-full text-success"><RefreshCw className="h-6 w-6" /></div>
+                              <div>
+                                 <p className="font-black text-xs uppercase tracking-widest">Retentativas Automáticas</p>
+                                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Fallback em falhas de disparo</p>
+                              </div>
+                           </div>
+                           <Switch defaultChecked />
+                        </div>
+                        <div className="p-4 bg-white border-2 border-primary/30 rounded-xl flex items-center justify-between group/auto transition-all">
+                           <div className="flex items-center gap-4">
+                              <div className="p-3 bg-primary/10 rounded-full text-primary"><Search className="h-6 w-6" /></div>
+                              <div>
+                                 <p className="font-black text-xs uppercase tracking-widest">OCR & Resposta Inteligente</p>
+                                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Captura automática de PDF/Print</p>
+                              </div>
+                           </div>
+                           <Switch defaultChecked />
+                        </div>
+                     </div>
+
+                     <div className="flex-1 p-6 bg-black border border-white/10 rounded-2xl relative overflow-hidden group/logs">
+                        <div className="absolute top-0 left-0 w-full h-[1px] bg-primary animate-scan opacity-40" />
+                        <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">Nexus RPA Status</h5>
+                        <div className="space-y-3 font-mono text-[9px]">
+                           <div className="flex gap-2 text-success">
+                              <span className="opacity-50">[12:45]</span>
+                              <span>GATEWAY: DISPARO WHATSAPP OK</span>
+                           </div>
+                           <div className="flex gap-2 text-white/40">
+                              <span className="opacity-50">[12:46]</span>
+                              <span>PENDING: AGUARDANDO RESPOSTA LOGÍSTICA</span>
+                           </div>
+                           <div className="flex gap-2 text-primary">
+                              <span className="opacity-50">[12:48]</span>
+                              <span>HOOK: RESPOSTA RECEBIDA (R$ 145.00)</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="flex items-center gap-4">
                       <div className="p-3 bg-success/10 rounded-full"><RefreshCw className="h-6 w-6 text-success" /></div>
                       <div>
