@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useCotacoesMulticanal, type CotacaoMulticanal } from '@/hooks/useCotacoesMulticanal';
 import { isPast, differenceInHours, differenceInMinutes } from 'date-fns';
 import { TrechoComparativo } from './dashboard-cotacoes/TrechoComparativo';
+import { ResponseConsole } from '@/components/freight/ResponseConsole';
 
 function TimeRemaining({ expiresAt }: { expiresAt: string }) {
   const [now, setNow] = useState(Date.now());
