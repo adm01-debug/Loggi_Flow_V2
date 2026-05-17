@@ -70,6 +70,7 @@ export default function Configuracoes() {
       const keyMap: Record<string, keyof import('@/hooks/useNotificationPreferences').NotificationPreferences> = {
         'email': 'notifications_email',
         'push': 'notifications_push',
+        'whatsapp': 'notifications_whatsapp',
         'sla': 'notifications_sla',
         'ocorrencias': 'notifications_ocorrencias',
         'coletas': 'notifications_coletas',
