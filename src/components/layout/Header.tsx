@@ -83,7 +83,7 @@ export const Header = memo(function Header() {
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-20 px-3 sm:px-10 bg-background/60 backdrop-blur-3xl border-b border-primary/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] gap-2 sm:gap-6 transition-all duration-500">
       {/* Left side: Back button + Page title with History */}
-      <div className="flex items-center gap-2 flex-1 min-w-0">
+      <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
         <div className="flex items-center gap-1 min-w-0">
           <TooltipProvider>
             <Tooltip>
@@ -160,7 +160,7 @@ export const Header = memo(function Header() {
         </div>
 
         {/* Desktop: Search */}
-        <div className="hidden md:block flex-1 max-w-[280px] lg:max-w-md ml-4">
+        <div className="hidden md:block flex-1 min-w-0 max-w-[240px] lg:max-w-sm ml-2 lg:ml-4">
           <Suspense fallback={<div className="h-9 w-full rounded-md bg-muted animate-pulse" />}>
             <GlobalSearch />
           </Suspense>
@@ -168,10 +168,12 @@ export const Header = memo(function Header() {
       </div>
 
       {/* Center - Realtime Status */}
-      <RealtimeStatus />
+      <div className="hidden md:flex shrink-0">
+        <RealtimeStatus />
+      </div>
 
       {/* Gamification Stats */}
-      <div className="hidden md:flex items-center gap-2 lg:gap-4">
+      <div className="hidden md:flex items-center gap-2 lg:gap-4 shrink-0">
         <div className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl bg-primary/10 border border-primary/20 transition-all hover:scale-105 hover:bg-primary/20 shadow-lg shadow-primary/5">
           <Zap className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-primary" />
           <span className="text-xs lg:text-sm font-bold text-primary">
@@ -195,7 +197,7 @@ export const Header = memo(function Header() {
       </div>
 
       {/* Right Side */}
-      <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         <div className="hidden sm:block">
           <RecentlyVisited />
         </div>
