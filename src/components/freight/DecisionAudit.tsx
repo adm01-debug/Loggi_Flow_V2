@@ -13,22 +13,35 @@ import {
   Info
 } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+interface FreightDecision {
+  id: string;
+  created_at: string;
+  request_params: {
+    estado_destino: string;
+    peso_kg: number;
+    urgencia?: string;
+    tipo_carga?: string;
+  };
+  selected_carrier_name: string | null;
+  recommendations: Array<{
+    carrier_name: string;
+    score: number;
+    estimated_cost: number;
+    estimated_days: number;
+  }>;
+  rule_applied: {
+    event_type?: string;
+    price_weight: number;
+    time_weight: number;
+    performance_weight: number;
+  };
+  status: string;
+  error_message: string | null;
+}
+
 
 export function DecisionAudit() {
   const { data: decisions, isLoading } = useQuery({
