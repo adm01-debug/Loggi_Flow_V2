@@ -42,6 +42,7 @@ function formatDate(date: string | null): string {
 }
 
 export default function CentralRastreamento() {
+  const navigate = useNavigate();
   const {
     shipments, summary, isLoading, filter, setFilter,
     searchTerm, setSearchTerm, refetch, getStatusLabel,
@@ -55,8 +56,7 @@ export default function CentralRastreamento() {
   const pagination = usePagination(shipments, { initialPageSize: 20 });
 
   const openDetail = (s: UnifiedShipment) => {
-    setSelectedShipment(s);
-    setDetailOpen(true);
+    navigate(`/rastreamento/${s.id}`);
   };
 
   return (
