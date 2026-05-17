@@ -116,7 +116,7 @@ export default function CotacaoFrete() {
           </TabsContent>
 
           <TabsContent value="historico" className="space-y-4">
-            <QuotationHistory history={flow.history} onReuse={(data) => flow.calculate(data)} />
+            <QuotationHistory history={flow.history} onReuse={async (data) => await flow.calculate(data)} />
           </TabsContent>
 
           <TabsContent value="templates" className="space-y-4">
