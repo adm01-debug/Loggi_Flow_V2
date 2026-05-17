@@ -101,6 +101,7 @@ export const ACTION_TYPES: { value: ActionType; label: string; icon: string }[] 
   { value: "change_status", label: "Alterar Status", icon: "RefreshCw" },
   { value: "send_email", label: "Enviar Email", icon: "Mail" },
   { value: "create_alert", label: "Criar Alerta", icon: "AlertTriangle" },
+  { value: "block_carrier", label: "Bloquear Transportadora", icon: "Shield" },
 ];
 
 export function useBusinessRules() {
