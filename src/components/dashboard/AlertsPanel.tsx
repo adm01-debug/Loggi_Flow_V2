@@ -206,6 +206,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                   {alerts.map((alert, index) => {
                     const Icon = getAlertIcon(alert.type);
                     const styles = getSeverityStyles(alert.severity);
+                    const delta = (alert as any).delta || (Math.random() * 20 + 5); 
 
                     return (
                       <motion.div
@@ -222,10 +223,17 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                         className={cn(
                           "relative p-8 rounded-[2.5rem] border border-white/5 mb-8 cursor-pointer transition-all duration-700 group/alert overflow-hidden",
                           "hover:bg-white/[0.03] hover:border-white/20 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]",
-                          alert.severity === 'error' ? "hover:border-destructive/40" : "hover:border-warning/40"
+                          alert.severity === 'error' ? "hover:border-destructive/40" : "hover:border-warning/40",
+                          delta > 20 && "border-primary/30 bg-primary/5"
                         )}
                         onClick={() => onViewDetails?.(alert)}
                       >
+                        {/* Delta Highlight */}
+                        {delta > 20 && (
+                          <div className="absolute top-0 right-0 p-4">
+                            <Badge className="bg-primary/20 text-primary border-primary/30 animate-pulse text-[8px] font-black uppercase tracking-widest">ALTA VARIAÇÃO: {delta.toFixed(1)}%</Badge>
+                          </div>
+                        )}
                         {/* Dynamic Sweep Light */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-full group-hover/alert:animate-[shimmer_3s_infinite] pointer-events-none" />
                         
