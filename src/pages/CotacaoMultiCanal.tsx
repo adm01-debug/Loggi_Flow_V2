@@ -343,16 +343,21 @@ export default function CotacaoMultiCanal() {
         </PageHeader>
 
         <div className="flex flex-col md:flex-row gap-4 mb-4">
-           <div className="flex-1">
-              <Label className="text-xs font-black uppercase mb-1.5 block text-muted-foreground">Tipo de Evento (Priorização)</Label>
+           <div className="flex-1 space-y-1">
+              <Label className="text-xs font-black uppercase mb-1.5 block text-muted-foreground">Estratégia Nexus (Priorização)</Label>
               <Select defaultValue="Normal">
-                 <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                 <SelectTrigger className="h-10 border-primary/20 bg-primary/5"><SelectValue /></SelectTrigger>
                  <SelectContent>
-                    <SelectItem value="Normal">Operação Normal</SelectItem>
-                    <SelectItem value="Urgente">Entrega Urgente (SLA Crítico)</SelectItem>
-                    <SelectItem value="Evento">Evento com Data Fixa</SelectItem>
+                    <SelectItem value="Normal">Operação Normal (Foco: Preço)</SelectItem>
+                    <SelectItem value="Urgente">Entrega Urgente (Foco: Prazo)</SelectItem>
+                    <SelectItem value="Evento">Evento com Data Fixa (Híbrido)</SelectItem>
                  </SelectContent>
               </Select>
+              <div className="flex gap-2 mt-1">
+                <Badge variant="ghost" className="text-[9px] px-1 py-0 h-4 bg-primary/10">Preço: 70%</Badge>
+                <Badge variant="ghost" className="text-[9px] px-1 py-0 h-4 bg-primary/10">Prazo: 20%</Badge>
+                <Badge variant="ghost" className="text-[9px] px-1 py-0 h-4 bg-primary/10">Perf: 10%</Badge>
+              </div>
            </div>
            <div className="flex-[3]">
               <StepProgress 
