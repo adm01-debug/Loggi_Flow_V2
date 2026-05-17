@@ -256,7 +256,7 @@ export default function CentralRastreamento() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); navigate(`/rastreamento/${s.id}`); }}>
                             <Eye className="w-3.5 h-3.5" />
                           </Button>
                         </TableCell>
