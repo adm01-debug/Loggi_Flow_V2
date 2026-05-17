@@ -258,7 +258,21 @@ export function LogisticsMapWidget() {
                       s.atrasado ? "bg-destructive" : "bg-primary")}>
                       {s.statusLabel}
                     </Badge>
-                    <span className="text-[8px] font-bold text-white/40 italic">{s.tipo === 'entrega' ? 'ENT' : 'COL'}</span>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-6 w-6 text-white/40 hover:text-primary transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedShipment(s);
+                          setShowMission(true);
+                        }}
+                      >
+                        <Info className="w-3.5 h-3.5" />
+                      </Button>
+                      <span className="text-[8px] font-bold text-white/40 italic">{s.tipo === 'entrega' ? 'ENT' : 'COL'}</span>
+                    </div>
                   </div>
                 </button>
               ))}
