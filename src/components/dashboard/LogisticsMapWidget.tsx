@@ -4,8 +4,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
-  MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, 
-  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2, RefreshCw, Star
+  Truck, Package, Activity, Navigation2, Satellite, 
+  Search, AlertTriangle, CheckCircle2, Layers, Info, X, Zap, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2, RefreshCw, Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

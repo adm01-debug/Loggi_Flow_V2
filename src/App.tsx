@@ -1,4 +1,4 @@
-import { lazy, Suspense, memo, useEffect } from "react";
+import { lazy, Suspense, memo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
