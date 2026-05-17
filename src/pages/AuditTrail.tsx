@@ -1,6 +1,8 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AuditTrailViewer } from "@/components/audit/AuditTrailViewer";
-import { History, Shield, Download } from "lucide-react";
+import { DecisionAudit } from "@/components/freight/DecisionAudit";
+import { History, Shield, Download, Brain, Database } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
@@ -61,10 +63,26 @@ export default function AuditTrail() {
           </div>
         </div>
 
-        {/* Audit Trail Viewer */}
-        <div className="card-base">
-          <AuditTrailViewer maxHeight="calc(100vh - 350px)" />
-        </div>
+        <Tabs defaultValue="decisions" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
+            <TabsTrigger value="decisions" className="gap-2">
+              <Brain className="h-4 w-4" />
+              Decisões de Frete
+            </TabsTrigger>
+            <TabsTrigger value="general" className="gap-2">
+              <Database className="h-4 w-4" />
+              Logs do Sistema
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="decisions" className="space-y-4">
+            <DecisionAudit />
+          </TabsContent>
+
+          <TabsContent value="general" className="card-base">
+            <AuditTrailViewer maxHeight="calc(100vh - 450px)" />
+          </TabsContent>
+        </Tabs>
       </div>
     </MainLayout>
   );

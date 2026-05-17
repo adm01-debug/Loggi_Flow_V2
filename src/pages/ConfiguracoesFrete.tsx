@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,11 +24,18 @@ import {
   Code,
   FileJson,
   Zap,
-  RefreshCw
+  RefreshCw,
+  Brain,
+  Scale,
+  TrendingUp,
+  Target,
+  Clock
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { PageHeader } from '@/components/common/PageHeader';
+import { NormalizationMapping } from '@/components/transportadoras/NormalizationMapping';
+import { Slider } from '@/components/ui/slider';
 
 interface CarrierConfig {
   id: string;
@@ -270,18 +278,34 @@ export default function FreightConfig() {
                           </div>
                         </TabsContent>
 
-                        <TabsContent value="non-api" className="space-y-4">
-                          <div className="space-y-2">
-                            <Label>Template de Mensagem (WhatsApp)</Label>
-                            <Textarea 
-                              className="font-mono text-xs h-32"
-                              placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
-                              value={(selectedCarrier.non_api_config as any)?.whatsapp_template || ''}
-                              onChange={e => {
-                                const cfg = { ...(selectedCarrier.non_api_config as any), whatsapp_template: e.target.value };
-                                updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
-                              }}
-                            />
+                        <TabsContent value="non-api" className="space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label>Template de Mensagem (WhatsApp/Email)</Label>
+                                <Textarea 
+                                  className="font-mono text-xs h-32"
+                                  placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
+                                  value={(selectedCarrier.non_api_config as any)?.whatsapp_template || ''}
+                                  onChange={e => {
+                                    const cfg = { ...(selectedCarrier.non_api_config as any), whatsapp_template: e.target.value };
+                                    updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
+                                  }}
+                                />
+                                <p className="text-[10px] text-muted-foreground">O Nexus disparará esta mensagem automaticamente quando necessário.</p>
+                              </div>
+                            </div>
+                            
+                            <div className="border-l pl-8">
+                               <NormalizationMapping 
+                                 carrierId={selectedCarrier.id} 
+                                 initialConfig={(selectedCarrier.non_api_config as any)?.normalization}
+                                 onSave={(normConfig) => {
+                                   const cfg = { ...(selectedCarrier.non_api_config as any), normalization: normConfig };
+                                   updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
+                                 }}
+                               />
+                            </div>
                           </div>
                         </TabsContent>
                       </Tabs>
@@ -303,82 +327,126 @@ export default function FreightConfig() {
                   <CardTitle>Configuração de Melhor Frete</CardTitle>
                   <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
                 </div>
-                <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 50, time_weight: 50, max_sla_days: 10, is_active: true })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
+                <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 10, is_active: true, is_default: false })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   {rules.length === 0 && !editingRule && <p className="text-center py-8 text-muted-foreground italic">Nenhuma regra personalizada. Usando padrões do sistema.</p>}
                   
                   {editingRule && (
-                    <div className="p-6 border-2 border-primary rounded-xl space-y-4 bg-primary/5 mb-8">
-                       <h4 className="font-bold text-primary flex items-center justify-between">
-                         Editando Regra: {editingRule.event_type}
+                    <div className="p-6 border-2 border-primary rounded-xl space-y-6 bg-primary/5 mb-8">
+                       <div className="flex items-center justify-between">
+                         <h4 className="font-bold text-primary flex items-center gap-2 text-lg">
+                           <Brain className="h-5 w-5" />
+                           {editingRule.id ? 'Editar Estratégia' : 'Nova Estratégia Nexus'}
+                         </h4>
                          <Button variant="ghost" size="sm" onClick={() => setEditRule(null)}>Cancelar</Button>
-                       </h4>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       </div>
+                       
+                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="space-y-2">
-                             <Label>Tipo de Evento</Label>
-                             <Input value={editingRule.event_type} onChange={e => setEditRule({...editingRule, event_type: e.target.value})} />
+                             <Label>Nome do Evento / Tipo</Label>
+                             <Input placeholder="Ex: Black Friday, Urgente" value={editingRule.event_type} onChange={e => setEditRule({...editingRule, event_type: e.target.value})} />
                           </div>
                           <div className="space-y-2">
-                             <Label>SLA Máximo (Dias)</Label>
+                             <Label>SLA Máximo Permitido (Dias)</Label>
                              <Input type="number" value={editingRule.max_sla_days} onChange={e => setEditRule({...editingRule, max_sla_days: parseInt(e.target.value)})} />
                           </div>
-                       </div>
-                       <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                             <Label>Peso Preço (%)</Label>
-                             <Input type="number" value={editingRule.price_weight} onChange={e => {
-                               const val = parseInt(e.target.value);
-                               setEditRule({...editingRule, price_weight: val, time_weight: 100 - val});
-                             }} />
-                          </div>
-                          <div className="space-y-2">
-                             <Label>Peso Prazo (%)</Label>
-                             <Input type="number" value={editingRule.time_weight} onChange={e => {
-                               const val = parseInt(e.target.value);
-                               setEditRule({...editingRule, time_weight: val, price_weight: 100 - val});
-                             }} />
+                          <div className="flex items-end gap-2 pb-1">
+                             <Switch 
+                               checked={editingRule.is_default} 
+                               onCheckedChange={checked => setEditRule({...editingRule, is_default: checked})} 
+                             />
+                             <Label>Regra Padrão (Fallback)</Label>
                           </div>
                        </div>
-                       <Button className="w-full mt-4" onClick={() => saveRule.mutate(editingRule)} disabled={saveRule.isPending}>
-                         {saveRule.isPending ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                         Salvar Regra
-                       </Button>
+
+                       <div className="space-y-8 pt-4">
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2"><Target className="h-4 w-4" /> Peso de Preço ({(editingRule.price_weight * 100).toFixed(0)}%)</Label>
+                            </div>
+                            <Slider 
+                              value={[editingRule.price_weight * 100]} 
+                              onValueChange={(val) => setEditRule({...editingRule, price_weight: val[0]/100})} 
+                              max={100} step={5} 
+                            />
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2"><Clock className="h-4 w-4" /> Peso de Prazo ({(editingRule.time_weight * 100).toFixed(0)}%)</Label>
+                            </div>
+                            <Slider 
+                              value={[editingRule.time_weight * 100]} 
+                              onValueChange={(val) => setEditRule({...editingRule, time_weight: val[0]/100})} 
+                              max={100} step={5} 
+                            />
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Peso de Performance/Score ({(editingRule.performance_weight * 100).toFixed(0)}%)</Label>
+                            </div>
+                            <Slider 
+                              value={[editingRule.performance_weight * 100]} 
+                              onValueChange={(val) => setEditRule({...editingRule, performance_weight: val[0]/100})} 
+                              max={100} step={5} 
+                            />
+                          </div>
+                       </div>
+
+                       <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                          <p className="text-xs text-muted-foreground">
+                            <strong>Nota:</strong> A soma dos pesos deve idealmente ser 1.0 (100%) para um score normalizado. 
+                            Atual: {((editingRule.price_weight + editingRule.time_weight + editingRule.performance_weight) * 100).toFixed(0)}%
+                          </p>
+                          <Button onClick={() => saveRule.mutate(editingRule)} disabled={saveRule.isPending}>
+                            {saveRule.isPending ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                            Publicar Estratégia
+                          </Button>
+                       </div>
                     </div>
                   )}
 
-                  {rules.map((rule: any) => (
-                    <div key={rule.id} className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                           <div className="p-2 bg-primary/10 rounded-lg"><Zap className="h-4 w-4 text-primary" /></div>
-                           <h4 className="font-bold text-foreground">{rule.event_type}</h4>
+                  <div className="grid gap-4">
+                    {rules.map((rule: any) => (
+                      <div key={rule.id} className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                             <div className="p-2 bg-primary/10 rounded-lg"><Zap className="h-4 w-4 text-primary" /></div>
+                             <div>
+                                <h4 className="font-bold flex items-center gap-2">
+                                  {rule.event_type}
+                                  {rule.is_default && <Badge variant="secondary">Padrão</Badge>}
+                                  {!rule.is_active && <Badge variant="outline">Inativa</Badge>}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">SLA Máximo: {rule.max_sla_days} dias</p>
+                             </div>
+                          </div>
+                          <div className="flex gap-2">
+                             <Button size="sm" variant="outline" onClick={() => setEditRule(rule)}>Configurar</Button>
+                             <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteRule.mutate(rule.id)}><Trash2 className="h-4 w-4" /></Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                           <Button variant="ghost" size="icon" onClick={() => setEditRule(rule)}><Settings className="h-4 w-4" /></Button>
-                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteRule.mutate(rule.id)}><Trash2 className="h-4 w-4" /></Button>
-                           <Switch checked={rule.is_active} onCheckedChange={(v) => saveRule.mutate({...rule, is_active: v})} />
+                        <div className="grid grid-cols-3 gap-2">
+                           <div className="text-center p-2 bg-background rounded-lg border">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold">Custo</p>
+                             <p className="text-sm font-black">{(rule.price_weight * 100).toFixed(0)}%</p>
+                           </div>
+                           <div className="text-center p-2 bg-background rounded-lg border">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold">Prazo</p>
+                             <p className="text-sm font-black">{(rule.time_weight * 100).toFixed(0)}%</p>
+                           </div>
+                           <div className="text-center p-2 bg-background rounded-lg border">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold">Confiança</p>
+                             <p className="text-sm font-black">{(rule.performance_weight * 100).toFixed(0)}%</p>
+                           </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-6">
-                        <div className="space-y-1">
-                          <Label className="text-[10px] uppercase text-muted-foreground">Preço</Label>
-                          <p className="font-black">{rule.price_weight}%</p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-[10px] uppercase text-muted-foreground">Prazo</Label>
-                          <p className="font-black">{rule.time_weight}%</p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-[10px] uppercase text-muted-foreground">Limite SLA</Label>
-                          <p className="font-black">{rule.max_sla_days}d</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {/* Default Fallback info */}
+                    ))}
+                  </div>
+
                   {rules.length > 0 && (
                     <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest mt-4">
                       O sistema usará estas regras para classificar o "Melhor Custo-Benefício"
@@ -413,8 +481,8 @@ export default function FreightConfig() {
                           </div>
                         </div>
                         <div className="bg-black/40 p-2 rounded border border-white/10 flex items-center justify-between">
-                           <code className="text-[10px] text-primary truncate mr-2">/api/hooks/freight/{m.id}</code>
-                           <Button variant="ghost" size="sm" className="h-6 px-2 text-[8px] uppercase font-black" onClick={() => {navigator.clipboard.writeText(`https://nexus-api.lovable.app/api/hooks/freight/${m.id}`); toast.success('URL Copiada');}}>Copy</Button>
+                           <code className="text-[10px] text-primary truncate mr-2">/functions/v1/nexus-webhook-receiver</code>
+                           <Button variant="ghost" size="sm" className="h-6 px-2 text-[8px] uppercase font-black" onClick={() => {navigator.clipboard.writeText(`https://hgicfqjayrjurivtygqf.supabase.co/functions/v1/nexus-webhook-receiver`); toast.success('URL do Nexus Receiver Copiada');}}>Copy</Button>
                         </div>
                       </div>
                     ))}
