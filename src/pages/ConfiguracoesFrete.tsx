@@ -42,12 +42,40 @@ export default function FreightConfig() {
   const [selectedCarrierId, setSelectedCarrierId] = useState<string>('');
 
   // 1. Selection Rules
-  const { data: rules = [] } = useQuery({
+  const { data: rules = [], refetch: refetchRules } = useQuery({
     queryKey: ['freight-selection-rules'],
     queryFn: async () => {
       const { data, error } = await (supabase as any).from('freight_selection_rules').select('*');
       if (error) throw error;
       return data;
+    }
+  });
+
+  const [editingRule, setEditRule] = useState<any>(null);
+
+  const saveRule = useMutation({
+    mutationFn: async (rule: any) => {
+      const { data, error } = await (supabase as any).from('freight_selection_rules').upsert(rule);
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['freight-selection-rules'] });
+      refetchRules();
+      toast.success('Regra de seleção salva!');
+      setEditRule(null);
+    }
+  });
+
+  const deleteRule = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any).from('freight_selection_rules').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['freight-selection-rules'] });
+      refetchRules();
+      toast.success('Regra excluída');
     }
   });
 
@@ -238,34 +266,92 @@ export default function FreightConfig() {
 
           <TabsContent value="regras" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Configuração de Melhor Frete</CardTitle>
-                <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Configuração de Melhor Frete</CardTitle>
+                  <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
+                </div>
+                <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 50, time_weight: 50, max_sla_days: 10, is_active: true })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {['Normal', 'Urgente', 'Evento Crítico'].map(type => (
-                    <div key={type} className="p-4 border rounded-xl space-y-4 bg-muted/20">
+                  {rules.length === 0 && !editingRule && <p className="text-center py-8 text-muted-foreground italic">Nenhuma regra personalizada. Usando padrões do sistema.</p>}
+                  
+                  {editingRule && (
+                    <div className="p-6 border-2 border-primary rounded-xl space-y-4 bg-primary/5 mb-8">
+                       <h4 className="font-bold text-primary flex items-center justify-between">
+                         Editando Regra: {editingRule.event_type}
+                         <Button variant="ghost" size="sm" onClick={() => setEditRule(null)}>Cancelar</Button>
+                       </h4>
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                             <Label>Tipo de Evento</Label>
+                             <Input value={editingRule.event_type} onChange={e => setEditRule({...editingRule, event_type: e.target.value})} />
+                          </div>
+                          <div className="space-y-2">
+                             <Label>SLA Máximo (Dias)</Label>
+                             <Input type="number" value={editingRule.max_sla_days} onChange={e => setEditRule({...editingRule, max_sla_days: parseInt(e.target.value)})} />
+                          </div>
+                       </div>
+                       <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                             <Label>Peso Preço (%)</Label>
+                             <Input type="number" value={editingRule.price_weight} onChange={e => {
+                               const val = parseInt(e.target.value);
+                               setEditRule({...editingRule, price_weight: val, time_weight: 100 - val});
+                             }} />
+                          </div>
+                          <div className="space-y-2">
+                             <Label>Peso Prazo (%)</Label>
+                             <Input type="number" value={editingRule.time_weight} onChange={e => {
+                               const val = parseInt(e.target.value);
+                               setEditRule({...editingRule, time_weight: val, price_weight: 100 - val});
+                             }} />
+                          </div>
+                       </div>
+                       <Button className="w-full mt-4" onClick={() => saveRule.mutate(editingRule)} disabled={saveRule.isPending}>
+                         {saveRule.isPending ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                         Salvar Regra
+                       </Button>
+                    </div>
+                  )}
+
+                  {rules.map((rule: any) => (
+                    <div key={rule.id} className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-primary">{type}</h4>
-                        <Switch checked />
+                        <div className="flex items-center gap-3">
+                           <div className="p-2 bg-primary/10 rounded-lg"><Zap className="h-4 w-4 text-primary" /></div>
+                           <h4 className="font-bold text-foreground">{rule.event_type}</h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <Button variant="ghost" size="icon" onClick={() => setEditRule(rule)}><Settings className="h-4 w-4" /></Button>
+                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteRule.mutate(rule.id)}><Trash2 className="h-4 w-4" /></Button>
+                           <Switch checked={rule.is_active} onCheckedChange={(v) => saveRule.mutate({...rule, is_active: v})} />
+                        </div>
                       </div>
                       <div className="grid grid-cols-3 gap-6">
-                        <div className="space-y-2">
-                          <Label>Peso Preço (%)</Label>
-                          <Input type="number" defaultValue={type === 'Urgente' ? 30 : 70} />
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase text-muted-foreground">Preço</Label>
+                          <p className="font-black">{rule.price_weight}%</p>
                         </div>
-                        <div className="space-y-2">
-                          <Label>Peso Prazo (%)</Label>
-                          <Input type="number" defaultValue={type === 'Urgente' ? 70 : 30} />
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase text-muted-foreground">Prazo</Label>
+                          <p className="font-black">{rule.time_weight}%</p>
                         </div>
-                        <div className="space-y-2">
-                          <Label>Limite SLA (Dias)</Label>
-                          <Input type="number" defaultValue={type === 'Normal' ? 10 : 3} />
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase text-muted-foreground">Limite SLA</Label>
+                          <p className="font-black">{rule.max_sla_days}d</p>
                         </div>
                       </div>
                     </div>
                   ))}
+                  
+                  {/* Default Fallback info */}
+                  {rules.length > 0 && (
+                    <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest mt-4">
+                      O sistema usará estas regras para classificar o "Melhor Custo-Benefício"
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
