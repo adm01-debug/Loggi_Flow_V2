@@ -125,14 +125,15 @@ export const AVAILABLE_WIDGETS: WidgetDefinition[] = [
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
   { i: "xp-progress", x: 0, y: 0, w: 12, h: 2 },
-  { i: "kpi-pendentes", x: 0, y: 2, w: 3, h: 2 },
-  { i: "kpi-transito", x: 3, y: 2, w: 3, h: 2 },
-  { i: "kpi-finalizadas", x: 6, y: 2, w: 3, h: 2 },
-  { i: "kpi-problemas", x: 9, y: 2, w: 3, h: 2 },
-  { i: "intelligence-widget", x: 0, y: 4, w: 6, h: 4 },
-  { i: "alerts-panel", x: 6, y: 4, w: 6, h: 4 },
-  { i: "chart-performance", x: 0, y: 8, w: 12, h: 4 },
-  { i: "quick-actions", x: 0, y: 12, w: 12, h: 2 },
+  { i: "logistics-map", x: 0, y: 2, w: 12, h: 6 },
+  { i: "kpi-pendentes", x: 0, y: 8, w: 3, h: 2 },
+  { i: "kpi-transito", x: 3, y: 8, w: 3, h: 2 },
+  { i: "kpi-finalizadas", x: 6, y: 8, w: 3, h: 2 },
+  { i: "kpi-problemas", x: 9, y: 8, w: 3, h: 2 },
+  { i: "intelligence-widget", x: 0, y: 10, w: 6, h: 4 },
+  { i: "alerts-panel", x: 6, y: 10, w: 6, h: 4 },
+  { i: "chart-performance", x: 0, y: 14, w: 12, h: 4 },
+  { i: "quick-actions", x: 0, y: 18, w: 12, h: 2 },
 ];
 
 export function useDashboardWidgets() {
