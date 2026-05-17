@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { hapticFeedback } from "@/utils/haptics";
 
 export function PreferencePanel() {
-  const { preferences, updatePreference, updateAccessibility } = useUserPreferences();
+  const { preferences, updatePreference, updateAccessibility, updateGamification } = useUserPreferences();
 
   return (
     <div className="space-y-8 p-1">
@@ -151,6 +151,62 @@ export function PreferencePanel() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Gamification Section */}
+      <div className="space-y-4 pt-6 border-t border-white/5">
+        <div className="flex items-center gap-2 mb-2">
+          <Move className="w-4 h-4 text-primary" />
+          <h4 className="text-sm font-bold uppercase tracking-widest">Gamificação</h4>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-white/5">
+            <div className="space-y-0.5">
+              <p className="text-sm font-bold">Efeitos de Partículas</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Visual tático avançado</p>
+            </div>
+            <Switch 
+              checked={preferences.gamification.showParticles}
+              onCheckedChange={(v) => updateGamification('showParticles', v)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-white/5">
+            <div className="space-y-0.5">
+              <p className="text-sm font-bold">Efeitos Sonoros</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Feedback auditivo de conquistas</p>
+            </div>
+            <Switch 
+              checked={preferences.gamification.soundEffects}
+              onCheckedChange={(v) => updateGamification('soundEffects', v)}
+            />
+          </div>
+
+          <div className="space-y-3 p-3 rounded-xl bg-muted/30 border border-white/5">
+            <Label className="text-xs text-muted-foreground uppercase font-black">Cor de Destaque (Accent)</Label>
+            <div className="flex gap-3 flex-wrap">
+              {[
+                { name: 'Nexus Red', color: '#ea384c' },
+                { name: 'Cyber Blue', color: '#0ea5e9' },
+                { name: 'Emerald', color: '#10b981' },
+                { name: 'Amber', color: '#f59e0b' },
+                { name: 'Violet', color: '#8b5cf6' }
+              ].map((c) => (
+                <button
+                  key={c.color}
+                  onClick={() => updateGamification('accentColor', c.color)}
+                  className={cn(
+                    "w-8 h-8 rounded-full border-2 transition-all",
+                    preferences.gamification.accentColor === c.color ? "border-white scale-125 shadow-lg" : "border-transparent opacity-60 hover:opacity-100"
+                  )}
+                  style={{ backgroundColor: c.color }}
+                  title={c.name}
+                />
+              ))}
             </div>
           </div>
         </div>

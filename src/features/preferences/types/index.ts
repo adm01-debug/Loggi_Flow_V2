@@ -12,4 +12,9 @@ export interface UserPreferences {
   theme: ThemeMode;
   accessibility: AccessibilitySettings;
   language: 'pt-BR' | 'en-US';
+  gamification: {
+    showParticles: boolean;
+    soundEffects: boolean;
+    accentColor: string;
+  };
 }

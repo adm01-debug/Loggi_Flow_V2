@@ -12,6 +12,11 @@ const DEFAULT_PREFERENCES: UserPreferences = {
     dyslexicFont: false,
   },
   language: 'pt-BR',
+  gamification: {
+    showParticles: true,
+    soundEffects: true,
+    accentColor: '#ea384c',
+  },
 };
 
 export function useUserPreferences() {
@@ -34,6 +39,16 @@ export function useUserPreferences() {
     setPreferences(prev => ({
       ...prev,
       accessibility: { ...prev.accessibility, [key]: value }
+    }));
+  }, [setPreferences]);
+
+  const updateGamification = useCallback(<K extends keyof UserPreferences['gamification']>(
+    key: K,
+    value: UserPreferences['gamification'][K]
+  ) => {
+    setPreferences(prev => ({
+      ...prev,
+      gamification: { ...prev.gamification, [key]: value }
     }));
   }, [setPreferences]);
 
@@ -88,11 +103,17 @@ export function useUserPreferences() {
       root.classList.remove('dark');
     }
 
+    // Apply Gamification Accent
+    root.style.setProperty('--primary', preferences.gamification.accentColor);
+    // Convert hex to hsl for Tailwind variables if needed, but LogiFlow uses variables
+    // For now we assume the system reacts to the --primary variable
+
   }, [preferences]);
 
   return {
     preferences,
     updatePreference,
     updateAccessibility,
+    updateGamification,
   };
 }

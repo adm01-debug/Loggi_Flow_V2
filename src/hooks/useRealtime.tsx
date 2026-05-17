@@ -49,6 +49,11 @@ export function useRealtime<T = Record<string, unknown>>({
       // Force refresh for core dashboard components if relevant
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       
+      // Update Bitrix24 state if tracking changes
+      if (keys.some(k => ["entregas", "coletas"].includes(k))) {
+        queryClient.invalidateQueries({ queryKey: ["bitrix-logs"] });
+      }
+
       // Provide haptic feedback if supported for real-time updates
       if ('vibrate' in navigator) {
         navigator.vibrate(5);
