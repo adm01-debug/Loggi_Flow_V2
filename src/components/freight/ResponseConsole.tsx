@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, Wand2, CheckCircle2, AlertTriangle, RefreshCw, Send, Trash2 } from "lucide-react";
+import { MessageSquare, Wand2, CheckCircle2, AlertTriangle, RefreshCw, Send, Trash2, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
