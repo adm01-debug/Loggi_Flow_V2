@@ -113,7 +113,7 @@ const gamificationItems = [
 const adminItems = [
   { title: "Usuários", url: "/gerenciamento-usuarios", icon: Users },
   { title: "Segurança", url: "/seguranca", icon: Shield },
-  { title: "Webhooks", url: "/webhooks", icon: Webhook },
+  { title: "Webhooks Nexus", url: "/webhooks", icon: Webhook },
   { title: "Reset Senha", url: "/aprovacao-reset-senha", icon: KeyRound },
   { title: "Audit Trail", url: "/audit-trail", icon: History },
   { title: "Documentação API", url: "/api-docs", icon: Code },
