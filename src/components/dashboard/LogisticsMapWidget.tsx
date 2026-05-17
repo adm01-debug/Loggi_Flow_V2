@@ -145,6 +145,28 @@ export function LogisticsMapWidget() {
               <Button 
                 variant="outline" 
                 size="sm" 
+                onClick={() => {
+                  setIsOptimizing(true);
+                  toast.promise(new Promise(r => setTimeout(r, 2000)), {
+                    loading: 'Calculando rotas neurais...',
+                    success: 'Logística otimizada via IA!',
+                    error: 'Falha na otimização',
+                  });
+                  setTimeout(() => setIsOptimizing(false), 2000);
+                }}
+                disabled={isOptimizing}
+                className={cn(
+                  "h-9 rounded-full bg-primary/10 border-primary/20 text-primary gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
+                  isOptimizing && "animate-pulse"
+                )}
+              >
+                <Zap className={cn("w-3 h-3", isOptimizing && "fill-current")} />
+                {isOptimizing ? "Otimizando..." : "Auto-Otimizar"}
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
                 onClick={() => setShowLayers(!showLayers)}
                 className={cn(
                   "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
