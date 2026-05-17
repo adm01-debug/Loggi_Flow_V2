@@ -88,57 +88,73 @@ const SortableWidget = React.forwardRef<HTMLDivElement, SortableWidgetProps>(
         ref={mergedRef}
         style={style}
         layout
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: isSorting ? 0.5 : 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ 
+          opacity: isSorting ? 0.3 : 1, 
+          scale: isSorting ? 0.98 : 1,
+          zIndex: isSorting ? 50 : 1
+        }}
         exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.4, ease: "circOut" }}
         className={cn(
           sizeClasses[size],
-          isSorting && "z-50",
-          "transition-all duration-200"
+          "transition-all duration-300 relative group/sortable"
         )}
       >
-        <Card
+        <div
           className={cn(
-            "h-full overflow-hidden relative group",
-            isEditMode && "ring-2 ring-primary/20 ring-dashed hover:ring-primary/40",
-            isSorting && "shadow-2xl ring-primary/50"
+            "h-full rounded-[2.5rem] transition-all duration-500",
+            isEditMode && "ring-2 ring-primary/40 ring-dashed bg-primary/5 p-2",
+            isSorting && "shadow-2xl ring-primary scale-[1.02]"
           )}
         >
           <AnimatePresence>
             {isEditMode && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-10 bg-background/50 backdrop-blur-[1px] flex items-center justify-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-[2.5rem] overflow-hidden"
               >
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    {...attributes}
-                    {...listeners}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="cursor-grab active:cursor-grabbing p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
-                  >
-                    <GripVertical className="w-5 h-5 text-primary" />
-                  </motion.div>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-2 rounded-lg bg-destructive/10 hover:bg-destructive/20 text-destructive transition-colors"
-                    onClick={() => onRemove(id)}
-                  >
-                    <X className="w-5 h-5" />
-                  </motion.button>
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(234,56,76,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(234,56,76,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-30" />
+                
+                <div className="relative flex flex-col items-center gap-6 p-8">
+                   <div className="flex items-center gap-4">
+                      <motion.div
+                        {...attributes}
+                        {...listeners}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        whileTap={{ scale: 0.9, rotate: -5 }}
+                        className="cursor-grab active:cursor-grabbing w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center shadow-[0_0_30px_rgba(234,56,76,0.5)] border-2 border-white/20"
+                      >
+                        <GripVertical className="w-8 h-8" />
+                      </motion.div>
+                      
+                      <motion.button
+                        whileHover={{ scale: 1.1, rotate: -5 }}
+                        whileTap={{ scale: 0.9, rotate: 5 }}
+                        className="w-16 h-16 rounded-2xl bg-black border-2 border-destructive/50 text-destructive flex items-center justify-center hover:bg-destructive hover:text-white transition-all shadow-xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRemove(id);
+                        }}
+                      >
+                        <X className="w-8 h-8" />
+                      </motion.button>
+                   </div>
+                   <div className="flex flex-col items-center gap-1">
+                      <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Módulo Nexus</span>
+                      <span className="text-white/60 text-[8px] font-bold uppercase tracking-widest italic">{id.replace(/-/g, '_').toUpperCase()}</span>
+                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-          <div className={cn("h-full", isEditMode && "pointer-events-none")}>
+          <div className={cn("h-full transition-all duration-500", isEditMode && "blur-sm grayscale opacity-40 scale-[0.98]")}>
             {children}
           </div>
-        </Card>
+        </div>
       </motion.div>
     );
   }
