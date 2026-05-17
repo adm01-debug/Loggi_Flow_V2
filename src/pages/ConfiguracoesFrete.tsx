@@ -327,7 +327,10 @@ export default function FreightConfig() {
                   <CardTitle>Configuração de Melhor Frete</CardTitle>
                   <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
                 </div>
-                <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 10, is_active: true, is_default: false })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => window.location.href='/automacao-regras'}><Zap className="h-4 w-4 mr-2" />Regras de Automação</Button>
+                  <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 10, is_active: true, is_default: false })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
