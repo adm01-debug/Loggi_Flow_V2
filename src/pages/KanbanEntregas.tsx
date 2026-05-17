@@ -97,7 +97,7 @@ function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number
             
             <Dialog open={showDetails} onOpenChange={setShowDetails}>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); setShowDetails(true); }}>
                   <Eye className="w-3 h-3" />
                 </Button>
               </DialogTrigger>
