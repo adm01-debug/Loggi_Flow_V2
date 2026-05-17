@@ -23,7 +23,7 @@ serve(async (req) => {
       userId = user?.id;
     }
 
-    log('INFO', "Analizing smart carrier selection request", { estado_destino, peso_kg, urgencia, tipo_carga, userId });
+    log({ level: LogLevel.INFO, message: "Analizing smart carrier selection request", meta: { estado_destino, peso_kg, urgencia, tipo_carga }, userId });
 
     // Fetch selection rules
     const { data: selectionRules } = await supabase
