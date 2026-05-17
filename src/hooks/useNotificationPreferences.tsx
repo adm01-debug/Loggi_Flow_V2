@@ -7,6 +7,7 @@ import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 export interface NotificationPreferences {
   notifications_email: boolean;
   notifications_push: boolean;
+  notifications_whatsapp: boolean;
   notifications_sla: boolean;
   notifications_ocorrencias: boolean;
   notifications_coletas: boolean;
@@ -18,6 +19,7 @@ export interface NotificationPreferences {
 const defaultPreferences: NotificationPreferences = {
   notifications_email: true,
   notifications_push: true,
+  notifications_whatsapp: true,
   notifications_sla: true,
   notifications_ocorrencias: true,
   notifications_coletas: true,
@@ -91,6 +93,7 @@ export function useNotificationPreferences() {
     ? {
         notifications_email: dbPreferences.notifications_email,
         notifications_push: dbPreferences.notifications_push,
+        notifications_whatsapp: dbPreferences.notifications_whatsapp ?? true,
         notifications_sla: dbPreferences.notifications_sla,
         notifications_ocorrencias: dbPreferences.notifications_ocorrencias,
         notifications_coletas: dbPreferences.notifications_coletas,

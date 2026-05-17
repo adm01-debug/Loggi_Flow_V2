@@ -224,6 +224,45 @@ export const handler = async (req: Request) => {
       taxa_atraso_historica: delayRate,
     };
 
+    // 3. Trigger WhatsApp alerts for Critical risks
+    const criticals = predictions.filter((p: any) => p.risco === 'critico');
+    if (criticals.length > 0) {
+      log('INFO', 'Triggering WhatsApp alerts for critical delays', { count: criticals.length });
+      
+      // Fetch users with WhatsApp notifications enabled for SLA
+      const { data: usersToNotify } = await supabase
+        .from('user_notification_preferences')
+        .select('user_id, profiles(phone)')
+        .eq('notifications_whatsapp', true)
+        .eq('notifications_sla', true);
+
+      if (usersToNotify && usersToNotify.length > 0) {
+        for (const prediction of criticals) {
+          const originalItem = prediction.tipo === 'entrega' 
+            ? entregasForAnalysis.find(e => e.id === prediction.id)
+            : coletasForAnalysis.find(c => c.id === prediction.id);
+
+          for (const user of usersToNotify) {
+            const phone = (user.profiles as any)?.phone;
+            if (phone) {
+              await supabase.functions.invoke('whatsapp-notification', {
+                body: {
+                  action: 'send_delay_alert',
+                  phone,
+                  entrega_id: prediction.tipo === 'entrega' ? prediction.id : undefined,
+                  coleta_id: prediction.tipo === 'coleta' ? prediction.id : undefined,
+                  variables: {
+                    numero: prediction.numero,
+                    transportadora: originalItem?.transportadora || "N/A"
+                  }
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+
     return new Response(JSON.stringify({ 
       success: true, 
       predictions, 

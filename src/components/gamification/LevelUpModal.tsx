@@ -6,6 +6,7 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Sparkles, Trophy, Star, ArrowUpCircle, Coins, Zap } from "lucide-react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
@@ -72,6 +73,15 @@ export function LevelUpModal() {
                   transition={{ delay: 0.2 }}
                 >
                   <h2 className="text-3xl font-black tracking-tight mb-2">NÍVEL SUPERIOR!</h2>
+                  {userLevel?.rank && (
+                    <Badge 
+                      variant="outline" 
+                      className="mb-4 text-xs font-black px-4 py-1 uppercase tracking-widest border-2"
+                      style={{ borderColor: userLevel.rank.color, color: userLevel.rank.color, backgroundColor: `${userLevel.rank.color}10` }}
+                    >
+                      PATENTE: {userLevel.rank.name}
+                    </Badge>
+                  )}
                   <p className="text-muted-foreground mb-8">Parabéns! Sua eficiência operacional levou você a um novo patamar.</p>
                 </motion.div>
 

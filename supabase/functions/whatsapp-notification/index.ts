@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface WhatsAppRequest {
-  action: "send_status_update" | "send_delivery_notification" | "send_collection_alert" | "send_custom";
+  action: "send_status_update" | "send_delivery_notification" | "send_collection_alert" | "send_delay_alert" | "send_normalization_alert" | "send_custom";
   phone: string;
   entrega_id?: string;
   coleta_id?: string;
@@ -152,6 +152,24 @@ serve(async (req) => {
           `Data prevista: *${formatDate(coleta.data_prevista_coleta)}*\n` +
           `Endereço: ${coleta.endereco_coleta}\n` +
           `\nPor favor, tenha o material pronto para retirada.`;
+        break;
+      }
+
+      case "send_delay_alert": {
+        templateName = "delay_alert";
+        message = `⚠️ *LogiFlow - Alerta de Atraso*\n\n` +
+          `A remessa *${body.variables?.numero || "N/A"}* está com atraso detectado.\n` +
+          `Ação recomendada: Contatar transportadora *${body.variables?.transportadora || "N/A"}*.\n` +
+          `Link: https://logiflow-nexus.lovable.app/rastreamento/${body.entrega_id || ""}`;
+        break;
+      }
+
+      case "send_normalization_alert": {
+        templateName = "normalization_fail";
+        message = `❌ *LogiFlow - Falha de Normalização*\n\n` +
+          `Ocorreu uma falha ao processar a resposta da transportadora *${body.variables?.transportadora || "N/A"}*.\n` +
+          `Cotação ID: *${body.variables?.cotacao_id || "N/A"}*\n` +
+          `Necessário intervenção manual no painel Nexus.`;
         break;
       }
 

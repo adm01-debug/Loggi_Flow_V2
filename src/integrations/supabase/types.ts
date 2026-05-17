@@ -3898,6 +3898,7 @@ export type Database = {
           id: string
           last_activity_date: string | null
           level: number
+          rank_id: string | null
           streak_days: number
           total_xp: number
           updated_at: string
@@ -3910,6 +3911,7 @@ export type Database = {
           id?: string
           last_activity_date?: string | null
           level?: number
+          rank_id?: string | null
           streak_days?: number
           total_xp?: number
           updated_at?: string
@@ -3922,12 +3924,21 @@ export type Database = {
           id?: string
           last_activity_date?: string | null
           level?: number
+          rank_id?: string | null
           streak_days?: number
           total_xp?: number
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_levels_rank_id_fkey"
+            columns: ["rank_id"]
+            isOneToOne: false
+            referencedRelation: "user_ranks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_notification_preferences: {
         Row: {
@@ -3941,6 +3952,7 @@ export type Database = {
           notifications_ocorrencias: boolean
           notifications_push: boolean
           notifications_sla: boolean
+          notifications_whatsapp: boolean | null
           updated_at: string
           user_id: string
         }
@@ -3955,6 +3967,7 @@ export type Database = {
           notifications_ocorrencias?: boolean
           notifications_push?: boolean
           notifications_sla?: boolean
+          notifications_whatsapp?: boolean | null
           updated_at?: string
           user_id: string
         }
@@ -3969,6 +3982,7 @@ export type Database = {
           notifications_ocorrencias?: boolean
           notifications_push?: boolean
           notifications_sla?: boolean
+          notifications_whatsapp?: boolean | null
           updated_at?: string
           user_id?: string
         }
@@ -4004,6 +4018,36 @@ export type Database = {
           updated_at?: string
           user_id?: string
           xp_earned?: number | null
+        }
+        Relationships: []
+      }
+      user_ranks: {
+        Row: {
+          color: string
+          created_at: string | null
+          icon: string
+          id: string
+          min_level: number
+          name: string
+          reward_multiplier: number | null
+        }
+        Insert: {
+          color: string
+          created_at?: string | null
+          icon: string
+          id?: string
+          min_level: number
+          name: string
+          reward_multiplier?: number | null
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          icon?: string
+          id?: string
+          min_level?: number
+          name?: string
+          reward_multiplier?: number | null
         }
         Relationships: []
       }

@@ -97,6 +97,43 @@ serve(async (req) => {
     )
 
   } catch (error) {
+    // Alert on normalization failure
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+      const supabaseClient = createClient(supabaseUrl, supabaseKey);
+      
+      const { data: usersToNotify } = await supabaseClient
+        .from('user_notification_preferences')
+        .select('user_id, profiles(phone)')
+        .eq('notifications_whatsapp', true);
+
+      if (usersToNotify) {
+        for (const user of usersToNotify) {
+          const phone = (user.profiles as any)?.phone;
+          if (phone) {
+            await fetch(`${supabaseUrl}/functions/v1/whatsapp-notification`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                action: 'send_normalization_alert',
+                phone,
+                variables: {
+                  transportadora: "Nexus Engine",
+                  cotacao_id: "Internal"
+                }
+              })
+            });
+          }
+        }
+      }
+    } catch (alertError) {
+      console.error('Failed to send failure alert:', alertError);
+    }
+
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }

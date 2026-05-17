@@ -20,6 +20,11 @@ import { RankingPodium } from "./ranking/RankingPodium";
 
 interface RankUser {
   id: string; name: string; avatar?: string; xp: number; level: number; streak: number; coins: number; achievements: number; rank: number;
+  rank_display?: {
+    name: string;
+    icon: string;
+    color: string;
+  };
 }
 
 const filterConfig: FilterConfig<RankUser> = { search: { fields: ["name"] } };
@@ -33,7 +38,20 @@ export default function Ranking() {
   const { data: leaderboard = [], isLoading, refetch } = useQuery({
     queryKey: ["leaderboard", period],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_leaderboard", { limit_count: 100, period_filter: period });
+      const { data, error } = await supabase
+        .from("user_levels")
+        .select(`
+          user_id,
+          total_xp,
+          level,
+          streak_days,
+          coins,
+          profiles:user_id(full_name, avatar_url),
+          rank_display:user_ranks(*)
+        `)
+        .order("total_xp", { ascending: false })
+        .limit(100);
+      
       if (error) throw error;
       return data;
     },
@@ -44,10 +62,17 @@ export default function Ranking() {
   interface LeaderboardEntry { user_id: string; full_name?: string; avatar_url?: string; total_xp?: number; level?: number; streak_days?: number; coins?: number; achievements_count?: string | number; rank?: string | number; }
 
   const users: RankUser[] = useMemo(() =>
-    (leaderboard || []).map((u: LeaderboardEntry) => ({
-      id: u.user_id, name: u.full_name || "Usuário", avatar: u.avatar_url, xp: u.total_xp || 0,
-      level: u.level || 1, streak: u.streak_days || 0, coins: u.coins || 0,
-      achievements: Number(u.achievements_count) || 0, rank: Number(u.rank) || 0,
+    (leaderboard || []).map((u: any, index: number) => ({
+      id: u.user_id, 
+      name: u.profiles?.full_name || "Usuário", 
+      avatar: u.profiles?.avatar_url, 
+      xp: u.total_xp || 0,
+      level: u.level || 1, 
+      streak: u.streak_days || 0, 
+      coins: u.coins || 0,
+      achievements: 0, // Simplified for now
+      rank: index + 1,
+      rank_display: u.rank_display
     })), [leaderboard]);
 
   const currentUserRank = useMemo(() => user?.id ? users.find((u) => u.id === user.id) : null, [users, user]);
@@ -148,8 +173,16 @@ export default function Ranking() {
                   <div className="flex items-center gap-2"><p className="font-semibold truncate">{rankUser.name}</p>{isCurrentUser && <Badge variant="secondary" className="text-xs">Você</Badge>}</div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Badge variant="outline" className="text-xs">Nível {rankUser.level}</Badge>
+                    {rankUser.rank_display && (
+                      <Badge 
+                        variant="outline" 
+                        className="text-[10px] font-black uppercase tracking-tighter border-none"
+                        style={{ backgroundColor: `${rankUser.rank_display.color}15`, color: rankUser.rank_display.color }}
+                      >
+                        {rankUser.rank_display.name}
+                      </Badge>
+                    )}
                     {rankUser.streak > 0 && <span className="flex items-center gap-1"><Flame className="w-3 h-3 text-warning" />{rankUser.streak}</span>}
-                    <span className="flex items-center gap-1"><Trophy className="w-3 h-3 text-warning" />{rankUser.achievements}</span>
                   </div>
                 </div>
                 <div className="text-right">
