@@ -481,8 +481,8 @@ export default function FreightConfig() {
                           </div>
                         </div>
                         <div className="bg-black/40 p-2 rounded border border-white/10 flex items-center justify-between">
-                           <code className="text-[10px] text-primary truncate mr-2">/api/hooks/freight/{m.id}</code>
-                           <Button variant="ghost" size="sm" className="h-6 px-2 text-[8px] uppercase font-black" onClick={() => {navigator.clipboard.writeText(`https://nexus-api.lovable.app/api/hooks/freight/${m.id}`); toast.success('URL Copiada');}}>Copy</Button>
+                           <code className="text-[10px] text-primary truncate mr-2">/functions/v1/nexus-webhook-receiver</code>
+                           <Button variant="ghost" size="sm" className="h-6 px-2 text-[8px] uppercase font-black" onClick={() => {navigator.clipboard.writeText(`https://hgicfqjayrjurivtygqf.supabase.co/functions/v1/nexus-webhook-receiver`); toast.success('URL do Nexus Receiver Copiada');}}>Copy</Button>
                         </div>
                       </div>
                     ))}
