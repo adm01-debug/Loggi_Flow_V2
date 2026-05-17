@@ -39,16 +39,20 @@ export function LogisticsMapWidget() {
     return shipments.filter(s => {
       const matchesSearch = s.numero.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            s.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           s.transportadora.toLowerCase().includes(searchTerm.toLowerCase());
+                            s.transportadora.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === "all" || 
                            (statusFilter === "in_transit" && ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)) ||
                            (statusFilter === "delayed" && s.atrasado) ||
-                           (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status));
+                           (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status)) ||
+                           (statusFilter === "pending" && ["aguardando_producao", "pronto_despacho", "pendente"].includes(s.status)) ||
+                           (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status));
 
-      return s.coordinates && matchesSearch && matchesStatus;
+      const matchesType = typeFilter === "all" || s.tipo === typeFilter;
+
+      return s.coordinates && matchesSearch && matchesStatus && matchesType;
     });
-  }, [shipments, searchTerm, statusFilter]);
+  }, [shipments, searchTerm, statusFilter, typeFilter]);
 
   const activeShipments = shipments.filter(s => 
     ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)
