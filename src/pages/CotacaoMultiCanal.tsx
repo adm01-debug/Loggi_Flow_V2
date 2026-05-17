@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StepProgress } from '@/components/common/StepProgress';
 import { DataExporter } from '@/components/common/DataExporter';
-import { Zap, CheckCircle2, TrendingDown } from 'lucide-react';
+import { Zap, CheckCircle2, TrendingDown, Rocket, ShieldCheck, Timer, Award, Info, Map } from 'lucide-react';
 import { useTransportadoraRotas } from '@/hooks/useTransportadoraRotas';
 import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
 import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
@@ -21,6 +21,11 @@ import { CotacaoSearchForm } from './cotacao-multicanal/CotacaoSearchForm';
 import { CotacaoCarrierList } from './cotacao-multicanal/CotacaoCarrierList';
 import { CotacaoResultsTable } from './cotacao-multicanal/CotacaoResultsTable';
 import { NegotiationAssistant } from '@/components/freight';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { CotacaoManual, TransportadoraComCanal } from './cotacao-multicanal/types';
 
 export default function CotacaoMultiCanal() {
@@ -41,6 +46,8 @@ export default function CotacaoMultiCanal() {
   const [valorMercadoria, setValorMercadoria] = useState('');
   const [carriers, setCarriers] = useState<TransportadoraComCanal[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isBlasting, setIsBlasting] = useState(false);
+  const [blastProgress, setBlastProgress] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
   const [manualDialog, setManualDialog] = useState(false);
   const [selectedCarrier, setSelectedCarrier] = useState<TransportadoraComCanal | null>(null);
