@@ -230,6 +230,16 @@ export default function DashboardCotacoes() {
                   )}
                 </div>
               </div>
+              {selectedCotacao?.normalization_data && (
+                <div className="space-y-2">
+                  <Label className="text-[10px] uppercase font-black text-muted-foreground">Dados de Normalização (IA/Regex)</Label>
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <pre className="text-[10px] font-mono whitespace-pre-wrap">
+                      {JSON.stringify(selectedCotacao.normalization_data, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
               {selectedCotacao?.status === 'pendente' && (
                 <Button variant="outline" className="w-full gap-2 text-xs" onClick={() => toast.info('Retentativa disparada!')}>
                   <RotateCcw className="w-3.5 h-3.5" /> Forçar Retentativa
