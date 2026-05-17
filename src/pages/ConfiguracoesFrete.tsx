@@ -282,7 +282,7 @@ export default function FreightConfig() {
                     <CardDescription>Mapeamento de respostas automáticas de parceiros</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {mappings.filter(m => m.source_type === 'webhook').map(m => (
+                    {mappings.filter((m: any) => m.source_type === 'webhook').map((m: any) => (
                       <div key={m.id} className="p-3 border rounded-lg flex items-center justify-between">
                         <div>
                           <p className="text-sm font-bold">{m.transportadora?.nome_fantasia}</p>
