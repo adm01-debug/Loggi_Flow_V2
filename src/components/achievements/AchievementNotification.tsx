@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, Star, X, Coins } from "lucide-react";
 import { useAchievementNotifications } from "@/hooks/useAchievementNotifications";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 
 const rarityConfig = {
   common: {
@@ -40,9 +42,22 @@ function RarityBadge({ rarity, label }: { rarity: string, label: string }) {
 
 export function AchievementNotificationContainer() {
   const { notifications, dismissNotification } = useAchievementNotifications();
+  const { width, height } = useWindowSize();
+  
+  const hasLegendary = notifications.some(n => n.rarity === "legendary");
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+    <div className="fixed top-4 right-4 z-[100] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+      {hasLegendary && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={150}
+          gravity={0.1}
+          colors={['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899']}
+        />
+      )}
       <AnimatePresence mode="popLayout">
         {notifications.map((notification) => {
           const config = rarityConfig[notification.rarity];
