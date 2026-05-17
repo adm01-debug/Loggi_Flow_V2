@@ -62,9 +62,10 @@ function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={cn(
-            "p-3 rounded-xl border bg-card shadow-sm transition-all select-none group relative",
+            "p-3 rounded-xl border bg-card shadow-sm transition-all select-none group relative cursor-pointer",
             snapshot.isDragging ? "shadow-xl ring-2 ring-primary border-primary scale-105 z-50" : "hover:border-primary/30"
           )}
+          onClick={() => navigate(`/rastreamento/${entrega.id}`)}
         >
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-2">
