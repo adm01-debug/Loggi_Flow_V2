@@ -23,6 +23,9 @@ export function LogisticsMapWidget() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [selectedShipment, setSelectedShipment] = React.useState<UnifiedShipment | null>(null);
+  const [showLayers, setShowLayers] = React.useState(false);
+  const [typeFilter, setTypeFilter] = React.useState<"all" | "entrega" | "coleta">("all");
+  const [showMission, setShowMission] = React.useState(false);
   
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,
