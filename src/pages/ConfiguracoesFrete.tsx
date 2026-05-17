@@ -151,9 +151,9 @@ export default function FreightConfig() {
                               <Label>API Key / Token</Label>
                               <Input 
                                 type="password" 
-                                value={selectedCarrier.credentials?.api_key || ''} 
+                                value={(selectedCarrier.credentials as any)?.api_key || ''} 
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, api_key: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), api_key: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -162,9 +162,9 @@ export default function FreightConfig() {
                               <Label>Endpoint URL</Label>
                               <Input 
                                 placeholder="https://api..." 
-                                value={selectedCarrier.credentials?.endpoint || ''}
+                                value={(selectedCarrier.credentials as any)?.endpoint || ''}
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, endpoint: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), endpoint: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -174,9 +174,9 @@ export default function FreightConfig() {
                             <div className="space-y-2">
                               <Label>Usuário Portal</Label>
                               <Input 
-                                value={selectedCarrier.credentials?.username || ''}
+                                value={(selectedCarrier.credentials as any)?.username || ''}
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, username: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), username: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -185,9 +185,9 @@ export default function FreightConfig() {
                               <Label>Senha Portal</Label>
                               <Input 
                                 type="password" 
-                                value={selectedCarrier.credentials?.password || ''}
+                                value={(selectedCarrier.credentials as any)?.password || ''}
                                 onChange={e => {
-                                  const creds = { ...selectedCarrier.credentials, password: e.target.value };
+                                  const creds = { ...(selectedCarrier.credentials as any), password: e.target.value };
                                   updateCarrier.mutate({ id: selectedCarrier.id, credentials: creds });
                                 }}
                               />
@@ -216,9 +216,9 @@ export default function FreightConfig() {
                             <Textarea 
                               className="font-mono text-xs h-32"
                               placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
-                              value={selectedCarrier.non_api_config?.whatsapp_template || ''}
+                              value={(selectedCarrier.non_api_config as any)?.whatsapp_template || ''}
                               onChange={e => {
-                                const cfg = { ...selectedCarrier.non_api_config, whatsapp_template: e.target.value };
+                                const cfg = { ...(selectedCarrier.non_api_config as any), whatsapp_template: e.target.value };
                                 updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
                               }}
                             />
