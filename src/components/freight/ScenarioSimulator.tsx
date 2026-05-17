@@ -18,16 +18,16 @@ interface SimulationResult {
 
 interface ScenarioSimulatorProps {
   cargoData: any;
-  simulateScenario: (data: any, splitVolumes: number) => SimulationResult[];
+  simulateScenario: (data: any, splitVolumes: number) => Promise<SimulationResult[]>;
 }
 
 export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimulatorProps) {
   const [volumes, setVolumes] = useState(2);
   const [results, setResults] = useState<SimulationResult[]>([]);
 
-  const handleSimulate = () => {
+  const handleSimulate = async () => {
     if (!cargoData) return;
-    const scenarios = simulateScenario(cargoData, volumes);
+    const scenarios = await simulateScenario(cargoData, volumes);
     setResults(scenarios);
   };
 
