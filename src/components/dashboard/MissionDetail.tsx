@@ -50,7 +50,7 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
       if (!shipment.id) return;
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('integracoes_bitrix')
           .select('*')
           .eq('entidade_id', shipment.id)
