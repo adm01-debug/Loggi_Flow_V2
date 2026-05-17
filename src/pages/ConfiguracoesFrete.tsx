@@ -46,7 +46,7 @@ export default function FreightConfig() {
   const { data: rules = [], refetch: refetchRules } = useQuery({
     queryKey: ['freight-selection-rules'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from('freight_selection_rules').select('*');
+      const { data, error } = await supabase.from('freight_selection_rules').select('*');
       if (error) throw error;
       return data;
     }
@@ -56,7 +56,7 @@ export default function FreightConfig() {
 
   const saveRule = useMutation({
     mutationFn: async (rule: any) => {
-      const { data, error } = await (supabase as any).from('freight_selection_rules').upsert(rule);
+      const { data, error } = await supabase.from('freight_selection_rules').upsert(rule);
       if (error) throw error;
       return data;
     },
@@ -70,7 +70,7 @@ export default function FreightConfig() {
 
   const deleteRule = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any).from('freight_selection_rules').delete().eq('id', id);
+      const { error } = await supabase.from('freight_selection_rules').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -84,7 +84,7 @@ export default function FreightConfig() {
   const { data: mappings = [] } = useQuery({
     queryKey: ['freight-integration-mappings'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from('freight_integration_mappings').select('*, transportadora:transportadoras(nome_fantasia)');
+      const { data, error } = await supabase.from('freight_integration_mappings').select('*, transportadora:transportadoras(nome_fantasia)');
       if (error) throw error;
       return data;
     }
