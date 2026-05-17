@@ -75,6 +75,10 @@ export default function RotasTransportadoras() {
             <Truck className="h-4 w-4" />
             Gerenciar Rotas
           </TabsTrigger>
+          <TabsTrigger value="importar" className="gap-2">
+            <Upload className="h-4 w-4" />
+            Importação em Massa
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="buscar" className="space-y-6">
