@@ -51,9 +51,9 @@ export function LogisticsMapWidget() {
                            (statusFilter === "in_transit" && ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)) ||
                            (statusFilter === "delayed" && s.atrasado) ||
                            (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status)) ||
-                           (statusFilter === "pending" && ["aguardando_producao", "pronto_despacho", "pendente"].includes(s.status)) ||
+                           (statusFilter === "pending" && ["aguardando_producao", "pronto_despacho", "pendente", "cotacao_frete"].includes(s.status)) ||
                            (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status)) ||
-                           (statusFilter === "high_variance" && (s.atrasado || (s.valorFrete && s.valorFrete > 500)));
+                           (statusFilter === "high_variance" && (s.atrasado || (s.valorFrete && s.valorFrete > 500) || s.status === "ocorrencia"));
 
       const matchesType = typeFilter === "all" || s.tipo === typeFilter;
 

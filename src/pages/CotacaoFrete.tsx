@@ -136,8 +136,46 @@ export default function CotacaoFrete() {
             <CotacoesFreteManager />
           </TabsContent>
 
-          <TabsContent value="ia">
-            <SmartCarrierSelector />
+          <TabsContent value="ia" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <SmartCarrierSelector onSelect={(r) => flow.selectAndAdvance({
+                  transportadora_id: r.id,
+                  transportadora_nome: r.nome,
+                  valor_total: r.valorTotal,
+                  prazo_dias: r.prazoDias,
+                  score_performance: r.scorePerformance,
+                  preco_por_kg: r.precoPorKg,
+                  taxa_fixa: r.taxaFixa,
+                  regiao_destino: r.regiao,
+                  melhor_preco: false,
+                  melhor_prazo: false,
+                  melhor_custo_beneficio: true
+                })} />
+              </div>
+              <div className="space-y-6">
+                <div className="card-base p-6 border-primary/20 bg-primary/5">
+                  <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
+                    <TrendingDown className="w-5 h-5 text-primary" />
+                    Economia Garantida
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Nossa IA compara automaticamente tabelas e histórico do Bitrix24 para encontrar discrepâncias de até 50%.
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg">
+                      <span className="text-xs uppercase font-bold">Média Mensal</span>
+                      <span className="font-bold">R$ 12.450,00</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-success/20 rounded-lg border border-success/30">
+                      <span className="text-xs uppercase font-bold text-success">Economia IA</span>
+                      <span className="font-bold text-success">- R$ 3.120,00</span>
+                    </div>
+                  </div>
+                </div>
+                <TransportadoraRanking transportadoras={flow.transportadoras || []} />
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
