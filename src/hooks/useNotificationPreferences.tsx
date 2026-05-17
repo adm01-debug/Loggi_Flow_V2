@@ -93,6 +93,7 @@ export function useNotificationPreferences() {
     ? {
         notifications_email: dbPreferences.notifications_email,
         notifications_push: dbPreferences.notifications_push,
+        notifications_whatsapp: dbPreferences.notifications_whatsapp ?? true,
         notifications_sla: dbPreferences.notifications_sla,
         notifications_ocorrencias: dbPreferences.notifications_ocorrencias,
         notifications_coletas: dbPreferences.notifications_coletas,
