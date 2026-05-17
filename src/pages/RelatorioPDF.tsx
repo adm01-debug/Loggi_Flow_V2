@@ -246,8 +246,13 @@ export default function RelatorioPDF() {
     doc.setFontSize(14);
     doc.text('Relatório de Auditoria Diária (Compliance)', 14, 50);
 
+    const isAtrasado = (e: EntregaRow) => {
+      if (!e.previsao_entrega) return false;
+      return new Date(e.previsao_entrega) < new Date() && !['entregue', 'finalizado'].includes(e.status);
+    };
+
     const ocorrencias = data.filter(e => e.status === 'ocorrencia');
-    const atrasados = data.filter(e => e.atrasado);
+    const atrasados = data.filter(isAtrasado);
     const semTransportadora = data.filter(e => !e.transportadora_id);
 
     doc.setFontSize(10);
@@ -256,10 +261,10 @@ export default function RelatorioPDF() {
     autoTableFn(doc, {
       startY: 65,
       head: [['Nº Entrega', 'Status', 'Divergência/Ocorrência', 'Transportadora', 'Valor', 'Data Registro']],
-      body: data.filter(e => e.status === 'ocorrencia' || e.atrasado || !e.transportadora_id).slice(0, 100).map(e => [
+      body: data.filter(e => e.status === 'ocorrencia' || isAtrasado(e) || !e.transportadora_id).slice(0, 100).map(e => [
         e.numero_entrega,
         e.status.toUpperCase(),
-        e.atrasado ? 'ATRASO DETECTADO' : (e.status === 'ocorrencia' ? 'OCORRÊNCIA ATIVA' : 'SEM TRANSP. VÍNCULADA'),
+        isAtrasado(e) ? 'ATRASO DETECTADO' : (e.status === 'ocorrencia' ? 'OCORRÊNCIA ATIVA' : 'SEM TRANSP. VÍNCULADA'),
         e.transportadora?.nome_fantasia || 'N/A',
         e.valor_frete ? `R$ ${e.valor_frete.toFixed(2)}` : 'R$ 0,00',
         format(new Date(e.created_at), 'dd/MM/yy HH:mm'),
