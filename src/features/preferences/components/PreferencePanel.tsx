@@ -186,6 +186,28 @@ export function PreferencePanel() {
             />
           </div>
 
+          <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-white/5">
+            <div className="space-y-0.5">
+              <p className="text-sm font-bold">Velocidade de Animação</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Ritmo da interface Nexus</p>
+            </div>
+            <div className="w-32">
+              <Select 
+                value={(preferences.gamification as any).animationSpeed || 'normal'}
+                onValueChange={(v) => updateGamification('animationSpeed' as any, v)}
+              >
+                <SelectTrigger className="h-8 text-[10px] font-black uppercase bg-background/50 border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-white/10">
+                  <SelectItem value="fast" className="text-[10px] font-bold uppercase tracking-tighter">Instantâneo</SelectItem>
+                  <SelectItem value="normal" className="text-[10px] font-bold uppercase tracking-tighter">Equilibrado</SelectItem>
+                  <SelectItem value="smooth" className="text-[10px] font-bold uppercase tracking-tighter">Cinematográfico</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="space-y-3 p-3 rounded-xl bg-muted/30 border border-white/5">
             <Label className="text-xs text-muted-foreground uppercase font-black">Cor de Destaque (Accent)</Label>
             <div className="flex gap-3 flex-wrap">
@@ -194,14 +216,15 @@ export function PreferencePanel() {
                 { name: 'Cyber Blue', color: '#0ea5e9' },
                 { name: 'Emerald', color: '#10b981' },
                 { name: 'Amber', color: '#f59e0b' },
-                { name: 'Violet', color: '#8b5cf6' }
+                { name: 'Violet', color: '#8b5cf6' },
+                { name: 'Gold', color: '#FFD700' }
               ].map((c) => (
                 <button
                   key={c.color}
                   onClick={() => updateGamification('accentColor', c.color)}
                   className={cn(
-                    "w-8 h-8 rounded-full border-2 transition-all",
-                    preferences.gamification.accentColor === c.color ? "border-white scale-125 shadow-lg" : "border-transparent opacity-60 hover:opacity-100"
+                    "w-8 h-8 rounded-full border-2 transition-all duration-500",
+                    preferences.gamification.accentColor === c.color ? "border-white scale-125 shadow-[0_0_15px_rgba(255,255,255,0.4)]" : "border-transparent opacity-60 hover:opacity-100"
                   )}
                   style={{ backgroundColor: c.color }}
                   title={c.name}
