@@ -135,17 +135,53 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                 </div>
               </div>
 
-              {alerts.length > 0 && (
-                <div className="flex flex-col items-end gap-2">
+              <div className="flex flex-col items-end gap-4">
+                <div className="flex items-center gap-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-primary hover:border-primary/40 transition-all">
+                        <SlidersHorizontal className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 bg-black/95 border-primary/20 backdrop-blur-2xl p-6 rounded-3xl shadow-2xl">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-black text-white uppercase tracking-widest italic">Configuração Delta</h4>
+                          <Badge variant="outline" className="text-[10px] font-black border-primary/30 text-primary">{threshold}%</Badge>
+                        </div>
+                        <div className="space-y-6">
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] font-bold text-white/40 uppercase tracking-tighter">
+                              <span>Sensibilidade</span>
+                              <span>Limiar de Variação</span>
+                            </div>
+                            <Slider 
+                              value={[threshold]} 
+                              onValueChange={([v]) => setThreshold(v)} 
+                              max={50} 
+                              step={1} 
+                              className="py-4"
+                            />
+                          </div>
+                          <p className="text-[10px] text-white/40 leading-relaxed italic uppercase font-medium">
+                            Ajuste o limiar delta para filtrar alertas de variação operacional. Valores maiores reduzem o ruído, menores aumentam a precisão.
+                          </p>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
                   <div className="relative group/counter">
                     <div className="absolute inset-0 bg-destructive/30 blur-xl rounded-full animate-pulse" />
                     <div className="relative bg-destructive text-white px-8 py-3 rounded-2xl border-b-[4px] border-black/40 font-black text-base shadow-2xl transform hover:scale-105 transition-all cursor-default tracking-tighter">
-                      {alerts.length} INTERRUPÇÕES DETECTADAS
+                      {alerts.length} DELTA DETECTADOS
                     </div>
                   </div>
-                  <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mr-4">Protocolo de Emergência Ativo</span>
                 </div>
-              )}
+                <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mr-4 flex items-center gap-2">
+                  <BarChart className="w-2.5 h-2.5" /> Protocolo de Emergência Ativo
+                </span>
+              </div>
             </div>
 
             {/* Main Content Area */}
