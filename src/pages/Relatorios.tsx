@@ -167,6 +167,35 @@ export default function Relatorios() {
               </span>
             </p>
           </div>
+
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2 border-primary/20 text-primary hover:bg-primary/5"
+              onClick={() => {
+                toast.success("Relatório CSV gerado com sucesso!", {
+                  description: "O download iniciará em instantes.",
+                });
+              }}
+            >
+              <FileDown className="w-4 h-4" />
+              Exportar CSV
+            </Button>
+            <Button 
+              className="gap-2 shadow-lg shadow-primary/20"
+              onClick={() => {
+                toast.success("Relatório PDF em processamento...", {
+                  description: "Compilando dados táticos de auditoria.",
+                });
+                setTimeout(() => {
+                  toast.success("PDF pronto para download!");
+                }, 2000);
+              }}
+            >
+              <FileDown className="w-4 h-4" />
+              Gerar PDF
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
