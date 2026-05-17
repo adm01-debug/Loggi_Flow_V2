@@ -40,12 +40,20 @@ export function QuotationResults({ results, hasSearched, onSelect }: QuotationRe
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20"
+          className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-success/20 to-success/5 border-2 border-success/30 shadow-lg shadow-success/10"
         >
-          <TrendingDown className="w-5 h-5 text-success shrink-0" />
-          <p className="text-sm font-medium">
-            Economia potencial de <span className="text-success font-bold">R$ {savings.toFixed(2)}</span> comparando {results.length} opções
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-success/20">
+              <TrendingDown className="w-6 h-6 text-success animate-bounce" />
+            </div>
+            <div>
+              <p className="text-sm font-black uppercase tracking-widest text-success">Oportunidade de Lucro</p>
+              <p className="text-xl font-black italic tracking-tighter">
+                Economia de <span className="text-success text-2xl">R$ {savings.toFixed(2)}</span> identificada
+              </p>
+            </div>
+          </div>
+          <Badge className="bg-success text-white px-4 py-1 rounded-full animate-pulse">Custo Reduzido</Badge>
         </motion.div>
       )}
 

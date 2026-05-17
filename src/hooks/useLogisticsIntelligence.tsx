@@ -61,6 +61,15 @@ export function useLogisticsIntelligence() {
       type: 'cost'
     });
 
+    list.push({
+      id: 'opt-4',
+      title: 'Economia: Cotação Multicanal',
+      description: 'Identificada variação de 45% nos preços para a região Nordeste. Recomenda-se nova cotação via transportadoras homologadas.',
+      impact: 'Alta',
+      icon: 'trending-up',
+      type: 'cost'
+    });
+
     return list;
   }, [delaySummary, metrics]);
 

@@ -27,6 +27,7 @@ interface PerformanceChartProps {
   secondaryDataKey?: string;
   xAxisKey?: string;
   colors?: string[];
+  performanceMode?: boolean;
   className?: string;
 }
 
@@ -47,6 +48,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
     dataKey, 
     secondaryDataKey,
     xAxisKey = 'name', 
+    performanceMode,
     className, 
     colors = defaultColors
   }, ref) => {
@@ -289,6 +291,12 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
                   <Terminal className="w-4 h-4 text-primary" />
                   {subtitle}
                 </p>
+              )}
+              {performanceMode && (
+                <div className="flex items-center gap-2 mt-4 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 animate-pulse w-fit">
+                  <Activity className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-[9px] font-black text-primary uppercase tracking-[0.4em]">Live Flow Active</span>
+                </div>
               )}
             </div>
           </div>

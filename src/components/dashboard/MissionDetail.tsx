@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -15,13 +15,17 @@ import {
   ExternalLink,
   Zap,
   Navigation,
-  ArrowRight
+  ArrowRight,
+  Database,
+  Search,
+  RefreshCw
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { UnifiedShipment } from "@/hooks/useUnifiedTracking";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MissionDetailProps {
   shipment: UnifiedShipment;
@@ -38,6 +42,31 @@ function formatDate(date: string | null): string {
 }
 
 export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
+  const [bitrixData, setBitrixData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchBitrixInfo() {
+      if (!shipment.id) return;
+      setIsLoading(true);
+      try {
+        const { data, error } = await (supabase as any)
+          .from('integracoes_bitrix')
+          .select('*')
+          .eq('entidade_id', shipment.id)
+          .single();
+        
+        if (data) {
+          setBitrixData(data);
+        }
+      } catch (err) {
+        console.error('Error fetching bitrix data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBitrixInfo();
+  }, [shipment.id]);
   // Mock timeline events based on status
   const mockTimeline = [
     { 

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { StatsCard } from '@/components/common/StatsCard';
 import {
   FileText, Download, Loader2, BarChart3, Truck, Package,
-  DollarSign, CheckCircle2, Clock, AlertTriangle, Calendar
+  DollarSign, CheckCircle2, Clock, AlertTriangle, Calendar, FileCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -30,13 +30,14 @@ const loadPdfLibs = () => Promise.all([
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-type ReportType = 'entregas' | 'transportadoras' | 'custos' | 'sla';
+type ReportType = 'entregas' | 'transportadoras' | 'custos' | 'sla' | 'auditoria_diaria';
 
 const REPORT_TYPES = [
   { value: 'entregas', label: 'Relatório de Entregas', icon: Package },
   { value: 'transportadoras', label: 'Performance de Transportadoras', icon: Truck },
   { value: 'custos', label: 'Relatório de Custos', icon: DollarSign },
   { value: 'sla', label: 'Relatório SLA/OTIF', icon: CheckCircle2 },
+  { value: 'auditoria_diaria', label: 'Auditoria Diária', icon: FileCheck },
 ];
 
 const PERIODS = [
@@ -103,6 +104,8 @@ export default function RelatorioPDF() {
         generateCustosReport(doc, entregas, autoTableFn);
       } else if (reportType === 'sla' && entregas) {
         generateSLAReport(doc, entregas, autoTableFn);
+      } else if (reportType === 'auditoria_diaria' && entregas) {
+        generateAuditoriaReport(doc, entregas, autoTableFn);
       }
 
       // Footer
@@ -236,6 +239,38 @@ export default function RelatorioPDF() {
       ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [34, 197, 94] },
+    });
+  };
+
+  const generateAuditoriaReport = (doc: PdfDoc, data: EntregaRow[], autoTableFn: AutoTableFn) => {
+    doc.setFontSize(14);
+    doc.text('Relatório de Auditoria Diária (Compliance)', 14, 50);
+
+    const isAtrasado = (e: EntregaRow) => {
+      if (!e.previsao_entrega) return false;
+      return new Date(e.previsao_entrega) < new Date() && !['entregue', 'finalizado'].includes(e.status);
+    };
+
+    const ocorrencias = data.filter(e => e.status === 'ocorrencia');
+    const atrasados = data.filter(isAtrasado);
+    const semTransportadora = data.filter(e => !e.transportadora_id);
+
+    doc.setFontSize(10);
+    doc.text(`Alertas Críticos: ${ocorrencias.length} | Atrasos: ${atrasados.length} | Sem Transp: ${semTransportadora.length}`, 14, 58);
+
+    autoTableFn(doc, {
+      startY: 65,
+      head: [['Nº Entrega', 'Status', 'Divergência/Ocorrência', 'Transportadora', 'Valor', 'Data Registro']],
+      body: data.filter(e => e.status === 'ocorrencia' || isAtrasado(e) || !e.transportadora_id).slice(0, 100).map(e => [
+        e.numero_entrega,
+        e.status.toUpperCase(),
+        isAtrasado(e) ? 'ATRASO DETECTADO' : (e.status === 'ocorrencia' ? 'OCORRÊNCIA ATIVA' : 'SEM TRANSP. VÍNCULADA'),
+        e.transportadora?.nome_fantasia || 'N/A',
+        e.valor_frete ? `R$ ${e.valor_frete.toFixed(2)}` : 'R$ 0,00',
+        format(new Date(e.created_at), 'dd/MM/yy HH:mm'),
+      ]),
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [239, 68, 68] }, // Destructive/Red
     });
   };
 
