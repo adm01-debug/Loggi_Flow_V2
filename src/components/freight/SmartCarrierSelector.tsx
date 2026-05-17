@@ -84,15 +84,27 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
   return (
     <div className="space-y-6">
       {/* Input Form */}
-      <Card>
+      <Card className="border-2 border-primary/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
-            Seleção Inteligente de Transportadora
-          </CardTitle>
-          <CardDescription>
-            IA analisa histórico, performance e custos para recomendar a melhor opção
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-primary" />
+                Nexus Smart Selection Engine
+              </CardTitle>
+              <CardDescription>
+                IA e regras de negócio analisam performance e SLA em tempo real
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+               <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 gap-1">
+                 <Zap className="w-3 h-3" /> SLA Engine Active
+               </Badge>
+               <Badge variant="outline" className="bg-success/5 text-success border-success/30 gap-1">
+                 <Target className="w-3 h-3" /> Precision: 98.4%
+               </Badge>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-5">

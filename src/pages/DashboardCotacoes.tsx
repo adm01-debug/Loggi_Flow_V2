@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import { toast } from 'sonner';
 import { useCotacoesMulticanal, type CotacaoMulticanal } from '@/hooks/useCotacoesMulticanal';
 import { isPast, differenceInHours, differenceInMinutes } from 'date-fns';
 import { TrechoComparativo } from './dashboard-cotacoes/TrechoComparativo';
+import { ResponseConsole } from '@/components/freight/ResponseConsole';
 
 function TimeRemaining({ expiresAt }: { expiresAt: string }) {
   const [now, setNow] = useState(Date.now());
@@ -106,7 +108,32 @@ export default function DashboardCotacoes() {
             </h1>
             <p className="text-muted-foreground mt-1">Acompanhe todas as cotações em andamento e compare preços</p>
           </div>
-          <Button onClick={() => refetch()} variant="outline" size="sm" className="gap-2"><RefreshCw className="w-4 h-4" /> Atualizar</Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={async () => {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                const { error } = await supabase.from('cotacoes_multicanal').insert([{
+                  user_id: user.id,
+                  transportadora_id: '86815340-4107-4286-9a29-798858348981',
+                  canal: 'whatsapp',
+                  status: 'pendente',
+                  origem_estado: 'SP',
+                  destino_estado: 'RJ',
+                  observacoes: 'Olá! O valor para esse frete SP-RJ é de R$ 145,00 com entrega em 3 dias úteis.',
+                  expires_at: new Date(Date.now() + 86400000).toISOString()
+                } as any]);
+                if (!error) toast.success('Resposta simulada recebida via WhatsApp!');
+                refetch();
+              }} 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 bg-success/5 text-success border-success/20 hover:bg-success/10"
+            >
+              <MessageCircle className="w-4 h-4" /> Simular Resposta WA
+            </Button>
+            <Button onClick={() => refetch()} variant="outline" size="sm" className="gap-2"><RefreshCw className="w-4 h-4" /> Atualizar</Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -117,7 +144,14 @@ export default function DashboardCotacoes() {
           <StatsCard title="Economia" value={`R$ ${savings.toFixed(0)}`} icon={TrendingDown} color="success" />
         </div>
 
-        <TrechoComparativo trechoGroups={trechoGroups} onSelect={(id) => selectCotacao.mutate(id)} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <TrechoComparativo trechoGroups={trechoGroups} onSelect={(id) => selectCotacao.mutate(id)} />
+          </div>
+          <div className="lg:col-span-1">
+            <ResponseConsole />
+          </div>
+        </div>
 
         <Card>
           <CardHeader>
