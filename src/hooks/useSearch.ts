@@ -34,7 +34,7 @@ function useDebouncedValue<T>(value: T, delay: number): T {
 }
 
 export function useSearch<T extends Record<string, unknown>>(
-  tableName: TableNames,
+  tableName: string,
   options: SearchOptions
 ): UseSearchResult<T> {
   const { columns, minChars = 2, debounceMs = 300, limit = 50, orderBy } = options;
