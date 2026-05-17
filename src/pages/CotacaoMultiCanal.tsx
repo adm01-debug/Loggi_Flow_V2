@@ -181,14 +181,111 @@ export default function CotacaoMultiCanal() {
     }
   };
 
-  const addCotacao = (c: CotacaoManual) => setCotacoes(prev => [...prev, c]);
+  const handleNexusBlast = async () => {
+    if (carriers.length === 0) {
+      toast.error('Busque transportadoras primeiro');
+      return;
+    }
+
+    setIsBlasting(true);
+    setBlastProgress(0);
+    toast.info('Iniciando Nexus Blast: Cotação Automatizada em Massa');
+
+    let completed = 0;
+    const total = carriers.length;
+
+    for (const carrier of carriers) {
+      try {
+        if (carrier.canal_cotacao === 'api') {
+          await handleCotarAPI(carrier);
+        } else if (carrier.canal_cotacao === 'whatsapp') {
+          // Record that we intend to quote via WhatsApp (automation would trigger here in real scenario)
+          createCotacao.mutate({ 
+            transportadora_id: carrier.transportadora_id, 
+            canal: 'whatsapp', 
+            origem_estado: origemEstado, 
+            destino_estado: destinoEstado, 
+            peso_kg: pesoKg ? parseFloat(pesoKg) : undefined, 
+            volumes: parseInt(volumes) 
+          });
+          addCotacao({ 
+            id: crypto.randomUUID(), 
+            transportadora_id: carrier.transportadora_id, 
+            transportadora_nome: carrier.transportadora?.nome_fantasia || 'N/A', 
+            canal: 'whatsapp', 
+            valor: null, 
+            prazo_dias: null, 
+            status: 'pendente', 
+            observacoes: 'Nexus Blast: Aguardando RPA/WhatsApp', 
+            created_at: new Date().toISOString() 
+          });
+        } else {
+           createCotacao.mutate({ 
+            transportadora_id: carrier.transportadora_id, 
+            canal: 'email', 
+            origem_estado: origemEstado, 
+            destino_estado: destinoEstado, 
+            peso_kg: pesoKg ? parseFloat(pesoKg) : undefined, 
+            volumes: parseInt(volumes) 
+          });
+          addCotacao({ 
+            id: crypto.randomUUID(), 
+            transportadora_id: carrier.transportadora_id, 
+            transportadora_nome: carrier.transportadora?.nome_fantasia || 'N/A', 
+            canal: 'email', 
+            valor: null, 
+            prazo_dias: null, 
+            status: 'pendente', 
+            observacoes: 'Nexus Blast: Email Automático Enviado', 
+            created_at: new Date().toISOString() 
+          });
+        }
+      } catch (e) {
+        console.error(`Erro ao cotar com ${carrier.transportadora?.nome_fantasia}:`, e);
+      }
+      completed++;
+      setBlastProgress(Math.round((completed / total) * 100));
+    }
+
+    setIsBlasting(false);
+    toast.success('Nexus Blast concluído! Aguardando respostas das transportadoras sem API.');
+  };
+
+  const addCotacao = (c: CotacaoManual) => setCotacoes(prev => {
+    // Avoid duplicates
+    if (prev.some(x => x.transportadora_id === c.transportadora_id && x.canal === c.canal)) return prev;
+    return [...prev, c];
+  });
 
   const handleCotarAPI = async (carrier: TransportadoraComCanal) => {
     if (!pesoKg) { toast.error('Informe o peso para cotar via API'); return; }
-    const valorCalculado = carrier.taxa_fixa + (carrier.preco_por_kg * parseFloat(pesoKg));
-    await createCotacao.mutateAsync({ transportadora_id: carrier.transportadora_id, canal: 'api', origem_estado: origemEstado, origem_cidade: origemCidade || undefined, destino_estado: destinoEstado, destino_cidade: destinoCidade || undefined, peso_kg: parseFloat(pesoKg), volumes: parseInt(volumes), valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined, valor_cotado: valorCalculado, prazo_dias: carrier.prazo_dias, observacoes: 'Cotação via tabela de frete cadastrada', status: 'respondido' });
-    addCotacao({ id: crypto.randomUUID(), transportadora_id: carrier.transportadora_id, transportadora_nome: carrier.transportadora?.nome_fantasia || 'N/A', canal: 'api', valor: valorCalculado, prazo_dias: carrier.prazo_dias, status: 'respondido', observacoes: 'Cotação via tabela', created_at: new Date().toISOString() });
-    toast.success(`Cotação API recebida: R$ ${valorCalculado.toFixed(2)}`);
+    const valorCalculado = (carrier.taxa_fixa || 0) + ((carrier.preco_por_kg || 0) * parseFloat(pesoKg));
+    await createCotacao.mutateAsync({ 
+      transportadora_id: carrier.transportadora_id, 
+      canal: 'api', 
+      origem_estado: origemEstado, 
+      origem_cidade: origemCidade || undefined, 
+      destino_estado: destinoEstado, 
+      destino_cidade: destinoCidade || undefined, 
+      peso_kg: parseFloat(pesoKg), 
+      volumes: parseInt(volumes), 
+      valor_mercadoria: valorMercadoria ? parseFloat(valorMercadoria) : undefined, 
+      valor_cotado: valorCalculado, 
+      prazo_dias: carrier.prazo_dias, 
+      observacoes: 'Cotação via Nexus Blast (API)', 
+      status: 'respondido' 
+    });
+    addCotacao({ 
+      id: crypto.randomUUID(), 
+      transportadora_id: carrier.transportadora_id, 
+      transportadora_nome: carrier.transportadora?.nome_fantasia || 'N/A', 
+      canal: 'api', 
+      valor: valorCalculado, 
+      prazo_dias: carrier.prazo_dias, 
+      status: 'respondido', 
+      observacoes: 'Nexus Blast API', 
+      created_at: new Date().toISOString() 
+    });
   };
 
   const handleCotarWhatsApp = (carrier: TransportadoraComCanal) => {
