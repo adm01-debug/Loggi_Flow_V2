@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calculator, TrendingUp, MapPin, Truck, Clock, Bookmark, SplitSquareVertical, FileCheck } from 'lucide-react';
+import { Calculator, TrendingUp, MapPin, Truck, Clock, Bookmark, SplitSquareVertical, FileCheck, TrendingDown } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { DataExporter } from '@/components/common/DataExporter';
@@ -16,6 +16,7 @@ import {
   CargoTemplates,
   ScenarioSimulator,
 } from '@/components/freight';
+import { TransportadoraRanking } from '@/components/dashboard/TransportadoraRanking';
 import { CotacoesFreteManager } from '@/components/freight/CotacoesFreteManager';
 import type { QuotationFormData } from '@/components/freight/QuotationForm';
 
