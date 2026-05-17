@@ -106,8 +106,10 @@ export function useUserPreferences() {
 
     // Apply Gamification Accent
     root.style.setProperty('--primary', preferences.gamification.accentColor);
-    // Convert hex to hsl for Tailwind variables if needed, but LogiFlow uses variables
-    // For now we assume the system reacts to the --primary variable
+    
+    // Apply Animation Speed
+    const speedMap = { fast: '0.6', normal: '1.0', smooth: '1.6' };
+    root.style.setProperty('--animation-speed-scale', speedMap[preferences.gamification.animationSpeed] || '1.0');
 
   }, [preferences]);
 
