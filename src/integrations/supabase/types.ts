@@ -2072,6 +2072,53 @@ export type Database = {
         }
         Relationships: []
       }
+      freight_decisions: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          id: string
+          recommendations: Json
+          request_params: Json
+          rule_applied: Json | null
+          selected_carrier_id: string | null
+          selected_carrier_name: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          recommendations: Json
+          request_params: Json
+          rule_applied?: Json | null
+          selected_carrier_id?: string | null
+          selected_carrier_name?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          recommendations?: Json
+          request_params?: Json
+          rule_applied?: Json | null
+          selected_carrier_id?: string | null
+          selected_carrier_name?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freight_decisions_selected_carrier_id_fkey"
+            columns: ["selected_carrier_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       freight_integration_mappings: {
         Row: {
           created_at: string | null
