@@ -59,6 +59,7 @@ const RefreshTimer = memo(({ lastRefresh }: { lastRefresh: Date }) => {
 RefreshTimer.displayName = "RefreshTimer";
 
 export default function Index() {
+  const [performanceMode, setPerformanceMode] = useState(false);
   const { data: metrics, refetch: refetchMetrics } = useDashboardMetrics();
   const { data: alerts = [], isLoading: alertsLoading, refetch: refetchAlerts } = useRecentAlerts();
   const { data: transportadoras = [], isLoading: transportadorasLoading } = useTransportadoraPerformance();
