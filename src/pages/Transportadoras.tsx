@@ -269,6 +269,7 @@ export default function Transportadoras() {
             <div className="grid gap-2"><Label>Template de Mensagem</Label><Textarea placeholder="Olá, gostaria de cotar um frete..." value={form.non_api_config.template} onChange={(e) => setForm({ ...form, non_api_config: { ...form.non_api_config, template: e.target.value } })} /></div>
           </>
         )}
+      </TabsContent>
       <TabsContent value="mapeamento" className="space-y-4">
         <NormalizationMapping 
           carrierId={selected?.id || "new"} 
