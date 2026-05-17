@@ -363,21 +363,30 @@ export default function FreightConfig() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Code className="h-5 w-5 text-primary" />
-                      Incoming Webhooks
+                      Incoming Webhooks / API
                     </CardTitle>
-                    <CardDescription>Mapeamento de respostas automáticas de parceiros</CardDescription>
+                    <CardDescription>Consolidação automática de respostas via Webhooks ou API externa</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {mappings.filter((m: any) => m.source_type === 'webhook').map((m: any) => (
-                      <div key={m.id} className="p-3 border rounded-lg flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-bold">{m.transportadora?.nome_fantasia}</p>
-                          <p className="text-xs text-muted-foreground">Endpoint: /hooks/carrier/{m.id}</p>
+                      <div key={m.id} className="p-4 border-2 border-primary/20 rounded-xl bg-primary/5 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-black uppercase italic tracking-tighter">{m.transportadora?.nome_fantasia}</p>
+                            <p className="text-[10px] font-mono text-muted-foreground">NX-WH-{m.id.slice(0,8)}</p>
+                          </div>
+                          <div className="flex gap-1">
+                             <Button size="sm" variant="ghost" className="h-8 w-8 p-0"><Settings className="h-4 w-4" /></Button>
+                             <Switch checked={m.is_active} />
+                          </div>
                         </div>
-                        <Button size="sm" variant="ghost"><Settings className="h-4 w-4" /></Button>
+                        <div className="bg-black/40 p-2 rounded border border-white/10 flex items-center justify-between">
+                           <code className="text-[10px] text-primary truncate mr-2">/api/hooks/freight/{m.id}</code>
+                           <Button variant="ghost" size="sm" className="h-6 px-2 text-[8px] uppercase font-black" onClick={() => {navigator.clipboard.writeText(`https://nexus-api.lovable.app/api/hooks/freight/${m.id}`); toast.success('URL Copiada');}}>Copy</Button>
+                        </div>
                       </div>
                     ))}
-                    <Button className="w-full" variant="outline"><Plus className="h-4 w-4 mr-2" />Novo Webhook</Button>
+                    <Button className="w-full h-12 border-dashed border-2 rounded-xl" variant="outline"><Plus className="h-4 w-4 mr-2" />Novo Gateway de Resposta</Button>
                   </CardContent>
                 </Card>
 
@@ -385,26 +394,35 @@ export default function FreightConfig() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <FileJson className="h-5 w-5 text-primary" />
-                      Normalização de Campos
+                      Normalização de Campos (Parser)
                     </CardTitle>
-                    <CardDescription>Mapeie campos externos para o padrão Nexus</CardDescription>
+                    <CardDescription>Mapeie chaves do JSON externo para normalização Nexus</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-2 text-xs font-bold uppercase text-muted-foreground px-2">
-                      <span>Campo Externo</span>
-                      <span>Campo Nexus</span>
+                    <div className="grid grid-cols-2 gap-2 text-[9px] font-black uppercase text-muted-foreground px-2">
+                      <span>CHAVE EXTERNA (PARTNER)</span>
+                      <span>CHAVE INTERNA (NEXUS)</span>
                     </div>
                     <div className="space-y-2">
                       {[
-                        { ext: 'valor_total', int: 'valor_cotado' },
-                        { ext: 'delivery_days', int: 'prazo_dias' },
-                        { ext: 'obs', int: 'observacoes' }
+                        { ext: 'shipping_cost', int: 'valor_cotado', type: 'decimal' },
+                        { ext: 'estimated_days', int: 'prazo_dias', type: 'integer' },
+                        { ext: 'partner_notes', int: 'observacoes', type: 'text' },
+                        { ext: 'tracking_id', int: 'codigo_rastreio', type: 'text' }
                       ].map((m, i) => (
-                        <div key={i} className="grid grid-cols-2 gap-2">
-                          <Input defaultValue={m.ext} className="h-8 text-xs" />
-                          <Input defaultValue={m.int} className="h-8 text-xs bg-muted" readOnly />
+                        <div key={i} className="grid grid-cols-2 gap-2 p-1 border border-white/5 rounded bg-muted/10">
+                          <Input defaultValue={m.ext} className="h-8 text-xs font-mono bg-transparent border-none" />
+                          <div className="flex items-center gap-2 px-2 bg-muted/40 rounded">
+                             <span className="text-xs font-bold text-primary italic">→</span>
+                             <span className="text-[10px] font-black text-foreground uppercase">{m.int}</span>
+                          </div>
                         </div>
                       ))}
+                    </div>
+                    <div className="pt-4 border-t border-white/5 mt-4">
+                       <p className="text-[9px] text-muted-foreground leading-relaxed uppercase font-bold">
+                         A normalização garante que o sistema consolide preço e prazo automaticamente, independente do formato enviado pelo parceiro.
+                       </p>
                     </div>
                   </CardContent>
                 </Card>
