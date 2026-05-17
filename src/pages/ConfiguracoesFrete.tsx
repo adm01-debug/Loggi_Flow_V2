@@ -429,32 +429,6 @@ export default function FreightConfig() {
                     ))}
                   </div>
 
-                           <h4 className="font-bold text-foreground">{rule.event_type}</h4>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <Button variant="ghost" size="icon" onClick={() => setEditRule(rule)}><Settings className="h-4 w-4" /></Button>
-                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteRule.mutate(rule.id)}><Trash2 className="h-4 w-4" /></Button>
-                           <Switch checked={rule.is_active} onCheckedChange={(v) => saveRule.mutate({...rule, is_active: v})} />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-3 gap-6">
-                        <div className="space-y-1">
-                          <Label className="text-[10px] uppercase text-muted-foreground">Preço</Label>
-                          <p className="font-black">{rule.price_weight}%</p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-[10px] uppercase text-muted-foreground">Prazo</Label>
-                          <p className="font-black">{rule.time_weight}%</p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-[10px] uppercase text-muted-foreground">Limite SLA</Label>
-                          <p className="font-black">{rule.max_sla_days}d</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {/* Default Fallback info */}
                   {rules.length > 0 && (
                     <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest mt-4">
                       O sistema usará estas regras para classificar o "Melhor Custo-Benefício"
