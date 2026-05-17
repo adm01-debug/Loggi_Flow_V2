@@ -13,6 +13,13 @@ export interface UserLevel {
   coins: number;
   streak_days: number;
   last_activity_date: string | null;
+  rank_id?: string;
+  rank?: {
+    name: string;
+    icon: string;
+    color: string;
+    reward_multiplier: number;
+  };
 }
 
 export interface Achievement {
