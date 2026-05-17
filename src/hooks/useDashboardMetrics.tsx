@@ -188,15 +188,16 @@ export function useRecentAlerts() {
 
       // Add variation alerts for freights
       const { data: cotacoesVariacao } = await supabase
-        .from('cotacoes_frete')
-        .select('id, valor, transportadora_id, transportadora:transportadoras(nome_fantasia), created_at')
+        .from('cotacoes_multicanal')
+        .select('id, valor_cotado, transportadora_id, transportadora:transportadoras(nome_fantasia), created_at, status, workflow_logs')
         .order('created_at', { ascending: false })
         .limit(10);
 
       cotacoesVariacao?.forEach(c => {
         // High variation alert if price is very high/low compared to others
         // Simplified detection for UI demonstration
-        const delta = Math.abs((c.valor % 50) - 25) * 2; // Simulated delta
+        const val = c.valor_cotado || 0;
+        const delta = Math.abs((val % 50) - 25) * 2; // Simulated delta
         if (delta > 30) {
           alerts.push({
             id: `variacao-frete-${c.id}`,
@@ -206,6 +207,18 @@ export function useRecentAlerts() {
             createdAt: c.created_at,
             entityId: c.id,
             delta: delta
+          } as any);
+        }
+
+        // Monitoring failures
+        if (c.status === 'falhou') {
+           alerts.push({
+            id: `falha-frete-${c.id}`,
+            type: 'ocorrencia',
+            message: `Falha na integração de cotação com ${c.transportadora?.nome_fantasia}`,
+            severity: 'error',
+            createdAt: c.created_at,
+            entityId: c.id,
           } as any);
         }
       });
