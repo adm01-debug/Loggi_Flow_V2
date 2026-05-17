@@ -29,6 +29,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { PageHeader } from '@/components/common/PageHeader';
 
+interface CarrierConfig {
+  id: string;
+  nome_fantasia: string;
+  credentials: any;
+  regioes_atendidas: string[];
+  non_api_config: any;
+}
+
 export default function FreightConfig() {
   const queryClient = useQueryClient();
   const [selectedCarrierId, setSelectedCarrierId] = useState<string>('');
