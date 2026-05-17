@@ -28,6 +28,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { CotacaoManual, TransportadoraComCanal } from './cotacao-multicanal/types';
 
+import { NexusCoverageMap } from '@/components/freight/NexusCoverageMap';
+
 export default function CotacaoMultiCanal() {
   const { searchRoutes } = useTransportadoraRotas();
   const { createCotacao } = useCotacoesMulticanal();
@@ -50,6 +52,7 @@ export default function CotacaoMultiCanal() {
   const [blastProgress, setBlastProgress] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
   const [manualDialog, setManualDialog] = useState(false);
+  const [coverageDialog, setCoverageDialog] = useState(false);
   const [selectedCarrier, setSelectedCarrier] = useState<TransportadoraComCanal | null>(null);
   const [manualValor, setManualValor] = useState('');
   const [manualPrazo, setManualPrazo] = useState('');
