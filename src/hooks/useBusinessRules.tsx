@@ -82,6 +82,8 @@ export const TRIGGER_EVENTS: { value: TriggerEvent; label: string }[] = [
   { value: "on_create", label: "Quando criado" },
   { value: "on_update", label: "Quando atualizado" },
   { value: "on_status_change", label: "Quando status mudar" },
+  { value: "low_performance", label: "Baixa Performance (Nexus Score)" },
+  { value: "high_cost", label: "Custo Acima da Média" },
 ];
 
 export const CONDITION_OPERATORS: { value: ConditionOperator; label: string }[] = [
