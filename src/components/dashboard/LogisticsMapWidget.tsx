@@ -410,6 +410,35 @@ export function LogisticsMapWidget() {
           </div>
         </CardContent>
       </div>
+
+      <Sheet open={showMission} onOpenChange={setShowMission}>
+        <SheetContent className="sm:max-w-xl bg-black/95 border-primary/20 backdrop-blur-3xl overflow-y-auto">
+          <SheetHeader className="mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Box className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <SheetTitle className="text-2xl font-black italic tracking-tighter text-white uppercase">
+                  Dossiê de Missão
+                </SheetTitle>
+                <SheetDescription className="text-primary font-black uppercase text-[10px] tracking-widest">
+                  Nexus Intelligence Archive • Protocolo {selectedShipment?.numero}
+                </SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
+          
+          {selectedShipment && (
+            <MissionDetail 
+              shipment={selectedShipment} 
+              onOpenBitrix={() => {
+                window.open('https://bitrix24.com', '_blank');
+              }}
+            />
+          )}
+        </SheetContent>
+      </Sheet>
     </Card>
   );
 }
