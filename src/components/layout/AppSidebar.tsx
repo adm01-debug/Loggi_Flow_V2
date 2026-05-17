@@ -84,6 +84,7 @@ const menuSections: MenuSection[] = [
        { title: "Melhor Envio", url: "/melhor-envio", icon: Package },
         { title: "Bitrix24 CRM", url: "/bitrix24", icon: Building2 },
         { title: "Config Nexus", url: "/config-frete", icon: Cog },
+        { title: "Auditoria Nexus", url: "/audit-trail", icon: History },
       ],
     },
   {
