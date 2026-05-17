@@ -12,11 +12,18 @@ serve(async (req) => {
   try {
     const { estado_destino, peso_kg, urgencia, tipo_carga } = await req.json();
     
-    log('INFO', "Analizing smart carrier selection request", { estado_destino, peso_kg, urgencia, tipo_carga });
-
+    const authHeader = req.headers.get('Authorization');
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let userId = null;
+    if (authHeader) {
+      const { data: { user } } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+      userId = user?.id;
+    }
+
+    log('INFO', "Analizing smart carrier selection request", { estado_destino, peso_kg, urgencia, tipo_carga, userId });
 
     // Fetch selection rules
     const { data: selectionRules } = await supabase
@@ -24,9 +31,9 @@ serve(async (req) => {
       .select("*")
       .eq("is_active", true);
 
-    const activeRule = selectionRules?.find(r => r.event_type === (urgencia === 'alta' ? 'Urgente' : 'Normal')) 
+    const activeRule = selectionRules?.find(r => r.event_type?.toLowerCase() === urgencia?.toLowerCase()) 
                     || selectionRules?.find(r => r.is_default) 
-                    || { price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 15 };
+                    || { price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 15, event_type: 'Default' };
 
     // Fetch freight tables with carrier info
     const { data: tabelasFrete, error: tabelasError } = await supabase
@@ -59,11 +66,23 @@ serve(async (req) => {
     );
 
     if (matchingTables.length === 0) {
-      log('WARN', "No carriers available for this destination and weight", { estado_destino, peso_kg });
+      const errorMsg = "Nenhuma transportadora disponível para este destino e peso";
+      
+      // Log failed decision
+      await supabase.from("freight_decisions").insert({
+        user_id: userId,
+        request_params: { estado_destino, peso_kg, urgencia, tipo_carga },
+        recommendations: [],
+        rule_applied: activeRule,
+        status: 'no_options',
+        error_message: errorMsg
+      });
+
+      log('WARN', errorMsg, { estado_destino, peso_kg });
       return new Response(
         JSON.stringify({
           success: false,
-          message: "Nenhuma transportadora disponível para este destino e peso",
+          message: errorMsg,
           recommendations: [],
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -79,54 +98,34 @@ serve(async (req) => {
       .order("created_at", { ascending: false })
       .limit(500);
 
-    // Calculate historical metrics per carrier
-    const carrierMetrics: Record<string, { onTime: number; total: number; avgCost: number; totalCost: number }> = {};
-    
+    const carrierMetrics: Record<string, { onTime: number; total: number; totalCost: number }> = {};
     (historicoEntregas || []).forEach((entrega: any) => {
       if (!carrierMetrics[entrega.transportadora_id]) {
-        carrierMetrics[entrega.transportadora_id] = { onTime: 0, total: 0, avgCost: 0, totalCost: 0 };
+        carrierMetrics[entrega.transportadora_id] = { onTime: 0, total: 0, totalCost: 0 };
       }
       carrierMetrics[entrega.transportadora_id].total++;
-      
-      if (entrega.data_entrega_efetiva && entrega.previsao_entrega) {
-        const efetiva = new Date(entrega.data_entrega_efetiva);
-        const prevista = new Date(entrega.previsao_entrega);
-        if (efetiva <= prevista) {
-          carrierMetrics[entrega.transportadora_id].onTime++;
-        }
+      if (entrega.data_entrega_efetiva && entrega.previsao_entrega && new Date(entrega.data_entrega_efetiva) <= new Date(entrega.previsao_entrega)) {
+        carrierMetrics[entrega.transportadora_id].onTime++;
       }
-      
-      if (entrega.valor_frete) {
-        carrierMetrics[entrega.transportadora_id].totalCost += entrega.valor_frete;
-      }
+      if (entrega.valor_frete) carrierMetrics[entrega.transportadora_id].totalCost += entrega.valor_frete;
     });
 
-    // Calculate recommendations
     const recommendations = matchingTables.map((table: any) => {
       const carrierId = table.transportadora_id;
-      const metrics = carrierMetrics[carrierId] || { onTime: 0, total: 0, avgCost: 0 };
-      
+      const metrics = carrierMetrics[carrierId] || { onTime: 0, total: 0 };
       const onTimeRate = metrics.total > 0 ? (metrics.onTime / metrics.total) * 100 : (table.transportadora.score_performance || 80);
       
       const priceWeight = parseFloat(activeRule.price_weight);
       const timeWeight = parseFloat(activeRule.time_weight);
       const performanceWeight = parseFloat(activeRule.performance_weight);
 
-      // Scoring 0-100
-      // 1. Price Score: Lower is better. Inverse normalization.
       const maxPriceFound = Math.max(...matchingTables.map((t: any) => t.valor_total));
       const minPriceFound = Math.min(...matchingTables.map((t: any) => t.valor_total));
       const priceScore = maxPriceFound === minPriceFound ? 100 : ((maxPriceFound - table.valor_total) / (maxPriceFound - minPriceFound)) * 100;
-      
-      // 2. Time Score: Lower days is better.
       const timeScore = Math.max(0, 100 - (table.transportadora.prazo_medio_dias * 5)); 
-      
-      // 3. Performance Score: Historical on-time rate
       const perfScore = onTimeRate;
 
       const score = (priceScore * priceWeight) + (timeScore * timeWeight) + (perfScore * performanceWeight);
-
-      // Check SLA
       const meetsSLA = activeRule.max_sla_days ? (table.transportadora.prazo_medio_dias <= activeRule.max_sla_days) : true;
 
       return {
@@ -137,17 +136,28 @@ serve(async (req) => {
         estimated_cost: table.valor_total,
         estimated_days: table.transportadora.prazo_medio_dias,
         reliability: Math.round(onTimeRate),
-        reason: score > 80 ? `Recomendação baseada em ${activeRule.event_type}: Equilíbrio ideal entre custo e prazo.` : `Opção disponível para o trecho.`
+        details: { priceScore, timeScore, perfScore },
+        reason: score > 80 ? `Recomendação TOP para evento ${activeRule.event_type || 'Geral'}.` : `Opção secundária.`
       };
     }).filter((r: any) => r.meets_sla).sort((a: any, b: any) => b.score - a.score);
+
+    // Log the decision
+    if (recommendations.length > 0) {
+      await supabase.from("freight_decisions").insert({
+        user_id: userId,
+        request_params: { estado_destino, peso_kg, urgencia, tipo_carga },
+        selected_carrier_id: recommendations[0].carrier_id,
+        selected_carrier_name: recommendations[0].carrier_name,
+        recommendations: recommendations,
+        rule_applied: activeRule,
+        status: 'success'
+      });
+    }
 
     log('INFO', "Smart carrier selection completed", { carrier_count: recommendations.length });
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        recommendations,
-      }),
+      JSON.stringify({ success: true, recommendations }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
