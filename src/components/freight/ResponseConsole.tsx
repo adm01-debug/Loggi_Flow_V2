@@ -26,9 +26,13 @@ export function ResponseConsole() {
     fetchIncoming();
     const channel = supabase
       .channel("raw_responses")
-      .on("postgres_changes", { event: "INSERT", table: "cotacoes_multicanal" }, () => {
-        fetchIncoming();
-      })
+      .on(
+        "postgres_changes" as any,
+        { event: "*", schema: "public", table: "cotacoes_multicanal" },
+        () => {
+          fetchIncoming();
+        }
+      )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, []);
