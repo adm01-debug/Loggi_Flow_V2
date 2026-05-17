@@ -108,6 +108,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
     status = 'neutral', 
     sparklineData, 
     previousValue, 
+    performanceMode,
     className
   }, ref) => {
     const numericValue = typeof value === 'number' ? value : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
