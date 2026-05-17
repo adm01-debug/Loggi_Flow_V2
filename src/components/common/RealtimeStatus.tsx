@@ -52,7 +52,7 @@ export function RealtimeStatus() {
           color: "text-green-500",
           text: "Enterprise On",
           bg: "bg-green-500/10",
-          desc: `Sincronização 10/10 ativa ${latency ? `(${latency}ms)` : ''}`
+          desc: `Sincronização 10/10 ativa ${latency ? '(' + latency + 'ms)' : ''}`
         };
       case 'JOINING':
         return {
