@@ -327,6 +327,39 @@ export function LogisticsMapWidget() {
               <FullscreenControl position="top-right" />
               <ScaleControl position="bottom-right" />
 
+              {/* Variation Alert Layer */}
+              <Source
+                id="variation-alerts"
+                type="geojson"
+                data={{
+                  type: "FeatureCollection",
+                  features: shipments
+                    .filter(s => (s.atrasado || s.diasAtraso > 2) && s.coordinates)
+                    .map(s => ({
+                      type: "Feature",
+                      properties: { 
+                        severity: s.diasAtraso > 5 ? 'critical' : 'warning',
+                        dias: s.diasAtraso
+                      },
+                      geometry: {
+                        type: "Point",
+                        coordinates: [s.coordinates!.lng, s.coordinates!.lat]
+                      }
+                    }))
+                }}
+              >
+                <Layer
+                  id="variation-glow"
+                  type="circle"
+                  paint={{
+                    'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 8, 12, 25],
+                    'circle-color': ['match', ['get', 'severity'], 'critical', '#ef4444', '#f59e0b'],
+                    'circle-opacity': 0.4,
+                    'circle-blur': 1,
+                  }}
+                />
+              </Source>
+
               {/* Heatmap Layer */}
               {showHeatmap && (
                 <Source
