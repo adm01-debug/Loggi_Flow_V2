@@ -2113,7 +2113,9 @@ export type Database = {
           event_type: string
           id: string
           is_active: boolean | null
+          is_default: boolean | null
           max_sla_days: number | null
+          performance_weight: number | null
           price_weight: number | null
           time_weight: number | null
           updated_at: string | null
@@ -2123,7 +2125,9 @@ export type Database = {
           event_type: string
           id?: string
           is_active?: boolean | null
+          is_default?: boolean | null
           max_sla_days?: number | null
+          performance_weight?: number | null
           price_weight?: number | null
           time_weight?: number | null
           updated_at?: string | null
@@ -2133,7 +2137,9 @@ export type Database = {
           event_type?: string
           id?: string
           is_active?: boolean | null
+          is_default?: boolean | null
           max_sla_days?: number | null
+          performance_weight?: number | null
           price_weight?: number | null
           time_weight?: number | null
           updated_at?: string | null

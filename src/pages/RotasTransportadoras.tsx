@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Route, Plus, Truck } from 'lucide-react';
+import { Route, Plus, Truck, Upload } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RotaSearchFilter } from '@/components/transportadoras/RotaSearchFilter';
 import { RotaResultsList } from '@/components/transportadoras/RotaResultsList';
 import { RotaFormDialog } from '@/components/transportadoras/RotaFormDialog';
+import { BulkRouteImport } from '@/components/transportadoras/BulkRouteImport';
 import { useTransportadoraRotas, RotaFilter, TransportadoraRota } from '@/hooks/useTransportadoraRotas';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -74,6 +75,10 @@ export default function RotasTransportadoras() {
             <Truck className="h-4 w-4" />
             Gerenciar Rotas
           </TabsTrigger>
+          <TabsTrigger value="importar" className="gap-2">
+            <Upload className="h-4 w-4" />
+            Importação em Massa
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="buscar" className="space-y-6">
@@ -106,6 +111,9 @@ export default function RotasTransportadoras() {
             rotas={rotas}
             isLoading={isLoading}
           />
+        </TabsContent>
+        <TabsContent value="importar" className="space-y-6">
+          <BulkRouteImport />
         </TabsContent>
       </Tabs>
     </MainLayout>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Truck, MoreVertical, Phone, Mail, MapPin, Star, CheckCircle2, XCircle, Edit, Trash2, Globe, Building2, Clock, TrendingUp, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, Key, Settings, Map } from "lucide-react";
+import { Plus, Truck, MoreVertical, Phone, Mail, MapPin, Star, CheckCircle2, XCircle, Edit, Trash2, Globe, Building2, Clock, TrendingUp, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, Key, Settings, Map, Wand2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
@@ -20,8 +20,7 @@ import { MaskedInput } from "@/components/ui/MaskedInput";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatsCard } from "@/components/common/StatsCard";
 import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/common/PageTransition";
-
-
+import { NormalizationMapping } from "@/components/transportadoras/NormalizationMapping";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -72,7 +71,14 @@ const emptyForm = {
   observacoes: "", 
   homologada: true,
   credentials: { api_key: "", api_user: "", api_password: "", endpoint: "" },
-  non_api_config: { type: "whatsapp" as "whatsapp" | "email" | "portal", template: "", recipient: "", portal_url: "", portal_user: "" },
+  non_api_config: { 
+    type: "whatsapp" as "whatsapp" | "email" | "portal", 
+    template: "", 
+    recipient: "", 
+    portal_url: "", 
+    portal_user: "",
+    normalization: { price_pattern: "", term_pattern: "", fallback_strategy: "ai_extraction", ai_prompt: "" }
+  },
   coverage_details: { states: [] as string[], cities: [] as string[] }
 };
 
@@ -211,10 +217,11 @@ export default function Transportadoras() {
 
   const FormFields = () => (
     <Tabs defaultValue="geral" className="w-full">
-      <TabsList className="grid w-full grid-cols-4 mb-4">
+      <TabsList className="grid w-full grid-cols-5 mb-4">
         <TabsTrigger value="geral">Geral</TabsTrigger>
         <TabsTrigger value="api">API</TabsTrigger>
         <TabsTrigger value="automacao">Automação</TabsTrigger>
+        <TabsTrigger value="mapeamento">Integração</TabsTrigger>
         <TabsTrigger value="cobertura">Cobertura</TabsTrigger>
       </TabsList>
       
@@ -269,6 +276,16 @@ export default function Transportadoras() {
             <div className="grid gap-2"><Label>Template de Mensagem</Label><Textarea placeholder="Olá, gostaria de cotar um frete..." value={form.non_api_config.template} onChange={(e) => setForm({ ...form, non_api_config: { ...form.non_api_config, template: e.target.value } })} /></div>
           </>
         )}
+      </TabsContent>
+      <TabsContent value="mapeamento" className="space-y-4">
+        <NormalizationMapping 
+          carrierId={selected?.id || "new"} 
+          initialConfig={form.non_api_config?.normalization}
+          onSave={(normConfig) => setForm({ 
+            ...form, 
+            non_api_config: { ...form.non_api_config, normalization: normConfig } 
+          })}
+        />
       </TabsContent>
 
       <TabsContent value="cobertura" className="space-y-4">
