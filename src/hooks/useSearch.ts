@@ -48,12 +48,18 @@ export function useSearch<T extends Record<string, unknown>>(
       if (!shouldSearch) return [];
       const orConditions = columns.map((col) => `${col}.ilike.%${debouncedTerm}%`).join(',');
       
-      const baseQuery = supabase.from(tableName).select('*').or(orConditions).limit(limit);
-      const query = orderBy 
-        ? baseQuery.order(orderBy.column, { ascending: orderBy.ascending ?? true })
-        : baseQuery;
+      let queryBuilder = supabase.from(tableName as any).select('*');
       
-      const { data, error } = await query;
+      if (orConditions) {
+        queryBuilder = queryBuilder.or(orConditions);
+      }
+      
+      if (orderBy) {
+        queryBuilder = queryBuilder.order(orderBy.column, { ascending: orderBy.ascending ?? true });
+      }
+      
+      const { data, error } = await queryBuilder.limit(limit);
+      
       if (error) throw error;
       return (data || []) as unknown as T[];
     },
