@@ -111,16 +111,18 @@ export default function DashboardCotacoes() {
           <div className="flex gap-2">
             <Button 
               onClick={async () => {
-                const { error } = await supabase.from('cotacoes_multicanal').insert({
-                  user_id: (await supabase.auth.getUser()).data.user?.id,
-                  transportadora_id: '86815340-4107-4286-9a29-798858348981', // Exemplo
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                const { error } = await supabase.from('cotacoes_multicanal').insert([{
+                  user_id: user.id,
+                  transportadora_id: '86815340-4107-4286-9a29-798858348981',
                   canal: 'whatsapp',
                   status: 'pendente',
                   origem_estado: 'SP',
                   destino_estado: 'RJ',
                   observacoes: 'Olá! O valor para esse frete SP-RJ é de R$ 145,00 com entrega em 3 dias úteis.',
                   expires_at: new Date(Date.now() + 86400000).toISOString()
-                });
+                } as any]);
                 if (!error) toast.success('Resposta simulada recebida via WhatsApp!');
                 refetch();
               }} 
