@@ -278,18 +278,34 @@ export default function FreightConfig() {
                           </div>
                         </TabsContent>
 
-                        <TabsContent value="non-api" className="space-y-4">
-                          <div className="space-y-2">
-                            <Label>Template de Mensagem (WhatsApp)</Label>
-                            <Textarea 
-                              className="font-mono text-xs h-32"
-                              placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
-                              value={(selectedCarrier.non_api_config as any)?.whatsapp_template || ''}
-                              onChange={e => {
-                                const cfg = { ...(selectedCarrier.non_api_config as any), whatsapp_template: e.target.value };
-                                updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
-                              }}
-                            />
+                        <TabsContent value="non-api" className="space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label>Template de Mensagem (WhatsApp/Email)</Label>
+                                <Textarea 
+                                  className="font-mono text-xs h-32"
+                                  placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
+                                  value={(selectedCarrier.non_api_config as any)?.whatsapp_template || ''}
+                                  onChange={e => {
+                                    const cfg = { ...(selectedCarrier.non_api_config as any), whatsapp_template: e.target.value };
+                                    updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
+                                  }}
+                                />
+                                <p className="text-[10px] text-muted-foreground">O Nexus disparará esta mensagem automaticamente quando necessário.</p>
+                              </div>
+                            </div>
+                            
+                            <div className="border-l pl-8">
+                               <NormalizationMapping 
+                                 carrierId={selectedCarrier.id} 
+                                 initialConfig={(selectedCarrier.non_api_config as any)?.normalization}
+                                 onSave={(normConfig) => {
+                                   const cfg = { ...(selectedCarrier.non_api_config as any), normalization: normConfig };
+                                   updateCarrier.mutate({ id: selectedCarrier.id, non_api_config: cfg });
+                                 }}
+                               />
+                            </div>
                           </div>
                         </TabsContent>
                       </Tabs>
