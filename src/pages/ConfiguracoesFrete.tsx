@@ -350,6 +350,7 @@ export default function FreightConfig() {
                           <div className="space-y-2">
                              <Label>Nome do Evento / Tipo</Label>
                              <Input placeholder="Ex: Black Friday, Urgente" value={editingRule.event_type} onChange={e => setEditRule({...editingRule, event_type: e.target.value})} />
+                             <p className="text-[10px] text-muted-foreground mt-1">O nome deve corresponder à 'Urgência' na seleção ou ao tipo de evento.</p>
                           </div>
                           <div className="space-y-2">
                              <Label>SLA Máximo Permitido (Dias)</Label>
