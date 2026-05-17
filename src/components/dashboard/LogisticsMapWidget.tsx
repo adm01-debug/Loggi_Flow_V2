@@ -314,6 +314,10 @@ export function LogisticsMapWidget() {
                   }}
                 >
                   <div className="group/marker cursor-pointer relative">
+                    {/* Variational Alert Rings */}
+                    {s.atrasado && (
+                      <div className="absolute -inset-8 rounded-full bg-destructive/20 animate-ping" />
+                    )}
                     <div className={cn(
                       "absolute -inset-4 rounded-full animate-ping opacity-20",
                       ["em_transito", "despachado", "saiu_entrega"].includes(s.status) ? "bg-primary" : 
@@ -326,7 +330,13 @@ export function LogisticsMapWidget() {
                       ["em_transito", "despachado", "saiu_entrega"].includes(s.status) ? "bg-black border-primary text-primary" : 
                       ["entregue", "finalizado", "recebido"].includes(s.status) ? "bg-black border-success text-success" : "bg-black border-destructive text-destructive"
                     )}>
-                      {s.tipo === 'entrega' ? <Truck className="w-5 h-5" /> : <Package className="w-5 h-5" />}
+                      {s.atrasado ? (
+                        <AlertTriangle className="w-5 h-5 animate-bounce" />
+                      ) : s.tipo === 'entrega' ? (
+                        <Truck className="w-5 h-5" />
+                      ) : (
+                        <Package className="w-5 h-5" />
+                      )}
                     </div>
 
                     {/* Simple Tooltip on Hover */}
@@ -346,7 +356,18 @@ export function LogisticsMapWidget() {
                             <Activity className="w-3 h-3 text-primary" />
                             <span className="text-[8px] font-black text-white uppercase">{s.statusLabel}</span>
                           </div>
-                          <span className="text-[7px] font-bold text-white/30 uppercase tracking-widest">Live Pos</span>
+                          <div className="flex items-center gap-1">
+                            <Button 
+                              size="sm" 
+                              className="h-6 px-3 bg-primary text-[8px] font-black uppercase rounded-lg pointer-events-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowMission(true);
+                              }}
+                            >
+                              Missão
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
