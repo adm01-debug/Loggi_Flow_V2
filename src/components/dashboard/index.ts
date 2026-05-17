@@ -14,3 +14,4 @@ export { LiveStatusBar } from './LiveStatusBar';
 export { LogisticsMapWidget } from './LogisticsMapWidget';
 export { IntelligentLogisticsWidget } from './IntelligentLogisticsWidget';
 export { SystemHealthWidget } from './SystemHealthWidget';
+export { BiometricConsentModal } from './BiometricConsentModal';

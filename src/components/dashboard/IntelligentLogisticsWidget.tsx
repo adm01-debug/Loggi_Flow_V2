@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useLogisticsIntelligence } from "@/hooks/useLogisticsIntelligence";
 import { cn } from "@/lib/utils";
+import { BiometricConsentModal } from "./BiometricConsentModal";
 
 const iconMap: Record<string, any> = {
   truck: Truck,
@@ -28,6 +30,8 @@ const iconMap: Record<string, any> = {
 
 export function IntelligentLogisticsWidget() {
   const { healthScore, optimizations } = useLogisticsIntelligence();
+  const [isBiometricOpen, setIsBiometricOpen] = useState(false);
+  const [isBiometricAuthorized, setIsBiometricAuthorized] = useState(false);
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return "text-success border-success/30 bg-success/10 shadow-[0_0_15px_rgba(34,197,94,0.3)]";
@@ -217,13 +221,29 @@ export function IntelligentLogisticsWidget() {
                   <p className="text-[10px] font-bold text-primary/70 uppercase tracking-tighter mt-1">Sincronize sua biometria para autorizar otimizações</p>
                 </div>
               </div>
-              <Button size="lg" className="w-full sm:w-auto h-12 px-10 text-[11px] font-black bg-primary text-white hover:bg-white hover:text-primary rounded-full shadow-[0_0_30px_rgba(234,56,76,0.5)] uppercase tracking-[0.2em] transition-all group-hover/footer:px-12">
-                SINCRONIZAR AGORA
+              <Button 
+                size="lg" 
+                onClick={() => setIsBiometricOpen(true)}
+                disabled={isBiometricAuthorized}
+                className={cn(
+                  "w-full sm:w-auto h-12 px-10 text-[11px] font-black uppercase tracking-[0.2em] transition-all group-hover/footer:px-12 rounded-full",
+                  isBiometricAuthorized 
+                    ? "bg-success text-white cursor-default" 
+                    : "bg-primary text-white hover:bg-white hover:text-primary shadow-[0_0_30px_rgba(234,56,76,0.5)]"
+                )}
+              >
+                {isBiometricAuthorized ? "SINCRONIZADO" : "SINCRONIZAR AGORA"}
               </Button>
             </div>
           </div>
         </CardContent>
       </div>
+
+      <BiometricConsentModal 
+        isOpen={isBiometricOpen} 
+        onClose={() => setIsBiometricOpen(false)} 
+        onConfirm={() => setIsBiometricAuthorized(true)} 
+      />
     </Card>
   );
 }
