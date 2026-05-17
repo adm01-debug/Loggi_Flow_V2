@@ -71,6 +71,11 @@ export const ENTITY_FIELDS: Record<EntityType, { field: string; label: string; t
     { field: "resolvida", label: "Resolvida", type: "boolean" },
     { field: "descricao", label: "Descrição", type: "text" },
   ],
+  frete: [
+    { field: "valor_cotado", label: "Valor Cotado", type: "number" },
+    { field: "prazo_dias", label: "Prazo (Dias)", type: "number" },
+    { field: "status", label: "Status Cotação", type: "select" },
+  ],
 };
 
 export const TRIGGER_EVENTS: { value: TriggerEvent; label: string }[] = [
