@@ -563,6 +563,11 @@ export default function CotacaoMultiCanal() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        <Dialog open={coverageDialog} onOpenChange={setCoverageDialog}>
+          <DialogContent className="max-w-4xl p-0 overflow-hidden">
+            <NexusCoverageMap />
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
