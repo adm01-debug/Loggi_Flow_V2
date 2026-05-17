@@ -62,6 +62,7 @@ const ImportacaoMassa = lazy(() => import("./pages/ImportacaoMassa"));
 const AutomacaoRegras = lazy(() => import("./pages/AutomacaoRegras"));
 const CentralRastreamento = lazy(() => import("./pages/CentralRastreamento"));
 const AdminTelemetria = lazy(() => import("./pages/AdminTelemetria"));
+const RastreamentoRealTime = lazy(() => import("./pages/RastreamentoRealTime"));
 const GestaoWebhooks = lazy(() => import("./pages/GestaoWebhooks"));
 const IntegracaoBitrix = lazy(() => import("./pages/IntegracaoBitrix"));
 const LogisticaReversa = lazy(() => import("./pages/LogisticaReversa"));
