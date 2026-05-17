@@ -66,6 +66,7 @@ const GestaoWebhooks = lazy(() => import("./pages/GestaoWebhooks"));
 const IntegracaoBitrix = lazy(() => import("./pages/IntegracaoBitrix"));
 const LogisticaReversa = lazy(() => import("./pages/LogisticaReversa"));
 const AdminADR = lazy(() => import("./pages/AdminADR"));
+const ConfiguracoesFrete = lazy(() => import("./pages/ConfiguracoesFrete"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load non-critical providers
