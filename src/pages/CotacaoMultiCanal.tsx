@@ -331,6 +331,9 @@ export default function CotacaoMultiCanal() {
           icon={Rocket}
         >
           <div className="flex gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => window.location.href='/dashboard-cotacoes'}>
+              <TrendingDown className="w-4 h-4" /> Ver Dashboard
+            </Button>
             {cotacoes.length > 0 && <DataExporter data={exportData} filename="nexus-cotacoes" />}
             <Button variant="outline" className="gap-2" onClick={() => setCoverageDialog(true)}>
               <Map className="w-4 h-4" /> Visualizar Malha
@@ -338,15 +341,30 @@ export default function CotacaoMultiCanal() {
           </div>
         </PageHeader>
 
-        <StepProgress 
-          steps={[
-            { id: 'buscar', title: 'Mapear Trecho' }, 
-            { id: 'cotar', title: 'Nexus Blast' }, 
-            { id: 'receber', title: 'Consolidar Respostas' }, 
-            { id: 'selecionar', title: 'Decisão Inteligente' }
-          ]} 
-          currentStep={currentStep} 
-        />
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+           <div className="flex-1">
+              <Label className="text-xs font-black uppercase mb-1.5 block text-muted-foreground">Tipo de Evento (Priorização)</Label>
+              <Select defaultValue="Normal">
+                 <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                 <SelectContent>
+                    <SelectItem value="Normal">Operação Normal</SelectItem>
+                    <SelectItem value="Urgente">Entrega Urgente (SLA Crítico)</SelectItem>
+                    <SelectItem value="Evento">Evento com Data Fixa</SelectItem>
+                 </SelectContent>
+              </Select>
+           </div>
+           <div className="flex-[3]">
+              <StepProgress 
+                steps={[
+                  { id: 'buscar', title: 'Mapear Trecho' }, 
+                  { id: 'cotar', title: 'Nexus Blast' }, 
+                  { id: 'receber', title: 'Consolidar Respostas' }, 
+                  { id: 'selecionar', title: 'Decisão Inteligente' }
+                ]} 
+                currentStep={currentStep} 
+              />
+           </div>
+        </div>
 
         {/* Nexus Blast Control */}
         <AnimatePresence>
