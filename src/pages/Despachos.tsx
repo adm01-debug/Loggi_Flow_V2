@@ -214,7 +214,10 @@ export default function Despachos() {
                                 variant="ghost" 
                                 size="icon" 
                                 className="h-7 w-7 rounded-full bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all shadow-sm" 
-                                onClick={() => moveToNext(item)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  moveToNext(item);
+                                }}
                                 title={`Mover para ${statusConfig[validTransitions[col]]?.label}`}
                               >
                                 <ArrowRight className="w-4 h-4" />
