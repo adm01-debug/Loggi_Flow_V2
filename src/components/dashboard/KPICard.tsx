@@ -1,8 +1,9 @@
 import * as React from "react";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Cpu, Activity, Zap, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, animate, useMotionValue, useTransform } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, animate, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { useEffect, useState, useMemo } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface KPICardProps {
   title: string;
@@ -25,7 +26,7 @@ function useAnimatedCounter(value: number, duration: number = 1.5) {
   useEffect(() => {
     const controls = animate(0, value, {
       duration,
-      ease: [0.34, 1.56, 0.64, 1], // Custom cubic-bezier for a "bouncy" but professional feel
+      ease: [0.34, 1.56, 0.64, 1],
       onUpdate: (v) => setDisplayValue(Math.round(v)),
     });
     return () => controls.stop();
@@ -41,8 +42,8 @@ function TacticalSparkline({ data, color }: { data: number[]; color: string }) {
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
-  const width = 80;
-  const height = 32;
+  const width = 100;
+  const height = 40;
   const padding = 4;
   
   const points = data.map((val, i) => {
@@ -52,18 +53,18 @@ function TacticalSparkline({ data, color }: { data: number[]; color: string }) {
   }).join(' ');
   
   return (
-    <div className="relative group/sparkline">
-      <svg width={width} height={height} className="overflow-visible filter drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]">
+    <div className="relative group/sparkline overflow-visible">
+      <svg width={width} height={height} className="overflow-visible filter drop-shadow-[0_0_12px_rgba(var(--primary-rgb),0.5)]">
         <defs>
           <linearGradient id={`spark-grad-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+            <stop offset="0%" stopColor={color} stopOpacity="0.4" />
             <stop offset="100%" stopColor={color} stopOpacity="0" />
           </linearGradient>
         </defs>
         <motion.path
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          transition={{ duration: 2, ease: "circOut" }}
           d={`M ${points} L ${padding + (width - 2 * padding)},${height} L ${padding},${height} Z`}
           fill={`url(#spark-grad-${color})`}
           className="pointer-events-none"
@@ -71,10 +72,10 @@ function TacticalSparkline({ data, color }: { data: number[]; color: string }) {
         <motion.polyline
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          transition={{ duration: 2, ease: "circOut" }}
           fill="none"
           stroke={color}
-          strokeWidth="2.5"
+          strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
           points={points}
@@ -82,12 +83,12 @@ function TacticalSparkline({ data, color }: { data: number[]; color: string }) {
         <motion.circle
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 1, type: "spring" }}
+          transition={{ delay: 1.5, type: "spring", stiffness: 100 }}
           cx={padding + (width - 2 * padding)}
           cy={height - padding - ((data[data.length - 1] - min) / range) * (height - 2 * padding)}
-          r="3.5"
+          r="4"
           fill={color}
-          className="animate-pulse shadow-[0_0_10px_white]"
+          className="animate-pulse shadow-[0_0_15px_white]"
         />
       </svg>
     </div>
@@ -111,43 +112,53 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
     const numericValue = typeof value === 'number' ? value : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
     const animatedValue = useAnimatedCounter(numericValue);
     
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
 
-    const statusConfig = {
+    const mouseX = useSpring(x, { stiffness: 150, damping: 20 });
+    const mouseY = useSpring(y, { stiffness: 150, damping: 20 });
+
+    const rotateX = useTransform(mouseY, [0, 300], [5, -5]);
+    const rotateY = useTransform(mouseX, [0, 400], [-5, 5]);
+
+    const statusConfig = useMemo(() => ({
       success: {
-        border: 'border-success/30 hover:border-success/60',
-        bg: 'bg-gradient-to-br from-success/10 via-success/5 to-transparent',
-        iconBg: 'bg-success/20 text-success ring-1 ring-success/30 shadow-[0_0_15px_rgba(34,197,94,0.2)]',
+        border: 'border-success/40 hover:border-success/80',
+        bg: 'bg-gradient-to-br from-success/15 via-success/5 to-transparent',
+        iconBg: 'bg-black text-success border-success/40 shadow-[0_0_20px_rgba(34,197,94,0.3)]',
         sparkColor: 'hsl(var(--success))',
         trendColor: 'text-success',
         accent: 'bg-success',
+        tag: 'OPTIMIZED',
       },
       warning: {
-        border: 'border-warning/30 hover:border-warning/60',
-        bg: 'bg-gradient-to-br from-warning/10 via-warning/5 to-transparent',
-        iconBg: 'bg-warning/20 text-warning ring-1 ring-warning/30 shadow-[0_0_15px_rgba(234,179,8,0.2)]',
+        border: 'border-warning/40 hover:border-warning/80',
+        bg: 'bg-gradient-to-br from-warning/15 via-warning/5 to-transparent',
+        iconBg: 'bg-black text-warning border-warning/40 shadow-[0_0_20px_rgba(234,179,8,0.3)]',
         sparkColor: 'hsl(var(--warning))',
         trendColor: 'text-warning',
         accent: 'bg-warning',
+        tag: 'CAUTION',
       },
       danger: {
-        border: 'border-destructive/30 hover:border-destructive/60',
-        bg: 'bg-gradient-to-br from-destructive/10 via-destructive/5 to-transparent',
-        iconBg: 'bg-destructive/20 text-destructive ring-1 ring-destructive/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]',
+        border: 'border-destructive/40 hover:border-destructive/80',
+        bg: 'bg-gradient-to-br from-destructive/15 via-destructive/5 to-transparent',
+        iconBg: 'bg-black text-destructive border-destructive/40 shadow-[0_0_20px_rgba(239,68,68,0.3)]',
         sparkColor: 'hsl(var(--destructive))',
         trendColor: 'text-destructive',
         accent: 'bg-destructive',
+        tag: 'CRITICAL',
       },
       neutral: {
-        border: 'border-white/10 hover:border-primary/40',
-        bg: 'bg-black/40 backdrop-blur-xl',
-        iconBg: 'bg-primary/15 text-primary ring-1 ring-primary/30 shadow-[0_0_15px_rgba(var(--primary),0.15)]',
+        border: 'border-white/10 hover:border-primary/50',
+        bg: 'bg-black/80 backdrop-blur-3xl',
+        iconBg: 'bg-black text-primary border-primary/40 shadow-[0_0_20px_rgba(234,56,76,0.2)]',
         sparkColor: 'hsl(var(--primary))',
         trendColor: 'text-muted-foreground',
         accent: 'bg-primary',
+        tag: 'NOMINAL',
       },
-    };
+    }), []);
 
     const config = statusConfig[status] || statusConfig.neutral;
     const progressPercent = target ? Math.min((numericValue / target) * 100, 100) : 0;
@@ -155,19 +166,26 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
 
     function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
       const { left, top } = currentTarget.getBoundingClientRect();
-      mouseX.set(clientX - left);
-      mouseY.set(clientY - top);
+      x.set(clientX - left);
+      y.set(clientY - top);
+    }
+
+    function handleMouseLeave() {
+      x.set(200);
+      y.set(150);
     }
 
     return (
       <motion.div
         ref={ref}
         onMouseMove={handleMouseMove}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ y: -8 }}
+        onMouseLeave={handleMouseLeave}
+        style={{ rotateX, rotateY, perspective: 1000 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.02 }}
         className={cn(
-          "group relative rounded-[2.5rem] border p-7 transition-all duration-500 overflow-hidden cursor-pointer",
+          "group relative rounded-[2.5rem] border-2 p-8 transition-all duration-700 overflow-hidden cursor-pointer",
           config.border,
           config.bg,
           className
@@ -175,66 +193,75 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
       >
         {/* Dynamic Spotlight Glow */}
         <motion.div
-          className="pointer-events-none absolute -inset-px rounded-[2.5rem] opacity-0 transition duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute -inset-px rounded-[2.5rem] opacity-0 transition duration-500 group-hover:opacity-100"
           style={{
             background: useTransform(
-              [mouseX, mouseY],
-              ([x, y]) => `radial-gradient(600px circle at ${x}px ${y}px, rgba(var(--primary-rgb), 0.1), transparent 40%)`
+              [x, y],
+              ([xv, yv]) => `radial-gradient(400px circle at ${xv}px ${yv}px, rgba(var(--primary-rgb), 0.2), transparent 40%)`
             ),
           }}
         />
 
-        {/* Structural Grid Background */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:30px_30px] opacity-20" />
+        {/* Tactical Scanning Line */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 animate-scan transition-opacity duration-700" />
+
+        {/* Tech Corner Labels */}
+        <div className="absolute top-4 right-8 flex items-center gap-2 opacity-30 group-hover:opacity-60 transition-opacity">
+          <span className="text-[7px] font-black text-white uppercase tracking-[0.4em]">Nexus_Protocol_{config.tag}</span>
+          <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+        </div>
 
         <div className="relative z-10 flex flex-col h-full">
-          <div className="flex items-start justify-between mb-8">
+          <div className="flex items-start justify-between mb-10">
             <motion.div 
-              whileHover={{ rotate: -10, scale: 1.1 }}
+              whileHover={{ rotate: 360, scale: 1.1 }}
+              transition={{ duration: 0.8, ease: "expoOut" }}
               className={cn(
-                "flex items-center justify-center w-16 h-16 rounded-[1.25rem] transition-all duration-500 border-b-2",
+                "flex items-center justify-center w-16 h-16 rounded-2xl border-2 transition-all duration-500",
                 config.iconBg
               )}
             >
-              <Icon className="w-8 h-8" />
+              <Icon className="w-8 h-8 animate-pulse" />
             </motion.div>
             
-            <div className="flex flex-col items-end gap-3">
+            <div className="flex flex-col items-end gap-4">
               {sparklineData && (
-                <div className="bg-white/5 backdrop-blur-md px-3 py-2 rounded-2xl border border-white/5 group-hover:border-white/10 transition-colors">
+                <div className="bg-black/60 backdrop-blur-xl px-4 py-3 rounded-2xl border-2 border-white/10 group-hover:border-primary/40 transition-all duration-500 shadow-xl">
                   <TacticalSparkline data={sparklineData} color={config.sparkColor} />
                 </div>
               )}
               {(trendValue || changePercent !== null) && (
                 <motion.div 
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
                   className={cn(
-                    "flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 rounded-full border shadow-inner tracking-widest uppercase",
-                    trend === 'up' ? "bg-success/10 text-success border-success/20" : 
-                    trend === 'down' ? "bg-destructive/10 text-destructive border-destructive/20" : 
-                    "bg-white/5 text-muted-foreground border-white/10"
+                    "flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-full border-2 shadow-2xl tracking-[0.2em] uppercase",
+                    trend === 'up' ? "bg-success/20 text-success border-success/40" : 
+                    trend === 'down' ? "bg-destructive/20 text-destructive border-destructive/40" : 
+                    "bg-white/10 text-white/60 border-white/20"
                   )}
                 >
-                  <span className="text-sm font-bold">{trend === 'up' ? '↑' : trend === 'down' ? '↓' : '•'}</span>
-                  <span>{trendValue || `${changePercent}%`}</span>
+                  {trend === 'up' ? <Activity className="w-3 h-3" /> : trend === 'down' ? <Activity className="w-3 h-3 rotate-180" /> : <Zap className="w-3 h-3" />}
+                  <span>{trendValue || `${changePercent}%`} Delta</span>
                 </motion.div>
               )}
             </div>
           </div>
 
-          <div className="mt-auto space-y-1">
-            <div className="flex items-center gap-2 mb-1">
-              <div className={cn("w-2 h-0.5 rounded-full", config.accent)} />
-              <span className="text-[10px] font-black text-white/40 tracking-[0.3em] uppercase">{title}</span>
+          <div className="mt-auto space-y-2">
+            <div className="flex items-center gap-3 mb-2">
+              <div className={cn("w-4 h-1 rounded-full", config.accent, "shadow-[0_0_10px_currentColor]")} />
+              <span className="text-[11px] font-black text-white/50 tracking-[0.4em] uppercase italic italic">{title}</span>
             </div>
             
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-3">
               <motion.span 
-                className="text-5xl font-display font-black tracking-tighter tabular-nums bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent"
+                className="text-6xl font-display font-black tracking-tighter tabular-nums bg-gradient-to-br from-white via-white to-white/40 bg-clip-text text-transparent italic"
               >
-                {typeof value === 'string' && value.includes('R$') ? value : animatedValue}
+                {typeof value === 'string' && (value.includes('R$') || value.includes('%')) ? value : animatedValue}
               </motion.span>
               {status !== 'neutral' && (
-                <div className={cn("w-2 h-2 rounded-full mb-3 animate-pulse shadow-[0_0_8px_currentColor]", 
+                <div className={cn("w-3 h-3 rounded-full mb-4 animate-ping shadow-[0_0_15px_currentColor]", 
                   status === 'success' ? 'text-success bg-success' : 
                   status === 'warning' ? 'text-warning bg-warning' : 'text-destructive bg-destructive'
                 )} />
@@ -242,39 +269,50 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
             </div>
             
             {subtitle && (
-              <p className="text-[11px] font-bold text-white/30 uppercase tracking-tighter italic group-hover:text-white/50 transition-colors">
-                {subtitle}
-              </p>
+              <div className="flex items-center gap-2">
+                <Cpu className="w-3 h-3 text-primary/40" />
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] group-hover:text-primary/60 transition-colors">
+                  {subtitle}
+                </p>
+              </div>
             )}
           </div>
 
           {target && (
-            <div className="mt-8 space-y-3">
+            <div className="mt-10 space-y-4">
               <div className="flex justify-between items-end">
-                <div className="flex flex-col">
-                  <span className="text-[8px] font-black text-white/20 uppercase tracking-widest mb-0.5">Performance Analysis</span>
-                  <span className="text-[10px] font-black text-white/80">{progressPercent.toFixed(1)}% OF TARGET</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-3 h-3 text-success/60" />
+                    <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Efficiency Grid Matrix</span>
+                  </div>
+                  <span className="text-sm font-black text-white tracking-tighter tabular-nums">
+                    {progressPercent.toFixed(1)}% <span className="text-[10px] text-primary/60 uppercase ml-1">Threshold</span>
+                  </span>
                 </div>
-                <div className="text-[10px] font-black px-2 py-0.5 rounded bg-white/5 border border-white/10 text-white/60">
-                  GOAL: {target}
-                </div>
+                <Badge variant="outline" className="bg-white/5 border-white/10 text-[9px] font-black tracking-widest uppercase py-1 px-3 rounded-lg">
+                  OBJETIVO: {target}
+                </Badge>
               </div>
-              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px] border border-white/5">
+              <div className="h-3 bg-white/5 rounded-full overflow-hidden p-[2px] border-2 border-white/10 relative shadow-inner">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 2, ease: [0.34, 1.56, 0.64, 1] }}
+                  transition={{ duration: 2.5, ease: "circOut" }}
                   className={cn(
-                    "h-full rounded-full relative bg-gradient-to-r from-transparent via-white/20 to-white/40 shadow-[0_0_15px_rgba(255,255,255,0.2)]",
-                    status === 'neutral' ? 'bg-primary' : config.accent
+                    "h-full rounded-full relative shadow-[0_0_20px_rgba(255,255,255,0.3)]",
+                    status === 'neutral' ? 'bg-gradient-to-r from-primary/50 to-primary' : `bg-gradient-to-r from-${status}/50 to-${status}`
                   )}
                 >
-                  <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.3)_50%,transparent_100%)] animate-shimmer" />
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.3)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.3)_50%,rgba(255,255,255,0.3)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[pulse_2s_linear_infinite]" />
                 </motion.div>
               </div>
             </div>
           )}
         </div>
+        
+        {/* Corner Decoration */}
+        <div className="absolute -bottom-1 -right-1 w-12 h-12 border-r-2 border-b-2 border-primary/20 rounded-br-[2.5rem]" />
       </motion.div>
     );
   }
