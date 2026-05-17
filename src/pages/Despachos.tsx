@@ -200,7 +200,8 @@ export default function Despachos() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         whileHover={{ y: -2 }}
-                        className="card-interactive p-3 border-2 hover:border-primary/40 group/card relative overflow-hidden"
+                        className="card-interactive p-3 border-2 hover:border-primary/40 group/card relative overflow-hidden cursor-pointer"
+                        onClick={() => navigate(`/rastreamento/${item.id}`)}
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                         <div className="relative z-10">
