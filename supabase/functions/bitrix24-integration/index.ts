@@ -152,9 +152,22 @@ serve(async (req) => {
         });
         const entregasData = await entregasResponse.json();
 
+        // Sync Ocorrências from SPA 1050 (New: Ocorrências Log)
+        const ocorrenciasResponse = await fetch(`${bitrixWebhookUrl}/crm.item.list`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            entityTypeId: 1050, 
+            filter: { ">=updatedTime": getLastSyncTime() },
+            select: ["id", "title", "stageId", "assignedById", "createdTime", "updatedTime", "ufCrm*"],
+          }),
+        });
+        const ocorrenciasData = await ocorrenciasResponse.json();
+
         const syncResults = {
           coletas_synced: coletasData.result?.items?.length || 0,
           entregas_synced: entregasData.result?.items?.length || 0,
+          ocorrencias_synced: ocorrenciasData.result?.items?.length || 0,
           synced_at: new Date().toISOString(),
         };
 

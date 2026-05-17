@@ -55,7 +55,7 @@ export default function IntegracaoBitrix() {
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["bitrix-logs"] });
-      toast.success(`Sincronização concluída: ${data.coletas_synced} coletas e ${data.entregas_synced} entregas.`);
+      toast.success(`Sincronização concluída: ${data.coletas_synced} coletas, ${data.entregas_synced} entregas e ${data.ocorrencias_synced || 0} ocorrências.`);
     },
     onError: (err) => {
       toast.error(`Erro na sincronização: ${err.message}`);
@@ -177,6 +177,17 @@ export default function IntegracaoBitrix() {
                        <div>
                          <p className="font-bold">Entregas Log</p>
                          <p className="text-xs text-muted-foreground">Mapped to: Entregas</p>
+                       </div>
+                    </div>
+                    <Badge variant="success">Ativo</Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
+                    <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold">1050</div>
+                       <div>
+                         <p className="font-bold">Ocorrências Log</p>
+                         <p className="text-xs text-muted-foreground">Mapped to: Ocorrências</p>
                        </div>
                     </div>
                     <Badge variant="success">Ativo</Badge>

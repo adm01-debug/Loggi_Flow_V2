@@ -17,5 +17,6 @@ export interface UserPreferences {
     soundEffects: boolean;
     accentColor: string;
     animationSpeed: 'fast' | 'normal' | 'smooth';
+    vibrationIntensity: 'none' | 'low' | 'high';
   };
 }

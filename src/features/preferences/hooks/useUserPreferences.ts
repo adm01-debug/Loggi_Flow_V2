@@ -17,6 +17,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
     soundEffects: true,
     accentColor: '#ea384c',
     animationSpeed: 'normal',
+    vibrationIntensity: 'low',
   },
 };
 
@@ -111,6 +112,10 @@ export function useUserPreferences() {
     const speedMap = { fast: '0.6', normal: '1.0', smooth: '1.6' };
     const baseSpeed = speedMap[preferences.gamification.animationSpeed] || '1.0';
     root.style.setProperty('--animation-speed-scale', baseSpeed);
+    
+    // Apply Vibration Intensity
+    const vibrationMap = { none: '0', low: '5', high: '15' };
+    root.style.setProperty('--vibration-intensity', vibrationMap[preferences.gamification.vibrationIntensity] || '5');
     
     // Global duration adjustments for motion components
     root.style.setProperty('--transition-duration', `${0.3 * parseFloat(baseSpeed)}s`);

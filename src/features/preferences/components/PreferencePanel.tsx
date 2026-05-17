@@ -224,6 +224,33 @@ export function PreferencePanel() {
             </div>
           </div>
 
+          <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-white/5">
+            <div className="flex gap-3 items-center">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Volume2 className="w-4 h-4 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-sm font-bold">Intensidade Hática</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Feedback tátil do sistema</p>
+              </div>
+            </div>
+            <div className="w-32">
+              <Select 
+                value={(preferences.gamification as any).vibrationIntensity || 'low'}
+                onValueChange={(v) => updateGamification('vibrationIntensity' as any, v)}
+              >
+                <SelectTrigger className="h-8 text-[10px] font-black uppercase bg-background/50 border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-white/10">
+                  <SelectItem value="none" className="text-[10px] font-bold uppercase tracking-tighter">Desativado</SelectItem>
+                  <SelectItem value="low" className="text-[10px] font-bold uppercase tracking-tighter">Sutil</SelectItem>
+                  <SelectItem value="high" className="text-[10px] font-bold uppercase tracking-tighter">Intenso</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="space-y-3 p-3 rounded-xl bg-muted/30 border border-white/5">
             <Label className="text-xs text-muted-foreground uppercase font-black">Cor de Destaque (Accent)</Label>
             <div className="flex gap-3 flex-wrap">
