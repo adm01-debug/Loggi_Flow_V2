@@ -107,7 +107,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <span>Suporte Notificado</span>
                 </div>
                 <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-                <span>ID do Erro: {Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
+                <span>ID do Erro: {crypto.randomUUID().split('-')[0].toUpperCase()}</span>
               </div>
             </div>
 
