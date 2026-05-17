@@ -27,6 +27,8 @@ export function LogisticsMapWidget() {
   const [showLayers, setShowLayers] = React.useState(false);
   const [typeFilter, setTypeFilter] = React.useState<"all" | "entrega" | "coleta">("all");
   const [showMission, setShowMission] = React.useState(false);
+  const [showHeatmap, setShowHeatmap] = React.useState(false);
+  const [isOptimizing, setIsOptimizing] = React.useState(false);
   
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,
