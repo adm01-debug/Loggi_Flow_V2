@@ -111,7 +111,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
     performanceMode,
     className
   }, ref) => {
-    const numericValue = typeof value === 'number' ? value : parseInt(String(value).replace(/[^0-9]/g, '')) || 0;
+    const numericValue = typeof value === 'number' ? value : parseInt(String(value).replace(/\D/g, '')) || 0;
     const animatedValue = useAnimatedCounter(numericValue);
     
     const x = useMotionValue(0);
