@@ -146,6 +146,44 @@ export function NormalizationMapping({ carrierId, initialConfig, onSave }: Norma
           )}
         </div>
 
+        <div className="space-y-4 pt-4 border-t">
+          <Label className="text-sm font-semibold">Simular Resposta (WhatsApp/Email)</Label>
+          <div className="flex gap-2">
+            <Textarea 
+              placeholder="Cole aqui a resposta da transportadora para testar o mapeamento..." 
+              value={testText}
+              onChange={(e) => setTestText(e.target.value)}
+              className="text-xs h-20"
+            />
+            <Button 
+              size="icon" 
+              variant="outline" 
+              onClick={handleTest} 
+              disabled={isTesting}
+              className="shrink-0 h-20"
+            >
+              {isTesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+            </Button>
+          </div>
+
+          {testResult && (
+            <div className="p-3 bg-muted/50 rounded-lg flex justify-around animate-in zoom-in-95">
+              <div className="text-center">
+                <p className="text-[10px] uppercase text-muted-foreground font-bold">Valor</p>
+                <p className="text-lg font-black text-primary">
+                  {testResult.price ? `R$ ${testResult.price.toFixed(2)}` : "???"}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] uppercase text-muted-foreground font-bold">Prazo</p>
+                <p className="text-lg font-black text-primary">
+                  {testResult.days ? `${testResult.days} dias` : "???"}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="pt-4 border-t">
           <Button onClick={handleSave} className="w-full gap-2">
             <Save className="w-4 h-4" /> Salvar Parametrização
