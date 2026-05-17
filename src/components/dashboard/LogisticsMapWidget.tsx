@@ -450,8 +450,11 @@ export function LogisticsMapWidget() {
                 >
                   <div className="group/marker cursor-pointer relative">
                     {/* Variational Alert Rings */}
-                    {s.atrasado && (
-                      <div className="absolute -inset-8 rounded-full bg-destructive/20 animate-ping" />
+                    {(s.atrasado || (s.valorFrete && s.valorFrete > 500)) && (
+                      <div className={cn(
+                        "absolute -inset-8 rounded-full animate-ping",
+                        s.atrasado ? "bg-destructive/30" : "bg-primary/30"
+                      )} />
                     )}
                     <div className={cn(
                       "absolute -inset-4 rounded-full animate-ping opacity-20",
@@ -467,6 +470,8 @@ export function LogisticsMapWidget() {
                     )}>
                       {s.atrasado ? (
                         <AlertTriangle className="w-5 h-5 animate-bounce" />
+                      ) : (s.valorFrete && s.valorFrete > 500) ? (
+                        <Star className="w-5 h-5 animate-pulse text-primary fill-primary" />
                       ) : s.tipo === 'entrega' ? (
                         <Truck className="w-5 h-5" />
                       ) : (
@@ -479,7 +484,10 @@ export function LogisticsMapWidget() {
                       <div className="bg-black/90 border-2 border-primary/30 backdrop-blur-xl p-4 rounded-2xl shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] min-w-[220px]">
                         <div className="flex justify-between items-start mb-2">
                           <p className="text-[10px] font-black uppercase text-primary tracking-widest">{s.numero}</p>
-                          {s.atrasado && <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce">ATRASADO</Badge>}
+                          <div className="flex gap-1">
+                            {s.atrasado && <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce uppercase">Atraso</Badge>}
+                            {(s.valorFrete && s.valorFrete > 500) && <Badge className="bg-primary text-[8px] font-black px-1 h-4 animate-pulse uppercase">Variação</Badge>}
+                          </div>
                         </div>
                         <p className="text-sm font-black text-white mb-1 uppercase tracking-tighter italic">{s.cliente || 'CLIENTE NÃO INFORMADO'}</p>
                         <p className="text-[9px] font-bold text-white/50 mb-3 uppercase tracking-widest">{s.transportadora}</p>
