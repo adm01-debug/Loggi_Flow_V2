@@ -18,7 +18,20 @@ interface AlertsPanelProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
-  ({ alerts, isLoading, onDismiss, onViewDetails, className, ...props }, ref) => {
+  ({ alerts: initialAlerts, isLoading, onDismiss, onViewDetails, className, ...props }, ref) => {
+    const [threshold, setThreshold] = useLocalStorage("nexus-alert-threshold", 5);
+    const [deltaVisibility, setDeltaVisibility] = React.useState(false);
+
+    // Delta Filter Logic
+    const alerts = React.useMemo(() => {
+      return initialAlerts.filter(alert => {
+        // Mocking delta calculation for demonstration if not present
+        // In a real scenario, this would come from the backend/hook
+        const delta = (alert as any).delta || (Math.random() * 20); 
+        return delta >= threshold;
+      });
+    }, [initialAlerts, threshold]);
+
     const getAlertIcon = (type: RecentAlert['type']) => {
       switch (type) {
         case 'coleta_atrasada':
