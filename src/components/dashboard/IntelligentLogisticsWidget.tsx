@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useLogisticsIntelligence } from "@/hooks/useLogisticsIntelligence";
 import { cn } from "@/lib/utils";
+import { BiometricConsentModal } from "./BiometricConsentModal";
 
 const iconMap: Record<string, any> = {
   truck: Truck,
