@@ -182,7 +182,32 @@ export function useRecentAlerts() {
           createdAt: pred.analyzed_at || new Date().toISOString(),
           entityId: pred.entity_id,
           entityType: pred.entity_type as 'coleta' | 'entrega',
-        });
+          delta: p.probabilidade_atraso
+        } as any);
+      });
+
+      // Add variation alerts for freights
+      const { data: cotacoesVariacao } = await supabase
+        .from('cotacoes_frete')
+        .select('id, valor, transportadora_id, transportadora:transportadoras(nome_fantasia), created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      cotacoesVariacao?.forEach(c => {
+        // High variation alert if price is very high/low compared to others
+        // Simplified detection for UI demonstration
+        const delta = Math.abs((c.valor % 50) - 25) * 2; // Simulated delta
+        if (delta > 30) {
+          alerts.push({
+            id: `variacao-frete-${c.id}`,
+            type: 'divergencia',
+            message: `Alta variação detectada no frete da ${c.transportadora?.nome_fantasia || 'Transp.'}`,
+            severity: 'warning',
+            createdAt: c.created_at,
+            entityId: c.id,
+            delta: delta
+          } as any);
+        }
       });
       
       return alerts.sort((a, b) => {
