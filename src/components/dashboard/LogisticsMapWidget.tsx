@@ -3,7 +3,7 @@ import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, Geoloc
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, Search } from "lucide-react";
+import { MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, Search, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUnifiedTracking, UnifiedShipment } from "@/hooks/useUnifiedTracking";
@@ -15,6 +15,7 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXl
 export function LogisticsMapWidget() {
   const { allShipments: shipments, isLoading } = useUnifiedTracking();
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [selectedShipment, setSelectedShipment] = React.useState<UnifiedShipment | null>(null);
   
   const [viewState, setViewState] = React.useState({
@@ -26,15 +27,21 @@ export function LogisticsMapWidget() {
   const [mapStyle, setMapStyle] = React.useState<string>("mapbox://styles/mapbox/dark-v11");
 
   const filteredShipments = React.useMemo(() => {
-    return shipments.filter(s => 
-      s.coordinates && 
-      (s.numero.toLowerCase().includes(searchTerm.toLowerCase()) || 
-       s.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       s.transportadora.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [shipments, searchTerm]);
+    return shipments.filter(s => {
+      const matchesSearch = s.numero.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           s.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           s.transportadora.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === "all" || 
+                           (statusFilter === "in_transit" && ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)) ||
+                           (statusFilter === "delayed" && s.atrasado) ||
+                           (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status));
 
-  const activeShipments = filteredShipments.filter(s => 
+      return s.coordinates && matchesSearch && matchesStatus;
+    });
+  }, [shipments, searchTerm, statusFilter]);
+
+  const activeShipments = shipments.filter(s => 
     ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)
   );
 
@@ -77,16 +84,38 @@ export function LogisticsMapWidget() {
               </div>
             </div>
             
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex bg-white/5 p-1 rounded-full border border-white/10">
+                {[
+                  { id: 'all', label: 'TODOS', icon: Activity },
+                  { id: 'in_transit', label: 'TRÂNSITO', icon: Truck },
+                  { id: 'delayed', label: 'ATRASADOS', icon: AlertTriangle },
+                  { id: 'completed', label: 'OK', icon: CheckCircle2 }
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setStatusFilter(f.id)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
+                      statusFilter === f.id ? "bg-primary text-white shadow-lg" : "text-white/40 hover:text-white/70"
+                    )}
+                  >
+                    <f.icon className="w-3 h-3" />
+                    <span className="hidden sm:inline">{f.label}</span>
+                  </button>
+                ))}
+              </div>
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
                 <Input 
                   placeholder="BUSCAR REMESSA..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-9 w-40 md:w-60 bg-white/5 border-white/10 rounded-full pl-9 text-[10px] font-black tracking-widest uppercase placeholder:text-white/20 focus:ring-primary/50"
+                  className="h-9 w-40 md:w-48 bg-white/5 border-white/10 rounded-full pl-9 text-[10px] font-black tracking-widest uppercase placeholder:text-white/20 focus:ring-primary/50"
                 />
               </div>
+
                <Button 
                 variant="outline" 
                 size="sm" 
@@ -96,9 +125,6 @@ export function LogisticsMapWidget() {
                 {mapStyle.includes("dark") ? <Satellite className="w-3 h-3 text-primary" /> : <Activity className="w-3 h-3 text-primary" />}
                 {mapStyle.includes("dark") ? "Satélite" : "Tático"}
               </Button>
-              <Badge variant="outline" className="font-black uppercase tracking-widest px-4 py-1.5 rounded-full border-2 text-success border-success/30 bg-success/5 animate-pulse">
-                Live Feed
-              </Badge>
             </div>
           </div>
         </CardHeader>
