@@ -156,6 +156,68 @@ export function LogisticsMapWidget() {
         </CardHeader>
 
         <CardContent className="p-4 flex-1 flex flex-col md:flex-row gap-4 relative overflow-hidden">
+          <AnimatePresence>
+            {showLayers && (
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="absolute top-20 right-6 z-50 w-64 bg-black/90 backdrop-blur-3xl border border-white/10 rounded-3xl p-6 shadow-2xl space-y-6"
+              >
+                <div className="flex justify-between items-center">
+                  <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Nexus Layer Engine</h4>
+                  <button onClick={() => setShowLayers(false)} className="text-white/40 hover:text-white"><X className="w-4 h-4" /></button>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Tipo de Fluxo</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['all', 'entrega', 'coleta'].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setTypeFilter(type as any)}
+                          className={cn(
+                            "h-8 rounded-xl border text-[8px] font-black uppercase transition-all",
+                            typeFilter === type ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/5 text-white/40 hover:text-white/60"
+                          )}
+                        >
+                          {type === 'all' ? 'Tudo' : type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Filtros Táticos</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { id: 'all', label: 'Global', icon: Activity },
+                        { id: 'in_transit', label: 'Transito', icon: Truck },
+                        { id: 'pending', label: 'Pendente', icon: Clock },
+                        { id: 'completed', label: 'Sucesso', icon: CheckCircle2 },
+                        { id: 'delayed', label: 'Atraso', icon: AlertTriangle },
+                        { id: 'problems', label: 'Crítico', icon: AlertTriangle },
+                      ].map((f) => (
+                        <button
+                          key={f.id}
+                          onClick={() => setStatusFilter(f.id)}
+                          className={cn(
+                            "flex items-center gap-2 p-2 rounded-xl border text-[8px] font-black uppercase transition-all",
+                            statusFilter === f.id ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/5 text-white/40 hover:text-white/60"
+                          )}
+                        >
+                          <f.icon className="w-3 h-3" />
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Sidebar Info */}
           <div className="w-full md:w-72 flex flex-col gap-3 z-10">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
