@@ -7,8 +7,8 @@ interface Transportadora {
   id: string;
   nome_fantasia: string;
   score_performance: number | null;
-  prazo_medio_dias: number | null;
-  homologada: boolean;
+  prazo_medio_dias?: number | null;
+  homologada: boolean | null;
 }
 
 interface TransportadoraRankingProps {
