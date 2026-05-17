@@ -1,7 +1,8 @@
 import { useMemo, useState, useEffect, useRef, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, ShieldCheck } from "lucide-react";
+import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, ShieldCheck, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/common/PageTransition";
 
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
