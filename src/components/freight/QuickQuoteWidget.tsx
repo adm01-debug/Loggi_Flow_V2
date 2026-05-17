@@ -15,11 +15,11 @@ export function QuickQuoteWidget() {
   const [results, setResults] = useState<QuotationResult[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const handleQuote = useCallback(() => {
+  const handleQuote = useCallback(async () => {
     if (!uf || !peso) { toast.error('Preencha UF e peso'); return; }
     setLoading(true);
-    const r = calculateQuotations?.({ estado_destino: uf, peso_kg: parseFloat(peso) }) || [];
-    setResults(r.slice(0, 3));
+    const r = await calculateQuotations?.({ estado_destino: uf, peso_kg: parseFloat(peso) });
+    setResults((r || []).slice(0, 3));
     setLoading(false);
   }, [uf, peso, calculateQuotations]);
 

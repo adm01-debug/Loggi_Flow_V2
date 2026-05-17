@@ -85,10 +85,14 @@ export function useQuotationFlow() {
     }));
   }, []);
 
-  const calculate = useCallback((data: CargoData) => {
+  const calculate = useCallback(async (data: CargoData & { event_type?: string }) => {
     setCargoData(data);
     if (calculateQuotations) {
-      const results = calculateQuotations({ estado_destino: data.estado_destino, peso_kg: data.peso_kg });
+      const results = await calculateQuotations({ 
+        estado_destino: data.estado_destino, 
+        peso_kg: data.peso_kg,
+        event_type: data.event_type 
+      });
       const withAnomalies = detectPriceAnomaly(results || []);
       setQuotationResults(withAnomalies);
       setHasSearched(true);
@@ -108,12 +112,12 @@ export function useQuotationFlow() {
   }, [calculateQuotations, smartCarrier, detectPriceAnomaly, setHistory]);
 
   // Scenario simulation (#13)
-  const simulateScenario = useCallback((data: CargoData, splitVolumes: number) => {
+  const simulateScenario = useCallback(async (data: CargoData, splitVolumes: number) => {
     if (!calculateQuotations) return [];
     const pesoPerVolume = data.peso_kg / splitVolumes;
     const scenarios: Array<{ volumes: number; results: QuotationResult[] }> = [];
     for (let v = 1; v <= splitVolumes; v++) {
-      const results = calculateQuotations({ estado_destino: data.estado_destino, peso_kg: pesoPerVolume * v });
+      const results = await calculateQuotations({ estado_destino: data.estado_destino, peso_kg: pesoPerVolume * v });
       scenarios.push({ volumes: v, results: results || [] });
     }
     return scenarios;
