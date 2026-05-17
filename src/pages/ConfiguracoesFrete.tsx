@@ -292,7 +292,7 @@ export default function FreightConfig() {
                           <p className="text-sm font-bold">{m.transportadora?.nome_fantasia}</p>
                           <p className="text-xs text-muted-foreground">Endpoint: /hooks/carrier/{m.id}</p>
                         </div>
-                        <Button size="sm" variant="ghost"><Edit className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost"><Settings className="h-4 w-4" /></Button>
                       </div>
                     ))}
                     <Button className="w-full" variant="outline"><Plus className="h-4 w-4 mr-2" />Novo Webhook</Button>
