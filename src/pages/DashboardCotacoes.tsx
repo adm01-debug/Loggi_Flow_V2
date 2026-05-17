@@ -118,7 +118,14 @@ export default function DashboardCotacoes() {
           <StatsCard title="Economia" value={`R$ ${savings.toFixed(0)}`} icon={TrendingDown} color="success" />
         </div>
 
-        <TrechoComparativo trechoGroups={trechoGroups} onSelect={(id) => selectCotacao.mutate(id)} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <TrechoComparativo trechoGroups={trechoGroups} onSelect={(id) => selectCotacao.mutate(id)} />
+          </div>
+          <div className="lg:col-span-1">
+            <ResponseConsole />
+          </div>
+        </div>
 
         <Card>
           <CardHeader>
