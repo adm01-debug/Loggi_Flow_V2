@@ -1,0 +1,16 @@
+ALTER FUNCTION public.add_user_xp(p_user_id uuid, p_xp_amount integer, p_coins_amount integer) SET search_path = public;
+ALTER FUNCTION public.update_user_streak(p_user_id uuid) SET search_path = public;
+ALTER FUNCTION public.handle_new_user() SET search_path = public;
+ALTER FUNCTION public.handle_new_user_levels() SET search_path = public;
+ALTER FUNCTION public.get_user_permissions(p_user_id uuid) SET search_path = public;
+ALTER FUNCTION public.update_user_rank() SET search_path = public;
+ALTER FUNCTION public.get_carrier_performance_stats() SET search_path = public;
+ALTER FUNCTION public.purchase_reward(p_user_id uuid, p_item_id uuid) SET search_path = public;
+ALTER FUNCTION public.get_dashboard_metrics() SET search_path = public;
+ALTER FUNCTION public.get_leaderboard(p_limit integer, p_period text) SET search_path = public;
+ALTER FUNCTION public.cleanup_old_telemetry_logs() SET search_path = public;
+ALTER FUNCTION public.system_health_check() SET search_path = public;
+ALTER FUNCTION public.update_device_last_seen() SET search_path = public;
+ALTER FUNCTION public.generate_coleta_numero() SET search_path = public;
+ALTER FUNCTION public.generate_entrega_numero() SET search_path = public;
+ALTER FUNCTION public.get_public_tracking(p_tracking_code text) SET search_path = public;
