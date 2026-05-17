@@ -175,10 +175,10 @@ export function LogisticsMapWidget() {
                 onClick={() => setShowPerformance(!showPerformance)}
                 className={cn(
                   "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
-                  showPerformance ? "bg-primary border-primary" : "bg-white/5"
+                  showPerformance ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" : "bg-white/5"
                 )}
               >
-                <Gauge className="w-3 h-3" />
+                <Gauge className={cn("w-3 h-3", showPerformance && "animate-spin-slow")} />
                 Performance
               </Button>
 
@@ -217,6 +217,72 @@ export function LogisticsMapWidget() {
 
         <CardContent className="p-4 flex-1 flex flex-col md:flex-row gap-4 relative overflow-hidden">
           <AnimatePresence>
+            {showPerformance && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="absolute inset-4 z-[60] bg-black/95 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl overflow-hidden"
+              >
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">Nexus Performance Engine</h3>
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2">Métricas táticas em tempo real</p>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => setShowPerformance(false)} className="rounded-full text-white/40 hover:text-white">
+                    <X className="w-6 h-6" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+                    <div className="flex items-center gap-3 mb-4 text-primary">
+                      <Zap className="w-5 h-5" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Velocidade de Fluxo</span>
+                    </div>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">94.2%</p>
+                    <p className="text-[10px] font-bold text-success uppercase mt-2">↑ 2.4% vs ontem</p>
+                  </div>
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+                    <div className="flex items-center gap-3 mb-4 text-primary">
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Taxa de Conclusão</span>
+                    </div>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">98.8%</p>
+                    <p className="text-[10px] font-bold text-success uppercase mt-2">Nominal</p>
+                  </div>
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+                    <div className="flex items-center gap-3 mb-4 text-primary">
+                      <Clock className="w-5 h-5" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">SLA Médio</span>
+                    </div>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">1.4d</p>
+                    <p className="text-[10px] font-bold text-white/40 uppercase mt-2">Meta: 2.0d</p>
+                  </div>
+                </div>
+
+                <div className="h-[300px] w-full bg-white/5 rounded-[2rem] border border-white/10 p-6">
+                  <PerformanceChart 
+                    title="Análise de Vazão Logística" 
+                    subtitle="Volume de remessas vs Capacidade de processamento"
+                    data={[
+                      { name: '00h', v: 12, c: 80 },
+                      { name: '04h', v: 8, c: 80 },
+                      { name: '08h', v: 45, c: 90 },
+                      { name: '12h', v: 82, c: 95 },
+                      { name: '16h', v: 65, c: 90 },
+                      { name: '20h', v: 30, c: 85 },
+                      { name: '23h', v: 15, c: 80 },
+                    ]}
+                    dataKey="v"
+                    secondaryDataKey="c"
+                    xAxisKey="name"
+                    className="border-none bg-transparent p-0 shadow-none rounded-none"
+                  />
+                </div>
+              </motion.div>
+            )}
+
             {showLayers && (
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
