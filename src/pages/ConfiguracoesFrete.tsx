@@ -35,6 +35,7 @@ interface CarrierConfig {
   credentials: any;
   regioes_atendidas: string[];
   non_api_config: any;
+  coverage_details?: any;
 }
 
 export default function FreightConfig() {
@@ -225,16 +226,47 @@ export default function FreightConfig() {
 
                         <TabsContent value="malha" className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <Label>Cobertura de Regiões</Label>
-                            <Button size="sm" variant="outline"><Plus className="h-4 w-4 mr-2" />Add Praça</Button>
+                            <Label>Cobertura de Regiões e Malha Tática</Label>
+                            <Button size="sm" variant="outline"><Plus className="h-4 w-4 mr-2" />Nova Região</Button>
                           </div>
-                          <div className="grid grid-cols-3 gap-2">
-                            {['SP - Capital', 'RJ - Metropolitana', 'MG - BH', 'Sul', 'Nordeste'].map(r => (
-                              <div key={r} className="flex items-center gap-2 p-2 border rounded-lg">
-                                <Switch checked={selectedCarrier.regioes_atendidas?.includes(r)} />
-                                <span className="text-xs font-medium">{r}</span>
-                              </div>
-                            ))}
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                             <div className="space-y-2">
+                                <Label className="text-[10px] uppercase font-bold">Tipo de Cobertura</Label>
+                                <Select defaultValue="regional">
+                                   <SelectTrigger className="h-8 text-xs font-black uppercase"><SelectValue /></SelectTrigger>
+                                   <SelectContent>
+                                      <SelectItem value="nacional">Nacional (Brasil)</SelectItem>
+                                      <SelectItem value="regional">Regional (Específico)</SelectItem>
+                                      <SelectItem value="lastmile">Last Mile (Cidade)</SelectItem>
+                                   </SelectContent>
+                                </Select>
+                             </div>
+                             <div className="space-y-2">
+                                <Label className="text-[10px] uppercase font-bold">Eficiência Malha</Label>
+                                <div className="h-8 flex items-center gap-2 bg-muted/40 px-3 rounded">
+                                   <Zap className="h-3 w-3 text-warning" />
+                                   <span className="text-xs font-black">94.8% OPTIMIZED</span>
+                                </div>
+                             </div>
+                          </div>
+
+                          <div className="space-y-2">
+                             <Label className="text-[10px] uppercase font-bold">Zonas de Atuação</Label>
+                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {['SP - Capital', 'RJ - Metropolitana', 'MG - BH', 'Curitiba - PR', 'Porto Alegre - RS', 'Campinas - SP'].map(r => (
+                                  <div key={r} className="flex items-center justify-between p-2 border rounded-xl bg-muted/20 hover:border-primary/40 transition-all group/region">
+                                    <span className="text-[10px] font-black uppercase tracking-tighter truncate">{r}</span>
+                                    <Switch checked={selectedCarrier.regioes_atendidas?.includes(r)} className="scale-75" />
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+
+                          <div className="p-4 border-2 border-dashed rounded-xl bg-muted/10">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold text-center italic">
+                               Integração de Malha: O Nexus prioriza estas rotas para este parceiro.
+                             </p>
                           </div>
                         </TabsContent>
 
