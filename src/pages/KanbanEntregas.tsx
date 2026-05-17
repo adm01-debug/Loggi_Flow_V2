@@ -51,6 +51,7 @@ const COLUMNS = [
 ] as const;
 
 function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number }) {
+  const navigate = useNavigate();
   const [showDetails, setShowDetails] = useState(false);
 
   return (
