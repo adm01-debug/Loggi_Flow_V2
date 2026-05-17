@@ -8,7 +8,9 @@ import {
   Minimize, 
   Eye,
   Type,
-  Move
+  Move,
+  Zap,
+  Volume2
 } from "lucide-react";
 import { useUserPreferences } from "../hooks/useUserPreferences";
 import { Button } from "@/components/ui/button";
@@ -156,18 +158,22 @@ export function PreferencePanel() {
         </div>
       </div>
 
-      {/* Gamification Section */}
       <div className="space-y-4 pt-6 border-t border-white/5">
         <div className="flex items-center gap-2 mb-2">
-          <Move className="w-4 h-4 text-primary" />
+          <Zap className="w-4 h-4 text-primary" />
           <h4 className="text-sm font-bold uppercase tracking-widest">Gamificação</h4>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-white/5">
-            <div className="space-y-0.5">
-              <p className="text-sm font-bold">Efeitos de Partículas</p>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Visual tático avançado</p>
+            <div className="flex gap-3 items-center">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Move className="w-4 h-4 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-sm font-bold">Efeitos de Partículas</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Visual tático avançado</p>
+              </div>
             </div>
             <Switch 
               checked={preferences.gamification.showParticles}
@@ -176,14 +182,46 @@ export function PreferencePanel() {
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-white/5">
-            <div className="space-y-0.5">
-              <p className="text-sm font-bold">Efeitos Sonoros</p>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Feedback auditivo de conquistas</p>
+            <div className="flex gap-3 items-center">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Volume2 className="w-4 h-4 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-sm font-bold">Efeitos Sonoros</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Feedback auditivo de conquistas</p>
+              </div>
             </div>
             <Switch 
               checked={preferences.gamification.soundEffects}
               onCheckedChange={(v) => updateGamification('soundEffects', v)}
             />
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-white/5">
+            <div className="flex gap-3 items-center">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Settings2 className="w-4 h-4 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-sm font-bold">Velocidade de Animação</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">Ritmo da interface Nexus</p>
+              </div>
+            </div>
+            <div className="w-32">
+              <Select 
+                value={(preferences.gamification as any).animationSpeed || 'normal'}
+                onValueChange={(v) => updateGamification('animationSpeed' as any, v)}
+              >
+                <SelectTrigger className="h-8 text-[10px] font-black uppercase bg-background/50 border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-white/10">
+                  <SelectItem value="fast" className="text-[10px] font-bold uppercase tracking-tighter">Instantâneo</SelectItem>
+                  <SelectItem value="normal" className="text-[10px] font-bold uppercase tracking-tighter">Equilibrado</SelectItem>
+                  <SelectItem value="smooth" className="text-[10px] font-bold uppercase tracking-tighter">Cinematográfico</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-3 p-3 rounded-xl bg-muted/30 border border-white/5">
@@ -194,14 +232,15 @@ export function PreferencePanel() {
                 { name: 'Cyber Blue', color: '#0ea5e9' },
                 { name: 'Emerald', color: '#10b981' },
                 { name: 'Amber', color: '#f59e0b' },
-                { name: 'Violet', color: '#8b5cf6' }
+                { name: 'Violet', color: '#8b5cf6' },
+                { name: 'Gold', color: '#FFD700' }
               ].map((c) => (
                 <button
                   key={c.color}
                   onClick={() => updateGamification('accentColor', c.color)}
                   className={cn(
-                    "w-8 h-8 rounded-full border-2 transition-all",
-                    preferences.gamification.accentColor === c.color ? "border-white scale-125 shadow-lg" : "border-transparent opacity-60 hover:opacity-100"
+                    "w-8 h-8 rounded-full border-2 transition-all duration-500",
+                    preferences.gamification.accentColor === c.color ? "border-white scale-125 shadow-[0_0_15px_rgba(255,255,255,0.4)]" : "border-transparent opacity-60 hover:opacity-100"
                   )}
                   style={{ backgroundColor: c.color }}
                   title={c.name}

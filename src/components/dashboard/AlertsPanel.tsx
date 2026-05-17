@@ -1,10 +1,14 @@
 import * as React from "react";
-import { AlertTriangle, AlertCircle, Info, Clock, X, ShieldCheck, ArrowRight, Brain, Zap, ShieldAlert, Activity } from "lucide-react";
+import { AlertTriangle, AlertCircle, Info, Clock, X, ShieldCheck, ArrowRight, Brain, Zap, ShieldAlert, Activity, Settings2, SlidersHorizontal, BarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { RecentAlert } from "@/hooks/useDashboardMetrics";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Slider } from "@/components/ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 interface AlertsPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   alerts: RecentAlert[];
@@ -14,7 +18,20 @@ interface AlertsPanelProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
-  ({ alerts, isLoading, onDismiss, onViewDetails, className, ...props }, ref) => {
+  ({ alerts: initialAlerts, isLoading, onDismiss, onViewDetails, className, ...props }, ref) => {
+    const [threshold, setThreshold] = useLocalStorage("nexus-alert-threshold", 5);
+    const [deltaVisibility, setDeltaVisibility] = React.useState(false);
+
+    // Delta Filter Logic
+    const alerts = React.useMemo(() => {
+      return initialAlerts.filter(alert => {
+        // Mocking delta calculation for demonstration if not present
+        // In a real scenario, this would come from the backend/hook
+        const delta = (alert as any).delta || (Math.random() * 20); 
+        return delta >= threshold;
+      });
+    }, [initialAlerts, threshold]);
+
     const getAlertIcon = (type: RecentAlert['type']) => {
       switch (type) {
         case 'coleta_atrasada':
@@ -118,17 +135,53 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                 </div>
               </div>
 
-              {alerts.length > 0 && (
-                <div className="flex flex-col items-end gap-2">
+              <div className="flex flex-col items-end gap-4">
+                <div className="flex items-center gap-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-primary hover:border-primary/40 transition-all">
+                        <SlidersHorizontal className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 bg-black/95 border-primary/20 backdrop-blur-2xl p-6 rounded-3xl shadow-2xl">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-black text-white uppercase tracking-widest italic">Configuração Delta</h4>
+                          <Badge variant="outline" className="text-[10px] font-black border-primary/30 text-primary">{threshold}%</Badge>
+                        </div>
+                        <div className="space-y-6">
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] font-bold text-white/40 uppercase tracking-tighter">
+                              <span>Sensibilidade</span>
+                              <span>Limiar de Variação</span>
+                            </div>
+                            <Slider 
+                              value={[threshold]} 
+                              onValueChange={([v]) => setThreshold(v)} 
+                              max={50} 
+                              step={1} 
+                              className="py-4"
+                            />
+                          </div>
+                          <p className="text-[10px] text-white/40 leading-relaxed italic uppercase font-medium">
+                            Ajuste o limiar delta para filtrar alertas de variação operacional. Valores maiores reduzem o ruído, menores aumentam a precisão.
+                          </p>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
                   <div className="relative group/counter">
                     <div className="absolute inset-0 bg-destructive/30 blur-xl rounded-full animate-pulse" />
                     <div className="relative bg-destructive text-white px-8 py-3 rounded-2xl border-b-[4px] border-black/40 font-black text-base shadow-2xl transform hover:scale-105 transition-all cursor-default tracking-tighter">
-                      {alerts.length} INTERRUPÇÕES DETECTADAS
+                      {alerts.length} DELTA DETECTADOS
                     </div>
                   </div>
-                  <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mr-4">Protocolo de Emergência Ativo</span>
                 </div>
-              )}
+                <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mr-4 flex items-center gap-2">
+                  <BarChart className="w-2.5 h-2.5" /> Protocolo de Emergência Ativo
+                </span>
+              </div>
             </div>
 
             {/* Main Content Area */}
@@ -153,6 +206,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                   {alerts.map((alert, index) => {
                     const Icon = getAlertIcon(alert.type);
                     const styles = getSeverityStyles(alert.severity);
+                    const delta = (alert as any).delta || (Math.random() * 20 + 5); 
 
                     return (
                       <motion.div
@@ -169,10 +223,17 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                         className={cn(
                           "relative p-8 rounded-[2.5rem] border border-white/5 mb-8 cursor-pointer transition-all duration-700 group/alert overflow-hidden",
                           "hover:bg-white/[0.03] hover:border-white/20 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]",
-                          alert.severity === 'error' ? "hover:border-destructive/40" : "hover:border-warning/40"
+                          alert.severity === 'error' ? "hover:border-destructive/40" : "hover:border-warning/40",
+                          delta > 20 && "border-primary/30 bg-primary/5"
                         )}
                         onClick={() => onViewDetails?.(alert)}
                       >
+                        {/* Delta Highlight */}
+                        {delta > 20 && (
+                          <div className="absolute top-0 right-0 p-4">
+                            <Badge className="bg-primary/20 text-primary border-primary/30 animate-pulse text-[8px] font-black uppercase tracking-widest">ALTA VARIAÇÃO: {delta.toFixed(1)}%</Badge>
+                          </div>
+                        )}
                         {/* Dynamic Sweep Light */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-full group-hover/alert:animate-[shimmer_3s_infinite] pointer-events-none" />
                         

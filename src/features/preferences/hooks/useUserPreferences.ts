@@ -16,6 +16,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
     showParticles: true,
     soundEffects: true,
     accentColor: '#ea384c',
+    animationSpeed: 'normal',
   },
 };
 
@@ -105,8 +106,14 @@ export function useUserPreferences() {
 
     // Apply Gamification Accent
     root.style.setProperty('--primary', preferences.gamification.accentColor);
-    // Convert hex to hsl for Tailwind variables if needed, but LogiFlow uses variables
-    // For now we assume the system reacts to the --primary variable
+    
+    // Apply Animation Speed
+    const speedMap = { fast: '0.6', normal: '1.0', smooth: '1.6' };
+    const baseSpeed = speedMap[preferences.gamification.animationSpeed] || '1.0';
+    root.style.setProperty('--animation-speed-scale', baseSpeed);
+    
+    // Global duration adjustments for motion components
+    root.style.setProperty('--transition-duration', `${0.3 * parseFloat(baseSpeed)}s`);
 
   }, [preferences]);
 
