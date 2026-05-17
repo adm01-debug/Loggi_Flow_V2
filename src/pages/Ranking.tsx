@@ -38,7 +38,20 @@ export default function Ranking() {
   const { data: leaderboard = [], isLoading, refetch } = useQuery({
     queryKey: ["leaderboard", period],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_leaderboard", { limit_count: 100, period_filter: period });
+      const { data, error } = await supabase
+        .from("user_levels")
+        .select(`
+          user_id,
+          total_xp,
+          level,
+          streak_days,
+          coins,
+          profiles:user_id(full_name, avatar_url),
+          rank_display:user_ranks(*)
+        `)
+        .order("total_xp", { ascending: false })
+        .limit(100);
+      
       if (error) throw error;
       return data;
     },
