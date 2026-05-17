@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { 
   MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, 
-  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock
+  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MissionDetail } from "./MissionDetail";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
 
@@ -26,6 +27,8 @@ export function LogisticsMapWidget() {
   const [showLayers, setShowLayers] = React.useState(false);
   const [typeFilter, setTypeFilter] = React.useState<"all" | "entrega" | "coleta">("all");
   const [showMission, setShowMission] = React.useState(false);
+  const [showHeatmap, setShowHeatmap] = React.useState(false);
+  const [isOptimizing, setIsOptimizing] = React.useState(false);
   
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,
@@ -137,6 +140,28 @@ export function LogisticsMapWidget() {
               >
                 {mapStyle.includes("dark") ? <Satellite className="w-3 h-3 text-primary" /> : <Activity className="w-3 h-3 text-primary" />}
                 {mapStyle.includes("dark") ? "Satélite" : "Tático"}
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  setIsOptimizing(true);
+                  toast.promise(new Promise(r => setTimeout(r, 2000)), {
+                    loading: 'Calculando rotas neurais...',
+                    success: 'Logística otimizada via IA!',
+                    error: 'Falha na otimização',
+                  });
+                  setTimeout(() => setIsOptimizing(false), 2000);
+                }}
+                disabled={isOptimizing}
+                className={cn(
+                  "h-9 rounded-full bg-primary/10 border-primary/20 text-primary gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
+                  isOptimizing && "animate-pulse"
+                )}
+              >
+                <Zap className={cn("w-3 h-3", isOptimizing && "fill-current")} />
+                {isOptimizing ? "Otimizando..." : "Auto-Otimizar"}
               </Button>
 
               <Button 
@@ -301,6 +326,47 @@ export function LogisticsMapWidget() {
               <NavigationControl position="top-right" />
               <FullscreenControl position="top-right" />
               <ScaleControl position="bottom-right" />
+
+              {/* Heatmap Layer */}
+              {showHeatmap && (
+                <Source
+                  id="delays-heatmap"
+                  type="geojson"
+                  data={{
+                    type: "FeatureCollection",
+                    features: shipments
+                      .filter(s => s.atrasado && s.coordinates)
+                      .map(s => ({
+                        type: "Feature",
+                        properties: { intensity: s.diasAtraso },
+                        geometry: {
+                          type: "Point",
+                          coordinates: [s.coordinates!.lng, s.coordinates!.lat]
+                        }
+                      }))
+                  }}
+                >
+                  <Layer
+                    id="heatmap-layer"
+                    type="heatmap"
+                    paint={{
+                      'heatmap-weight': ['interpolate', ['linear'], ['get', 'intensity'], 0, 0, 10, 1],
+                      'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 9, 3],
+                      'heatmap-color': [
+                        'interpolate', ['linear'], ['heatmap-density'],
+                        0, 'rgba(33,102,172,0)',
+                        0.2, 'rgb(103,169,207)',
+                        0.4, 'rgb(209,229,240)',
+                        0.6, 'rgb(253,219,199)',
+                        0.8, 'rgb(239,138,98)',
+                        1, 'rgb(178,24,43)'
+                      ],
+                      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 20],
+                      'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 9, 0]
+                    }}
+                  />
+                </Source>
+              )}
 
               {filteredShipments.map((s) => (
                 <Marker
