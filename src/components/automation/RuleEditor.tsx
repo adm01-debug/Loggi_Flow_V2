@@ -24,7 +24,7 @@ import {
 } from "@/hooks/useBusinessRules";
 
 const actionIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  Bell, RefreshCw, Mail, AlertTriangle,
+  Bell, RefreshCw, Mail, AlertTriangle, Shield,
 };
 
 interface RuleEditorProps {
