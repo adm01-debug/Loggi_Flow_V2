@@ -1273,6 +1273,45 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_audit_logs: {
+        Row: {
+          action_taken: string | null
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          error_message: string | null
+          execution_time_ms: number | null
+          id: string
+          payload: Json | null
+          rule_id: string | null
+          status: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          payload?: Json | null
+          rule_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          payload?: Json | null
+          rule_id?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       business_rules: {
         Row: {
           actions: Json
@@ -2192,6 +2231,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      freight_webhooks: {
+        Row: {
+          created_at: string | null
+          endpoint_url: string
+          event_type: string
+          id: string
+          is_active: boolean | null
+          last_called_at: string | null
+          secret_key: string | null
+          transportadora_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint_url: string
+          event_type: string
+          id?: string
+          is_active?: boolean | null
+          last_called_at?: string | null
+          secret_key?: string | null
+          transportadora_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint_url?: string
+          event_type?: string
+          id?: string
+          is_active?: boolean | null
+          last_called_at?: string | null
+          secret_key?: string | null
+          transportadora_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freight_webhooks_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fretes_internos: {
         Row: {

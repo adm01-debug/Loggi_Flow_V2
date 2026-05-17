@@ -28,6 +28,6 @@ export const log = (entry: Omit<LogEntry, 'timestamp'>) => {
   } else if (entry.level === LogLevel.WARN) {
     console.warn(logStr);
   } else {
-    log.info(logStr);
+    console.info(logStr);
   }
 };

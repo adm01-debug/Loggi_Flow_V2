@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2, Bell, RefreshCw, Mail, AlertTriangle, Zap } from "lucide-react";
+import { Plus, Trash2, Bell, RefreshCw, Mail, AlertTriangle, Zap, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +24,7 @@ import {
 } from "@/hooks/useBusinessRules";
 
 const actionIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  Bell, RefreshCw, Mail, AlertTriangle,
+  Bell, RefreshCw, Mail, AlertTriangle, Shield,
 };
 
 interface RuleEditorProps {
@@ -109,6 +109,7 @@ export function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
                     <SelectItem value="coleta">Coleta</SelectItem>
                     <SelectItem value="entrega">Entrega</SelectItem>
                     <SelectItem value="ocorrencia">Ocorrência</SelectItem>
+                    <SelectItem value="frete">Cotação de Frete</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -221,6 +222,12 @@ export function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
                     )}
                     {action.type === "create_alert" && (
                       <Input value={action.config.alert_message || ""} onChange={(e) => updateAction(action.id, { config: { ...action.config, alert_message: e.target.value } })} placeholder="Mensagem do alerta..." />
+                    )}
+                    {action.type === "block_carrier" && (
+                      <div className="p-2 bg-destructive/10 rounded border border-destructive/20">
+                         <p className="text-[10px] text-destructive font-bold uppercase">Atenção</p>
+                         <p className="text-[11px]">Esta ação bloqueará automaticamente a transportadora se as condições forem atendidas.</p>
+                      </div>
                     )}
                   </div>
                 ))}

@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
-import { log } from "../_shared/logger.ts";
+import { log, LogLevel } from "../_shared/logger.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -23,7 +23,7 @@ serve(async (req) => {
       userId = user?.id;
     }
 
-    log('INFO', "Analizing smart carrier selection request", { estado_destino, peso_kg, urgencia, tipo_carga, userId });
+    log({ level: LogLevel.INFO, message: "Analizing smart carrier selection request", meta: { estado_destino, peso_kg, urgencia, tipo_carga }, userId });
 
     // Fetch selection rules
     const { data: selectionRules } = await supabase
@@ -53,7 +53,7 @@ serve(async (req) => {
       .eq("ativo", true);
 
     if (tabelasError) {
-      log('ERROR', "Error fetching freight tables", { error: tabelasError.message });
+      log({ level: LogLevel.ERROR, message: "Error fetching freight tables", meta: { error: tabelasError.message } });
       throw tabelasError;
     }
 
@@ -78,7 +78,7 @@ serve(async (req) => {
         error_message: errorMsg
       });
 
-      log('WARN', errorMsg, { estado_destino, peso_kg });
+      log({ level: LogLevel.WARN, message: errorMsg, meta: { estado_destino, peso_kg } });
       return new Response(
         JSON.stringify({
           success: false,
@@ -154,7 +154,7 @@ serve(async (req) => {
       });
     }
 
-    log('INFO', "Smart carrier selection completed", { carrier_count: recommendations.length });
+    log({ level: LogLevel.INFO, message: "Smart carrier selection completed", meta: { carrier_count: recommendations.length } });
 
     return new Response(
       JSON.stringify({ success: true, recommendations }),
@@ -162,7 +162,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    log('ERROR', "Smart carrier selection function error", { error: error.message });
+    log({ level: LogLevel.ERROR, message: "Smart carrier selection function error", meta: { error: error.message } });
     return new Response(
       JSON.stringify({ error: "Internal Server Error", message: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

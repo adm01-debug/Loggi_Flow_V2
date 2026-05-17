@@ -5,10 +5,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Json } from "@/integrations/supabase/types";
 
-export type EntityType = "coleta" | "entrega" | "ocorrencia";
-export type TriggerEvent = "on_create" | "on_update" | "on_status_change";
-export type ConditionOperator = "equals" | "not_equals" | "contains" | "greater_than" | "less_than" | "is_empty" | "is_not_empty";
-export type ActionType = "send_notification" | "change_status" | "send_email" | "add_tag" | "assign_user" | "create_alert";
+export type EntityType = "coleta" | "entrega" | "ocorrencia" | "frete";
+export type TriggerEvent = "on_create" | "on_update" | "on_status_change" | "low_performance" | "high_cost";
+export type ConditionOperator = "equals" | "not_equals" | "contains" | "greater_than" | "less_than" | "is_empty" | "is_not_empty" | "below_threshold";
+export type ActionType = "send_notification" | "change_status" | "send_email" | "add_tag" | "assign_user" | "create_alert" | "block_carrier";
 
 export interface RuleCondition {
   id: string;
@@ -71,12 +71,19 @@ export const ENTITY_FIELDS: Record<EntityType, { field: string; label: string; t
     { field: "resolvida", label: "Resolvida", type: "boolean" },
     { field: "descricao", label: "Descrição", type: "text" },
   ],
+  frete: [
+    { field: "valor_cotado", label: "Valor Cotado", type: "number" },
+    { field: "prazo_dias", label: "Prazo (Dias)", type: "number" },
+    { field: "status", label: "Status Cotação", type: "select" },
+  ],
 };
 
 export const TRIGGER_EVENTS: { value: TriggerEvent; label: string }[] = [
   { value: "on_create", label: "Quando criado" },
   { value: "on_update", label: "Quando atualizado" },
   { value: "on_status_change", label: "Quando status mudar" },
+  { value: "low_performance", label: "Baixa Performance (Nexus Score)" },
+  { value: "high_cost", label: "Custo Acima da Média" },
 ];
 
 export const CONDITION_OPERATORS: { value: ConditionOperator; label: string }[] = [
@@ -94,6 +101,7 @@ export const ACTION_TYPES: { value: ActionType; label: string; icon: string }[] 
   { value: "change_status", label: "Alterar Status", icon: "RefreshCw" },
   { value: "send_email", label: "Enviar Email", icon: "Mail" },
   { value: "create_alert", label: "Criar Alerta", icon: "AlertTriangle" },
+  { value: "block_carrier", label: "Bloquear Transportadora", icon: "Shield" },
 ];
 
 export function useBusinessRules() {

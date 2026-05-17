@@ -84,6 +84,7 @@ const menuSections: MenuSection[] = [
        { title: "Melhor Envio", url: "/melhor-envio", icon: Package },
         { title: "Bitrix24 CRM", url: "/bitrix24", icon: Building2 },
         { title: "Config Nexus", url: "/config-frete", icon: Cog },
+        { title: "Auditoria Nexus", url: "/audit-trail", icon: History },
       ],
     },
   {
@@ -112,7 +113,7 @@ const gamificationItems = [
 const adminItems = [
   { title: "Usuários", url: "/gerenciamento-usuarios", icon: Users },
   { title: "Segurança", url: "/seguranca", icon: Shield },
-  { title: "Webhooks", url: "/webhooks", icon: Webhook },
+  { title: "Webhooks Nexus", url: "/webhooks", icon: Webhook },
   { title: "Reset Senha", url: "/aprovacao-reset-senha", icon: KeyRound },
   { title: "Audit Trail", url: "/audit-trail", icon: History },
   { title: "Documentação API", url: "/api-docs", icon: Code },
