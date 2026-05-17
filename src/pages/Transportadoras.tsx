@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Truck, MoreVertical, Phone, Mail, MapPin, Star, CheckCircle2, XCircle, Edit, Trash2, Globe, Building2, Clock, TrendingUp, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { Plus, Truck, MoreVertical, Phone, Mail, MapPin, Star, CheckCircle2, XCircle, Edit, Trash2, Globe, Building2, Clock, TrendingUp, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, Key, Settings, Map } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MaskedInput } from "@/components/ui/MaskedInput";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -34,12 +35,24 @@ import { useSorting } from "@/hooks/useSorting";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 interface Transportadora {
-  id: string; razao_social: string; nome_fantasia: string; cnpj: string | null;
-  contato_comercial: string | null; email_comercial: string | null; 
-  whatsapp_operacional: string | null; url_rastreamento: string | null;
-  regioes_atendidas: string[] | null; homologada: boolean | null; observacoes: string | null;
-  created_at: string; total_entregas?: number; entregas_sucesso?: number;
+  id: string; 
+  razao_social: string; 
+  nome_fantasia: string; 
+  cnpj: string | null;
+  contato_comercial: string | null; 
+  email_comercial: string | null; 
+  whatsapp_operacional: string | null; 
+  url_rastreamento: string | null;
+  regioes_atendidas: string[] | null; 
+  homologada: boolean | null; 
+  observacoes: string | null;
+  created_at: string; 
+  total_entregas?: number; 
+  entregas_sucesso?: number;
   score_performance?: number | null;
+  credentials?: any;
+  non_api_config?: any;
+  coverage_details?: any;
 }
 
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
@@ -48,7 +61,20 @@ const filterConfig: FilterConfig<Transportadora> = {
   search: { fields: ["nome_fantasia", "razao_social", "cnpj"] },
 };
 
-const emptyForm = { razao_social: "", nome_fantasia: "", cnpj: "", contato_comercial: "", email_comercial: "", whatsapp_operacional: "", url_rastreamento: "", observacoes: "", homologada: true };
+const emptyForm = { 
+  razao_social: "", 
+  nome_fantasia: "", 
+  cnpj: "", 
+  contato_comercial: "", 
+  email_comercial: "", 
+  whatsapp_operacional: "", 
+  url_rastreamento: "", 
+  observacoes: "", 
+  homologada: true,
+  credentials: { api_key: "", api_user: "", api_password: "", endpoint: "" },
+  non_api_config: { type: "whatsapp" as "whatsapp" | "email" | "portal", template: "", recipient: "", portal_url: "", portal_user: "" },
+  coverage_details: { states: [] as string[], cities: [] as string[] }
+};
 
 export default function Transportadoras() {
   const { toast } = useToast();
@@ -110,7 +136,10 @@ export default function Transportadoras() {
       whatsapp_operacional: form.whatsapp_operacional,
       url_rastreamento: form.url_rastreamento,
       observacoes: form.observacoes,
-      homologada: form.homologada 
+      homologada: form.homologada,
+      credentials: form.credentials,
+      non_api_config: form.non_api_config,
+      coverage_details: form.coverage_details
     });
     if (error) { toast({ title: "Erro", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Sucesso", description: "Transportadora cadastrada!" }); setDialogOpen(false); fetchData();
@@ -128,7 +157,10 @@ export default function Transportadoras() {
       whatsapp_operacional: form.whatsapp_operacional,
       url_rastreamento: form.url_rastreamento,
       observacoes: form.observacoes,
-      homologada: form.homologada 
+      homologada: form.homologada,
+      credentials: form.credentials,
+      non_api_config: form.non_api_config,
+      coverage_details: form.coverage_details
     }).eq("id", selected.id);
     if (error) { toast({ title: "Erro", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Sucesso", description: "Atualizado!" }); setEditDialog(false); fetchData();
@@ -160,8 +192,11 @@ export default function Transportadoras() {
       whatsapp_operacional: t.whatsapp_operacional || "", 
       url_rastreamento: t.url_rastreamento || "", 
       observacoes: t.observacoes || "", 
-      homologada: t.homologada ?? true 
-    }); 
+      homologada: t.homologada ?? true,
+      credentials: t.credentials || emptyForm.credentials,
+      non_api_config: t.non_api_config || emptyForm.non_api_config,
+      coverage_details: t.coverage_details || emptyForm.coverage_details
+    });
     setEditDialog(true); 
   };
 
@@ -175,23 +210,97 @@ export default function Transportadoras() {
   const SortIcon = ({ field }: { field: keyof Transportadora }) => { const dir = getSortDirection(field); if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; };
 
   const FormFields = () => (
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="grid gap-2"><Label>Razão Social *</Label><Input value={form.razao_social} onChange={(e) => setForm({ ...form, razao_social: e.target.value })} /></div>
-        <div className="grid gap-2"><Label>Nome Fantasia *</Label><Input value={form.nome_fantasia} onChange={(e) => setForm({ ...form, nome_fantasia: e.target.value })} /></div>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="grid gap-2"><Label>CNPJ</Label><MaskedInput maskType="cnpj" value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })} /></div>
-        <div className="grid gap-2"><Label>Contato Comercial</Label><Input value={form.contato_comercial} onChange={(e) => setForm({ ...form, contato_comercial: e.target.value })} /></div>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="grid gap-2"><Label>Email Comercial</Label><Input type="email" value={form.email_comercial} onChange={(e) => setForm({ ...form, email_comercial: e.target.value })} /></div>
-        <div className="grid gap-2"><Label>WhatsApp</Label><MaskedInput maskType="phone" value={form.whatsapp_operacional} onChange={(e) => setForm({ ...form, whatsapp_operacional: e.target.value })} /></div>
-      </div>
-      <div className="grid gap-2"><Label>URL Rastreamento</Label><Input value={form.url_rastreamento} onChange={(e) => setForm({ ...form, url_rastreamento: e.target.value })} /></div>
-      <div className="flex items-center gap-2"><Switch checked={form.homologada} onCheckedChange={(v) => setForm({ ...form, homologada: v })} /><Label>Homologada</Label></div>
-      <div className="grid gap-2"><Label>Observações</Label><Textarea value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} /></div>
-    </div>
+    <Tabs defaultValue="geral" className="w-full">
+      <TabsList className="grid w-full grid-cols-4 mb-4">
+        <TabsTrigger value="geral">Geral</TabsTrigger>
+        <TabsTrigger value="api">API</TabsTrigger>
+        <TabsTrigger value="automacao">Automação</TabsTrigger>
+        <TabsTrigger value="cobertura">Cobertura</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="geral" className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2"><Label>Razão Social *</Label><Input value={form.razao_social} onChange={(e) => setForm({ ...form, razao_social: e.target.value })} /></div>
+          <div className="grid gap-2"><Label>Nome Fantasia *</Label><Input value={form.nome_fantasia} onChange={(e) => setForm({ ...form, nome_fantasia: e.target.value })} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2"><Label>CNPJ</Label><MaskedInput maskType="cnpj" value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })} /></div>
+          <div className="grid gap-2"><Label>Contato Comercial</Label><Input value={form.contato_comercial} onChange={(e) => setForm({ ...form, contato_comercial: e.target.value })} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2"><Label>Email Comercial</Label><Input type="email" value={form.email_comercial} onChange={(e) => setForm({ ...form, email_comercial: e.target.value })} /></div>
+          <div className="grid gap-2"><Label>WhatsApp</Label><MaskedInput maskType="phone" value={form.whatsapp_operacional} onChange={(e) => setForm({ ...form, whatsapp_operacional: e.target.value })} /></div>
+        </div>
+        <div className="grid gap-2"><Label>URL Rastreamento</Label><Input value={form.url_rastreamento} onChange={(e) => setForm({ ...form, url_rastreamento: e.target.value })} /></div>
+        <div className="flex items-center gap-2"><Switch checked={form.homologada} onCheckedChange={(v) => setForm({ ...form, homologada: v })} /><Label>Homologada</Label></div>
+        <div className="grid gap-2"><Label>Observações</Label><Textarea value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} /></div>
+      </TabsContent>
+
+      <TabsContent value="api" className="space-y-4">
+        <div className="grid gap-2"><Label>Endpoint API</Label><Input placeholder="https://api.transportadora.com/v1" value={form.credentials.endpoint} onChange={(e) => setForm({ ...form, credentials: { ...form.credentials, endpoint: e.target.value } })} /></div>
+        <div className="grid gap-2"><Label>API Key / Token</Label><Input type="password" value={form.credentials.api_key} onChange={(e) => setForm({ ...form, credentials: { ...form.credentials, api_key: e.target.value } })} /></div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2"><Label>Usuário API</Label><Input value={form.credentials.api_user} onChange={(e) => setForm({ ...form, credentials: { ...form.credentials, api_user: e.target.value } })} /></div>
+          <div className="grid gap-2"><Label>Senha API</Label><Input type="password" value={form.credentials.api_password} onChange={(e) => setForm({ ...form, credentials: { ...form.credentials, api_password: e.target.value } })} /></div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="automacao" className="space-y-4">
+        <div className="grid gap-2">
+          <Label>Canal de Cotação</Label>
+          <Select value={form.non_api_config.type} onValueChange={(v: any) => setForm({ ...form, non_api_config: { ...form.non_api_config, type: v } })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="whatsapp">WhatsApp Business</SelectItem>
+              <SelectItem value="email">E-mail Corporativo</SelectItem>
+              <SelectItem value="portal">Portal Web (Login)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {form.non_api_config.type === 'portal' ? (
+          <>
+            <div className="grid gap-2"><Label>URL do Portal</Label><Input value={form.non_api_config.portal_url} onChange={(e) => setForm({ ...form, non_api_config: { ...form.non_api_config, portal_url: e.target.value } })} /></div>
+            <div className="grid gap-2"><Label>Usuário de Acesso</Label><Input value={form.non_api_config.portal_user} onChange={(e) => setForm({ ...form, non_api_config: { ...form.non_api_config, portal_user: e.target.value } })} /></div>
+          </>
+        ) : (
+          <>
+            <div className="grid gap-2"><Label>{form.non_api_config.type === 'whatsapp' ? 'Número WhatsApp' : 'E-mail de Destino'}</Label><Input value={form.non_api_config.recipient} onChange={(e) => setForm({ ...form, non_api_config: { ...form.non_api_config, recipient: e.target.value } })} /></div>
+            <div className="grid gap-2"><Label>Template de Mensagem</Label><Textarea placeholder="Olá, gostaria de cotar um frete..." value={form.non_api_config.template} onChange={(e) => setForm({ ...form, non_api_config: { ...form.non_api_config, template: e.target.value } })} /></div>
+          </>
+        )}
+      </TabsContent>
+
+      <TabsContent value="cobertura" className="space-y-4">
+        <div className="grid gap-2">
+          <Label>Estados Atendidos (UF)</Label>
+          <div className="flex flex-wrap gap-2 p-2 border rounded-md max-h-32 overflow-y-auto">
+            {UFS.map(uf => (
+              <div key={uf} className="flex items-center gap-1 bg-secondary/50 px-2 py-1 rounded">
+                <Checkbox 
+                  checked={form.coverage_details.states.includes(uf)} 
+                  onCheckedChange={(checked) => {
+                    const states = checked 
+                      ? [...form.coverage_details.states, uf]
+                      : form.coverage_details.states.filter((s: string) => s !== uf);
+                    setForm({ ...form, coverage_details: { ...form.coverage_details, states } });
+                  }}
+                />
+                <span className="text-xs">{uf}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Label>Cidades Específicas (Opcional)</Label>
+          <Textarea 
+            placeholder="Ex: São Paulo, Rio de Janeiro, Curitiba..." 
+            value={form.coverage_details.cities.join(", ")} 
+            onChange={(e) => setForm({ ...form, coverage_details: { ...form.coverage_details, cities: e.target.value.split(",").map(c => c.trim()).filter(c => c) } })} 
+          />
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 
   return (
@@ -228,7 +337,7 @@ export default function Transportadoras() {
                         <Plus className="w-4 h-4 mr-2" />Nova
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Nova Transportadora</DialogTitle>
                       </DialogHeader>
@@ -285,10 +394,14 @@ export default function Transportadoras() {
             <div className="flex items-start gap-3 mb-3">
               <Checkbox checked={isSelected(t.id)} onCheckedChange={() => toggle(t.id)} />
               <div className="flex-1"><p className="font-semibold">{t.nome_fantasia}</p><p className="text-xs text-muted-foreground">{t.razao_social}</p></div>
-              <Badge variant={t.homologada ? "default" : "secondary"} className={t.homologada ? "bg-success/20 text-success" : ""}>{t.homologada ? "Ativa" : "Inativa"}</Badge>
+              <div className="flex gap-1 items-center">
+                {t.credentials?.api_key && <Key className="w-3 h-3 text-primary" />}
+                {t.non_api_config?.type && <Settings className="w-3 h-3 text-info" />}
+                <Badge variant={t.homologada ? "default" : "secondary"} className={t.homologada ? "bg-success/20 text-success" : ""}>{t.homologada ? "Ativa" : "Inativa"}</Badge>
+              </div>
               <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => openEdit(t)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(t.id)}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
             </div>
-            <div className="space-y-1 text-sm text-muted-foreground">{t.contato_comercial && <div className="flex items-center gap-1"><Phone className="w-3 h-3" />{t.contato_comercial}</div>}{t.email_comercial && <div className="flex items-center gap-1"><Mail className="w-3 h-3" />{t.email_comercial}</div>}{t.regioes_atendidas && t.regioes_atendidas.length > 0 && <div className="flex items-center gap-1"><MapPin className="w-3 h-3" />{t.regioes_atendidas.slice(0, 3).join(", ")}{t.regioes_atendidas.length > 3 && ` +${t.regioes_atendidas.length - 3}`}</div>}</div>
+            <div className="space-y-1 text-sm text-muted-foreground">{t.contato_comercial && <div className="flex items-center gap-1"><Phone className="w-3 h-3" />{t.contato_comercial}</div>}{t.email_comercial && <div className="flex items-center gap-1"><Mail className="w-3 h-3" />{t.email_comercial}</div>}{(t.regioes_atendidas || t.coverage_details?.states) && <div className="flex items-center gap-1"><MapPin className="w-3 h-3" />{(t.coverage_details?.states || t.regioes_atendidas).slice(0, 3).join(", ")}{(t.coverage_details?.states?.length || t.regioes_atendidas?.length || 0) > 3 && ` +${(t.coverage_details?.states?.length || t.regioes_atendidas?.length || 0) - 3}`}</div>}</div>
             <div className="flex items-center justify-between mt-3 pt-3 border-t"><div className="flex items-center gap-1">{[1,2,3,4,5].map(s => <Star key={s} className={`w-4 h-4 ${s <= (t.score_performance || 0) / 20 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />)}</div><span className="text-sm font-medium">{t.total_entregas || 0} entregas</span></div>
             </div>
           </StaggeredItem>
@@ -327,7 +440,7 @@ export default function Transportadoras() {
       </AlertDialog>
 
       <Dialog open={editDialog} onOpenChange={setEditDialog}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Editar Transportadora</DialogTitle></DialogHeader>
           <FormFields />
           <DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate}>Salvar Alterações</Button></DialogFooter>
