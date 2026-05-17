@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Activity, ShieldCheck, Zap, AlertTriangle, Cpu, Radio, Fingerprint, Database } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
