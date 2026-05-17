@@ -170,7 +170,7 @@ export default function Index() {
     "kpi-problemas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Problemas"><KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" target={10} performanceMode={performanceMode} /></WidgetErrorBoundary> },
     "logistics-map": { size: "full", render: () => <WidgetErrorBoundary widgetName="Mapa Logístico"><LogisticsMapWidget /></WidgetErrorBoundary> },
     "intelligence-widget": { size: "large", render: () => <WidgetErrorBoundary widgetName="Inteligência"><IntelligentLogisticsWidget /></WidgetErrorBoundary> },
-    "chart-performance": { size: "large", render: () => <WidgetErrorBoundary widgetName="Gráfico Performance"><PerformanceChart title="Movimentação" subtitle="Coletas vs Entregas" data={chartData} dataKey="coletas" secondaryDataKey="entregas" /></WidgetErrorBoundary> },
+    "chart-performance": { size: "large", render: () => <WidgetErrorBoundary widgetName="Gráfico Performance"><PerformanceChart title="Movimentação" subtitle="Fluxo Logístico em Tempo Real" data={chartData} dataKey="coletas" secondaryDataKey="entregas" performanceMode={performanceMode} /></WidgetErrorBoundary> },
     "alerts-panel": { size: "large", render: () => <WidgetErrorBoundary widgetName="Alertas"><AlertsPanel alerts={alerts} isLoading={alertsLoading} /></WidgetErrorBoundary> },
     "quick-actions": { size: "full", render: () => <WidgetErrorBoundary widgetName="Ações Rápidas"><QuickActions /></WidgetErrorBoundary> },
     "transportadora-ranking": { size: "large", render: () => <WidgetErrorBoundary widgetName="Ranking Transportadoras"><TransportadoraRanking transportadoras={transportadoras} isLoading={transportadorasLoading} /></WidgetErrorBoundary> },
