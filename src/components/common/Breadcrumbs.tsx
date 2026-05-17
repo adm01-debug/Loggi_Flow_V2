@@ -1,9 +1,8 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { ChevronRight, Home, Copy, Check, History as HistoryIcon, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import {

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  Search, Package, Truck, Users, AlertTriangle, FileText, Settings, 
-  BarChart3, Trophy, Building2, PackageSearch, Command as CommandIcon,
+  Search, Package, Users, Settings, 
+  BarChart3, Command as CommandIcon,
   Loader2, ArrowRight
 } from "lucide-react";
 import { 

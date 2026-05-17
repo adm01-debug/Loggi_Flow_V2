@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode, useCallback, useState } from "react";
-import { AlertTriangle, RefreshCw, Home, ChevronLeft, ShieldAlert, LifeBuoy } from "lucide-react";
+import { RefreshCw, Home, ChevronLeft, ShieldAlert, LifeBuoy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
