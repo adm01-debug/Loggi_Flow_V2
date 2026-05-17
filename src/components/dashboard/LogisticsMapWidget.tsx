@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { 
   MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, 
-  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame
+  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,12 @@ import { MissionDetail } from "./MissionDetail";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { PerformanceChart } from "./PerformanceChart";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
 
 export function LogisticsMapWidget() {
-  const { allShipments: shipments, isLoading } = useUnifiedTracking();
+  const { allShipments: shipments, summary, isLoading } = useUnifiedTracking();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [selectedShipment, setSelectedShipment] = React.useState<UnifiedShipment | null>(null);
@@ -29,6 +30,8 @@ export function LogisticsMapWidget() {
   const [showMission, setShowMission] = React.useState(false);
   const [showHeatmap, setShowHeatmap] = React.useState(false);
   const [isOptimizing, setIsOptimizing] = React.useState(false);
+  const [showPerformance, setShowPerformance] = React.useState(false);
+  const [isExporting, setIsExporting] = React.useState(false);
   
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,
@@ -162,6 +165,36 @@ export function LogisticsMapWidget() {
               >
                 <Zap className={cn("w-3 h-3", isOptimizing && "fill-current")} />
                 {isOptimizing ? "Otimizando..." : "Auto-Otimizar"}
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowPerformance(!showPerformance)}
+                className={cn(
+                  "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
+                  showPerformance ? "bg-primary border-primary" : "bg-white/5"
+                )}
+              >
+                <Gauge className="w-3 h-3" />
+                Performance
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  setIsExporting(true);
+                  setTimeout(() => {
+                    setIsExporting(false);
+                    toast.success("Relatório Auditoria Gerado!");
+                  }, 1500);
+                }}
+                disabled={isExporting}
+                className="h-9 rounded-full bg-white/5 border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2"
+              >
+                {isExporting ? <RefreshCw className="w-3 h-3 animate-spin" /> : <FileText className="w-3 h-3" />}
+                Exportar
               </Button>
 
               <Button 
@@ -573,8 +606,42 @@ export function LogisticsMapWidget() {
           )}
         </SheetContent>
       </Sheet>
+      <Sheet open={showMission} onOpenChange={setShowMission}>
+        <SheetContent side="right" className="w-full sm:w-[540px] bg-black/95 backdrop-blur-3xl border-l border-white/10 p-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+          <ScrollArea className="h-full">
+            <SheetHeader className="p-8 pb-4">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+                  <Zap className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <SheetTitle className="text-3xl font-black text-white italic tracking-tighter uppercase leading-none">
+                    Dossiê de Missão
+                  </SheetTitle>
+                  <SheetDescription className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2">
+                    Célula de Inteligência Nexus
+                  </SheetDescription>
+                </div>
+              </div>
+              <Separator className="bg-white/10" />
+            </SheetHeader>
+            <div className="p-8 pt-0">
+              {selectedShipment && (
+                <MissionDetail 
+                  shipment={selectedShipment} 
+                  onOpenBitrix={() => toast.info("Sincronizando com Bitrix24...")}
+                />
+              )}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
     </Card>
   );
 }
+
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 
