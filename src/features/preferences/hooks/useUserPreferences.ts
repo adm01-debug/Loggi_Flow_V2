@@ -16,6 +16,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
     showParticles: true,
     soundEffects: true,
     accentColor: '#ea384c',
+    animationSpeed: 'normal',
   },
 };
 
