@@ -113,6 +113,14 @@ export const AVAILABLE_WIDGETS: WidgetDefinition[] = [
     minSize: { w: 4, h: 4 },
     category: "action",
   },
+  {
+    id: "logistics-map",
+    title: "Mapa Logístico Nexus",
+    description: "Monitoramento global de frota em tempo real",
+    defaultSize: { w: 12, h: 6 },
+    minSize: { w: 6, h: 4 },
+    category: "chart",
+  },
 ];
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
