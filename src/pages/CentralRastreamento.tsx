@@ -291,46 +291,6 @@ export default function CentralRastreamento() {
         )}
       </div>
 
-      {/* Detail Sheet */}
-      {selectedShipment && (
-        <DetailSheet
-          open={detailOpen}
-          onOpenChange={setDetailOpen}
-          title={`${selectedShipment.tipo === 'entrega' ? '📦' : '🚚'} ${selectedShipment.numero}`}
-          subtitle={selectedShipment.transportadora}
-          badge={{
-            label: selectedShipment.statusLabel,
-            variant: selectedShipment.atrasado ? 'destructive' : 'default',
-          }}
-          fields={[
-            { label: 'Tipo', value: selectedShipment.tipo === 'entrega' ? 'Entrega' : 'Coleta' },
-            { label: 'Transportadora', value: selectedShipment.transportadora },
-            { label: 'Origem', value: selectedShipment.origem, fullWidth: true },
-            { label: 'Destino', value: selectedShipment.destino, fullWidth: true },
-            ...(selectedShipment.cliente ? [{ label: 'Cliente', value: selectedShipment.cliente }] : []),
-            ...(selectedShipment.nfRemessa ? [{ label: 'NF Remessa', value: selectedShipment.nfRemessa }] : []),
-            { label: 'Previsão', value: formatDate(selectedShipment.previsao) },
-            ...(selectedShipment.dataEfetiva ? [{ label: 'Data Efetiva', value: formatDate(selectedShipment.dataEfetiva) }] : []),
-            ...(selectedShipment.valorFrete ? [{ label: 'Valor Frete', value: `R$ ${selectedShipment.valorFrete.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` }] : []),
-            ...(selectedShipment.codigoRastreamento ? [{ label: 'Código Rastreamento', value: selectedShipment.codigoRastreamento, fullWidth: true }] : []),
-            ...(selectedShipment.atrasado ? [{ label: 'Atraso', value: `${selectedShipment.diasAtraso} dia(s)` }] : []),
-          ]}
-        >
-          <div className="card-base p-4 bg-muted/30 mt-4">
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex items-center gap-2 flex-1">
-                <MapPin className="w-4 h-4 text-primary shrink-0" />
-                <span className="truncate">{selectedShipment.origem}</span>
-              </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
-              <div className="flex items-center gap-2 flex-1">
-                <Navigation className="w-4 h-4 text-success shrink-0" />
-                <span className="truncate">{selectedShipment.destino}</span>
-              </div>
-            </div>
-          </div>
-        </DetailSheet>
-      )}
     </MainLayout>
   );
 }
