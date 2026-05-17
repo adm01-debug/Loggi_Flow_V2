@@ -155,6 +155,24 @@ serve(async (req) => {
         break;
       }
 
+      case "send_delay_alert": {
+        templateName = "delay_alert";
+        message = `⚠️ *LogiFlow - Alerta de Atraso*\n\n` +
+          `A remessa *${body.variables?.numero || "N/A"}* está com atraso detectado.\n` +
+          `Ação recomendada: Contatar transportadora *${body.variables?.transportadora || "N/A"}*.\n` +
+          `Link: https://logiflow-nexus.lovable.app/rastreamento/${body.entrega_id || ""}`;
+        break;
+      }
+
+      case "send_normalization_alert": {
+        templateName = "normalization_fail";
+        message = `❌ *LogiFlow - Falha de Normalização*\n\n` +
+          `Ocorreu uma falha ao processar a resposta da transportadora *${body.variables?.transportadora || "N/A"}*.\n` +
+          `Cotação ID: *${body.variables?.cotacao_id || "N/A"}*\n` +
+          `Necessário intervenção manual no painel Nexus.`;
+        break;
+      }
+
       case "send_custom": {
         if (!body.template) {
           return new Response(
