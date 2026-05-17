@@ -20,6 +20,11 @@ import { RankingPodium } from "./ranking/RankingPodium";
 
 interface RankUser {
   id: string; name: string; avatar?: string; xp: number; level: number; streak: number; coins: number; achievements: number; rank: number;
+  rank_display?: {
+    name: string;
+    icon: string;
+    color: string;
+  };
 }
 
 const filterConfig: FilterConfig<RankUser> = { search: { fields: ["name"] } };
