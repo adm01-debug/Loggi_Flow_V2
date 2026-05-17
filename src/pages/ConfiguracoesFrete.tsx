@@ -64,10 +64,10 @@ export default function FreightConfig() {
   // 3. Carrier Credentials & Non-API Config
   const { data: carriers = [] } = useQuery({
     queryKey: ['carriers-config'],
-    queryFn: async () => {
+    queryFn: async (): Promise<CarrierConfig[]> => {
       const { data, error } = await supabase.from('transportadoras').select('*').order('nome_fantasia');
       if (error) throw error;
-      return data;
+      return (data || []) as any;
     }
   });
 
