@@ -395,8 +395,8 @@ export default function Transportadoras() {
               <Checkbox checked={isSelected(t.id)} onCheckedChange={() => toggle(t.id)} />
               <div className="flex-1"><p className="font-semibold">{t.nome_fantasia}</p><p className="text-xs text-muted-foreground">{t.razao_social}</p></div>
               <div className="flex gap-1 items-center">
-                {t.credentials?.api_key && <Key className="w-3 h-3 text-primary" title="API Configurada" />}
-                {t.non_api_config?.type && <Settings className="w-3 h-3 text-info" title="Automação Ativa" />}
+                {t.credentials?.api_key && <Key className="w-3 h-3 text-primary" />}
+                {t.non_api_config?.type && <Settings className="w-3 h-3 text-info" />}
                 <Badge variant={t.homologada ? "default" : "secondary"} className={t.homologada ? "bg-success/20 text-success" : ""}>{t.homologada ? "Ativa" : "Inativa"}</Badge>
               </div>
               <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => openEdit(t)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(t.id)}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
