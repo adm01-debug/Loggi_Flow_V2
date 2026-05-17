@@ -5,10 +5,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Json } from "@/integrations/supabase/types";
 
-export type EntityType = "coleta" | "entrega" | "ocorrencia";
-export type TriggerEvent = "on_create" | "on_update" | "on_status_change";
-export type ConditionOperator = "equals" | "not_equals" | "contains" | "greater_than" | "less_than" | "is_empty" | "is_not_empty";
-export type ActionType = "send_notification" | "change_status" | "send_email" | "add_tag" | "assign_user" | "create_alert";
+export type EntityType = "coleta" | "entrega" | "ocorrencia" | "frete";
+export type TriggerEvent = "on_create" | "on_update" | "on_status_change" | "low_performance" | "high_cost";
+export type ConditionOperator = "equals" | "not_equals" | "contains" | "greater_than" | "less_than" | "is_empty" | "is_not_empty" | "below_threshold";
+export type ActionType = "send_notification" | "change_status" | "send_email" | "add_tag" | "assign_user" | "create_alert" | "block_carrier";
 
 export interface RuleCondition {
   id: string;
