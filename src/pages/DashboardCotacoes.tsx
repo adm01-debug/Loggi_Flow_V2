@@ -164,6 +164,7 @@ export default function DashboardCotacoes() {
                         <TableCell><TimeRemaining expiresAt={cotacao.expires_at} /></TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" title="Ver Logs" onClick={() => { setSelectedCotacao(cotacao); setLogsDialog(true); }}><History className="w-3.5 h-3.5" /></Button>
                             {cotacao.status === 'pendente' && (
                               <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => { setSelectedCotacao(cotacao); setRespondDialog(true); }}><Send className="w-3 h-3" /> Registrar</Button>
                             )}
