@@ -1,7 +1,8 @@
 import { useMemo, useState, useEffect, useRef, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, ShieldCheck } from "lucide-react";
+import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, ShieldCheck, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/common/PageTransition";
 
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
@@ -59,6 +60,7 @@ const RefreshTimer = memo(({ lastRefresh }: { lastRefresh: Date }) => {
 RefreshTimer.displayName = "RefreshTimer";
 
 export default function Index() {
+  const [performanceMode, setPerformanceMode] = useState(false);
   const { data: metrics, refetch: refetchMetrics } = useDashboardMetrics();
   const { data: alerts = [], isLoading: alertsLoading, refetch: refetchAlerts } = useRecentAlerts();
   const { data: transportadoras = [], isLoading: transportadorasLoading } = useTransportadoraPerformance();
@@ -162,10 +164,10 @@ export default function Index() {
 
   const widgetDefinitions: Record<string, { size: DashboardWidget["size"]; render: () => React.ReactNode }> = {
     "xp-progress": { size: "full", render: () => <WidgetErrorBoundary widgetName="XP Progress">{userLevel ? <XPProgressBar currentXP={userLevel.current_xp} nextLevelXP={userLevel.level * 1000} level={userLevel.level} /> : null}</WidgetErrorBoundary> },
-    "kpi-pendentes": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Pendentes"><KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" /></WidgetErrorBoundary> },
-    "kpi-transito": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Trânsito"><KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" /></WidgetErrorBoundary> },
-    "kpi-finalizadas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Finalizadas"><KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" /></WidgetErrorBoundary> },
-    "kpi-problemas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Problemas"><KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" /></WidgetErrorBoundary> },
+    "kpi-pendentes": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Pendentes"><KPICard title="Pendentes" value={statusStats.pendentes} icon={Clock} trend="neutral" status="warning" target={100} performanceMode={performanceMode} /></WidgetErrorBoundary> },
+    "kpi-transito": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Trânsito"><KPICard title="Em Trânsito" value={statusStats.transito} icon={Truck} trend="neutral" status="neutral" target={100} performanceMode={performanceMode} /></WidgetErrorBoundary> },
+    "kpi-finalizadas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Finalizadas"><KPICard title="Finalizadas" value={statusStats.finalizadas} icon={CheckCircle2} trend="neutral" status="success" target={100} performanceMode={performanceMode} /></WidgetErrorBoundary> },
+    "kpi-problemas": { size: "small", render: () => <WidgetErrorBoundary widgetName="KPI Problemas"><KPICard title="Problemas" value={statusStats.problemas} icon={AlertTriangle} trend="neutral" status="danger" target={10} performanceMode={performanceMode} /></WidgetErrorBoundary> },
     "logistics-map": { size: "full", render: () => <WidgetErrorBoundary widgetName="Mapa Logístico"><LogisticsMapWidget /></WidgetErrorBoundary> },
     "intelligence-widget": { size: "large", render: () => <WidgetErrorBoundary widgetName="Inteligência"><IntelligentLogisticsWidget /></WidgetErrorBoundary> },
     "chart-performance": { size: "large", render: () => <WidgetErrorBoundary widgetName="Gráfico Performance"><PerformanceChart title="Movimentação" subtitle="Coletas vs Entregas" data={chartData} dataKey="coletas" secondaryDataKey="entregas" /></WidgetErrorBoundary> },
@@ -215,6 +217,20 @@ export default function Index() {
                   <div className="shrink-0"><Button variant="outline" size="sm" onClick={resetLayout} className="whitespace-nowrap"><RotateCcw className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Resetar</span></Button></div>
                 </>
               )}
+              <div className="shrink-0">
+                <Button 
+                  variant={performanceMode ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setPerformanceMode(!performanceMode)} 
+                  className={cn(
+                    "whitespace-nowrap transition-all duration-500",
+                    performanceMode ? "bg-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]" : ""
+                  )}
+                >
+                  <Zap className={cn("w-4 h-4 sm:mr-2", performanceMode && "fill-current animate-pulse")} />
+                  <span className="hidden sm:inline">{performanceMode ? "Performance ON" : "Modo Performance"}</span>
+                </Button>
+              </div>
               <div className="shrink-0">
                 <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={toggleEditMode} className="whitespace-nowrap">
                   <Settings2 className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">{isEditMode ? "Salvar" : "Personalizar"}</span>

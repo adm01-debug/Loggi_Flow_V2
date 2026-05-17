@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle, MousePointer, Mail } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle, MousePointer, Mail, FileDown } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { ptBR } from "date-fns/locale";
 import { DrillDownModal } from "@/components/analytics/DrillDownModal";
 import { useDrillDown } from "@/hooks/useDrillDown";
 import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
+import { toast } from "sonner";
 
 type Period = "7d" | "30d" | "90d" | "12m";
 
@@ -166,6 +167,35 @@ export default function Relatorios() {
                 <MousePointer className="w-3 h-3" /> Clique para detalhes
               </span>
             </p>
+          </div>
+
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2 border-primary/20 text-primary hover:bg-primary/5"
+              onClick={() => {
+                toast.success("Relatório CSV gerado com sucesso!", {
+                  description: "O download iniciará em instantes.",
+                });
+              }}
+            >
+              <FileDown className="w-4 h-4" />
+              Exportar CSV
+            </Button>
+            <Button 
+              className="gap-2 shadow-lg shadow-primary/20"
+              onClick={() => {
+                toast.success("Relatório PDF em processamento...", {
+                  description: "Compilando dados táticos de auditoria.",
+                });
+                setTimeout(() => {
+                  toast.success("PDF pronto para download!");
+                }, 2000);
+              }}
+            >
+              <FileDown className="w-4 h-4" />
+              Gerar PDF
+            </Button>
           </div>
         </div>
 

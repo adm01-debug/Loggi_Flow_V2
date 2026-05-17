@@ -3,12 +3,18 @@ import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, Geoloc
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, Search, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { 
+  MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, 
+  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUnifiedTracking, UnifiedShipment } from "@/hooks/useUnifiedTracking";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MissionDetail } from "./MissionDetail";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
 
@@ -17,6 +23,9 @@ export function LogisticsMapWidget() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [selectedShipment, setSelectedShipment] = React.useState<UnifiedShipment | null>(null);
+  const [showLayers, setShowLayers] = React.useState(false);
+  const [typeFilter, setTypeFilter] = React.useState<"all" | "entrega" | "coleta">("all");
+  const [showMission, setShowMission] = React.useState(false);
   
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,
@@ -30,16 +39,20 @@ export function LogisticsMapWidget() {
     return shipments.filter(s => {
       const matchesSearch = s.numero.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            s.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           s.transportadora.toLowerCase().includes(searchTerm.toLowerCase());
+                            s.transportadora.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === "all" || 
                            (statusFilter === "in_transit" && ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)) ||
                            (statusFilter === "delayed" && s.atrasado) ||
-                           (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status));
+                           (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status)) ||
+                           (statusFilter === "pending" && ["aguardando_producao", "pronto_despacho", "pendente"].includes(s.status)) ||
+                           (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status));
 
-      return s.coordinates && matchesSearch && matchesStatus;
+      const matchesType = typeFilter === "all" || s.tipo === typeFilter;
+
+      return s.coordinates && matchesSearch && matchesStatus && matchesType;
     });
-  }, [shipments, searchTerm, statusFilter]);
+  }, [shipments, searchTerm, statusFilter, typeFilter]);
 
   const activeShipments = shipments.filter(s => 
     ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)
@@ -125,11 +138,86 @@ export function LogisticsMapWidget() {
                 {mapStyle.includes("dark") ? <Satellite className="w-3 h-3 text-primary" /> : <Activity className="w-3 h-3 text-primary" />}
                 {mapStyle.includes("dark") ? "Satélite" : "Tático"}
               </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowLayers(!showLayers)}
+                className={cn(
+                  "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
+                  showLayers ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" : "bg-white/5"
+                )}
+              >
+                <Layers className="w-3 h-3" />
+                Camadas
+              </Button>
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-4 flex-1 flex flex-col md:flex-row gap-4 relative overflow-hidden">
+          <AnimatePresence>
+            {showLayers && (
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="absolute top-20 right-6 z-50 w-64 bg-black/90 backdrop-blur-3xl border border-white/10 rounded-3xl p-6 shadow-2xl space-y-6"
+              >
+                <div className="flex justify-between items-center">
+                  <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Nexus Layer Engine</h4>
+                  <button onClick={() => setShowLayers(false)} className="text-white/40 hover:text-white"><X className="w-4 h-4" /></button>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Tipo de Fluxo</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['all', 'entrega', 'coleta'].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setTypeFilter(type as any)}
+                          className={cn(
+                            "h-8 rounded-xl border text-[8px] font-black uppercase transition-all",
+                            typeFilter === type ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/5 text-white/40 hover:text-white/60"
+                          )}
+                        >
+                          {type === 'all' ? 'Tudo' : type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Filtros Táticos</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { id: 'all', label: 'Global', icon: Activity },
+                        { id: 'in_transit', label: 'Transito', icon: Truck },
+                        { id: 'pending', label: 'Pendente', icon: Clock },
+                        { id: 'completed', label: 'Sucesso', icon: CheckCircle2 },
+                        { id: 'delayed', label: 'Atraso', icon: AlertTriangle },
+                        { id: 'problems', label: 'Crítico', icon: AlertTriangle },
+                      ].map((f) => (
+                        <button
+                          key={f.id}
+                          onClick={() => setStatusFilter(f.id)}
+                          className={cn(
+                            "flex items-center gap-2 p-2 rounded-xl border text-[8px] font-black uppercase transition-all",
+                            statusFilter === f.id ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/5 text-white/40 hover:text-white/60"
+                          )}
+                        >
+                          <f.icon className="w-3 h-3" />
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Sidebar Info */}
           <div className="w-full md:w-72 flex flex-col gap-3 z-10">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
@@ -170,7 +258,21 @@ export function LogisticsMapWidget() {
                       s.atrasado ? "bg-destructive" : "bg-primary")}>
                       {s.statusLabel}
                     </Badge>
-                    <span className="text-[8px] font-bold text-white/40 italic">{s.tipo === 'entrega' ? 'ENT' : 'COL'}</span>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-6 w-6 text-white/40 hover:text-primary transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedShipment(s);
+                          setShowMission(true);
+                        }}
+                      >
+                        <Info className="w-3.5 h-3.5" />
+                      </Button>
+                      <span className="text-[8px] font-bold text-white/40 italic">{s.tipo === 'entrega' ? 'ENT' : 'COL'}</span>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -212,6 +314,10 @@ export function LogisticsMapWidget() {
                   }}
                 >
                   <div className="group/marker cursor-pointer relative">
+                    {/* Variational Alert Rings */}
+                    {s.atrasado && (
+                      <div className="absolute -inset-8 rounded-full bg-destructive/20 animate-ping" />
+                    )}
                     <div className={cn(
                       "absolute -inset-4 rounded-full animate-ping opacity-20",
                       ["em_transito", "despachado", "saiu_entrega"].includes(s.status) ? "bg-primary" : 
@@ -224,7 +330,13 @@ export function LogisticsMapWidget() {
                       ["em_transito", "despachado", "saiu_entrega"].includes(s.status) ? "bg-black border-primary text-primary" : 
                       ["entregue", "finalizado", "recebido"].includes(s.status) ? "bg-black border-success text-success" : "bg-black border-destructive text-destructive"
                     )}>
-                      {s.tipo === 'entrega' ? <Truck className="w-5 h-5" /> : <Package className="w-5 h-5" />}
+                      {s.atrasado ? (
+                        <AlertTriangle className="w-5 h-5 animate-bounce" />
+                      ) : s.tipo === 'entrega' ? (
+                        <Truck className="w-5 h-5" />
+                      ) : (
+                        <Package className="w-5 h-5" />
+                      )}
                     </div>
 
                     {/* Simple Tooltip on Hover */}
@@ -244,7 +356,18 @@ export function LogisticsMapWidget() {
                             <Activity className="w-3 h-3 text-primary" />
                             <span className="text-[8px] font-black text-white uppercase">{s.statusLabel}</span>
                           </div>
-                          <span className="text-[7px] font-bold text-white/30 uppercase tracking-widest">Live Pos</span>
+                          <div className="flex items-center gap-1">
+                            <Button 
+                              size="sm" 
+                              className="h-6 px-3 bg-primary text-[8px] font-black uppercase rounded-lg pointer-events-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowMission(true);
+                              }}
+                            >
+                              Missão
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -322,6 +445,35 @@ export function LogisticsMapWidget() {
           </div>
         </CardContent>
       </div>
+
+      <Sheet open={showMission} onOpenChange={setShowMission}>
+        <SheetContent className="sm:max-w-xl bg-black/95 border-primary/20 backdrop-blur-3xl overflow-y-auto">
+          <SheetHeader className="mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Box className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <SheetTitle className="text-2xl font-black italic tracking-tighter text-white uppercase">
+                  Dossiê de Missão
+                </SheetTitle>
+                <SheetDescription className="text-primary font-black uppercase text-[10px] tracking-widest">
+                  Nexus Intelligence Archive • Protocolo {selectedShipment?.numero}
+                </SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
+          
+          {selectedShipment && (
+            <MissionDetail 
+              shipment={selectedShipment} 
+              onOpenBitrix={() => {
+                window.open('https://bitrix24.com', '_blank');
+              }}
+            />
+          )}
+        </SheetContent>
+      </Sheet>
     </Card>
   );
 }
