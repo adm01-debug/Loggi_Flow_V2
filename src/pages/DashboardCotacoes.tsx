@@ -59,6 +59,7 @@ export default function DashboardCotacoes() {
   const [tab, setTab] = useState('ativas');
   const [filterCanal, setFilterCanal] = useState<string>('all');
   const [respondDialog, setRespondDialog] = useState(false);
+  const [logsDialog, setLogsDialog] = useState(false);
   const [selectedCotacao, setSelectedCotacao] = useState<CotacaoMulticanal | null>(null);
   const [respValor, setRespValor] = useState('');
   const [respPrazo, setRespPrazo] = useState('');
