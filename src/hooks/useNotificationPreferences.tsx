@@ -19,6 +19,7 @@ export interface NotificationPreferences {
 const defaultPreferences: NotificationPreferences = {
   notifications_email: true,
   notifications_push: true,
+  notifications_whatsapp: true,
   notifications_sla: true,
   notifications_ocorrencias: true,
   notifications_coletas: true,
