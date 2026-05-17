@@ -8,8 +8,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Truck, Package, MapPin, Clock, CheckCircle2, AlertTriangle, 
   ArrowLeft, RefreshCw, User, Calendar, History, Navigation,
-  ChevronRight, MoreVertical, ExternalLink
+  ChevronRight, MoreVertical, ExternalLink, Share2, Copy, Check
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 import { useUnifiedTracking, UnifiedShipment } from '@/hooks/useUnifiedTracking';
 import { useRecordHistory } from '@/hooks/useAuditLogs';
 import { format, parseISO } from 'date-fns';
@@ -95,7 +105,50 @@ export default function RastreamentoRealTime() {
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Share2 className="w-4 h-4 mr-2" /> Compartilhar
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Share2 className="w-5 h-5 text-primary" />
+                    Compartilhar Rastreamento
+                  </DialogTitle>
+                  <DialogDescription>
+                    Envie este link para que outras pessoas acompanhem o status desta carga.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col items-center gap-6 py-4">
+                  <div className="p-4 bg-white rounded-2xl shadow-inner border">
+                    <QRCodeSVG 
+                      value={`${window.location.origin}/rastrear?id=${shipment.numero}`} 
+                      size={180}
+                      level="H"
+                      includeMargin={false}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 w-full">
+                    <div className="flex-1 bg-muted p-2 rounded-md font-mono text-xs truncate border">
+                      {window.location.origin}/rastrear?id={shipment.numero}
+                    </div>
+                    <Button 
+                      size="icon" 
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/rastrear?id=${shipment.numero}`);
+                        toast.success("Link copiado para a área de transferência!");
+                      }}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             {shipment.codigoRastreamento && (
               <Button variant="outline" size="sm" onClick={() => window.open(shipment.codigoRastreamento || '', '_blank')}>
                 <ExternalLink className="w-4 h-4 mr-2" /> Rastreamento Externo

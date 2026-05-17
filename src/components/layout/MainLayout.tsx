@@ -13,6 +13,7 @@ import { PageSkeleton } from "@/components/ui/skeletons";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
+import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
 import { useUserPreferences } from "@/features/preferences";
 
 const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));
@@ -113,6 +114,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <MobileBottomNav />
       <MobileQuickActions />
       <LevelUpModal />
+      <AchievementNotificationContainer />
       <ScrollToTop />
       
       <Suspense fallback={null}>
