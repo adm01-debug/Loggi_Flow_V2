@@ -189,7 +189,16 @@ export function LogisticsMapWidget() {
                   setIsExporting(true);
                   setTimeout(() => {
                     setIsExporting(false);
-                    toast.success("Relatório Auditoria Gerado!");
+                    const csvContent = "data:text/csv;charset=utf-8,ID,Numero,Status,Tipo,Valor,Atrasado\n" + 
+                      shipments.slice(0, 10).map(s => `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.atrasado}`).join("\n");
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `auditoria_nexus_${new Date().toISOString().slice(0,10)}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    toast.success("Relatório Auditoria Nexus Gerado (CSV)!");
                   }, 1500);
                 }}
                 disabled={isExporting}
