@@ -309,56 +309,126 @@ export default function FreightConfig() {
                   <CardTitle>Configuração de Melhor Frete</CardTitle>
                   <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
                 </div>
-                <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 50, time_weight: 50, max_sla_days: 10, is_active: true })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
+                <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 10, is_active: true, is_default: false })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   {rules.length === 0 && !editingRule && <p className="text-center py-8 text-muted-foreground italic">Nenhuma regra personalizada. Usando padrões do sistema.</p>}
                   
                   {editingRule && (
-                    <div className="p-6 border-2 border-primary rounded-xl space-y-4 bg-primary/5 mb-8">
-                       <h4 className="font-bold text-primary flex items-center justify-between">
-                         Editando Regra: {editingRule.event_type}
+                    <div className="p-6 border-2 border-primary rounded-xl space-y-6 bg-primary/5 mb-8">
+                       <div className="flex items-center justify-between">
+                         <h4 className="font-bold text-primary flex items-center gap-2 text-lg">
+                           <Brain className="h-5 w-5" />
+                           {editingRule.id ? 'Editar Estratégia' : 'Nova Estratégia Nexus'}
+                         </h4>
                          <Button variant="ghost" size="sm" onClick={() => setEditRule(null)}>Cancelar</Button>
-                       </h4>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       </div>
+                       
+                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="space-y-2">
-                             <Label>Tipo de Evento</Label>
-                             <Input value={editingRule.event_type} onChange={e => setEditRule({...editingRule, event_type: e.target.value})} />
+                             <Label>Nome do Evento / Tipo</Label>
+                             <Input placeholder="Ex: Black Friday, Urgente" value={editingRule.event_type} onChange={e => setEditRule({...editingRule, event_type: e.target.value})} />
                           </div>
                           <div className="space-y-2">
-                             <Label>SLA Máximo (Dias)</Label>
+                             <Label>SLA Máximo Permitido (Dias)</Label>
                              <Input type="number" value={editingRule.max_sla_days} onChange={e => setEditRule({...editingRule, max_sla_days: parseInt(e.target.value)})} />
                           </div>
-                       </div>
-                       <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                             <Label>Peso Preço (%)</Label>
-                             <Input type="number" value={editingRule.price_weight} onChange={e => {
-                               const val = parseInt(e.target.value);
-                               setEditRule({...editingRule, price_weight: val, time_weight: 100 - val});
-                             }} />
-                          </div>
-                          <div className="space-y-2">
-                             <Label>Peso Prazo (%)</Label>
-                             <Input type="number" value={editingRule.time_weight} onChange={e => {
-                               const val = parseInt(e.target.value);
-                               setEditRule({...editingRule, time_weight: val, price_weight: 100 - val});
-                             }} />
+                          <div className="flex items-end gap-2 pb-1">
+                             <Switch 
+                               checked={editingRule.is_default} 
+                               onCheckedChange={checked => setEditRule({...editingRule, is_default: checked})} 
+                             />
+                             <Label>Regra Padrão (Fallback)</Label>
                           </div>
                        </div>
-                       <Button className="w-full mt-4" onClick={() => saveRule.mutate(editingRule)} disabled={saveRule.isPending}>
-                         {saveRule.isPending ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                         Salvar Regra
-                       </Button>
+
+                       <div className="space-y-8 pt-4">
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2"><Target className="h-4 w-4" /> Peso de Preço ({(editingRule.price_weight * 100).toFixed(0)}%)</Label>
+                            </div>
+                            <Slider 
+                              value={[editingRule.price_weight * 100]} 
+                              onValueChange={(val) => setEditRule({...editingRule, price_weight: val[0]/100})} 
+                              max={100} step={5} 
+                            />
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2"><Clock className="h-4 w-4" /> Peso de Prazo ({(editingRule.time_weight * 100).toFixed(0)}%)</Label>
+                            </div>
+                            <Slider 
+                              value={[editingRule.time_weight * 100]} 
+                              onValueChange={(val) => setEditRule({...editingRule, time_weight: val[0]/100})} 
+                              max={100} step={5} 
+                            />
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                              <Label className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Peso de Performance/Score ({(editingRule.performance_weight * 100).toFixed(0)}%)</Label>
+                            </div>
+                            <Slider 
+                              value={[editingRule.performance_weight * 100]} 
+                              onValueChange={(val) => setEditRule({...editingRule, performance_weight: val[0]/100})} 
+                              max={100} step={5} 
+                            />
+                          </div>
+                       </div>
+
+                       <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                          <p className="text-xs text-muted-foreground">
+                            <strong>Nota:</strong> A soma dos pesos deve idealmente ser 1.0 (100%) para um score normalizado. 
+                            Atual: {((editingRule.price_weight + editingRule.time_weight + editingRule.performance_weight) * 100).toFixed(0)}%
+                          </p>
+                          <Button onClick={() => saveRule.mutate(editingRule)} disabled={saveRule.isPending}>
+                            {saveRule.isPending ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                            Publicar Estratégia
+                          </Button>
+                       </div>
                     </div>
                   )}
 
-                  {rules.map((rule: any) => (
-                    <div key={rule.id} className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                           <div className="p-2 bg-primary/10 rounded-lg"><Zap className="h-4 w-4 text-primary" /></div>
+                  <div className="grid gap-4">
+                    {rules.map((rule: any) => (
+                      <div key={rule.id} className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                             <div className="p-2 bg-primary/10 rounded-lg"><Zap className="h-4 w-4 text-primary" /></div>
+                             <div>
+                                <h4 className="font-bold flex items-center gap-2">
+                                  {rule.event_type}
+                                  {rule.is_default && <Badge variant="secondary">Padrão</Badge>}
+                                  {!rule.is_active && <Badge variant="outline">Inativa</Badge>}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">SLA Máximo: {rule.max_sla_days} dias</p>
+                             </div>
+                          </div>
+                          <div className="flex gap-2">
+                             <Button size="sm" variant="outline" onClick={() => setEditRule(rule)}>Configurar</Button>
+                             <Button size="icon" variant="ghost" className="text-destructive" onClick={() => deleteRule.mutate(rule.id)}><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                           <div className="text-center p-2 bg-background rounded-lg border">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold">Custo</p>
+                             <p className="text-sm font-black">{(rule.price_weight * 100).toFixed(0)}%</p>
+                           </div>
+                           <div className="text-center p-2 bg-background rounded-lg border">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold">Prazo</p>
+                             <p className="text-sm font-black">{(rule.time_weight * 100).toFixed(0)}%</p>
+                           </div>
+                           <div className="text-center p-2 bg-background rounded-lg border">
+                             <p className="text-[10px] text-muted-foreground uppercase font-bold">Confiança</p>
+                             <p className="text-sm font-black">{(rule.performance_weight * 100).toFixed(0)}%</p>
+                           </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
                            <h4 className="font-bold text-foreground">{rule.event_type}</h4>
                         </div>
                         <div className="flex items-center gap-2">
