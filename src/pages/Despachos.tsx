@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ const validTransitions: Record<string, string> = {
 
 export default function Despachos() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [confirmItem, setConfirmItem] = useState<Despacho | null>(null);
 
   const { data: despachos = [], isLoading, refetch } = useQuery({
@@ -198,7 +200,8 @@ export default function Despachos() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         whileHover={{ y: -2 }}
-                        className="card-interactive p-3 border-2 hover:border-primary/40 group/card relative overflow-hidden"
+                        className="card-interactive p-3 border-2 hover:border-primary/40 group/card relative overflow-hidden cursor-pointer"
+                        onClick={() => navigate(`/rastreamento/${item.id}`)}
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
                         <div className="relative z-10">
@@ -211,7 +214,10 @@ export default function Despachos() {
                                 variant="ghost" 
                                 size="icon" 
                                 className="h-7 w-7 rounded-full bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all shadow-sm" 
-                                onClick={() => moveToNext(item)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  moveToNext(item);
+                                }}
                                 title={`Mover para ${statusConfig[validTransitions[col]]?.label}`}
                               >
                                 <ArrowRight className="w-4 h-4" />

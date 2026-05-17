@@ -62,6 +62,7 @@ const ImportacaoMassa = lazy(() => import("./pages/ImportacaoMassa"));
 const AutomacaoRegras = lazy(() => import("./pages/AutomacaoRegras"));
 const CentralRastreamento = lazy(() => import("./pages/CentralRastreamento"));
 const AdminTelemetria = lazy(() => import("./pages/AdminTelemetria"));
+const RastreamentoRealTime = lazy(() => import("./pages/RastreamentoRealTime"));
 const GestaoWebhooks = lazy(() => import("./pages/GestaoWebhooks"));
 const IntegracaoBitrix = lazy(() => import("./pages/IntegracaoBitrix"));
 const LogisticaReversa = lazy(() => import("./pages/LogisticaReversa"));
@@ -164,6 +165,7 @@ function AppRoutes() {
           <Route path="/importacao-massa" element={<ProtectedRoute><ImportacaoMassa /></ProtectedRoute>} />
           <Route path="/automacao-regras" element={<ProtectedRoute><AutomacaoRegras /></ProtectedRoute>} />
           <Route path="/central-rastreamento" element={<ProtectedRoute><CentralRastreamento /></ProtectedRoute>} />
+          <Route path="/rastreamento/:id" element={<ProtectedRoute><RastreamentoRealTime /></ProtectedRoute>} />
           <Route path="/audit-trail" element={<ProtectedRoute requiredRole="admin"><AuditTrail /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute requiredRole="admin"><APIDocumentation /></ProtectedRoute>} />
           <Route path="/gerenciamento-usuarios" element={<ProtectedRoute requiredRole="admin"><GerenciamentoUsuarios /></ProtectedRoute>} />

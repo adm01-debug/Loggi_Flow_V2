@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -50,6 +51,7 @@ const COLUMNS = [
 ] as const;
 
 function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number }) {
+  const navigate = useNavigate();
   const [showDetails, setShowDetails] = useState(false);
 
   return (
@@ -60,9 +62,10 @@ function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={cn(
-            "p-3 rounded-xl border bg-card shadow-sm transition-all select-none group relative",
+            "p-3 rounded-xl border bg-card shadow-sm transition-all select-none group relative cursor-pointer",
             snapshot.isDragging ? "shadow-xl ring-2 ring-primary border-primary scale-105 z-50" : "hover:border-primary/30"
           )}
+          onClick={() => navigate(`/rastreamento/${entrega.id}`)}
         >
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -94,7 +97,7 @@ function EntregaCard({ entrega, index }: { entrega: KanbanEntrega; index: number
             
             <Dialog open={showDetails} onOpenChange={setShowDetails}>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); setShowDetails(true); }}>
                   <Eye className="w-3 h-3" />
                 </Button>
               </DialogTrigger>
