@@ -1,6 +1,8 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AuditTrailViewer } from "@/components/audit/AuditTrailViewer";
-import { History, Shield, Download } from "lucide-react";
+import { DecisionAudit } from "@/components/freight/DecisionAudit";
+import { History, Shield, Download, Brain, Database } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
