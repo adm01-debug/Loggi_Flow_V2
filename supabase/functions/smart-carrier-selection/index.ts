@@ -18,6 +18,16 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Fetch selection rules
+    const { data: selectionRules } = await supabase
+      .from("freight_selection_rules")
+      .select("*")
+      .eq("is_active", true);
+
+    const activeRule = selectionRules?.find(r => r.event_type === (urgencia === 'alta' ? 'Urgente' : 'Normal')) 
+                    || selectionRules?.find(r => r.is_default) 
+                    || { price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 15 };
+
     // Fetch freight tables with carrier info
     const { data: tabelasFrete, error: tabelasError } = await supabase
       .from("tabelas_frete")
