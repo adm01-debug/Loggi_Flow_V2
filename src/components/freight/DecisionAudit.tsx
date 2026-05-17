@@ -53,9 +53,9 @@ export function DecisionAudit() {
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;
-      return data;
+      return data as any[] as FreightDecision[];
     },
-    refetchInterval: 10000, // Real-time feel
+    refetchInterval: 10000, 
   });
 
   if (isLoading) {
@@ -95,11 +95,11 @@ export function DecisionAudit() {
                 <div className="flex items-center gap-4 text-sm font-medium">
                    <div className="flex items-center gap-1">
                      <MapPin className="h-3 w-3 text-muted-foreground" />
-                     {decision.request_params.estado_destino}
+                     {decision.request_params?.estado_destino}
                    </div>
                    <div className="flex items-center gap-1">
                      <Scale className="h-3 w-3 text-muted-foreground" />
-                     {decision.request_params.peso_kg}kg
+                     {decision.request_params?.peso_kg}kg
                    </div>
                 </div>
               </div>
@@ -120,13 +120,12 @@ export function DecisionAudit() {
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground">Score Nexus</p>
                       <p className="text-xl font-black text-primary">
-                        {decision.recommendations[0]?.score}/100
+                        {decision.recommendations?.[0]?.score}/100
                       </p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                    {/* Weights and Rules applied */}
                     <div className="space-y-2">
                       <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider flex items-center gap-2">
                         <Scale className="h-3 w-3" /> Pesos da Estratégia: {decision.rule_applied?.event_type || 'Geral'}
@@ -134,26 +133,25 @@ export function DecisionAudit() {
                       <div className="grid grid-cols-3 gap-2">
                         <div className="bg-muted/50 p-2 rounded text-center">
                           <p className="text-[10px] text-muted-foreground">Preço</p>
-                          <p className="text-sm font-bold">{(decision.rule_applied?.price_weight * 100).toFixed(0)}%</p>
+                          <p className="text-sm font-bold">{(Number(decision.rule_applied?.price_weight || 0) * 100).toFixed(0)}%</p>
                         </div>
                         <div className="bg-muted/50 p-2 rounded text-center">
                           <p className="text-[10px] text-muted-foreground">Prazo</p>
-                          <p className="text-sm font-bold">{(decision.rule_applied?.time_weight * 100).toFixed(0)}%</p>
+                          <p className="text-sm font-bold">{(Number(decision.rule_applied?.time_weight || 0) * 100).toFixed(0)}%</p>
                         </div>
                         <div className="bg-muted/50 p-2 rounded text-center">
                           <p className="text-[10px] text-muted-foreground">Perf.</p>
-                          <p className="text-sm font-bold">{(decision.rule_applied?.performance_weight * 100).toFixed(0)}%</p>
+                          <p className="text-sm font-bold">{(Number(decision.rule_applied?.performance_weight || 0) * 100).toFixed(0)}%</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Rankings */}
                     <div className="space-y-2">
                       <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
                         Rankings de Comparação
                       </h4>
                       <div className="max-h-[150px] overflow-y-auto pr-2 space-y-1">
-                        {decision.recommendations.map((rec: any, idx: number) => (
+                        {decision.recommendations?.map((rec: any, idx: number) => (
                           <div key={idx} className={`flex items-center justify-between text-xs p-2 rounded ${idx === 0 ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'}`}>
                             <div className="flex items-center gap-2">
                               <span className="font-bold w-4">{idx + 1}.</span>
@@ -187,3 +185,4 @@ export function DecisionAudit() {
     </div>
   );
 }
+
