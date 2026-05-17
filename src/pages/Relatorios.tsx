@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle, MousePointer, Mail } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, Package, Truck, Calendar, ArrowUpRight, ArrowDownRight, Target, Users, Star, Trophy, Loader2, AlertCircle, MousePointer, Mail, FileDown } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
