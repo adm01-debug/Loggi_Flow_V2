@@ -16,6 +16,7 @@ interface KPICardProps {
   status?: 'success' | 'warning' | 'danger' | 'neutral';
   sparklineData?: number[];
   previousValue?: number;
+  performanceMode?: boolean;
   className?: string;
 }
 
