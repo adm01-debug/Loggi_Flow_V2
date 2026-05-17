@@ -321,36 +321,230 @@ export default function CotacaoMultiCanal() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <Breadcrumbs items={[{ label: 'Operações' }, { label: 'Cotação Multi-Canal' }]} />
-        <PageHeader title="Cotação Multi-Canal" description="Busque transportadoras por trecho e cote via API, WhatsApp ou Email" icon={Zap}>
-          {cotacoes.length > 0 && <DataExporter data={exportData} filename="cotacoes-multicanal" />}
+        <Breadcrumbs items={[{ label: 'Operações' }, { label: 'Nexus Freight Command' }]} />
+        <PageHeader 
+          title="Nexus Freight Command" 
+          description="Controle central de cotações automatizadas com inteligência de malha" 
+          icon={Rocket}
+        >
+          <div className="flex gap-2">
+            {cotacoes.length > 0 && <DataExporter data={exportData} filename="nexus-cotacoes" />}
+            <Button variant="outline" className="gap-2">
+              <Map className="w-4 h-4" /> Visualizar Malha
+            </Button>
+          </div>
         </PageHeader>
-        <StepProgress steps={[{ id: 'buscar', title: 'Buscar Transportadoras' }, { id: 'cotar', title: 'Enviar Cotações' }, { id: 'receber', title: 'Receber Respostas' }, { id: 'selecionar', title: 'Selecionar Melhor' }]} currentStep={currentStep} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {savings > 0 && (
-            <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
-              <TrendingDown className="w-5 h-5 text-success shrink-0" />
-              <p className="text-sm font-medium">Economia de <span className="text-success font-bold">R$ {savings.toFixed(2)}</span> entre {respondidas.length} cotações</p>
-            </motion.div>
-          )}
-          {melhorCotacao && (
-            <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}>
-              <NegotiationAssistant bestValue={melhorCotacao.valor} carrierName={melhorCotacao.transportadora_nome} />
-            </motion.div>
-          )}
-        </div>
+        <StepProgress 
+          steps={[
+            { id: 'buscar', title: 'Mapear Trecho' }, 
+            { id: 'cotar', title: 'Nexus Blast' }, 
+            { id: 'receber', title: 'Consolidar Respostas' }, 
+            { id: 'selecionar', title: 'Decisão Inteligente' }
+          ]} 
+          currentStep={currentStep} 
+        />
 
-        <CotacaoSearchForm origemEstado={origemEstado} setOrigemEstado={setOrigemEstado} destinoEstado={destinoEstado} setDestinoEstado={setDestinoEstado} origemCidade={origemCidade} setOrigemCidade={setOrigemCidade} destinoCidade={destinoCidade} setDestinoCidade={setDestinoCidade} origemCep={origemCep} setOrigemCep={setOrigemCep} destinoCep={destinoCep} setDestinoCep={setDestinoCep} pesoKg={pesoKg} setPesoKg={setPesoKg} volumes={volumes} setVolumes={setVolumes} valorMercadoria={valorMercadoria} setValorMercadoria={setValorMercadoria} isSearching={isSearching} onSearch={handleSearch} />
-
+        {/* Nexus Blast Control */}
         <AnimatePresence>
-          {hasSearched && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <CotacaoCarrierList carriers={carriers} onCotarAPI={handleCotarAPI} onCotarWhatsApp={handleCotarWhatsApp} onCotarEmail={handleCotarEmail} onRegistrar={(c) => { setSelectedCarrier(c); setManualDialog(true); }} />
-              <CotacaoResultsTable cotacoes={cotacoes} melhorCotacao={melhorCotacao} onRegistrar={(tid) => { const c = carriers.find(x => x.transportadora_id === tid); if (c) { setSelectedCarrier(c); setManualDialog(true); } }} />
+          {carriers.length > 0 && !isBlasting && currentStep === 1 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+            >
+              <Alert className="border-primary bg-primary/5">
+                <Rocket className="h-4 w-4 text-primary" />
+                <AlertTitle className="text-primary font-bold flex items-center justify-between">
+                  Trecho Mapeado: {carriers.length} Transportadoras Disponíveis
+                  <Button onClick={handleNexusBlast} className="bg-primary hover:bg-primary/90">
+                    <Zap className="w-4 h-4 mr-2" /> Iniciar Nexus Blast
+                  </Button>
+                </AlertTitle>
+                <AlertDescription>
+                  O Nexus Blast enviará solicitações automáticas para todas as transportadoras mapeadas para este trecho.
+                </AlertDescription>
+              </Alert>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {isBlasting && (
+          <Card className="border-primary animate-pulse">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium flex items-center gap-2">
+                  <Rocket className="w-4 h-4 text-primary" />
+                  Nexus Blast em Execução...
+                </span>
+                <span className="text-sm font-bold text-primary">{blastProgress}%</span>
+              </div>
+              <Progress value={blastProgress} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-2">
+                Conectando APIs e disparando gatilhos de RPA para transportadoras sem API direta.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-6">
+            <CotacaoSearchForm 
+              origemEstado={origemEstado} setOrigemEstado={setOrigemEstado} 
+              destinoEstado={destinoEstado} setDestinoEstado={setDestinoEstado} 
+              origemCidade={origemCidade} setOrigemCidade={setOrigemCidade} 
+              destinoCidade={destinoCidade} setDestinoCidade={setDestinoCidade} 
+              origemCep={origemCep} setOrigemCep={setOrigemCep} 
+              destinoCep={destinoCep} setDestinoCep={setDestinoCep} 
+              pesoKg={pesoKg} setPesoKg={setPesoKg} 
+              volumes={volumes} setVolumes={setVolumes} 
+              valorMercadoria={valorMercadoria} setValorMercadoria={setValorMercadoria} 
+              isSearching={isSearching} onSearch={handleSearch} 
+            />
+
+            {/* Coverage Summary */}
+            {carriers.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-success" />
+                    Cobertura de Malha
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Transportadoras:</span>
+                    <span className="font-bold">{carriers.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Cotação Instantânea (API):</span>
+                    <Badge variant="outline" className="text-success">{carriers.filter(c => c.canal_cotacao === 'api').length}</Badge>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Prazo Médio:</span>
+                    <span className="font-bold">
+                      {(carriers.reduce((acc, c) => acc + (c.prazo_dias || 0), 0) / carriers.length).toFixed(1)} dias
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          <div className="lg:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {savings > 0 && (
+                <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
+                  <TrendingDown className="w-5 h-5 text-success shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium">Economia Detectada</p>
+                    <p className="text-lg font-bold text-success">R$ {savings.toFixed(2)}</p>
+                  </div>
+                </motion.div>
+              )}
+              {melhorCotacao && (
+                <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}>
+                  <NegotiationAssistant bestValue={melhorCotacao.valor} carrierName={melhorCotacao.transportadora_nome} />
+                </motion.div>
+              )}
+            </div>
+
+            {/* Smart Recommendations */}
+            <AnimatePresence>
+              {respondidas.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                >
+                  {/* Cheaper */}
+                  <Card className="border-success/50 bg-success/5">
+                    <CardHeader className="p-3">
+                      <CardTitle className="text-xs flex items-center gap-1 text-success">
+                        <Award className="w-3 h-3" /> CAMPEÃO DE PREÇO
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-3 pt-0">
+                      <p className="font-bold text-sm truncate">{melhorCotacao?.transportadora_nome}</p>
+                      <p className="text-xs text-muted-foreground">R$ {melhorCotacao?.valor?.toFixed(2)}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Faster */}
+                  {respondidas.length > 0 && (
+                    <Card className="border-primary/50 bg-primary/5">
+                      <CardHeader className="p-3">
+                        <CardTitle className="text-xs flex items-center gap-1 text-primary">
+                          <Timer className="w-3 h-3" /> CAMPEÃO DE PRAZO
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-3 pt-0">
+                        {(() => {
+                          const fastest = respondidas.reduce((a, b) => (a.prazo_dias! < b.prazo_dias! ? a : b));
+                          return (
+                            <>
+                              <p className="font-bold text-sm truncate">{fastest.transportadora_nome}</p>
+                              <p className="text-xs text-muted-foreground">{fastest.prazo_dias} dias</p>
+                            </>
+                          );
+                        })()}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Best Value */}
+                  {respondidas.length > 1 && (
+                    <Card className="border-warning/50 bg-warning/5">
+                      <CardHeader className="p-3">
+                        <CardTitle className="text-xs flex items-center gap-1 text-warning">
+                          <Zap className="w-3 h-3" /> MELHOR CUSTO-BENEFÍCIO
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-3 pt-0">
+                         {(() => {
+                          const bestValue = respondidas.reduce((a, b) => {
+                            // Weight: 70% Price, 30% Deadline
+                            const scoreA = (a.valor! * 0.7) + ((a.prazo_dias || 0) * 50 * 0.3);
+                            const scoreB = (b.valor! * 0.7) + ((b.prazo_dias || 0) * 50 * 0.3);
+                            return scoreA < scoreB ? a : b;
+                          });
+                          return (
+                            <>
+                              <p className="font-bold text-sm truncate">{bestValue.transportadora_nome}</p>
+                              <p className="text-xs text-muted-foreground">Equilíbrio sugerido pelo Nexus</p>
+                            </>
+                          );
+                        })()}
+                      </CardContent>
+                    </Card>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {hasSearched && (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                  <CotacaoCarrierList 
+                    carriers={carriers} 
+                    onCotarAPI={handleCotarAPI} 
+                    onCotarWhatsApp={handleCotarWhatsApp} 
+                    onCotarEmail={handleCotarEmail} 
+                    onRegistrar={(c) => { setSelectedCarrier(c); setManualDialog(true); }} 
+                  />
+                  <CotacaoResultsTable 
+                    cotacoes={cotacoes} 
+                    melhorCotacao={melhorCotacao} 
+                    onRegistrar={(tid) => { 
+                      const c = carriers.find(x => x.transportadora_id === tid); 
+                      if (c) { setSelectedCarrier(c); setManualDialog(true); } 
+                    }} 
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
 
         <Dialog open={manualDialog} onOpenChange={setManualDialog}>
           <DialogContent>
