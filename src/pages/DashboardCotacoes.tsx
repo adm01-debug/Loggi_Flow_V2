@@ -158,7 +158,7 @@ export default function DashboardCotacoes() {
                         <TableCell className="font-medium">{cotacao.transportadora?.nome_fantasia || 'N/A'}</TableCell>
                         <TableCell><span className="font-mono text-xs">{cotacao.origem_estado} → {cotacao.destino_estado}</span></TableCell>
                         <TableCell><CanalBadge canal={cotacao.canal} /></TableCell>
-                        <TableCell><StatusBadge status={cotacao.status} /></TableCell>
+                        <TableCell><StatusBadge status={cotacao.status} retryCount={cotacao.retry_count} /></TableCell>
                         <TableCell>{cotacao.valor_cotado ? <span className="font-semibold">R$ {cotacao.valor_cotado.toFixed(2)}</span> : <span className="text-muted-foreground">—</span>}</TableCell>
                         <TableCell>{cotacao.prazo_dias ? `${cotacao.prazo_dias}d` : '—'}</TableCell>
                         <TableCell><TimeRemaining expiresAt={cotacao.expires_at} /></TableCell>
