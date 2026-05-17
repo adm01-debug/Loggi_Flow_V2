@@ -238,70 +238,97 @@ export function DraggableDashboard({
   }, {} as Record<string, AvailableWidget[]>);
 
   return (
-    <div className="space-y-4">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {isEditMode && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-2"
-            >
-              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                Modo Edição
-              </Badge>
-              {widgetsToAdd.length > 0 && onAdd && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-1">
-                      <Plus className="w-4 h-4" />
-                      Adicionar Widget
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    {Object.entries(categorizedWidgets).map(([category, categoryWidgets]) => (
-                      <div key={category}>
-                        <DropdownMenuLabel className="text-xs uppercase text-muted-foreground">
-                          {category}
-                        </DropdownMenuLabel>
-                        {categoryWidgets.map((w) => (
-                          <DropdownMenuItem key={w.id} onClick={() => onAdd(w.id)}>
-                            <div>
-                              <p className="font-medium">{w.title}</p>
-                              <p className="text-xs text-muted-foreground">{w.description}</p>
-                            </div>
-                          </DropdownMenuItem>
-                        ))}
-                        <DropdownMenuSeparator />
-                      </div>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              {onReset && (
-                <Button variant="ghost" size="sm" onClick={onReset} className="gap-1">
-                  <RotateCcw className="w-4 h-4" />
-                  Resetar
-                </Button>
-              )}
-            </motion.div>
-          )}
+    <div className="space-y-8 animate-in fade-in duration-1000">
+      {/* Tactical Toolbar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 px-4 py-6 bg-black/40 backdrop-blur-xl rounded-[2rem] border border-white/5 shadow-2xl">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <Settings2 className="w-5 h-5 text-primary" />
+             </div>
+             <div className="flex flex-col">
+                <span className="text-white font-black italic uppercase tracking-widest text-sm leading-none">Workspace Core</span>
+                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] mt-1">Grid Management System</span>
+             </div>
+          </div>
+          
+          <AnimatePresence>
+            {isEditMode && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex items-center gap-4 pl-6 border-l border-white/10"
+              >
+                <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 px-4 py-1 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                  EDIT_MODE_ACTIVE
+                </Badge>
+                
+                {widgetsToAdd.length > 0 && onAdd && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-10 px-6 rounded-xl bg-primary/10 border-primary/30 text-primary hover:bg-primary hover:text-white transition-all font-black text-[10px] uppercase tracking-widest gap-2">
+                        <Plus className="w-4 h-4" />
+                        INJETAR WIDGET
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-72 bg-black/95 border-primary/20 backdrop-blur-2xl p-4 rounded-2xl shadow-2xl">
+                      <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-2">Módulos Disponíveis</DropdownMenuLabel>
+                      {Object.entries(categorizedWidgets).map(([category, categoryWidgets]) => (
+                        <div key={category} className="mb-4 last:mb-0">
+                          <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-3 px-2 italic">{category}</p>
+                          <div className="space-y-1">
+                            {categoryWidgets.map((w) => (
+                              <DropdownMenuItem 
+                                key={w.id} 
+                                onClick={() => onAdd(w.id)}
+                                className="flex items-center gap-3 p-3 rounded-xl hover:bg-primary/10 cursor-pointer transition-all border border-transparent hover:border-primary/20"
+                              >
+                                <div className="p-2 rounded-lg bg-white/5">
+                                   <Settings2 className="w-3 h-3 text-white/60" />
+                                </div>
+                                <div>
+                                  <p className="text-xs font-black text-white uppercase italic">{w.title}</p>
+                                  <p className="text-[9px] text-white/40 font-bold uppercase tracking-tighter line-clamp-1">{w.description}</p>
+                                </div>
+                              </DropdownMenuItem>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                      <DropdownMenuSeparator className="bg-white/10 my-3" />
+                      {onReset && (
+                        <DropdownMenuItem onClick={onReset} className="flex items-center justify-center gap-2 p-2 text-[9px] font-black text-white/30 hover:text-white transition-colors">
+                           <RotateCcw className="w-3 h-3" /> RESETAR GRID PADRÃO
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+
         {onToggleEditMode && (
           <Button
             variant={isEditMode ? "default" : "outline"}
-            size="sm"
+            size="lg"
             onClick={onToggleEditMode}
-            className="gap-1"
+            className={cn(
+              "h-12 px-10 rounded-full transition-all duration-500 font-black text-[11px] uppercase tracking-[0.2em] gap-3",
+              isEditMode 
+                ? "bg-success text-white shadow-[0_0_30px_rgba(34,197,94,0.4)] border-b-4 border-black/20" 
+                : "bg-white/5 border-white/10 text-white/60 hover:text-primary hover:border-primary/40 hover:bg-primary/5"
+            )}
           >
-            <Settings2 className="w-4 h-4" />
-            {isEditMode ? "Salvar Layout" : "Editar Dashboard"}
+            {isEditMode ? <ShieldCheck className="w-5 h-5" /> : <Settings2 className="w-5 h-5 group-hover:rotate-90 transition-transform" />}
+            {isEditMode ? "FINALIZAR E SALVAR" : "PERSONALIZAR GRID"}
           </Button>
         )}
       </div>
 
-      {/* Grid */}
+      {/* Main Tactical Grid */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -309,7 +336,7 @@ export function DraggableDashboard({
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={widgets.map((w) => w.id)} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
             <AnimatePresence mode="popLayout">
               {widgets.map((widget) => (
                 <SortableWidget
@@ -326,46 +353,53 @@ export function DraggableDashboard({
           </div>
         </SortableContext>
 
-        {/* Drag Overlay */}
+        {/* Tactical Drag Overlay */}
         <DragOverlay>
           {activeWidget && (
             <motion.div
-              initial={{ scale: 1 }}
-              animate={{ scale: 1.05, rotate: 2 }}
-              className="opacity-90"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1.05, opacity: 0.9, rotate: 1 }}
+              className="z-[100] cursor-grabbing"
             >
-              <Card className="shadow-2xl ring-2 ring-primary/50 overflow-hidden">
-                <div className="p-4 bg-muted/50">
-                  <p className="text-sm font-medium text-center">
-                    {activeWidget.title || activeWidget.id}
-                  </p>
-                </div>
-              </Card>
+              <div className="relative p-1 rounded-[2.5rem] bg-primary shadow-[0_0_50px_rgba(234,56,76,0.6)]">
+                 <div className="bg-black rounded-[2.4rem] p-10 flex flex-col items-center justify-center gap-4">
+                    <GripVertical className="w-10 h-10 text-primary animate-pulse" />
+                    <div className="text-center">
+                       <p className="text-sm font-black text-white italic uppercase tracking-widest">{activeWidget.title || activeWidget.id}</p>
+                       <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-1">REPOSICIONANDO MÓDULO</p>
+                    </div>
+                 </div>
+              </div>
             </motion.div>
           )}
         </DragOverlay>
       </DndContext>
 
-      {/* Empty State */}
+      {/* Enhanced Empty State */}
       {widgets.length === 0 && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center py-12 text-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center justify-center py-32 text-center bg-black/40 backdrop-blur-xl rounded-[4rem] border-4 border-dashed border-white/5 relative overflow-hidden"
         >
-          <div className="p-4 rounded-full bg-muted/50 mb-4">
-            <Settings2 className="w-8 h-8 text-muted-foreground" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(234,56,76,0.1),transparent_70%)] animate-pulse" />
+          <div className="relative z-10 space-y-8">
+            <div className="p-10 rounded-full bg-primary/5 border border-primary/10 inline-block animate-bounce">
+              <Settings2 className="w-16 h-16 text-primary/40" />
+            </div>
+            <div className="max-w-md mx-auto space-y-4">
+              <h3 className="text-4xl font-black italic text-white tracking-tighter uppercase">Dashboard Desativado</h3>
+              <p className="text-sm text-white/40 font-bold uppercase tracking-[0.2em] leading-relaxed">
+                Nenhum módulo Nexus detectado na matriz operacional. Inicie a personalização para injetar novos widgets de comando.
+              </p>
+            </div>
+            {onToggleEditMode && !isEditMode && (
+              <Button onClick={onToggleEditMode} size="lg" className="h-14 px-12 rounded-full bg-primary text-white hover:bg-white hover:text-primary transition-all font-black uppercase tracking-[0.3em] shadow-[0_0_30px_rgba(234,56,76,0.5)] active:scale-95">
+                <Plus className="w-6 h-6 mr-3" />
+                ATIVAR PERSONALIZAÇÃO
+              </Button>
+            )}
           </div>
-          <h3 className="text-lg font-medium mb-2">Dashboard Vazio</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Adicione widgets para personalizar seu dashboard
-          </p>
-          {onToggleEditMode && !isEditMode && (
-            <Button onClick={onToggleEditMode} className="gap-1">
-              <Plus className="w-4 h-4" />
-              Começar a Personalizar
-            </Button>
-          )}
         </motion.div>
       )}
     </div>
