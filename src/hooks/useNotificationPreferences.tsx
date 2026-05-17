@@ -7,6 +7,7 @@ import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 export interface NotificationPreferences {
   notifications_email: boolean;
   notifications_push: boolean;
+  notifications_whatsapp: boolean;
   notifications_sla: boolean;
   notifications_ocorrencias: boolean;
   notifications_coletas: boolean;
