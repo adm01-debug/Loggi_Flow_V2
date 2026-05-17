@@ -60,6 +60,7 @@ const validTransitions: Record<string, string> = {
 
 export default function Despachos() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [confirmItem, setConfirmItem] = useState<Despacho | null>(null);
 
   const { data: despachos = [], isLoading, refetch } = useQuery({
