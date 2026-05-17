@@ -16,5 +16,6 @@ export interface UserPreferences {
     showParticles: boolean;
     soundEffects: boolean;
     accentColor: string;
+    animationSpeed: 'fast' | 'normal' | 'smooth';
   };
 }
