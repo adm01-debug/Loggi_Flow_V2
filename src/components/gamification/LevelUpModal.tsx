@@ -6,6 +6,7 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Sparkles, Trophy, Star, ArrowUpCircle, Coins, Zap } from "lucide-react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
