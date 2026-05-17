@@ -215,7 +215,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
           <div className="flex items-start justify-between mb-10">
             <motion.div 
               whileHover={{ rotate: 360, scale: 1.1 }}
-              transition={{ duration: 0.8, ease: "expoOut" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className={cn(
                 "flex items-center justify-center w-16 h-16 rounded-2xl border-2 transition-all duration-500",
                 config.iconBg
