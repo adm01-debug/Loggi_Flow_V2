@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface WhatsAppRequest {
-  action: "send_status_update" | "send_delivery_notification" | "send_collection_alert" | "send_custom";
+  action: "send_status_update" | "send_delivery_notification" | "send_collection_alert" | "send_delay_alert" | "send_normalization_alert" | "send_custom";
   phone: string;
   entrega_id?: string;
   coleta_id?: string;
