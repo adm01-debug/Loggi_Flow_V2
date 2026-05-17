@@ -199,6 +199,44 @@ export default function DashboardCotacoes() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={logsDialog} onOpenChange={setLogsDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle className="flex items-center gap-2"><History className="w-5 h-5 text-primary" /> Histórico & Auditoria</DialogTitle></DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                <span className="text-xs font-bold uppercase text-muted-foreground">Status Atual</span>
+                <StatusBadge status={selectedCotacao?.status || ''} retryCount={selectedCotacao?.retry_count} />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase font-black text-muted-foreground">Workflow Logs</Label>
+                <div className="border rounded-lg divide-y bg-black/5">
+                  {(selectedCotacao?.workflow_logs && selectedCotacao.workflow_logs.length > 0) ? (
+                    selectedCotacao.workflow_logs.map((log: any, i: number) => (
+                      <div key={i} className="p-3 text-xs flex items-start gap-3">
+                        <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary" />
+                        <div>
+                          <p className="font-bold text-foreground">{log.action}</p>
+                          <p className="text-muted-foreground">{log.timestamp}</p>
+                          {log.details && <p className="mt-1 text-[10px] font-mono opacity-70">{log.details}</p>}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center text-muted-foreground italic text-xs">
+                      [Simulado] Cotação enviada via {selectedCotacao?.canal}. Aguardando gateway.
+                    </div>
+                  )}
+                </div>
+              </div>
+              {selectedCotacao?.status === 'pendente' && (
+                <Button variant="outline" className="w-full gap-2 text-xs" onClick={() => toast.info('Retentativa disparada!')}>
+                  <RotateCcw className="w-3.5 h-3.5" /> Forçar Retentativa
+                </Button>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
