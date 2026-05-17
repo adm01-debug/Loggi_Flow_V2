@@ -223,6 +223,12 @@ export function RuleEditor({ open, onOpenChange, editRule }: RuleEditorProps) {
                     {action.type === "create_alert" && (
                       <Input value={action.config.alert_message || ""} onChange={(e) => updateAction(action.id, { config: { ...action.config, alert_message: e.target.value } })} placeholder="Mensagem do alerta..." />
                     )}
+                    {action.type === "block_carrier" && (
+                      <div className="p-2 bg-destructive/10 rounded border border-destructive/20">
+                         <p className="text-[10px] text-destructive font-bold uppercase">Atenção</p>
+                         <p className="text-[11px]">Esta ação bloqueará automaticamente a transportadora se as condições forem atendidas.</p>
+                      </div>
+                    )}
                   </div>
                 ))}
             </div>
