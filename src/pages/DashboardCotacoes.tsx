@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EmptyState } from '@/components/common/EmptyState';
 import { StatsCard } from '@/components/common/StatsCard';
-import { Clock, CheckCircle2, AlertTriangle, Truck, MessageCircle, Mail, Globe, Timer, FileText, TrendingDown, RefreshCw, Zap, AlertCircle, Award, Send } from 'lucide-react';
+import { Clock, CheckCircle2, AlertTriangle, Truck, MessageCircle, Mail, Globe, Timer, FileText, TrendingDown, RefreshCw, Zap, AlertCircle, Award, Send, History, RotateCcw } from 'lucide-react';
 import { useCotacoesMulticanal, type CotacaoMulticanal } from '@/hooks/useCotacoesMulticanal';
 import { isPast, differenceInHours, differenceInMinutes } from 'date-fns';
 import { TrechoComparativo } from './dashboard-cotacoes/TrechoComparativo';
