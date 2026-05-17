@@ -88,7 +88,10 @@ export function useGamification() {
       
       const { data, error } = await supabase
         .from("user_levels")
-        .select("*")
+        .select(`
+          *,
+          rank:user_ranks(*)
+        `)
         .eq("user_id", user.id)
         .maybeSingle();
       
