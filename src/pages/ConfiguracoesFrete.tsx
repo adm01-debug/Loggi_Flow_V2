@@ -23,11 +23,17 @@ import {
   Code,
   FileJson,
   Zap,
-  RefreshCw
+  RefreshCw,
+  Brain,
+  Scale,
+  TrendingUp,
+  Target
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { PageHeader } from '@/components/common/PageHeader';
+import { NormalizationMapping } from '@/components/transportadoras/NormalizationMapping';
+import { Slider } from '@/components/ui/slider';
 
 interface CarrierConfig {
   id: string;
