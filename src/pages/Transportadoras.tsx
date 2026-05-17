@@ -71,7 +71,14 @@ const emptyForm = {
   observacoes: "", 
   homologada: true,
   credentials: { api_key: "", api_user: "", api_password: "", endpoint: "" },
-  non_api_config: { type: "whatsapp" as "whatsapp" | "email" | "portal", template: "", recipient: "", portal_url: "", portal_user: "" },
+  non_api_config: { 
+    type: "whatsapp" as "whatsapp" | "email" | "portal", 
+    template: "", 
+    recipient: "", 
+    portal_url: "", 
+    portal_user: "",
+    normalization: { price_pattern: "", term_pattern: "", fallback_strategy: "ai_extraction", ai_prompt: "" }
+  },
   coverage_details: { states: [] as string[], cities: [] as string[] }
 };
 
