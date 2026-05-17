@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { 
   MapPin, Truck, Package, Activity, Navigation2, Satellite, Filter, 
-  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2, RefreshCw
+  Search, AlertTriangle, CheckCircle2, Layout, Layers, Box, Info, X, Zap, ArrowRight, Building2, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2, RefreshCw, Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,8 @@ export function LogisticsMapWidget() {
                            (statusFilter === "delayed" && s.atrasado) ||
                            (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status)) ||
                            (statusFilter === "pending" && ["aguardando_producao", "pronto_despacho", "pendente"].includes(s.status)) ||
-                           (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status));
+                           (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status)) ||
+                           (statusFilter === "high_variance" && (s.atrasado || (s.valorFrete && s.valorFrete > 500)));
 
       const matchesType = typeFilter === "all" || s.tipo === typeFilter;
 
@@ -109,7 +110,8 @@ export function LogisticsMapWidget() {
                   { id: 'all', label: 'TODOS', icon: Activity },
                   { id: 'in_transit', label: 'TRÂNSITO', icon: Truck },
                   { id: 'delayed', label: 'ATRASADOS', icon: AlertTriangle },
-                  { id: 'completed', label: 'OK', icon: CheckCircle2 }
+                  { id: 'completed', label: 'OK', icon: CheckCircle2 },
+                  { id: 'high_variance', label: 'VARIAÇÃO', icon: Star }
                 ].map((f) => (
                   <button
                     key={f.id}
@@ -256,6 +258,7 @@ export function LogisticsMapWidget() {
                         { id: 'completed', label: 'Sucesso', icon: CheckCircle2 },
                         { id: 'delayed', label: 'Atraso', icon: AlertTriangle },
                         { id: 'problems', label: 'Crítico', icon: AlertTriangle },
+                        { id: 'high_variance', label: 'Variação', icon: Star },
                       ].map((f) => (
                         <button
                           key={f.id}
