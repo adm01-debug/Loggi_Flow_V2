@@ -62,10 +62,17 @@ export default function Ranking() {
   interface LeaderboardEntry { user_id: string; full_name?: string; avatar_url?: string; total_xp?: number; level?: number; streak_days?: number; coins?: number; achievements_count?: string | number; rank?: string | number; }
 
   const users: RankUser[] = useMemo(() =>
-    (leaderboard || []).map((u: LeaderboardEntry) => ({
-      id: u.user_id, name: u.full_name || "Usuário", avatar: u.avatar_url, xp: u.total_xp || 0,
-      level: u.level || 1, streak: u.streak_days || 0, coins: u.coins || 0,
-      achievements: Number(u.achievements_count) || 0, rank: Number(u.rank) || 0,
+    (leaderboard || []).map((u: any, index: number) => ({
+      id: u.user_id, 
+      name: u.profiles?.full_name || "Usuário", 
+      avatar: u.profiles?.avatar_url, 
+      xp: u.total_xp || 0,
+      level: u.level || 1, 
+      streak: u.streak_days || 0, 
+      coins: u.coins || 0,
+      achievements: 0, // Simplified for now
+      rank: index + 1,
+      rank_display: u.rank_display
     })), [leaderboard]);
 
   const currentUserRank = useMemo(() => user?.id ? users.find((u) => u.id === user.id) : null, [users, user]);
