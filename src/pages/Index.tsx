@@ -28,7 +28,8 @@ import {
   useRealtime, 
   useGamification, 
   useDashboardWidgets, 
-  useLocalStorage 
+  useLocalStorage,
+  usePerformanceMonitor 
 } from "@/hooks";
 import { toast } from "sonner";
 
@@ -62,6 +63,7 @@ RefreshTimer.displayName = "RefreshTimer";
 
 export default function Index() {
   const [performanceMode, setPerformanceMode] = useState(false);
+  usePerformanceMonitor("DashboardIndex");
   const { data: metrics, refetch: refetchMetrics } = useDashboardMetrics();
   const { data: alerts = [], isLoading: alertsLoading, refetch: refetchAlerts } = useRecentAlerts();
   const { data: transportadoras = [], isLoading: transportadorasLoading } = useTransportadoraPerformance();
