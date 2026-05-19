@@ -185,7 +185,7 @@ const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
                       <Shield className="w-3.5 h-3.5 text-primary/60" />
                       <span className="text-[11px] font-black text-primary/60 uppercase tracking-[0.5em] font-mono">Central de Comando</span>
                     </div>
-                    <h3 className="font-display font-black text-4xl sm:text-5xl leading-none tracking-tighter italic bg-gradient-to-r from-white via-white to-white/30 bg-clip-text text-transparent">
+                    <h3 className="font-display font-black text-2xl sm:text-5xl leading-none tracking-tighter italic bg-gradient-to-r from-white via-white to-white/30 bg-clip-text text-transparent">
                       SISTEMA DE ATALHOS
                     </h3>
                   </div>
