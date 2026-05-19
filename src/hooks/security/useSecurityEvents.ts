@@ -23,7 +23,7 @@ interface SecurityEventFilters {
 }
 
 export function useSecurityEvents(filters?: SecurityEventFilters) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: events = [], isLoading, refetch } = useQuery({
@@ -33,6 +33,10 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
         .from("security_events")
         .select("*")
         .order("created_at", { ascending: false });
+
+      if (!isAdmin && user?.id) {
+        query = query.eq("user_id", user.id);
+      }
 
       if (filters?.severity) {
         query = query.eq("severity", filters.severity);
@@ -57,7 +61,7 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
       if (error) throw error;
       return data as SecurityEvent[];
     },
-    enabled: isAdmin,
+    enabled: !!user?.id,
     refetchInterval: 15000, // Poll every 15s instead of Realtime (security table removed from publication)
   });
 
@@ -144,7 +148,7 @@ export function useSecurityEvents(filters?: SecurityEventFilters) {
         warningsLast7d: warningData?.length || 0,
       };
     },
-    enabled: isAdmin,
+    enabled: isAdmin && !!user?.id,
   });
 
   // Get unique event types for filtering
