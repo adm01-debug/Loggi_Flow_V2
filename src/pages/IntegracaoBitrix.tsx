@@ -207,7 +207,7 @@ export default function IntegracaoBitrix() {
 
                   <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
                     <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold"><CloudSync className="w-5 h-5" /></div>
+                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold"><CloudLightning className="w-5 h-5" /></div>
                        <div>
                          <p className="font-bold">Negócios (Deals)</p>
                          <p className="text-xs text-muted-foreground">Mapped to: entregas</p>
