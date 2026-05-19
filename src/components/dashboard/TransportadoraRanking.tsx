@@ -161,7 +161,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-black text-base sm:text-lg truncate group-hover/item:text-primary transition-colors duration-300 uppercase italic tracking-tight text-white">
+                    <p className="font-black text-sm sm:text-lg truncate group-hover/item:text-primary transition-colors duration-300 uppercase italic tracking-tight text-white">
                       {transportadora.nome_fantasia}
                     </p>
                     {transportadora.homologada && (
