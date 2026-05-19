@@ -67,6 +67,8 @@ export * from './analytics/useKPIBenchmark';
 export * from './analytics/useDashboardWidgets';
 export * from './analytics/useDashboardMetrics';
 export * from './analytics/useAnalytics';
+export * from './analytics/useDashboardData';
+
 export * from './analytics/useExecutiveMetrics';
 export * from './analytics/usePerformanceMonitor';
 export * from './analytics/useTelemetry';
