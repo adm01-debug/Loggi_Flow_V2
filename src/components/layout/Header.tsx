@@ -160,7 +160,7 @@ export const Header = memo(function Header() {
         </div>
 
         {/* Desktop: Search */}
-        <div className="hidden lg:block flex-1 min-w-[200px] max-w-[400px] ml-4">
+        <div className="hidden lg:block flex-1 min-w-[240px] max-w-[400px] ml-4">
           <Suspense fallback={<div className="h-9 w-full rounded-md bg-muted animate-pulse" />}>
             <GlobalSearch />
           </Suspense>
