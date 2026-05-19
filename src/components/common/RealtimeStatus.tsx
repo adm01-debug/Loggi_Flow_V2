@@ -38,10 +38,19 @@ export function RealtimeStatus() {
 
   const handleQuickAudit = async () => {
     setIsValidating(true);
-    const loader = toast.loading("Executando auditoria rápida...");
-    await runSystemSanityChecks();
-    toast.dismiss(loader);
-    setIsValidating(false);
+    const loader = toast.loading("Executando protocolo Nexus Auto-Healing...");
+    try {
+      const { data, error } = await supabase.functions.invoke('nexus-auto-healing');
+      if (error) throw error;
+      
+      await runSystemSanityChecks();
+      toast.success(data.message || "Auditoria Nexus concluída com sucesso!");
+    } catch (err) {
+      toast.error("Protocolo de auto-reparo falhou. Verifique logs.");
+    } finally {
+      toast.dismiss(loader);
+      setIsValidating(false);
+    }
   };
 
   const getStatusInfo = () => {

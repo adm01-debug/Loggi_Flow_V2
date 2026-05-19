@@ -16,6 +16,7 @@ import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
 import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
 import { LiveStatusBar } from "@/components/dashboard/LiveStatusBar";
+import { SystemHealthWidget } from "@/components/dashboard/SystemHealthWidget";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { subDays } from "date-fns";
@@ -83,7 +84,7 @@ export default function Index() {
 
   const [widgetOrder, setWidgetOrder] = useLocalStorage<string[]>("dashboard-widget-order", [
     "xp-progress", "logistics-map", "kpi-pendentes", "kpi-transito", "kpi-finalizadas", "kpi-problemas",
-    "intelligence-widget", "alerts-panel", "chart-performance", "quick-actions"
+    "intelligence-widget", "system-health", "alerts-panel", "chart-performance", "quick-actions"
   ]);
 
   useRealtime({ table: "entregas", queryKey: ["dashboard-metrics", "recent-alerts"] });
@@ -126,6 +127,7 @@ export default function Index() {
     "quick-actions": { size: "full", render: () => <WidgetErrorBoundary widgetName="Ações Rápidas"><QuickActions /></WidgetErrorBoundary> },
     "transportadora-ranking": { size: "large", render: () => <WidgetErrorBoundary widgetName="Ranking Transportadoras"><TransportadoraRanking transportadoras={transportadoras} isLoading={transportadorasLoading} /></WidgetErrorBoundary> },
     "delay-prediction": { size: "full", render: () => <WidgetErrorBoundary widgetName="Predição Atrasos"><DelayPredictionPanel /></WidgetErrorBoundary> },
+    "system-health": { size: "small", render: () => <WidgetErrorBoundary widgetName="Saúde do Sistema"><SystemHealthWidget /></WidgetErrorBoundary> },
   };
 
   const widgets: DashboardWidget[] = widgetOrder.filter(id => widgetDefinitions[id]).map(id => ({ id, ...widgetDefinitions[id] }));
