@@ -1,39 +1,48 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7'
+import { getCorsHeaders, corsResponse } from "../_shared/cors.ts"
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts"
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  if (req.method === 'OPTIONS') return corsResponse(req)
+
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  const supabase = createClient(supabaseUrl, supabaseKey)
 
   try {
-    // Basic connectivity check for dependencies could be added here
-    // For now, a heartbeat for external monitoring services (UptimeRobot, etc.)
-    
+    const results = await withCircuitBreaker('system-health-check', async () => {
+      // 1. DB Heartbeat
+      const { data: dbCheck, error: dbError } = await supabase.from('profiles').select('id').limit(1).maybeSingle()
+      
+      // 2. Storage Check
+      const { data: storageCheck, error: storageError } = await supabase.storage.listBuckets()
+
+      // 3. Auth Service Check (MFA as proxy)
+      const { error: authError } = await supabase.auth.admin.listUsers({ perPage: 1 })
+
+      return {
+        database: !dbError,
+        storage: !storageError,
+        auth: !authError,
+        timestamp: new Date().toISOString()
+      }
+    })
+
+    const isHealthy = Object.values(results).every(v => v === true || typeof v === 'string')
+
     return new Response(
       JSON.stringify({
-        status: "healthy",
-        timestamp: new Date().toISOString(),
-        version: "1.0.0",
-        environment: Deno.env.get("ENVIRONMENT") || "production",
-        uptime: performance.now()
+        status: isHealthy ? "healthy" : "degraded",
+        checks: results,
+        version: "1.1.0-nexus"
       }),
-      { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200 
-      }
+      { headers: { ...getCorsHeaders(req), "Content-Type": "application/json" }, status: isHealthy ? 200 : 500 }
     )
   } catch (error) {
     return new Response(
       JSON.stringify({ status: "unhealthy", error: error.message }),
-      { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500 
-      }
+      { headers: { ...getCorsHeaders(req), "Content-Type": "application/json" }, status: 503 }
     )
   }
 })
