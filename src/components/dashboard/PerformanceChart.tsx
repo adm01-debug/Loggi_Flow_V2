@@ -283,7 +283,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em] bg-primary/10 px-3 py-1 rounded-full border border-primary/20">PREMIUM ANALYTICS</span>
                 <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent min-w-[60px]" />
               </div>
-              <h3 className="font-display font-black text-5xl tracking-tighter uppercase italic text-white leading-none group-hover/chart:text-primary transition-colors duration-700 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <h3 className="font-display font-black text-3xl sm:text-5xl tracking-tighter uppercase italic text-white leading-none group-hover/chart:text-primary transition-colors duration-700 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {title}
               </h3>
               {subtitle && (
