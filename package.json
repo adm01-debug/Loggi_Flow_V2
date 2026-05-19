@@ -14,7 +14,7 @@
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
     "test:e2e": "playwright test",
-    "test:fuzz": "vitest tests/integration/fuzzing.test.ts",
+    "test:fuzz": "vitest tests/integration/fuzzing.spec.ts",
     "typecheck": "tsc --noEmit",
     "check-circular": "madge --circular src",
     "security-scan": "npm audit --audit-level=high",
