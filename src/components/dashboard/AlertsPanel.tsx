@@ -173,7 +173,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
 
                   <div className="relative group/counter">
                     <div className="absolute inset-0 bg-destructive/30 blur-xl rounded-full animate-pulse" />
-                    <div className="relative bg-destructive text-white px-8 py-3 rounded-2xl border-b-[4px] border-black/40 font-black text-base shadow-2xl transform hover:scale-105 transition-all cursor-default tracking-tighter">
+                    <div className="relative bg-destructive text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl sm:rounded-2xl border-b-[4px] border-black/40 font-black text-xs sm:text-base shadow-2xl transform hover:scale-105 transition-all cursor-default tracking-tighter">
                       {alerts.length} DELTA DETECTADOS
                     </div>
                   </div>
