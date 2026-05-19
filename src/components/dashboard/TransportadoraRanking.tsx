@@ -183,7 +183,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                       <div className={cn("absolute inset-0 blur-md opacity-50", getScoreColor(transportadora.score_performance))} />
                     </div>
                     <span className={cn(
-                      "text-3xl font-black tabular-nums tracking-tighter italic drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]",
+                      "text-xl sm:text-3xl font-black tabular-nums tracking-tighter italic drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]",
                       getScoreColor(transportadora.score_performance)
                     )}>
                       {transportadora.score_performance ?? 0}
