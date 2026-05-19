@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, Clock, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText, LayoutGrid, Activity, History } from "lucide-react";
+import { Package, Truck, Clock, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText, LayoutGrid, Activity, History, MapPin } from "lucide-react";
 import { useRealtime } from "@/hooks/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
