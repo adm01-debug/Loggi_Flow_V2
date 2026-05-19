@@ -138,20 +138,21 @@ export default function Index() {
           {/* Header with responsive layout */}
           <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
             <div className="animate-in slide-in-from-left-6 duration-700 ease-out-expo">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
-                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
-                  <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-white animate-pulse" />
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter group/title cursor-default">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 transition-all duration-500 group-hover/title:rotate-12 group-hover/title:scale-110 relative">
+                  <div className="absolute inset-0 bg-white/20 rounded-2xl blur-xl opacity-0 group-hover/title:opacity-100 transition-opacity" />
+                  <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-white relative z-10" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="truncate drop-shadow-sm">LogiFlow Dashboard</span>
+                  <span className="truncate drop-shadow-sm bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent italic">LogiFlow Dashboard</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">{greeting}! Operação em escala.</span>
-                    <kbd className="hidden lg:flex pointer-events-none h-5 select-none items-center gap-1 rounded border border-primary/20 bg-primary/5 px-1.5 font-mono text-[9px] font-black text-primary opacity-70">
-                      <span className="text-[10px]">⌘</span>K
-                    </kbd>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                      <span className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.2em]">{greeting}! Operação em escala.</span>
+                    </div>
                   </div>
                 </div>
               </h1>
+
             </div>
             
             {/* Actions - Scrollable on mobile */}
