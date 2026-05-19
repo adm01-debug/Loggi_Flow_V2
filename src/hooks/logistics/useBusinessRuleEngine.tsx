@@ -1,7 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useBusinessRules, BusinessRule, RuleCondition } from "@/hooks";
 import { Json } from "@/integrations/supabase/types";
+import { useTelemetry } from "@/hooks/analytics/useTelemetry";
 
 /**
  * Business Rule Engine — evaluates rules against entity data and executes actions.
@@ -9,6 +10,29 @@ import { Json } from "@/integrations/supabase/types";
  */
 export function useBusinessRuleEngine() {
   const { rules } = useBusinessRules();
+  const { logTelemetry } = useTelemetry();
+  const executionBatchRef = useRef<any[]>([]);
+  const batchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced Batch Logging for high-frequency rule execution
+  const flushLogs = useCallback(async () => {
+    if (executionBatchRef.current.length === 0) return;
+    
+    const logs = [...executionBatchRef.current];
+    executionBatchRef.current = [];
+    
+    try {
+      await supabase.from("rule_execution_logs").insert(logs);
+    } catch (err) {
+      console.error('Failed to flush rule logs:', err);
+    }
+  }, []);
+
+  const addToBatch = useCallback((log: any) => {
+    executionBatchRef.current.push(log);
+    if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
+    batchTimerRef.current = setTimeout(flushLogs, 2000);
+  }, [flushLogs]);
 
   const evaluateCondition = useCallback((condition: RuleCondition, data: Record<string, unknown>): boolean => {
     const fieldValue = data[condition.field];
@@ -96,9 +120,9 @@ export function useBusinessRuleEngine() {
       }
     }
 
-    // Log execution
+    // Log execution using batching system
     const executionTime = Date.now() - startTime;
-    await supabase.from("rule_execution_logs").insert({
+    addToBatch({
       rule_id: rule.id,
       entity_id: entityId,
       entity_type: rule.entity_type,
@@ -106,7 +130,16 @@ export function useBusinessRuleEngine() {
       conditions_met: true,
       actions_executed: JSON.parse(JSON.stringify(rule.actions)) as Json,
       execution_time_ms: executionTime,
-    }).then(() => {}, () => {});
+    });
+
+    if (executionTime > 500) {
+      logTelemetry({
+        severity: 'warning',
+        category: 'rule_engine_performance',
+        message: `Regra "${rule.name}" demorou ${executionTime}ms para executar`,
+        metadata: { rule_id: rule.id, entity_type: rule.entity_type }
+      });
+    }
   }, []);
 
   const evaluateRules = useCallback(async (

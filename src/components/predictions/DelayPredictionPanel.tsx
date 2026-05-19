@@ -38,7 +38,7 @@ export function DelayPredictionPanel() {
   useEffect(() => {
     // Tenta carregar predições em cache ao montar o componente
     if (predictions.length === 0) {
-      analyzeDelays();
+      analyzeDelays(false);
     }
   }, [analyzeDelays, predictions.length]);
 
@@ -55,7 +55,7 @@ export function DelayPredictionPanel() {
             <CardTitle className="text-lg">Previsão de Atrasos com IA</CardTitle>
           </div>
           <Button 
-            onClick={analyzeDelays} 
+            onClick={() => analyzeDelays(true)} 
             disabled={isLoading}
             size="sm"
             className="gap-2"

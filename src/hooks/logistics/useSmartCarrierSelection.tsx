@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTelemetry } from '@/hooks/analytics/useTelemetry';
 
 export interface CarrierRecommendation {
   id: string;
@@ -36,8 +37,19 @@ export interface SmartSelectionRequest {
 export const useSmartCarrierSelection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<SmartSelectionResult | null>(null);
+  const { logTelemetry } = useTelemetry();
+  const cacheRef = useRef<{ [key: string]: { data: SmartSelectionResult, timestamp: number } }>({});
+  const CACHE_TTL = 1000 * 60 * 10; // 10 minutos de cache para recomendações fixas
 
-  const analyzeCarriers = async (request: SmartSelectionRequest) => {
+  const analyzeCarriers = useCallback(async (request: SmartSelectionRequest, forceRefresh = false) => {
+    const cacheKey = JSON.stringify(request);
+    
+    if (!forceRefresh && cacheRef.current[cacheKey] && (Date.now() - cacheRef.current[cacheKey].timestamp < CACHE_TTL)) {
+      const cached = cacheRef.current[cacheKey].data;
+      setResult(cached);
+      return cached;
+    }
+
     setIsLoading(true);
     setResult(null);
 
@@ -48,8 +60,9 @@ export const useSmartCarrierSelection = () => {
 
       if (error) {
         toast.error('Erro ao analisar transportadoras');
-        setResult({ success: false, recommendations: [], error: error.message });
-        return null;
+        const errorResult: SmartSelectionResult = { success: false, recommendations: [], error: error.message };
+        setResult(errorResult);
+        return errorResult;
       }
 
       if (data.success) {
@@ -62,17 +75,32 @@ export const useSmartCarrierSelection = () => {
         toast.info(data.message);
       }
 
-      setResult(data);
-      return data;
-    } catch {
+      const selectionResult = data as SmartSelectionResult;
+      setResult(selectionResult);
+      
+      // Armazenar no cache
+      cacheRef.current[cacheKey] = {
+        data: selectionResult,
+        timestamp: Date.now()
+      };
+
+      logTelemetry({
+        severity: 'info',
+        category: 'carrier_selection',
+        message: 'Seleção inteligente de transportadora realizada',
+        metadata: { request, result_count: selectionResult.recommendations?.length, type: selectionResult.analysisType }
+      });
+
+      return selectionResult;
+    } catch (err) {
       toast.error('Erro ao processar seleção inteligente');
-      const errorResult = { success: false, recommendations: [], error: 'Erro inesperado' };
+      const errorResult: SmartSelectionResult = { success: false, recommendations: [], error: (err as Error).message };
       setResult(errorResult);
       return errorResult;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [logTelemetry]);
 
   const clearResult = () => {
     setResult(null);
