@@ -4,134 +4,136 @@
 // ============================================
 // Core State Management (Common)
 // ============================================
-export { usePagination } from './common/usePagination';
-export { useFilters } from './common/useFilters';
-export { useSorting } from './common/useSorting';
-export { useDebounce } from './common/useDebounce';
-export { useLocalStorage } from './common/useLocalStorage';
-export { useMediaQuery, useIsTablet, useIsDesktop, usePrefersDarkMode, usePrefersReducedMotion } from './common/useMediaQuery';
-export { useSearch } from './common/useSearch';
-export { useSelection } from './common/useSelection';
-export { useBulkActions } from './common/useBulkActions';
-export { useComments } from './common/useComments';
-export { useExport } from './common/useExport';
-export { useImportData } from './common/useImportData';
-export { useKeyboardShortcut, useGlobalShortcuts, useShortcutsDialog, shortcutsList, formatShortcut } from './common/useKeyboardShortcuts';
-export { useNavigationHistory } from './common/useNavigationHistory';
-export { useConfirmExit } from './common/useConfirmExit';
-export { useTimezone } from './common/useTimezone';
-export { useDensity } from './common/useDensity';
-export { useGlobalSearch } from './common/useGlobalSearch';
+export * from './common/usePagination';
+export * from './common/useFilters';
+export * from './common/useSorting';
+export * from './common/useDebounce';
+export * from './common/useLocalStorage';
+export * from './common/useMediaQuery';
+export * from './common/useSearch';
+export * from './common/useSelection';
+export * from './common/useBulkActions';
+export * from './common/useComments';
+export * from './common/useExport';
+export * from './common/useImportData';
+export * from './common/useKeyboardShortcuts';
+export * from './common/useNavigationHistory';
+export * from './common/useConfirmExit';
+export * from './common/useTimezone';
+export * from './common/useDensity';
+export * from './common/useGlobalSearch';
+export * from './common/useOnlineStatus';
 
 // ============================================
 // Realtime & Sync (Data)
 // ============================================
-export { useRealtime } from './data/useRealtime';
-export { useMemoizedQuery } from './data/useMemoizedQuery';
-export { usePrefetch } from './data/usePrefetch';
-export { useResilientMutation } from './data/useResilientMutation';
-export { useSoftDelete } from './data/useSoftDelete';
-export { useDocumentUpload } from './data/useDocumentUpload';
-export { useImageUpload } from './data/useImageUpload';
+export * from './data/useRealtime';
+export * from './data/useMemoizedQuery';
+export * from './data/usePrefetch';
+export * from './data/useResilientMutation';
+export * from './data/useSoftDelete';
+export * from './data/useDocumentUpload';
+export * from './data/useImageUpload';
 
 // ============================================
 // Authentication (Auth)
 // ============================================
-export { useAuth, AuthProvider } from './auth/useAuth';
-export { useNewDeviceDetection } from './auth/useNewDeviceDetection';
-export { useMFA } from './auth/useMFA';
-export { useSessionTimeout } from './auth/useSessionTimeout';
-export { usePermissions } from './auth/usePermissions';
-export { useRole } from './auth/useRole';
-export { useWebAuthn } from './auth/useWebAuthn';
-export { useDeviceSessions } from './auth/useDeviceSessions';
+export * from './auth/useAuth';
+export * from './auth/useNewDeviceDetection';
+export * from './auth/useMFA';
+export * from './auth/useSessionTimeout';
+export * from './auth/usePermissions';
+export * from './auth/useRole';
+export * from './auth/useWebAuthn';
+export * from './auth/useDeviceSessions';
 
 // ============================================
 // Security & Governance (Security)
 // ============================================
-export { useSecurityEvents } from './security/useSecurityEvents';
-export { useRateLimitLogs } from './security/useRateLimitLogs';
-export { useFeatureFlags, useFeatureFlag } from './security/useFeatureFlags';
-export { useAuditLogs } from './security/useAuditLogs';
-export { useEntityHistory } from './security/useEntityHistory';
-export { useIntegrationValidation } from './security/useIntegrationValidation';
+export * from './security/useSecurityEvents';
+export * from './security/useRateLimitLogs';
+export * from './security/useFeatureFlags';
+export * from './security/useAuditLogs';
+export * from './security/useEntityHistory';
+export * from './security/useIntegrationValidation';
 
 // ============================================
 // Dashboard & Analytics (Analytics)
 // ============================================
-export { useDrillDown } from './analytics/useDrillDown';
-export { useFavoriteMetrics, AVAILABLE_METRICS } from './analytics/useFavoriteMetrics';
-export { useKPIBenchmark } from './analytics/useKPIBenchmark';
-export { useDashboardWidgets } from './analytics/useDashboardWidgets';
-export { useDashboardMetrics } from './analytics/useDashboardMetrics';
-export { useAnalytics } from './analytics/useAnalytics';
-export { useExecutiveMetrics } from './analytics/useExecutiveMetrics';
-export { usePerformanceMonitor } from './analytics/usePerformanceMonitor';
-export { useTelemetry } from './analytics/useTelemetry';
-export { useScheduledReports } from './analytics/useScheduledReports';
+export * from './analytics/useDrillDown';
+export * from './analytics/useFavoriteMetrics';
+export * from './analytics/useKPIBenchmark';
+export * from './analytics/useDashboardWidgets';
+export * from './analytics/useDashboardMetrics';
+export * from './analytics/useAnalytics';
+export * from './analytics/useExecutiveMetrics';
+export * from './analytics/usePerformanceMonitor';
+export * from './analytics/useTelemetry';
+export * from './analytics/useScheduledReports';
 
 // ============================================
 // Gamification
 // ============================================
-export { useGamification } from './gamification/useGamification';
-export { useAchievementNotifications } from './gamification/useAchievementNotifications';
-export { useRewardPurchases } from './gamification/useRewardPurchases';
+export * from './gamification/useGamification';
+export * from './gamification/useAchievementNotifications';
+export * from './gamification/useRewardPurchases';
 
 // ============================================
 // Notifications
 // ============================================
-export { useNotifications } from './notifications/useNotifications';
-export { useNotificationPreferences } from './notifications/useNotificationPreferences';
-export { usePushNotifications } from './notifications/usePushNotifications';
-export { useSecurityPushNotifications } from './notifications/useSecurityPushNotifications';
-export { useWhatsAppNotification } from './notifications/useWhatsAppNotification';
-export { useAudioFeedback } from './notifications/useAudioFeedback';
+export * from './notifications/useNotifications';
+export * from './notifications/useNotificationPreferences';
+export * from './notifications/usePushNotifications';
+export * from './notifications/useSecurityPushNotifications';
+export * from './notifications/useWhatsAppNotification';
+export * from './notifications/useAudioFeedback';
 
 // ============================================
 // Logistics & Business
 // ============================================
-export { useSLAMetrics } from './logistics/useSLAMetrics';
-export { useSLANotifications } from './logistics/useSLANotifications';
-export { useLogisticsCosts } from './logistics/useLogisticsCosts';
-export { useLogisticsCalendar } from './logistics/useLogisticsCalendar';
-export { useCostAlerts } from './logistics/useCostAlerts';
-export { useDelayPrediction } from './logistics/useDelayPrediction';
-export { useDeliveryRoutes } from './logistics/useDeliveryRoutes';
-export { useFreightQuotation } from './logistics/useFreightQuotation';
-export { useSmartCarrierSelection } from './logistics/useSmartCarrierSelection';
-export { useQuotationFlow } from './logistics/useQuotationFlow';
-export { useSmartAlerts } from './logistics/useSmartAlerts';
-export { useBoxManagement } from './logistics/useBoxManagement';
-export { useConciliacao } from './logistics/useConciliacao';
-export { useBusinessRules } from './logistics/useBusinessRules';
-export { useTransportadoraRotas } from './logistics/useTransportadoraRotas';
-export { useRodonavesTracking, RODONAVES_STATUS_MAP } from './logistics/useRodonavesTracking';
-export { useRodonavesWebhook } from './logistics/useRodonavesWebhook';
-export { useMelhorEnvio } from './logistics/useMelhorEnvio';
-export { useCotacoesFrete } from './logistics/useCotacoesFrete';
-export { useCotacoesMulticanal } from './logistics/useCotacoesMulticanal';
-export { useFreightIntelligence } from './logistics/useFreightIntelligence';
-export { useLogisticaReversaReal } from './logistics/useLogisticaReversaReal';
-export { useLogisticsIntelligence } from './logistics/useLogisticsIntelligence';
-export { useSLAAlerts } from './logistics/useSLAAlerts';
-export { useLalamoveTracking } from './logistics/useLalamoveTracking';
-export { useLalamoveOrders } from './logistics/useLalamoveOrders';
+export * from './logistics/useSLAMetrics';
+export * from './logistics/useSLANotifications';
+export * from './logistics/useLogisticsCosts';
+export * from './logistics/useLogisticsCalendar';
+export * from './logistics/useCostAlerts';
+export * from './logistics/useDelayPrediction';
+export * from './logistics/useDeliveryRoutes';
+export * from './logistics/useFreightQuotation';
+export * from './logistics/useSmartCarrierSelection';
+export * from './logistics/useQuotationFlow';
+export * from './logistics/useSmartAlerts';
+export * from './logistics/useBoxManagement';
+export * from './logistics/useConciliacao';
+export * from './logistics/useBusinessRules';
+export * from './logistics/useTransportadoraRotas';
+export * from './logistics/useRodonavesTracking';
+export * from './logistics/useRodonavesWebhook';
+export * from './logistics/useMelhorEnvio';
+export * from './logistics/useCotacoesFrete';
+export * from './logistics/useCotacoesMulticanal';
+export * from './logistics/useFreightIntelligence';
+export * from './logistics/useLogisticaReversaReal';
+export * from './logistics/useLogisticsIntelligence';
+export * from './logistics/useSLAAlerts';
+export * from './logistics/useLalamoveTracking';
+export * from './logistics/useLalamoveOrders';
+export * from './logistics/useBusinessRuleEngine';
 
 // ============================================
 // Integrations
 // ============================================
-export { useEvolutionWhatsApp } from './integrations/useEvolutionWhatsApp';
-export { useBitrixEntregaSync } from './integrations/useBitrixEntregaSync';
-export { useClientWebhooks } from './integrations/useClientWebhooks';
-export { useExternalDbBridge } from './integrations/useExternalDbBridge';
-export { useGeocoding } from './integrations/useGeocoding';
+export * from './integrations/useEvolutionWhatsApp';
+export * from './integrations/useBitrixEntregaSync';
+export * from './integrations/useClientWebhooks';
+export * from './integrations/useExternalDbBridge';
+export * from './integrations/useGeocoding';
+export * from './logistics/useUnifiedTracking';
 
 // ============================================
 // UI & Utilities
 // ============================================
 export { useIsMobile } from './ui/use-mobile';
 export { useToast, toast } from './ui/use-toast';
-export { useOnboarding } from './ui/useOnboarding';
-export { useQRScanner } from './ui/useQRScanner';
-export { useVirtualTable } from './ui/useVirtualTable';
-export { useOnlineStatus } from './common/useOnlineStatus';
+export * from './ui/useOnboarding';
+export * from './ui/useQRScanner';
+export * from './ui/useVirtualTable';
