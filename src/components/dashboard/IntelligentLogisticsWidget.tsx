@@ -15,7 +15,7 @@ import {
   Radio
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLogisticsIntelligence } from "@/hooks";
+import { useLogisticsIntelligence, useGamification } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { BiometricConsentModal } from "./BiometricConsentModal";
 
@@ -27,6 +27,7 @@ const iconMap: Record<string, any> = {
 
 export function IntelligentLogisticsWidget() {
   const { healthScore, optimizations } = useLogisticsIntelligence();
+  const { nexusScore } = useGamification();
   const [isBiometricOpen, setIsBiometricOpen] = useState(false);
   const [isBiometricAuthorized, setIsBiometricAuthorized] = useState(false);
 
@@ -110,7 +111,7 @@ export function IntelligentLogisticsWidget() {
                 </div>
                 <div className="text-right">
                   <div className="relative inline-block">
-                    <span className="text-6xl font-black text-white italic tracking-tighter leading-none drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">{healthScore}</span>
+                    <span className="text-6xl font-black text-white italic tracking-tighter leading-none drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">{nexusScore}</span>
                     <span className="text-2xl font-black text-primary italic ml-1">%</span>
                   </div>
                 </div>
@@ -125,7 +126,7 @@ export function IntelligentLogisticsWidget() {
                 <div className="h-4 w-full bg-black/40 rounded-full border border-white/10 p-[2px] relative overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
-                    animate={{ width: `${healthScore}%` }}
+                    animate={{ width: `${nexusScore}%` }}
                     transition={{ duration: 1.5, ease: "circOut" }}
                     className="h-full rounded-full bg-gradient-to-r from-primary/40 via-primary to-primary/60 relative"
                   >

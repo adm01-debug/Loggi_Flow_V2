@@ -16,13 +16,15 @@ export function useDashboardData(dateRange: DateRange) {
       
       const [{ data: coletas }, { data: entregas }] = await Promise.all([
         supabase.from("coletas")
-          .select("status, created_at")
+          .select("id, status, created_at")
           .gte("created_at", startDate)
-          .lte("created_at", endDate),
+          .lte("created_at", endDate)
+          .limit(1000),
         supabase.from("entregas")
-          .select("status, created_at")
+          .select("id, status, created_at")
           .gte("created_at", startDate)
-          .lte("created_at", endDate),
+          .lte("created_at", endDate)
+          .limit(1000),
       ]);
       return { coletas: coletas || [], entregas: entregas || [] };
     },
