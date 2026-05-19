@@ -366,16 +366,17 @@ export default function DashboardExecutivo() {
             {trendData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={trendData}>
-                  <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-                  <YAxis className="text-xs fill-muted-foreground" />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="entregas" name="Entregas" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="coletas" name="Coletas" stroke="hsl(var(--warning))" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="ocorrencias" name="Ocorrências" stroke="hsl(var(--destructive))" strokeWidth={2} dot={{ r: 3 }} />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" vertical={false} />
+                  <XAxis dataKey="month" className="text-[10px] fill-white/40 font-black uppercase" axisLine={false} tickLine={false} />
+                  <YAxis className="text-[10px] fill-white/40 font-black" axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem' }} />
+                  <Line type="monotone" dataKey="entregas" name="Entregas" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, fill: 'hsl(var(--primary))' }} />
+                  <Line type="monotone" dataKey="coletas" name="Coletas" stroke="hsl(var(--warning))" strokeWidth={3} dot={{ r: 4, fill: 'hsl(var(--warning))' }} />
+                  <Line type="monotone" dataKey="ocorrencias" name="Ocorrências" stroke="hsl(var(--destructive))" strokeWidth={3} dot={{ r: 4, fill: 'hsl(var(--destructive))' }} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground text-center py-8">Carregando tendências...</p>
+              <p className="text-muted-foreground text-center py-8 font-black uppercase tracking-widest text-[10px]">Mapeando Volume Histórico...</p>
             )}
           </div>
 
