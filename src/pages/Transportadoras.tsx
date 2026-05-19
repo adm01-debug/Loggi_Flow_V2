@@ -32,6 +32,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
+import { cn } from "@/lib/utils";
 
 interface Transportadora {
   id: string; 
