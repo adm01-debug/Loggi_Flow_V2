@@ -175,7 +175,7 @@ const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full animate-pulse" />
-                    <div className="relative flex items-center justify-center w-20 h-20 rounded-[1.75rem] bg-gradient-to-br from-primary/40 to-black border border-primary/40 shadow-2xl group-hover/container:rotate-12 transition-transform duration-1000">
+                    <div className="relative flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-[1.25rem] sm:rounded-[1.75rem] bg-gradient-to-br from-primary/40 to-black border border-primary/40 shadow-2xl group-hover/container:rotate-12 transition-transform duration-1000">
                       <Zap className="w-10 h-10 text-primary animate-pulse" />
                     </div>
                   </div>
