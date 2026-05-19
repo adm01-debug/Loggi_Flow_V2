@@ -99,7 +99,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
           <div className="relative group/header-icon">
             <div className="absolute -inset-2 bg-primary/30 rounded-2xl blur-lg group-hover/header-icon:bg-primary/50 transition-all duration-700" />
             <div className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-[1rem] sm:rounded-2xl bg-black border border-primary/40 shadow-[0_0_20px_rgba(234,56,76,0.3)] group-hover/header-icon:rotate-12 transition-all duration-500">
-              <Crown className="w-8 h-8 text-primary animate-pulse" />
+              <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-primary animate-pulse" />
             </div>
           </div>
           <div>
