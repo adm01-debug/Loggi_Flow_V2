@@ -359,7 +359,7 @@ export const AppSidebar = memo(function AppSidebar() {
       )}
 
       {/* AI Assistant Button */}
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border shrink-0">
         <Sheet>
           <SheetTrigger asChild>
             <button
