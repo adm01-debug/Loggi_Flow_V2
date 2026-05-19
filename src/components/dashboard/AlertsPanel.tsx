@@ -109,7 +109,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
         {/* Atmosphere & Holographic Base */}
         <div className="absolute -inset-10 bg-destructive/5 rounded-[5rem] blur-[120px] opacity-0 group-hover/panel:opacity-100 transition-all duration-1000" />
         
-        <div className="relative overflow-hidden rounded-[3.5rem] border border-white/10 bg-[#050505]/60 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.4)] transition-all duration-700 hover:border-destructive/30">
+        <div className="relative overflow-hidden rounded-[2rem] sm:rounded-[3.5rem] border border-white/10 bg-[#050505]/60 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.4)] transition-all duration-700 hover:border-destructive/30">
           {/* Tactical Background Elements */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-destructive/5 blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
