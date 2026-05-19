@@ -149,25 +149,25 @@ export const AppSidebar = memo(function AppSidebar() {
   return (
     <aside
       className={cn(
-        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 ease-in-out z-50",
+        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border/50 transition-all duration-500 ease-out-expo z-50 shadow-2xl shadow-black/20",
         collapsed ? "w-[var(--sidebar-collapsed-width)]" : "w-[var(--sidebar-width)]"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-4 p-6 border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
+      <div className="flex items-center gap-4 p-8 border-b border-sidebar-border/30 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
         <div 
-          className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_20px_rgba(var(--primary-rgb),0.4)] border border-white/20 animate-[sidebar-logo_4s_ease-in-out_infinite]"
+          className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_30px_rgba(var(--primary-rgb),0.5)] border border-white/20 animate-float"
         >
           <Truck className="w-7 h-7 text-white" />
         </div>
         {!collapsed && (
           <div 
-            className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500 ease-out-expo"
+            className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700 ease-out-expo"
           >
-            <span className="font-display font-black text-2xl tracking-tighter uppercase italic bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+            <span className="font-display font-black text-2xl tracking-tighter uppercase italic bg-gradient-to-r from-foreground via-foreground/80 to-primary bg-clip-text text-transparent drop-shadow-sm">
               LogiFlow
             </span>
-            <span className="text-[10px] text-primary font-black tracking-[0.3em] uppercase opacity-70">
+            <span className="text-[10px] text-primary font-black tracking-[0.4em] uppercase opacity-80">
               Nexus Edition
             </span>
           </div>
@@ -230,27 +230,27 @@ export const AppSidebar = memo(function AppSidebar() {
             <CollapsibleTrigger asChild>
               <button
                 className={cn(
-                  "flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-all duration-200 group",
+                  "flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-300 group active-press",
                   isSectionActive(section)
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    ? "bg-primary/10 text-primary shadow-sm shadow-primary/5 border border-primary/10"
+                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground border border-transparent"
                 )}
               >
                 <section.icon className={cn(
-                  "w-5 h-5 flex-shrink-0 transition-colors",
-                  isSectionActive(section) && "text-primary"
+                  "w-5 h-5 flex-shrink-0 transition-all duration-300",
+                  isSectionActive(section) ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)]" : "group-hover:scale-110"
                 )} />
                 {!collapsed && (
                   <>
-                    <span className="flex-1 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span className="flex-1 text-left text-[11px] font-black uppercase tracking-[0.15em]">
                       {section.title}
                     </span>
-                    <span className="text-[10px] font-medium text-muted-foreground/60 tabular-nums mr-1">
+                    <span className="text-[10px] font-bold text-muted-foreground/40 tabular-nums mr-1">
                       {section.items.length}
                     </span>
                     <ChevronDown className={cn(
-                      "w-4 h-4 transition-transform duration-200",
-                      openSection === section.id && "rotate-180"
+                      "w-4 h-4 transition-transform duration-500 ease-out-expo",
+                      openSection === section.id && "rotate-180 text-primary"
                     )} />
                   </>
                 )}
@@ -267,23 +267,23 @@ export const AppSidebar = memo(function AppSidebar() {
                     to={item.url}
                     onMouseEnter={() => prefetch(item.url)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-500 group/item relative overflow-hidden",
-                      collapsed ? "justify-center" : "ml-2",
+                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-500 group/item relative overflow-hidden active-press",
+                      collapsed ? "justify-center" : "ml-4",
                       isActive(item.url)
-                        ? "bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-white shadow-[0_10px_20px_rgba(var(--primary-rgb),0.3)] scale-[1.05]"
-                        : "text-sidebar-foreground hover:bg-primary/10 hover:text-primary hover:translate-x-2"
+                        ? "bg-gradient-to-br from-primary via-primary to-primary-glow text-white shadow-lg shadow-primary/25 scale-[1.02] border border-white/10"
+                        : "text-sidebar-foreground/70 hover:bg-primary/5 hover:text-primary hover:translate-x-1"
                     )}
                   >
-                    {/* Active indicator pill */}
+                    {/* Active indicator glow */}
                     {isActive(item.url) && !collapsed && (
-                      <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-primary-foreground/60" />
+                      <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-6 rounded-full bg-white/40 blur-[2px]" />
                     )}
                     <item.icon className={cn(
-                      "w-4 h-4 flex-shrink-0 transition-transform duration-300",
-                      isActive(item.url) ? "scale-110" : "group-hover/item:scale-110"
+                      "w-4 h-4 flex-shrink-0 transition-all duration-500",
+                      isActive(item.url) ? "scale-110 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]" : "group-hover/item:scale-110"
                     )} />
                     {!collapsed && (
-                      <span className="text-sm font-medium tracking-tight">{item.title}</span>
+                      <span className="text-sm font-bold tracking-tight">{item.title}</span>
                     )}
                   </NavLink>
                 </div>

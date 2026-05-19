@@ -81,7 +81,7 @@ export const Header = memo(function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-20 px-3 sm:px-10 bg-background/60 backdrop-blur-3xl border-b border-primary/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] gap-2 sm:gap-6 transition-all duration-500">
+    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-20 px-4 sm:px-10 bg-background/40 backdrop-blur-2xl border-b border-primary/5 shadow-header gap-2 sm:gap-6 transition-all duration-500">
       {/* Left side: Back button + Page title with History */}
       <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
         <div className="flex items-center gap-1 min-w-0">
@@ -174,23 +174,23 @@ export const Header = memo(function Header() {
 
       {/* Gamification Stats */}
       <div className="hidden xl:flex items-center gap-2 lg:gap-4 shrink-0">
-        <div className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl bg-primary/10 border border-primary/20 transition-all hover:scale-105 hover:bg-primary/20 shadow-lg shadow-primary/5">
-          <Zap className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-primary" />
-          <span className="text-xs lg:text-sm font-bold text-primary">
+        <div className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl bg-primary/5 border border-primary/10 transition-all hover:bg-primary/10 hover:border-primary/20 hover-lift shadow-sm">
+          <Zap className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-primary animate-pulse" />
+          <span className="text-xs lg:text-sm font-black text-primary tracking-tight">
             {userLevel?.total_xp?.toLocaleString() || 0}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl bg-coins/10 border border-coins/20 transition-all hover:scale-105 hover:bg-coins/20 shadow-lg shadow-coins/5">
+        <div className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl bg-coins/5 border border-coins/10 transition-all hover:bg-coins/10 hover:border-coins/20 hover-lift shadow-sm">
           <Coins className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-coins" />
-          <span className="text-xs lg:text-sm font-bold text-coins">
+          <span className="text-xs lg:text-sm font-black text-coins tracking-tight">
             {userLevel?.coins?.toLocaleString() || 0}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-streak/10 border border-streak/20 transition-all hover:scale-105 hover:bg-streak/20 shadow-lg shadow-streak/5">
-          <Flame className="w-4 h-4 text-streak animate-bounce" />
-          <span className="text-sm font-bold text-streak">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-streak/5 border border-streak/10 transition-all hover:bg-streak/10 hover:border-streak/20 hover-lift shadow-sm">
+          <Flame className="w-4 h-4 text-streak animate-float" />
+          <span className="text-sm font-black text-streak tracking-tight">
             {userLevel?.streak_days || 0} dias
           </span>
         </div>
