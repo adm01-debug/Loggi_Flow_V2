@@ -37,7 +37,7 @@ export { useImageUpload } from './data/useImageUpload';
 // ============================================
 // Authentication (Auth)
 // ============================================
-export { useAuth } from './auth/useAuth';
+export { useAuth, AuthProvider } from './auth/useAuth';
 export { useNewDeviceDetection } from './auth/useNewDeviceDetection';
 export { useMFA } from './auth/useMFA';
 export { useSessionTimeout } from './auth/useSessionTimeout';
