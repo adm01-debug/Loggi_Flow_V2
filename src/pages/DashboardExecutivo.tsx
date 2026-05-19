@@ -381,20 +381,20 @@ export default function DashboardExecutivo() {
           </div>
 
           {/* Carrier OTIF Breakdown */}
-          <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">OTIF por Transportadora</h3>
+          <div className="card-base p-6 border-white/5 bg-black/40 backdrop-blur-xl rounded-[2.5rem]">
+            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary mb-6">OTIF por Transportadora</h3>
             {carrierData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={carrierData.slice(0, 8)} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis type="number" domain={[0, 100]} className="text-xs fill-muted-foreground" tickFormatter={v => `${v}%`} />
-                  <YAxis type="category" dataKey="name" width={100} className="text-xs fill-muted-foreground" tickFormatter={v => v.substring(0, 12)} />
-                  <Tooltip formatter={(value: number) => [`${value}%`, "OTIF"]} />
-                  <Bar dataKey="otifRate" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" horizontal={false} />
+                  <XAxis type="number" domain={[0, 100]} className="text-[10px] fill-white/40 font-black" axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+                  <YAxis type="category" dataKey="name" width={100} className="text-[10px] fill-white/40 font-black uppercase" axisLine={false} tickLine={false} tickFormatter={v => v.substring(0, 12)} />
+                  <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem' }} />
+                  <Bar dataKey="otifRate" fill="hsl(var(--primary))" radius={[0, 8, 8, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground text-center py-8">Sem dados de transportadoras</p>
+              <p className="text-muted-foreground text-center py-8 font-black uppercase tracking-widest text-[10px]">Analisando Rankings de Performance...</p>
             )}
           </div>
         </div>
