@@ -187,7 +187,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ scale: 1.02 }}
         className={cn(
-          "group relative rounded-[2.5rem] border-2 p-8 transition-all duration-700 overflow-hidden cursor-pointer",
+          "group relative rounded-[1.5rem] sm:rounded-[2.5rem] border-2 p-6 sm:p-8 transition-all duration-700 overflow-hidden cursor-pointer",
           config.border,
           config.bg,
           className
