@@ -128,7 +128,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                       <Info className="w-4 h-4" /> Origem / Fornecedor
                     </h3>
                     <div>
-                      <p className="font-bold">
+                      <p className="font-black text-base tracking-tighter uppercase italic text-white truncate">
                         {pickup.fornecedores?.nome_fantasia || pickup.fornecedores?.razao_social || 'Não informado'}
                       </p>
                       <p className="text-[10px] font-bold text-white/40 uppercase tracking-tight flex items-center gap-2 mt-1">
