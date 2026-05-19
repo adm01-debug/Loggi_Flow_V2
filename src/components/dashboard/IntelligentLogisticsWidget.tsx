@@ -59,7 +59,7 @@ export function IntelligentLogisticsWidget() {
               <div className="relative group/icon">
                 <div className="absolute -inset-2 bg-primary/20 rounded-2xl blur-lg group-hover/icon:bg-primary/40 transition-all duration-500" />
                 <div className="relative p-3 sm:p-4 rounded-[1.25rem] sm:rounded-2xl bg-black border border-primary/40 shadow-[0_0_20px_rgba(234,56,76,0.3)] group-hover/icon:scale-110 group-hover/icon:rotate-6 transition-all">
-                  <Brain className="h-8 w-8 text-primary animate-pulse" />
+                  <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-primary animate-pulse" />
                 </div>
               </div>
               <div>
