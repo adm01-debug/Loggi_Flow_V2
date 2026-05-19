@@ -23,7 +23,7 @@ export default function Analytics() {
   const kpiBenchmarkResult = useKPIBenchmark();
   const trackingResult = useTrackingAnalytics();
 
-  const { summaryMetrics, isLoading } = analyticsResult;
+  const { summaryMetrics, monthlyData, isLoading } = analyticsResult;
   const benchmarkData = kpiBenchmarkResult.data;
   const trackingData = trackingResult.data;
 
