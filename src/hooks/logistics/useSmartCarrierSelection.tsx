@@ -60,8 +60,9 @@ export const useSmartCarrierSelection = () => {
 
       if (error) {
         toast.error('Erro ao analisar transportadoras');
-        setResult({ success: false, recommendations: [], error: error.message });
-        return null;
+        const errorResult: SmartSelectionResult = { success: false, recommendations: [], error: error.message };
+        setResult(errorResult);
+        return errorResult;
       }
 
       if (data.success) {
@@ -74,11 +75,12 @@ export const useSmartCarrierSelection = () => {
         toast.info(data.message);
       }
 
-      setResult(data);
+      const selectionResult = data as SmartSelectionResult;
+      setResult(selectionResult);
       
       // Armazenar no cache
       cacheRef.current[cacheKey] = {
-        data: data as SmartSelectionResult,
+        data: selectionResult,
         timestamp: Date.now()
       };
 
@@ -86,19 +88,19 @@ export const useSmartCarrierSelection = () => {
         severity: 'info',
         category: 'carrier_selection',
         message: 'Seleção inteligente de transportadora realizada',
-        metadata: { request, result_count: data.recommendations?.length, type: data.analysisType }
+        metadata: { request, result_count: selectionResult.recommendations?.length, type: selectionResult.analysisType }
       });
 
-      return data;
-    } catch {
+      return selectionResult;
+    } catch (err) {
       toast.error('Erro ao processar seleção inteligente');
-      const errorResult = { success: false, recommendations: [], error: 'Erro inesperado' };
+      const errorResult: SmartSelectionResult = { success: false, recommendations: [], error: (err as Error).message };
       setResult(errorResult);
       return errorResult;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [logTelemetry]);
 
   const clearResult = () => {
     setResult(null);
