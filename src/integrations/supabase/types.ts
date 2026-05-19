@@ -2527,6 +2527,7 @@ export type Database = {
           id: string
           motorista: string | null
           observacoes: string | null
+          organization_id: string | null
           origem: string
           previsao_entrega: string | null
           quantidade_itens: number
@@ -2541,6 +2542,7 @@ export type Database = {
           id?: string
           motorista?: string | null
           observacoes?: string | null
+          organization_id?: string | null
           origem: string
           previsao_entrega?: string | null
           quantidade_itens?: number
@@ -2555,6 +2557,7 @@ export type Database = {
           id?: string
           motorista?: string | null
           observacoes?: string | null
+          organization_id?: string | null
           origem?: string
           previsao_entrega?: string | null
           quantidade_itens?: number
@@ -2562,7 +2565,15 @@ export type Database = {
           updated_at?: string
           xp_reward?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fretes_internos_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       geo_access_rules: {
         Row: {
@@ -3087,6 +3098,30 @@ export type Database = {
           },
         ]
       }
+      organizations: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       password_reset_requests: {
         Row: {
           created_at: string
@@ -3206,6 +3241,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          organization_id: string | null
           updated_at: string
         }
         Insert: {
@@ -3215,6 +3251,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          organization_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -3224,9 +3261,18 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          organization_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {
@@ -4764,6 +4810,7 @@ export type Database = {
           transportadora_id: string
         }[]
       }
+      get_current_organization_id: { Args: never; Returns: string }
       get_dashboard_metrics: { Args: never; Returns: Json }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
