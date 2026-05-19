@@ -78,68 +78,78 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="qtd_recebida">Qtd. Volumes Recebidos</Label>
-          <div className="relative">
-            <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+    <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
+      <div className="grid grid-cols-2 gap-6 bg-sidebar-accent/30 p-6 rounded-3xl border border-white/5 backdrop-blur-sm">
+        <div className="space-y-3">
+          <Label htmlFor="qtd_recebida" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Volumes Recebidos</Label>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-primary/10 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
+            <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary pointer-events-none" />
             <Input 
               id="qtd_recebida" 
               type="number" 
               value={qtdRecebida} 
               onChange={(e) => setQtdRecebida(Number(e.target.value))}
-              className="pl-10"
+              className="pl-12 h-14 rounded-2xl bg-black/40 border-white/10 font-black text-xl italic tracking-tighter"
             />
           </div>
-          <p className="text-xs text-muted-foreground">Esperado: {pickup.qtd_volumes}</p>
+          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Esperado_NODE: {pickup.qtd_volumes}</p>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="peso_efetivo">Peso Efetivo (kg)</Label>
-          <div className="relative">
-            <Weight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="space-y-3">
+          <Label htmlFor="peso_efetivo" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Peso Real (KG)</Label>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-primary/10 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
+            <Weight className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary pointer-events-none" />
             <Input 
               id="peso_efetivo" 
               type="number" 
               step="0.01" 
               value={pesoEfetivo} 
               onChange={(e) => setPesoEfetivo(Number(e.target.value))}
-              className="pl-10"
+              className="pl-12 h-14 rounded-2xl bg-black/40 border-white/10 font-black text-xl italic tracking-tighter"
             />
           </div>
-          <p className="text-xs text-muted-foreground">Estimado: {pickup.peso_estimado_kg} kg</p>
+          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Estimado_NODE: {pickup.peso_estimado_kg} KG</p>
         </div>
       </div>
 
       {divergencia && (divergencia.volumes || divergencia.peso) && (
-        <Alert variant="destructive" className="bg-destructive/10">
-          <AlertTriangle className="h-4 h-4" />
-          <AlertTitle>Divergência Detectada</AlertTitle>
-          <AlertDescription>
-            {divergencia.volumes && <p>• Quantidade de volumes difere do solicitado.</p>}
-            {divergencia.peso && <p>• Variação de peso superior a 5% da estimativa.</p>}
-          </AlertDescription>
+        <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 rounded-3xl p-6 shadow-xl shadow-destructive/5 animate-in slide-in-from-top-4 duration-500">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-destructive/20">
+              <AlertTriangle className="h-8 w-8 text-destructive animate-pulse" />
+            </div>
+            <div>
+              <AlertTitle className="font-black text-xl italic tracking-tighter uppercase text-destructive mb-1">Divergência_Delta Detectada</AlertTitle>
+              <AlertDescription className="text-[10px] font-bold uppercase tracking-widest text-destructive/70">
+                {divergencia.volumes && <p>• Quantidade de volumes diverge da solicitação original.</p>}
+                {divergencia.peso && <p>• Variação de peso superior a 5% da métrica base.</p>}
+              </AlertDescription>
+            </div>
+          </div>
         </Alert>
       )}
 
       {!divergencia && (
-        <div className="bg-muted/30 p-4 rounded-lg flex items-start gap-3">
-          <InfoIcon className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-          <div className="text-sm">
-            <p className="font-semibold">Instruções de Conferência</p>
-            <p className="text-muted-foreground">Verifique a integridade das embalagens e confirme se a quantidade e peso batem com o manifesto de coleta.</p>
+        <div className="bg-primary/5 p-6 rounded-3xl border border-primary/20 flex items-start gap-4 shadow-inner group/hint">
+          <div className="p-3 rounded-2xl bg-primary/10 transition-transform group-hover/hint:rotate-12 duration-500">
+            <InfoIcon className="w-6 h-6 text-primary" />
+          </div>
+          <div className="space-y-1">
+            <p className="font-black text-base italic tracking-tighter uppercase text-primary">Protocolo de Conferência</p>
+            <p className="text-xs text-white/50 font-medium leading-relaxed">Valide a integridade estrutural das embalagens. O sistema Nexus exige conformidade total entre o manifesto e a recepção física.</p>
           </div>
         </div>
       )}
 
       <div className="flex gap-3">
         <Button 
-          className="flex-1 bg-success hover:bg-success/90" 
+          className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs bg-success text-white hover:scale-[1.02] transition-all shadow-2xl shadow-success/20 group/submit" 
           onClick={handleFinish} 
           disabled={loading}
         >
-          {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
-          Finalizar Conferência
+          {loading ? <Loader2 className="w-5 h-5 mr-3 animate-spin" /> : <CheckCircle2 className="w-5 h-5 mr-3 group-hover/submit:scale-110 transition-transform" />}
+          AUTORIZAR_RECEPÇÃO_FINAL
         </Button>
       </div>
     </div>
