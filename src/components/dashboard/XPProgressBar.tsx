@@ -18,10 +18,10 @@ export function XPProgressBar({ currentXP, nextLevelXP, level, className }: XPPr
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("relative overflow-hidden group p-[2px] rounded-[2.5rem] shadow-2xl", className)}
+      className={cn("relative overflow-hidden group p-[2px] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl", className)}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[2.5rem]" />
-      <div className="relative h-full bg-black/95 backdrop-blur-[50px] rounded-[2.4rem] p-8 flex flex-col gap-8 border border-white/5">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[1.5rem] sm:rounded-[2.5rem]" />
+      <div className="relative h-full bg-black/95 backdrop-blur-[50px] rounded-[1.4rem] sm:rounded-[2.4rem] p-6 sm:p-8 flex flex-col gap-6 sm:gap-8 border border-white/5">
         
         {/* Scanning Line Effect */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 animate-scan" />
