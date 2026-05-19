@@ -195,7 +195,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
       >
         {/* Dynamic Spotlight Glow */}
         <motion.div
-          className="pointer-events-none absolute -inset-px rounded-[2.5rem] opacity-0 transition duration-500 group-hover:opacity-100"
+          className="pointer-events-none absolute -inset-px rounded-[1.5rem] sm:rounded-[2.5rem] opacity-0 transition duration-500 group-hover:opacity-100"
           style={{
             background: useTransform(
               [x, y],
