@@ -20,6 +20,7 @@ import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 export default function DashboardExecutivo() {
   const [showAI, setShowAI] = useState(false);
   const { trends, carrierOtif, avgCollectionTime } = useExecutiveMetrics();
+  const { monthlyData } = useAnalytics();
 
   // Core monthly metrics (current vs previous)
   const { data: entregasData } = useQuery({
