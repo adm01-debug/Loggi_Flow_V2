@@ -12,10 +12,10 @@ import { cn } from "@/lib/utils";
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DrillDownModal } from "@/components/analytics/DrillDownModal";
-import { useDrillDown } from "@/hooks/useDrillDown";
+import { useDrillDown } from "@/hooks";
 import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
 import { toast } from "sonner";
-import { useExport, exportConfigs } from "@/hooks/useExport";
+import { useExport, exportConfigs } from "@/hooks";
 
 type Period = "7d" | "30d" | "90d" | "12m";
 

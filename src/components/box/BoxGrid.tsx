@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { BoxData } from "@/hooks/useBoxManagement";
+import { BoxData } from "@/hooks";
 import { Package, AlertTriangle, ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";

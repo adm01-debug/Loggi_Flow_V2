@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useMelhorEnvio } from '@/hooks/useMelhorEnvio';
+import { useMelhorEnvio } from '@/hooks';
 import { User, Wallet, MapPin, PlusCircle, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { CardSkeleton } from '@/components/ui/skeletons';

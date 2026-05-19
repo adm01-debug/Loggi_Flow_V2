@@ -25,10 +25,10 @@ import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/co
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks/useSelection";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
-import { useSorting } from "@/hooks/useSorting";
+import { useSelection } from "@/hooks";
+import { usePagination } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks";
+import { useSorting } from "@/hooks";
 
 interface Fornecedor {
   id: string; razao_social: string; nome_fantasia: string | null; cnpj: string | null;

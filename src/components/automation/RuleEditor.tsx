@@ -21,7 +21,7 @@ import {
   ACTION_TYPES,
   CreateRuleInput,
   BusinessRule,
-} from "@/hooks/useBusinessRules";
+} from "@/hooks";
 
 const actionIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Bell, RefreshCw, Mail, AlertTriangle, Shield,

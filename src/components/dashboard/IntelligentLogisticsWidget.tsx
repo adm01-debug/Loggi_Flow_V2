@@ -15,7 +15,7 @@ import {
   Radio
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLogisticsIntelligence } from "@/hooks/useLogisticsIntelligence";
+import { useLogisticsIntelligence } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { BiometricConsentModal } from "./BiometricConsentModal";
 

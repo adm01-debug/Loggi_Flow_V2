@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
+import { useRodonavesTracking } from '@/hooks';
 import { Search, Loader2, MapPin } from 'lucide-react';
 
 interface RTECepAutoFillProps {

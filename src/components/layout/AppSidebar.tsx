@@ -11,14 +11,14 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 // Lazy-load AIAssistant - only needed when user opens the sheet
 const AIAssistant = lazy(() => import("@/components/ai/AIAssistant").then(m => ({ default: m.AIAssistant })));
-import { usePrefetch } from "@/hooks/usePrefetch";
+import { usePrefetch } from "@/hooks";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useGamification } from "@/hooks/useGamification";
+import { useGamification } from "@/hooks";
 import { Progress } from "@/components/ui/progress";
 
 interface MenuSection {

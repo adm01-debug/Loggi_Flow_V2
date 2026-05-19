@@ -5,7 +5,7 @@ import { Calculator, TrendingUp, MapPin, Truck, Clock, Bookmark, SplitSquareVert
 import { PageHeader } from '@/components/common/PageHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { DataExporter } from '@/components/common/DataExporter';
-import { useQuotationFlow } from '@/hooks/useQuotationFlow';
+import { useQuotationFlow, type TabelaFrete } from '@/hooks';
 import {
   QuotationForm,
   QuotationResults,
@@ -27,7 +27,7 @@ export default function CotacaoFrete() {
     flow.calculate(data);
   }, [flow]);
 
-  const handleAddTable = useCallback((data: Omit<import('@/hooks/useFreightQuotation').TabelaFrete, 'id' | 'created_at' | 'updated_at' | 'transportadora'>) => {
+  const handleAddTable = useCallback((data: Omit<TabelaFrete, 'id' | 'created_at' | 'updated_at' | 'transportadora'>) => {
     flow.addTabelaFrete?.mutate(data);
   }, [flow.addTabelaFrete]);
 

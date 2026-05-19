@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FadeIn } from "@/components/ui/micro-interactions";
 import { AnimatedBackground } from "./AuthHeroSection";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks";
 import { z } from "zod";
 
 const forgotPasswordSchema = z.object({ email: z.string().email("Email inválido") });

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useConfirmExit } from "@/hooks/useConfirmExit";
+import { useConfirmExit, useIntegrationValidation, useNotificationPreferences, type NotificationPreferences } from "@/hooks";
 import { format } from "date-fns";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Zap, Truck, Package, Palette } from "lucide-react";
 import { PreferencePanel } from "@/features/preferences";
-import { useIntegrationValidation } from "@/hooks/useIntegrationValidation";
-import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { BusinessRulesManager } from "@/components/automation/BusinessRulesManager";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
 
 export default function Configuracoes() {
   const integrationValidation = useIntegrationValidation();
@@ -67,7 +66,7 @@ export default function Configuracoes() {
     setIsDirty(true);
     if (updatePreference) {
       // Map UI keys to actual preference keys
-      const keyMap: Record<string, keyof import('@/hooks/useNotificationPreferences').NotificationPreferences> = {
+      const keyMap: Record<string, keyof NotificationPreferences> = {
         'email': 'notifications_email',
         'push': 'notifications_push',
         'whatsapp': 'notifications_whatsapp',

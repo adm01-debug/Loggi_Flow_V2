@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { RotaFilter } from '@/hooks/useTransportadoraRotas';
+import { RotaFilter } from '@/hooks';
 
 const ESTADOS_BRASIL = [
   { sigla: 'AC', nome: 'Acre' },

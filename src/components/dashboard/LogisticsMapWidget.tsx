@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useUnifiedTracking, UnifiedShipment } from "@/hooks/useUnifiedTracking";
+import { useUnifiedTracking, UnifiedShipment } from "@/hooks";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MissionDetail } from "./MissionDetail";

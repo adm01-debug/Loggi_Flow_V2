@@ -1,5 +1,4 @@
-import { ReactNode, Suspense, lazy, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { ReactNode, Suspense, lazy } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
@@ -15,6 +14,8 @@ import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
 import { useUserPreferences } from "@/features/preferences";
+import { useTouchGestures } from "@/hooks";
+
 
 const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));
 const OnboardingProgress = lazy(() => import("@/components/onboarding/OnboardingProgress").then(m => ({ default: m.OnboardingProgress })));
@@ -29,47 +30,9 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const navigate = useNavigate();
-  const location = useLocation();
   useUserPreferences(); // Applies global styles and classes based on stored preferences
+  useTouchGestures();
 
-  useEffect(() => {
-    let touchStartX = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      // Ignore if touching elements that should handle their own gestures
-      if ((e.target as HTMLElement).closest('[data-no-swipe], .no-swipe')) return;
-      touchStartX = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (touchStartX === 0) return;
-      
-      const touchEndX = e.changedTouches[0].clientX;
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = Math.abs(e.changedTouches[0].clientY - (e.target as any).dataset?.touchStartY || 0);
-      
-      // Vertical scroll check to avoid accidental back navigation while scrolling
-      if (deltaY > 50) return;
-
-      // Swipe from left to right (at least 120px) and starting near the edge (0-40px)
-      if (deltaX > 120 && touchStartX < 40) {
-        if (location.pathname !== "/") {
-          // Provide haptic feedback if supported
-          if ('vibrate' in navigator) navigator.vibrate(10);
-          navigate(-1);
-        }
-      }
-      touchStartX = 0;
-    };
-
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchend", handleTouchEnd);
-    
-    return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [navigate, location]);
 
   return (
     <div className="flex min-h-screen w-full bg-background">

@@ -20,8 +20,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useUnifiedTracking, UnifiedShipment } from '@/hooks/useUnifiedTracking';
-import { useRecordHistory } from '@/hooks/useAuditLogs';
+import { useUnifiedTracking, UnifiedShipment } from '@/hooks';
+import { useRecordHistory } from '@/hooks';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';

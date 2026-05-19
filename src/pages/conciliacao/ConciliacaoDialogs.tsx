@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Check, AlertTriangle } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
-import type { Conciliacao, ItemImportado } from "@/hooks/useConciliacao";
+import type { Conciliacao, ItemImportado } from "@/hooks";
 import { TIPOS_CONCILIACAO } from "./ConciliacaoList";
 
 interface NovaConciliacaoDialogProps {

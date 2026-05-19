@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks";
+import { useToast } from "@/hooks";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { AnimatedBackground, AuthHeroSection } from "./auth/AuthHeroSection";

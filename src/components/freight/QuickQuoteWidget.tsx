@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Zap, Search, Loader2, Star, Clock } from 'lucide-react';
-import { useFreightQuotation, QuotationResult } from '@/hooks/useFreightQuotation';
+import { useFreightQuotation, QuotationResult } from '@/hooks';
 import { toast } from 'sonner';
 
 const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];

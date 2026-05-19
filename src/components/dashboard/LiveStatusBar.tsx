@@ -1,6 +1,6 @@
 import { Activity, Database, Shield, Wifi, Clock, Server, Radio, Cpu, Globe } from "lucide-react";
-import { useOnlineStatus } from "@/hooks/useOnlineStatus";
-import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
+import { useOnlineStatus } from "@/hooks";
+import { useDashboardMetrics } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";

@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { BoxData } from "@/hooks/useBoxManagement";
+import { BoxData } from "@/hooks";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { 
@@ -28,7 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { History } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { useAudioFeedback } from "@/hooks";
 
 interface BoxDetailModalProps {
   box: BoxData | null;

@@ -3,7 +3,7 @@ import { Bot, Send, Trash2, Sparkles, AlertCircle, TrendingUp, Zap, MessageSquar
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';

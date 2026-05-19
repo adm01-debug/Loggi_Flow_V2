@@ -5,16 +5,16 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Package, Truck, Clock, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText, LayoutGrid, Activity, History, MapPin } from "lucide-react";
-import { useRealtime } from "@/hooks/useRealtime";
+import { useRealtime } from "@/hooks";
 import { FilterBar } from "@/components/common/FilterBar";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
+import { useFilters, FilterConfig } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetailsDialog";
-import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { useAudioFeedback } from "@/hooks";
 
 interface Despacho {
   id: string;

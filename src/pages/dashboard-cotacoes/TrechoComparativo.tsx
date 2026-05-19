@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Star, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { CotacaoMulticanal } from '@/hooks/useCotacoesMulticanal';
+import type { CotacaoMulticanal } from '@/hooks';
 
 function CanalBadge({ canal }: { canal: string }) {
   switch (canal) {

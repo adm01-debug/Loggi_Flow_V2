@@ -3,7 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { BoxGrid } from "@/components/box/BoxGrid";
 import { BoxDetailModal } from "@/components/box/BoxDetailModal";
-import { useBoxManagement, BoxData, DeliveryWithRelations } from "@/hooks/useBoxManagement";
+import { useBoxManagement, BoxData, DeliveryWithRelations } from "@/hooks";
 import { 
   Box, 
   Loader2, 
@@ -21,12 +21,12 @@ import {
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks/useSelection";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
+import { useSelection } from "@/hooks";
+import { usePagination } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { useAudioFeedback } from "@/hooks";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

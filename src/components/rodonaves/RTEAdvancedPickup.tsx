@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
+import { useRodonavesTracking } from '@/hooks';
 import { Truck, Plus, Loader2, CalendarDays, RefreshCw, Zap, FileText } from 'lucide-react';
 
 export function RTEAdvancedPickup() {

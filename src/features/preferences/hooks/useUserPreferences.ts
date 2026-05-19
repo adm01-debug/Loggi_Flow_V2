@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useLocalStorage } from '@/hooks';
 import { UserPreferences, UIDensity, ThemeMode, AccessibilitySettings } from '../types';
 
 const DEFAULT_PREFERENCES: UserPreferences = {

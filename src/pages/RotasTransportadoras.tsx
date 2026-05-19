@@ -8,7 +8,7 @@ import { RotaSearchFilter } from '@/components/transportadoras/RotaSearchFilter'
 import { RotaResultsList } from '@/components/transportadoras/RotaResultsList';
 import { RotaFormDialog } from '@/components/transportadoras/RotaFormDialog';
 import { BulkRouteImport } from '@/components/transportadoras/BulkRouteImport';
-import { useTransportadoraRotas, RotaFilter, TransportadoraRota } from '@/hooks/useTransportadoraRotas';
+import { useTransportadoraRotas, RotaFilter, TransportadoraRota } from '@/hooks';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 

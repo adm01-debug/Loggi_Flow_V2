@@ -3,7 +3,7 @@ import { History, Plus, Pencil, Trash2, User, Calendar, ChevronDown, ChevronUp, 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuditLogs, AuditLog, tableNameLabels, actionLabels } from "@/hooks/useAuditLogs";
+import { useAuditLogs, AuditLog, tableNameLabels, actionLabels } from "@/hooks";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
@@ -11,13 +11,13 @@ import { toast } from "sonner";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks/useSelection";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters } from "@/hooks/useFilters";
-import { useSorting } from "@/hooks/useSorting";
-import { useRealtime } from "@/hooks/useRealtime";
-import { useExport } from "@/hooks/useExport";
-import { useVirtualTable } from "@/hooks/useVirtualTable";
+import { useSelection } from "@/hooks";
+import { usePagination } from "@/hooks";
+import { useFilters } from "@/hooks";
+import { useSorting } from "@/hooks";
+import { useRealtime } from "@/hooks";
+import { useExport } from "@/hooks";
+import { useVirtualTable } from "@/hooks";
 
 interface AuditTrailViewerProps { 
   recordId?: string; 

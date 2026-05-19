@@ -1,5 +1,5 @@
 import { MainLayout } from "@/components/layout/MainLayout";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks";
 import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
 import { IPAccessControl } from "@/components/security/IPAccessControl";
 import { LoginAttemptsLog } from "@/components/security/LoginAttemptsLog";

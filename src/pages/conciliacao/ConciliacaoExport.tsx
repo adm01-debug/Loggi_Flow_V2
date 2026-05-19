@@ -5,7 +5,7 @@ import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { formatCurrency, formatDate } from "@/lib/formatters";
-import type { Conciliacao, ItemImportado } from "@/hooks/useConciliacao";
+import type { Conciliacao, ItemImportado } from "@/hooks";
 import { TIPOS_CONCILIACAO } from "./ConciliacaoList";
 
 interface ConciliacaoStats {
