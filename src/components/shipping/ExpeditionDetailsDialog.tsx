@@ -17,14 +17,16 @@ type EntregaStatus = Database["public"]["Enums"]["entrega_status"];
 
 interface TimelineEvent {
   id: string;
-  action: string;
+  delivery_id: string;
+  from_status: string | null;
+  to_status: string;
+  notes: string | null;
   created_at: string;
-  new_data?: {
-    status?: string;
-    nf_remessa?: string;
-    box_alocado?: string;
+  action_by?: string;
+  action_by_user?: {
+    display_name: string | null;
+    avatar_url: string | null;
   };
-  user_name?: string;
 }
 
 interface ExpeditionDetailsDialogProps {
