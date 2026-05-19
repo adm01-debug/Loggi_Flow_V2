@@ -223,7 +223,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                 config.iconBg
               )}
             >
-              <Icon className="w-8 h-8 animate-pulse" />
+              <Icon className="w-6 h-6 sm:w-8 sm:h-8 animate-pulse" />
             </motion.div>
             
             <div className="flex flex-col items-end gap-4">
