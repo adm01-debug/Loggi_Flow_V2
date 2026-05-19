@@ -199,7 +199,7 @@ const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate('/historico')}
-                  className="h-14 px-10 text-[12px] font-black uppercase tracking-[0.4em] text-white/60 hover:text-primary gap-4 bg-white/5 hover:bg-primary/10 rounded-2xl transition-all border border-white/5 hover:border-primary/40 group/hist font-mono"
+                  className="h-12 sm:h-14 px-6 sm:px-10 text-[10px] sm:text-[12px] font-black uppercase tracking-[0.4em] text-white/60 hover:text-primary gap-4 bg-white/5 hover:bg-primary/10 rounded-2xl transition-all border border-white/5 hover:border-primary/40 group/hist font-mono"
                 >
                   <History className="w-5 h-5 group-hover/hist:rotate-[-45deg] transition-transform" />
                   Logs de Atividade
