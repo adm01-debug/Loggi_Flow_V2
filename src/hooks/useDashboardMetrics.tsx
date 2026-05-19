@@ -102,7 +102,7 @@ export function useRecentAlerts() {
       const now = new Date();
       const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString();
       
-      const [coletasRes, entregasRes, predictionsRes] = await Promise.all([
+      const [coletasRes, entregasRes, predictionsRes, slaAlertsRes] = await Promise.all([
         supabase
           .from('coletas')
           .select('id, numero_coleta, status, divergencia_percentual, created_at')
@@ -116,6 +116,11 @@ export function useRecentAlerts() {
           .select('*')
           .gte('analyzed_at', sixHoursAgo)
           .in('risco', ['alto', 'critico'])
+          .limit(10),
+        supabase
+          .from('sla_alerts')
+          .select('*')
+          .is('resolved_at', null)
           .limit(10)
       ]);
       
