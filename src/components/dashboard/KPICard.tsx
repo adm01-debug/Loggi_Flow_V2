@@ -219,7 +219,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
               whileHover={{ rotate: 360, scale: 1.1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className={cn(
-                "flex items-center justify-center w-16 h-16 rounded-2xl border-2 transition-all duration-500",
+                "flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-[1rem] sm:rounded-2xl border-2 transition-all duration-500",
                 config.iconBg
               )}
             >
