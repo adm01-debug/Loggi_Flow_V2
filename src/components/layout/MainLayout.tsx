@@ -33,7 +33,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   useUserPreferences(); // Applies global styles and classes based on stored preferences
   useTouchGestures();
-  usePerformanceMonitor("MainLayout");
+  usePerformanceMonitor();
 
 
   return (
