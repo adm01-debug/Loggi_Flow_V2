@@ -51,7 +51,7 @@ export function XPProgressBar({ currentXP, nextLevelXP, level, className }: XPPr
 
           <div className="flex flex-col items-end gap-2 text-right shrink-0">
             <div className="flex items-baseline gap-2">
-              <span className="text-6xl font-black italic text-white tracking-tighter tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">{currentXP.toLocaleString()}</span>
+              <span className="text-3xl sm:text-6xl font-black italic text-white tracking-tighter tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">{currentXP.toLocaleString()}</span>
               <span className="text-xl font-black text-primary italic">XP</span>
             </div>
             <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-2">
