@@ -1,0 +1,45 @@
+name: CI Quality Gate Nexus
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Lint Check
+        run: npm run lint
+        
+      - name: Type Check
+        run: npm run typecheck
+        
+      - name: Security Scan
+        run: npm run security-scan
+        
+      - name: Run Unit & Integration Tests
+        run: npm run test
+        
+      - name: Run Fuzzing Tests
+        run: npm run test:fuzz
+        
+      - name: Check Coverage
+        run: npm run test:coverage
+        
+      - name: E2E Tests (Playwright)
+        run: |
+          npx playwright install --with-deps
+          npm run test:e2e

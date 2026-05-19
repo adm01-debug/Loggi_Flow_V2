@@ -49,7 +49,7 @@ describe('System Integrity Tests', () => {
       return { select: vi.fn().mockReturnThis(), limit: vi.fn().mockResolvedValue({ data: [], error: null }) };
     });
 
-    (supabase.functions.invoke as any).mockResolvedValue({ data: { status: 'healthy' }, error: null });
+    (supabase.functions.invoke as any).mockResolvedValue({ data: { status: 'healthy', checks: { database: true } }, error: null });
     (supabase.auth.mfa.listFactors as any).mockResolvedValue({ data: [], error: null });
     (supabase.storage.listBuckets as any).mockResolvedValue({ data: [], error: null });
 
