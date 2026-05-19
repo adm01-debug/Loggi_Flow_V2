@@ -114,7 +114,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-destructive/5 blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           
-          <div className="p-10 sm:p-14 relative z-10">
+          <div className="p-6 sm:p-14 relative z-10">
             {/* Header Structure */}
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-10">
               <div className="flex items-center gap-6">
