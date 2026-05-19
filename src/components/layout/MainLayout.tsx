@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, lazy } from "react";
+import { ReactNode, Suspense, lazy, ErrorInfo } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
@@ -9,6 +9,7 @@ import { ScrollRestoration } from "@/components/common/ScrollRestoration";
 import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { PageSkeleton } from "@/components/ui/skeletons";
+import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
@@ -66,9 +67,11 @@ export function MainLayout({ children }: MainLayoutProps) {
               </Suspense>
               
               <div className="flex-1 h-full">
-                <Suspense fallback={<PageSkeleton />}>
-                  {children}
-                </Suspense>
+                <WidgetErrorBoundary widgetName="MainLayout Content">
+                  <Suspense fallback={<PageSkeleton />}>
+                    {children}
+                  </Suspense>
+                </WidgetErrorBoundary>
               </div>
             </div>
           </main>
