@@ -1,6 +1,7 @@
 import { lazy, Suspense, memo, useEffect } from "react";
 import { ArrowLeft, Zap, Coins, Flame, User, Trophy, LogOut, ChevronRight, History } from "lucide-react";
 import { RealtimeStatus } from "@/components/common/RealtimeStatus";
+import { SystemPulse } from "./SystemPulse";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -173,9 +174,10 @@ export const Header = memo(function Header() {
         </div>
       </div>
 
-      {/* Center - Realtime Status */}
-      <div className="hidden md:flex shrink-0">
+      {/* Center - Realtime Status & System Pulse */}
+      <div className="hidden md:flex shrink-0 items-center gap-4">
         <RealtimeStatus />
+        <SystemPulse />
       </div>
 
       {/* Gamification Stats */}
