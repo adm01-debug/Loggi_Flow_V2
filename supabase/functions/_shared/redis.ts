@@ -1,4 +1,4 @@
-import { Redis } from "redis";
+import { Redis } from "https://esm.sh/@upstash/redis@1.25.0";
 
 const UPSTASH_REDIS_REST_URL = Deno.env.get("UPSTASH_REDIS_REST_URL");
 const UPSTASH_REDIS_REST_TOKEN = Deno.env.get("UPSTASH_REDIS_REST_TOKEN");
