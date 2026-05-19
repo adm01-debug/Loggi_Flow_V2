@@ -99,7 +99,7 @@ export default function GestaoBox() {
   
   const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters } = useFilters(boxesList, filterConfig);
   const pagination = usePagination(filteredData, { initialPageSize: 16 });
-  const { selectedIds, clearSelection } = useSelection(pagination.paginatedData.map(b => ({ ...b, id: `box-${b.number}` })));
+  const { selectedIds, clearSelection } = useSelection(pagination.paginatedData);
 
   const occupiedCount = boxes.filter((b) => b.isOccupied).length;
   const crossDockingCount = boxes.filter((b) => b.isCrossDocking).length;
