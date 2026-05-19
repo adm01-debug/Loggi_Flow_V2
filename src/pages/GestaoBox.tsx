@@ -37,6 +37,14 @@ const filterConfig: FilterConfig<BoxData> = {
   search: {
     fields: ["number" as keyof BoxData],
     placeholder: "Buscar box..."
+  },
+  status: {
+    field: "isOccupied" as any,
+    options: [
+      { value: "ocupado", label: "Ocupados" },
+      { value: "livre", label: "Livres" },
+      { value: "cross_docking", label: "Cross-docking" }
+    ]
   }
 };
 
@@ -84,21 +92,12 @@ export default function GestaoBox() {
   
   const [selectedBox, setSelectedBox] = useState<BoxData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("all");
   const [scanValue, setScanValue] = useState("");
   const scanInputRef = useRef<HTMLInputElement>(null);
 
   const boxesList = useMemo(() => (boxes || []).map((b, i) => ({ ...b, id: `box-${b.number}` })), [boxes]);
   
-  const statusFiltered = useMemo(() => {
-    let result = boxesList;
-    if (statusFilter === "ocupado") result = boxesList.filter(b => b.isOccupied);
-    else if (statusFilter === "livre") result = boxesList.filter(b => !b.isOccupied);
-    else if (statusFilter === "cross_docking") result = boxesList.filter(b => b.isCrossDocking);
-    return result;
-  }, [boxesList, statusFilter]);
-  
-  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(statusFiltered, filterConfig);
+  const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters } = useFilters(boxesList, filterConfig);
   const pagination = usePagination(filteredData, { initialPageSize: 16 });
   const { selectedIds, clearSelection } = useSelection(pagination.paginatedData.map(b => ({ ...b, id: `box-${b.number}` })));
 
@@ -268,15 +267,11 @@ export default function GestaoBox() {
                 search={filters.search} 
                 onSearchChange={setSearch} 
                 searchPlaceholder="Buscar box..." 
-                status={statusFilter}
-                onStatusChange={setStatusFilter}
-                statusOptions={[
-                  { value: "ocupado", label: "Ocupados" }, 
-                  { value: "livre", label: "Livres" },
-                  { value: "cross_docking", label: "Cross-docking" }
-                ]}
-                onClearFilters={() => { clearFilters(); setStatusFilter("all"); }} 
-                hasActiveFilters={hasActiveFilters || statusFilter !== "all"} 
+                status={filters.status}
+                onStatusChange={setStatus}
+                statusOptions={filterConfig.status?.options}
+                onClearFilters={clearFilters} 
+                hasActiveFilters={hasActiveFilters} 
                 totalFiltered={filteredData.length} 
                 totalOriginal={boxesList.length} 
               />

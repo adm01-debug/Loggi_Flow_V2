@@ -124,19 +124,21 @@ export default function FreightConfig() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex-1 min-w-0 animate-in slide-in-from-left-6 duration-700 ease-out-expo">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
-            <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
-              <Settings className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
-            </div>
-            <div className="flex flex-col">
-              <span className="truncate drop-shadow-sm">Nexus Freight Config</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Parametrização Tática de Malha</span>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex-1 min-w-0 animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                <Settings className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
               </div>
-            </div>
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Gestão de credenciais, regras de decisão automatizada e otimização de praça.</p>
+              <div className="flex flex-col">
+                <span className="truncate drop-shadow-sm">Nexus Freight Config</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Parametrização Tática de Malha</span>
+                </div>
+              </div>
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Gestão de credenciais, regras de decisão automatizada e otimização de praça.</p>
+          </div>
         </div>
 
         <Tabs defaultValue="transportadoras" className="space-y-6">

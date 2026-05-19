@@ -42,12 +42,12 @@ export default function Configuracoes() {
   };
 
   const integrationsList = [
-    { id: "supabase", name: "Supabase", icon: Database, status: "connected" },
-    { id: "bitrix24", name: "Bitrix24", icon: Link, status: integrations.find(i => i.name === "Bitrix24")?.status || "not_configured" },
-    { id: "lalamove", name: "Lalamove", icon: Globe, status: integrations.find(i => i.name === "Lalamove")?.status || "not_configured" },
-    { id: "n8n", name: "n8n", icon: Settings, status: integrations.find(i => i.name === "n8n")?.status || "unknown" },
-    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: integrations.find(i => i.name === "Rodonaves")?.status || "not_configured" },
-    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: integrations.find(i => i.name === "Melhor Envio")?.status || "not_configured" },
+    { id: "supabase", name: "Supabase", icon: Database, status: "connected" as const },
+    { id: "bitrix24", name: "Bitrix24", icon: Link, status: (integrations.find(i => i.name === "Bitrix24")?.status || "not_configured") as any },
+    { id: "lalamove", name: "Lalamove", icon: Globe, status: (integrations.find(i => i.name === "Lalamove")?.status || "not_configured") as any },
+    { id: "n8n", name: "n8n", icon: Settings, status: (integrations.find(i => i.name === "n8n")?.status || "unknown") as any },
+    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: (integrations.find(i => i.name === "Rodonaves")?.status || "not_configured") as any },
+    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: (integrations.find(i => i.name === "Melhor Envio")?.status || "not_configured") as any },
   ];
 
   const handleValidateIntegration = (id: string) => {

@@ -322,10 +322,3 @@ export default function IntegracaoBitrix() {
   );
 }
 
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
-}
-
-function Label({ children }: { children: React.ReactNode }) {
-  return <label className="text-sm font-bold text-foreground mb-2 block">{children}</label>;
-}
