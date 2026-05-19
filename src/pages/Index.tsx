@@ -84,7 +84,7 @@ export default function Index() {
 
   const [widgetOrder, setWidgetOrder] = useLocalStorage<string[]>("dashboard-widget-order", [
     "xp-progress", "logistics-map", "kpi-pendentes", "kpi-transito", "kpi-finalizadas", "kpi-problemas",
-    "intelligence-widget", "alerts-panel", "chart-performance", "quick-actions"
+    "intelligence-widget", "system-health", "alerts-panel", "chart-performance", "quick-actions"
   ]);
 
   useRealtime({ table: "entregas", queryKey: ["dashboard-metrics", "recent-alerts"] });
