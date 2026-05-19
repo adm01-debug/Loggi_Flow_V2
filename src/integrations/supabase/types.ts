@@ -4574,7 +4574,9 @@ export type Database = {
         Returns: undefined
       }
       calculate_level: { Args: { xp: number }; Returns: number }
-      cleanup_old_telemetry_logs: { Args: never; Returns: undefined }
+      cleanup_old_telemetry_logs:
+        | { Args: never; Returns: undefined }
+        | { Args: { days_to_keep?: number }; Returns: number }
       get_carrier_performance_stats: {
         Args: never
         Returns: {
@@ -4654,6 +4656,7 @@ export type Database = {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json
       }
+      reconcile_pending_freights: { Args: never; Returns: Json }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       system_health_check: { Args: never; Returns: Json }

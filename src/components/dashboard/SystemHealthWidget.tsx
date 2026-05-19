@@ -1,12 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, ShieldCheck, Zap, AlertTriangle, Cpu, Radio, Fingerprint, Database } from "lucide-react";
+import { Activity, ShieldCheck, Zap, AlertTriangle, Cpu, Radio, Fingerprint, Database, RefreshCcw, Play } from "lucide-react";
+import { useSelfHealing } from "@/hooks/security/useSelfHealing";
+import { useNexusSimulator } from "@/hooks/ai/useNexusSimulator";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function SystemHealthWidget() {
+  const { isHealing, performSelfHealing } = useSelfHealing();
+  const { isSimulating, progress, runMassiveSimulation } = useNexusSimulator();
+
   const { data: healthData, isLoading } = useQuery({
     queryKey: ["system-health"],
     queryFn: async () => {
@@ -223,6 +230,44 @@ export function SystemHealthWidget() {
                 <span className="relative z-10 italic">Ativar Protocolo de Contenção: Anomalias Detectadas no Core Operacional</span>
               </motion.div>
             )}
+            <div className="flex flex-col gap-4 w-full pt-4 border-t border-white/5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Ações Alpha</span>
+                <Badge variant="outline" className="text-[8px] font-black text-primary border-primary/20">LOCKED_FOR_ADMIN</Badge>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <Button 
+                  onClick={performSelfHealing}
+                  disabled={isHealing}
+                  variant="outline"
+                  className="rounded-2xl bg-black/40 border-white/10 hover:bg-success/20 hover:border-success/40 group/repair h-12"
+                >
+                  <RefreshCcw className={cn("w-4 h-4 mr-2 text-success", isHealing && "animate-spin")} />
+                  <span className="text-[10px] font-black uppercase tracking-tighter">Repair Core</span>
+                </Button>
+                
+                <Button 
+                  onClick={runMassiveSimulation}
+                  disabled={isSimulating}
+                  variant="outline"
+                  className="rounded-2xl bg-black/40 border-white/10 hover:bg-primary/20 hover:border-primary/40 group/sim h-12"
+                >
+                  <Play className={cn("w-4 h-4 mr-2 text-primary", isSimulating && "animate-pulse")} />
+                  <span className="text-[10px] font-black uppercase tracking-tighter">Stress Test</span>
+                </Button>
+              </div>
+
+              {isSimulating && (
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-[9px] font-black text-primary uppercase">
+                    <span>Simulando 10k Webhooks...</span>
+                    <span>{progress}%</span>
+                  </div>
+                  <Progress value={progress} className="h-1 bg-white/5" />
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
 
