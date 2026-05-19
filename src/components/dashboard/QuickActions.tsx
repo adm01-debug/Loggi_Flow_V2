@@ -92,7 +92,7 @@ const ActionButton = ({ action, index, navigate }: { action: typeof actions[0], 
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(action.path)}
       className={cn(
-        "group/btn relative h-full py-12 px-10 flex flex-col items-start gap-10 transition-all duration-500 rounded-[3rem] border border-white/5 bg-white/[0.03] backdrop-blur-3xl overflow-hidden",
+        "group/btn relative h-full py-8 sm:py-12 px-6 sm:px-10 flex flex-col items-start gap-6 sm:gap-10 transition-all duration-500 rounded-[2rem] sm:rounded-[3rem] border border-white/5 bg-white/[0.03] backdrop-blur-3xl overflow-hidden",
         "hover:border-white/20 hover:bg-white/[0.05] hover:shadow-[0_20px_80px_-15px_rgba(0,0,0,0.7)]"
       )}
     >
