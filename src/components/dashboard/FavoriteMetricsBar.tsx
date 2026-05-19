@@ -194,9 +194,9 @@ export function FavoriteMetricsBar() {
 
   return (
     <TooltipProvider>
-      <Card className="relative overflow-hidden group border-none bg-transparent p-[2px] rounded-[2.5rem] shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[2.5rem]" />
-        <div className="relative bg-black/95 backdrop-blur-[50px] rounded-[2.4rem] p-6 border border-white/5">
+      <Card className="relative overflow-hidden group border-none bg-transparent p-[2px] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[1.5rem] sm:rounded-[2.5rem]" />
+        <div className="relative bg-black/95 backdrop-blur-[50px] rounded-[1.4rem] sm:rounded-[2.4rem] p-4 sm:p-6 border border-white/5">
           
           {/* Scanning Line Effect */}
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 animate-scan" />
