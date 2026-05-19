@@ -86,7 +86,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
   }
 
   return (
-    <div className="relative h-full rounded-[2.5rem] bg-black/90 backdrop-blur-[50px] border border-white/10 p-8 shadow-2xl overflow-hidden group">
+    <div className="relative h-full rounded-[1.5rem] sm:rounded-[2.5rem] bg-black/90 backdrop-blur-[50px] border border-white/10 p-6 sm:p-8 shadow-2xl overflow-hidden group">
       {/* Dynamic Background Elements */}
       <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary/10 rounded-full blur-[100px] animate-pulse pointer-events-none" />
       <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
