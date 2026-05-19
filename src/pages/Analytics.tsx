@@ -23,7 +23,7 @@ export default function Analytics() {
   const kpiBenchmarkResult = useKPIBenchmark();
   const trackingResult = useTrackingAnalytics();
 
-  const { summaryMetrics, isLoading } = analyticsResult;
+  const { summaryMetrics, monthlyData, isLoading } = analyticsResult;
   const benchmarkData = kpiBenchmarkResult.data;
   const trackingData = trackingResult.data;
 
@@ -134,8 +134,8 @@ export default function Analytics() {
             )}
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-              <PerformanceChart />
-              <DistributionChart />
+              <PerformanceChart data={monthlyData} />
+              <DistributionChart data={monthlyData} />
             </div>
           </TabsContent>
 
