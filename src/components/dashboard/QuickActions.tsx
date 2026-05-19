@@ -169,7 +169,7 @@ const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
           <div className="absolute inset-0 bg-radial-at-t from-primary/5 via-transparent to-transparent opacity-50" />
           
-          <div className="p-10 sm:p-14 relative z-10">
+          <div className="p-6 sm:p-14 relative z-10">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-16 gap-10">
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
