@@ -154,7 +154,7 @@ export const AppSidebar = memo(function AppSidebar() {
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-4 p-6 border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar via-sidebar to-transparent">
+      <div className="flex items-center gap-4 p-6 border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
         <div 
           className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_20px_rgba(var(--primary-rgb),0.4)] border border-white/20 animate-[sidebar-logo_4s_ease-in-out_infinite]"
         >
