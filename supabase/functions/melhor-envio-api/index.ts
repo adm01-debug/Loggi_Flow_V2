@@ -271,6 +271,9 @@ Deno.serve(async (req) => {
     }
 
 
+    // For calcularFrete, we already returned early with cache or custom response
+    if (action === "calcularFrete") return new Response(null); // Should not reach here
+
     const response = await meBreaker.execute(async () => {
       const res = await fetch(url, {
         method,
