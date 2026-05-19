@@ -3994,6 +3994,69 @@ export type Database = {
         }
         Relationships: []
       }
+      system_heartbeat: {
+        Row: {
+          last_check: string
+          latency_ms: number | null
+          metadata: Json | null
+          service_name: string
+          status: string
+          version: string | null
+        }
+        Insert: {
+          last_check?: string
+          latency_ms?: number | null
+          metadata?: Json | null
+          service_name: string
+          status: string
+          version?: string | null
+        }
+        Update: {
+          last_check?: string
+          latency_ms?: number | null
+          metadata?: Json | null
+          service_name?: string
+          status?: string
+          version?: string | null
+        }
+        Relationships: []
+      }
+      system_integrity_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string
+          entity_affected: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          severity: string
+          success: boolean
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description: string
+          entity_affected?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          severity: string
+          success?: boolean
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string
+          entity_affected?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          severity?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       tabelas_frete: {
         Row: {
           ativo: boolean
