@@ -90,7 +90,7 @@ export function LiveStatusBar() {
              </div>
           </div>
 
-          <div className="flex items-center gap-6 sm:gap-10">
+          <div className="flex items-center gap-6 sm:gap-10 shrink-0 sm:shrink">
             {statusItems.map((item, i) => (
               <Tooltip key={i}>
                 <TooltipTrigger asChild>
