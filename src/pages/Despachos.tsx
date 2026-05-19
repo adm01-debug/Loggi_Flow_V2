@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, Clock, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText, LayoutGrid, Activity, History, MapPin } from "lucide-react";
+import { Package, Truck, Clock, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText, LayoutGrid, Activity, History, MapPin, Tag } from "lucide-react";
 import { useRealtime } from "@/hooks";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters, FilterConfig } from "@/hooks";
@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetailsDialog";
-import { useAudioFeedback } from "@/hooks";
+import { useAudioFeedback, useAuth } from "@/hooks";
 
 interface Despacho {
   id: string;
@@ -26,6 +26,7 @@ interface Despacho {
   transportadora?: string;
   nf_remessa?: string | null;
   box_alocado?: string | null;
+  tags?: string[] | null;
   version: number;
   created_at: string;
 }
@@ -62,6 +63,7 @@ const validTransitions: Record<string, string> = {
 export default function Despachos() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [confirmItem, setConfirmItem] = useState<Despacho | null>(null);
   const [selectedItem, setSelectedItem] = useState<Despacho | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -72,7 +74,7 @@ export default function Despachos() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("entregas")
-        .select("id, numero_entrega, status, nf_remessa, box_alocado, version, endereco_entrega, created_at, cliente:clientes(razao_social, nome_fantasia), transportadora:transportadoras(nome_fantasia)")
+        .select("id, numero_entrega, status, nf_remessa, box_alocado, tags, version, endereco_entrega, created_at, cliente:clientes(razao_social, nome_fantasia), transportadora:transportadoras(nome_fantasia)")
         .in("status", ["pronto_despacho", "cotacao_frete", "nf_emitida", "despachado"])
         .is("deleted_at", null)
         .order("created_at", { ascending: false })
@@ -88,6 +90,7 @@ export default function Despachos() {
         transportadora: (d.transportadora as Record<string, string>)?.nome_fantasia,
         nf_remessa: d.nf_remessa as string | undefined,
         box_alocado: d.box_alocado as string | undefined,
+        tags: d.tags as string[] | undefined,
         version: d.version as number,
         created_at: d.created_at as string,
       })) as Despacho[];
@@ -144,6 +147,15 @@ export default function Despachos() {
       .eq("version", item.version);
     
     if (!error) {
+      // Record history
+      await supabase.from("kanban_history").insert({
+        delivery_id: item.id,
+        from_status: item.status,
+        to_status: nextStatus,
+        action_by: user?.id,
+        notes: `Transição automática no Kanban: ${item.status} -> ${nextStatus}`
+      });
+
       playSuccess();
       toast.success(`Movido para ${statusConfig[nextStatus]?.label || nextStatus}`);
       refetch();
@@ -162,6 +174,15 @@ export default function Despachos() {
       .eq("version", confirmItem.version);
     
     if (!error) {
+      // Record history
+      await supabase.from("kanban_history").insert({
+        delivery_id: confirmItem.id,
+        from_status: confirmItem.status,
+        to_status: "despachado",
+        action_by: user?.id,
+        notes: "Despacho final autorizado"
+      });
+
       playSuccess();
       toast.success("Entrega despachada com sucesso!");
       setConfirmItem(null);
@@ -296,6 +317,17 @@ export default function Despachos() {
                           <h3 className="font-black text-lg tracking-tighter uppercase italic text-white group-hover:text-primary transition-colors truncate mb-1">
                             {item.cliente}
                           </h3>
+                          
+                          {item.tags && item.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mb-3">
+                              {item.tags.map((tag, idx) => (
+                                <span key={idx} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/20 text-[8px] font-black text-primary uppercase tracking-tighter border border-primary/30">
+                                  <Tag className="w-2 h-2" /> {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
                           <p className="text-[11px] font-medium text-white/40 truncate flex items-center gap-2 mb-4">
                             <MapPin className="w-3 h-3 text-primary/50" /> {item.destino}
                           </p>
