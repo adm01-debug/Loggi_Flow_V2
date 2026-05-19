@@ -138,23 +138,59 @@ export default function Despachos() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                <Package className="w-6 h-6 text-primary" />
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                <Package className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
               </div>
-              Despachos
+              <div className="flex flex-col">
+                <span className="truncate drop-shadow-sm">Despachos</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Expedição Kanban Nexus</span>
+                </div>
+              </div>
             </h1>
-            <p className="text-muted-foreground mt-1">Kanban de expedição — fluxo BOX → NF → Despacho</p>
           </div>
-          <Button variant="outline" onClick={() => refetch()}><RefreshCw className="w-4 h-4 mr-2" />Atualizar</Button>
+          <Button variant="outline" size="lg" onClick={() => refetch()} className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 hover:bg-primary/5 transition-all"><RefreshCw className="w-4 h-4" />Atualizar</Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="stat-card text-center p-3"><Package className="w-5 h-5 text-primary mx-auto mb-1" /><p className="text-xl font-bold">{stats.prontos}</p><p className="text-[10px] text-muted-foreground">Prontos</p></div>
-          <div className="stat-card text-center p-3"><Clock className="w-5 h-5 text-warning mx-auto mb-1" /><p className="text-xl font-bold">{stats.cotacao}</p><p className="text-[10px] text-muted-foreground">Cotação</p></div>
-          <div className="stat-card text-center p-3"><FileText className="w-5 h-5 text-success mx-auto mb-1" /><p className="text-xl font-bold">{stats.nfEmitida}</p><p className="text-[10px] text-muted-foreground">NF Emitida</p></div>
-          <div className="stat-card text-center p-3"><Truck className="w-5 h-5 text-primary mx-auto mb-1" /><p className="text-xl font-bold">{stats.despachados}</p><p className="text-[10px] text-muted-foreground">Despachados</p></div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <Package className="w-6 h-6" />
+              </div>
+              <p className="text-3xl font-black tracking-tighter tabular-nums">{stats.prontos}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Pronto Despacho</p>
+          </div>
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-warning/10 text-warning group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <Clock className="w-6 h-6" />
+              </div>
+              <p className="text-3xl font-black tracking-tighter tabular-nums text-warning">{stats.cotacao}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Em Cotação</p>
+          </div>
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-success/10 text-success group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <FileText className="w-6 h-6" />
+              </div>
+              <p className="text-3xl font-black tracking-tighter tabular-nums text-success">{stats.nfEmitida}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">NF Emitida</p>
+          </div>
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <Truck className="w-6 h-6" />
+              </div>
+              <p className="text-3xl font-black tracking-tighter tabular-nums">{stats.despachados}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Despachados</p>
+          </div>
         </div>
 
         <FilterBar
@@ -184,9 +220,9 @@ export default function Despachos() {
               const items = getColumnItems(col);
               return (
                 <div key={col} className="space-y-3">
-                  <div className={cn("p-3 rounded-lg flex items-center justify-between", config.color)}>
-                    <div className="flex items-center gap-2"><Icon className="w-4 h-4" /><span className="font-semibold text-sm">{config.label}</span></div>
-                    <Badge variant="secondary">{items.length}</Badge>
+                  <div className={cn("p-4 rounded-2xl flex items-center justify-between shadow-lg", config.color)}>
+                    <div className="flex items-center gap-3"><Icon className="w-5 h-5" /><span className="font-black uppercase tracking-widest text-[11px] italic">{config.label}</span></div>
+                    <Badge variant="secondary" className="bg-black/20 text-foreground border-none font-black">{items.length}</Badge>
                   </div>
                   <div className="space-y-2 min-h-[150px]">
                     {items.length === 0 && (
@@ -200,7 +236,7 @@ export default function Despachos() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         whileHover={{ y: -2 }}
-                        className="card-interactive p-3 border-2 hover:border-primary/40 group/card relative overflow-hidden cursor-pointer"
+                        className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary p-5"
                         onClick={() => navigate(`/rastreamento/${item.id}`)}
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
@@ -224,7 +260,7 @@ export default function Despachos() {
                               </Button>
                             )}
                           </div>
-                          <p className="font-bold text-sm truncate text-foreground group-hover/card:text-primary transition-colors">{item.cliente}</p>
+                          <p className="font-black text-base tracking-tighter uppercase italic truncate text-foreground group-hover/card:text-primary transition-colors">{item.cliente}</p>
                           <p className="text-[11px] text-muted-foreground truncate leading-relaxed mt-0.5">{item.destino}</p>
                           <div className="flex flex-wrap gap-1.5 mt-3">
                             {item.transportadora && (
