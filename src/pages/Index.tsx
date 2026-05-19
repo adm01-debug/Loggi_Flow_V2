@@ -1,11 +1,7 @@
-import { useMemo, useState, useEffect, useRef, memo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, ShieldCheck, Zap } from "lucide-react";
+import { useMemo, useState, useEffect, memo } from "react";
+import { Truck, Clock, AlertTriangle, CheckCircle2, RefreshCw, Settings2, RotateCcw, Activity, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/common/PageTransition";
-
-import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
@@ -21,8 +17,21 @@ import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
 import { LiveStatusBar } from "@/components/dashboard/LiveStatusBar";
 import { Button } from "@/components/ui/button";
-import { useDashboardMetrics, useRecentAlerts, useTransportadoraPerformance, useDashboardData, useRealtime, useGamification, useDashboardWidgets, useLocalStorage } from "@/hooks";
+import { DateRangePicker } from "@/components/common/DateRangePicker";
+import { subDays } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { 
+  useDashboardMetrics, 
+  useRecentAlerts, 
+  useTransportadoraPerformance, 
+  useDashboardData, 
+  useRealtime, 
+  useGamification, 
+  useDashboardWidgets, 
+  useLocalStorage 
+} from "@/hooks";
 import { toast } from "sonner";
+
 
 
 // Isolated timer component to prevent full-page re-renders
