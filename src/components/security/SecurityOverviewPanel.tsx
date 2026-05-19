@@ -44,10 +44,11 @@ export function SecurityOverviewPanel() {
   const fetchSecurityStats = async () => {
     setIsLoading(true);
     try {
+      if (!user?.id) return;
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-      const currentUserId = user?.id;
+      const currentUserId = user.id;
 
       const [sessionsResult, devicesResult, loginAttemptsResult, securityEventsResult, blockedIPsResult] = await Promise.all([
         supabase.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId),
