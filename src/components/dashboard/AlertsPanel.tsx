@@ -129,7 +129,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                     <Activity className="w-3.5 h-3.5 text-destructive/60 animate-[ping_2s_infinite]" />
                     <span className="text-[11px] font-black text-destructive/60 uppercase tracking-[0.5em] font-mono">Status Operacional</span>
                   </div>
-                  <h3 className="font-display font-black text-4xl sm:text-5xl leading-none tracking-tighter italic bg-gradient-to-r from-white via-white to-white/30 bg-clip-text text-transparent">
+                  <h3 className="font-display font-black text-2xl sm:text-5xl leading-none tracking-tighter italic bg-gradient-to-r from-white via-white to-white/30 bg-clip-text text-transparent">
                     NEXUS <span className="text-destructive drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">TERMINAL</span>
                   </h3>
                 </div>
