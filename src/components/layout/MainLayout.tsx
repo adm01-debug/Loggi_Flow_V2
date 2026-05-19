@@ -92,22 +92,24 @@ export function MainLayout({ children }: MainLayoutProps) {
             role="main"
             aria-label="Conteúdo principal"
           >
-            <div className="max-w-[1600px] mx-auto w-full">
+            <div className="max-w-[1600px] mx-auto w-full min-h-full flex flex-col">
               <nav aria-label="Navegação breadcrumb" className="flex items-center gap-4 mb-8 animate-in fade-in slide-in-from-left-4 duration-500 ease-out-expo">
                 <PageBackButton className="md:flex" />
                 <Breadcrumbs className="flex-1" />
               </nav>
 
-
-          
-          <Suspense fallback={null}>
-            <OnboardingProgress variant="full" className="mb-6" />
-          </Suspense>
-          
-          <Suspense fallback={<PageSkeleton />}>
-            </Suspense>
-          </div>
-        </main>
+              <Suspense fallback={null}>
+                <OnboardingProgress variant="full" className="mb-6" />
+              </Suspense>
+              
+              <div className="flex-1 h-full">
+                <Suspense fallback={<PageSkeleton />}>
+                  {children}
+                </Suspense>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
       </div>
       
