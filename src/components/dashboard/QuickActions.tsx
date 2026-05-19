@@ -116,7 +116,7 @@ const ActionButton = ({ action, index, navigate }: { action: typeof actions[0], 
       <div className="relative z-10 w-full flex flex-col h-full justify-between" style={{ transform: "translateZ(50px)" }}>
         <div className="flex items-center justify-between w-full">
           <div className={cn(
-            "p-6 rounded-[1.5rem] bg-black/40 border border-white/10 backdrop-blur-xl transition-all duration-700 group-hover/btn:scale-110 group-hover/btn:shadow-[0_0_40px_rgba(255,255,255,0.1)] group-hover/btn:bg-white group-hover/btn:text-black group-hover/btn:border-transparent",
+            "p-4 sm:p-6 rounded-[1.25rem] sm:rounded-[1.5rem] bg-black/40 border border-white/10 backdrop-blur-xl transition-all duration-700 group-hover/btn:scale-110 group-hover/btn:shadow-[0_0_40px_rgba(255,255,255,0.1)] group-hover/btn:bg-white group-hover/btn:text-black group-hover/btn:border-transparent",
           )}>
             <action.icon className="w-8 h-8 stroke-[1.5]" />
           </div>
