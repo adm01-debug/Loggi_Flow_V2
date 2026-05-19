@@ -4537,6 +4537,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      jsonb_recursive_merge: { Args: { a: Json; b: Json }; Returns: Json }
       purchase_reward: {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json

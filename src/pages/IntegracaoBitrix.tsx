@@ -3,8 +3,10 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import { 
   Building2, 
   RefreshCw, 
@@ -322,10 +324,3 @@ export default function IntegracaoBitrix() {
   );
 }
 
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
-}
-
-function Label({ children }: { children: React.ReactNode }) {
-  return <label className="text-sm font-bold text-foreground mb-2 block">{children}</label>;
-}

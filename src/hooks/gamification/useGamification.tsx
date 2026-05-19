@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks";
 import { useToast } from "@/hooks";
 import { playCelebrationSound } from "@/utils/celebrationSounds";
+import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 export interface UserLevel {
   id: string;
@@ -112,7 +113,7 @@ export function useGamification() {
       return data as UserLevel;
     },
     enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5,
+    staleTime: QUERY_STALE_TIME.USER,
   });
 
   // Fetch all achievements
@@ -127,7 +128,7 @@ export function useGamification() {
       if (error) throw error;
       return data as Achievement[];
     },
-    staleTime: 1000 * 60 * 30,
+    staleTime: QUERY_STALE_TIME.STATIC,
   });
 
   // Fetch user's unlocked achievements
@@ -148,7 +149,7 @@ export function useGamification() {
       return data as (UserAchievement & { achievement: Achievement })[];
     },
     enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5,
+    staleTime: QUERY_STALE_TIME.DYNAMIC,
   });
 
   // Add XP mutation
