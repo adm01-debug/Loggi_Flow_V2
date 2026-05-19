@@ -149,25 +149,25 @@ export const AppSidebar = memo(function AppSidebar() {
   return (
     <aside
       className={cn(
-        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 ease-in-out z-50",
+        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border/50 transition-all duration-500 ease-out-expo z-50 shadow-2xl shadow-black/20",
         collapsed ? "w-[var(--sidebar-collapsed-width)]" : "w-[var(--sidebar-width)]"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-4 p-6 border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
+      <div className="flex items-center gap-4 p-8 border-b border-sidebar-border/30 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
         <div 
-          className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_20px_rgba(var(--primary-rgb),0.4)] border border-white/20 animate-[sidebar-logo_4s_ease-in-out_infinite]"
+          className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_30px_rgba(var(--primary-rgb),0.5)] border border-white/20 animate-float"
         >
           <Truck className="w-7 h-7 text-white" />
         </div>
         {!collapsed && (
           <div 
-            className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500 ease-out-expo"
+            className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700 ease-out-expo"
           >
-            <span className="font-display font-black text-2xl tracking-tighter uppercase italic bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+            <span className="font-display font-black text-2xl tracking-tighter uppercase italic bg-gradient-to-r from-foreground via-foreground/80 to-primary bg-clip-text text-transparent drop-shadow-sm">
               LogiFlow
             </span>
-            <span className="text-[10px] text-primary font-black tracking-[0.3em] uppercase opacity-70">
+            <span className="text-[10px] text-primary font-black tracking-[0.4em] uppercase opacity-80">
               Nexus Edition
             </span>
           </div>
