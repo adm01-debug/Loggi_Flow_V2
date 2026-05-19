@@ -89,56 +89,66 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col p-0">
-        <DialogHeader className="p-6 pb-2">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <Package className="w-5 h-5 text-primary" />
-              {pickup.numero_coleta}
-            </DialogTitle>
-            <Badge className={cn("px-3 py-1", statusConfig[pickup.status]?.color)}>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col p-0 bg-black/95 border-white/10 backdrop-blur-xl rounded-[2.5rem]">
+        <DialogHeader className="p-8 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:rotate-6 transition-transform duration-500">
+                <Package className="w-8 h-8 text-primary animate-pulse" />
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-black italic tracking-tighter uppercase text-white">
+                  {pickup.numero_coleta}
+                </DialogTitle>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-success animate-ping" />
+                  <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">SYNC_NODE_ACTIVE</p>
+                </div>
+              </div>
+            </div>
+            <Badge variant="outline" className={cn("px-5 py-2 font-black uppercase tracking-widest text-[10px] rounded-full border-2 shadow-lg", statusConfig[pickup.status]?.color)}>
               {statusConfig[pickup.status]?.label}
             </Badge>
           </div>
         </DialogHeader>
 
-        <div className="px-6 flex-1 overflow-y-auto">
+        <div className="px-8 flex-1 overflow-y-auto scrollbar-none">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-4">
-              <TabsTrigger value="detalhes">Detalhes</TabsTrigger>
-              <TabsTrigger value="conferencia">Conferência</TabsTrigger>
-              <TabsTrigger value="historico">Histórico</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
+              <TabsTrigger value="detalhes" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Detalhes</TabsTrigger>
+              <TabsTrigger value="conferencia" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Conferência</TabsTrigger>
+              <TabsTrigger value="historico" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Histórico</TabsTrigger>
             </TabsList>
 
             <TabsContent value="detalhes" className="space-y-4 pb-6">
               <div className="grid grid-cols-2 gap-4">
-                <Card>
+                <Card className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg">
                   <CardContent className="p-4 space-y-3">
-                    <h3 className="font-semibold text-sm flex items-center gap-2 text-muted-foreground">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2 mb-3">
                       <Info className="w-4 h-4" /> Origem / Fornecedor
                     </h3>
                     <div>
-                      <p className="font-bold">
+                      <p className="font-black text-base tracking-tighter uppercase italic text-white truncate">
                         {pickup.fornecedores?.nome_fantasia || pickup.fornecedores?.razao_social || 'Não informado'}
                       </p>
-                      <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-tight flex items-center gap-2 mt-1">
                         <MapPin className="w-3 h-3" /> {pickup.endereco_coleta}
                       </p>
                     </div>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg">
                   <CardContent className="p-4 space-y-3">
-                    <h3 className="font-semibold text-sm flex items-center gap-2 text-muted-foreground">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2 mb-3">
                       <Truck className="w-4 h-4" /> Transporte
                     </h3>
                     <div>
-                      <p className="font-bold capitalize">
+                      <p className="font-black text-base tracking-tighter uppercase italic text-white truncate">
                         {pickup.tipo_coleta === 'lalamove' 
                           ? 'Lalamove' 
                           : (pickup.transportadoras?.nome_fantasia || 'Transportadora Tradicional')}
                       </p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-tight flex items-center gap-2 mt-1">
                         Status: {statusConfig[pickup.status]?.label}
                       </p>
                     </div>
@@ -146,63 +156,65 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                 </Card>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Prevista</p>
-                  <p className="text-sm font-medium flex items-center gap-1">
-                    <Calendar className="w-4 h-4 text-primary" /> 
-                    {pickup.data_prevista_coleta ? format(new Date(pickup.data_prevista_coleta), "dd/MM/yyyy") : '-'}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-sidebar-accent/30 p-5 rounded-3xl border border-white/5 backdrop-blur-sm">
+                <div className="space-y-2">
+                  <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em]">Previsão de Coleta</p>
+                  <p className="text-sm font-black italic tracking-tighter uppercase text-white flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-background shadow-sm"><Calendar className="w-3.5 h-3.5 text-primary" /></div>
+                    {pickup.data_prevista_coleta ? format(new Date(pickup.data_prevista_coleta), "dd MMM yyyy", { locale: ptBR }) : '-'}
                   </p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Volumes</p>
-                  <p className="text-sm font-medium flex items-center gap-1">
-                    <Package className="w-4 h-4 text-primary" /> {pickup.qtd_volumes}
+                <div className="space-y-2">
+                  <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em]">Volumes Totais</p>
+                  <p className="text-sm font-black italic tracking-tighter uppercase text-white flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-background shadow-sm"><Package className="w-3.5 h-3.5 text-primary" /></div>
+                    {pickup.qtd_volumes} UND
                   </p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Peso Est.</p>
-                  <p className="text-sm font-medium flex items-center gap-1">
-                    <Truck className="w-4 h-4 text-primary" /> {pickup.peso_estimado_kg} kg
+                <div className="space-y-2">
+                  <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em]">Peso Estimado</p>
+                  <p className="text-sm font-black italic tracking-tighter uppercase text-white flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-background shadow-sm"><Truck className="w-3.5 h-3.5 text-primary" /></div>
+                    {pickup.peso_estimado_kg} KG
                   </p>
                 </div>
               </div>
 
               {pickup.observacoes && (
-                <div className="bg-muted/50 p-3 rounded-lg border border-dashed border-muted-foreground/20">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Observações</p>
-                  <p className="text-sm">{pickup.observacoes}</p>
+                <div className="bg-black/40 p-5 rounded-2xl border border-white/5 border-dashed">
+                  <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] mb-2">Logs e Observações</p>
+                  <p className="text-sm text-white/70 font-medium italic">{pickup.observacoes}</p>
                 </div>
               )}
 
-              <div className="pt-4 border-t space-y-3">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-primary" /> Ações do Fluxo
+              <div className="pt-8 border-t border-white/5 space-y-5">
+                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                  <Zap className="w-5 h-5 animate-pulse" /> Executar Protocolo_Fluxo
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {pickup.status === 'aguardando_liberacao' && (
-                    <Button onClick={() => updateStatus('solicitada')} className="bg-primary hover:bg-primary/90 shadow-sm">
-                      <Calendar className="w-4 h-4 mr-2" /> Agendar Coleta
+                    <Button onClick={() => updateStatus('solicitada')} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] bg-primary text-white hover:scale-[1.03] transition-all shadow-xl shadow-primary/20">
+                      <Calendar className="w-4.5 h-4.5 mr-2" /> Agendar Coleta
                     </Button>
                   )}
                   {pickup.status === 'solicitada' && (
-                    <Button onClick={() => updateStatus('em_transito')} className="bg-warning hover:bg-warning/90 text-warning-foreground shadow-sm">
-                      <Truck className="w-4 h-4 mr-2" /> Confirmar Saída
+                    <Button onClick={() => updateStatus('em_transito')} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] bg-warning text-warning-foreground hover:scale-[1.03] transition-all shadow-xl shadow-warning/20">
+                      <Truck className="w-4.5 h-4.5 mr-2" /> Confirmar Saída
                     </Button>
                   )}
                   {pickup.status === 'em_transito' && (
-                    <Button onClick={() => updateStatus('chegou_expedicao')} variant="outline" className="border-primary/20 hover:bg-primary/5">
-                      <History className="w-4 h-4 mr-2 text-primary" /> Receber na Expedição
+                    <Button onClick={() => updateStatus('chegou_expedicao')} variant="outline" className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] border-2 border-primary/30 text-primary hover:bg-primary/5">
+                      <History className="w-4.5 h-4.5 mr-2" /> Receber na Expedição
                     </Button>
                   )}
                   {(pickup.status === 'chegou_expedicao' || pickup.status === 'divergencia') && (
-                    <Button onClick={() => handleTabChange('conferencia')} className="bg-success hover:bg-success/90 shadow-sm shadow-success/10">
-                      <CheckCircle2 className="w-4 h-4 mr-2" /> Iniciar Conferência Real
+                    <Button onClick={() => handleTabChange('conferencia')} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] bg-success text-white hover:scale-[1.03] transition-all shadow-xl shadow-success/20">
+                      <CheckCircle2 className="w-4.5 h-4.5 mr-2" /> Iniciar Conferência
                     </Button>
                   )}
                   {pickup.tipo_coleta === 'transportadora' && (
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" onClick={() => toast.info("Consultando API Rodonaves...")}>
-                      <History className="w-4 h-4 mr-1" /> Log API
+                    <Button variant="ghost" className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] text-white/40 hover:text-primary transition-colors" onClick={() => toast.info("Consultando API Rodonaves...")}>
+                      <History className="w-4 h-4 mr-2" /> Log API
                     </Button>
                   )}
                 </div>

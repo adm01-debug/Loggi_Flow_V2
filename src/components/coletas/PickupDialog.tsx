@@ -124,36 +124,36 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{pickup ? "Editar Coleta" : "Nova Coleta"}</DialogTitle>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-black/95 border-white/10 backdrop-blur-xl rounded-[2.5rem] p-8">
+        <DialogHeader className="mb-6">
+          <DialogTitle className="font-black text-2xl tracking-tighter uppercase italic text-white">{pickup ? "Editar Coleta" : "Nova Coleta_Grid"}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="numero_coleta">Número da Coleta</Label>
-              <Input id="numero_coleta" {...register("numero_coleta", { required: true })} />
+              <Label htmlFor="numero_coleta" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Número da Coleta</Label>
+              <Input id="numero_coleta" {...register("numero_coleta", { required: true })} className="h-12 rounded-xl bg-white/5 border-white/10 font-bold uppercase tracking-widest text-xs" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="status">Status Inicial</Label>
+              <Label htmlFor="status" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Status Inicial</Label>
               <Select defaultValue={watch("status")} onValueChange={(val: ColetaStatus) => setValue("status", val)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-12 rounded-xl bg-white/5 border-white/10 font-black uppercase tracking-widest text-[10px]">
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="aguardando_liberacao">Aguardando Liberação</SelectItem>
-                  <SelectItem value="solicitada">Solicitada</SelectItem>
-                  <SelectItem value="em_transito">Em Trânsito</SelectItem>
+                <SelectContent className="bg-black/95 border-white/10 backdrop-blur-xl">
+                  <SelectItem value="aguardando_liberacao" className="font-black uppercase tracking-widest text-[10px]">Aguardando Liberação</SelectItem>
+                  <SelectItem value="solicitada" className="font-black uppercase tracking-widest text-[10px]">Solicitada</SelectItem>
+                  <SelectItem value="em_transito" className="font-black uppercase tracking-widest text-[10px]">Em Trânsito</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Fornecedor</Label>
+            <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Fornecedor_Node</Label>
             <Select defaultValue={watch("fornecedor_id") || undefined} onValueChange={(val) => setValue("fornecedor_id", val)}>
-              <SelectTrigger>
+              <SelectTrigger className="h-12 rounded-xl bg-white/5 border-white/10 font-bold uppercase tracking-widest text-xs">
                 <SelectValue placeholder="Selecione o fornecedor" />
               </SelectTrigger>
               <SelectContent>
@@ -165,15 +165,15 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endereco_coleta">Endereço de Coleta</Label>
-            <Input id="endereco_coleta" {...register("endereco_coleta", { required: true })} placeholder="Rua, Número, Bairro, Cidade - UF" />
+            <Label htmlFor="endereco_coleta" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Endereço de Coleta</Label>
+            <Input id="endereco_coleta" {...register("endereco_coleta", { required: true })} placeholder="Rua, Número, Bairro, Cidade - UF" className="h-12 rounded-xl bg-white/5 border-white/10" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Tipo de Transporte</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Tipo de Transporte</Label>
               <Select defaultValue={watch("tipo_coleta")} onValueChange={(val: ColetaTipo) => setValue("tipo_coleta", val)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-12 rounded-xl bg-white/5 border-white/10 font-bold uppercase tracking-widest text-[10px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -184,9 +184,9 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
             </div>
             {tipoColeta === "transportadora" && (
               <div className="space-y-2">
-                <Label>Transportadora</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Transportadora</Label>
                 <Select defaultValue={watch("transportadora_id") || undefined} onValueChange={(val) => setValue("transportadora_id", val)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 rounded-xl bg-white/5 border-white/10 font-bold uppercase tracking-widest text-[10px]">
                     <SelectValue placeholder="Selecione a transportadora" />
                   </SelectTrigger>
                   <SelectContent>
@@ -201,29 +201,29 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="data_prevista_coleta">Data Prevista</Label>
-              <Input id="data_prevista_coleta" type="date" {...register("data_prevista_coleta")} />
+              <Label htmlFor="data_prevista_coleta" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Data Prevista</Label>
+              <Input id="data_prevista_coleta" type="date" {...register("data_prevista_coleta")} className="h-12 rounded-xl bg-white/5 border-white/10 text-white font-bold uppercase" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="qtd_volumes">Volumes</Label>
-              <Input id="qtd_volumes" type="number" {...register("qtd_volumes")} />
+              <Label htmlFor="qtd_volumes" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Volumes</Label>
+              <Input id="qtd_volumes" type="number" {...register("qtd_volumes")} className="h-12 rounded-xl bg-white/5 border-white/10 font-black text-xl italic" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="peso_estimado_kg">Peso Est. (kg)</Label>
-              <Input id="peso_estimado_kg" type="number" step="0.01" {...register("peso_estimado_kg")} />
+              <Label htmlFor="peso_estimado_kg" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Peso Est. (KG)</Label>
+              <Input id="peso_estimado_kg" type="number" step="0.01" {...register("peso_estimado_kg")} className="h-12 rounded-xl bg-white/5 border-white/10 font-black text-xl italic" />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="observacoes">Observações</Label>
-            <Textarea id="observacoes" {...register("observacoes")} placeholder="Informações adicionais para a coleta..." />
+            <Label htmlFor="observacoes" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Observações_Logs</Label>
+            <Textarea id="observacoes" {...register("observacoes")} placeholder="Informações adicionais para a coleta..." className="min-h-[100px] rounded-2xl bg-white/5 border-white/10 italic" />
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] border-2">Cancelar</Button>
+            <Button type="submit" disabled={loading} className="h-12 px-10 rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary text-white shadow-xl shadow-primary/20">
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {pickup ? "Atualizar" : "Criar Coleta"}
+              {pickup ? "AUTORIZAR_ATUALIZAÇÃO" : "INJETAR_COLETA_REDE"}
             </Button>
           </DialogFooter>
         </form>
