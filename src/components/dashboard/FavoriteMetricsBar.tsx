@@ -340,7 +340,7 @@ export function FavoriteMetricsBar() {
                       <TooltipTrigger asChild>
                         <div
                           className={cn(
-                            "relative p-5 rounded-[2rem] border-2 transition-all duration-500 overflow-hidden",
+                            "relative p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] border-2 transition-all duration-500 overflow-hidden",
                             "bg-gradient-to-br from-white/[0.07] via-white/[0.03] to-transparent border-white/5",
                             isEditMode ? "ring-2 ring-primary/40 cursor-move" : "hover:border-primary/40 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] hover:-translate-y-2",
                             "group/metric"
