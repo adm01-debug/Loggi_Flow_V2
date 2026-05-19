@@ -164,7 +164,7 @@ const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
         {/* Deep Atmosphere */}
         <div className="absolute -inset-10 bg-primary/5 rounded-[5rem] blur-[120px] opacity-0 group-hover/container:opacity-100 transition-opacity duration-1000" />
         
-        <div className="relative overflow-hidden rounded-[4rem] border border-white/10 bg-[#050505]/60 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)] transition-all duration-700 hover:border-primary/30">
+        <div className="relative overflow-hidden rounded-[2rem] sm:rounded-[4rem] border border-white/10 bg-[#050505]/60 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)] transition-all duration-700 hover:border-primary/30">
           {/* Animated Matrix Grid */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
           <div className="absolute inset-0 bg-radial-at-t from-primary/5 via-transparent to-transparent opacity-50" />
