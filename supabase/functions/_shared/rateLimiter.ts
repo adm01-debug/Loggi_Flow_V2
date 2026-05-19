@@ -20,7 +20,7 @@ export async function checkRateLimit(
   req: Request,
   endpoint: string,
   config?: RateLimitConfig
-): Promise<{ allowed: boolean; remaining: number }> {
+): Promise<{ allowed: boolean; remaining: number; message?: string }> {
   const cfg = { ...DEFAULT_CONFIG, ...config };
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
     || req.headers.get("x-real-ip")
@@ -44,7 +44,7 @@ export async function checkRateLimit(
     .limit(1);
 
   if (blocked && blocked.length > 0) {
-    return { allowed: false, remaining: 0 };
+    return { allowed: false, remaining: 0, message: "IP temporariamente bloqueado por excesso de requisições." };
   }
 
   // Count recent requests
@@ -70,5 +70,6 @@ export async function checkRateLimit(
   return {
     allowed: !isBlocked,
     remaining: Math.max(0, cfg.maxRequests - requestCount),
+    message: isBlocked ? "Limite de requisições excedido. IP bloqueado temporariamente." : undefined
   };
 }
