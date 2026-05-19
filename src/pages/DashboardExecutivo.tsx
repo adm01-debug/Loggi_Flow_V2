@@ -3,7 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
-import { BarChart3, Target, Truck, DollarSign, Clock, AlertTriangle, CheckCircle2, Package, ArrowUpRight, ArrowDownRight, Minus, Bot, BrainCircuit, Sparkles, X } from "lucide-react";
+import { BarChart3, Target, Truck, DollarSign, Clock, AlertTriangle, CheckCircle2, Package, ArrowUpRight, ArrowDownRight, Minus, Bot, BrainCircuit, Sparkles, X, LayoutGrid } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
@@ -13,6 +13,9 @@ import { formatCurrency } from "@/lib/formatters";
 import { useExecutiveMetrics } from "@/hooks";
 import { AIAssistant } from "@/components/ai/AIAssistant";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PerformanceChart, DistributionChart } from "@/components/analytics/AnalyticsCharts";
+import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function DashboardExecutivo() {
   const [showAI, setShowAI] = useState(false);
