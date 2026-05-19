@@ -221,7 +221,7 @@ const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
           </div>
           
           {/* Bottom Integrated Status */}
-          <div className="px-14 py-8 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="px-6 sm:px-14 py-6 sm:py-8 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               <div className="flex -space-x-3">
                 {[1, 2, 3, 4].map(i => (
