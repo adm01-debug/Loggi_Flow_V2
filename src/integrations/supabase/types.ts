@@ -1312,6 +1312,89 @@ export type Database = {
         }
         Relationships: []
       }
+      bitrix_sync_config: {
+        Row: {
+          access_token: string | null
+          client_id: string | null
+          client_secret: string | null
+          created_at: string | null
+          field_mapping: Json | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          refresh_token: string | null
+          sync_interval_minutes: number | null
+          updated_at: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          client_id?: string | null
+          client_secret?: string | null
+          created_at?: string | null
+          field_mapping?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          refresh_token?: string | null
+          sync_interval_minutes?: number | null
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          client_id?: string | null
+          client_secret?: string | null
+          created_at?: string | null
+          field_mapping?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          refresh_token?: string | null
+          sync_interval_minutes?: number | null
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      bitrix_sync_logs: {
+        Row: {
+          config_id: string | null
+          created_at: string | null
+          details: Json | null
+          error_message: string | null
+          id: string
+          status: string
+          synced_items_count: number | null
+        }
+        Insert: {
+          config_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          status: string
+          synced_items_count?: number | null
+        }
+        Update: {
+          config_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          status?: string
+          synced_items_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bitrix_sync_logs_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "bitrix_sync_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_rules: {
         Row: {
           actions: Json
@@ -2674,6 +2757,45 @@ export type Database = {
           },
         ]
       }
+      notification_templates: {
+        Row: {
+          body_html: string | null
+          body_text: string
+          channels: string[] | null
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          body_html?: string | null
+          body_text: string
+          channels?: string[] | null
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          body_html?: string | null
+          body_text?: string
+          channels?: string[] | null
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           action_url: string | null
@@ -2800,6 +2922,54 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          average_lead_time_hours: number | null
+          created_at: string | null
+          efficiency_score: number | null
+          entity_id: string
+          entity_type: string
+          id: string
+          late_deliveries: number | null
+          on_time_deliveries: number | null
+          period_end: string
+          period_start: string
+          sla_compliance_rate: number | null
+          total_freights: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          average_lead_time_hours?: number | null
+          created_at?: string | null
+          efficiency_score?: number | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          late_deliveries?: number | null
+          on_time_deliveries?: number | null
+          period_end: string
+          period_start: string
+          sla_compliance_rate?: number | null
+          total_freights?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          average_lead_time_hours?: number | null
+          created_at?: string | null
+          efficiency_score?: number | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          late_deliveries?: number | null
+          on_time_deliveries?: number | null
+          period_end?: string
+          period_start?: string
+          sla_compliance_rate?: number | null
+          total_freights?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -3590,6 +3760,36 @@ export type Database = {
           severity?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      sla_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          freight_id: string
+          id: string
+          message: string | null
+          resolved_at: string | null
+          severity: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          freight_id: string
+          id?: string
+          message?: string | null
+          resolved_at?: string | null
+          severity?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          freight_id?: string
+          id?: string
+          message?: string | null
+          resolved_at?: string | null
+          severity?: string | null
         }
         Relationships: []
       }

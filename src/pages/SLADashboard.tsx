@@ -110,7 +110,7 @@ export default function SLADashboard() {
             <TabsTrigger value="trends" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Tendências</TabsTrigger>
           </TabsList>
           <TabsContent value="carriers" className="space-y-3">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (stats.performancePorTransportadora || []).map((c: PerformanceTransportadora, i: number) => (
+            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (stats.performancePorTransportadora || []).map((c: any, i: number) => (
               <div key={i} className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between">
                 <div className="flex items-center gap-5">
                   <div className={cn("p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500", c.taxaOTIF >= 95 ? "bg-success/15 text-success" : c.taxaOTIF >= 80 ? "bg-warning/15 text-warning" : "bg-destructive/15 text-destructive")}>

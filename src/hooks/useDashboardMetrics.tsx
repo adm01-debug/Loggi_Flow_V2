@@ -102,7 +102,7 @@ export function useRecentAlerts() {
       const now = new Date();
       const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString();
       
-      const [coletasRes, entregasRes, predictionsRes] = await Promise.all([
+      const [coletasRes, entregasRes, predictionsRes, slaAlertsRes] = await Promise.all([
         supabase
           .from('coletas')
           .select('id, numero_coleta, status, divergencia_percentual, created_at')
@@ -116,6 +116,11 @@ export function useRecentAlerts() {
           .select('*')
           .gte('analyzed_at', sixHoursAgo)
           .in('risco', ['alto', 'critico'])
+          .limit(10),
+        supabase
+          .from('sla_alerts')
+          .select('*')
+          .is('resolved_at', null)
           .limit(10)
       ]);
       
@@ -184,6 +189,18 @@ export function useRecentAlerts() {
           entityType: pred.entity_type as 'coleta' | 'entrega',
           delta: p.probabilidade_atraso
         } as any);
+      });
+
+      slaAlertsRes.data?.forEach(alert => {
+        alerts.push({
+          id: `sla-${alert.id}`,
+          type: alert.alert_type as any,
+          message: alert.message || `Violação de SLA detectada`,
+          severity: alert.severity as any,
+          createdAt: alert.created_at || now.toISOString(),
+          entityId: alert.freight_id,
+          entityType: 'entrega'
+        });
       });
 
       // Add variation alerts for freights

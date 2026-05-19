@@ -15,6 +15,7 @@ import { DrillDownModal } from "@/components/analytics/DrillDownModal";
 import { useDrillDown } from "@/hooks/useDrillDown";
 import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
 import { toast } from "sonner";
+import { useExport, exportConfigs } from "@/hooks/useExport";
 
 type Period = "7d" | "30d" | "90d" | "12m";
 
@@ -23,6 +24,16 @@ const COLORS = { success: "hsl(142, 71%, 45%)", info: "hsl(199, 89%, 48%)", warn
 export default function Relatorios() {
   const [period, setPeriod] = useState<Period>("30d");
   const drillDown = useDrillDown();
+  const { exportToCSV, exportToPDF } = useExport();
+
+  const { data: performanceMetrics = [] } = useQuery({
+    queryKey: ["performance-metrics-report"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("performance_metrics").select("*");
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
   const periodDays = { "7d": 7, "30d": 30, "90d": 90, "12m": 365 };
   const startDate = subDays(new Date(), periodDays[period]);
@@ -174,9 +185,11 @@ export default function Relatorios() {
               variant="outline" 
               className="gap-2 border-primary/20 text-primary hover:bg-primary/5"
               onClick={() => {
-                toast.success("Relatório CSV gerado com sucesso!", {
-                  description: "O download iniciará em instantes.",
-                });
+                if (performanceMetrics.length === 0) {
+                  toast.error("Sem dados de performance para exportar");
+                  return;
+                }
+                exportToCSV(performanceMetrics, { filename: 'performance_logistica' });
               }}
             >
               <FileDown className="w-4 h-4" />
@@ -185,12 +198,15 @@ export default function Relatorios() {
             <Button 
               className="gap-2 shadow-lg shadow-primary/20"
               onClick={() => {
-                toast.success("Relatório PDF em processamento...", {
-                  description: "Compilando dados táticos de auditoria.",
+                if (performanceMetrics.length === 0) {
+                  toast.error("Sem dados de performance para exportar");
+                  return;
+                }
+                exportToPDF(performanceMetrics, { 
+                  filename: 'relatorio_performance',
+                  title: 'Relatório de Performance e SLA Logístico',
+                  subtitle: `Período de Análise: ${period} - Gerado em ${format(new Date(), "dd/MM/yyyy HH:mm")}`
                 });
-                setTimeout(() => {
-                  toast.success("PDF pronto para download!");
-                }, 2000);
               }}
             >
               <FileDown className="w-4 h-4" />

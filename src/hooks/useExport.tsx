@@ -297,4 +297,16 @@ export const exportConfigs = {
       contato_telefone: 'Telefone',
     },
   },
+  sla_metrics: {
+    columns: ['entity_id', 'entity_type', 'total_freights', 'on_time_deliveries', 'late_deliveries', 'sla_compliance_rate', 'average_lead_time_hours'],
+    labels: {
+      entity_id: 'ID Entidade',
+      entity_type: 'Tipo',
+      total_freights: 'Total Fretes',
+      on_time_deliveries: 'No Prazo',
+      late_deliveries: 'Atrasados',
+      sla_compliance_rate: '% SLA',
+      average_lead_time_hours: 'Lead Time Médio (h)'
+    }
+  }
 };

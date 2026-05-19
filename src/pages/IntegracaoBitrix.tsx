@@ -18,7 +18,9 @@ import {
   Zap,
   Activity,
   ArrowRightLeft,
-  Clock
+  Clock,
+  Database,
+  CloudLightning
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -28,16 +30,28 @@ import { ptBR } from "date-fns/locale";
 
 export default function IntegracaoBitrix() {
   const qc = useQueryClient();
-  const [isConfiguring, setIsConfiguring] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
+
+  const { data: config } = useQuery({
+    queryKey: ["bitrix-config"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("bitrix_sync_config")
+        .select("*")
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    }
+  });
 
   const { data: logs = [], isLoading: isLoadingLogs } = useQuery({
     queryKey: ["bitrix-logs"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("audit_logs")
-        .select("*")
-        .or("table_name.eq.bitrix24_sync,table_name.eq.bitrix24_webhook")
+        .from("bitrix_sync_logs")
+        .select(`
+          *
+        `)
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;
@@ -55,14 +69,30 @@ export default function IntegracaoBitrix() {
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["bitrix-logs"] });
-      toast.success(`Sincronização concluída: ${data.coletas_synced} coletas, ${data.entregas_synced} entregas e ${data.ocorrencias_synced || 0} ocorrências.`);
+      toast.success(`Sincronização concluída: ${data.coletas_synced} coletas, ${data.entregas_synced} entregas.`);
     },
     onError: (err) => {
       toast.error(`Erro na sincronização: ${err.message}`);
     }
   });
 
-  const lastSync = logs.find(l => l.action === "SYNC");
+  const updateConfigMutation = useMutation({
+    mutationFn: async (url: string) => {
+      const { error } = await supabase
+        .from("bitrix_sync_config")
+        .upsert({ 
+          webhook_url: url,
+          is_active: true 
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["bitrix-config"] });
+      toast.success("Configuração salva com sucesso!");
+    }
+  });
+
+  const lastSync = logs.find(l => l.status === "SUCCESS");
 
   return (
     <MainLayout>
@@ -105,10 +135,12 @@ export default function IntegracaoBitrix() {
                 <div className="p-2 rounded-lg bg-[#2fc6f6]/20">
                   <Activity className="w-5 h-5 text-[#2fc6f6]" />
                 </div>
-                <Badge variant="success" className="h-5">Conectado</Badge>
+                <Badge variant={config?.is_active ? "success" : "secondary"} className="h-5">
+                  {config?.is_active ? "Conectado" : "Inativo"}
+                </Badge>
               </div>
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-1">Status da API</p>
-              <h3 className="text-2xl font-black">Saudável</h3>
+              <h3 className="text-2xl font-black">{config?.is_active ? "Saudável" : "Desconectado"}</h3>
               <p className="text-xs text-muted-foreground mt-2">Latência média: 145ms</p>
             </CardContent>
           </Card>
@@ -123,9 +155,9 @@ export default function IntegracaoBitrix() {
               </div>
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-1">Última Sincronização</p>
               <h3 className="text-2xl font-black">
-                {lastSync ? format(new Date(lastSync.created_at), "HH:mm:ss", { locale: ptBR }) : "Nenhuma"}
+                {lastSync?.created_at ? format(new Date(lastSync.created_at), "HH:mm:ss", { locale: ptBR }) : "Nenhuma"}
               </h3>
-              <p className="text-xs text-muted-foreground mt-2">Próxima em: ~15 min</p>
+              <p className="text-xs text-muted-foreground mt-2">Próxima em: ~{config?.sync_interval_minutes || 60} min</p>
             </CardContent>
           </Card>
 
@@ -135,11 +167,13 @@ export default function IntegracaoBitrix() {
                 <div className="p-2 rounded-lg bg-warning/20">
                   <Zap className="w-5 h-5 text-warning" />
                 </div>
-                <Badge variant="warning" className="h-5">Webhook</Badge>
+                <Badge variant="warning" className="h-5">Fluxo</Badge>
               </div>
-              <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-1">Eventos Processados</p>
-              <h3 className="text-2xl font-black">1.2k</h3>
-              <p className="text-xs text-muted-foreground mt-2">Últimas 24 horas</p>
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-1">Itens Sincronizados</p>
+              <h3 className="text-2xl font-black">
+                {logs.reduce((acc, log) => acc + (log.synced_items_count || 0), 0)}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-2">Total no período</p>
             </CardContent>
           </Card>
         </div>
@@ -148,7 +182,7 @@ export default function IntegracaoBitrix() {
           <TabsList className="bg-muted/50 p-1 mb-6">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="logs">Log de Eventos</TabsTrigger>
-            <TabsTrigger value="mapping">Mapeamento de Campos</TabsTrigger>
+            <TabsTrigger value="mapping">Mapeamento</TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
@@ -157,15 +191,15 @@ export default function IntegracaoBitrix() {
               <Card>
                 <CardHeader>
                   <CardTitle>Entidades Sincronizadas</CardTitle>
-                  <CardDescription>SPAs (Processos Inteligentes) vinculados ao LogiFlow</CardDescription>
+                  <CardDescription>Fluxos vinculados ao CRM</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
                     <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold">1186</div>
+                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold"><Database className="w-5 h-5" /></div>
                        <div>
-                         <p className="font-bold">Gestão Compras</p>
-                         <p className="text-xs text-muted-foreground">Mapped to: Coletas</p>
+                         <p className="font-bold">Clientes & Contatos</p>
+                         <p className="text-xs text-muted-foreground">Mapped to: clientes</p>
                        </div>
                     </div>
                     <Badge variant="success">Ativo</Badge>
@@ -173,21 +207,10 @@ export default function IntegracaoBitrix() {
 
                   <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
                     <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold">1234</div>
+                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold"><CloudLightning className="w-5 h-5" /></div>
                        <div>
-                         <p className="font-bold">Entregas Log</p>
-                         <p className="text-xs text-muted-foreground">Mapped to: Entregas</p>
-                       </div>
-                    </div>
-                    <Badge variant="success">Ativo</Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
-                    <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 rounded-lg bg-[#2fc6f6]/10 flex items-center justify-center text-[#2fc6f6] font-bold">1050</div>
-                       <div>
-                         <p className="font-bold">Ocorrências Log</p>
-                         <p className="text-xs text-muted-foreground">Mapped to: Ocorrências</p>
+                         <p className="font-bold">Negócios (Deals)</p>
+                         <p className="text-xs text-muted-foreground">Mapped to: entregas</p>
                        </div>
                     </div>
                     <Badge variant="success">Ativo</Badge>
@@ -198,20 +221,20 @@ export default function IntegracaoBitrix() {
               <Card>
                 <CardHeader>
                   <CardTitle>Estado dos Webhooks</CardTitle>
-                  <CardDescription>Escuta ativa de alterações em tempo real</CardDescription>
+                  <CardDescription>Escuta ativa de alterações</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {[
                     { event: "ONCRMDEALUPDATE", status: "Ativo", icon: CheckCircle2 },
                     { event: "ONCRMDEALADD", status: "Ativo", icon: CheckCircle2 },
-                    { event: "ONCRMSPAITEMUPDATE", status: "Ativo", icon: CheckCircle2 },
-                    { event: "ONCRMACTIVITYADD", status: "Aguardando", icon: Clock },
+                    { event: "ONCRMCONTACTUPDATE", status: "Ativo", icon: CheckCircle2 },
+                    { event: "ONCRMCOMPANYUPDATE", status: "Ativo", icon: CheckCircle2 },
                   ].map((e, i) => (
                     <div key={i} className="flex items-center justify-between py-2 border-b last:border-0 border-border/50">
                       <code className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-mono">{e.event}</code>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">{e.status}</span>
-                        <e.icon className={cn("w-4 h-4", e.status === "Ativo" ? "text-success" : "text-muted-foreground")} />
+                        <e.icon className={cn("w-4 h-4 text-success")} />
                       </div>
                     </div>
                   ))}
@@ -235,18 +258,20 @@ export default function IntegracaoBitrix() {
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "w-8 h-8 rounded-full flex items-center justify-center",
-                          log.action === "SYNC" ? "bg-primary/10 text-primary" : "bg-warning/10 text-warning"
+                          log.status === "SUCCESS" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"
                         )}>
-                          {log.action === "SYNC" ? <RefreshCw className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
+                          {log.status === "SUCCESS" ? <RefreshCw className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
                         </div>
                         <div>
-                          <p className="text-sm font-bold uppercase tracking-tight">{log.action}</p>
-                          <p className="text-[10px] text-muted-foreground">{format(new Date(log.created_at), "dd/MM/yyyy HH:mm:ss", { locale: ptBR })}</p>
+                          <p className="text-sm font-bold uppercase tracking-tight">{log.status}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {log.created_at ? format(new Date(log.created_at), "dd/MM/yyyy HH:mm:ss", { locale: ptBR }) : "Data desconhecida"}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
-                         <p className="text-xs font-mono">{log.table_name}</p>
-                         <p className="text-[10px] text-muted-foreground truncate max-w-[200px]">{JSON.stringify(log.new_data)}</p>
+                         <p className="text-xs font-mono">{log.synced_items_count || 0} itens</p>
+                         <p className="text-[10px] text-muted-foreground truncate max-w-[200px]">{log.error_message || "Processado com sucesso"}</p>
                       </div>
                     </div>
                   ))}
@@ -262,7 +287,7 @@ export default function IntegracaoBitrix() {
                   <Settings2 className="w-5 h-5 text-primary" />
                   Configurações de Conexão
                 </CardTitle>
-                <CardDescription>Configure as chaves e URLs para integração com o Bitrix24</CardDescription>
+                <CardDescription>Configure as chaves para integração com o Bitrix24</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
@@ -271,10 +296,10 @@ export default function IntegracaoBitrix() {
                     <Input 
                       placeholder="https://seu-dominio.bitrix24.com.br/rest/1/webhook-key/" 
                       type="password"
-                      value={webhookUrl}
+                      defaultValue={config?.webhook_url || ""}
                       onChange={(e) => setWebhookUrl(e.target.value)}
                     />
-                    <Button>Salvar</Button>
+                    <Button onClick={() => updateConfigMutation.mutate(webhookUrl)}>Salvar</Button>
                   </div>
                   <p className="text-[10px] text-muted-foreground italic">Esta chave é gerada dentro do Bitrix24 em 'Aplicações - Webhooks'.</p>
                 </div>
@@ -285,7 +310,7 @@ export default function IntegracaoBitrix() {
                     <p className="font-bold">Segurança da Integração</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    A conexão utiliza uma Service Role Key para persistência de dados. Certifique-se de que o webhook no Bitrix24 tenha permissões de leitura/escrita para 'CRM' e 'SPA'.
+                    A conexão utiliza webhooks seguros para sincronização de Clientes e Negócios. Certifique-se de que o webhook no Bitrix24 tenha permissões de leitura/escrita para 'CRM'.
                   </p>
                 </div>
               </CardContent>
