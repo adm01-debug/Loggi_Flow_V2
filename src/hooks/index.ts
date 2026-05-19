@@ -142,3 +142,5 @@ export { useToast, toast } from './ui/use-toast';
 export * from './ui/useOnboarding';
 export * from './ui/useQRScanner';
 export * from './ui/useVirtualTable';
+export * from './ui/useTouchGestures';
+
