@@ -174,9 +174,10 @@ export const Header = memo(function Header() {
         </div>
       </div>
 
-      {/* Center - Realtime Status */}
-      <div className="hidden md:flex shrink-0">
+      {/* Center - Realtime Status & System Pulse */}
+      <div className="hidden md:flex shrink-0 items-center gap-4">
         <RealtimeStatus />
+        <SystemPulse />
       </div>
 
       {/* Gamification Stats */}
