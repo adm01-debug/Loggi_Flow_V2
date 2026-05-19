@@ -23,11 +23,11 @@ export const runSystemSanityChecks = async () => {
       } 
     },
     { 
-      name: "Edge Functions (Health)", 
+      name: "Edge Functions (Deep Health)", 
       fn: async () => { 
         try {
           const { data, error } = await supabase.functions.invoke('health-check'); 
-          return !error && data?.status === 'healthy'; 
+          return !error && data?.status === 'healthy' && data?.checks?.database === true; 
         } catch { return false; }
       } 
     },

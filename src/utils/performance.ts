@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export const usePerformanceMonitor = (componentName: string) => {
+export const useRenderingMonitor = (componentName: string) => {
   useEffect(() => {
     const start = performance.now();
     
