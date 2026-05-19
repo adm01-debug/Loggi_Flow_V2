@@ -258,7 +258,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
             
             <div className="flex items-baseline gap-3">
               <motion.span 
-                className="text-6xl font-display font-black tracking-tighter tabular-nums bg-gradient-to-br from-white via-white to-white/40 bg-clip-text text-transparent italic"
+                className="text-4xl sm:text-6xl font-display font-black tracking-tighter tabular-nums bg-gradient-to-br from-white via-white to-white/40 bg-clip-text text-transparent italic"
               >
                 {typeof value === 'string' && (value.includes('R$') || value.includes('%')) ? value : animatedValue}
               </motion.span>
