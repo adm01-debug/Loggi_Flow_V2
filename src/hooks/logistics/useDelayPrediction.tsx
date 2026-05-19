@@ -1,6 +1,7 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTelemetry } from '@/hooks/analytics/useTelemetry';
 
 export interface DelayPrediction {
   id: string;
@@ -30,6 +31,9 @@ export interface PredictionResult {
 
 export function useDelayPrediction() {
   const [isLoading, setIsLoading] = useState(false);
+  const { logTelemetry } = useTelemetry();
+  const cacheRef = useRef<{ [key: string]: { data: PredictionResult, timestamp: number } }>({});
+  const CACHE_TTL = 1000 * 60 * 5; // 5 minutos de cache local
   const [predictionsData, setPredictions] = useState<DelayPrediction[]>([]);
   const [summaryData, setSummary] = useState<PredictionSummary | null>(null);
 
@@ -40,7 +44,18 @@ export function useDelayPrediction() {
   const [error, setError] = useState<string | null>(null);
   const [isCached, setIsCached] = useState(false);
 
-  const analyzeDelays = useCallback(async () => {
+  const analyzeDelays = useCallback(async (forceRefresh = false) => {
+    // Verificação de cache para evitar chamadas de IA desnecessárias
+    const cacheKey = 'global_prediction';
+    if (!forceRefresh && cacheRef.current[cacheKey] && (Date.now() - cacheRef.current[cacheKey].timestamp < CACHE_TTL)) {
+      const cached = cacheRef.current[cacheKey].data;
+      setPredictions(cached.predictions);
+      setSummary(cached.summary);
+      setLastAnalyzed(cached.analyzed_at);
+      setIsCached(true);
+      return cached;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -63,6 +78,19 @@ export function useDelayPrediction() {
       setSummary(data.summary || null);
       setLastAnalyzed(data.analyzed_at);
       setIsCached(!!data.cached);
+
+      // Persistir no cache local
+      cacheRef.current[cacheKey] = {
+        data: data as PredictionResult,
+        timestamp: Date.now()
+      };
+
+      logTelemetry({
+        severity: 'info',
+        category: 'ai_prediction',
+        message: 'Análise preditiva de atrasos concluída com sucesso',
+        metadata: { summary: data.summary, analyzed_at: data.analyzed_at }
+      });
 
       const criticos = data.summary?.criticos || 0;
       const altos = data.summary?.altos || 0;
