@@ -122,60 +122,87 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
-      <div className="flex flex-col sm:flex-row gap-3">
+    <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <label htmlFor="csv-upload" className="sr-only">Selecione o arquivo para importação</label>
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-primary/0 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+          <div className="relative group/input">
+            <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-lg opacity-0 group-hover/input:opacity-100 transition-opacity" />
             <Input 
               id="csv-upload"
               type="file" 
               accept=".csv,.xlsx,.xls" 
               onChange={handleFileChange} 
               disabled={isImporting} 
-              className="relative cursor-pointer bg-card/50 hover:bg-card transition-colors border-dashed border-2"
+              className="relative cursor-pointer h-16 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border-dashed border-2 border-white/20 group-hover/input:border-primary/50 flex items-center pt-5 pl-4 font-black uppercase tracking-widest text-[10px]"
               aria-describedby="csv-instructions"
             />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none p-2 rounded-xl bg-primary/10">
+              <Upload className="w-5 h-5 text-primary animate-bounce" />
+            </div>
           </div>
         </div>
         {columns && (
-          <Button variant="outline" onClick={handleDownloadTemplate} className="hover-lift-sm">
-            <Download className="h-4 w-4 mr-2" />Template
+          <Button variant="outline" size="lg" onClick={handleDownloadTemplate} className="h-16 px-8 rounded-2xl border-2 font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-primary/5 transition-all">
+            <Download className="w-4 h-4" /> <span className="hidden sm:inline">Template_NODE</span>
           </Button>
         )}
       </div>
 
-      <div id="csv-instructions" className="text-[10px] text-muted-foreground bg-muted/30 p-2 rounded border border-border/50">
-        <p className="font-semibold uppercase tracking-wider mb-1">Dicas de Importação:</p>
-        <ul className="list-disc list-inside space-y-0.5">
-          <li>Use formatos .CSV ou .XLSX (Excel)</li>
-          <li>Garanta que as colunas obrigatórias estão preenchidas</li>
-          <li>Datas devem seguir o padrão AAAA-MM-DD</li>
+      <div id="csv-instructions" className="text-[10px] font-bold text-white/40 bg-sidebar-accent/30 p-4 rounded-2xl border border-white/5 backdrop-blur-sm">
+        <p className="font-black text-primary uppercase tracking-[0.3em] mb-2 flex items-center gap-2">
+          <div className="w-1 h-3 bg-primary rounded-full" />
+          Protocolo_Importação Nexus
+        </p>
+        <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <li className="flex items-center gap-2 bg-black/40 p-2 rounded-xl border border-white/5 uppercase tracking-tighter italic">✓ Formatos .CSV ou .XLSX</li>
+          <li className="flex items-center gap-2 bg-black/40 p-2 rounded-xl border border-white/5 uppercase tracking-tighter italic">✓ Colunas Mandatórias Ativas</li>
+          <li className="flex items-center gap-2 bg-black/40 p-2 rounded-xl border border-white/5 uppercase tracking-tighter italic">✓ Datas ISO AAAA-MM-DD</li>
         </ul>
       </div>
 
       {isImporting && (
-        <div className="space-y-2">
-          <div className="flex justify-between text-[10px] font-bold uppercase text-primary">
-            <span>Processando arquivo</span>
-            <span>{progress}%</span>
+        <div className="space-y-3 p-6 rounded-3xl bg-black/40 border border-primary/20 shadow-inner">
+          <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+            <span className="flex items-center gap-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              Sincronizando Buffer_Node
+            </span>
+            <span className="tabular-nums italic">{progress}%</span>
           </div>
-          <Progress value={progress} className="h-1.5" />
+          <Progress value={progress} className="h-2 bg-primary/10 [&>div]:bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]" />
         </div>
       )}
 
       {result && (
         <div className="animate-in zoom-in-95 duration-300 space-y-3">
           <Alert variant={result.errors.length > 0 ? 'destructive' : 'default'} className={cn(
-            "border-2",
-            result.errors.length === 0 ? "bg-success/5 border-success/20" : "bg-destructive/5 border-destructive/20"
+            "border-2 rounded-[1.5rem] sm:rounded-[2rem] p-6 shadow-2xl overflow-hidden relative",
+            result.errors.length === 0 ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"
           )}>
-            {result.errors.length === 0 ? (
-              <><CheckCircle2 className="h-4 w-4 text-success" /><AlertDescription className="text-success font-medium">{result.success.length} registros válidos e prontos para importação</AlertDescription></>
-            ) : (
-              <><AlertCircle className="h-4 w-4" /><AlertDescription className="font-medium">{result.success.length} válidos, {result.errors.length} erros detectados</AlertDescription></>
-            )}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+            <div className="relative z-10 flex items-center gap-5">
+              {result.errors.length === 0 ? (
+                <div className="p-3 rounded-2xl bg-success/20">
+                  <CheckCircle2 className="h-8 w-8 text-success animate-bounce" />
+                </div>
+              ) : (
+                <div className="p-3 rounded-2xl bg-destructive/20">
+                  <AlertCircle className="h-8 w-8 text-destructive animate-pulse" />
+                </div>
+              )}
+              <div>
+                <AlertDescription className={cn(
+                  "font-black text-xl tracking-tighter uppercase italic leading-none mb-1",
+                  result.errors.length === 0 ? "text-success" : "text-destructive"
+                )}>
+                  {result.errors.length === 0 ? "Registros_Sync OK" : "Inconsistência Detectada"}
+                </AlertDescription>
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">
+                  {result.success.length} Válidos • {result.errors.length} Falhas de Protocolo
+                </p>
+              </div>
+            </div>
           </Alert>
           
           {result.errors.length > 0 && (
@@ -191,9 +218,9 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
           )}
           
           {result.success.length > 0 && (
-            <Button onClick={handleConfirmImport} disabled={isImporting} variant="premium" className="w-full h-12">
-              {isImporting ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Upload className="h-5 w-5 mr-2" />}
-              Finalizar Importação de {result.success.length} Itens
+            <Button onClick={handleConfirmImport} disabled={isImporting} size="lg" className="w-full h-16 rounded-[1.5rem] sm:rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs bg-primary text-white shadow-2xl shadow-primary/30 hover:scale-[1.02] transition-all group/finish">
+              {isImporting ? <Loader2 className="h-6 w-6 mr-3 animate-spin" /> : <Upload className="h-6 w-6 mr-3 group-hover/finish:scale-110 transition-transform" />}
+              AUTORIZAR_INJEÇÃO_DE_{result.success.length}_ITENS
             </Button>
           )}
         </div>
