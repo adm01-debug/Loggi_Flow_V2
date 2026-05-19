@@ -24,6 +24,16 @@ const COLORS = { success: "hsl(142, 71%, 45%)", info: "hsl(199, 89%, 48%)", warn
 export default function Relatorios() {
   const [period, setPeriod] = useState<Period>("30d");
   const drillDown = useDrillDown();
+  const { exportToCSV, exportToPDF } = useExport();
+
+  const { data: performanceMetrics = [] } = useQuery({
+    queryKey: ["performance-metrics-report"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("performance_metrics").select("*");
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
   const periodDays = { "7d": 7, "30d": 30, "90d": 90, "12m": 365 };
   const startDate = subDays(new Date(), periodDays[period]);
