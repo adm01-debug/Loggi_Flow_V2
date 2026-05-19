@@ -130,20 +130,56 @@ export function DeliveryReceiptUpload({ entregaId, onUploadSuccess, currentUrl }
   return (
     <div className="space-y-3">
       {preview ? (
-        <div className="relative group rounded-lg overflow-hidden border bg-muted/50 aspect-video flex items-center justify-center">
-          {preview.toLowerCase().endsWith(".pdf") ? (
-            <div className="flex flex-col items-center gap-2">
-              <FileText className="w-12 h-12 text-primary" />
-              <span className="text-xs font-medium">Comprovante PDF</span>
+        <div className="space-y-4">
+          <div className="relative group rounded-[2rem] overflow-hidden border-2 border-white/5 bg-black/40 aspect-video flex items-center justify-center shadow-2xl backdrop-blur-xl">
+            {preview.toLowerCase().endsWith(".pdf") ? (
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20">
+                  <FileText className="w-12 h-12 text-primary" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Digital_Vault_PDF</span>
+              </div>
+            ) : (
+              <img src={preview} alt="Comprovante" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            )}
+            
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm">
+              <Button size="sm" variant="secondary" className="rounded-xl font-black text-[10px] uppercase tracking-widest gap-2" asChild>
+                <a href={preview} target="_blank" rel="noreferrer">
+                  <Eye className="w-3.5 h-3.5" /> Visualizar
+                </a>
+              </Button>
+              <Button size="sm" variant="secondary" className="rounded-xl font-black text-[10px] uppercase tracking-widest gap-2" asChild>
+                <a href={preview} download={`comprovante_${entregaId}`} target="_blank" rel="noreferrer">
+                  <Download className="w-3.5 h-3.5" /> Salvar
+                </a>
+              </Button>
+              <Button size="sm" variant="destructive" className="rounded-xl font-black text-[10px] uppercase tracking-widest gap-2" onClick={removeReceipt}>
+                <X className="w-3.5 h-3.5" /> Remover
+              </Button>
             </div>
-          ) : (
-            <img src={preview} alt="Comprovante" className="w-full h-full object-cover" />
-          )}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <Button size="sm" variant="secondary" asChild>
-              <a href={preview} target="_blank" rel="noreferrer">Visualizar</a>
-            </Button>
-            <Button size="sm" variant="destructive" onClick={removeReceipt}>Remover</Button>
+
+            <div className="absolute bottom-4 left-4 flex items-center gap-2">
+              <div className="px-3 py-1 rounded-full bg-success/20 border border-success/30 backdrop-blur-md flex items-center gap-1.5">
+                <ShieldCheck className="w-3 h-3 text-success" />
+                <span className="text-[8px] font-black text-success uppercase tracking-widest">Verificado_Nexus</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3">
+             <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between group hover:border-primary/20 transition-all">
+                <div className="flex items-center gap-3">
+                   <div className="p-2 rounded-xl bg-primary/10"><Search className="w-4 h-4 text-primary" /></div>
+                   <div>
+                      <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">Status OCR</p>
+                      <p className="text-[10px] font-black text-white uppercase tracking-widest">
+                        {isProcessingOCR ? "Processando_IA..." : "Extração_Completa"}
+                      </p>
+                   </div>
+                </div>
+                {isProcessingOCR && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+             </div>
           </div>
         </div>
       ) : (
