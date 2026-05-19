@@ -1992,6 +1992,56 @@ export type Database = {
           },
         ]
       }
+      delivery_receipt_audit: {
+        Row: {
+          created_at: string
+          delivery_id: string
+          error_message: string | null
+          file_name: string
+          file_size: number | null
+          file_type: string | null
+          id: string
+          ocr_status: string | null
+          storage_path: string
+          upload_status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivery_id: string
+          error_message?: string | null
+          file_name: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          ocr_status?: string | null
+          storage_path: string
+          upload_status: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivery_id?: string
+          error_message?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          ocr_status?: string | null
+          storage_path?: string
+          upload_status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_receipt_audit_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "entregas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_badges: {
         Row: {
           badge_type: string
@@ -2051,6 +2101,7 @@ export type Database = {
           box_alocado: string | null
           cliente_id: string | null
           codigo_rastreamento: string | null
+          comprovante_audit_info: Json | null
           comprovante_entrega_url: string | null
           contato_cliente: string | null
           created_at: string
@@ -2068,6 +2119,7 @@ export type Database = {
           nf_remessa_url: string | null
           numero_entrega: string
           observacoes: string | null
+          ocr_data_extraida: Json | null
           previsao_entrega: string | null
           recebedor: string | null
           status: Database["public"]["Enums"]["entrega_status"]
@@ -2082,6 +2134,7 @@ export type Database = {
           box_alocado?: string | null
           cliente_id?: string | null
           codigo_rastreamento?: string | null
+          comprovante_audit_info?: Json | null
           comprovante_entrega_url?: string | null
           contato_cliente?: string | null
           created_at?: string
@@ -2099,6 +2152,7 @@ export type Database = {
           nf_remessa_url?: string | null
           numero_entrega: string
           observacoes?: string | null
+          ocr_data_extraida?: Json | null
           previsao_entrega?: string | null
           recebedor?: string | null
           status?: Database["public"]["Enums"]["entrega_status"]
@@ -2113,6 +2167,7 @@ export type Database = {
           box_alocado?: string | null
           cliente_id?: string | null
           codigo_rastreamento?: string | null
+          comprovante_audit_info?: Json | null
           comprovante_entrega_url?: string | null
           contato_cliente?: string | null
           created_at?: string
@@ -2130,6 +2185,7 @@ export type Database = {
           nf_remessa_url?: string | null
           numero_entrega?: string
           observacoes?: string | null
+          ocr_data_extraida?: Json | null
           previsao_entrega?: string | null
           recebedor?: string | null
           status?: Database["public"]["Enums"]["entrega_status"]
