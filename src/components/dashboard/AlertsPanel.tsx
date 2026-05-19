@@ -237,7 +237,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                         {/* Dynamic Sweep Light */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-full group-hover/alert:animate-[shimmer_3s_infinite] pointer-events-none" />
                         
-                        <div className="relative z-10 flex items-start gap-10">
+                        <div className="relative z-10 flex items-start gap-4 sm:gap-10">
                           <div className={cn(
                             "flex items-center justify-center w-18 h-18 rounded-3xl shrink-0 shadow-2xl border border-white/10 transition-all duration-700 group-hover/alert:scale-110 group-hover/alert:rotate-6",
                             styles.icon
