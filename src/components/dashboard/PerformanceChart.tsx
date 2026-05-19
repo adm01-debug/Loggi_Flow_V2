@@ -268,7 +268,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
         </div>
         
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-end justify-between mb-8 sm:mb-16 gap-6 sm:gap-10">
-          <div className="flex items-start gap-8">
+          <div className="flex items-start gap-4 sm:gap-8">
             <motion.div 
               whileHover={{ rotate: 180, scale: 1.15 }}
               transition={{ duration: 0.8, ease: "circOut" }}
