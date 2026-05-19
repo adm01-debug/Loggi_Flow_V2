@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, ShieldCheck, Zap, AlertTriangle, Cpu, Radio, Fingerprint, Database } from "lucide-react";
+import { Activity, ShieldCheck, Zap, AlertTriangle, Cpu, Radio, Fingerprint, Database, RefreshCcw, Play } from "lucide-react";
+import { useSelfHealing } from "@/hooks/security/useSelfHealing";
+import { useNexusSimulator } from "@/hooks/ai/useNexusSimulator";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
