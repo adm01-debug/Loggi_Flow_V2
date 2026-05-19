@@ -296,59 +296,67 @@ export default function DashboardExecutivo() {
           </div>
         </div>
 
-        {/* Trend Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* OTIF Evolution (6 months) */}
-          <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">Evolução OTIF — Últimos 6 meses</h3>
-            {trendData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={trendData}>
-                  <defs>
-                    <linearGradient id="otifGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-                  <YAxis domain={[0, 100]} className="text-xs fill-muted-foreground" tickFormatter={v => `${v}%`} />
-                  <Tooltip formatter={(value: number) => [`${value}%`, "OTIF"]} />
-                  <Area type="monotone" dataKey="otif" stroke="hsl(var(--primary))" fill="url(#otifGradient)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">Carregando tendências...</p>
-            )}
-          </div>
+        {/* Dashboard Sections */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="bg-black/20 border-white/5 p-1.5 rounded-[1.5rem] h-auto backdrop-blur-xl">
+            <TabsTrigger value="overview" className="rounded-xl px-6 py-2.5 font-black uppercase tracking-widest text-[10px] data-[state=active]:bg-primary data-[state=active]:text-white">Visão_Estratégica</TabsTrigger>
+            <TabsTrigger value="analytics" className="rounded-xl px-6 py-2.5 font-black uppercase tracking-widest text-[10px] data-[state=active]:bg-primary data-[state=active]:text-white">Análise_Profunda</TabsTrigger>
+          </TabsList>
 
-          {/* Freight Cost Evolution */}
-          <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">Custo de Frete Mensal</h3>
-            {trendData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-                  <YAxis className="text-xs fill-muted-foreground" tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(value: number) => [formatCurrency(value), "Custo Frete"]} />
-                  <Bar dataKey="custoFrete" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">Carregando tendências...</p>
-            )}
-          </div>
-        </div>
+          <TabsContent value="overview" className="space-y-6 animate-in fade-in duration-500">
+            {/* Trend Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* OTIF Evolution (6 months) */}
+              <div className="card-base p-6 border-white/5 bg-black/40 backdrop-blur-xl rounded-[2.5rem]">
+                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary mb-6">Evolução OTIF — 6 Meses</h3>
+                {trendData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={250}>
+                    <AreaChart data={trendData}>
+                      <defs>
+                        <linearGradient id="otifGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" vertical={false} />
+                      <XAxis dataKey="month" className="text-[10px] fill-white/40 font-black uppercase" axisLine={false} tickLine={false} />
+                      <YAxis domain={[0, 100]} className="text-[10px] fill-white/40 font-black" axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+                      <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem' }} />
+                      <Area type="monotone" dataKey="otif" stroke="hsl(var(--primary))" fill="url(#otifGradient)" strokeWidth={3} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-muted-foreground text-center py-8 font-black uppercase tracking-widest text-[10px]">Sincronizando Tendências...</p>
+                )}
+              </div>
 
-        {/* Volume Trend + Carrier OTIF */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Volume Trend */}
-          <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">Volume Operacional — 6 meses</h3>
-            {trendData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={trendData}>
+              {/* Freight Cost Evolution */}
+              <div className="card-base p-6 border-white/5 bg-black/40 backdrop-blur-xl rounded-[2.5rem]">
+                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-success mb-6">Fluxo de Custos Logísticos</h3>
+                {trendData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={trendData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" vertical={false} />
+                      <XAxis dataKey="month" className="text-[10px] fill-white/40 font-black uppercase" axisLine={false} tickLine={false} />
+                      <YAxis className="text-[10px] fill-white/40 font-black" axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                      <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem' }} />
+                      <Bar dataKey="custoFrete" fill="hsl(var(--success))" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-muted-foreground text-center py-8 font-black uppercase tracking-widest text-[10px]">Mapeando Fluxo Financeiro...</p>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PerformanceChart data={monthlyData} />
+              <DistributionChart data={monthlyData} />
+            </div>
+          </TabsContent>
+        </Tabs>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
                   <YAxis className="text-xs fill-muted-foreground" />
