@@ -1,45 +1,76 @@
 import { memo } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, Legend 
+  PieChart, Pie, Cell, Legend, LineChart, Line, AreaChart, Area
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MonthlyData } from "@/hooks/analytics/useAnalytics";
 
 interface AnalyticsChartsProps {
-  data?: unknown;
+  data?: MonthlyData[];
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export const PerformanceChart = memo(({ data }: AnalyticsChartsProps) => {
-  const chartData = [
-    { name: 'Seg', entregas: 400, onTime: 380 },
-    { name: 'Ter', entregas: 300, onTime: 290 },
-    { name: 'Qua', entregas: 200, onTime: 190 },
-    { name: 'Qui', entregas: 278, onTime: 260 },
-    { name: 'Sex', entregas: 189, onTime: 180 },
-    { name: 'Sáb', entregas: 239, onTime: 230 },
-    { name: 'Dom', entregas: 349, onTime: 340 },
+  // Use real data if available, otherwise mock it for visual stability
+  const chartData = data && data.length > 0 ? data : [
+    { month: 'Jan', entregas: 0, slaAtingido: 0 },
+    { month: 'Fev', entregas: 0, slaAtingido: 0 },
   ];
 
   return (
-    <Card className="card-base">
-      <CardHeader>
-        <CardTitle className="text-sm font-medium">Performance de Entregas</CardTitle>
+    <Card className="card-base border-primary/10 bg-black/40 backdrop-blur-xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xs font-black uppercase tracking-[0.4em] text-primary">Volume vs Performance</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-            <YAxis fontSize={12} tickLine={false} axisLine={false} />
-            <Tooltip 
-              contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
-              itemStyle={{ fontSize: '12px' }}
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="colorEntregas" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+            <XAxis 
+              dataKey="month" 
+              fontSize={10} 
+              tickLine={false} 
+              axisLine={false} 
+              stroke="rgba(255,255,255,0.3)"
+              className="font-black uppercase"
             />
-            <Bar dataKey="entregas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="onTime" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
-          </BarChart>
+            <YAxis 
+              fontSize={10} 
+              tickLine={false} 
+              axisLine={false} 
+              stroke="rgba(255,255,255,0.3)"
+              className="font-black"
+            />
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem' }}
+              itemStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="entregas" 
+              stroke="#3b82f6" 
+              strokeWidth={3}
+              fillOpacity={1} 
+              fill="url(#colorEntregas)" 
+              name="Entregas"
+            />
+            <Line 
+              type="monotone" 
+              dataKey="slaAtingido" 
+              stroke="#10b981" 
+              strokeWidth={2}
+              dot={{ r: 4, fill: '#10b981', strokeWidth: 0 }}
+              name="SLA (%)"
+            />
+          </AreaChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
