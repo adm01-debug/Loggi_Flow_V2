@@ -156,7 +156,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                   "relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full text-base sm:text-lg font-black shadow-2xl shrink-0 transition-transform duration-500 group-hover/item:rotate-[360deg]",
                   styles.badge
                 )}>
-                  <RankIcon className="w-6 h-6" />
+                  <RankIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
