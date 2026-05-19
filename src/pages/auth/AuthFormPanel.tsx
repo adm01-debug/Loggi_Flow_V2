@@ -149,36 +149,39 @@ export function AuthFormPanel({
               <TabsContent value="signup" className="mt-0">
                 <motion.div key={`tab-signup-${activeTab}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}>
                   <form onSubmit={handleSignup} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name">Nome completo</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="signup-name" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 ml-1">Protocolo_Identidade</Label>
                       <div className="relative group">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                        <Input id="signup-name" placeholder="João Silva" value={signupFullName} onChange={(e) => setSignupFullName(e.target.value)} className="pl-10 h-12" />
+                        <div className="absolute inset-0 bg-primary/10 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                        <Input id="signup-name" placeholder="Nome do Comandante" value={signupFullName} onChange={(e) => setSignupFullName(e.target.value)} className="pl-12 h-14 rounded-2xl bg-white/5 border-white/10 focus:border-primary/50 focus:ring-primary/20 transition-all font-medium" />
                       </div>
-                      {errors.signup_fullName && <p className="text-sm text-destructive">{errors.signup_fullName}</p>}
+                      {errors.signup_fullName && <p className="text-[10px] font-black uppercase text-destructive tracking-widest mt-1 ml-1">{errors.signup_fullName}</p>}
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email">Email</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="signup-email" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 ml-1">Hub_Email</Label>
                       <div className="relative group">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                        <Input id="signup-email" type="email" placeholder="seu@email.com" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} className="pl-10 h-12" />
+                        <div className="absolute inset-0 bg-primary/10 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                        <Input id="signup-email" type="email" placeholder="seu@email.com" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} className="pl-12 h-14 rounded-2xl bg-white/5 border-white/10 focus:border-primary/50 focus:ring-primary/20 transition-all font-medium" />
                       </div>
-                      {errors.signup_email && <p className="text-sm text-destructive">{errors.signup_email}</p>}
+                      {errors.signup_email && <p className="text-[10px] font-black uppercase text-destructive tracking-widest mt-1 ml-1">{errors.signup_email}</p>}
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">Senha</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="signup-password" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 ml-1">Senha_Segurança</Label>
                       <div className="relative group">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                        <Input id="signup-password" type={showSignupPassword ? "text" : "password"} placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} className="pl-10 pr-10 h-12" />
-                        <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setShowSignupPassword(!showSignupPassword)}>
-                          {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <div className="absolute inset-0 bg-primary/10 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                        <Input id="signup-password" type={showSignupPassword ? "text" : "password"} placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} className="pl-12 pr-12 h-14 rounded-2xl bg-white/5 border-white/10 focus:border-primary/50 focus:ring-primary/20 transition-all font-medium" />
+                        <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 hover:bg-white/5" onClick={() => setShowSignupPassword(!showSignupPassword)}>
+                          {showSignupPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </Button>
                       </div>
-                      {errors.signup_password && <p className="text-sm text-destructive">{errors.signup_password}</p>}
+                      {errors.signup_password && <p className="text-[10px] font-black uppercase text-destructive tracking-widest mt-1 ml-1">{errors.signup_password}</p>}
                       <PasswordStrengthIndicator password={signupPassword} onStrengthChange={onPasswordStrengthChange} />
                     </div>
-                    <Button type="submit" className="w-full h-12 font-black text-base uppercase tracking-widest shadow-[0_10px_20px_rgba(var(--primary-rgb),0.3)] hover:shadow-primary/50 transition-all hover:scale-[1.03] active:scale-[0.97] rounded-xl bg-gradient-to-r from-primary via-primary/90 to-primary/80" disabled={isLoading}>
-                      {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Criando conta...</> : "Criar Conta Gratuita"}
+                    <Button type="submit" className="w-full h-14 font-black text-xs uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(var(--primary-rgb),0.3)] hover:shadow-primary/50 transition-all hover:scale-[1.03] active:scale-[0.97] rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-primary/80" disabled={isLoading}>
+                      {isLoading ? <><Loader2 className="mr-3 h-5 w-5 animate-spin" /> INICIALIZANDO...</> : "INJETAR_CONTA_REDE"}
                     </Button>
                     <SocialLoginButtons isLoading={isLoading} />
                   </form>
