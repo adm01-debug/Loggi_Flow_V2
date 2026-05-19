@@ -264,6 +264,7 @@ export function ExpeditionDetailsDialog({ open, onOpenChange, delivery, statusCo
                   </div>
                 )}
               </div>
+            </TabsContent>
             <TabsContent value="comprovante" className="pb-8">
               <div className="space-y-6">
                 <div className="p-6 rounded-[2.5rem] bg-sidebar-accent/30 border border-white/5 backdrop-blur-sm">
