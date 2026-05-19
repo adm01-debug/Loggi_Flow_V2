@@ -357,7 +357,15 @@ export default function DashboardExecutivo() {
             </div>
           </TabsContent>
         </Tabs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+
+        {/* Volume Trend + Carrier OTIF */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Volume Trend */}
+          <div className="card-base p-6 border-white/5 bg-black/40 backdrop-blur-xl rounded-[2.5rem]">
+            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary mb-6">Volume Operacional — 6 meses</h3>
+            {trendData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={trendData}>
                   <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
                   <YAxis className="text-xs fill-muted-foreground" />
                   <Tooltip />
