@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateContract } from "../_shared/contract-validator.ts";
+import { requireString } from "../_shared/validate.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,7 +20,37 @@ serve(async (req) => {
     );
 
     const body = await req.json();
-    console.log('Received webhook:', JSON.stringify(body));
+    console.log('Nexus Webhook received:', JSON.stringify(body));
+
+    // Contract Validation
+    const { isValid, errors } = await validateContract(
+      supabaseClient,
+      'nexus-webhook-receiver',
+      body,
+      (p) => {
+        if (p.event === 'messages.upsert') {
+          requireString(p, 'event');
+          if (!p.data) throw new Error('data is required for messages.upsert');
+        } else if (p.source === 'generic_api') {
+          requireString(p, 'source');
+          requireString(p, 'carrier_id');
+          requireString(p, 'text');
+        } else {
+          throw new Error('Unsupported event source or type');
+        }
+      }
+    );
+
+    if (!isValid) {
+      return new Response(JSON.stringify({ 
+        error: "Contract Violation", 
+        details: errors,
+        nexus_protocol: "CORE_GATE_REJECTION"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
 
     // 1. Identify source (WhatsApp Evolution API usually sends 'messages-upsert')
     if (body.event === 'messages.upsert') {
@@ -82,7 +114,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ success: true, message: 'Webhook ignored or not handled' }), { headers: corsHeaders });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Webhook processing error:', error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
