@@ -31,7 +31,7 @@ const variants: Record<string, Variants> = {
   },
 };
 
-export function PageTransition({ children, mode = "directional" }: PageTransitionProps) {
+export function PageTransition({ children, mode = "fade" }: PageTransitionProps) {
   const location = useLocation();
   const { direction } = useNavigationHistory();
   
@@ -40,24 +40,18 @@ export function PageTransition({ children, mode = "directional" }: PageTransitio
     return {
       initial: { 
         opacity: 0, 
-        x: isBack ? -60 : 60,
-        scale: 0.95,
-        filter: "blur(12px)",
-        rotateY: isBack ? -5 : 5
+        x: isBack ? -30 : 30,
+        filter: "blur(8px)",
       },
       animate: { 
         opacity: 1, 
         x: 0,
-        scale: 1,
         filter: "blur(0px)",
-        rotateY: 0
       },
       exit: { 
         opacity: 0, 
-        x: isBack ? 60 : -60,
-        scale: 0.95,
-        filter: "blur(12px)",
-        rotateY: isBack ? 5 : -5,
+        x: isBack ? 30 : -30,
+        filter: "blur(8px)",
         zIndex: 0
       },
     };
@@ -74,10 +68,10 @@ export function PageTransition({ children, mode = "directional" }: PageTransitio
         exit="exit"
         variants={activeVariants}
         transition={{
-          duration: 0.5,
-          ease: [0.16, 1, 0.3, 1], // iOS-style quintic ease-out
+          duration: 0.35,
+          ease: [0.25, 0.1, 0.25, 1],
         }}
-        className="w-full h-full origin-top"
+        className="w-full h-full"
       >
         {children}
       </motion.div>

@@ -92,7 +92,7 @@ export function RealtimeStatus() {
                   <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-green-500 animate-ping" />
                 )}
               </div>
-              <span className={cn("hidden lg:inline", info.color)}>{info.text}{latency && status === 'SUBSCRIBED' ? ` • ${latency}ms` : ''}</span>
+              <span className={cn("hidden xl:inline", info.color)}>{info.text}{latency && status === 'SUBSCRIBED' ? ` • ${latency}ms` : ''}</span>
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom">

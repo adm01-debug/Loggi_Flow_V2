@@ -253,7 +253,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
         className={cn(
-          "relative rounded-[4rem] border-2 border-white/5 p-10 sm:p-16 transition-all duration-700 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)] bg-[#050505]/80 backdrop-blur-[40px] group/chart",
+          "relative rounded-[2rem] sm:rounded-[4rem] border-2 border-white/5 p-6 sm:p-16 transition-all duration-700 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)] bg-[#050505]/80 backdrop-blur-[40px] group/chart",
           "hover:border-primary/30 hover:shadow-[0_0_120px_rgba(59,130,246,0.15)]",
           className
         )}
@@ -267,14 +267,14 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
           <Gauge className="w-96 h-96 text-primary" />
         </div>
         
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-end justify-between mb-16 gap-10">
-          <div className="flex items-start gap-8">
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-end justify-between mb-8 sm:mb-16 gap-6 sm:gap-10">
+          <div className="flex items-start gap-4 sm:gap-8">
             <motion.div 
               whileHover={{ rotate: 180, scale: 1.15 }}
               transition={{ duration: 0.8, ease: "circOut" }}
-              className="mt-2 p-5 rounded-[2rem] bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.2)] relative group/icon"
+              className="mt-2 p-3 sm:p-5 rounded-[1.25rem] sm:rounded-[2rem] bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.2)] relative group/icon"
             >
-              <Cpu className="w-10 h-10 text-primary group-hover/icon:text-white transition-colors duration-500" />
+              <Cpu className="w-7 h-7 sm:w-10 sm:h-10 text-primary group-hover/icon:text-white transition-colors duration-500" />
               <div className="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full animate-ping opacity-60" />
               <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white rounded-full animate-pulse opacity-40" />
             </motion.div>
@@ -283,7 +283,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em] bg-primary/10 px-3 py-1 rounded-full border border-primary/20">PREMIUM ANALYTICS</span>
                 <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent min-w-[60px]" />
               </div>
-              <h3 className="font-display font-black text-5xl tracking-tighter uppercase italic text-white leading-none group-hover/chart:text-primary transition-colors duration-700 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <h3 className="font-display font-black text-3xl sm:text-5xl tracking-tighter uppercase italic text-white leading-none group-hover/chart:text-primary transition-colors duration-700 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 {title}
               </h3>
               {subtitle && (

@@ -154,7 +154,7 @@ export const AppSidebar = memo(function AppSidebar() {
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-4 p-6 border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar via-sidebar to-transparent">
+      <div className="flex items-center gap-4 p-6 border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
         <div 
           className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_20px_rgba(var(--primary-rgb),0.4)] border border-white/20 animate-[sidebar-logo_4s_ease-in-out_infinite]"
         >
@@ -176,7 +176,7 @@ export const AppSidebar = memo(function AppSidebar() {
 
       {/* XP Progress Bar */}
       {!collapsed && (
-        <div className="px-4 py-3 border-b border-sidebar-border/50 bg-sidebar-accent/30">
+        <div className="px-4 py-3 border-b border-sidebar-border/50 bg-sidebar-accent/30 shrink-0">
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
               {userLevel?.rank ? (
@@ -332,7 +332,7 @@ export const AppSidebar = memo(function AppSidebar() {
 
       {/* Admin Section */}
       {isAdmin && (
-        <div className="px-3 py-2 border-t border-sidebar-border/50">
+        <div className="px-3 py-2 border-t border-sidebar-border/50 shrink-0">
           {!collapsed && (
             <div className="flex items-center gap-2 px-3 mb-2">
               <Shield className="w-3 h-3 text-warning" />
@@ -359,7 +359,7 @@ export const AppSidebar = memo(function AppSidebar() {
       )}
 
       {/* AI Assistant Button */}
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border shrink-0">
         <Sheet>
           <SheetTrigger asChild>
             <button

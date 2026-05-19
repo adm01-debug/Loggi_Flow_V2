@@ -72,7 +72,7 @@ export function LiveStatusBar() {
 
   return (
     <TooltipProvider>
-      <div className="flex items-center gap-6 sm:gap-12 overflow-x-auto scrollbar-none py-5 px-10 bg-black/90 rounded-[2.5rem] border-2 border-primary/20 backdrop-blur-[50px] shadow-2xl group/status relative overflow-hidden">
+      <div className="flex items-center gap-6 sm:gap-12 overflow-x-auto scrollbar-none py-5 px-6 sm:px-10 bg-black/90 rounded-[1.5rem] sm:rounded-[2.5rem] border-2 border-primary/20 backdrop-blur-[50px] shadow-2xl group/status relative overflow-hidden">
         {/* Scanning Line Effect */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent animate-scan" />
         
@@ -80,7 +80,7 @@ export function LiveStatusBar() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(234,56,76,0.05),transparent_70%)] animate-pulse pointer-events-none" />
         
         <div className="flex items-center gap-8 relative z-10">
-          <div className="flex items-center gap-3 pr-8 border-r-2 border-white/5">
+          <div className="flex items-center gap-3 pr-6 sm:pr-8 border-r-2 border-white/5">
              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                <Globe className="w-5 h-5 text-primary animate-pulse" />
              </div>
@@ -90,7 +90,7 @@ export function LiveStatusBar() {
              </div>
           </div>
 
-          <div className="flex items-center gap-6 sm:gap-10">
+          <div className="flex items-center gap-6 sm:gap-10 shrink-0 sm:shrink">
             {statusItems.map((item, i) => (
               <Tooltip key={i}>
                 <TooltipTrigger asChild>

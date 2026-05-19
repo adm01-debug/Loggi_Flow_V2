@@ -109,19 +109,19 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
         {/* Atmosphere & Holographic Base */}
         <div className="absolute -inset-10 bg-destructive/5 rounded-[5rem] blur-[120px] opacity-0 group-hover/panel:opacity-100 transition-all duration-1000" />
         
-        <div className="relative overflow-hidden rounded-[3.5rem] border border-white/10 bg-[#050505]/60 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.4)] transition-all duration-700 hover:border-destructive/30">
+        <div className="relative overflow-hidden rounded-[2rem] sm:rounded-[3.5rem] border border-white/10 bg-[#050505]/60 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.4)] transition-all duration-700 hover:border-destructive/30">
           {/* Tactical Background Elements */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-destructive/5 blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           
-          <div className="p-10 sm:p-14 relative z-10">
+          <div className="p-6 sm:p-14 relative z-10">
             {/* Header Structure */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-10">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-14 gap-6 sm:gap-10">
               <div className="flex items-center gap-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-destructive/20 blur-2xl rounded-2xl animate-pulse" />
-                  <div className="relative flex items-center justify-center w-20 h-20 rounded-[1.75rem] bg-gradient-to-br from-destructive/40 to-black border border-destructive/40 shadow-2xl group-hover/panel:rotate-12 transition-transform duration-1000">
-                    <ShieldAlert className="w-10 h-10 text-destructive animate-pulse" />
+                  <div className="relative flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-[1.25rem] sm:rounded-[1.75rem] bg-gradient-to-br from-destructive/40 to-black border border-destructive/40 shadow-2xl group-hover/panel:rotate-12 transition-transform duration-1000">
+                    <ShieldAlert className="w-7 h-7 sm:w-10 sm:h-10 text-destructive animate-pulse" />
                   </div>
                 </div>
                 <div>
@@ -129,7 +129,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                     <Activity className="w-3.5 h-3.5 text-destructive/60 animate-[ping_2s_infinite]" />
                     <span className="text-[11px] font-black text-destructive/60 uppercase tracking-[0.5em] font-mono">Status Operacional</span>
                   </div>
-                  <h3 className="font-display font-black text-4xl sm:text-5xl leading-none tracking-tighter italic bg-gradient-to-r from-white via-white to-white/30 bg-clip-text text-transparent">
+                  <h3 className="font-display font-black text-2xl sm:text-5xl leading-none tracking-tighter italic bg-gradient-to-r from-white via-white to-white/30 bg-clip-text text-transparent">
                     NEXUS <span className="text-destructive drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">TERMINAL</span>
                   </h3>
                 </div>
@@ -173,7 +173,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
 
                   <div className="relative group/counter">
                     <div className="absolute inset-0 bg-destructive/30 blur-xl rounded-full animate-pulse" />
-                    <div className="relative bg-destructive text-white px-8 py-3 rounded-2xl border-b-[4px] border-black/40 font-black text-base shadow-2xl transform hover:scale-105 transition-all cursor-default tracking-tighter">
+                    <div className="relative bg-destructive text-white px-4 sm:px-8 py-2 sm:py-3 rounded-xl sm:rounded-2xl border-b-[4px] border-black/40 font-black text-xs sm:text-base shadow-2xl transform hover:scale-105 transition-all cursor-default tracking-tighter">
                       {alerts.length} DELTA DETECTADOS
                     </div>
                   </div>
@@ -221,7 +221,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                           delay: index * 0.1 
                         }}
                         className={cn(
-                          "relative p-8 rounded-[2.5rem] border border-white/5 mb-8 cursor-pointer transition-all duration-700 group/alert overflow-hidden",
+                          "relative p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/5 mb-4 sm:mb-8 cursor-pointer transition-all duration-700 group/alert overflow-hidden",
                           "hover:bg-white/[0.03] hover:border-white/20 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]",
                           alert.severity === 'error' ? "hover:border-destructive/40" : "hover:border-warning/40",
                           delta > 20 && "border-primary/30 bg-primary/5"
@@ -237,12 +237,12 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                         {/* Dynamic Sweep Light */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-full group-hover/alert:animate-[shimmer_3s_infinite] pointer-events-none" />
                         
-                        <div className="relative z-10 flex items-start gap-10">
+                        <div className="relative z-10 flex items-start gap-4 sm:gap-10">
                           <div className={cn(
-                            "flex items-center justify-center w-18 h-18 rounded-3xl shrink-0 shadow-2xl border border-white/10 transition-all duration-700 group-hover/alert:scale-110 group-hover/alert:rotate-6",
+                            "flex items-center justify-center w-12 h-12 sm:w-18 sm:h-18 rounded-[1rem] sm:rounded-3xl shrink-0 shadow-2xl border border-white/10 transition-all duration-700 group-hover/alert:scale-110 group-hover/alert:rotate-6",
                             styles.icon
                           )}>
-                            <Icon className="w-9 h-9" />
+                            <Icon className="w-6 h-6 sm:w-9 sm:h-9" />
                           </div>
                           
                           <div className="flex-1 min-w-0 space-y-5">
@@ -270,7 +270,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                             </div>
 
                             <div className="space-y-2">
-                              <h4 className="text-2xl font-black text-white leading-tight tracking-tighter group-hover/alert:translate-x-2 transition-transform duration-700 uppercase italic">
+                              <h4 className="text-lg sm:text-2xl font-black text-white leading-tight tracking-tighter group-hover/alert:translate-x-2 transition-transform duration-700 uppercase italic">
                                 {alert.message}
                               </h4>
                               <p className="text-sm font-bold text-white/30 uppercase tracking-[0.2em] font-mono">ID_PROTOCOL: NX-{index + 1024}-SRV</p>

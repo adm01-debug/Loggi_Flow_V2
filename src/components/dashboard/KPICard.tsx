@@ -187,7 +187,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ scale: 1.02 }}
         className={cn(
-          "group relative rounded-[2.5rem] border-2 p-8 transition-all duration-700 overflow-hidden cursor-pointer",
+          "group relative rounded-[1.5rem] sm:rounded-[2.5rem] border-2 p-6 sm:p-8 transition-all duration-700 overflow-hidden cursor-pointer",
           config.border,
           config.bg,
           className
@@ -195,7 +195,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
       >
         {/* Dynamic Spotlight Glow */}
         <motion.div
-          className="pointer-events-none absolute -inset-px rounded-[2.5rem] opacity-0 transition duration-500 group-hover:opacity-100"
+          className="pointer-events-none absolute -inset-px rounded-[1.5rem] sm:rounded-[2.5rem] opacity-0 transition duration-500 group-hover:opacity-100"
           style={{
             background: useTransform(
               [x, y],
@@ -219,11 +219,11 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
               whileHover={{ rotate: 360, scale: 1.1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className={cn(
-                "flex items-center justify-center w-16 h-16 rounded-2xl border-2 transition-all duration-500",
+                "flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-[1rem] sm:rounded-2xl border-2 transition-all duration-500",
                 config.iconBg
               )}
             >
-              <Icon className="w-8 h-8 animate-pulse" />
+              <Icon className="w-6 h-6 sm:w-8 sm:h-8 animate-pulse" />
             </motion.div>
             
             <div className="flex flex-col items-end gap-4">
@@ -258,7 +258,7 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
             
             <div className="flex items-baseline gap-3">
               <motion.span 
-                className="text-6xl font-display font-black tracking-tighter tabular-nums bg-gradient-to-br from-white via-white to-white/40 bg-clip-text text-transparent italic"
+                className="text-4xl sm:text-6xl font-display font-black tracking-tighter tabular-nums bg-gradient-to-br from-white via-white to-white/40 bg-clip-text text-transparent italic"
               >
                 {typeof value === 'string' && (value.includes('R$') || value.includes('%')) ? value : animatedValue}
               </motion.span>

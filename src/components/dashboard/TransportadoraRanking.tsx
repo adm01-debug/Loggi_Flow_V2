@@ -86,7 +86,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
   }
 
   return (
-    <div className="relative h-full rounded-[2.5rem] bg-black/90 backdrop-blur-[50px] border border-white/10 p-8 shadow-2xl overflow-hidden group">
+    <div className="relative h-full rounded-[1.5rem] sm:rounded-[2.5rem] bg-black/90 backdrop-blur-[50px] border border-white/10 p-6 sm:p-8 shadow-2xl overflow-hidden group">
       {/* Dynamic Background Elements */}
       <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary/10 rounded-full blur-[100px] animate-pulse pointer-events-none" />
       <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
@@ -94,16 +94,16 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
       {/* Scanning Line Effect */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-30 animate-scan pointer-events-none" />
 
-      <div className="flex items-center justify-between mb-10 relative z-10">
+      <div className="flex items-center justify-between mb-6 sm:mb-10 relative z-10">
         <div className="flex items-center gap-6">
           <div className="relative group/header-icon">
             <div className="absolute -inset-2 bg-primary/30 rounded-2xl blur-lg group-hover/header-icon:bg-primary/50 transition-all duration-700" />
-            <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-black border border-primary/40 shadow-[0_0_20px_rgba(234,56,76,0.3)] group-hover/header-icon:rotate-12 transition-all duration-500">
-              <Crown className="w-8 h-8 text-primary animate-pulse" />
+            <div className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-[1rem] sm:rounded-2xl bg-black border border-primary/40 shadow-[0_0_20px_rgba(234,56,76,0.3)] group-hover/header-icon:rotate-12 transition-all duration-500">
+              <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-primary animate-pulse" />
             </div>
           </div>
           <div>
-            <h3 className="font-display font-black text-2xl sm:text-3xl leading-tight tracking-tighter bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent uppercase italic">
+            <h3 className="font-display font-black text-xl sm:text-3xl leading-tight tracking-tighter bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent uppercase italic">
               Elite Logistics <span className="text-primary not-italic">Ranking</span>
             </h3>
             <div className="flex items-center gap-3 mt-1.5">
@@ -141,7 +141,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                 transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
                 whileHover={{ scale: 1.03, x: 8 }}
                 className={cn(
-                  "group/item relative flex items-center gap-5 p-5 rounded-[2rem] border-2 transition-all duration-500 cursor-pointer overflow-hidden",
+                  "group/item relative flex items-center gap-3 sm:gap-5 p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[2rem] border-2 transition-all duration-500 cursor-pointer overflow-hidden",
                   styles.border,
                   styles.bg,
                   index < 3 ? "shadow-[0_0_30px_rgba(0,0,0,0.3)] backdrop-blur-md" : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20"
@@ -153,15 +153,15 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                 )}
 
                 <div className={cn(
-                  "relative flex items-center justify-center w-12 h-12 rounded-full text-lg font-black shadow-2xl shrink-0 transition-transform duration-500 group-hover/item:rotate-[360deg]",
+                  "relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full text-base sm:text-lg font-black shadow-2xl shrink-0 transition-transform duration-500 group-hover/item:rotate-[360deg]",
                   styles.badge
                 )}>
-                  <RankIcon className="w-6 h-6" />
+                  <RankIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-black text-base sm:text-lg truncate group-hover/item:text-primary transition-colors duration-300 uppercase italic tracking-tight text-white">
+                    <p className="font-black text-sm sm:text-lg truncate group-hover/item:text-primary transition-colors duration-300 uppercase italic tracking-tight text-white">
                       {transportadora.nome_fantasia}
                     </p>
                     {transportadora.homologada && (
@@ -183,7 +183,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                       <div className={cn("absolute inset-0 blur-md opacity-50", getScoreColor(transportadora.score_performance))} />
                     </div>
                     <span className={cn(
-                      "text-3xl font-black tabular-nums tracking-tighter italic drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]",
+                      "text-xl sm:text-3xl font-black tabular-nums tracking-tighter italic drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]",
                       getScoreColor(transportadora.score_performance)
                     )}>
                       {transportadora.score_performance ?? 0}
