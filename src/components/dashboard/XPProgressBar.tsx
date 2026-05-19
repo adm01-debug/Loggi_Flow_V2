@@ -42,7 +42,7 @@ export function XPProgressBar({ currentXP, nextLevelXP, level, className }: XPPr
                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[9px] font-black uppercase tracking-widest px-3">Elite_Level_Alpha</Badge>
                  <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-1.5"><Activity className="w-2.5 h-2.5" /> Frequência de Rede Ativa</span>
               </div>
-              <h2 className="font-black italic text-4xl sm:text-5xl tracking-tighter text-white uppercase leading-none bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">Nível {level}</h2>
+              <h2 className="font-black italic text-2xl sm:text-5xl tracking-tighter text-white uppercase leading-none bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">Nível {level}</h2>
               <p className="text-xs font-black text-primary/80 mt-3 uppercase tracking-[0.4em] flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" /> Comandante Nexus de Perímetro
               </p>
