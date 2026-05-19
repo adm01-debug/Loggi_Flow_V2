@@ -94,7 +94,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
       {/* Scanning Line Effect */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-30 animate-scan pointer-events-none" />
 
-      <div className="flex items-center justify-between mb-10 relative z-10">
+      <div className="flex items-center justify-between mb-6 sm:mb-10 relative z-10">
         <div className="flex items-center gap-6">
           <div className="relative group/header-icon">
             <div className="absolute -inset-2 bg-primary/30 rounded-2xl blur-lg group-hover/header-icon:bg-primary/50 transition-all duration-700" />
