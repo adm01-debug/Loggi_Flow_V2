@@ -13,9 +13,14 @@ export const handler = async (req: Request) => {
   }
 
   try {
-    const { allowed } = await checkRateLimit(req, 'predict-delays', { maxRequests: 20 });
+    const { allowed, message } = await checkRateLimit(req, 'predict-delays', { 
+      maxRequests: 10, // Limit to 10 requests per minute
+      windowMs: 60 * 1000 
+    });
+    
     if (!allowed) {
-      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+      log('WARN', 'Rate limit exceeded for predict-delays', { message });
+      return new Response(JSON.stringify({ error: message || 'Rate limit exceeded' }), {
         status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
