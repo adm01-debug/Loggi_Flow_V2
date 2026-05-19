@@ -274,7 +274,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
               transition={{ duration: 0.8, ease: "circOut" }}
               className="mt-2 p-3 sm:p-5 rounded-[1.25rem] sm:rounded-[2rem] bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.2)] relative group/icon"
             >
-              <Cpu className="w-10 h-10 text-primary group-hover/icon:text-white transition-colors duration-500" />
+              <Cpu className="w-7 h-7 sm:w-10 sm:h-10 text-primary group-hover/icon:text-white transition-colors duration-500" />
               <div className="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full animate-ping opacity-60" />
               <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white rounded-full animate-pulse opacity-40" />
             </motion.div>
