@@ -113,16 +113,22 @@ export function QRScannerModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden">
-        <DialogHeader className="p-4 pb-2">
-          <DialogTitle className="flex items-center gap-2">
-            <QrCode className="h-5 w-5 text-primary" />
-            {title}
-          </DialogTitle>
-          <p className="text-sm text-muted-foreground">{description}</p>
+      <DialogContent className="sm:max-w-lg p-0 overflow-hidden bg-black/95 border-white/10 backdrop-blur-xl rounded-[2.5rem]">
+        <DialogHeader className="p-8 pb-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner">
+              <QrCode className="w-8 h-8 text-primary animate-pulse" />
+            </div>
+            <div>
+              <DialogTitle className="font-black text-2xl tracking-tighter uppercase italic text-white leading-none">
+                {title}
+              </DialogTitle>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/70 mt-1">{description}</p>
+            </div>
+          </div>
         </DialogHeader>
 
-        <div className="relative bg-black aspect-video overflow-hidden">
+        <div className="relative bg-black aspect-video overflow-hidden border-y border-white/10">
           {/* Video feed */}
           <video
             ref={videoRef}
@@ -151,9 +157,9 @@ export function QRScannerModal({
                 {/* Scanning line animation */}
                 {isScanning && (
                   <motion.div
-                    className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent"
-                    animate={{ top: ["10%", "90%", "10%"] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute left-2 right-2 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_rgba(var(--primary-rgb),0.8)] rounded-full z-10"
+                    animate={{ top: ["5%", "95%", "5%"] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                   />
                 )}
               </div>
@@ -196,11 +202,13 @@ export function QRScannerModal({
                 exit={{ opacity: 0, y: 20 }}
                 className="absolute bottom-4 left-4 right-4"
               >
-                <div className="bg-background/95 backdrop-blur rounded-lg p-3 shadow-lg border">
-                  <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm font-medium text-green-600">
-                      Código detectado!
+                <div className="bg-black/90 backdrop-blur-2xl rounded-3xl p-5 shadow-2xl border-2 border-success/30 animate-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-1.5 rounded-lg bg-success/20">
+                      <CheckCircle className="h-5 w-5 text-success animate-bounce" />
+                    </div>
+                    <span className="text-sm font-black italic tracking-tighter uppercase text-success">
+                      Código Detectado_OK
                     </span>
                     <Badge variant="secondary" className="text-xs">
                       {lastResult.format}
@@ -214,7 +222,7 @@ export function QRScannerModal({
         </div>
 
         {/* Controls */}
-        <div className="p-4 bg-muted/50 border-t">
+        <div className="p-6 bg-sidebar-accent/30 backdrop-blur-md">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Barcode className="h-4 w-4 text-muted-foreground" />
@@ -226,9 +234,9 @@ export function QRScannerModal({
             <div className="flex items-center gap-2">
               {availableCameras.length > 1 && (
                 <Select value={selectedCamera} onValueChange={switchCamera}>
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="h-12 rounded-xl bg-white/5 border-white/10 font-black uppercase tracking-widest text-[10px] w-48">
                     <SwitchCamera className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Câmera" />
+                    <SelectValue placeholder="Câmera_Node" />
                   </SelectTrigger>
                   <SelectContent>
                     {availableCameras.map((camera) => (
@@ -243,16 +251,17 @@ export function QRScannerModal({
               <Button
                 variant={isScanning ? "destructive" : "default"}
                 onClick={isScanning ? stopScanning : startScanning}
+                className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl hover:scale-[1.03] transition-all"
               >
                 {isScanning ? (
                   <>
-                    <CameraOff className="h-4 w-4 mr-2" />
-                    Parar
+                    <CameraOff className="w-4.5 h-4.5 mr-2" />
+                    Encerrar
                   </>
                 ) : (
                   <>
-                    <Camera className="h-4 w-4 mr-2" />
-                    Iniciar
+                    <Camera className="w-4.5 h-4.5 mr-2" />
+                    Inicializar
                   </>
                 )}
               </Button>
