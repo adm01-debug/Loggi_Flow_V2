@@ -153,7 +153,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                 )}
 
                 <div className={cn(
-                  "relative flex items-center justify-center w-12 h-12 rounded-full text-lg font-black shadow-2xl shrink-0 transition-transform duration-500 group-hover/item:rotate-[360deg]",
+                  "relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full text-base sm:text-lg font-black shadow-2xl shrink-0 transition-transform duration-500 group-hover/item:rotate-[360deg]",
                   styles.badge
                 )}>
                   <RankIcon className="w-6 h-6" />
