@@ -1855,6 +1855,36 @@ export type Database = {
         }
         Relationships: []
       }
+      contract_test_logs: {
+        Row: {
+          created_at: string | null
+          entity_name: string
+          errors: Json | null
+          id: string
+          is_valid: boolean
+          latency_ms: number | null
+          payload: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          entity_name: string
+          errors?: Json | null
+          id?: string
+          is_valid: boolean
+          latency_ms?: number | null
+          payload?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          entity_name?: string
+          errors?: Json | null
+          id?: string
+          is_valid?: boolean
+          latency_ms?: number | null
+          payload?: Json | null
+        }
+        Relationships: []
+      }
       cotacoes_frete: {
         Row: {
           created_at: string
@@ -3994,6 +4024,33 @@ export type Database = {
         }
         Relationships: []
       }
+      system_contract_schemas: {
+        Row: {
+          created_at: string | null
+          entity_name: string
+          id: string
+          schema: Json
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          entity_name: string
+          id?: string
+          schema: Json
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          entity_name?: string
+          id?: string
+          schema?: Json
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: []
+      }
       system_heartbeat: {
         Row: {
           last_check: string
@@ -4780,6 +4837,10 @@ export type Database = {
       show_trgm: { Args: { "": string }; Returns: string[] }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
+      validate_payload_schema: {
+        Args: { p_entity_name: string; p_payload: Json }
+        Returns: boolean
+      }
       xp_for_level: { Args: { lvl: number }; Returns: number }
     }
     Enums: {
