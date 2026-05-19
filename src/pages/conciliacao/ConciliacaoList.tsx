@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Conciliacao } from "@/hooks/useConciliacao";
+import type { Conciliacao } from "@/hooks";
 
 const TIPOS_CONCILIACAO = [
   { value: "faturas_entregas", label: "Faturas x Entregas" },

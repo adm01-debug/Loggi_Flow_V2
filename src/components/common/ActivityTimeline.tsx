@@ -3,7 +3,7 @@ import { CheckCircle2, Clock, Package, Truck, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { useAuditLogs, AuditLog } from "@/hooks/useAuditLogs";
+import { useAuditLogs, AuditLog } from "@/hooks";
 
 interface ActivityTimelineProps {
   recordId: string;

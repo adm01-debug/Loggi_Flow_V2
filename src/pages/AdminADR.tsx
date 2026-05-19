@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, BookOpen, CheckCircle2, Clock, AlertCircle, Trash2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 

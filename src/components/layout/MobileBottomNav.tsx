@@ -8,7 +8,7 @@ import { ArrowLeft, LayoutDashboard, Package, Truck, Trophy, Menu, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useNavigationHistory } from "@/hooks/useNavigationHistory";
+import { useNavigationHistory } from "@/hooks";
 import { hapticFeedback } from "@/utils/haptics";
 
 interface NavItem {

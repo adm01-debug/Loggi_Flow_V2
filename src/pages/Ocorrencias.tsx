@@ -19,16 +19,16 @@ import { cn } from "@/lib/utils";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks/useSelection";
+import { useSelection } from "@/hooks";
 import { CommentSection } from "@/components/common/CommentSection";
 import { ImageUploader } from "@/components/common/ImageUploader";
 import { Timeline } from "@/components/common/Timeline";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
-import { useSorting } from "@/hooks/useSorting";
-import { useComments } from "@/hooks/useComments";
-import { useImageUpload } from "@/hooks/useImageUpload";
-import { useEntityHistory } from "@/hooks/useEntityHistory";
+import { usePagination } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks";
+import { useSorting } from "@/hooks";
+import { useComments } from "@/hooks";
+import { useImageUpload } from "@/hooks";
+import { useEntityHistory } from "@/hooks";
 
 interface Ocorrencia {
   id: string; tipo_ocorrencia: string; descricao: string | null; acao_tomada: string | null;

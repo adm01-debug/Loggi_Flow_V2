@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Bookmark, Trash2, Play, Plus } from 'lucide-react';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import type { CargoTemplate, CargoData } from '@/hooks/useQuotationFlow';
+import type { CargoTemplate, CargoData } from '@/hooks';
 
 interface CargoTemplatesProps {
   templates: CargoTemplate[];

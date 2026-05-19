@@ -19,7 +19,7 @@ import {
   Sparkles,
   Target
 } from 'lucide-react';
-import { useSmartCarrierSelection, CarrierRecommendation } from '@/hooks/useSmartCarrierSelection';
+import { useSmartCarrierSelection, CarrierRecommendation } from '@/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ESTADOS_BRASIL = [

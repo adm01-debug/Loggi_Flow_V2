@@ -1,4 +1,4 @@
-import { useNewDeviceDetection } from '@/hooks/useNewDeviceDetection';
+import { useNewDeviceDetection } from '@/hooks';
 
 export function NewDeviceDetector() {
   // This hook automatically checks for new devices on mount

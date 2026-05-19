@@ -4,8 +4,8 @@ import { Clock, MapPin, Package, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/common/EmptyState';
-import type { QuotationResult } from '@/hooks/useFreightQuotation';
-import type { CargoData } from '@/hooks/useQuotationFlow';
+import type { QuotationResult } from '@/hooks';
+import type { CargoData } from '@/hooks';
 
 interface HistoryEntry {
   data: CargoData;

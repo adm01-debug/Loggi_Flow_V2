@@ -6,19 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, MapPin, Calendar, Download, Loader2, LucideIcon, Building2, Search, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useExport } from "@/hooks/useExport";
+import { useToast } from "@/hooks";
+import { useExport } from "@/hooks";
 import { cn } from "@/lib/utils";
-import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { useAudioFeedback } from "@/hooks";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { VirtualizedList } from "@/components/common/VirtualizedList";
 import { RealtimeBadge } from "@/components/common/RealtimeBadge";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
-import { useSorting } from "@/hooks/useSorting";
-import { useRealtime } from "@/hooks/useRealtime";
+import { usePagination } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks";
+import { useSorting } from "@/hooks";
+import { useRealtime } from "@/hooks";
 import { PickupDialog } from "@/components/coletas/PickupDialog";
 import { PickupDetailsDialog } from "@/components/coletas/PickupDetailsDialog";
 

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
+import { useRodonavesTracking } from '@/hooks';
 import { Search, Loader2, Package, FileText } from 'lucide-react';
 
 export function RTEOrdersPanel() {

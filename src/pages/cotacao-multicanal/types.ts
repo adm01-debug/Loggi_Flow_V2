@@ -1,4 +1,4 @@
-import type { TransportadoraRota } from '@/hooks/useTransportadoraRotas';
+import type { TransportadoraRota } from '@/hooks';
 
 export interface CotacaoManual {
   id: string;

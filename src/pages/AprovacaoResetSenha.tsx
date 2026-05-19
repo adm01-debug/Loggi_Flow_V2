@@ -8,8 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks";
+import { useAuth } from "@/hooks";
 import { KeyRound, CheckCircle, XCircle, Clock, Loader2, AlertTriangle } from "lucide-react";
 import { ResetRequestsTable } from "./aprovacao-reset/ResetRequestsTable";
 

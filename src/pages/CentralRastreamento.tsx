@@ -11,9 +11,9 @@ import { StatsCard } from '@/components/common/StatsCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { DetailSheet } from '@/components/common/DetailSheet';
 import { Pagination } from '@/components/common/Pagination';
-import { usePagination } from '@/hooks/usePagination';
-import { useUnifiedTracking, UnifiedShipment, TrackingFilter } from '@/hooks/useUnifiedTracking';
-import { useDelayPrediction } from '@/hooks/useDelayPrediction';
+import { usePagination } from '@/hooks';
+import { useUnifiedTracking, UnifiedShipment, TrackingFilter } from '@/hooks';
+import { useDelayPrediction } from '@/hooks';
 import {
   Radar, Truck, Package, AlertTriangle, Clock, CheckCircle2,
   Search, RefreshCw, MapPin, DollarSign, TrendingDown, Eye,

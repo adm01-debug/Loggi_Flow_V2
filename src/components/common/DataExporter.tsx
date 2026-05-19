@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Download, FileSpreadsheet, FileText, Loader2 } from 'lucide-react';
-import { useExport } from '@/hooks/useExport';
+import { useExport } from '@/hooks';
 import { exportToExcel } from '@/lib/excelImporter';
 
 interface DataExporterProps<T> { data: T[]; filename: string; columns?: { key: keyof T; label: string }[]; }

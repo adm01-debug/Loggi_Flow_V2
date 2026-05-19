@@ -22,8 +22,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks";
+import { useAuth } from "@/hooks";
 import { 
   Shield, 
   ShieldCheck, 

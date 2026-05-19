@@ -3,7 +3,7 @@ import { Bell, BellOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks";
 
 export function BrowserNotificationPrompt() {
   const [permission, setPermission] = useState<NotificationPermission | "unsupported">("default");

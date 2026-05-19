@@ -25,11 +25,11 @@ import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/co
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks/useSelection";
+import { useSelection } from "@/hooks";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
-import { useSorting } from "@/hooks/useSorting";
+import { usePagination } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks";
+import { useSorting } from "@/hooks";
 import { CSVImporter } from "@/components/common/CSVImporter";
 import { Dialog as ImportDialog, DialogContent as ImportDialogContent, DialogHeader as ImportDialogHeader, DialogTitle as ImportDialogTitle } from "@/components/ui/dialog";
 import { RTECustomerSync } from "@/components/rodonaves/RTECustomerSync";

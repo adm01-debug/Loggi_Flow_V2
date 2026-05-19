@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { RotaFormData, TransportadoraRota } from '@/hooks/useTransportadoraRotas';
+import { RotaFormData, TransportadoraRota } from '@/hooks';
 
 const ESTADOS_BRASIL = [
   { sigla: 'AC', nome: 'Acre' },

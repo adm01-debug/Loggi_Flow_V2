@@ -8,8 +8,8 @@ import { Calculator, ShoppingCart, Tag, MapPin, Truck, User, Store, Package2, We
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
+import { useLocalStorage } from '@/hooks';
+import { useKeyboardShortcut } from '@/hooks';
 import { useState, useCallback } from 'react';
 
 export default function GestaoMelhorEnvio() {

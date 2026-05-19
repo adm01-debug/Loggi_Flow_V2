@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Check, X, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounce } from "@/hooks";
 
 interface PasswordStrengthIndicatorProps {
   password: string;

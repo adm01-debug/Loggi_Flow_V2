@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useBusinessRules, BusinessRule, RuleCondition } from "@/hooks/useBusinessRules";
+import { useBusinessRules, BusinessRule, RuleCondition } from "@/hooks";
 import { Json } from "@/integrations/supabase/types";
 
 /**

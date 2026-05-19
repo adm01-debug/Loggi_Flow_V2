@@ -1,7 +1,7 @@
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { ReactNode, useMemo } from "react";
-import { useNavigationHistory } from "@/hooks/useNavigationHistory";
+import { useNavigationHistory } from "@/hooks";
 
 interface PageTransitionProps {
   children: ReactNode;

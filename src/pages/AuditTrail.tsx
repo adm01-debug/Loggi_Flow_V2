@@ -4,7 +4,7 @@ import { DecisionAudit } from "@/components/freight/DecisionAudit";
 import { History, Shield, Download, Brain, Database } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks";
 import { Navigate } from "react-router-dom";
 
 export default function AuditTrail() {

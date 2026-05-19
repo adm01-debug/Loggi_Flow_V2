@@ -7,7 +7,7 @@ import { Code, Copy, CheckCircle2, ExternalLink, Book, Zap, Shield, Globe } from
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { FilterBar } from "@/components/common/FilterBar";
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/hooks";
 
 interface Endpoint { 
   id: string; 

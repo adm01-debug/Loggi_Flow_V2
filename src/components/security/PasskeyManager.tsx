@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useWebAuthn } from "@/hooks/useWebAuthn";
+import { useWebAuthn } from "@/hooks";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

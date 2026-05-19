@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { CheckCircle2, AlertTriangle, Clock, XCircle, MoreVertical, ArrowLeftRight, Loader2, LucideIcon } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
-import type { ItemImportado } from "@/hooks/useConciliacao";
+import type { ItemImportado } from "@/hooks";
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; icon: LucideIcon }> = {
   pendente: { bg: "bg-muted", text: "text-muted-foreground", icon: Clock },

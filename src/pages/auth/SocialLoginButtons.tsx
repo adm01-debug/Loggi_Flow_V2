@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks";
 import { lovable } from "@/integrations/lovable/index";
 
 export function SocialLoginButtons({ isLoading }: { isLoading: boolean }) {

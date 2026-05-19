@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useFreightQuotation, QuotationResult } from '@/hooks/useFreightQuotation';
-import { useSmartCarrierSelection } from '@/hooks/useSmartCarrierSelection';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useFreightQuotation, QuotationResult } from '@/hooks';
+import { useSmartCarrierSelection } from '@/hooks';
+import { useLocalStorage } from '@/hooks';
 import { toast } from 'sonner';
 
 export interface CargoData {

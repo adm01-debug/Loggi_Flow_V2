@@ -14,10 +14,10 @@ import { ptBR } from "date-fns/locale";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks/useSelection";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
-import { useRealtime } from "@/hooks/useRealtime";
+import { useSelection } from "@/hooks";
+import { usePagination } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks";
+import { useRealtime } from "@/hooks";
 
 interface Notification { id: string; title: string; message: string; type: string; read: boolean; created_at: string; user_id: string; }
 

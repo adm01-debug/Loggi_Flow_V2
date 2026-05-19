@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useRodonavesTracking } from '@/hooks/useRodonavesTracking';
+import { useRodonavesTracking } from '@/hooks';
 import { Calculator, FileText, Loader2, Truck, RefreshCw, Key } from 'lucide-react';
 
 export function RTEAdvancedQuotation() {

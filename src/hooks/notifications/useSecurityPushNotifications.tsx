@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks';
 import { toast } from 'sonner';
 
 interface SecurityEvent {

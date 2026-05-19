@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks';
 import { toast } from 'sonner';
 import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 import { Decimal } from 'decimal.js';

@@ -9,12 +9,12 @@ import { Plus, Trash2, MapPin, Loader2, ArrowUpDown, ChevronUp, ChevronDown, Dow
 import { Pagination } from '@/components/common/Pagination';
 import { FilterBar } from '@/components/common/FilterBar';
 import { BulkActions } from '@/components/common/BulkActions';
-import { useSelection } from '@/hooks/useSelection';
+import { useSelection } from '@/hooks';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { usePagination } from '@/hooks/usePagination';
-import { useFilters, FilterConfig } from '@/hooks/useFilters';
-import { useSorting } from '@/hooks/useSorting';
+import { usePagination } from '@/hooks';
+import { useFilters, FilterConfig } from '@/hooks';
+import { useSorting } from '@/hooks';
 import { cn } from '@/lib/utils';
 
 const ESTADOS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];

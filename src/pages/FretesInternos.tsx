@@ -28,12 +28,12 @@ import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/co
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks/useSelection";
+import { useSelection } from "@/hooks";
 import { Timeline } from "@/components/common/Timeline";
-import { usePagination } from "@/hooks/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/useFilters";
-import { useSorting } from "@/hooks/useSorting";
-import { useEntityHistory } from "@/hooks/useEntityHistory";
+import { usePagination } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks";
+import { useSorting } from "@/hooks";
+import { useEntityHistory } from "@/hooks";
 
 type FreteStatus = "pendente" | "em_transito" | "entregue" | "atrasado" | "cancelado";
 

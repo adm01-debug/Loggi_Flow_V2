@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useRealtime } from '@/hooks/useRealtime';
-import { useAuth } from '@/hooks/useAuth';
+import { useRealtime } from '@/hooks';
+import { useAuth } from '@/hooks';
 
 // ==========================================
 // NORMALIZED TRACKING INTERFACES

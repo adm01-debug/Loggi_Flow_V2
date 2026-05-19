@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useConfirmExit } from "@/hooks/useConfirmExit";
+import { useConfirmExit } from "@/hooks";
 import { format } from "date-fns";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings, Bell, Shield, Link, CheckCircle2, XCircle, Loader2, RefreshCw, Save, Globe, Database, Zap, Truck, Package, Palette } from "lucide-react";
 import { PreferencePanel } from "@/features/preferences";
-import { useIntegrationValidation } from "@/hooks/useIntegrationValidation";
-import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
+import { useIntegrationValidation } from "@/hooks";
+import { useNotificationPreferences } from "@/hooks";
 import { OnboardingTooltip } from "@/components/onboarding/OnboardingTooltip";
 import { BusinessRulesManager } from "@/components/automation/BusinessRulesManager";
 import { toast } from "sonner";

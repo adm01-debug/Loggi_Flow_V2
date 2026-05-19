@@ -5,8 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Package, AlertTriangle, CheckCircle2, Loader2, Weight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useAudioFeedback } from "@/hooks/useAudioFeedback";
+import { useToast } from "@/hooks";
+import { useAudioFeedback } from "@/hooks";
 import { Coleta as Pickup, ColetaStatus } from "./types";
 
 
