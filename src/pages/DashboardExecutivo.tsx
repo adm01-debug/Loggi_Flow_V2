@@ -352,9 +352,16 @@ export default function DashboardExecutivo() {
           </TabsContent>
 
           <TabsContent value="analytics" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <PerformanceChart data={monthlyData} />
-              <DistributionChart data={monthlyData} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1">
+                <OperationalPulse />
+              </div>
+              <div className="lg:col-span-1">
+                <PerformanceChart data={monthlyData} />
+              </div>
+              <div className="lg:col-span-1">
+                <DistributionChart data={monthlyData} />
+              </div>
             </div>
           </TabsContent>
         </Tabs>
