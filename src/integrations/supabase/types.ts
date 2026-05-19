@@ -2000,6 +2000,7 @@ export type Database = {
           previsao_entrega: string | null
           recebedor: string | null
           status: Database["public"]["Enums"]["entrega_status"]
+          tags: string[] | null
           tipo_frete: Database["public"]["Enums"]["frete_tipo"] | null
           transportadora_id: string | null
           updated_at: string
@@ -2030,6 +2031,7 @@ export type Database = {
           previsao_entrega?: string | null
           recebedor?: string | null
           status?: Database["public"]["Enums"]["entrega_status"]
+          tags?: string[] | null
           tipo_frete?: Database["public"]["Enums"]["frete_tipo"] | null
           transportadora_id?: string | null
           updated_at?: string
@@ -2060,6 +2062,7 @@ export type Database = {
           previsao_entrega?: string | null
           recebedor?: string | null
           status?: Database["public"]["Enums"]["entrega_status"]
+          tags?: string[] | null
           tipo_frete?: Database["public"]["Enums"]["frete_tipo"] | null
           transportadora_id?: string | null
           updated_at?: string
@@ -2574,6 +2577,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      kanban_history: {
+        Row: {
+          action_by: string | null
+          created_at: string
+          delivery_id: string
+          from_status: string | null
+          id: string
+          notes: string | null
+          to_status: string
+        }
+        Insert: {
+          action_by?: string | null
+          created_at?: string
+          delivery_id: string
+          from_status?: string | null
+          id?: string
+          notes?: string | null
+          to_status: string
+        }
+        Update: {
+          action_by?: string | null
+          created_at?: string
+          delivery_id?: string
+          from_status?: string | null
+          id?: string
+          notes?: string | null
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kanban_history_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "entregas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       known_devices: {
         Row: {
