@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function SystemHealthWidget() {
+  const { isHealing, performSelfHealing } = useSelfHealing();
+  const { isSimulating, progress, runMassiveSimulation } = useNexusSimulator();
+
   const { data: healthData, isLoading } = useQuery({
     queryKey: ["system-health"],
     queryFn: async () => {
