@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
+import { validateContract } from "../_shared/contract-validator.ts";
+import { requireString } from "../_shared/validate.ts";
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -54,7 +56,6 @@ function mapLalamoveStatus(status: string): string {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -72,29 +73,48 @@ serve(async (req) => {
     const isTestMode = req.headers.get('x-test-mode') === 'true';
     
     log.info('Received Lalamove webhook:', payload);
-    log.info('Test mode:', isTestMode);
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const webhookData = JSON.parse(payload);
+
+    // Contract Validation
+    const { isValid, errors } = await validateContract(
+      supabase,
+      'lalamove-webhook',
+      webhookData,
+      (p) => {
+        requireString(p, 'eventType');
+        if (!p.data) throw new Error('data object is required');
+      }
+    );
+
+    if (!isValid) {
+      return new Response(JSON.stringify({ 
+        error: "Contract Violation", 
+        details: errors,
+        nexus_protocol: "LALAMOVE_GATE_REJECTION"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
 
     // Skip signature verification in test mode (internal testing only)
     if (!isTestMode) {
-      const isValid = await verifySignature(payload, signature);
-      if (!isValid) {
+      const isVerified = await verifySignature(payload, signature);
+      if (!isVerified) {
         console.error('Invalid webhook signature');
         return new Response(JSON.stringify({ error: 'Invalid signature' }), {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-    } else {
-      log.info('Skipping signature verification (test mode)');
     }
 
-    const webhookData = JSON.parse(payload);
     const { eventType, data, eventId } = webhookData;
     const finalEventId = eventId || data?.orderId || crypto.randomUUID();
 
     log('INFO', 'Processing Lalamove webhook', { eventType, eventId: finalEventId });
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Idempotency check
     const { data: existingEvent } = await supabase
@@ -115,7 +135,6 @@ serve(async (req) => {
       case 'ORDER_STATUS_CHANGED': {
         const { orderId, status, timestamp } = data;
         
-        // Update tracking history with status change
         const { error: historyError } = await supabase
           .from('rastreamento_historico')
           .insert({
@@ -126,31 +145,20 @@ serve(async (req) => {
             recorded_at: timestamp || new Date().toISOString(),
           });
 
-        if (historyError) {
-          console.error('Error saving status history:', historyError);
-        }
+        if (historyError) console.error('Error saving status history:', historyError);
 
-        // Update coleta status if linked
         if (status === 'COMPLETED') {
-          const { error: coletaError } = await supabase
+          await supabase
             .from('coletas')
             .update({ status: 'chegou_expedicao' })
             .eq('codigo_rastreamento', orderId);
-
-          if (coletaError) {
-            console.error('Error updating coleta:', coletaError);
-          }
         }
-
-        log.info(`Order ${orderId} status updated to: ${status}`);
         break;
       }
 
       case 'DRIVER_LOCATION_UPDATED': {
         const { orderId, driverId, location, timestamp } = data;
-        
-        // Save driver location to history
-        const { error: locationError } = await supabase
+        await supabase
           .from('rastreamento_historico')
           .insert({
             lalamove_order_id: orderId,
@@ -159,20 +167,12 @@ serve(async (req) => {
             longitude: location.lng,
             recorded_at: timestamp || new Date().toISOString(),
           });
-
-        if (locationError) {
-          console.error('Error saving location:', locationError);
-        }
-
-        log.info(`Driver ${driverId} location updated for order ${orderId}`);
         break;
       }
 
       case 'DRIVER_ASSIGNED': {
         const { orderId, driver } = data;
-        
-        // Save driver assignment to history
-        const { error: driverError } = await supabase
+        await supabase
           .from('rastreamento_historico')
           .insert({
             lalamove_order_id: orderId,
@@ -185,21 +185,13 @@ serve(async (req) => {
             order_status: 'motorista_alocado',
             recorded_at: new Date().toISOString(),
           });
-
-        if (driverError) {
-          console.error('Error saving driver assignment:', driverError);
-        }
-
-        log.info(`Driver ${driver.name} assigned to order ${orderId}`);
         break;
       }
 
       case 'ORDER_CANCELED':
       case 'ORDER_EXPIRED': {
         const { orderId, reason } = data;
-        
-        // Create alert for canceled/expired order
-        const { error: alertError } = await supabase
+        await supabase
           .from('rastreamento_alertas')
           .insert({
             lalamove_order_id: orderId,
@@ -207,17 +199,8 @@ serve(async (req) => {
             severity: 'high',
             message: `Pedido ${eventType === 'ORDER_CANCELED' ? 'cancelado' : 'expirado'}: ${reason || 'Sem motivo informado'}`,
           });
-
-        if (alertError) {
-          console.error('Error creating alert:', alertError);
-        }
-
-        log.info(`Order ${orderId} ${eventType.toLowerCase()}: ${reason}`);
         break;
       }
-
-      default:
-        log('WARN', `Unhandled event type: ${eventType}`);
     }
 
     // Mark as processed
@@ -231,10 +214,9 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    log('ERROR', 'Webhook processing error', { error: message });
-    return new Response(JSON.stringify({ error: message }), {
+  } catch (error: any) {
+    log('ERROR', 'Webhook processing error', { error: error.message });
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

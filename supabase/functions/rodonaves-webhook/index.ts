@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateContract } from "../_shared/contract-validator.ts";
+import { requireString } from "../_shared/validate.ts";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,9 +36,32 @@ serve(async (req: Request) => {
     });
 
     const payload = await req.json();
-    log.info("Rodonaves webhook received:", JSON.stringify(payload));
+    log.info("Rodonaves webhook received:", { payload });
 
-    // Expected payload: { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, ... }
+    // Contract Validation
+    const { isValid, errors } = await validateContract(
+      supabaseAdmin,
+      'rodonaves-webhook',
+      payload,
+      (p) => {
+        if (!p.nf_numero && !p.codigo_rastreamento) {
+            throw new Error("nf_numero or codigo_rastreamento is required");
+        }
+        requireString(p, 'status_code');
+      }
+    );
+
+    if (!isValid) {
+      return new Response(JSON.stringify({ 
+        error: "Contract Violation", 
+        details: errors,
+        nexus_protocol: "RODONAVES_GATE_REJECTION"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     const { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, recebedor, event_id } = payload;
 
     // Idempotency: use event_id or create one from unique fields
@@ -54,13 +80,6 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ success: true, message: "Already processed" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
-    }
-
-    if (!nf_numero && !codigo_rastreamento) {
-      return new Response(
-        JSON.stringify({ error: "nf_numero or codigo_rastreamento required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
     }
 
     // Find the entrega
@@ -129,11 +148,10 @@ serve(async (req: Request) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Unknown error";
+  } catch (error: any) {
     console.error("Rodonaves webhook error:", error);
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

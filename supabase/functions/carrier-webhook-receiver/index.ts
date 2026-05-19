@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { validateContract } from "../_shared/contract-validator.ts";
+import { requireString } from "../_shared/validate.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,24 +20,43 @@ serve(async (req) => {
     )
 
     const payload = await req.json()
-    console.log('Webhook received:', payload)
+    console.log('Carrier Webhook received:', payload)
 
-    // Lógica para processar webhooks recebidos das transportadoras
-    // Exemplo: Atualizar cotações, status de entrega, etc.
-    
+    // Contract Validation
+    const { isValid, errors } = await validateContract(
+      supabaseClient,
+      'carrier-webhook-receiver',
+      payload,
+      (p) => {
+        requireString(p, 'carrier_id', { minLength: 2 });
+        requireString(p, 'event_type', { minLength: 3 });
+      }
+    )
+
+    if (!isValid) {
+      return new Response(JSON.stringify({ 
+        error: "Contract Violation", 
+        details: errors,
+        nexus_protocol: "SHIELD_GATE_REJECTION"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     // 1. Audit log
     await supabaseClient.from('automation_audit_logs').insert({
-      action_taken: 'webhook_received',
+      action_taken: 'carrier_webhook_validated',
       payload: payload,
       status: 'success'
     })
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Webhook processed' }),
+      JSON.stringify({ success: true, message: 'Carrier Webhook processed via Nexus Shield' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
-  } catch (error) {
+  } catch (error: any) {
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }

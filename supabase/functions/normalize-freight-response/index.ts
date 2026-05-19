@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { validateContract } from "../_shared/contract-validator.ts";
+import { requireString } from "../_shared/validate.ts";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,11 +20,32 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { text, transportadora_id, cotacao_id } = await req.json()
+    const body = await req.json()
+    log.info("Normalize Freight call received", { body_summary: body.text?.substring(0, 50) });
 
-    if (!text || !transportadora_id) {
-      throw new Error('Text and transportadora_id are required')
+    // Contract Validation
+    const { isValid, errors } = await validateContract(
+      supabaseClient,
+      'normalize-freight-response',
+      body,
+      (p) => {
+        requireString(p, 'text', { minLength: 1 });
+        requireString(p, 'transportadora_id', { minLength: 36 }); // UUID
+      }
+    );
+
+    if (!isValid) {
+      return new Response(JSON.stringify({ 
+        error: "Contract Violation", 
+        details: errors,
+        nexus_protocol: "NORMALIZE_GATE_REJECTION"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
+
+    const { text, transportadora_id, cotacao_id } = body;
 
     // 1. Fetch normalization config
     const { data: carrier, error: carrierError } = await supabaseClient
@@ -55,7 +79,7 @@ serve(async (req) => {
 
     // 3. Use AI if fallback is enabled and we are missing data
     if ((!price || !days) && (config.fallback_strategy === 'ai_extraction' || config.fallback_strategy === 'hybrid')) {
-      console.log('Using AI to extract data...')
+      log.info('Using AI to extract data...');
       const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -96,7 +120,9 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
-  } catch (error) {
+  } catch (error: any) {
+    log.error('Normalization error', { error: error.message });
+    
     // Alert on normalization failure
     try {
       const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
