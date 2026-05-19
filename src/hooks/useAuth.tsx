@@ -1,18 +1,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Profile {
-  id: string;
-  email: string | null;
-  full_name: string | null;
-  avatar_url: string | null;
-  cargo: string | null;
-}
+import { authService, Profile } from "@/services/api/authService";
 
 interface UserRole {
   role: "admin" | "user";
 }
+
 
 interface AuthContextType {
   user: User | null;
@@ -28,14 +22,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Auto-update streak when user logs in via SECURITY DEFINER RPC
-async function updateUserStreak(userId: string) {
-  try {
-    await supabase.rpc("update_user_streak", { p_user_id: userId });
-  } catch {
-    // Error updating streak - silent fail
-  }
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -46,31 +32,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUserData = async (userId: string) => {
     try {
-      const [profileRes, rolesRes] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", userId)
-          .maybeSingle(),
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", userId)
+      const [profileData, rolesData] = await Promise.all([
+        authService.fetchProfile(userId),
+        authService.fetchRoles(userId)
       ]);
 
-      if (profileRes.data) {
-        setProfile(profileRes.data);
+      if (profileData) {
+        setProfile(profileData);
       }
 
-      if (rolesRes.data) {
-        setRoles(rolesRes.data.map((r: any) => r.role));
+      if (rolesData) {
+        setRoles(rolesData);
       }
 
-      updateUserStreak(userId);
+      authService.updateStreak(userId);
     } catch (err) {
       console.error("Error fetching user data:", err);
     }
   };
+
 
   useEffect(() => {
     let isMounted = true;
@@ -138,12 +118,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await authService.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);
     setRoles([]);
   };
+
 
   const isAdmin = roles.includes("admin");
 
