@@ -1464,6 +1464,50 @@ export type Database = {
         }
         Relationships: []
       }
+      carrier_rankings: {
+        Row: {
+          efficiency_score: number | null
+          id: string
+          last_updated: string | null
+          on_time_shipments: number | null
+          period: string
+          rank_tier: string | null
+          sla_percentage: number | null
+          total_shipments: number | null
+          transportadora_id: string
+        }
+        Insert: {
+          efficiency_score?: number | null
+          id?: string
+          last_updated?: string | null
+          on_time_shipments?: number | null
+          period: string
+          rank_tier?: string | null
+          sla_percentage?: number | null
+          total_shipments?: number | null
+          transportadora_id: string
+        }
+        Update: {
+          efficiency_score?: number | null
+          id?: string
+          last_updated?: string | null
+          on_time_shipments?: number | null
+          period?: string
+          rank_tier?: string | null
+          sla_percentage?: number | null
+          total_shipments?: number | null
+          transportadora_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carrier_rankings_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_webhooks: {
         Row: {
           active: boolean
@@ -1947,6 +1991,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      driver_badges: {
+        Row: {
+          badge_type: string
+          driver_id: string
+          id: string
+          level: number | null
+          metadata: Json | null
+          unlocked_at: string | null
+        }
+        Insert: {
+          badge_type: string
+          driver_id: string
+          id?: string
+          level?: number | null
+          metadata?: Json | null
+          unlocked_at?: string | null
+        }
+        Update: {
+          badge_type?: string
+          driver_id?: string
+          id?: string
+          level?: number | null
+          metadata?: Json | null
+          unlocked_at?: string | null
+        }
+        Relationships: []
       }
       email_verification_tokens: {
         Row: {
