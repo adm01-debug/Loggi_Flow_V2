@@ -226,7 +226,7 @@ export function UserNotificationCenter() {
       </TooltipProvider>
 
       <PopoverContent 
-        className="w-[420px] p-0 border-2 border-primary/5 shadow-2xl overflow-hidden rounded-2xl animate-in zoom-in-95 duration-200" 
+        className="w-[420px] p-0 border-2 border-primary/5 bg-black/95 backdrop-blur-xl shadow-2xl overflow-hidden rounded-2xl animate-in zoom-in-95 duration-200" 
         align="end"
         sideOffset={12}
       >
