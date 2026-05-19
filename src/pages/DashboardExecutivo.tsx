@@ -401,21 +401,21 @@ export default function DashboardExecutivo() {
 
         {/* Status Distribution + Carrier Cost */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">Distribuição de Status</h3>
+          <div className="card-base p-6 border-white/5 bg-black/40 backdrop-blur-xl rounded-[2.5rem]">
+            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-warning mb-6">Distribuição de Status</h3>
             {statusDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
-                  <Pie data={statusDistribution} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`} labelLine={false}>
+                  <Pie data={statusDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value" stroke="none">
                     {statusDistribution.map((_, i) => (
                       <Cell key={i} fill={pieColors[i % pieColors.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground text-center py-8">Sem dados</p>
+              <p className="text-muted-foreground text-center py-8 font-black uppercase tracking-widest text-[10px]">Mapeando Estados Operacionais...</p>
             )}
           </div>
 
