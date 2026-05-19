@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, Reorder, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, Clock, CheckCircle2, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText } from "lucide-react";
+import { Package, Truck, Clock, Plus, Loader2, RefreshCw, ArrowRight, LucideIcon, AlertTriangle, FileText, LayoutGrid, Activity, History } from "lucide-react";
 import { useRealtime } from "@/hooks/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
@@ -13,6 +13,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetailsDialog";
+import { useAudioFeedback } from "@/hooks/useAudioFeedback";
 
 interface Despacho {
   id: string;
@@ -31,27 +33,26 @@ interface Despacho {
 const filterConfig: FilterConfig<Despacho> = {
   search: {
     fields: ["numero", "numero_entrega", "cliente", "destino"],
-    placeholder: "Buscar despacho..."
+    placeholder: "Buscar protocolo..."
   },
   status: {
     field: "status",
     options: [
-      { value: "pronto_despacho", label: "Pronto Despacho" },
-      { value: "cotacao_frete", label: "Cotação Frete" },
-      { value: "nf_emitida", label: "NF Emitida" },
-      { value: "despachado", label: "Despachado" },
+      { value: "pronto_despacho", label: "BOX" },
+      { value: "cotacao_frete", label: "Cotação" },
+      { value: "nf_emitida", label: "NF" },
+      { value: "despachado", label: "Despacho" },
     ]
   }
 };
 
 const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
-  pronto_despacho: { label: "Pronto Despacho", color: "bg-primary/15 text-primary", icon: Package },
-  cotacao_frete: { label: "Cotação Frete", color: "bg-warning/15 text-warning", icon: Clock },
-  nf_emitida: { label: "NF Emitida", color: "bg-success/15 text-success", icon: FileText },
-  despachado: { label: "Despachado", color: "bg-primary/10 text-primary", icon: Truck },
+  pronto_despacho: { label: "BOX", color: "bg-blue-500/10 text-blue-500 border-blue-500/20", icon: Package },
+  cotacao_frete: { label: "Cotação", color: "bg-amber-500/10 text-amber-500 border-amber-500/20", icon: Clock },
+  nf_emitida: { label: "NF", color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", icon: FileText },
+  despachado: { label: "Despacho", color: "bg-primary/10 text-primary border-primary/20", icon: Truck },
 };
 
-// Valid flow: pronto_despacho → cotacao_frete → nf_emitida → despachado
 const validTransitions: Record<string, string> = {
   pronto_despacho: "cotacao_frete",
   cotacao_frete: "nf_emitida",
