@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./useAuth";
+import { useAuth } from "@/hooks";
 
 export type TelemetrySeverity = 'info' | 'warning' | 'error' | 'critical';
 

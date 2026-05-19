@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useLocalStorage } from "./useLocalStorage";
+import { useLocalStorage } from "@/hooks";
 
 export interface WidgetConfig {
   i: string;
