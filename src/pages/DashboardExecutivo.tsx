@@ -15,6 +15,7 @@ import { AIAssistant } from "@/components/ai/AIAssistant";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PerformanceChart, DistributionChart } from "@/components/analytics/AnalyticsCharts";
+import { OperationalPulse } from "@/components/analytics/OperationalPulse";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function DashboardExecutivo() {
