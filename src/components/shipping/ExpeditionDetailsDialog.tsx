@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, MapPin, Calendar, Clock, CheckCircle2, History, Info, Zap, FileText, Loader2 } from "lucide-react";
+import { Truck, Package, MapPin, Calendar, Clock, CheckCircle2, History, Info, Zap, FileText, Loader2, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useAudioFeedback } from "@/hooks";
+import { useAudioFeedback, useAuth } from "@/hooks";
 import { Database } from "@/integrations/supabase/types";
 
 type EntregaStatus = Database["public"]["Enums"]["entrega_status"];
@@ -39,16 +39,19 @@ export function ExpeditionDetailsDialog({ open, onOpenChange, delivery, statusCo
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [loadingTimeline, setLoadingTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState("detalhes");
+  const { user } = useAuth();
   const { playSuccess, playWhoosh } = useAudioFeedback();
 
   const fetchTimeline = useCallback(async () => {
     if (!delivery) return;
     setLoadingTimeline(true);
     const { data } = await supabase
-      .from("audit_logs")
-      .select("*")
-      .eq("record_id", delivery.id)
-      .eq("table_name", "entregas")
+      .from("kanban_history")
+      .select(`
+        *,
+        action_by_user:profiles(display_name, avatar_url)
+      `)
+      .eq("delivery_id", delivery.id)
       .order("created_at", { ascending: false });
     
     if (data) setTimeline(data as unknown as TimelineEvent[]);
@@ -81,6 +84,15 @@ export function ExpeditionDetailsDialog({ open, onOpenChange, delivery, statusCo
       .eq("id", delivery.id);
     
     if (!error) {
+      // Record history
+      await supabase.from("kanban_history").insert({
+        delivery_id: delivery.id,
+        from_status: delivery.status,
+        to_status: newStatus,
+        action_by: user?.id,
+        notes: `Transição via modal: ${delivery.status} -> ${newStatus}`
+      });
+
       playSuccess();
       toast.success(`Status atualizado para ${statusConfig[newStatus]?.label || newStatus}`);
       onStatusUpdate();
@@ -222,21 +234,17 @@ export function ExpeditionDetailsDialog({ open, onOpenChange, delivery, statusCo
                         </div>
                         <div className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all">
                           <p className="text-sm font-black uppercase tracking-widest text-white italic">
-                            {event.action === 'UPDATE' ? 'Transição de Estado' : 'Registro de Entrada'}
+                            {event.from_status ? `${statusConfig[event.from_status]?.label || event.from_status} → ${statusConfig[event.to_status]?.label || event.to_status}` : `Início: ${statusConfig[event.to_status]?.label || event.to_status}`}
                           </p>
                           <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-2 space-y-1">
-                            {event.new_data?.status && (
-                              <p>Novo status: <span className="text-primary">{statusConfig[event.new_data.status]?.label || event.new_data.status}</span></p>
-                            )}
-                            {event.new_data?.nf_remessa && (
-                              <p>NF vinculada: <span className="text-success">{event.new_data.nf_remessa}</span></p>
-                            )}
-                            {event.new_data?.box_alocado && (
-                              <p>BOX: <span className="text-info">{event.new_data.box_alocado}</span></p>
+                            {event.notes && (
+                              <p className="text-primary/70">{event.notes}</p>
                             )}
                             <div className="flex items-center gap-3 pt-2 border-t border-white/5 mt-2">
                                <span className="flex items-center gap-1.5"><History className="w-3 h-3" /> {format(new Date(event.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</span>
-                               {event.user_name && <span className="flex items-center gap-1.5"><Info className="w-3 h-3" /> {event.user_name}</span>}
+                               {(event as any).action_by_user?.display_name && (
+                                 <span className="flex items-center gap-1.5 text-primary"><User className="w-3 h-3" /> {(event as any).action_by_user.display_name}</span>
+                               )}
                             </div>
                           </div>
                         </div>
