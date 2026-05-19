@@ -116,7 +116,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
           
           <div className="p-6 sm:p-14 relative z-10">
             {/* Header Structure */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-10">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-14 gap-6 sm:gap-10">
               <div className="flex items-center gap-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-destructive/20 blur-2xl rounded-2xl animate-pulse" />
