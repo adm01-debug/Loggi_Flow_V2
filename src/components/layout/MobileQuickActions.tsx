@@ -93,15 +93,14 @@ export const MobileQuickActions = () => {
         <Button
           size="icon"
           className={cn(
-            "w-18 h-18 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] transition-all border-4 border-background group",
+            "w-[72px] h-[72px] rounded-3xl shadow-[0_20px_50px_rgba(var(--primary-rgb),0.3)] transition-all border-4 border-background group relative",
             isOpen 
               ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
               : "bg-primary text-primary-foreground hover:bg-primary/90"
           )}
-          style={{ width: '72px', height: '72px' }}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <div className="relative">
+          <div className="relative flex items-center justify-center">
             {isOpen ? (
               <X className="w-8 h-8" />
             ) : (
@@ -110,9 +109,9 @@ export const MobileQuickActions = () => {
                 <motion.div 
                   animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ repeat: Infinity, duration: 2 }}
-                  className="absolute -top-2 -right-2 bg-xp text-white p-1 rounded-full border-2 border-background"
+                  className="absolute -top-3 -right-3 bg-xp text-white p-1 rounded-full border-2 border-background shadow-lg"
                 >
-                  <Sparkles className="w-3 h-3" />
+                  <Sparkles className="w-3.5 h-3.5" />
                 </motion.div>
               </>
             )}
