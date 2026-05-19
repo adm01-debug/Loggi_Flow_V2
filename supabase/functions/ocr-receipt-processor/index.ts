@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { validateContract } from "../_shared/contract-validator.ts";
+import { requireString } from "../_shared/validate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,12 +14,32 @@ serve(async (req) => {
   }
 
   try {
-    const { storage_path, delivery_id } = await req.json();
-
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    const body = await req.json();
+
+    // Contract Validation
+    const { isValid, errors } = await validateContract(
+      supabaseAdmin,
+      'ocr-receipt-processor',
+      body,
+      (p) => {
+        requireString(p, 'storage_path', { minLength: 5 });
+        requireString(p, 'delivery_id', { minLength: 10 });
+      }
+    );
+
+    if (!isValid) {
+      return new Response(JSON.stringify({ error: "Invalid Contract", details: errors }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    const { storage_path, delivery_id } = body;
 
     // Get file from storage
     const { data: fileData, error: downloadError } = await supabaseAdmin.storage
@@ -26,11 +48,8 @@ serve(async (req) => {
 
     if (downloadError) throw downloadError;
 
-    // Simulate OCR Processing (In a real scenario, we'd use Tesseract or a cloud Vision API)
-    // For this 10/10 implementation, we simulate a very high quality extraction
+    // Simulate OCR Processing
     console.log(`Processing OCR for delivery ${delivery_id}...`);
-    
-    // Artificial delay to simulate heavy processing
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const extractedData = {
@@ -46,11 +65,12 @@ serve(async (req) => {
     };
 
     // Update the delivery with OCR results
+    // Consistency validation: set status only after processing
     const { error: updateError } = await supabaseAdmin
       .from("entregas")
       .update({ 
         ocr_data_extraida: extractedData,
-        status: 'entregue' // Final consistency validation: set status only after processing
+        status: 'entregue'
       })
       .eq("id", delivery_id);
 
@@ -68,7 +88,7 @@ serve(async (req) => {
       status: 200,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
