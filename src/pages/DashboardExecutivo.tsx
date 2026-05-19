@@ -444,34 +444,35 @@ export default function DashboardExecutivo() {
         </div>
 
         {/* Goals Summary */}
-        <div className="card-base p-4">
-          <h3 className="font-semibold mb-4">Resumo de Metas</h3>
+        <div className="card-base p-8 border-white/5 bg-black/40 backdrop-blur-xl rounded-[2.5rem]">
+          <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary mb-8 flex items-center gap-3">
+            <LayoutGrid className="w-5 h-5" /> Resumo de Metas Estratégicas
+          </h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-left">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 text-muted-foreground font-medium">KPI</th>
-                  <th className="text-center py-2 text-muted-foreground font-medium">Atual</th>
-                  <th className="text-center py-2 text-muted-foreground font-medium">Meta</th>
-                  <th className="text-center py-2 text-muted-foreground font-medium">Status</th>
+                <tr className="border-b border-white/10">
+                  <th className="pb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Métrica_KPI</th>
+                  <th className="pb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/30 text-center">Status_Atual</th>
+                  <th className="pb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/30 text-center">Meta_Benchmark</th>
+                  <th className="pb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/30 text-right">Status_Geral</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {[
-                  { name: "OTIF", current: `${kpis.otifRate.toFixed(1)}%`, target: "≥95%", ok: kpis.otifRate >= 95 },
+                  { name: "SLA / OTIF Geral", current: `${kpis.otifRate.toFixed(1)}%`, target: "≥95%", ok: kpis.otifRate >= 95 },
                   { name: "Taxa de Incidentes", current: `${kpis.incidentRate.toFixed(1)}%`, target: "≤1%", ok: kpis.incidentRate <= 1 },
                   { name: "Divergência Coletas", current: `${kpis.avgDivergencia.toFixed(1)}%`, target: "≤5%", ok: kpis.avgDivergencia <= 5 },
                   { name: "Tempo Médio Coleta", current: avgColTime > 0 ? `${avgColTime}h` : "-", target: "≤48h", ok: avgColTime <= 48 },
-                  { name: "Entregas no Prazo", current: `${kpis.otifRate.toFixed(1)}%`, target: "≥98%", ok: kpis.otifRate >= 98 },
                   { name: "Ocorrências Resolvidas", current: `${kpis.ocorrencias > 0 ? ((kpis.ocorrenciasResolvidas / kpis.ocorrencias) * 100).toFixed(0) : 100}%`, target: "≥90%", ok: kpis.ocorrencias === 0 || (kpis.ocorrenciasResolvidas / kpis.ocorrencias) >= 0.9 },
                 ].map((row, i) => (
-                  <tr key={i} className="border-b last:border-0">
-                    <td className="py-2 font-medium">{row.name}</td>
-                    <td className="py-2 text-center font-semibold">{row.current}</td>
-                    <td className="py-2 text-center text-muted-foreground">{row.target}</td>
-                    <td className="py-2 text-center">
-                      <Badge variant="secondary" className={cn("text-xs", row.ok ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive")}>
-                        {row.ok ? "✓ Atingida" : "✗ Pendente"}
+                  <tr key={i} className="group hover:bg-white/5 transition-colors">
+                    <td className="py-5 font-black uppercase tracking-widest text-[11px] italic text-white">{row.name}</td>
+                    <td className="py-5 text-center font-black text-xs text-white/60">{row.current}</td>
+                    <td className="py-5 text-center font-bold text-[10px] text-white/30">{row.target}</td>
+                    <td className="py-5 text-right">
+                      <Badge variant="outline" className={cn("px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-widest border-2", row.ok ? "bg-success/10 text-success border-success/20" : "bg-destructive/10 text-destructive border-destructive/20")}>
+                        {row.ok ? "Atingida" : "Em Alerta"}
                       </Badge>
                     </td>
                   </tr>
