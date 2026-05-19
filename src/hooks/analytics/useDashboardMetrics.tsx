@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks";
+import { useAuth, useExecutiveMetrics } from "@/hooks";
 import { QUERY_KEYS } from "@/lib/queryKeys";
 import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
 
@@ -39,6 +39,8 @@ export interface RecentAlert {
 
 export function useDashboardMetrics() {
   const { user } = useAuth();
+  const { avgCollectionTime } = useExecutiveMetrics();
+  
   return useQuery({
     queryKey: QUERY_KEYS.analytics.dashboard,
     queryFn: async (): Promise<DashboardMetrics> => {
@@ -82,7 +84,7 @@ export function useDashboardMetrics() {
         lastSync: data.lastSync || new Date().toISOString(),
         taxaOcorrencias: data.totalEntregas > 0 ? (data.entregasComOcorrencia / data.totalEntregas) * 100 : 0,
         taxaEntregaNoPrazo: data.otifRate || 92, // Use OTIF as proxy or real metric
-        tempoMedioColeta: 36, // To be implemented with real historical data
+        tempoMedioColeta: avgCollectionTime.data || 36, // To be implemented with real historical data
         alertasCriticos: (data.coletasComDivergencia || 0) + (data.entregasComOcorrencia || 0),
         coletasAtrasadas: data.coletasPendentes > 5 ? Math.floor(data.coletasPendentes * 0.1) : 0, // Predictive fallback
         divergenciasAltas: data.coletasComDivergencia || 0,
