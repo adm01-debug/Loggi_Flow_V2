@@ -141,7 +141,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
                 transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
                 whileHover={{ scale: 1.03, x: 8 }}
                 className={cn(
-                  "group/item relative flex items-center gap-5 p-5 rounded-[2rem] border-2 transition-all duration-500 cursor-pointer overflow-hidden",
+                  "group/item relative flex items-center gap-3 sm:gap-5 p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[2rem] border-2 transition-all duration-500 cursor-pointer overflow-hidden",
                   styles.border,
                   styles.bg,
                   index < 3 ? "shadow-[0_0_30px_rgba(0,0,0,0.3)] backdrop-blur-md" : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20"
