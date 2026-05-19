@@ -1,5 +1,6 @@
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
 
 const SANDBOX_URL = "https://sandbox.melhorenvio.com.br/api/v2";
@@ -43,11 +44,44 @@ Deno.serve(async (req) => {
 
     switch (action) {
       // === COTAÇÃO ===
-      case "calcularFrete":
+      case "calcularFrete": {
+        const redis = getRedisClient();
+        const cacheKey = `me_quote_${btoa(JSON.stringify(params))}`;
+        if (redis) {
+          try {
+            const cached = await redis.get(cacheKey);
+            if (cached) {
+              return new Response(JSON.stringify(cached), {
+                headers: { ...corsHeaders, "Content-Type": "application/json", "X-Cache": "HIT" },
+              });
+            }
+          } catch (e) {
+            log({ level: 'WARN', message: 'Redis cache fail', meta: { error: e.message } });
+          }
+        }
+
         url = `${baseUrl}/me/shipment/calculate`;
         method = "POST";
         fetchBody = JSON.stringify(params);
-        break;
+
+        const response = await meBreaker.execute(async () => {
+          const res = await fetch(url, { method, headers, body: fetchBody });
+          if (!res.ok && res.status >= 500) throw new Error(`ME API Server Error: ${res.status}`);
+          return res;
+        });
+
+        const data = await response.json();
+        if (response.ok && redis) {
+          try {
+            await redis.set(cacheKey, data, { ex: 600 }); // 10 minutes cache
+          } catch (e) {}
+        }
+
+        return new Response(JSON.stringify(data), {
+          status: response.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json", "X-Cache": "MISS" },
+        });
+      }
 
       // === CARRINHO ===
       case "inserirCarrinho":
@@ -236,6 +270,9 @@ Deno.serve(async (req) => {
         );
     }
 
+
+    // For calcularFrete, we already returned early with cache or custom response
+    if (action === "calcularFrete") return new Response(null); // Should not reach here
 
     const response = await meBreaker.execute(async () => {
       const res = await fetch(url, {
