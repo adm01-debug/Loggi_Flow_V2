@@ -191,6 +191,18 @@ export function useRecentAlerts() {
         } as any);
       });
 
+      slaAlertsRes.data?.forEach(alert => {
+        alerts.push({
+          id: `sla-${alert.id}`,
+          type: alert.alert_type as any,
+          message: alert.message || `Violação de SLA detectada`,
+          severity: alert.severity as any,
+          createdAt: alert.created_at || now.toISOString(),
+          entityId: alert.freight_id,
+          entityType: 'entrega'
+        });
+      });
+
       // Add variation alerts for freights
       const { data: cotacoesVariacao } = await supabase
         .from('cotacoes_multicanal')
