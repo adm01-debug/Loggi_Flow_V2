@@ -31,7 +31,7 @@ export function XPProgressBar({ currentXP, nextLevelXP, level, className }: XPPr
             <div className="relative group/rank">
               <div className="absolute -inset-4 bg-primary/20 rounded-full blur-2xl group-hover/rank:bg-primary/40 transition-all duration-700" />
               <div className="relative flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-[1.25rem] sm:rounded-[1.75rem] bg-black border-2 border-primary/40 shadow-[0_0_30px_rgba(234,56,76,0.3)] shrink-0 group-hover:rotate-12 transition-all duration-500">
-                <Crown className="w-10 h-10 text-primary animate-pulse" />
+                <Crown className="w-7 h-7 sm:w-10 sm:h-10 text-primary animate-pulse" />
               </div>
               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-primary border-2 border-black flex items-center justify-center shadow-xl">
                 <Star className="w-4 h-4 text-white fill-white" />
