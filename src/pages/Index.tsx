@@ -16,6 +16,7 @@ import { WidgetPicker } from "@/components/dashboard/WidgetPicker";
 import { WidgetErrorBoundary } from "@/components/common/WidgetErrorBoundary";
 import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
 import { LiveStatusBar } from "@/components/dashboard/LiveStatusBar";
+import { SystemHealthWidget } from "@/components/dashboard/SystemHealthWidget";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { subDays } from "date-fns";
