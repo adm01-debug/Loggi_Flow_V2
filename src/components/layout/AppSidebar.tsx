@@ -176,7 +176,7 @@ export const AppSidebar = memo(function AppSidebar() {
 
       {/* XP Progress Bar */}
       {!collapsed && (
-        <div className="px-4 py-3 border-b border-sidebar-border/50 bg-sidebar-accent/30">
+        <div className="px-4 py-3 border-b border-sidebar-border/50 bg-sidebar-accent/30 shrink-0">
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
               {userLevel?.rank ? (
