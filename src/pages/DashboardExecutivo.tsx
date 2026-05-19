@@ -420,25 +420,25 @@ export default function DashboardExecutivo() {
           </div>
 
           {/* Carrier avg cost ranking */}
-          <div className="card-base p-4">
-            <h3 className="font-semibold mb-4">Custo Médio por Transportadora</h3>
+          <div className="card-base p-6 border-white/5 bg-black/40 backdrop-blur-xl rounded-[2.5rem]">
+            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-success mb-6">Custo Médio por Transportadora</h3>
             {carrierData.length > 0 ? (
-              <div className="space-y-2 max-h-[250px] overflow-y-auto">
+              <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {carrierData.slice(0, 10).map((c, i) => (
-                  <div key={c.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-muted-foreground w-5">{i + 1}.</span>
-                      <span className="text-sm font-medium truncate max-w-[140px]">{c.name}</span>
+                  <div key={c.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group">
+                    <div className="flex items-center gap-4">
+                      <span className="text-[10px] font-black text-white/20 w-4">{i + 1}.</span>
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">{c.name}</p>
+                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-tighter mt-1">{c.total} entregas vinculadas</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="text-xs">{c.total} entregas</Badge>
-                      <span className="text-sm font-semibold text-success">{formatCurrency(c.avgCost)}</span>
-                    </div>
+                    <span className="text-xs font-black text-success italic tracking-tighter">{formatCurrency(c.avgCost)}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-center py-8">Sem dados</p>
+              <p className="text-muted-foreground text-center py-8 font-black uppercase tracking-widest text-[10px]">Auditando Custos Unitários...</p>
             )}
           </div>
         </div>
