@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, TrendingUp, AlertTriangle, CheckCircle2, Target, Calendar, Loader2, RefreshCw } from "lucide-react";
+import { Clock, TrendingUp, AlertTriangle, CheckCircle2, Target, Calendar, Loader2, RefreshCw, Truck } from "lucide-react";
 import { useSLAMetrics } from "@/hooks/useSLAMetrics";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { useRealtime } from "@/hooks/useRealtime";
