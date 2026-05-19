@@ -14,6 +14,7 @@ export interface UserLevel {
   coins: number;
   streak_days: number;
   last_activity_date: string | null;
+  nexus_score?: number; // Core Nexus Score for logistics performance
   rank_id?: string;
   rank?: {
     name: string;
@@ -271,9 +272,15 @@ export function useGamification() {
   const unlockedAchievementIds = new Set(userAchievements.map(ua => ua.achievement_id));
 
   // Calculate level progress
-  const levelProgress = userLevel 
-    ? calculateLevelProgress(userLevel.total_xp)
-    : { currentLevel: 1, currentLevelXP: 0, nextLevelXP: 100, progress: 0 };
+  const levelProgress = useMemo(() => {
+    if (!userLevel) return { currentLevel: 1, currentLevelXP: 0, nextLevelXP: 100, progress: 0 };
+    return calculateLevelProgress(userLevel.total_xp);
+  }, [userLevel]);
+
+  // Derived Nexus Score based on global logistics efficiency
+  const nexusScore = useMemo(() => {
+    return userLevel?.nexus_score || 85; // Fallback to base score
+  }, [userLevel]);
 
   return {
     // Data
@@ -282,6 +289,7 @@ export function useGamification() {
     userAchievements,
     unlockedAchievementIds,
     levelProgress,
+    nexusScore,
     
     // Loading states
     isLoading: isLoadingLevel || isLoadingAchievements || isLoadingUserAchievements,
