@@ -53,7 +53,7 @@ export function IntelligentLogisticsWidget() {
         {/* Scanning Header Line */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 animate-scan" />
 
-        <CardHeader className="p-0 mb-10">
+        <CardHeader className="p-0 mb-6 sm:mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               <div className="relative group/icon">
