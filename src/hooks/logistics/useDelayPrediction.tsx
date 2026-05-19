@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -30,8 +30,12 @@ export interface PredictionResult {
 
 export function useDelayPrediction() {
   const [isLoading, setIsLoading] = useState(false);
-  const [predictions, setPredictions] = useState<DelayPrediction[]>([]);
-  const [summary, setSummary] = useState<PredictionSummary | null>(null);
+  const [predictionsData, setPredictions] = useState<DelayPrediction[]>([]);
+  const [summaryData, setSummary] = useState<PredictionSummary | null>(null);
+
+  // Memoize results to prevent cascading re-renders
+  const predictions = useMemo(() => predictionsData, [predictionsData]);
+  const summary = useMemo(() => summaryData, [summaryData]);
   const [lastAnalyzed, setLastAnalyzed] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isCached, setIsCached] = useState(false);
