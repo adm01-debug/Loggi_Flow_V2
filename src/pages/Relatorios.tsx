@@ -15,6 +15,7 @@ import { DrillDownModal } from "@/components/analytics/DrillDownModal";
 import { useDrillDown } from "@/hooks/useDrillDown";
 import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
 import { toast } from "sonner";
+import { useExport, exportConfigs } from "@/hooks/useExport";
 
 type Period = "7d" | "30d" | "90d" | "12m";
 
