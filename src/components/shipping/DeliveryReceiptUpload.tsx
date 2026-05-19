@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, FileText, CheckCircle2, Loader2, Camera } from "lucide-react";
+import { Upload, X, FileText, CheckCircle2, Loader2, Camera, Download, Eye, ShieldCheck, Search } from "lucide-react";
+import { useAuth } from "@/hooks";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,9 @@ interface DeliveryReceiptUploadProps {
 
 export function DeliveryReceiptUpload({ entregaId, onUploadSuccess, currentUrl }: DeliveryReceiptUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [isProcessingOCR, setIsProcessingOCR] = useState(false);
   const [preview, setPreview] = useState<string | null>(currentUrl || null);
+  const { user } = useAuth();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -37,27 +40,75 @@ export function DeliveryReceiptUpload({ entregaId, onUploadSuccess, currentUrl }
         .from("documents")
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        await supabase.from("delivery_receipt_audit").insert({
+          delivery_id: entregaId,
+          user_id: user?.id,
+          file_name: file.name,
+          file_size: file.size,
+          file_type: file.type,
+          storage_path: filePath,
+          upload_status: 'failed',
+          error_message: uploadError.message
+        });
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from("documents")
         .getPublicUrl(filePath);
 
+      // Audit log for success
+      await supabase.from("delivery_receipt_audit").insert({
+        delivery_id: entregaId,
+        user_id: user?.id,
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+        storage_path: filePath,
+        upload_status: 'success',
+        ocr_status: 'pending'
+      });
+
+      // Update basic info first
       const { error: updateError } = await supabase
         .from("entregas")
-        .update({ comprovante_entrega_url: publicUrl, status: 'entregue', data_entrega_efetiva: new Date().toISOString() })
+        .update({ 
+          comprovante_entrega_url: publicUrl,
+          comprovante_audit_info: { 
+            uploaded_by: user?.id, 
+            uploaded_at: new Date().toISOString(),
+            original_name: file.name
+          }
+        })
         .eq("id", entregaId);
 
       if (updateError) throw updateError;
 
       setPreview(publicUrl);
+      
+      // Trigger OCR
+      setIsProcessingOCR(true);
+      toast.info("Processando OCR para extração de dados...");
+      
+      const { data: ocrResult, error: ocrError } = await supabase.functions.invoke('ocr-receipt-processor', {
+        body: { storage_path: filePath, delivery_id: entregaId }
+      });
+
+      if (ocrError) {
+        console.error("OCR Error:", ocrError);
+        toast.warning("Comprovante enviado, mas houve erro no processamento OCR.");
+      } else {
+        toast.success("Dados extraídos via OCR com sucesso!");
+      }
+
       onUploadSuccess?.(publicUrl);
-      toast.success("Comprovante enviado com sucesso!");
+      toast.success("Comprovante vinculado com sucesso!");
     } catch (error: any) {
-      // Internal telemetry
-      toast.error("Erro ao enviar comprovante: " + error.message);
+      toast.error("Falha no protocolo de upload: " + error.message);
     } finally {
       setIsUploading(false);
+      setIsProcessingOCR(false);
     }
   };
 
