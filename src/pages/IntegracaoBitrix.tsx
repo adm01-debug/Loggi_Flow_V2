@@ -35,9 +35,11 @@ export default function IntegracaoBitrix() {
     queryKey: ["bitrix-logs"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("audit_logs")
-        .select("*")
-        .or("table_name.eq.bitrix24_sync,table_name.eq.bitrix24_webhook")
+        .from("bitrix_sync_logs")
+        .select(`
+          *,
+          config:bitrix_sync_config(*)
+        `)
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;
