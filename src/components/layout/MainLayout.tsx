@@ -111,7 +111,6 @@ export function MainLayout({ children }: MainLayoutProps) {
           </main>
         </div>
       </div>
-      </div>
       
       <MobileBottomNav />
       <MobileQuickActions />
