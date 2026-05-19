@@ -43,12 +43,12 @@ export function IntelligentLogisticsWidget() {
   };
 
   return (
-    <Card className="relative overflow-hidden group border-none bg-transparent p-[2px] rounded-[2.5rem] shadow-2xl h-full min-h-[700px]">
+    <Card className="relative overflow-hidden group border-none bg-transparent p-[2px] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl h-full min-h-[700px]">
       {/* Bio-Organic Neural Network Effect */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(234,56,76,0.15),transparent_70%)] animate-pulse" />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[2.5rem]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[1.5rem] sm:rounded-[2.5rem]" />
       
-      <div className="relative h-full bg-black/95 backdrop-blur-[50px] rounded-[2.4rem] p-8 flex flex-col border border-white/5">
+      <div className="relative h-full bg-black/95 backdrop-blur-[50px] rounded-[1.4rem] sm:rounded-[2.4rem] p-6 sm:p-8 flex flex-col border border-white/5">
         
         {/* Scanning Header Line */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 animate-scan" />
