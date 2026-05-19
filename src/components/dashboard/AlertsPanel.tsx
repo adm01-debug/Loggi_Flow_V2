@@ -121,7 +121,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                 <div className="relative">
                   <div className="absolute inset-0 bg-destructive/20 blur-2xl rounded-2xl animate-pulse" />
                   <div className="relative flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-[1.25rem] sm:rounded-[1.75rem] bg-gradient-to-br from-destructive/40 to-black border border-destructive/40 shadow-2xl group-hover/panel:rotate-12 transition-transform duration-1000">
-                    <ShieldAlert className="w-10 h-10 text-destructive animate-pulse" />
+                    <ShieldAlert className="w-7 h-7 sm:w-10 sm:h-10 text-destructive animate-pulse" />
                   </div>
                 </div>
                 <div>
