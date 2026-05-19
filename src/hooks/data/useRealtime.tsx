@@ -12,6 +12,22 @@ function debounce<T extends (...args: any[]) => void>(func: T, wait: number): (.
   };
 }
 
+// Memory-efficient LRU cache for realtime payloads
+const payloadCache = new Map<string, string>();
+const MAX_CACHE_SIZE = 50;
+
+function isDuplicatePayload(table: string, payload: any): boolean {
+  const hash = JSON.stringify(payload);
+  if (payloadCache.get(table) === hash) return true;
+  
+  payloadCache.set(table, hash);
+  if (payloadCache.size > MAX_CACHE_SIZE) {
+    const firstKey = payloadCache.keys().next().value;
+    if (firstKey) payloadCache.delete(firstKey);
+  }
+  return false;
+}
+
 type PostgresChangesEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
 
 interface UseRealtimeOptions<T> {
@@ -68,6 +84,9 @@ export function useRealtime<T = Record<string, unknown>>({
 
   const handleChange = useCallback(
     (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
+      // Avoid processing identical sequential payloads (e.g., from multiple subscriptions)
+      if (isDuplicatePayload(table, payload.new || payload.old)) return;
+      
       if (queryKey) {
         queryClient.invalidateQueries({ queryKey });
         

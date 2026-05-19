@@ -1,4 +1,5 @@
 import { CircuitState, ResilienceConfig } from "@/features/incidents/types";
+import { supabase } from "@/integrations/supabase/client";
 
 class CircuitBreaker {
   private state: CircuitState = 'CLOSED';
@@ -50,8 +51,29 @@ class CircuitBreaker {
   private onFailure() {
     this.failures++;
     this.lastFailureTime = Date.now();
-    if (this.failures >= this.config.circuitBreakerThreshold) {
+    
+    // Log state change to database for visibility
+    if (this.failures >= this.config.circuitBreakerThreshold && this.state !== 'OPEN') {
       this.state = 'OPEN';
+      this.logCircuitEvent('OPEN');
+    }
+  }
+
+  private async logCircuitEvent(newState: CircuitState) {
+    try {
+      await supabase.from('security_events').insert({
+        event_type: 'resilience_event',
+        description: `Circuit Breaker alterado para: ${newState}`,
+        severity: newState === 'OPEN' ? 'critical' : 'warning',
+        metadata: {
+          failures: this.failures,
+          state: newState,
+          config: this.config,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (e) {
+      console.error('CB logging failure:', e);
     }
   }
 
