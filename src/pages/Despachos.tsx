@@ -63,6 +63,9 @@ export default function Despachos() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [confirmItem, setConfirmItem] = useState<Despacho | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Despacho | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const { playSuccess, playWhoosh, playNotification } = useAudioFeedback();
 
   const { data: despachos = [], isLoading, refetch } = useQuery({
     queryKey: ["despachos"],
@@ -91,7 +94,16 @@ export default function Despachos() {
     },
   });
 
-  useRealtime({ table: "entregas", onInsert: () => refetch(), onUpdate: () => refetch() });
+  useRealtime({ 
+    table: "entregas", 
+    onInsert: () => {
+      playNotification();
+      refetch();
+    }, 
+    onUpdate: () => {
+      refetch();
+    } 
+  });
 
   const { filteredData, filters, setSearch, setStatus, clearFilters, hasActiveFilters, totalFiltered, totalOriginal } = useFilters(despachos, filterConfig);
 
@@ -99,194 +111,229 @@ export default function Despachos() {
   const getColumnItems = (status: string) => filteredData.filter(d => d.status === status);
   const stats = {
     total: despachos.length,
-    prontos: getColumnItems("pronto_despacho").length,
-    cotacao: getColumnItems("cotacao_frete").length,
-    nfEmitida: getColumnItems("nf_emitida").length,
-    despachados: getColumnItems("despachado").length,
+    prontos: despachos.filter(d => d.status === "pronto_despacho").length,
+    cotacao: despachos.filter(d => d.status === "cotacao_frete").length,
+    nfEmitida: despachos.filter(d => d.status === "nf_emitida").length,
+    despachados: despachos.filter(d => d.status === "despachado").length,
+  };
+
+  const handleOpenDetails = (item: Despacho) => {
+    playWhoosh();
+    setSelectedItem(item);
+    setDetailsOpen(true);
   };
 
   const moveToNext = async (item: Despacho) => {
     const nextStatus = validTransitions[item.status];
     if (!nextStatus) return;
 
-    // CRITICAL RULE: NF must be present before dispatch
     if (nextStatus === "despachado" && !item.nf_remessa) {
       toast.error("NF de Simples Remessa obrigatória antes do despacho. Emita a NF primeiro.");
       return;
     }
 
-    // Confirm dispatch action
     if (nextStatus === "despachado") {
       setConfirmItem(item);
       return;
     }
 
-    await supabase.from("entregas").update({ status: nextStatus as any }).eq("id", item.id).eq("version", item.version);
-    toast.success(`Movido para ${statusConfig[nextStatus]?.label || nextStatus}`);
-    refetch();
+    const { error } = await supabase
+      .from("entregas")
+      .update({ status: nextStatus as any })
+      .eq("id", item.id)
+      .eq("version", item.version);
+    
+    if (!error) {
+      playSuccess();
+      toast.success(`Movido para ${statusConfig[nextStatus]?.label || nextStatus}`);
+      refetch();
+    }
   };
 
   const confirmDispatch = async () => {
     if (!confirmItem) return;
-    await supabase.from("entregas").update({ status: "despachado" as any, data_despacho: new Date().toISOString() }).eq("id", confirmItem.id).eq("version", confirmItem.version);
-    toast.success("Entrega despachada com sucesso!");
-    setConfirmItem(null);
-    refetch();
+    const { error } = await supabase
+      .from("entregas")
+      .update({ 
+        status: "despachado" as any, 
+        data_despacho: new Date().toISOString() 
+      })
+      .eq("id", confirmItem.id)
+      .eq("version", confirmItem.version);
+    
+    if (!error) {
+      playSuccess();
+      toast.success("Entrega despachada com sucesso!");
+      setConfirmItem(null);
+      refetch();
+    }
   };
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
-              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
-                <Package className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
+      <div className="space-y-8 max-w-[1600px] mx-auto pb-12">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Package className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-pulse" />
+                </div>
               </div>
               <div className="flex flex-col">
-                <span className="truncate drop-shadow-sm">Despachos</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Expedição Kanban Nexus</span>
+                <span className="drop-shadow-2xl">Expedição</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Live_Nexus</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">BOX → NF → DESPACHO</span>
                 </div>
               </div>
             </h1>
           </div>
-          <Button variant="outline" size="lg" onClick={() => refetch()} className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 hover:bg-primary/5 transition-all"><RefreshCw className="w-4 h-4" />Atualizar</Button>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
-          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
-                <Package className="w-6 h-6" />
-              </div>
-              <p className="text-3xl font-black tracking-tighter tabular-nums">{stats.prontos}</p>
-            </div>
-            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Pronto Despacho</p>
-          </div>
-          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-3 rounded-2xl bg-warning/10 text-warning group-hover:rotate-12 transition-transform duration-500 shadow-inner">
-                <Clock className="w-6 h-6" />
-              </div>
-              <p className="text-3xl font-black tracking-tighter tabular-nums text-warning">{stats.cotacao}</p>
-            </div>
-            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Em Cotação</p>
-          </div>
-          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-3 rounded-2xl bg-success/10 text-success group-hover:rotate-12 transition-transform duration-500 shadow-inner">
-                <FileText className="w-6 h-6" />
-              </div>
-              <p className="text-3xl font-black tracking-tighter tabular-nums text-success">{stats.nfEmitida}</p>
-            </div>
-            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">NF Emitida</p>
-          </div>
-          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
-                <Truck className="w-6 h-6" />
-              </div>
-              <p className="text-3xl font-black tracking-tighter tabular-nums">{stats.despachados}</p>
-            </div>
-            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Despachados</p>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="lg" onClick={() => refetch()} className="h-14 px-8 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[11px] gap-3 hover:bg-white/5 transition-all group">
+              <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-700 text-primary" />
+              Sincronizar
+            </Button>
           </div>
         </div>
 
-        <FilterBar
-          search={filters.search}
-          onSearchChange={setSearch}
-          searchPlaceholder="Buscar despacho..."
-          status={filters.status}
-          onStatusChange={setStatus}
-          statusOptions={filterConfig.status?.options}
-          hasActiveFilters={hasActiveFilters}
-          onClearFilters={clearFilters}
-          totalFiltered={totalFiltered}
-          totalOriginal={totalOriginal}
-        />
-
-        {/* NF Warning */}
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-warning/10 border border-warning/20 text-sm">
-          <AlertTriangle className="w-4 h-4 text-warning shrink-0" />
-          <span className="text-warning">Regra: NF de Simples Remessa deve ser emitida <strong>antes</strong> do despacho</span>
+        {/* Tactical Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-2">
+          {columns.map((col) => {
+            const config = statusConfig[col];
+            const count = stats[col === 'pronto_despacho' ? 'prontos' : col === 'cotacao_frete' ? 'cotacao' : col === 'nf_emitida' ? 'nfEmitida' : 'despachados'];
+            return (
+              <div key={col} className={cn("group relative overflow-hidden p-6 rounded-[2rem] border-2 backdrop-blur-3xl transition-all hover:scale-[1.02]", config.color)}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-current opacity-5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:opacity-10 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 rounded-2xl bg-black/20 backdrop-blur-xl">
+                      <config.icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-4xl font-black tracking-tighter tabular-nums italic">{count}</span>
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">{config.label}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {isLoading ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /> : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="px-2">
+          <FilterBar
+            search={filters.search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Filtro de protocolo..."
+            status={filters.status}
+            onStatusChange={setStatus}
+            statusOptions={filterConfig.status?.options}
+            hasActiveFilters={hasActiveFilters}
+            onClearFilters={clearFilters}
+            totalFiltered={totalFiltered}
+            totalOriginal={totalOriginal}
+          />
+        </div>
+
+        <div className="flex items-center gap-3 px-6 py-4 rounded-[2rem] bg-amber-500/5 border border-amber-500/10 mx-2 backdrop-blur-sm">
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 animate-pulse" />
+          <p className="text-[10px] font-black uppercase tracking-widest text-amber-500/80">
+            Protocolo de Segurança: <span className="text-white underline decoration-amber-500/30 underline-offset-4">NF de Remessa obrigatória</span> para transição final de despacho.
+          </p>
+        </div>
+
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+             <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+             <p className="text-[10px] font-black text-primary uppercase tracking-[0.5em]">Carregando Malha Logística...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
             {columns.map((col) => {
-              const config = statusConfig[col] || { label: col, color: "bg-muted text-muted-foreground", icon: Package };
-              const Icon = config.icon;
+              const config = statusConfig[col];
               const items = getColumnItems(col);
               return (
-                <div key={col} className="space-y-3">
-                  <div className={cn("p-4 rounded-2xl flex items-center justify-between shadow-lg", config.color)}>
-                    <div className="flex items-center gap-3"><Icon className="w-5 h-5" /><span className="font-black uppercase tracking-widest text-[11px] italic">{config.label}</span></div>
-                    <Badge variant="secondary" className="bg-black/20 text-foreground border-none font-black">{items.length}</Badge>
+                <div key={col} className="flex flex-col gap-5 min-h-[600px]">
+                  <div className={cn("p-5 rounded-[2rem] flex items-center justify-between shadow-2xl border-2 backdrop-blur-xl", config.color)}>
+                    <div className="flex items-center gap-3">
+                       <div className="p-2 rounded-xl bg-black/20"><config.icon className="w-5 h-5" /></div>
+                       <span className="font-black uppercase tracking-[0.3em] text-[11px] italic">{config.label}</span>
+                    </div>
+                    <Badge variant="outline" className="bg-black/40 text-white border-white/10 font-black px-3 py-1 rounded-full text-xs">{items.length}</Badge>
                   </div>
-                  <div className="space-y-2 min-h-[150px]">
-                    {items.length === 0 && (
-                      <p className="text-xs text-muted-foreground text-center py-6">Nenhum item</p>
-                    )}
-                    {items.map((item) => (
-                      <motion.div 
-                        key={item.id} 
-                        layout
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        whileHover={{ y: -2 }}
-                        className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary p-5"
-                        onClick={() => navigate(`/rastreamento/${item.id}`)}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                        <div className="relative z-10">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="font-mono text-[10px] font-bold text-muted-foreground/70 bg-muted px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  
+                  <div className="flex-1 space-y-4">
+                    <AnimatePresence mode="popLayout">
+                      {items.map((item) => (
+                        <motion.div 
+                          key={item.id} 
+                          layout
+                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          whileHover={{ y: -5 }}
+                          className="group relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-card/40 to-card/20 border border-white/5 backdrop-blur-xl shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all cursor-pointer p-6"
+                          onClick={() => handleOpenDetails(item)}
+                        >
+                          <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <div className="p-2 rounded-full bg-primary/10 text-primary"><Activity className="w-4 h-4" /></div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 mb-4">
+                            <span className="px-3 py-1 rounded-lg bg-black/40 border border-white/5 text-[10px] font-black text-primary tracking-widest uppercase">
                               #{item.numero_entrega.slice(-6)}
                             </span>
+                            {item.box_alocado && (
+                              <span className="text-[10px] font-black text-white/30 uppercase tracking-widest flex items-center gap-1">
+                                <LayoutGrid className="w-3 h-3" /> BOX_{item.box_alocado}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-black text-lg tracking-tighter uppercase italic text-white group-hover:text-primary transition-colors truncate mb-1">
+                            {item.cliente}
+                          </h3>
+                          <p className="text-[11px] font-medium text-white/40 truncate flex items-center gap-2 mb-4">
+                            <MapPin className="w-3 h-3 text-primary/50" /> {item.destino}
+                          </p>
+
+                          <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                            <div className="flex gap-2">
+                               {item.nf_remessa ? (
+                                 <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] font-black uppercase tracking-widest">NF_LINKED</Badge>
+                               ) : (
+                                 <Badge className="bg-white/5 text-white/30 border-white/10 text-[8px] font-black uppercase tracking-widest">NF_PENDING</Badge>
+                               )}
+                            </div>
+                            
                             {validTransitions[col] && (
                               <Button 
                                 variant="ghost" 
-                                size="icon" 
-                                className="h-7 w-7 rounded-full bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all shadow-sm" 
+                                size="sm" 
+                                className="h-9 px-4 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all font-black text-[10px] uppercase tracking-widest gap-2 group/btn" 
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   moveToNext(item);
                                 }}
-                                title={`Mover para ${statusConfig[validTransitions[col]]?.label}`}
                               >
-                                <ArrowRight className="w-4 h-4" />
+                                PROSSEGUIR
+                                <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                               </Button>
                             )}
                           </div>
-                          <p className="font-black text-base tracking-tighter uppercase italic truncate text-foreground group-hover/card:text-primary transition-colors">{item.cliente}</p>
-                          <p className="text-[11px] text-muted-foreground truncate leading-relaxed mt-0.5">{item.destino}</p>
-                          <div className="flex flex-wrap gap-1.5 mt-3">
-                            {item.transportadora && (
-                              <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-tighter border-primary/20 bg-primary/5">
-                                <Truck className="w-2.5 h-2.5 mr-1" /> {item.transportadora}
-                              </Badge>
-                            )}
-                            {item.box_alocado && (
-                              <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-tighter">
-                                📦 BOX {item.box_alocado}
-                              </Badge>
-                            )}
-                            {item.nf_remessa ? (
-                              <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-tighter bg-success/20 text-success border-success/20">
-                                NF OK
-                              </Badge>
-                            ) : col !== "pronto_despacho" && (
-                              <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-tighter bg-destructive/10 text-destructive border-destructive/20 animate-pulse">
-                                SEM NF
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                    
+                    {items.length === 0 && (
+                      <div className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-[2.5rem] border-2 border-dashed border-white/5">
+                        <History className="w-10 h-10 text-white/10 mb-3" />
+                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Fila Limpa</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -294,14 +341,44 @@ export default function Despachos() {
           </div>
         )}
 
+        <ExpeditionDetailsDialog 
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+          delivery={selectedItem}
+          statusConfig={statusConfig as any}
+          onStatusUpdate={() => {
+            refetch();
+          }}
+        />
+
         <ConfirmDialog
           open={!!confirmItem}
           onOpenChange={(open) => !open && setConfirmItem(null)}
-          title="Confirmar Despacho"
-          description={`Deseja despachar a entrega ${confirmItem?.numero_entrega}? Esta ação registrará a data de despacho.`}
+          title="AUTORIZAR DESPACHO FINAL"
+          description={`Confirmar saída do material ${confirmItem?.numero_entrega}? Esta ação é irreversível e registrará o timestamp de saída na malha logistica.`}
           onConfirm={confirmDispatch}
         />
       </div>
     </MainLayout>
+  );
+}
+
+function MapPin(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
   );
 }
