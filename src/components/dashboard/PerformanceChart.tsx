@@ -253,7 +253,7 @@ const PerformanceChart = React.forwardRef<HTMLDivElement, PerformanceChartProps>
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
         className={cn(
-          "relative rounded-[4rem] border-2 border-white/5 p-10 sm:p-16 transition-all duration-700 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)] bg-[#050505]/80 backdrop-blur-[40px] group/chart",
+          "relative rounded-[2rem] sm:rounded-[4rem] border-2 border-white/5 p-6 sm:p-16 transition-all duration-700 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)] bg-[#050505]/80 backdrop-blur-[40px] group/chart",
           "hover:border-primary/30 hover:shadow-[0_0_120px_rgba(59,130,246,0.15)]",
           className
         )}
