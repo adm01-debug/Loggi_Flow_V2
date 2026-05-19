@@ -80,7 +80,7 @@ export function LiveStatusBar() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(234,56,76,0.05),transparent_70%)] animate-pulse pointer-events-none" />
         
         <div className="flex items-center gap-8 relative z-10">
-          <div className="flex items-center gap-3 pr-8 border-r-2 border-white/5">
+          <div className="flex items-center gap-3 pr-6 sm:pr-8 border-r-2 border-white/5">
              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                <Globe className="w-5 h-5 text-primary animate-pulse" />
              </div>
