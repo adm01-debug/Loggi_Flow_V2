@@ -149,10 +149,14 @@ export const AppSidebar = memo(function AppSidebar() {
   return (
     <aside
       className={cn(
-        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border/50 transition-all duration-500 ease-out-expo z-50 shadow-2xl shadow-black/20",
+        "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border/50 transition-all duration-500 ease-out-expo z-50 shadow-2xl shadow-black/40 group/sidebar",
         collapsed ? "w-[var(--sidebar-collapsed-width)]" : "w-[var(--sidebar-width)]"
       )}
     >
+      {/* Dynamic Tactical Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(234,56,76,0.03),transparent_50%)] pointer-events-none opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-1000" />
+      <div className="absolute inset-y-0 right-0 w-[1px] bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
+
       {/* Logo */}
       <div className="flex items-center gap-4 p-8 border-b border-sidebar-border/30 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
         <div 

@@ -81,7 +81,13 @@ export const Header = memo(function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-20 px-4 sm:px-10 bg-background/40 backdrop-blur-2xl border-b border-primary/5 shadow-header gap-2 sm:gap-6 transition-all duration-500">
+    <header className="sticky top-0 z-40 flex items-center justify-between h-14 sm:h-20 px-4 sm:px-10 bg-background/40 backdrop-blur-2xl border-b border-primary/10 shadow-header gap-2 sm:gap-6 transition-all duration-500 group/header overflow-hidden">
+      {/* Tactical Scanning Line */}
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover/header:opacity-100 transition-opacity duration-700 animate-scan" />
+      
+      {/* Background Depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-50 pointer-events-none" />
+
       {/* Left side: Back button + Page title with History */}
       <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
         <div className="flex items-center gap-1 min-w-0">
