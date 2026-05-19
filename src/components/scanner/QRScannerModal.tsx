@@ -146,13 +146,13 @@ export function QRScannerModal({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative w-64 h-64">
                 {/* Top-left */}
-                <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-primary rounded-tl-lg" />
+                <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-primary rounded-tl-3xl shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
                 {/* Top-right */}
-                <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-primary rounded-tr-lg" />
+                <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-primary rounded-tr-3xl shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
                 {/* Bottom-left */}
-                <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-primary rounded-bl-lg" />
+                <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-primary rounded-bl-3xl shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
                 {/* Bottom-right */}
-                <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-primary rounded-br-lg" />
+                <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-primary rounded-br-3xl shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
                 
                 {/* Scanning line animation */}
                 {isScanning && (
