@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, MapPin, Calendar, Clock, CheckCircle2, History, Info, Zap, FileText, Loader2, User } from "lucide-react";
+import { Truck, Package, MapPin, Calendar, Clock, CheckCircle2, History, Info, Zap, FileText, Loader2, User, Camera } from "lucide-react";
+import { DeliveryReceiptUpload } from "./DeliveryReceiptUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -139,6 +140,7 @@ export function ExpeditionDetailsDialog({ open, onOpenChange, delivery, statusCo
             <TabsList className="grid w-full grid-cols-2 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
               <TabsTrigger value="detalhes" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Detalhes</TabsTrigger>
               <TabsTrigger value="historico" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Histórico_Logs</TabsTrigger>
+              <TabsTrigger value="comprovante" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Comprovante</TabsTrigger>
             </TabsList>
 
             <TabsContent value="detalhes" className="space-y-6 pb-8">
@@ -261,6 +263,27 @@ export function ExpeditionDetailsDialog({ open, onOpenChange, delivery, statusCo
                     <p className="text-white/40 font-black uppercase tracking-widest text-xs">Nenhum rastro binário localizado.</p>
                   </div>
                 )}
+              </div>
+            </TabsContent>
+            <TabsContent value="comprovante" className="pb-8">
+              <div className="space-y-6">
+                <div className="p-6 rounded-[2.5rem] bg-sidebar-accent/30 border border-white/5 backdrop-blur-sm">
+                  <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3 mb-6">
+                    <Camera className="w-5 h-5" /> Digitalização de Comprovante
+                  </h3>
+                  <DeliveryReceiptUpload 
+                    entregaId={delivery.id} 
+                    currentUrl={delivery.comprovante_entrega_url}
+                    onUploadSuccess={() => {
+                      onStatusUpdate();
+                    }}
+                  />
+                  <div className="mt-6 p-4 rounded-2xl bg-black/40 border border-white/5">
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest leading-relaxed">
+                      O upload do comprovante vincula automaticamente o arquivo à entrega e atualiza o status para <span className="text-success">ENTREGUE</span> no sistema Nexus.
+                    </p>
+                  </div>
+                </div>
               </div>
             </TabsContent>
           </Tabs>
