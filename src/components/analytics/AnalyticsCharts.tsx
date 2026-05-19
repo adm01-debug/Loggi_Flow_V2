@@ -80,17 +80,22 @@ export const PerformanceChart = memo(({ data }: AnalyticsChartsProps) => {
 PerformanceChart.displayName = "PerformanceChart";
 
 export const DistributionChart = memo(({ data }: AnalyticsChartsProps) => {
-  const chartData = [
-    { name: 'Norte', value: 400 },
-    { name: 'Sul', value: 300 },
-    { name: 'Leste', value: 300 },
-    { name: 'Oeste', value: 200 },
+  // Aggregate data for distribution by status or categories
+  // Since useAnalytics returns monthly trends, we'll derive distribution from most recent month or provided data
+  const chartData = data && data.length > 0 ? [
+    { name: 'Entregas', value: data[data.length-1].entregas },
+    { name: 'Coletas', value: data[data.length-1].coletas },
+    { name: 'Ocorrências', value: data[data.length-1].ocorrencias },
+  ] : [
+    { name: 'Entregas', value: 0 },
+    { name: 'Coletas', value: 0 },
+    { name: 'Ocorrências', value: 0 },
   ];
 
   return (
-    <Card className="card-base">
-      <CardHeader>
-        <CardTitle className="text-sm font-medium">Distribuição Regional</CardTitle>
+    <Card className="card-base border-primary/10 bg-black/40 backdrop-blur-xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xs font-black uppercase tracking-[0.4em] text-primary">Mix de Operações</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -99,17 +104,25 @@ export const DistributionChart = memo(({ data }: AnalyticsChartsProps) => {
               data={chartData}
               cx="50%"
               cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={5}
+              innerRadius={70}
+              outerRadius={90}
+              paddingAngle={10}
               dataKey="value"
+              stroke="none"
             >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip />
-            <Legend verticalAlign="bottom" height={36}/>
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem' }}
+              itemStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}
+            />
+            <Legend 
+              verticalAlign="bottom" 
+              height={36} 
+              formatter={(value) => <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{value}</span>}
+            />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
