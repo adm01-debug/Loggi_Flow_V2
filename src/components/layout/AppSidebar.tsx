@@ -332,7 +332,7 @@ export const AppSidebar = memo(function AppSidebar() {
 
       {/* Admin Section */}
       {isAdmin && (
-        <div className="px-3 py-2 border-t border-sidebar-border/50">
+        <div className="px-3 py-2 border-t border-sidebar-border/50 shrink-0">
           {!collapsed && (
             <div className="flex items-center gap-2 px-3 mb-2">
               <Shield className="w-3 h-3 text-warning" />
