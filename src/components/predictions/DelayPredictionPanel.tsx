@@ -55,7 +55,7 @@ export function DelayPredictionPanel() {
             <CardTitle className="text-lg">Previsão de Atrasos com IA</CardTitle>
           </div>
           <Button 
-            onClick={() => analyzeDelays(true)} 1 
+            onClick={() => analyzeDelays(true)} 
             disabled={isLoading}
             size="sm"
             className="gap-2"
