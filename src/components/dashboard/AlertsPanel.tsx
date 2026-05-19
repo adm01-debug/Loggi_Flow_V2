@@ -270,7 +270,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                             </div>
 
                             <div className="space-y-2">
-                              <h4 className="text-2xl font-black text-white leading-tight tracking-tighter group-hover/alert:translate-x-2 transition-transform duration-700 uppercase italic">
+                              <h4 className="text-lg sm:text-2xl font-black text-white leading-tight tracking-tighter group-hover/alert:translate-x-2 transition-transform duration-700 uppercase italic">
                                 {alert.message}
                               </h4>
                               <p className="text-sm font-bold text-white/30 uppercase tracking-[0.2em] font-mono">ID_PROTOCOL: NX-{index + 1024}-SRV</p>
