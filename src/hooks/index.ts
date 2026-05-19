@@ -55,7 +55,8 @@ export * from './security/useRateLimitLogs';
 export * from './security/useFeatureFlags';
 export * from './security/useAuditLogs';
 export * from './security/useEntityHistory';
-export * from './security/useIntegrationValidation';
+export { useIntegrationValidation } from './security/useIntegrationValidation';
+// Intentionally omitting getStatusColor/getStatusLabel from useIntegrationValidation if they conflict
 
 // ============================================
 // Dashboard & Analytics (Analytics)
@@ -75,7 +76,8 @@ export * from './analytics/useScheduledReports';
 // Gamification
 // ============================================
 export * from './gamification/useGamification';
-export * from './gamification/useAchievementNotifications';
+export { useAchievementNotifications, AchievementProvider } from './gamification/useAchievementNotifications';
+// Manually export what we need from useAchievementNotifications to avoid Achievement conflict
 export * from './gamification/useRewardPurchases';
 
 // ============================================
@@ -118,6 +120,8 @@ export * from './logistics/useSLAAlerts';
 export * from './logistics/useLalamoveTracking';
 export * from './logistics/useLalamoveOrders';
 export * from './logistics/useBusinessRuleEngine';
+export * from './logistics/useTrackingAnalytics';
+export * from './logistics/useUnifiedTracking';
 
 // ============================================
 // Integrations
@@ -127,7 +131,6 @@ export * from './integrations/useBitrixEntregaSync';
 export * from './integrations/useClientWebhooks';
 export * from './integrations/useExternalDbBridge';
 export * from './integrations/useGeocoding';
-export * from './logistics/useUnifiedTracking';
 
 // ============================================
 // UI & Utilities
