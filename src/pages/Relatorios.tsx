@@ -185,9 +185,11 @@ export default function Relatorios() {
               variant="outline" 
               className="gap-2 border-primary/20 text-primary hover:bg-primary/5"
               onClick={() => {
-                toast.success("Relatório CSV gerado com sucesso!", {
-                  description: "O download iniciará em instantes.",
-                });
+                if (performanceMetrics.length === 0) {
+                  toast.error("Sem dados de performance para exportar");
+                  return;
+                }
+                exportToCSV(performanceMetrics, { filename: 'performance_logistica' });
               }}
             >
               <FileDown className="w-4 h-4" />
@@ -196,12 +198,15 @@ export default function Relatorios() {
             <Button 
               className="gap-2 shadow-lg shadow-primary/20"
               onClick={() => {
-                toast.success("Relatório PDF em processamento...", {
-                  description: "Compilando dados táticos de auditoria.",
+                if (performanceMetrics.length === 0) {
+                  toast.error("Sem dados de performance para exportar");
+                  return;
+                }
+                exportToPDF(performanceMetrics, { 
+                  filename: 'relatorio_performance',
+                  title: 'Relatório de Performance e SLA Logístico',
+                  subtitle: `Período de Análise: ${period} - Gerado em ${format(new Date(), "dd/MM/yyyy HH:mm")}`
                 });
-                setTimeout(() => {
-                  toast.success("PDF pronto para download!");
-                }, 2000);
               }}
             >
               <FileDown className="w-4 h-4" />
