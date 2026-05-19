@@ -31,7 +31,7 @@ export function RecentlyVisited() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all active:scale-90"
+                className="h-9 w-9 text-muted-foreground hover:text-primary transition-all active:scale-90"
                 aria-label="Atalhos de páginas recentes"
               >
                 <History className="w-4 h-4" />
@@ -42,7 +42,7 @@ export function RecentlyVisited() {
             <p className="text-xs font-medium">Acesso Rápido / Recentes</p>
           </TooltipContent>
           
-          <DropdownMenuContent align="end" className="w-64 border-2 border-primary/5 shadow-xl animate-in zoom-in-95 duration-200">
+          <DropdownMenuContent align="end" className="w-64 border-2 border-primary/5 bg-black/95 backdrop-blur-xl shadow-2xl animate-in zoom-in-95 duration-200">
             <DropdownMenuLabel className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-3 py-2">
               Visitadas recentemente
             </DropdownMenuLabel>

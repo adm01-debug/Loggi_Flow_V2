@@ -89,10 +89,23 @@ export default function Configuracoes() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-muted"><Settings className="w-6 h-6 text-muted-foreground" /></div>Configurações</h1><p className="text-muted-foreground mt-1">Gerencie as configurações do sistema</p></div>
+          <div className="flex-1 min-w-0 animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                <Settings className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
+              </div>
+              <div className="flex flex-col">
+                <span className="truncate drop-shadow-sm">Configurações</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Painel de Controle Nexus</span>
+                </div>
+              </div>
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Gerencie as diretrizes, integrações e segurança do núcleo operacional.</p>
+          </div>
           <div className="flex items-center gap-2">
             {isDirty && <Badge variant="outline" className="text-warning border-warning animate-pulse">Alterações não salvas</Badge>}
-            <Button onClick={handleSave} disabled={saving || !isDirty}>{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
+            <Button size="lg" onClick={handleSave} disabled={saving || !isDirty} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all">{saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}Salvar</Button>
           </div>
         </div>
         <OnboardingTooltip
@@ -102,15 +115,15 @@ export default function Configuracoes() {
           position="bottom"
         >
           <Tabs defaultValue="integrations">
-            <TabsList>
-              <TabsTrigger value="integrations"><Link className="w-4 h-4 mr-2" />Integrações</TabsTrigger>
-              <TabsTrigger value="preferences"><Palette className="w-4 h-4 mr-2" />Personalização</TabsTrigger>
-              <TabsTrigger value="automation"><Zap className="w-4 h-4 mr-2" />Automações</TabsTrigger>
-              <TabsTrigger value="notifications"><Bell className="w-4 h-4 mr-2" />Notificações</TabsTrigger>
-              <TabsTrigger value="security"><Shield className="w-4 h-4 mr-2" />Segurança</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
+              <TabsTrigger value="integrations" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"><Link className="w-4 h-4" />Integrações</TabsTrigger>
+              <TabsTrigger value="preferences" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"><Palette className="w-4 h-4" />Personalização</TabsTrigger>
+              <TabsTrigger value="automation" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"><Zap className="w-4 h-4" />Automações</TabsTrigger>
+              <TabsTrigger value="notifications" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"><Bell className="w-4 h-4" />Notificações</TabsTrigger>
+              <TabsTrigger value="security" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"><Shield className="w-4 h-4" />Segurança</TabsTrigger>
             </TabsList>
             <TabsContent value="integrations" className="space-y-4">
-              <div className="flex justify-end"><Button variant="outline" onClick={handleValidateAll} disabled={isValidating}><RefreshCw className={cn("w-4 h-4 mr-2", isValidating && "animate-spin")} />Validar Todas</Button></div>
+              <div className="flex justify-end mb-6"><Button variant="outline" size="sm" onClick={handleValidateAll} disabled={isValidating} className="h-10 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[10px] gap-2"><RefreshCw className={cn("w-3.5 h-3.5", isValidating && "animate-spin")} />Validar Todas</Button></div>
               <div className="grid gap-4">{integrationsList.map((int) => {
                 const Icon = int.icon;
                 const integrationData = integrations.find(i => i.name.toLowerCase() === int.name.toLowerCase() || i.name.toLowerCase() === int.id.toLowerCase());
@@ -119,8 +132,16 @@ export default function Configuracoes() {
                 const isError = status === "error";
                 
                 return (
-                  <div key={int.id} className="card-interactive flex items-center justify-between">
-                    <div className="flex items-center gap-3"><div className={cn("p-2 rounded-lg", isConnected ? "bg-success/15" : "bg-muted")}><Icon className={cn("w-5 h-5", isConnected ? "text-success" : "text-muted-foreground")} /></div><div><p className="font-semibold">{int.name}</p><p className="text-sm text-muted-foreground">ID: {int.id}</p></div></div>
+                  <div key={int.id} className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between">
+                    <div className="flex items-center gap-5">
+                      <div className={cn("p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500", isConnected ? "bg-success/15 text-success" : "bg-muted/20 text-muted-foreground")}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="font-black text-xl tracking-tighter uppercase italic">{int.name}</p>
+                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-0.5">ID_NODE: {int.id}</p>
+                      </div>
+                    </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right hidden sm:block">
                         <Badge variant={isConnected ? "default" : isError ? "destructive" : "secondary"} className="mb-1">
@@ -130,7 +151,7 @@ export default function Configuracoes() {
                           <p className="text-[10px] text-muted-foreground">Check: {format(new Date(integrationData.lastCheck), 'HH:mm:ss')}</p>
                         )}
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => handleValidateIntegration(int.id)} disabled={isValidating}>Testar</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleValidateIntegration(int.id)} disabled={isValidating} className="h-10 px-6 rounded-xl border-2 font-black uppercase tracking-widest text-[10px] hover:bg-primary/5">Testar</Button>
                     </div>
                   </div>
                 );

@@ -124,25 +124,34 @@ export default function FreightConfig() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <PageHeader 
-          title="Nexus Freight Config" 
-          description="Parametrização avançada de malha, credenciais e regras de decisão" 
-          icon={Settings} 
-        />
+        <div className="flex-1 min-w-0 animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+            <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+              <Settings className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
+            </div>
+            <div className="flex flex-col">
+              <span className="truncate drop-shadow-sm">Nexus Freight Config</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Parametrização Tática de Malha</span>
+              </div>
+            </div>
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Gestão de credenciais, regras de decisão automatizada e otimização de praça.</p>
+        </div>
 
         <Tabs defaultValue="transportadoras" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-            <TabsTrigger value="transportadoras">Transportadoras</TabsTrigger>
-            <TabsTrigger value="regras">Regras de Seleção</TabsTrigger>
-            <TabsTrigger value="integracoes">Integrações</TabsTrigger>
-            <TabsTrigger value="automacao">Automação RPA</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
+            <TabsTrigger value="transportadoras" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Transportadoras</TabsTrigger>
+            <TabsTrigger value="regras" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Regras de Seleção</TabsTrigger>
+            <TabsTrigger value="integracoes" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Integrações</TabsTrigger>
+            <TabsTrigger value="automacao" className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all">Automação RPA</TabsTrigger>
           </TabsList>
 
           <TabsContent value="transportadoras" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="md:col-span-1">
-                <CardHeader>
-                  <CardTitle className="text-sm">Selecionar Transportadora</CardTitle>
+              <Card className="md:col-span-1 group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-card to-card/95 border-none shadow-lg">
+                <CardHeader className="border-b border-white/5">
+                  <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-primary">Selecionar Transportadora</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="relative">
@@ -155,7 +164,7 @@ export default function FreightConfig() {
                         key={c.id}
                         onClick={() => setSelectedCarrierId(c.id)}
                         className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          selectedCarrierId === c.id ? 'bg-primary text-white font-bold' : 'hover:bg-muted'
+                          selectedCarrierId === c.id ? 'bg-primary text-white font-black uppercase tracking-widest text-[10px] italic shadow-lg shadow-primary/20' : 'hover:bg-muted font-bold text-muted-foreground'
                         }`}
                       >
                         {c.nome_fantasia}
@@ -165,21 +174,23 @@ export default function FreightConfig() {
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
+              <Card className="md:col-span-2 group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-card to-card/95 border-none shadow-lg">
                 {selectedCarrier ? (
                   <>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Globe className="h-5 w-5 text-primary" />
+                    <CardHeader className="border-b border-white/5">
+                      <CardTitle className="flex items-center gap-3 font-black text-2xl tracking-tighter uppercase italic text-white">
+                        <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                          <Globe className="h-6 w-6 text-primary animate-pulse" />
+                        </div>
                         Configurar: {selectedCarrier.nome_fantasia}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <Tabs defaultValue="credenciais">
-                        <TabsList className="mb-4">
-                          <TabsTrigger value="credenciais"><Key className="h-4 w-4 mr-2" />API / Login</TabsTrigger>
-                          <TabsTrigger value="malha"><Map className="h-4 w-4 mr-2" />Malha / Praça</TabsTrigger>
-                          <TabsTrigger value="non-api"><MessageSquare className="h-4 w-4 mr-2" />WhatsApp/Email</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-sidebar-accent/50 rounded-xl border border-white/5 mb-6">
+                          <TabsTrigger value="credenciais" className="rounded-lg py-2 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[9px] gap-1.5 transition-all"><Key className="h-3.5 w-3.5" />API / Login</TabsTrigger>
+                          <TabsTrigger value="malha" className="rounded-lg py-2 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[9px] gap-1.5 transition-all"><Map className="h-3.5 w-3.5" />Malha / Praça</TabsTrigger>
+                          <TabsTrigger value="non-api" className="rounded-lg py-2 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[9px] gap-1.5 transition-all"><MessageSquare className="h-3.5 w-3.5" />WhatsApp/Email</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="credenciais" className="space-y-4">
@@ -321,15 +332,15 @@ export default function FreightConfig() {
           </TabsContent>
 
           <TabsContent value="regras" className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
+            <Card className="group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-card to-card/95 border-none shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-white/5 p-8">
                 <div>
-                  <CardTitle>Configuração de Melhor Frete</CardTitle>
-                  <CardDescription>Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
+                  <CardTitle className="font-black text-2xl tracking-tighter uppercase italic text-white">Configuração de Melhor Frete</CardTitle>
+                  <CardDescription className="text-xs font-black uppercase tracking-[0.2em] text-primary/70 mt-1">Defina pesos e limites de SLA por tipo de carga ou evento</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => window.location.href='/automacao-regras'}><Zap className="h-4 w-4 mr-2" />Regras de Automação</Button>
-                  <Button size="sm" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 10, is_active: true, is_default: false })}><Plus className="h-4 w-4 mr-2" />Add Regra</Button>
+                  <Button size="lg" variant="outline" onClick={() => window.location.href='/automacao-regras'} className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[10px] gap-2 hover:bg-primary/5 transition-all"><Zap className="h-4 w-4" />Regras</Button>
+                  <Button size="lg" onClick={() => setEditRule({ event_type: 'Novo Evento', price_weight: 0.5, time_weight: 0.3, performance_weight: 0.2, max_sla_days: 10, is_active: true, is_default: false })} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all"><Plus className="h-5 w-5" />Add Regra</Button>
                 </div>
               </CardHeader>
               <CardContent>
@@ -337,7 +348,8 @@ export default function FreightConfig() {
                   {rules.length === 0 && !editingRule && <p className="text-center py-8 text-muted-foreground italic">Nenhuma regra personalizada. Usando padrões do sistema.</p>}
                   
                   {editingRule && (
-                    <div className="p-6 border-2 border-primary rounded-xl space-y-6 bg-primary/5 mb-8">
+                    <div className="p-8 border-2 border-primary/30 rounded-[2rem] bg-primary/5 mb-8 shadow-2xl relative overflow-hidden group/form animate-in zoom-in-95 duration-500">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
                        <div className="flex items-center justify-between">
                          <h4 className="font-bold text-primary flex items-center gap-2 text-lg">
                            <Brain className="h-5 w-5" />

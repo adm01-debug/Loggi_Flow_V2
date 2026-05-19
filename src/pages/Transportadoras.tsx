@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Truck, MoreVertical, Phone, Mail, MapPin, Star, CheckCircle2, XCircle, Edit, Trash2, Globe, Building2, Clock, TrendingUp, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, Key, Settings, Map, Wand2 } from "lucide-react";
+import { Plus, Truck, MoreVertical, Phone, Mail, MapPin, Star, CheckCircle2, XCircle, Edit, Trash2, Globe, Building2, Clock, TrendingUp, Download, ArrowUpDown, ChevronUp, ChevronDown, Loader2, Key, Settings, Map, Wand2, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useExport } from "@/hooks/useExport";
@@ -32,6 +32,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/useFilters";
 import { useSorting } from "@/hooks/useSorting";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
+import { cn } from "@/lib/utils";
 
 interface Transportadora {
   id: string; 
@@ -324,63 +325,90 @@ export default function Transportadoras() {
     <MainLayout>
       <PageTransition>
         <div className="space-y-6">
-          <PageHeader
-            title="Transportadoras"
-            description="Gerencie suas transportadoras parceiras e acompanhe a performance de cada uma em tempo real."
-            icon={Truck}
-            actions={
-              <div className="flex gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Download className="w-4 h-4 mr-2" />Exportar
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1 min-w-0 animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                  <Truck className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="truncate drop-shadow-sm">Transportadoras</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Malha e Rede Nexus</span>
+                  </div>
+                </div>
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Gestão estratégica de parceiros logísticos, conformidade e monitoramento de rede.</p>
+            </div>
+            <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="lg" className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 hover:bg-primary/5 transition-all">
+                    <Download className="w-4 h-4" /> <span className="hidden sm:inline">Exportar</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-black/95 border-white/10 backdrop-blur-xl">
+                  <DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })} className="font-black uppercase tracking-widest text-[10px]">CSV</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })} className="font-black uppercase tracking-widest text-[10px]">JSON</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <OnboardingTooltip
+                id="transportadoras-nova-btn"
+                title="Cadastre uma transportadora"
+                description="Adicione transportadoras parceiras para gerenciar seus fretes. Compare performance e custos entre elas."
+                position="left"
+              >
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="lg" className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all">
+                      <Plus className="w-5 h-5" /> Nova
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => exportToCSV(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>CSV</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => exportToJSON(list as unknown as Record<string, unknown>[], { filename: "transportadoras" })}>JSON</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                <OnboardingTooltip
-                  id="transportadoras-nova-btn"
-                  title="Cadastre uma transportadora"
-                  description="Adicione transportadoras parceiras para gerenciar seus fretes. Compare performance e custos entre elas."
-                  position="left"
-                >
-                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="sm">
-                        <Plus className="w-4 h-4 mr-2" />Nova
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Nova Transportadora</DialogTitle>
-                      </DialogHeader>
-                      <FormFields />
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-                        <Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia}>Cadastrar</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </OnboardingTooltip>
-              </div>
-            }
-          />
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-black/95 border-white/10 backdrop-blur-xl rounded-[2.5rem]">
+                    <DialogHeader>
+                      <DialogTitle className="font-black text-2xl tracking-tighter uppercase italic text-white">Nova Transportadora</DialogTitle>
+                    </DialogHeader>
+                    <FormFields />
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl border-2 font-black uppercase tracking-widest text-[10px]">Cancelar</Button>
+                      <Button onClick={handleSubmit} disabled={!form.razao_social || !form.nome_fantasia} className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary text-white">Cadastrar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </OnboardingTooltip>
+            </div>
+          </div>
 
-          <StaggeredContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StaggeredItem>
-              <StatsCard title="Total" value={stats.total} icon={Truck} color="primary" />
-            </StaggeredItem>
-            <StaggeredItem>
-              <StatsCard title="Ativas" value={stats.ativas} icon={CheckCircle2} color="success" />
-            </StaggeredItem>
-            <StaggeredItem>
-              <StatsCard title="Entregas" value={stats.entregas} icon={TrendingUp} color="info" />
-            </StaggeredItem>
-          </StaggeredContent>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums">{stats.total}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Total Parceiros</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-success/10 text-success group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-success">{stats.ativas}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Ativas_Grid</p>
+            </div>
+            <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1 col-span-2">
+              <div className="flex items-center justify-between mb-2">
+                <div className="p-3 rounded-2xl bg-info/10 text-info group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <p className="text-3xl font-black tracking-tighter tabular-nums text-info">{stats.entregas}</p>
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Movimentação Total_Node</p>
+            </div>
+          </div>
 
 
 
@@ -404,25 +432,60 @@ export default function Transportadoras() {
 
         {loading && <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}
 
-        {!loading && <StaggeredContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{pagination.paginatedData.map((t, i) => (
-          <StaggeredItem key={t.id}>
-            <div className={`card-interactive animate-fade-in ${isSelected(t.id) ? 'ring-2 ring-primary' : ''}`} style={{ animationDelay: `${i * 30}ms` }}>
-
-            <div className="flex items-start gap-3 mb-3">
-              <Checkbox checked={isSelected(t.id)} onCheckedChange={() => toggle(t.id)} />
-              <div className="flex-1"><p className="font-semibold">{t.nome_fantasia}</p><p className="text-xs text-muted-foreground">{t.razao_social}</p></div>
-              <div className="flex gap-1 items-center">
-                {t.credentials?.api_key && <Key className="w-3 h-3 text-primary" />}
-                {t.non_api_config?.type && <Settings className="w-3 h-3 text-info" />}
-                <Badge variant={t.homologada ? "default" : "secondary"} className={t.homologada ? "bg-success/20 text-success" : ""}>{t.homologada ? "Ativa" : "Inativa"}</Badge>
+        {!loading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{pagination.paginatedData.map((t, i) => (
+          <div key={t.id} className="pb-4">
+            <div 
+              className={cn(
+                "group relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer p-8",
+                isSelected(t.id) ? "ring-2 ring-primary" : ""
+              )}
+            >
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center gap-5">
+                  <div className="relative group/check">
+                    <Checkbox checked={isSelected(t.id)} onCheckedChange={() => toggle(t.id)} className="w-6 h-6 rounded-lg border-2 border-white/20" />
+                  </div>
+                  <div className={cn("p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500", t.homologada ? "bg-success/15 text-success" : "bg-muted/20 text-muted-foreground")}>
+                    <Truck className="w-6 h-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-black text-xl tracking-tighter uppercase italic truncate text-white">{t.nome_fantasia}</p>
+                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-0.5 truncate">{t.razao_social}</p>
+                  </div>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-white/5"><MoreVertical className="w-5 h-5 text-white/40" /></Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-black/95 border-white/10 backdrop-blur-xl">
+                    <DropdownMenuItem onClick={() => openEdit(t)} className="font-black uppercase tracking-widest text-[10px] gap-2"><Edit className="w-4 h-4" />Editar</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive font-black uppercase tracking-widest text-[10px] gap-2" onClick={() => setDeleteTarget(t.id)}><Trash2 className="w-4 h-4" />Excluir</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => openEdit(t)}><Edit className="w-4 h-4 mr-2" />Editar</DropdownMenuItem><DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(t.id)}><Trash2 className="w-4 h-4 mr-2" />Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+
+              <div className="grid grid-cols-1 gap-3 mb-8">
+                {t.contato_comercial && <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80"><div className="p-2 rounded-lg bg-background shadow-sm"><Phone className="w-3.5 h-3.5 text-primary" /></div><span className="uppercase text-[11px] tracking-tight">{t.contato_comercial}</span></div>}
+                {t.email_comercial && <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80"><div className="p-2 rounded-lg bg-background shadow-sm"><Mail className="w-3.5 h-3.5 text-primary" /></div><span className="uppercase text-[11px] tracking-tight lowercase">{t.email_comercial}</span></div>}
+                {(t.regioes_atendidas || t.coverage_details?.states) && (
+                  <div className="flex items-center gap-3 text-sm font-bold text-muted-foreground/80">
+                    <div className="p-2 rounded-lg bg-background shadow-sm"><MapPin className="w-3.5 h-3.5 text-primary" /></div>
+                    <span className="uppercase text-[11px] tracking-tight">{(t.coverage_details?.states || t.regioes_atendidas).slice(0, 3).join(", ")}{(t.coverage_details?.states?.length || t.regioes_atendidas?.length || 0) > 3 && ` +${(t.coverage_details?.states?.length || t.regioes_atendidas?.length || 0) - 3}`}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                <div className="flex items-center gap-1.5">
+                  {[1,2,3,4,5].map(s => <Star key={s} className={cn("w-4 h-4 transition-all duration-700", s <= (t.score_performance || 0) / 20 ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]' : 'text-white/10')} />)}
+                </div>
+                <Badge variant="outline" className={cn("px-4 py-1.5 font-black uppercase tracking-widest text-[9px] rounded-xl shadow-sm", t.homologada ? "bg-success/15 text-success border-success/30" : "bg-muted/20 text-muted-foreground border-white/10")}>
+                  {t.homologada ? "ACTIVE_NODE" : "OFFLINE"}
+                </Badge>
+              </div>
             </div>
-            <div className="space-y-1 text-sm text-muted-foreground">{t.contato_comercial && <div className="flex items-center gap-1"><Phone className="w-3 h-3" />{t.contato_comercial}</div>}{t.email_comercial && <div className="flex items-center gap-1"><Mail className="w-3 h-3" />{t.email_comercial}</div>}{(t.regioes_atendidas || t.coverage_details?.states) && <div className="flex items-center gap-1"><MapPin className="w-3 h-3" />{(t.coverage_details?.states || t.regioes_atendidas).slice(0, 3).join(", ")}{(t.coverage_details?.states?.length || t.regioes_atendidas?.length || 0) > 3 && ` +${(t.coverage_details?.states?.length || t.regioes_atendidas?.length || 0) - 3}`}</div>}</div>
-            <div className="flex items-center justify-between mt-3 pt-3 border-t"><div className="flex items-center gap-1">{[1,2,3,4,5].map(s => <Star key={s} className={`w-4 h-4 ${s <= (t.score_performance || 0) / 20 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />)}</div><span className="text-sm font-medium">{t.total_entregas || 0} entregas</span></div>
-            </div>
-          </StaggeredItem>
-        ))}</StaggeredContent>}
+          </div>
+        ))}</div>}
 
 
         {!loading && sortedData.length === 0 && <div className="card-base flex flex-col items-center py-12"><Truck className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground">Nenhuma transportadora</p></div>}

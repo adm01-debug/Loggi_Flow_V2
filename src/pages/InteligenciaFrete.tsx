@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator, Sparkles, FileText, CheckCircle2, Wand2, Download, FileCheck } from "lucide-react";
+import { DollarSign, TrendingDown, AlertTriangle, Package, Truck, Target, Loader2, ArrowDownRight, Zap, Calculator, Sparkles, FileText, CheckCircle2, Wand2, Download, FileCheck, Brain } from "lucide-react";
 import { StrategySimulator, AIFreightForecasting, FreightAudit } from "@/components/freight";
 
 const pieColors = ["hsl(var(--primary))", "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--accent))", "hsl(var(--muted))", "hsl(var(--secondary))"];
@@ -40,63 +40,89 @@ export default function InteligenciaFrete() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-destructive/20 to-warning/10">
-              <TrendingDown className="w-6 h-6 text-destructive" />
-            </div>
-            Inteligência de Frete
-          </h1>
-          <p className="text-muted-foreground mt-1">Reduza custos com frete grátis — simulação, consolidação, negociação e alertas</p>
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex-1 min-w-0 animate-in slide-in-from-left-6 duration-700 ease-out-expo">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
+                <Brain className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
+              </div>
+              <div className="flex flex-col">
+                <span className="truncate drop-shadow-sm">Inteligência Frete</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Redução de Custos Nexus IA</span>
+                </div>
+              </div>
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Análise preditiva, consolidação tática e auditoria de malha logística.</p>
+          </div>
         </div>
 
         {/* Savings Summary */}
-        <div className="card-base p-4 border-2 border-success/30 bg-success/5">
-          <div className="flex items-center gap-2 mb-3">
-            <Zap className="w-5 h-5 text-success" />
-            <h3 className="font-semibold text-success">Potencial de Economia Identificado</h3>
+        <div className="group relative overflow-hidden p-8 rounded-[2rem] sm:rounded-[2.5rem] bg-black/90 border-2 border-success/30 shadow-[0_0_40px_rgba(34,197,94,0.1)] backdrop-blur-3xl animate-in fade-in duration-1000 delay-100">
+          <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-transparent opacity-50" />
+          <div className="relative z-10 flex items-center gap-4 mb-6">
+            <div className="p-3 rounded-2xl bg-success/10 text-success shadow-inner">
+              <Zap className="w-6 h-6 animate-pulse" />
+            </div>
+            <h3 className="font-black italic text-xl uppercase tracking-tighter text-success">Potencial de Economia_Grid_Nexus</h3>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-success">{formatCurrency(summary.totalPotentialSavings)}</p>
-              <p className="text-xs text-muted-foreground">Economia Total Estimada</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+            <div className="space-y-1">
+              <p className="text-3xl sm:text-4xl font-black text-success tabular-nums tracking-tighter italic">{formatCurrency(summary.totalPotentialSavings)}</p>
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Economia Total Est.</p>
             </div>
-            <div className="text-center">
-              <p className="text-xl font-bold text-destructive">{formatCurrency(summary.totalAbusiveValue)}</p>
-              <p className="text-xs text-muted-foreground">Excesso Fretes Abusivos ({summary.abusiveCount})</p>
+            <div className="space-y-1">
+              <p className="text-2xl sm:text-3xl font-black text-destructive tabular-nums tracking-tighter italic">{formatCurrency(summary.totalAbusiveValue)}</p>
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Excesso Abusivo ({summary.abusiveCount})</p>
             </div>
-            <div className="text-center">
-              <p className="text-xl font-bold text-warning">{formatCurrency(summary.consolidationSavings)}</p>
-              <p className="text-xs text-muted-foreground">Economia Consolidação ({summary.consolidationOpps} oport.)</p>
+            <div className="space-y-1">
+              <p className="text-2xl sm:text-3xl font-black text-warning tabular-nums tracking-tighter italic">{formatCurrency(summary.consolidationSavings)}</p>
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Consolidação ({summary.consolidationOpps})</p>
             </div>
-            <div className="text-center">
-              <p className="text-xl font-bold text-primary">{formatCurrency(summary.negotiationSavings)}</p>
-              <p className="text-xs text-muted-foreground">Economia Negociação</p>
+            <div className="space-y-1">
+              <p className="text-2xl sm:text-3xl font-black text-primary tabular-nums tracking-tighter italic">{formatCurrency(summary.negotiationSavings)}</p>
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Economia Negociação</p>
             </div>
           </div>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="stat-card text-center p-3">
-            <DollarSign className="w-5 h-5 text-primary mx-auto mb-1" />
-            <p className="text-xl font-bold">{formatCurrency(summary.totalFreight)}</p>
-            <p className="text-[10px] text-muted-foreground">Custo Total Frete</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <DollarSign className="w-6 h-6" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-black tracking-tighter tabular-nums">{formatCurrency(summary.totalFreight)}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Custo Total</p>
           </div>
-          <div className="stat-card text-center p-3">
-            <Target className="w-5 h-5 text-warning mx-auto mb-1" />
-            <p className="text-xl font-bold">{formatCurrency(summary.avgFreight)}</p>
-            <p className="text-[10px] text-muted-foreground">Custo Médio/Entrega</p>
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-warning/10 text-warning group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <Target className="w-6 h-6" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-black tracking-tighter tabular-nums text-warning">{formatCurrency(summary.avgFreight)}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Média / Entrega</p>
           </div>
-          <div className="stat-card text-center p-3">
-            <AlertTriangle className="w-5 h-5 text-destructive mx-auto mb-1" />
-            <p className="text-xl font-bold">{summary.abusiveCount}</p>
-            <p className="text-[10px] text-muted-foreground">Fretes Abusivos</p>
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-destructive/10 text-destructive group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-black tracking-tighter tabular-nums text-destructive">{summary.abusiveCount}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Fretes Abusivos</p>
           </div>
-          <div className="stat-card text-center p-3">
-            <Package className="w-5 h-5 text-success mx-auto mb-1" />
-            <p className="text-xl font-bold">{summary.consolidationOpps}</p>
-            <p className="text-[10px] text-muted-foreground">Oport. Consolidação</p>
+          <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-3 rounded-2xl bg-success/10 text-success group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                <Package className="w-6 h-6" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-black tracking-tighter tabular-nums text-success">{summary.consolidationOpps}</p>
+            </div>
+            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Oport. Consolidação</p>
           </div>
         </div>
 

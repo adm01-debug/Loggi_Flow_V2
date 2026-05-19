@@ -341,7 +341,7 @@ export default function Envios() {
                 </div>
                 <p className="text-3xl font-black tracking-tighter tabular-nums text-success">{stats.entregues}</p>
               </div>
-              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Entregues</p>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Entregues_OK</p>
             </div>
             <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
               <div className="flex items-center justify-between mb-2">
@@ -350,7 +350,7 @@ export default function Envios() {
                 </div>
                 <p className="text-3xl font-black tracking-tighter tabular-nums text-destructive">{stats.ocorrencias}</p>
               </div>
-              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Ocorrências</p>
+              <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Ocorrências_Delta</p>
             </div>
           </div>
         </OnboardingTooltip>
@@ -378,7 +378,7 @@ export default function Envios() {
           <div 
             key={e.id} 
             className={cn(
-              "group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4",
+              "group relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4",
               isSelected(e.id) ? 'ring-2 ring-primary bg-primary/5' : ''
             )}
             style={{ animationDelay: `${i * 30}ms` }}
@@ -450,9 +450,7 @@ export default function Envios() {
               <div className="flex items-center gap-2 ml-auto">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-primary/10 hover:text-primary transition-all">
-                      <MoreVertical className="w-5 h-5" />
-                    </Button>
+                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-white/5"><MoreVertical className="w-5 h-5 text-white/40" /></Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-2 border-primary/5 shadow-2xl">
                     <DropdownMenuItem className="rounded-xl h-11 font-bold gap-2" onClick={() => { setSel(e); setDlgView(true); }}>

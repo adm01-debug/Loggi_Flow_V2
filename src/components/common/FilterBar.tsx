@@ -60,41 +60,47 @@ export function FilterBar({
   className,
 }: FilterBarProps) {
   return (
-    <div className={cn("space-y-3", className)}>
-      {/* Filters container - scrollable on mobile */}
-      <div className="flex flex-col gap-3">
-        {/* Search - always full width on mobile */}
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={searchPlaceholder}
-            className="pl-9 pr-9 h-11 min-h-[44px]"
-          />
-          {search && (
-            <button
-              onClick={() => onSearchChange("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-1"
-              aria-label="Limpar busca"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
+    <div className={cn("space-y-4", className)}>
+      <div className="flex flex-col gap-4">
+        <div className="relative w-full group">
+          <div className="absolute inset-0 bg-primary/10 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none group-focus-within:text-primary transition-colors" />
+            <Input
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="pl-12 pr-12 h-14 rounded-2xl bg-sidebar-accent/50 border-white/5 focus:border-primary/50 focus:ring-primary/20 transition-all font-medium placeholder:font-normal placeholder:text-muted-foreground/60"
+            />
+            {search && (
+              <button
+                onClick={() => onSearchChange("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary p-2 transition-colors"
+                aria-label="Limpar busca"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Filter selects - horizontal scroll on mobile */}
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
-          {/* Status */}
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none items-center">
+          <div className="flex items-center gap-2 p-1 bg-sidebar-accent/50 rounded-xl border border-white/5">
+            <div className="p-2 rounded-lg bg-background shadow-sm">
+              <Filter className="w-4 h-4 text-primary" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 pr-2 hidden sm:inline">Refinar Grid</span>
+          </div>
+
           {statusOptions && onStatusChange && (
             <Select value={status} onValueChange={onStatusChange}>
-              <SelectTrigger className="min-w-[140px] sm:w-[180px] h-10 min-h-[44px] flex-shrink-0">
+              <SelectTrigger className="min-w-[160px] h-12 rounded-xl bg-sidebar-accent/50 border-white/5 font-black uppercase tracking-widest text-[10px] gap-2">
                 <SelectValue placeholder={statusLabel} />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+              <SelectContent className="bg-black/95 border-white/10 backdrop-blur-xl">
+                <SelectItem value="all" className="font-black uppercase tracking-widest text-[10px]">Todos os Status</SelectItem>
                 {statusOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
+                  <SelectItem key={opt.value} value={opt.value} className="font-black uppercase tracking-widest text-[10px]">
                     {opt.label}
                   </SelectItem>
                 ))}
@@ -102,7 +108,6 @@ export function FilterBar({
             </Select>
           )}
 
-          {/* Date Range */}
           {onDateRangeChange && (
             <DateRangePicker
               value={dateRange}
@@ -111,20 +116,19 @@ export function FilterBar({
             />
           )}
 
-          {/* Extra Filters */}
           {extraFilters?.map((filter) => (
             <Select
               key={filter.key}
               value={filter.value}
               onValueChange={filter.onChange}
             >
-              <SelectTrigger className="min-w-[130px] sm:w-[150px] h-10 min-h-[44px] flex-shrink-0">
+              <SelectTrigger className="min-w-[150px] h-12 rounded-xl bg-sidebar-accent/50 border-white/5 font-black uppercase tracking-widest text-[10px] gap-2">
                 <SelectValue placeholder={filter.label} />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+              <SelectContent className="bg-black/95 border-white/10 backdrop-blur-xl">
+                <SelectItem value="all" className="font-black uppercase tracking-widest text-[10px]">Todos</SelectItem>
                 {filter.options.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
+                  <SelectItem key={opt.value} value={opt.value} className="font-black uppercase tracking-widest text-[10px]">
                     {opt.label}
                   </SelectItem>
                 ))}
@@ -134,35 +138,34 @@ export function FilterBar({
         </div>
       </div>
 
-      {/* Info Row - responsive */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-4 px-2">
+        <div className="flex items-center gap-3">
           {hasActiveFilters && onClearFilters && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onClearFilters}
-              className="h-8 px-3 text-xs min-h-[36px]"
+              className="h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/10 transition-all border border-primary/20"
             >
-              <X className="h-3 w-3 mr-1" />
-              Limpar
+              <X className="h-3.5 w-3.5 mr-2" />
+              Resetar Filtros
             </Button>
           )}
           
           {totalFiltered !== undefined && totalOriginal !== undefined && (
-            <span className="text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
               {totalFiltered === totalOriginal
-                ? `${totalOriginal} registros`
-                : `${totalFiltered} de ${totalOriginal}`}
-            </span>
+                ? `${totalOriginal} REGISTROS_SYNC`
+                : `${totalFiltered} DE ${totalOriginal} FILTRADOS`}
+            </div>
           )}
         </div>
 
         {hasActiveFilters && (
-          <Badge variant="secondary" className="gap-1 text-xs">
-            <Filter className="h-3 w-3" />
-            <span className="hidden sm:inline">Filtros ativos</span>
-            <span className="sm:hidden">Filtrado</span>
+          <Badge className="bg-primary/10 text-primary border-primary/30 px-3 py-1.5 rounded-full font-black text-[9px] uppercase tracking-widest gap-2 shadow-lg shadow-primary/5">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
+            VUE_GRID_ACTIVE
           </Badge>
         )}
       </div>
