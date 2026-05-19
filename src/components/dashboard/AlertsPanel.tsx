@@ -242,7 +242,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                             "flex items-center justify-center w-12 h-12 sm:w-18 sm:h-18 rounded-[1rem] sm:rounded-3xl shrink-0 shadow-2xl border border-white/10 transition-all duration-700 group-hover/alert:scale-110 group-hover/alert:rotate-6",
                             styles.icon
                           )}>
-                            <Icon className="w-9 h-9" />
+                            <Icon className="w-6 h-6 sm:w-9 sm:h-9" />
                           </div>
                           
                           <div className="flex-1 min-w-0 space-y-5">
