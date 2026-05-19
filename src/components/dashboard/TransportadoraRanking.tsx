@@ -103,7 +103,7 @@ export function TransportadoraRanking({ transportadoras, isLoading }: Transporta
             </div>
           </div>
           <div>
-            <h3 className="font-display font-black text-2xl sm:text-3xl leading-tight tracking-tighter bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent uppercase italic">
+            <h3 className="font-display font-black text-xl sm:text-3xl leading-tight tracking-tighter bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent uppercase italic">
               Elite Logistics <span className="text-primary not-italic">Ranking</span>
             </h3>
             <div className="flex items-center gap-3 mt-1.5">
