@@ -110,6 +110,8 @@ export function useBoxManagement() {
     mutationFn: async ({ boxNumber, deliveryId, version }: { boxNumber: number; deliveryId: string; version: number }) => {
       const boxId = boxNumber.toString().padStart(2, "0");
 
+      const { data: currentDelivery } = await supabase.from("entregas").select("status").eq("id", deliveryId).single();
+      
       const { error } = await supabase
         .from("entregas")
         .update({ box_alocado: boxId })
@@ -117,6 +119,15 @@ export function useBoxManagement() {
         .eq("version", version);
 
       if (error) throw error;
+
+      // Record history
+      await supabase.from("kanban_history").insert({
+        delivery_id: deliveryId,
+        from_status: currentDelivery?.status || null,
+        to_status: currentDelivery?.status || 'desconhecido',
+        action_by: user?.id,
+        notes: `Alocado ao BOX ${boxId}`
+      });
     },
     onSuccess: (_, { boxNumber }) => {
       queryClient.invalidateQueries({ queryKey: ["box-deliveries"] });
@@ -150,6 +161,7 @@ export function useBoxManagement() {
   const removeMutation = useMutation({
     mutationFn: async (boxNumber: number) => {
       const boxId = boxNumber.toString().padStart(2, "0");
+      const { data: delivery } = await supabase.from("entregas").select("id, status").eq("box_alocado", boxId).single();
 
       const { error } = await supabase
         .from("entregas")
@@ -157,6 +169,16 @@ export function useBoxManagement() {
         .eq("box_alocado", boxId);
 
       if (error) throw error;
+
+      if (delivery) {
+        await supabase.from("kanban_history").insert({
+          delivery_id: delivery.id,
+          from_status: delivery.status,
+          to_status: delivery.status,
+          action_by: user?.id,
+          notes: `Removido do BOX ${boxId}`
+        });
+      }
     },
     onSuccess: (_, boxNumber) => {
       queryClient.invalidateQueries({ queryKey: ["box-deliveries"] });
