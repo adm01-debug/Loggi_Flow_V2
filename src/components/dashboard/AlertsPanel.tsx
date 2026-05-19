@@ -221,7 +221,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                           delay: index * 0.1 
                         }}
                         className={cn(
-                          "relative p-8 rounded-[2.5rem] border border-white/5 mb-8 cursor-pointer transition-all duration-700 group/alert overflow-hidden",
+                          "relative p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/5 mb-4 sm:mb-8 cursor-pointer transition-all duration-700 group/alert overflow-hidden",
                           "hover:bg-white/[0.03] hover:border-white/20 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]",
                           alert.severity === 'error' ? "hover:border-destructive/40" : "hover:border-warning/40",
                           delta > 20 && "border-primary/30 bg-primary/5"
