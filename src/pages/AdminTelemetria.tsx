@@ -101,16 +101,44 @@ export default function AdminTelemetriaPage() {
   return (
     <MainLayout>
       <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Activity className="h-7 w-7 text-primary" />
-            <div><h1 className="text-2xl font-bold">Painel de Telemetria</h1><p className="text-sm text-muted-foreground">Monitoramento de performance e erros</p></div>
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Activity className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Telemetria Nexus</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">System_Pulse_Active</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">REAL-TIME • DORA • OBSERVABILITY</span>
+                </div>
+              </div>
+            </h1>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={rows.length === 0}><Download className="h-3.5 w-3.5 mr-1.5" />CSV</Button>
-            <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={rows.length === 0}><FileText className="h-3.5 w-3.5 mr-1.5" />PDF</Button>
-            <Button variant="outline" size="sm" onClick={handleCleanup}><Trash2 className="h-3.5 w-3.5 mr-1.5" />Limpar +7d</Button>
-            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}><RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isRefetching ? "animate-spin" : ""}`} />Atualizar</Button>
+            <Button variant="outline" size="lg" onClick={handleExportCSV} disabled={rows.length === 0} className="h-14 px-6 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-white/5 transition-all">
+              <Download className="h-4 w-4 text-primary" />
+              CSV
+            </Button>
+            <Button variant="outline" size="lg" onClick={handleExportPDF} disabled={rows.length === 0} className="h-14 px-6 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-white/5 transition-all">
+              <FileText className="h-4 w-4 text-primary" />
+              PDF
+            </Button>
+            <Button variant="outline" size="lg" onClick={handleCleanup} className="h-14 px-6 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all text-rose-500">
+              <Trash2 className="h-4 w-4" />
+              Limpar +7d
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => refetch()} disabled={isRefetching} className="h-14 px-6 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-white/5 transition-all">
+              <RefreshCw className={cn("h-4 w-4 text-primary", isRefetching && "animate-spin")} />
+              Sync
+            </Button>
           </div>
         </div>
 
