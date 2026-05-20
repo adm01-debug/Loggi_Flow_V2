@@ -397,7 +397,9 @@ export default function Coletas() {
                         key={c.id} 
                         className={cn(
                           "group relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-primary",
-                          isAtrasado && "border-l-destructive shadow-destructive/10"
+                          isAtrasado && "border-l-destructive shadow-destructive/20 bg-destructive/5",
+                          c.is_urgent && "border-l-orange-500 shadow-orange-500/10",
+                          c.is_reverse && "border-l-purple-500 shadow-purple-500/10"
                         )}
                         onClick={() => { 
                           playAction();
