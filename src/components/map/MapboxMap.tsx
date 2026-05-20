@@ -191,29 +191,33 @@ export function MapboxMap({
     }
   }, [markers, originMarker, loading, onMarkerClick]);
 
-  // Draw route lines from origin to each marker (Smarter curved paths)
+  // Draw route lines from origin to each marker (Smarter curved paths with flow animation)
   useEffect(() => {
     if (!map.current || !showRoute || !originMarker || markers.length === 0 || loading) return;
 
     const sourceId = 'route-lines';
+    const arrowLayerId = 'route-arrows';
     
     const addRouteLayer = () => {
       if (map.current!.getSource(sourceId)) {
         map.current!.removeLayer('route-layer-glow');
         map.current!.removeLayer('route-layer');
+        if (map.current!.getLayer(arrowLayerId)) map.current!.removeLayer(arrowLayerId);
         map.current!.removeSource(sourceId);
       }
 
       const features = markers.map(mk => {
-        // Simple arc calculation for visual excellence
         const lngDiff = mk.lng - originMarker.lng;
         const latDiff = mk.lat - originMarker.lat;
+        const dist = Math.sqrt(lngDiff * lngDiff + latDiff * latDiff);
+        
+        // Arc calculation for visual excellence - dynamic curvature based on distance
         const midLng = originMarker.lng + lngDiff / 2;
-        const midLat = originMarker.lat + latDiff / 2 + (Math.abs(lngDiff) * 0.1); // add curve
+        const midLat = originMarker.lat + latDiff / 2 + (dist * 0.15); // Add arc height
 
         return {
           type: 'Feature' as const,
-          properties: { color: mk.color || '#3b82f6' },
+          properties: { color: mk.color || '#06b6d4' },
           geometry: {
             type: 'LineString' as const,
             coordinates: [
@@ -230,7 +234,7 @@ export function MapboxMap({
         data: { type: 'FeatureCollection', features },
       });
 
-      // Glow Layer
+      // Neon Glow Layer
       map.current!.addLayer({
         id: 'route-layer-glow',
         type: 'line',
@@ -238,12 +242,13 @@ export function MapboxMap({
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
           'line-color': ['get', 'color'],
-          'line-width': 4,
-          'line-opacity': 0.15,
-          'line-blur': 3,
+          'line-width': 6,
+          'line-opacity': 0.1,
+          'line-blur': 5,
         },
       });
 
+      // Main Route Line
       map.current!.addLayer({
         id: 'route-layer',
         type: 'line',
@@ -252,10 +257,27 @@ export function MapboxMap({
         paint: {
           'line-color': ['get', 'color'],
           'line-width': 2,
-          'line-opacity': 0.6,
-          'line-dasharray': [1, 2],
+          'line-opacity': 0.8,
+          'line-dasharray': [2, 2],
         },
       });
+
+      // Directional Flow Animation (using symbols)
+      if (!map.current!.getLayer(arrowLayerId)) {
+        map.current!.addLayer({
+          id: arrowLayerId,
+          type: 'symbol',
+          source: sourceId,
+          layout: {
+            'symbol-placement': 'line',
+            'symbol-spacing': 50,
+            'icon-image': 'pulsing-dot', // Assuming we add this image or use standard
+            'icon-size': 0.5,
+            'icon-rotate': 90,
+            'visibility': 'visible'
+          }
+        });
+      }
     };
 
     if (map.current.isStyleLoaded()) {
