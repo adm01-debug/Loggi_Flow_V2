@@ -161,11 +161,42 @@ export default function Ocorrencias() {
           <Button onClick={() => { setForm(emptyForm); setUploadedPhotos([]); setDlgCreate(true); }} className="gap-2"><Plus className="w-4 h-4" />Nova</Button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><AlertTriangle className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Total</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-warning mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pendentes}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-          <div className="stat-card text-center"><CheckCircle2 className="w-5 h-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{stats.resolvidas}</p><p className="text-xs text-muted-foreground">Resolvidas</p></div>
-          <div className="stat-card text-center"><Calendar className="w-5 h-5 text-info mx-auto mb-2" /><p className="text-2xl font-bold">{stats.hoje}</p><p className="text-xs text-muted-foreground">Hoje</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-destructive/10 to-destructive/5 border border-destructive/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-destructive/20"><AlertTriangle className="w-6 h-6 text-destructive animate-pulse" /></div>
+              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-destructive border-destructive/20 italic">Ação Imediata</Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">{stats.total}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-destructive/80">Total de Ocorrências</p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-amber-500/20"><Clock className="w-6 h-6 text-amber-500" /></div>
+              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-amber-500 border-amber-500/20 italic">SLA em Risco</Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">{stats.pendentes}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500/80">Pendentes de Resolução</p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-emerald-500/20"><CheckCircle2 className="w-6 h-6 text-emerald-500" /></div>
+              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-emerald-500 border-emerald-500/20 italic">Eficiência</Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">{stats.resolvidas}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">Ocorrências Sanadas</p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-primary/20"><Calendar className="w-6 h-6 text-primary" /></div>
+              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-primary border-primary/20 italic">New Today</Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">{stats.hoje}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">Novos Registros</p>
+          </motion.div>
         </div>
 
         <FilterBar 
