@@ -157,10 +157,9 @@ export function MapboxMap({
   useEffect(() => {
     if (!map.current) return;
     
+    // Simply trigger style change - Mapbox handles the check internally or we can use a ref
     const newStyle = mapStyle === 'satellite' ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/dark-v11';
-    if (map.current.getStyle()?.url !== newStyle) {
-      map.current.setStyle(newStyle);
-    }
+    map.current.setStyle(newStyle);
     
     map.current.easeTo({
       pitch: pitch,
