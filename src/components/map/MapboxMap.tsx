@@ -38,6 +38,7 @@ export function MapboxMap({
   originMarker,
   className = '',
   onMarkerClick,
+  showTraffic = false,
   mapStyle = 'dark',
   pitch = 0,
 }: MapboxMapProps) {
@@ -166,25 +167,19 @@ export function MapboxMap({
       essential: true
     });
 
-    // Update traffic layer if it exists
     const updateTraffic = () => {
-      if (showTraffic) {
-        if (!map.current!.getLayer('traffic-layer')) {
-          map.current!.addLayer({
-            'id': 'traffic-layer',
-            'type': 'line',
-            'source': 'mapbox-traffic',
-            'source-layer': 'traffic',
-            'paint': {
-              'line-width': 1.5,
-              'line-opacity': 0.5
+      if (!map.current) return;
+      try {
+        const layers = map.current.getStyle()?.layers;
+        if (layers) {
+          layers.forEach(layer => {
+            if (layer.id.includes('traffic')) {
+              map.current?.setLayoutProperty(layer.id, 'visibility', showTraffic ? 'visible' : 'none');
             }
           });
         }
-      } else {
-        if (map.current!.getLayer('traffic-layer')) {
-          map.current!.removeLayer('traffic-layer');
-        }
+      } catch (e) {
+        console.warn('Traffic layer error:', e);
       }
     };
 
