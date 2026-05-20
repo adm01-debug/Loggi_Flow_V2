@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 
-
 interface Anomaly {
   id: string;
   level: 'info' | 'crit';
@@ -13,15 +12,16 @@ interface Anomaly {
   action: string;
   unit: string;
   time: string;
-  telemetry?: { time: string; bpm: number }[];
+  telemetry?: { bpm: number }[];
 }
-
 
 interface AnomalyListProps {
   anomalies: Anomaly[];
   onClose: () => void;
   onAction: (id: string) => void;
 }
+
+const cn = (...classes: any[]) => classes.filter(Boolean).join(' ');
 
 export function AnomalyList({ anomalies, onClose, onAction }: AnomalyListProps) {
   return (
@@ -77,6 +77,30 @@ export function AnomalyList({ anomalies, onClose, onAction }: AnomalyListProps) 
                 </Badge>
               </div>
 
+              {/* Bio_Sync Telemetry Sparkline */}
+              <div className="h-16 w-full mb-6 bg-black/40 rounded-2xl p-2 border border-white/5 relative group/chart">
+                <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
+                  <Activity className="w-3 h-3 text-rose-500" />
+                  <span className="text-[7px] font-black text-white/30 uppercase tracking-widest">Bio_Sync: Heart_Rate_Telemetry</span>
+                </div>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={anomaly.telemetry || [
+                    { bpm: 72 }, { bpm: 75 }, { bpm: 82 }, { bpm: 95 }, { bpm: 108 }, { bpm: 115 }, { bpm: 110 }
+                  ]}>
+                    <YAxis hide domain={['dataMin - 10', 'dataMax + 10']} />
+                    <Line 
+                      type="monotone" 
+                      dataKey="bpm" 
+                      stroke={anomaly.level === 'crit' ? "#f43f5e" : "#06b6d4"} 
+                      strokeWidth={2} 
+                      dot={false}
+                      isAnimationActive={true}
+                      animationDuration={2000}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
               <div className="space-y-4">
                 <div className="bg-black/40 p-4 rounded-2xl border border-white/5">
                   <p className="text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">Causa Provável</p>
@@ -111,5 +135,3 @@ export function AnomalyList({ anomalies, onClose, onAction }: AnomalyListProps) 
     </motion.div>
   );
 }
-
-const cn = (...classes: any[]) => classes.filter(Boolean).join(' ');
