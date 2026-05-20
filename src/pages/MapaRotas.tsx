@@ -101,7 +101,7 @@ export default function MapaRotas() {
   }, [timeTravelValue]);
 
 
-  // Fetch real BioSync data
+  // Fetch real BioSync data and alert rules
   useEffect(() => {
     const fetchBio = async () => {
       const { data } = await supabase
@@ -113,29 +113,32 @@ export default function MapaRotas() {
       
       if (data) {
         setBioData({ heart_rate: data.heart_rate, fatigue_index: data.fatigue_index });
-        // Real-time alert based on BioSync (no simulation)
-        if (data.heart_rate > 100) {
-          toast.error(`ALERTA BIO_SYNC: BPM CRÍTICO (${data.heart_rate}) detectado no condutor DRV-001`, {
-            description: 'Protocolo de segurança Nexus ativado automaticamente.',
-            className: 'bg-red-500/10 border-red-500/20 text-red-500 font-black uppercase tracking-tighter',
+        
+        // REAL-TIME ALERTS FOR BIOSYNC (REAL DATA)
+        // Limits: bpm > 110 (Critical), bpm > 95 (Warning)
+        if (data.heart_rate > 110) {
+          toast.error("BIOSYNC_CRITICAL: Frequência cardíaca fora dos limites!", {
+            description: `Unidade: ${data.vehicle_id || 'DRV-001'} | BPM: ${data.heart_rate}`,
+            className: "bg-red-500/90 border-red-500 text-white font-black",
+            duration: 10000
+          });
+        } else if (data.heart_rate > 95) {
+          toast.warning("BIOSYNC_WARNING: Fadiga elevada detectada", {
+            description: `BPM: ${data.heart_rate} | Índice: ${data.fatigue_index}`,
+            className: "bg-amber-500/90 border-amber-500 text-white font-black"
           });
         }
       }
-
     };
     fetchBio();
 
     const interval = setInterval(async () => {
-      // For demo, we still trigger the ingest function to get "live" feel, 
-      // but the data is persisted and retrieved from DB.
-      await supabase.functions.invoke('ingest-biosync', {
-        body: { driver_id: 'DRV-001', vehicle_id: 'VH-452' }
-      });
       fetchBio();
-    }, 10000);
+    }, 5000); // 5s cooldown for real sync
 
     return () => clearInterval(interval);
   }, []);
+
 
   // Fetch real Weather data and update risk zones based on fleet timestamp
   useEffect(() => {
@@ -200,35 +203,48 @@ export default function MapaRotas() {
   })), [routes]);
 
   const anomalies = useMemo(() => {
-    return points
-      .filter(p => p.order % 5 === 0)
-      .map(p => ({
-        id: p.id,
+    // Map logs of type 'crit' to anomaly list for detailed inspection
+    return logs
+      .filter(l => l.type === 'crit')
+      .map(l => ({
+        id: l.id,
         level: 'crit' as const,
-        unit: String(p.order),
-        time: lastSync.toLocaleTimeString([], { hour12: false }),
-        cause: 'FALHA_CONEXÃO_TELEMETRIA',
-        action: 'REINICIAR_GATEWAY_OBDII'
+        unit: l.vehicle || 'UNKNOWN',
+        time: l.time,
+        cause: l.msg.includes('TELEMETRIA') ? 'FALHA_CONEXÃO_TELEMETRIA' : 'DESVIO_ROTA_NÃO_AUTORIZADO',
+        action: 'EXECUTAR_PROTOCOLO_RESET'
       }));
-  }, [points, lastSync]);
+  }, [logs]);
 
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
-      if (vehicleFilter !== "all" && !log.msg.includes(vehicleFilter)) return false;
-      // Adicionar filtro de tempo se necessário baseado no timeTravelValue
+      if (vehicleFilter !== "all" && log.vehicle !== vehicleFilter) return false;
       return true;
     });
   }, [logs, vehicleFilter]);
 
   const handleExportCSV = () => {
-    exportToCSV(logs, `nexus_tactical_log_${new Date().toISOString()}`);
-    toast.success("LOG EXPORTADO", { description: "Arquivo CSV gerado com sucesso." });
+    const dataToExport = filteredLogs.map(l => ({
+      Timestamp: l.time,
+      Unidade: l.vehicle || 'N/A',
+      Tipo: l.type.toUpperCase(),
+      Mensagem: l.msg
+    }));
+    exportToCSV(dataToExport, `nexus_tactical_log_${vehicleFilter}_${new Date().toISOString()}`);
+    toast.success("LOG EXPORTADO", { description: "Filtros aplicados via Time-Travel e Veículo." });
   };
 
   const handleExportPDF = () => {
-    exportToPDF(logs, ["time", "type", "msg"], `nexus_tactical_log_${new Date().toISOString()}`);
-    toast.success("LOG EXPORTADO", { description: "Arquivo PDF gerado com sucesso." });
+    const dataToExport = filteredLogs.map(l => ({
+      time: l.time,
+      vehicle: l.vehicle || 'N/A',
+      type: l.type.toUpperCase(),
+      msg: l.msg
+    }));
+    exportToPDF(dataToExport, ["time", "vehicle", "type", "msg"], `nexus_tactical_log_${new Date().toISOString()}`);
+    toast.success("LOG PDF GERADO", { description: "Relatório tático consolidado." });
   };
+
 
 
   const statusFiltered = useMemo(() => {
