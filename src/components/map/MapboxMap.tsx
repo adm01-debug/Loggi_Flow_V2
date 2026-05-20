@@ -153,19 +153,47 @@ export function MapboxMap({
     };
   }, [token, center, zoom]); // Re-init if core props change significantly
 
-  // Handle Style and Pitch changes without full re-init
+  // Handle Style, Pitch and Traffic changes
   useEffect(() => {
     if (!map.current) return;
     
-    // Simply trigger style change - Mapbox handles the check internally or we can use a ref
     const newStyle = mapStyle === 'satellite' ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/dark-v11';
     map.current.setStyle(newStyle);
     
     map.current.easeTo({
       pitch: pitch,
-      duration: 1000
+      duration: 1200,
+      essential: true
     });
-  }, [mapStyle, pitch]);
+
+    // Update traffic layer if it exists
+    const updateTraffic = () => {
+      if (showTraffic) {
+        if (!map.current!.getLayer('traffic-layer')) {
+          map.current!.addLayer({
+            'id': 'traffic-layer',
+            'type': 'line',
+            'source': 'mapbox-traffic',
+            'source-layer': 'traffic',
+            'paint': {
+              'line-width': 1.5,
+              'line-opacity': 0.5
+            }
+          });
+        }
+      } else {
+        if (map.current!.getLayer('traffic-layer')) {
+          map.current!.removeLayer('traffic-layer');
+        }
+      }
+    };
+
+    if (map.current.isStyleLoaded()) {
+      updateTraffic();
+    } else {
+      map.current.once('style.load', updateTraffic);
+    }
+  }, [mapStyle, pitch, showTraffic]);
 
   // Update markers
   useEffect(() => {

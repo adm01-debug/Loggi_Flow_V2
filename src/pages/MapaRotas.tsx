@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MapIntelligenceOverlay } from "@/components/map/MapIntelligenceOverlay";
 import { motion, AnimatePresence } from "framer-motion";
+import { Slider } from "@/components/ui/slider";
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
 
@@ -30,7 +31,8 @@ export default function MapaRotas() {
   const [mapStyle, setMapStyle] = useState<'dark' | 'satellite'>('dark');
   const [mapPitch, setMapPitch] = useState(0);
   const [timeTravelValue, setTimeTravelValue] = useState(100);
-  const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false });
+  const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true });
+  const [lastSync, setLastSync] = useState(new Date());
 
   const points: DeliveryPoint[] = useMemo(() => (routes || []).map((r, i) => ({
     id: r.id,
@@ -184,25 +186,37 @@ export default function MapaRotas() {
                     variant="outline" 
                     size="sm"
                     onClick={() => setActiveLayers(prev => ({ ...prev, fleet: !prev.fleet }))}
-                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.fleet ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.fleet ? "text-cyan-400 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]" : "text-white/40")}
                   >
+                    <Truck className="w-3 h-3 mr-1.5" />
                     Fleet
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => setActiveLayers(prev => ({ ...prev, deliveries: !prev.deliveries }))}
-                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.deliveries ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.deliveries ? "text-cyan-400 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]" : "text-white/40")}
                   >
+                    <Package className="w-3 h-3 mr-1.5" />
                     Deliveries
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => setActiveLayers(prev => ({ ...prev, nexus: !prev.nexus }))}
-                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.nexus ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.nexus ? "text-cyan-400 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]" : "text-white/40")}
                   >
+                    <Layers className="w-3 h-3 mr-1.5" />
                     Nexus_Grid
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, risks: !prev.risks }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.risks ? "text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]" : "text-white/40")}
+                  >
+                    <AlertTriangle className="w-3 h-3 mr-1.5" />
+                    Risks
                   </Button>
                 </div>
               </div>
@@ -214,12 +228,34 @@ export default function MapaRotas() {
                 showRoute={showRouteLines}
                 mapStyle={mapStyle}
                 pitch={mapPitch}
+                showTraffic={activeLayers.nexus}
                 className="h-[650px] w-full"
               />
 
+              {/* predictive risk alerts overlay */}
+              <AnimatePresence>
+                {activeLayers.risks && (
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="absolute top-24 right-4 z-20 flex flex-col gap-3 max-w-[280px]"
+                  >
+                    <div className="bg-amber-500/10 backdrop-blur-3xl border border-amber-500/20 p-4 rounded-2xl shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
+                      <div className="flex items-center gap-3 mb-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-500 animate-pulse" />
+                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Alerta_Preditivo_Nexus</span>
+                      </div>
+                      <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase tracking-tight">Bloqueio detectado na BR-116. Recalculando rotas em 2.4s...</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="absolute bottom-6 left-6 right-6 z-10 pointer-events-none">
                 <div className="flex justify-between items-end">
-                  <div className="bg-black/80 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 flex items-center gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
+                  <div className="bg-black/80 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 flex items-center gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto group/fleet">
                     <div className="flex -space-x-3">
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="w-10 h-10 rounded-full border-2 border-black bg-cyan-500/20 flex items-center justify-center backdrop-blur-md relative group/truck">
@@ -229,39 +265,43 @@ export default function MapaRotas() {
                       ))}
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-0.5">Nexus_Fleet_Dynamics</p>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em]">Nexus_Fleet_Dynamics</p>
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+                          <Zap className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />
+                          <span className="text-[8px] font-black text-cyan-400 uppercase tracking-widest">Sync_{lastSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                        </div>
+                      </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                        <p className="text-sm font-black text-white italic tracking-tight">OPERANDO EM CAPACIDADE MÁXIMA</p>
+                        <div className="w-2 h-2 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                        <p className="text-sm font-black text-white italic tracking-tight group-hover/fleet:text-cyan-400 transition-colors uppercase">OPERANDO_EM_CAPACIDADE_NOMINAL</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-black/90 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-auto min-w-[300px]">
+                  <div className="bg-black/90 backdrop-blur-2xl p-6 rounded-[2.5rem] border border-white/10 flex flex-col gap-4 shadow-[0_25px_60px_rgba(0,0,0,0.9)] pointer-events-auto min-w-[320px] group/simulator">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Play className="w-3 h-3 text-cyan-500 fill-cyan-500" />
+                        <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
                         <span className="text-[10px] font-black text-white uppercase tracking-widest italic">Time_Travel_Simulator</span>
                       </div>
-                      <span className="text-[10px] font-black text-cyan-500 uppercase tracking-widest">T-{100 - timeTravelValue}m</span>
+                      <Badge variant="outline" className="text-[10px] font-black text-cyan-500 border-cyan-500/30 bg-cyan-500/5">
+                        T-{100 - timeTravelValue}m
+                      </Badge>
                     </div>
-                    <div className="relative h-1.5 bg-white/5 rounded-full overflow-hidden">
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="100" 
-                        value={timeTravelValue}
-                        onChange={(e) => setTimeTravelValue(parseInt(e.target.value))}
-                        className="absolute inset-0 w-full opacity-0 cursor-pointer z-10"
-                      />
-                      <div 
-                        className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_15px_#06b6d4]" 
-                        style={{ width: `${timeTravelValue}%` }} 
+                    <div className="py-2">
+                      <Slider
+                        defaultValue={[100]}
+                        max={100}
+                        step={1}
+                        value={[timeTravelValue]}
+                        onValueChange={(vals) => setTimeTravelValue(vals[0])}
+                        className="cursor-pointer"
                       />
                     </div>
                     <div className="flex justify-between items-center text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">
-                      <span>Real_Time</span>
-                      <span>Nexus_Forecast</span>
+                      <span className="group-hover/simulator:text-cyan-500/50 transition-colors">Historical_Log</span>
+                      <span className="group-hover/simulator:text-cyan-500/50 transition-colors">Nexus_Forecast</span>
                     </div>
                   </div>
                   
