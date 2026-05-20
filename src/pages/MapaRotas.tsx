@@ -16,7 +16,9 @@ import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import { AnomalyList } from "@/components/map/AnomalyList";
+import { TacticalTerminal } from "@/components/map/TacticalTerminal";
 import { toast } from "sonner";
+
 
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
