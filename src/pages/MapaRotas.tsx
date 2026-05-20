@@ -837,7 +837,10 @@ export default function MapaRotas() {
           />
         )}
       </AnimatePresence>
+      
+      <TacticalTerminal />
     </MainLayout>
+
 
   );
 }
