@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe } from "lucide-react";
+import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe, Layers, Satellite, Zap, AlertTriangle, Play } from "lucide-react";
 import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -27,6 +27,10 @@ export default function MapaRotas() {
 
   const [statusFilter, setStatusFilter] = useState("all");
   const [showRouteLines, setShowRouteLines] = useState(true);
+  const [mapStyle, setMapStyle] = useState<'dark' | 'satellite'>('dark');
+  const [mapPitch, setMapPitch] = useState(0);
+  const [timeTravelValue, setTimeTravelValue] = useState(100);
+  const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false });
 
   const points: DeliveryPoint[] = useMemo(() => (routes || []).map((r, i) => ({
     id: r.id,
@@ -156,21 +160,61 @@ export default function MapaRotas() {
           <div className="lg:col-span-2 space-y-4">
             <div className="relative group overflow-hidden rounded-[2.5rem] border-2 border-white/5 bg-black shadow-2xl transition-all hover:border-cyan-500/30">
               <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                <Badge className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
-                  <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse" />
-                  Satellite_Sync: Active
-                </Badge>
-                <Badge className="bg-black/90 backdrop-blur-2xl text-white/80 border-white/10 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
-                  <Globe className="w-3.5 h-3.5 text-cyan-500" />
-                  Nexus_Grid_View
-                </Badge>
-              </div>
+                <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      onClick={() => {
+                        setMapStyle(mapStyle === 'dark' ? 'satellite' : 'dark');
+                        setMapPitch(mapStyle === 'dark' ? 45 : 0);
+                      }}
+                      className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-cyan-500/20 transition-all border shadow-2xl"
+                    >
+                      {mapStyle === 'dark' ? <Satellite className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
+                      {mapStyle === 'dark' ? 'Satellite_Fusion' : 'Tactical_Grid'}
+                    </Button>
+                    
+                    <Badge className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
+                      <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse" />
+                      Live_Telemetry: Active
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setActiveLayers(prev => ({ ...prev, fleet: !prev.fleet }))}
+                      className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.fleet ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                    >
+                      Fleet
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setActiveLayers(prev => ({ ...prev, deliveries: !prev.deliveries }))}
+                      className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.deliveries ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                    >
+                      Deliveries
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setActiveLayers(prev => ({ ...prev, nexus: !prev.nexus }))}
+                      className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.nexus ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                    >
+                      Nexus_Grid
+                    </Button>
+                  </div>
+                </div>
 
                 <MapIntelligenceOverlay />
                 <MapboxMap
-                markers={mapMarkers}
+                markers={activeLayers.deliveries ? mapMarkers : []}
                 originMarker={{ ...ORIGIN_COORDINATES, label: "🏭 CD Central — SP" }}
                 showRoute={showRouteLines}
+                mapStyle={mapStyle}
+                pitch={mapPitch}
                 className="h-[650px] w-full"
               />
 
@@ -191,6 +235,33 @@ export default function MapaRotas() {
                         <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                         <p className="text-sm font-black text-white italic tracking-tight">OPERANDO EM CAPACIDADE MÁXIMA</p>
                       </div>
+                  </div>
+                  
+                  <div className="bg-black/90 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-auto min-w-[300px]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Play className="w-3 h-3 text-cyan-500 fill-cyan-500" />
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest italic">Time_Travel_Simulator</span>
+                      </div>
+                      <span className="text-[10px] font-black text-cyan-500 uppercase tracking-widest">T-{100 - timeTravelValue}m</span>
+                    </div>
+                    <div className="relative h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        value={timeTravelValue}
+                        onChange={(e) => setTimeTravelValue(parseInt(e.target.value))}
+                        className="absolute inset-0 w-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div 
+                        className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_15px_#06b6d4]" 
+                        style={{ width: `${timeTravelValue}%` }} 
+                      />
+                    </div>
+                    <div className="flex justify-between items-center text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">
+                      <span>Real_Time</span>
+                      <span>Nexus_Forecast</span>
                     </div>
                   </div>
                   
@@ -254,10 +325,12 @@ export default function MapaRotas() {
                   <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black text-white shrink-0 italic border-t border-white/10 shadow-2xl group-hover:scale-110 transition-transform"
+                      className="w-12 h-12 rounded-2xl flex flex-col items-center justify-center text-sm font-black text-white shrink-0 italic border-t border-white/10 shadow-2xl group-hover:scale-110 transition-transform relative"
                       style={{ backgroundColor: `${getStatusColor(p.status)}33`, color: getStatusColor(p.status), border: `1px solid ${getStatusColor(p.status)}22` }}
                     >
-                      {String(p.order).padStart(2, '0')}
+                      <span className="text-xs">{String(p.order).padStart(2, '0')}</span>
+                      <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-success rounded-full border-2 border-black animate-pulse" />
+                    </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-black text-white/90 truncate uppercase tracking-tight">{p.address || "ENDEREÇO_NÃO_INFORMADO"}</p>
@@ -265,6 +338,7 @@ export default function MapaRotas() {
                         <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                         <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
                           {p.lat && p.lng ? `GPS: ${p.lat.toFixed(4)} / ${p.lng.toFixed(4)}` : 'COORDENADAS_AUSENTES'}
+                          <span className="ml-2 text-cyan-500 animate-pulse">● LIVE_SYNC</span>
                         </p>
                       </div>
                     </div>
