@@ -177,7 +177,7 @@ export function MapboxMap({
       bearing: mapStyle === 'satellite' || isDroneView ? 15 : 0,
       zoom: isDroneView ? 16 : map.current.getZoom(),
       duration: 2500,
-      easing: (t) => t * (2 - t), // easeOutQuad for silky smoothness
+      easing: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, // easeInOutCubic for cinematic flow
       essential: true
     });
 
