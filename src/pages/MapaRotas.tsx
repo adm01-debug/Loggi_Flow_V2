@@ -10,6 +10,7 @@ import { useFilters, FilterConfig } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { MapIntelligenceOverlay } from "@/components/map/MapIntelligenceOverlay";
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
 
@@ -135,7 +136,8 @@ export default function MapaRotas() {
                 </Badge>
               </div>
 
-              <MapboxMap
+                <MapIntelligenceOverlay />
+                <MapboxMap
                 markers={mapMarkers}
                 originMarker={{ ...ORIGIN_COORDINATES, label: "🏭 CD Central — SP" }}
                 showRoute={showRouteLines}
