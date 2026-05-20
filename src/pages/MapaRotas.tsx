@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route } from "lucide-react";
+import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe } from "lucide-react";
 import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { FilterBar } from "@/components/common/FilterBar";

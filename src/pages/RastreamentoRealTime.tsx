@@ -112,10 +112,10 @@ export default function RastreamentoRealTime() {
     }
 
     // Add truck/driver simulated marker if in transit
-    if (shipment.status === 'em_transito' || shipment.status === 'saiu_entrega') {
+    if (shipment?.status === 'em_transito' || shipment?.status === 'saiu_entrega') {
       // Simulate truck position between origin and destination
       if (originCoords && destCoords) {
-        const factor = shipment.status === 'saiu_entrega' ? 0.85 : 0.45;
+        const factor = shipment?.status === 'saiu_entrega' ? 0.85 : 0.45;
         const truckLat = originCoords.lat + (destCoords.lat - originCoords.lat) * factor;
         const truckLng = originCoords.lng + (destCoords.lng - originCoords.lng) * factor;
         
