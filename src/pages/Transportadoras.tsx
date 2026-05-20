@@ -515,7 +515,7 @@ export default function Transportadoras() {
           />
         )}
         </div>
-      </PageTransition>
+    </MainLayout>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
