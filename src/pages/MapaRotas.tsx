@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe, Layers, Satellite, Zap, AlertTriangle, Play, ShieldCheck } from "lucide-react";
+import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe, Layers, Satellite, Zap, AlertTriangle, Play, ShieldCheck, CloudRain, Activity } from "lucide-react";
 import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -31,9 +31,35 @@ export default function MapaRotas() {
   const [mapStyle, setMapStyle] = useState<'dark' | 'satellite'>('dark');
   const [mapPitch, setMapPitch] = useState(0);
   const [timeTravelValue, setTimeTravelValue] = useState(100);
-  const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true });
+  const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true, weather: false, bio: false });
+  const [isDroneView, setIsDroneView] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
+  const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'warn' | 'crit' }[]>([
+    { id: '1', time: '14:20:01', msg: 'NEXUS_CORE_INITIALIZED', type: 'info' },
+    { id: '2', time: '14:20:05', msg: 'SYNCING_FLEET_GRID...', type: 'info' },
+    { id: '3', time: '14:20:12', msg: 'WEATHER_SHIELD_ACTIVE', type: 'info' },
+  ]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newLog = {
+        id: Math.random().toString(),
+        time: new Date().toLocaleTimeString([], { hour12: false }),
+        msg: [
+          'NOMINAL_FLOW_DETECTED',
+          'REROUTING_UNIT_452',
+          'TELEMETRY_PACKET_RECEIVED',
+          'SIGNAL_LATENCY_0.4MS',
+          'BIO_SYNC_UPDATE_RECEIVED',
+          'ANOMALY_SCAN_COMPLETE'
+        ][Math.floor(Math.random() * 6)],
+        type: 'info' as const
+      };
+      setLogs(prev => [newLog, ...prev].slice(0, 10));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Sync state with simulator
   useEffect(() => {
@@ -89,23 +115,48 @@ export default function MapaRotas() {
           lng = ORIGIN_COORDINATES.lng + (lng - ORIGIN_COORDINATES.lng) * (1 - factor);
         }
 
+        const bioMetrics = activeLayers.bio ? `
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);display:grid;grid-cols:2;gap:8px">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase">Heart_Rate</span>
+              <span style="font-size:12px;color:#f43f5e;font-weight:900;font-family:monospace">72 BPM</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase">Fatigue_Index</span>
+              <span style="font-size:12px;color:#fbbf24;font-weight:900;font-family:monospace">LOW</span>
+            </div>
+          </div>
+        ` : '';
+
+        const isAnomaly = p.order % 5 === 0; // Simulate anomaly for every 5th unit
+
         return {
           id: p.id,
           lat,
           lng,
+          isAnomaly,
           label: `#${p.order} — ${p.address}`,
-          color: getStatusColor(p.status),
+          color: isAnomaly ? '#ef4444' : getStatusColor(p.status),
           popupHTML: `
-            <div style="padding:6px;font-size:12px;color:#111;max-width:220px">
-              <strong style="font-size:13px">#${p.order}</strong>
-              <div style="margin:4px 0;color:#555">${p.address}</div>
-              <span style="display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;color:#fff;background:${getStatusColor(p.status)}">${getStatusLabel(p.status)}</span>
-              ${isHistorical ? '<div style="margin-top:4px;font-size:9px;color:#666;font-weight:bold">POSIÇÃO_HISTÓRICA_SIMULADA</div>' : ''}
+            <div style="padding:16px;background:#000;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.8);max-width:240px;overflow:hidden;position:relative;">
+              <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${getStatusColor(p.status)}"></div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}22;display:flex;align-items:center;justify-center;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}44">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isAnomaly ? '#ef4444' : getStatusColor(p.status)}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+                <strong style="font-size:14px;color:#fff;font-family:system-ui, -apple-system, sans-serif;font-weight:900;letter-spacing:-0.5px">UNIT_${p.order} ${isAnomaly ? '[ANOMALY]' : ''}</strong>
+              </div>
+              <p style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;line-height:1.4;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:0.5px">${p.address}</p>
+              <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${isAnomaly ? '#ef4444' : getStatusColor(p.status)};background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}15;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}33;text-transform:uppercase;letter-spacing:1px">
+                STATUS: ${isAnomaly ? 'CRITICAL_DELAY' : getStatusLabel(p.status).toUpperCase()}
+              </div>
+              ${bioMetrics}
+              ${isHistorical ? '<div style="margin-top:12px;font-size:9px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase;letter-spacing:1px">--- DATA_RESTORED_LOG ---</div>' : ''}
             </div>
           `,
         };
       });
-  }, [filteredData, timeTravelValue]);
+  }, [filteredData, timeTravelValue, activeLayers.bio]);
 
   const handleClearFilters = () => {
     clearFilters();
@@ -203,6 +254,15 @@ export default function MapaRotas() {
                     {mapStyle === 'dark' ? <Satellite className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
                     {mapStyle === 'dark' ? 'Satellite_Fusion' : 'Tactical_Grid'}
                   </Button>
+
+                  <Button 
+                    size="sm" 
+                    onClick={() => setIsDroneView(!isDroneView)}
+                    className={cn("bg-black/90 backdrop-blur-2xl px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border shadow-2xl", isDroneView ? "text-amber-400 border-amber-500/30 bg-amber-500/10" : "text-white/40 border-white/5")}
+                  >
+                    <Globe className={cn("w-3.5 h-3.5", isDroneView && "animate-spin")} />
+                    {isDroneView ? 'Drone_Follow: ON' : 'Drone_View'}
+                  </Button>
                   
                   <Badge className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
                     <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse" />
@@ -247,8 +307,50 @@ export default function MapaRotas() {
                     <AlertTriangle className="w-3 h-3 mr-1.5" />
                     Risks
                   </Button>
-                </div>
-              </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, weather: !prev.weather }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.weather ? "text-blue-400 border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]" : "text-white/40")}
+                  >
+                    <CloudRain className="w-3 h-3 mr-1.5" />
+                    Weather
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, bio: !prev.bio }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.bio ? "text-rose-400 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.2)]" : "text-white/40")}
+                  >
+                    <Activity className="w-3 h-3 mr-1.5" />
+                    Bio_Sync
+                  </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Nexus Tactical Log */}
+                  <div className="bg-black/90 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-auto min-w-[280px] hidden xl:block">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                      <span className="text-[10px] font-black text-white uppercase tracking-widest italic">Nexus_Tactical_Log</span>
+                    </div>
+                    <div className="space-y-2 max-h-[120px] overflow-hidden">
+                      <AnimatePresence mode="popLayout">
+                        {logs.map((log) => (
+                          <motion.div 
+                            key={log.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            className="flex items-start gap-3"
+                          >
+                            <span className="text-[8px] font-black text-white/20 font-monospace">{log.time}</span>
+                            <span className="text-[8px] font-black text-cyan-500/80 uppercase tracking-tighter truncate">{log.msg}</span>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  </div>
 
               <MapIntelligenceOverlay />
               <MapboxMap
@@ -258,6 +360,8 @@ export default function MapaRotas() {
                 mapStyle={mapStyle}
                 pitch={mapPitch}
                 showTraffic={activeLayers.nexus}
+                showWeather={activeLayers.weather}
+                isDroneView={isDroneView}
                 className="h-[650px] w-full"
               />
 
@@ -296,6 +400,20 @@ export default function MapaRotas() {
                         <Badge variant="outline" className="text-[8px] font-black bg-red-500/10 text-red-500 border-red-500/30">CRÍTICO</Badge>
                       </div>
                       <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase tracking-tight">Área de alta periculosidade detectada (Satelite_Fusion AI). Protocolo Nexus_Shield ativo.</p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeLayers.bio && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="absolute top-4 left-1/2 -translate-x-1/2 z-20"
+                  >
+                    <div className="bg-rose-500/10 backdrop-blur-3xl border border-rose-500/20 px-6 py-2 rounded-full flex items-center gap-4 shadow-2xl">
+                      <Activity className="w-4 h-4 text-rose-500 animate-bounce" />
+                      <span className="text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Nexus_BioSync: Scanning_Vitals...</span>
                     </div>
                   </motion.div>
                 )}

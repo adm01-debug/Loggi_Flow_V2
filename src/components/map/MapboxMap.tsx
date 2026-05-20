@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Info, Navigation, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export interface MapMarker {
   id: string;
@@ -15,6 +16,7 @@ export interface MapMarker {
   type?: 'truck' | 'delivery' | 'pickup' | 'origin';
   status?: string;
   heading?: number;
+  isAnomaly?: boolean;
 }
 
 interface MapboxMapProps {
@@ -26,6 +28,8 @@ interface MapboxMapProps {
   className?: string;
   onMarkerClick?: (id: string) => void;
   showTraffic?: boolean;
+  showWeather?: boolean;
+  isDroneView?: boolean;
   mapStyle?: 'dark' | 'satellite';
   pitch?: number;
 }
@@ -39,6 +43,8 @@ export function MapboxMap({
   className = '',
   onMarkerClick,
   showTraffic = false,
+  showWeather = false,
+  isDroneView = false,
   mapStyle = 'dark',
   pitch = 0,
 }: MapboxMapProps) {
@@ -166,11 +172,32 @@ export function MapboxMap({
     // Continual animation for pitch/bearing
     map.current.easeTo({
       pitch: pitch,
-      bearing: mapStyle === 'satellite' ? 15 : 0,
+      bearing: mapStyle === 'satellite' || isDroneView ? 15 : 0,
+      zoom: isDroneView ? 16 : map.current.getZoom(),
       duration: 2500,
       easing: (t) => t * (2 - t), // easeOutQuad for silky smoothness
       essential: true
     });
+
+    if (isDroneView && markers.length > 0) {
+      const target = markers[0]; // Follow first vehicle for demo
+      map.current.flyTo({
+        center: [target.lng, target.lat],
+        zoom: 16,
+        pitch: 60,
+        bearing: 0,
+        duration: 3000
+      });
+      
+      let bearing = 0;
+      const rotateCamera = () => {
+        if (!isDroneView || !map.current) return;
+        bearing += 0.1;
+        map.current.setBearing(bearing % 360);
+        requestAnimationFrame(rotateCamera);
+      };
+      setTimeout(rotateCamera, 3000);
+    }
 
     const updateTraffic = () => {
       if (!map.current) return;
@@ -188,12 +215,73 @@ export function MapboxMap({
       }
     };
 
+    // Weather Layer Logic
+    const updateWeather = () => {
+      if (!map.current) return;
+      const weatherSourceId = 'nexus-weather';
+      
+      if (showWeather) {
+        if (!map.current.getSource(weatherSourceId)) {
+          map.current.addSource(weatherSourceId, {
+            'type': 'geojson',
+            'data': {
+              'type': 'FeatureCollection',
+              'features': [
+                {
+                  'type': 'Feature',
+                  'properties': {},
+                  'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[
+                      [-48, -24], [-45, -24], [-45, -22], [-48, -22], [-48, -24]
+                    ]]
+                  }
+                }
+              ]
+            }
+          });
+          
+          map.current.addLayer({
+            'id': 'weather-layer',
+            'type': 'fill',
+            'source': weatherSourceId,
+            'paint': {
+              'fill-color': '#3b82f6',
+              'fill-opacity': 0.15,
+              'fill-outline-color': '#60a5fa'
+            }
+          });
+
+          // Pulse effect for weather
+          let opacity = 0.15;
+          let direction = 1;
+          const animateWeather = () => {
+            if (!map.current?.getLayer('weather-layer')) return;
+            opacity += 0.005 * direction;
+            if (opacity > 0.3 || opacity < 0.1) direction *= -1;
+            map.current.setPaintProperty('weather-layer', 'fill-opacity', opacity);
+            requestAnimationFrame(animateWeather);
+          };
+          animateWeather();
+        }
+      } else {
+        if (map.current.getLayer('weather-layer')) {
+          map.current.removeLayer('weather-layer');
+          map.current.removeSource(weatherSourceId);
+        }
+      }
+    };
+
     if (map.current.isStyleLoaded()) {
       updateTraffic();
+      updateWeather();
     } else {
-      map.current.once('style.load', updateTraffic);
+      map.current.once('style.load', () => {
+        updateTraffic();
+        updateWeather();
+      });
     }
-  }, [mapStyle, pitch, showTraffic]);
+  }, [mapStyle, pitch, showTraffic, showWeather]);
 
   // Update markers
   useEffect(() => {
@@ -225,11 +313,16 @@ export function MapboxMap({
       const color = mk.color || '#3b82f6';
       
       if (mk.type === 'truck') {
-        el.className = 'mapbox-truck-marker';
+        el.className = cn('mapbox-truck-marker', mk.isAnomaly && 'nexus-anomaly-glitch');
         el.style.cssText = `width:30px;height:30px;background:white;border-radius:50%;display:flex;align-items:center;justify-center;box-shadow:0 0 15px ${color};border:2px solid ${color};cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:10;`;
-        el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${mk.heading || 0}deg)"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`;
+        if (mk.isAnomaly) {
+          el.style.boxShadow = `0 0 30px #ef4444, inset 0 0 10px #ef4444`;
+          el.style.borderColor = '#ef4444';
+        }
+        el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${mk.isAnomaly ? '#ef4444' : color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${mk.heading || 0}deg)"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`;
       } else {
-        el.style.cssText = `width:16px;height:16px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 10px ${color}66;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);`;
+        el.className = mk.isAnomaly ? 'nexus-anomaly-pulse' : '';
+        el.style.cssText = `width:16px;height:16px;border-radius:50%;background:${mk.isAnomaly ? '#ef4444' : color};border:2px solid #fff;box-shadow:0 0 10px ${mk.isAnomaly ? '#ef4444' : color}66;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);`;
       }
 
       el.addEventListener('mouseenter', () => { 
