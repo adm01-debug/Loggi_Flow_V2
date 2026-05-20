@@ -104,6 +104,53 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
     }
   };
 
+  const generateManifestoPDF = () => {
+    playSuccess();
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFillColor(31, 41, 55);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text("MANIFESTO DE COLETA NEXUS", 20, 25);
+    doc.setFontSize(10);
+    doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33);
+    
+    // Body
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.text("DADOS DA OPERAÇÃO", 20, 55);
+    
+    autoTable(doc, {
+      startY: 60,
+      head: [['Campo', 'Informação']],
+      body: [
+        ['Fornecedor', pickup.fornecedores?.nome_fantasia || pickup.fornecedores?.razao_social || 'N/A'],
+        ['Endereço', pickup.endereco_coleta],
+        ['Data Prevista', pickup.data_prevista_coleta ? format(new Date(pickup.data_prevista_coleta), "dd/MM/yyyy") : 'N/A'],
+        ['Volumes', pickup.qtd_volumes?.toString() || '0'],
+        ['Peso Estimado', `${pickup.peso_estimado_kg} KG`],
+        ['Transporte', pickup.tipo_coleta === 'lalamove' ? 'Lalamove' : (pickup.transportadoras?.nome_fantasia || 'Frota Terceirizada')],
+        ['Status Atual', statusConfig[pickup.status]?.label || pickup.status],
+      ],
+      theme: 'striped',
+      headStyles: { fillStyle: [31, 41, 55] }
+    });
+    
+    doc.setFontSize(14);
+    doc.text("NOTAS E OBSERVAÇÕES", 20, (doc as any).lastAutoTable.finalY + 20);
+    doc.setFontSize(10);
+    doc.text(pickup.observacoes || "Nenhuma observação registrada.", 20, (doc as any).lastAutoTable.finalY + 30, { maxWidth: 170 });
+    
+    // Footer
+    doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 20, 280);
+    doc.text("Protocolo Digital Nexus Logistics - Autenticação por Hash", 120, 280);
+
+    doc.save(`Manifesto_${pickup.numero_coleta}.pdf`);
+    toast.success("Manifesto de Coleta gerado com sucesso!");
+  };
+
   // Simulação de custos (Etapa 7)
   const estimatedCost = (pickup.peso_estimado_kg || 0) * 1.5 + (pickup.tipo_coleta === 'lalamove' ? 25 : 15);
 
