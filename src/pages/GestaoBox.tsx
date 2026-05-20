@@ -193,17 +193,26 @@ export default function GestaoBox() {
   return (
     <MainLayout>
       <div className="space-y-6 animate-in fade-in duration-500">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 shadow-inner">
-              <Box className="w-8 h-8 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight">Gestão de BOX</h1>
-              <p className="text-muted-foreground flex items-center gap-2">
-                Controle avançado de expedição (10/10 Pro)
-              </p>
-            </div>
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Box className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Gestão de Box</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Warehouse_Intelligence</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">ALOCAÇÃO INTELIGENTE • CROSS-DOCKING</span>
+                </div>
+              </div>
+            </h1>
           </div>
 
           <div className="flex items-center gap-2">
