@@ -31,10 +31,19 @@ import { useImageUpload } from "@/hooks";
 import { useEntityHistory } from "@/hooks";
 
 interface Ocorrencia {
-  id: string; tipo_ocorrencia: string; descricao: string | null; acao_tomada: string | null;
-  resolvida: boolean | null; data_resolucao: string | null; created_at: string;
-  coleta_id: string | null; entrega_id: string | null; fotos_urls: string[] | null;
-  coleta?: { numero_coleta: string } | null; entrega?: { numero_entrega: string } | null;
+  id: string; 
+  tipo_ocorrencia: string; 
+  descricao: string | null; 
+  acao_tomada: string | null;
+  prioridade: 'baixa' | 'media' | 'alta' | 'critica';
+  resolvida: boolean | null; 
+  data_resolucao: string | null; 
+  created_at: string;
+  coleta_id: string | null; 
+  entrega_id: string | null; 
+  fotos_urls: string[] | null;
+  coleta?: { numero_coleta: string } | null; 
+  entrega?: { numero_entrega: string } | null;
 }
 
 const TIPOS = [
