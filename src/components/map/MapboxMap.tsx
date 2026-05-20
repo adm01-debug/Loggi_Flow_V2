@@ -161,7 +161,7 @@ export function MapboxMap({
     const newStyle = mapStyle === 'satellite' ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/dark-v11';
     
     // Smooth transition between styles
-    map.current.setStyle(newStyle, { diff: true });
+    map.current.setStyle(newStyle, { diff: true } as any);
     
     // Continual animation for pitch/bearing
     map.current.easeTo({
