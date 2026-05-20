@@ -572,9 +572,12 @@ export default function MapaRotas() {
                      });
                    }
                  }}
-               />
+                 />
+               
+               <CinematicHUD />
 
               {/* predictive risk alerts overlay */}
+
               <AnimatePresence>
                 {activeLayers.risks && (
                   <motion.div 
