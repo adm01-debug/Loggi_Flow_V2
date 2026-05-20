@@ -174,11 +174,44 @@ export default function PainelOTIF() {
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatsCard title="OTIF Global" value={`${globalOTIF.toFixed(1)}%`} icon={Target} color={globalOTIF >= 95 ? 'success' : globalOTIF >= 85 ? 'warning' : 'destructive'} />
-          <StatsCard title="Transportadoras" value={transportadoraStats.length} icon={Truck} color="primary" />
-          <StatsCard title="Custo Médio/Entrega" value={`R$ ${custoMedioGlobal.toFixed(0)}`} icon={DollarSign} color="info" />
-          <StatsCard title="Total Entregas" value={transportadoraStats.reduce((s, t) => s + t.total_entregas, 0)} icon={CheckCircle2} color="success" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-primary/20"><Target className="w-6 h-6 text-primary" /></div>
+              <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest italic border-current", globalOTIF >= 95 ? 'text-emerald-500' : 'text-amber-500')}>
+                {globalOTIF >= 95 ? 'Nível Elite' : 'Abaixo da Meta'}
+              </Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">{globalOTIF.toFixed(1)}%</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">OTIF Global do Ecossistema</p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-indigo-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-indigo-500/20"><Truck className="w-6 h-6 text-indigo-500" /></div>
+              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-indigo-500 border-indigo-500/20 italic">Malha Ativa</Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">{transportadoraStats.length}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500/80">Transportadoras Monitoradas</p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-emerald-500/20"><DollarSign className="w-6 h-6 text-emerald-500" /></div>
+              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-emerald-500 border-emerald-500/20 italic">Ticket Médio</Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">R$ {custoMedioGlobal.toFixed(0)}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">Custo Médio por Entrega</p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-sky-500/10 to-sky-500/5 border border-sky-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-sky-500/20"><CheckCircle2 className="w-6 h-6 text-sky-500" /></div>
+              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-sky-500 border-sky-500/20 italic">Fluxo Total</Badge>
+            </div>
+            <p className="text-4xl font-black tracking-tighter italic text-white">{transportadoraStats.reduce((s, t) => s + t.total_entregas, 0)}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-500/80">Entregas Processadas</p>
+          </motion.div>
         </div>
 
         {/* Charts */}
