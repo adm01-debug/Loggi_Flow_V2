@@ -122,7 +122,10 @@ export function MapboxMap({
             ctx.fill();
             ctx.stroke();
             
-            this.data = ctx.getImageData(0, 0, this.width, this.height).data;
+            // Fix: Cast the clamped array to Uint8Array for Mapbox compatibility
+            const imageData = ctx.getImageData(0, 0, this.width, this.height).data;
+            this.data = new Uint8Array(imageData.buffer);
+            
             map.current?.triggerRepaint();
             return true;
           }
