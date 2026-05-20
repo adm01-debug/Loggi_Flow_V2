@@ -99,18 +99,26 @@ export default function IntegracaoBitrix() {
   return (
     <MainLayout>
       <div className="space-y-6 animate-in fade-in duration-500">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#2fc6f6]/10 shadow-inner">
-              <Building2 className="w-8 h-8 text-[#2fc6f6]" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight">Bitrix24 CRM</h1>
-              <p className="text-muted-foreground flex items-center gap-2">
-                Sincronização bidirecional de negócios e contatos
-                <Badge className="bg-[#2fc6f6]/10 text-[#2fc6f6] border-[#2fc6f6]/20 text-[10px] font-bold">BITRIX24</Badge>
-              </p>
-            </div>
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#2fc6f6] to-[#2fc6f6]/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-[#2fc6f6] animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Bitrix24 CRM</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2fc6f6]/10 border border-[#2fc6f6]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#2fc6f6] animate-ping" />
+                    <span className="text-[10px] font-black text-[#2fc6f6] uppercase tracking-[0.3em]">Omnichannel_Sync</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">PIPELINE • DEALS • REAL-TIME</span>
+                </div>
+              </div>
+            </h1>
           </div>
 
           <div className="flex items-center gap-2">
