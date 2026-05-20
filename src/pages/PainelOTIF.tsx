@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { differenceInDays, parseISO } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, RadialBarChart, RadialBar, Legend } from 'recharts';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 interface TransportadoraOTIF {
   id: string;
