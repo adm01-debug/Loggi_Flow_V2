@@ -324,23 +324,39 @@ export default function CotacaoMultiCanal() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <Breadcrumbs items={[{ label: 'Operações' }, { label: 'Nexus Freight Command' }]} />
-        <PageHeader 
-          title="Nexus Freight Command" 
-          description="Controle central de cotações automatizadas com inteligência de malha" 
-          icon={Rocket}
-        >
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2" onClick={() => window.location.href='/dashboard-cotacoes'}>
-              <TrendingDown className="w-4 h-4" /> Ver Dashboard
+      <div className="space-y-8 max-w-[1600px] mx-auto pb-12">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Rocket className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Freight Command</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Nexus_Blast_Enabled</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">SMART COTAÇÃO • MULTI-CHANNEL</span>
+                </div>
+              </div>
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="lg" onClick={() => setCoverageDialog(true)} className="h-14 px-8 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[11px] gap-3 hover:bg-white/5 transition-all group">
+              <Map className="w-4 h-4 text-primary" />
+              Ver Malha
             </Button>
-            {cotacoes.length > 0 && <DataExporter data={exportData} filename="nexus-cotacoes" />}
-            <Button variant="outline" className="gap-2" onClick={() => setCoverageDialog(true)}>
-              <Map className="w-4 h-4" /> Visualizar Malha
+            <Button size="lg" onClick={() => window.location.href='/dashboard-cotacoes'} className="h-14 px-8 rounded-2xl bg-primary text-black hover:bg-primary/90 font-black uppercase tracking-widest text-[11px] gap-3 transition-all shadow-lg shadow-primary/20">
+              <TrendingDown className="w-4 h-4" />
+              Insights de Custo
             </Button>
           </div>
-        </PageHeader>
+        </div>
 
         <div className="flex flex-col md:flex-row gap-4 mb-4">
            <div className="flex-1 space-y-1">

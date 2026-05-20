@@ -14,6 +14,7 @@ import {
   Wand2, FileSpreadsheet, Loader2, DollarSign, Truck, Package,
   RefreshCw, Eye
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks';
@@ -181,11 +182,58 @@ export default function ConciliacaoAutomatica() {
 
         {/* KPIs */}
         {showResults && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatsCard title="Conciliados" value={conciliados.length} icon={CheckCircle2} color="success" />
-            <StatsCard title="Divergências" value={divergencias.length} icon={AlertTriangle} color="warning" />
-            <StatsCard title="Sem Match" value={semMatch.length} icon={XCircle} color="destructive" />
-            <StatsCard title="Valor Divergência" value={`R$ ${valorDivergencia.toFixed(2)}`} icon={DollarSign} color="info" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+              <Card className="overflow-hidden border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 rounded-lg bg-emerald-500/10"><CheckCircle2 className="w-5 h-5 text-emerald-500" /></div>
+                    <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 border-emerald-500/20">Audit OK</Badge>
+                  </div>
+                  <p className="text-3xl font-black tracking-tighter italic text-emerald-500">{conciliados.length}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Conciliados 100%</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+              <Card className="overflow-hidden border-amber-500/20 bg-amber-500/5 backdrop-blur-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 rounded-lg bg-amber-500/10"><AlertTriangle className="w-5 h-5 text-amber-500" /></div>
+                    <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest text-amber-500 border-amber-500/20">Atenção</Badge>
+                  </div>
+                  <p className="text-3xl font-black tracking-tighter italic text-amber-500">{divergencias.length}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Divergências de Valor</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              <Card className="overflow-hidden border-rose-500/20 bg-rose-500/5 backdrop-blur-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 rounded-lg bg-rose-500/10"><XCircle className="w-5 h-5 text-rose-500" /></div>
+                    <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest text-rose-500 border-rose-500/20">Pendência</Badge>
+                  </div>
+                  <p className="text-3xl font-black tracking-tighter italic text-rose-500">{semMatch.length}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sem Registro no Sistema</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+              <Card className="overflow-hidden border-primary/20 bg-primary/5 backdrop-blur-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 rounded-lg bg-primary/10"><DollarSign className="w-5 h-5 text-primary" /></div>
+                    <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest text-primary border-primary/20">Economia Potencial</Badge>
+                  </div>
+                  <p className="text-3xl font-black tracking-tighter italic text-primary">{formatCurrency(valorDivergencia)}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Valor a Reaver (Glosas)</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         )}
 
