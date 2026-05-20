@@ -258,6 +258,7 @@ export default function Envios() {
 
   return (
     <MainLayout>
+      <div className="space-y-8 max-w-[1600px] mx-auto pb-12">
       {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} gravity={0.3} />}
       <div className="space-y-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
