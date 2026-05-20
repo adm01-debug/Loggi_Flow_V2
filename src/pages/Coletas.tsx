@@ -238,6 +238,75 @@ export default function Coletas() {
                 <p className="text-[9px] text-white/20 mt-2 italic">Ciclo completo de logística_REVERSE</p>
               </Card>
             </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
+              <Card className="lg:col-span-2 p-8 rounded-[2.5rem] bg-black/40 border-white/5 backdrop-blur-2xl shadow-2xl overflow-hidden relative group">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-1 italic">Performance_Nexus OTIF</h3>
+                    <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Sincronização de Fluxo Global em Tempo Real</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Live_Feed</span>
+                  </div>
+                </div>
+                <div className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={[
+                      { name: 'Seg', otif: 85, vol: 120 },
+                      { name: 'Ter', otif: 88, vol: 150 },
+                      { name: 'Qua', otif: 82, vol: 110 },
+                      { name: 'Qui', otif: 94, vol: 180 },
+                      { name: 'Sex', otif: 91, vol: 140 },
+                      { name: 'Sab', otif: 96, vol: 90 },
+                      { name: 'Dom', otif: 98, vol: 60 },
+                    ]}>
+                      <defs>
+                        <linearGradient id="colorOtif" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                      <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '10px', color: '#fff' }}
+                        itemStyle={{ color: 'var(--primary)', fontWeight: 'bold' }}
+                      />
+                      <Area type="monotone" dataKey="otif" stroke="var(--primary)" strokeWidth={4} fillOpacity={1} fill="url(#colorOtif)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+
+              <Card className="p-8 rounded-[2.5rem] bg-black/40 border-white/5 backdrop-blur-2xl shadow-2xl relative overflow-hidden group">
+                <h3 className="text-sm font-black uppercase tracking-[0.4em] text-warning mb-8 italic">Distribuição_Volume</h3>
+                <div className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { type: 'Inbound', val: stats.total - (coletas.filter(c => (c as any).is_reverse).length) },
+                      { type: 'Reversa', val: coletas.filter(c => (c as any).is_reverse).length },
+                      { type: 'Urgente', val: coletas.filter(c => (c as any).is_urgent).length },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                      <XAxis dataKey="type" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
+                      <Tooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} contentStyle={{ backgroundColor: 'rgba(0,0,0,0.9)', border: 'none', borderRadius: '12px', fontSize: '10px' }} />
+                      <Bar dataKey="val" radius={[8, 8, 0, 0]}>
+                        {[0, 1, 2].map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index === 0 ? 'var(--primary)' : index === 1 ? '#a855f7' : '#f97316'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+            </motion.div>
           ) : (
             <motion.div 
               key="stats"
