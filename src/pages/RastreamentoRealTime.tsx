@@ -468,7 +468,7 @@ export default function RastreamentoRealTime() {
                     Acionar Nexus Support_API
                   </Button>
                 </div>
-              </div>
+              </CardContent>
             </Card>
 
             <div className="bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-[2rem] border border-primary/10 flex items-center gap-4 group">
