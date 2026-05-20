@@ -327,7 +327,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                     <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
                       <Zap className="w-5 h-5 animate-pulse" /> Ações de Protocolo
                     </h3>
-                    <Button variant="ghost" className="h-8 px-3 rounded-lg text-[9px] font-black uppercase tracking-widest text-white/30 hover:text-primary" onClick={() => toast.success("Manifesto gerado com sucesso!")}>
+                    <Button variant="ghost" className="h-8 px-3 rounded-lg text-[9px] font-black uppercase tracking-widest text-white/30 hover:text-primary" onClick={generateManifestoPDF}>
                       <FileText className="w-3.5 h-3.5 mr-2" /> Gerar Manifesto_PDF
                     </Button>
                   </div>
