@@ -26,6 +26,7 @@ interface MapboxMapProps {
   className?: string;
   onMarkerClick?: (id: string) => void;
   showTraffic?: boolean;
+  showWeather?: boolean;
   mapStyle?: 'dark' | 'satellite';
   pitch?: number;
 }
@@ -39,6 +40,7 @@ export function MapboxMap({
   className = '',
   onMarkerClick,
   showTraffic = false,
+  showWeather = false,
   mapStyle = 'dark',
   pitch = 0,
 }: MapboxMapProps) {
@@ -188,12 +190,72 @@ export function MapboxMap({
       }
     };
 
+    // Weather Layer Logic
+    const updateWeather = () => {
+      if (!map.current) return;
+      const weatherSourceId = 'nexus-weather';
+      
+      if (showWeather) {
+        if (!map.current.getSource(weatherSourceId)) {
+          map.current.addSource(weatherSourceId, {
+            'type': 'geojson',
+            'data': {
+              'type': 'FeatureCollection',
+              'features': [
+                {
+                  'type': 'Feature',
+                  'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[
+                      [-48, -24], [-45, -24], [-45, -22], [-48, -22], [-48, -24]
+                    ]]
+                  }
+                }
+              ]
+            }
+          });
+          
+          map.current.addLayer({
+            'id': 'weather-layer',
+            'type': 'fill',
+            'source': weatherSourceId,
+            'paint': {
+              'fill-color': '#3b82f6',
+              'fill-opacity': 0.15,
+              'fill-outline-color': '#60a5fa'
+            }
+          });
+
+          // Pulse effect for weather
+          let opacity = 0.15;
+          let direction = 1;
+          const animateWeather = () => {
+            if (!map.current?.getLayer('weather-layer')) return;
+            opacity += 0.005 * direction;
+            if (opacity > 0.3 || opacity < 0.1) direction *= -1;
+            map.current.setPaintProperty('weather-layer', 'fill-opacity', opacity);
+            requestAnimationFrame(animateWeather);
+          };
+          animateWeather();
+        }
+      } else {
+        if (map.current.getLayer('weather-layer')) {
+          map.current.removeLayer('weather-layer');
+          map.current.removeSource(weatherSourceId);
+        }
+      }
+    };
+
     if (map.current.isStyleLoaded()) {
       updateTraffic();
+      updateWeather();
     } else {
-      map.current.once('style.load', updateTraffic);
+      map.current.once('style.load', () => {
+        updateTraffic();
+        updateWeather();
+      });
     }
-  }, [mapStyle, pitch, showTraffic]);
+  }, [mapStyle, pitch, showTraffic, showWeather]);
 
   // Update markers
   useEffect(() => {

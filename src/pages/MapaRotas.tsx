@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe, Layers, Satellite, Zap, AlertTriangle, Play, ShieldCheck } from "lucide-react";
+import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe, Layers, Satellite, Zap, AlertTriangle, Play, ShieldCheck, CloudRain, Activity } from "lucide-react";
 import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -31,7 +31,7 @@ export default function MapaRotas() {
   const [mapStyle, setMapStyle] = useState<'dark' | 'satellite'>('dark');
   const [mapPitch, setMapPitch] = useState(0);
   const [timeTravelValue, setTimeTravelValue] = useState(100);
-  const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true });
+  const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true, weather: false, bio: false });
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
 
@@ -247,6 +247,24 @@ export default function MapaRotas() {
                     <AlertTriangle className="w-3 h-3 mr-1.5" />
                     Risks
                   </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, weather: !prev.weather }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.weather ? "text-blue-400 border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]" : "text-white/40")}
+                  >
+                    <CloudRain className="w-3 h-3 mr-1.5" />
+                    Weather
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, bio: !prev.bio }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8 hover:bg-white/5 transition-all", activeLayers.bio ? "text-rose-400 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.2)]" : "text-white/40")}
+                  >
+                    <Activity className="w-3 h-3 mr-1.5" />
+                    Bio_Sync
+                  </Button>
                 </div>
               </div>
 
@@ -258,6 +276,7 @@ export default function MapaRotas() {
                 mapStyle={mapStyle}
                 pitch={mapPitch}
                 showTraffic={activeLayers.nexus}
+                showWeather={activeLayers.weather}
                 className="h-[650px] w-full"
               />
 
