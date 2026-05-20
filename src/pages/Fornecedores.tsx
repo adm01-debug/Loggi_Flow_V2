@@ -270,7 +270,7 @@ export default function Fornecedores() {
         <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>Detalhes do Fornecedor</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><p className="text-lg font-semibold">{sel.nome_fantasia || sel.razao_social}</p>{sel.cnpj && <p className="font-mono">{fmtCNPJ(sel.cnpj)}</p>}<div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p></div><div><p className="text-muted-foreground">Cidade/UF</p><p>{sel.cidade} - {sel.estado}</p></div></div>{sel.contato_nome && <div className="text-sm"><p className="text-muted-foreground">Contato</p><p>{sel.contato_nome} - {sel.contato_telefone}</p></div>}</div>}</DialogContent></Dialog>
         <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir fornecedor?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
-    </div>
+      </div>
     </MainLayout>
   );
 }
