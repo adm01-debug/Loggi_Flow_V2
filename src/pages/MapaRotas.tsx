@@ -80,37 +80,44 @@ export default function MapaRotas() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
-          <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
-                  <Map className="w-8 h-8 sm:w-10 sm:h-10 text-cyan-500 animate-pulse" />
+        {/* Premium Header */}
+        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between px-4 py-6 bg-black/40 backdrop-blur-3xl rounded-[3rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+          
+          <div className="space-y-4 relative z-10">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white flex flex-col gap-1 tracking-tighter uppercase italic leading-none">
+              <span className="text-cyan-500 drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]">Nexus</span>
+              <span className="flex items-center gap-4">
+                Routing_Grid
+                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] not-italic tracking-[0.3em] text-cyan-500">
+                  <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_#06b6d4]" />
+                  LIVE_SYNC
                 </div>
-              </div>
-              <div className="flex flex-col">
-                <span className="drop-shadow-2xl">Mapeamento Nexus</span>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-                    <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
-                    <span className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em]">Geospatial_Intelligence</span>
-                  </div>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">PRECISÃO GPS • OTIMIZAÇÃO DE ROTAS</span>
-                </div>
-              </div>
+              </span>
             </h1>
+            <p className="text-white/40 text-xs font-bold uppercase tracking-[0.4em] flex items-center gap-3">
+              <Globe className="w-3.5 h-3.5 text-cyan-500" />
+              Soberania em Inteligência Geoespacial & Logística Preditiva
+            </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Switch id="route-lines" checked={showRouteLines} onCheckedChange={setShowRouteLines} />
-              <Label htmlFor="route-lines" className="text-xs"><Route className="w-3 h-3 inline mr-1" />Linhas</Label>
+
+          <div className="flex flex-wrap items-center gap-4 relative z-10">
+            <div className="flex items-center gap-6 p-4 bg-white/5 rounded-3xl border border-white/5 backdrop-blur-xl">
+              <div className="flex items-center gap-3">
+                <Switch id="route-lines" checked={showRouteLines} onCheckedChange={setShowRouteLines} className="data-[state=checked]:bg-cyan-500" />
+                <Label htmlFor="route-lines" className="text-[10px] font-black uppercase tracking-widest text-white/60">Arc_Routes</Label>
+              </div>
+              <div className="h-8 w-px bg-white/10" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => deliveryRoutes?.refetchWithGeocoding?.()}
+                className="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 rounded-2xl px-6 h-10 transition-all active:scale-95"
+              >
+                <RefreshCw className={cn("w-4 h-4 mr-2", isGeocoding && "animate-spin")} />
+                <span className="text-[10px] font-black uppercase tracking-widest">Recalcular_Grid</span>
+              </Button>
             </div>
-            <Button variant="outline" size="sm" onClick={() => deliveryRoutes?.refetchWithGeocoding?.()}>
-              <RefreshCw className={cn("w-4 h-4 mr-1", isGeocoding && "animate-spin")} />
-              {isGeocoding ? "Geocodificando..." : "Atualizar"}
-            </Button>
           </div>
         </div>
 
