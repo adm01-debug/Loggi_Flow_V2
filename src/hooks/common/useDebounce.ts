@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export function useDebounce<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -15,17 +15,19 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number = 300
 ): (...args: Parameters<T>) => void {
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-
-  const debouncedCallback = ((...args: Parameters<T>) => {
-    if (timeoutId) clearTimeout(timeoutId);
-    const id = setTimeout(() => callback(...args), delay);
-    setTimeoutId(id);
-  }) as T;
+  // Keep the timer and the latest callback in refs so a synchronous burst of
+  // calls always clears the pending timer (no leaks / double-fires) and the
+  // returned function keeps a stable identity across renders.
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const callbackRef = useRef<T>(callback);
+  callbackRef.current = callback;
 
   useEffect(() => {
-    return () => { if (timeoutId) clearTimeout(timeoutId); };
-  }, [timeoutId]);
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+  }, []);
 
-  return debouncedCallback;
+  return useCallback((...args: Parameters<T>) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => callbackRef.current(...args), delay);
+  }, [delay]);
 }

@@ -100,7 +100,11 @@ export function useOfflineSync() {
   useEffect(() => {
     const stored = localStorage.getItem("pendingOperations");
     if (stored) {
-      setPendingOperations(JSON.parse(stored));
+      try {
+        setPendingOperations(JSON.parse(stored));
+      } catch {
+        localStorage.removeItem("pendingOperations");
+      }
     }
   }, []);
 
