@@ -32,6 +32,7 @@ export default function MapaRotas() {
   const [mapPitch, setMapPitch] = useState(0);
   const [timeTravelValue, setTimeTravelValue] = useState(100);
   const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true, weather: false, bio: false });
+  const [isDroneView, setIsDroneView] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
 
@@ -225,6 +226,15 @@ export default function MapaRotas() {
                     {mapStyle === 'dark' ? <Satellite className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
                     {mapStyle === 'dark' ? 'Satellite_Fusion' : 'Tactical_Grid'}
                   </Button>
+
+                  <Button 
+                    size="sm" 
+                    onClick={() => setIsDroneView(!isDroneView)}
+                    className={cn("bg-black/90 backdrop-blur-2xl px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border shadow-2xl", isDroneView ? "text-amber-400 border-amber-500/30 bg-amber-500/10" : "text-white/40 border-white/5")}
+                  >
+                    <Globe className={cn("w-3.5 h-3.5", isDroneView && "animate-spin")} />
+                    {isDroneView ? 'Drone_Follow: ON' : 'Drone_View'}
+                  </Button>
                   
                   <Badge className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
                     <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse" />
@@ -299,6 +309,7 @@ export default function MapaRotas() {
                 pitch={mapPitch}
                 showTraffic={activeLayers.nexus}
                 showWeather={activeLayers.weather}
+                isDroneView={isDroneView}
                 className="h-[650px] w-full"
               />
 

@@ -27,6 +27,7 @@ interface MapboxMapProps {
   onMarkerClick?: (id: string) => void;
   showTraffic?: boolean;
   showWeather?: boolean;
+  isDroneView?: boolean;
   mapStyle?: 'dark' | 'satellite';
   pitch?: number;
 }
@@ -41,6 +42,7 @@ export function MapboxMap({
   onMarkerClick,
   showTraffic = false,
   showWeather = false,
+  isDroneView = false,
   mapStyle = 'dark',
   pitch = 0,
 }: MapboxMapProps) {
@@ -168,11 +170,32 @@ export function MapboxMap({
     // Continual animation for pitch/bearing
     map.current.easeTo({
       pitch: pitch,
-      bearing: mapStyle === 'satellite' ? 15 : 0,
+      bearing: mapStyle === 'satellite' || isDroneView ? 15 : 0,
+      zoom: isDroneView ? 16 : map.current.getZoom(),
       duration: 2500,
       easing: (t) => t * (2 - t), // easeOutQuad for silky smoothness
       essential: true
     });
+
+    if (isDroneView && markers.length > 0) {
+      const target = markers[0]; // Follow first vehicle for demo
+      map.current.flyTo({
+        center: [target.lng, target.lat],
+        zoom: 16,
+        pitch: 60,
+        bearing: 0,
+        duration: 3000
+      });
+      
+      let bearing = 0;
+      const rotateCamera = () => {
+        if (!isDroneView || !map.current) return;
+        bearing += 0.1;
+        map.current.setBearing(bearing % 360);
+        requestAnimationFrame(rotateCamera);
+      };
+      setTimeout(rotateCamera, 3000);
+    }
 
     const updateTraffic = () => {
       if (!map.current) return;
