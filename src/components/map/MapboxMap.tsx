@@ -26,6 +26,8 @@ interface MapboxMapProps {
   className?: string;
   onMarkerClick?: (id: string) => void;
   showTraffic?: boolean;
+  mapStyle?: 'dark' | 'satellite';
+  pitch?: number;
 }
 
 export function MapboxMap({
@@ -36,6 +38,8 @@ export function MapboxMap({
   originMarker,
   className = '',
   onMarkerClick,
+  mapStyle = 'dark',
+  pitch = 0,
 }: MapboxMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -71,9 +75,10 @@ export function MapboxMap({
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
+      style: mapStyle === 'satellite' ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/dark-v11',
       center,
       zoom,
+      pitch,
       attributionControl: false,
       antialias: true
     });
@@ -146,7 +151,21 @@ export function MapboxMap({
       map.current?.remove();
       map.current = null;
     };
-  }, [token, center, zoom]);
+  }, [token, center, zoom]); // Re-init if core props change significantly
+
+  // Handle Style and Pitch changes without full re-init
+  useEffect(() => {
+    if (!map.current) return;
+    
+    // Simply trigger style change - Mapbox handles the check internally or we can use a ref
+    const newStyle = mapStyle === 'satellite' ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/dark-v11';
+    map.current.setStyle(newStyle);
+    
+    map.current.easeTo({
+      pitch: pitch,
+      duration: 1000
+    });
+  }, [mapStyle, pitch]);
 
   // Update markers
   useEffect(() => {
