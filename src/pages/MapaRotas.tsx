@@ -56,21 +56,35 @@ export default function MapaRotas() {
   const [vehicleFilter, setVehicleFilter] = useState("all");
 
 
-  // Load tactical logs from DB
+  // Load tactical logs and real anomalies from DB
   useEffect(() => {
     const fetchLogs = async () => {
-      const { data } = await supabase
+      // Filter by time travel window if not in Live Data mode
+      let query = supabase
         .from('nexus_tactical_logs')
         .select('*')
-        .order('event_time', { ascending: false })
-        .limit(15);
+        .order('event_time', { ascending: false });
+
+      if (timeTravelValue < 95) {
+        const historyDate = new Date();
+        historyDate.setMinutes(historyDate.getMinutes() - (100 - timeTravelValue));
+        const hourAgo = new Date(historyDate);
+        hourAgo.setMinutes(hourAgo.getMinutes() - 30);
+        query = query.lte('event_time', historyDate.toISOString())
+                     .gte('event_time', hourAgo.toISOString());
+      } else {
+        query = query.limit(20);
+      }
+
+      const { data } = await query;
       
       if (data) {
         setLogs(data.map(l => ({
           id: l.id,
           time: new Date(l.event_time).toLocaleTimeString([], { hour12: false }),
           msg: l.message,
-          type: l.type as any
+          type: l.type as any,
+          vehicle: l.target_vehicle
         })));
       }
     };
@@ -78,19 +92,14 @@ export default function MapaRotas() {
 
     const channel = supabase
       .channel('tactical-logs')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nexus_tactical_logs' }, payload => {
-        const newLog = payload.new;
-        setLogs(prev => [{
-          id: newLog.id,
-          time: new Date(newLog.event_time).toLocaleTimeString([], { hour12: false }),
-          msg: newLog.message,
-          type: newLog.type as any
-        }, ...prev].slice(0, 15));
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nexus_tactical_logs' }, () => {
+        if (timeTravelValue >= 95) fetchLogs();
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [timeTravelValue]);
+
 
   // Fetch real BioSync data
   useEffect(() => {
@@ -841,12 +850,32 @@ export default function MapaRotas() {
           <AnomalyList 
             anomalies={anomalies} 
             onClose={() => setShowAnomalyList(false)} 
-            onAction={(id) => {
-              toast.success("PROTOCOLO INICIADO", { description: "Reiniciando gateway OBDII remotamente..." });
+            onAction={async (id) => {
+              const anomaly = anomalies.find(a => a.id === id);
+              if (!anomaly) return;
+
+              toast.loading("EXECUTANDO PROTOCOLO NEXUS...", { id: "protocol-toast" });
+              
+              try {
+                await supabase.functions.invoke('execute-protocol', {
+                  body: { 
+                    vehicle_id: anomaly.unit, 
+                    protocol_name: "REINICIAR_GATEWAY_OBDII" 
+                  }
+                });
+                toast.success("PROTOCOLO EXECUTADO", { 
+                  id: "protocol-toast",
+                  description: `Gateway da Unidade ${anomaly.unit} reiniciado com sucesso.` 
+                });
+              } catch (err) {
+                toast.error("FALHA NO PROTOCOLO", { id: "protocol-toast" });
+              }
+              
               setShowAnomalyList(false);
             }}
           />
         )}
+
       </AnimatePresence>
       
       <TacticalTerminal />
