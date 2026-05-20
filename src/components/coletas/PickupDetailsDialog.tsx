@@ -246,6 +246,35 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                   </div>
                 </div>
 
+                </div>
+                
+                <div className="bg-white/[0.01] p-6 rounded-[2rem] border border-white/5 backdrop-blur-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
+                      <FileText className="w-4 h-4" /> GED_Nexus Documentos
+                    </h3>
+                    <Button variant="ghost" size="sm" className="h-7 px-3 rounded-lg text-[8px] font-black uppercase tracking-widest text-primary hover:bg-primary/10">
+                      <Plus className="w-3 h-3 mr-1" /> Anexar_Doc
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5 hover:border-primary/30 transition-all cursor-pointer group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary"><FileText className="w-3.5 h-3.5" /></div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Nota_Fiscal.pdf</span>
+                      </div>
+                      <ExternalLink className="w-3 h-3 text-white/20 group-hover:text-primary transition-colors" />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5 hover:border-warning/30 transition-all cursor-pointer group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-warning/10 text-warning"><Package className="w-3.5 h-3.5" /></div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Romaneio_Grid.xlsx</span>
+                      </div>
+                      <ExternalLink className="w-3 h-3 text-white/20 group-hover:text-warning transition-colors" />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="pt-6 border-t border-white/5 space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
