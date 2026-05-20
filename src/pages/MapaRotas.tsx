@@ -48,7 +48,7 @@ export default function MapaRotas() {
   const [isDroneView, setIsDroneView] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
-  const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'warn' | 'crit'; vehicle?: string }[]>([]);
+  const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'warn' | 'crit'; vehicle?: string | null }[]>([]);
   const [bioData, setBioData] = useState<{ heart_rate: number; fatigue_index: string } | null>(null);
   const [weatherData, setWeatherData] = useState<any>(null);
   const [selectedAnomaly, setSelectedAnomaly] = useState<{ id: string; level: 'info' | 'crit'; cause: string; action: string } | null>(null);
