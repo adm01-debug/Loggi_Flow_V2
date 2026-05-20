@@ -161,6 +161,18 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
               >
                 <HistoryIcon className="w-3 h-3" /> Reversa
               </Button>
+              <Button 
+                type="button"
+                variant={isUrgent ? "destructive" : "ghost"} 
+                size="sm" 
+                onClick={() => setIsUrgent(!isUrgent)}
+                className={cn(
+                  "h-8 px-4 rounded-full text-[9px] font-black uppercase tracking-widest gap-2",
+                  isUrgent && "bg-orange-500 text-white hover:bg-orange-600 border-none"
+                )}
+              >
+                <Zap className="w-3 h-3" /> Urgente
+              </Button>
             </div>
           </div>
         </DialogHeader>
