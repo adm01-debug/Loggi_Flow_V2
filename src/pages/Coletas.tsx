@@ -332,6 +332,16 @@ export default function Coletas() {
                                 <Badge variant="secondary" className="text-[10px] h-5 font-black uppercase tracking-widest px-2 bg-primary/5 text-primary border-primary/10">
                                   {c.tipo_coleta}
                                 </Badge>
+                                {c.is_reverse && (
+                                  <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 h-5 text-[9px] font-black uppercase tracking-widest px-2">
+                                    REVERSA
+                                  </Badge>
+                                )}
+                                {c.is_urgent && (
+                                  <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20 h-5 text-[9px] font-black uppercase tracking-widest px-2 animate-pulse">
+                                    URGENTE
+                                  </Badge>
+                                )}
                                 {isAtrasado && (
                                   <Badge variant="destructive" className="animate-pulse h-5 text-[9px] font-black uppercase tracking-widest px-2">
                                     ATRASO_SLA
