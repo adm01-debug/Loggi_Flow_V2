@@ -2971,6 +2971,8 @@ export type Database = {
           id: string
           message: string
           metadata: Json | null
+          protocol_executed: boolean | null
+          target_vehicle: string | null
           type: string
           vehicle_id: string | null
         }
@@ -2980,6 +2982,8 @@ export type Database = {
           id?: string
           message: string
           metadata?: Json | null
+          protocol_executed?: boolean | null
+          target_vehicle?: string | null
           type: string
           vehicle_id?: string | null
         }
@@ -2989,6 +2993,8 @@ export type Database = {
           id?: string
           message?: string
           metadata?: Json | null
+          protocol_executed?: boolean | null
+          target_vehicle?: string | null
           type?: string
           vehicle_id?: string | null
         }
@@ -4871,6 +4877,10 @@ export type Database = {
       cleanup_old_telemetry_logs:
         | { Args: never; Returns: undefined }
         | { Args: { days_to_keep?: number }; Returns: number }
+      execute_nexus_protocol: {
+        Args: { protocol_name: string; vehicle_id: string }
+        Returns: Json
+      }
       get_carrier_performance_stats: {
         Args: never
         Returns: {
