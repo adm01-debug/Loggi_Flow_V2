@@ -536,13 +536,36 @@ export function MapboxMap({
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
           'line-color': ['get', 'color'],
-          'line-width': 2.5,
+          'line-width': ['case', ['get', 'isRerouted'], 3.5, 2.5],
           'line-opacity': 0.9,
-          'line-dasharray': [3, 2],
+          'line-dasharray': ['case', ['get', 'isRerouted'], ['literal', [2, 1]], ['literal', [3, 2]]],
         },
       });
 
-      // City-to-City Connection Points (Visual enhancement)
+      // Recalculated Route Labels
+      map.current!.addLayer({
+        id: 'route-labels',
+        type: 'symbol',
+        source: sourceId,
+        filter: ['get', 'isRerouted'],
+        layout: {
+          'symbol-placement': 'line',
+          'text-field': 'REROUTED_BY_NEXUS_AI',
+          'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+          'text-size': 8,
+          'text-letter-spacing': 0.2,
+          'text-offset': [0, 1],
+          'symbol-spacing': 250,
+          'text-transform': 'uppercase'
+        },
+        paint: {
+          'text-color': '#F59E0B',
+          'text-halo-color': 'rgba(0,0,0,0.8)',
+          'text-halo-width': 1
+        }
+      });
+
+      // City-to-City Connection Points
       map.current!.addLayer({
         id: 'route-points',
         type: 'circle',
@@ -555,6 +578,7 @@ export function MapboxMap({
           'circle-opacity': 0.8
         }
       });
+
 
       // Directional Flow Animation (using symbols)
       if (!map.current!.getLayer(arrowLayerId)) {

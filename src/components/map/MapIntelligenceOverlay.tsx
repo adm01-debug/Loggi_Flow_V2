@@ -1,86 +1,113 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Zap, Clock, ShieldCheck, TrendingUp, AlertTriangle } from "lucide-react";
+import { Brain, Zap, Clock, ShieldCheck, TrendingUp, AlertTriangle, Activity } from "lucide-react";
 import { motion } from "framer-motion";
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
+
+const mockSystemLoad = [
+  { val: 40 }, { val: 45 }, { val: 42 }, { val: 48 }, { val: 55 }, { val: 50 }, { val: 47 }, { val: 52 }, { val: 49 }, { val: 45 }
+];
 
 export function MapIntelligenceOverlay() {
   return (
     <motion.div 
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="absolute top-4 right-4 z-10 w-64 space-y-3 pointer-events-none"
+      className="absolute top-4 right-4 z-10 w-72 space-y-3 pointer-events-none"
     >
-      <Card className="bg-black/80 backdrop-blur-2xl border-white/10 shadow-2xl pointer-events-auto overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse" />
-        <CardHeader className="p-4 pb-2">
-          <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-500 flex items-center gap-2">
-            <Brain className="w-3.5 h-3.5 animate-pulse" />
-            Nexus_AI_Engine
+      <Card className="bg-black/90 backdrop-blur-3xl border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)] pointer-events-auto overflow-hidden rounded-[2rem]">
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 animate-pulse" />
+        
+        <CardHeader className="p-5 pb-2">
+          <CardTitle className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 flex items-center justify-between">
+            <span className="flex items-center gap-2 italic">
+              <Brain className="w-4 h-4 animate-pulse" />
+              Nexus_Core_AI
+            </span>
+            <Badge className="bg-cyan-500/10 text-cyan-400 text-[8px] font-black border-cyan-500/20">V.4.0_STABLE</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-4 pt-0 space-y-4">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Otimização_Global</span>
-              <Badge className="bg-cyan-500/10 text-cyan-400 text-[8px] font-black border-none">98.4%</Badge>
+
+        <CardContent className="p-5 pt-0 space-y-5">
+          {/* Global Optimization Pulse */}
+          <div className="space-y-3">
+            <div className="flex justify-between items-end">
+              <div>
+                <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest block mb-1">Grid_Efficiency</span>
+                <span className="text-2xl font-black text-white italic leading-none tracking-tighter">98.4<span className="text-cyan-500/50">%</span></span>
+              </div>
+              <div className="h-8 w-24">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={mockSystemLoad}>
+                    <Line type="monotone" dataKey="val" stroke="#06b6d4" strokeWidth={2} dot={false} isAnimationActive={true} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
             <div className="h-1 bg-white/5 rounded-full overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: '98.4%' }}
-                className="h-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]"
+                className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.5)]"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/5 p-3 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
-              <p className="text-[7px] font-black text-white/30 uppercase tracking-widest mb-1.5 flex items-center gap-1">
-                <TrendingUp className="w-2 h-2" /> Tráfego
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/5 p-4 rounded-[1.5rem] border border-white/5 hover:bg-white/10 transition-all group/stat">
+              <p className="text-[8px] font-black text-white/20 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <TrendingUp className="w-3 h-3 text-cyan-500" /> Latência
               </p>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-white italic">FLUIDO</span>
-                <div className="flex gap-0.5">
-                  <div className="w-1 h-3 bg-cyan-500/50 rounded-full" />
-                  <div className="w-1 h-2 bg-cyan-500/30 rounded-full mt-auto" />
-                  <div className="w-1 h-4 bg-cyan-500 rounded-full mt-auto" />
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-white italic tracking-tight">12ms</span>
+                <div className="flex gap-0.5 items-end h-3">
+                  <div className="w-0.5 h-full bg-cyan-500/50 rounded-full animate-pulse" />
+                  <div className="w-0.5 h-2/3 bg-cyan-500/30 rounded-full" />
+                  <div className="w-0.5 h-full bg-cyan-500 rounded-full animate-pulse" />
                 </div>
               </div>
             </div>
-            <div className="bg-white/5 p-3 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
-              <p className="text-[7px] font-black text-white/30 uppercase tracking-widest mb-1.5 flex items-center gap-1">
-                <ShieldCheck className="w-2 h-2" /> Clima
+            <div className="bg-white/5 p-4 rounded-[1.5rem] border border-white/5 hover:bg-white/10 transition-all group/stat">
+              <p className="text-[8px] font-black text-white/20 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Activity className="w-3 h-3 text-rose-500" /> Bio_Sync
               </p>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-white italic">ESTÁVEL</span>
-                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-white italic tracking-tight">ACTIVE</span>
+                <div className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
               </div>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-white/5 space-y-2">
-            <div className="flex items-center gap-2 text-amber-500">
-              <AlertTriangle className="w-3 h-3 animate-bounce" />
-              <span className="text-[8px] font-black uppercase tracking-tighter">Fluxo Intenso em Rota B-12</span>
+          <div className="pt-3 border-t border-white/5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-amber-500">
+                <AlertTriangle className="w-3.5 h-3.5 animate-bounce" />
+                <span className="text-[8px] font-black uppercase tracking-widest">Atenção em Rota B-12</span>
+              </div>
+              <span className="text-[8px] font-bold text-white/20 tracking-tighter">04:12m</span>
             </div>
             <div className="flex items-center gap-2 text-cyan-500">
-              <Zap className="w-3 h-3" />
-              <span className="text-[8px] font-black uppercase tracking-tighter">Re-roteamento Otimizado via Nexus</span>
+              <Zap className="w-3.5 h-3.5" />
+              <span className="text-[8px] font-black uppercase tracking-widest">Recalculando Grid Preditivo</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-black/80 backdrop-blur-2xl border-white/10 shadow-2xl pointer-events-auto">
-        <CardContent className="p-3">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-success animate-pulse" />
+      <Card className="bg-black/90 backdrop-blur-3xl border-white/10 shadow-2xl pointer-events-auto rounded-2xl overflow-hidden group/sla">
+        <CardContent className="p-4 relative">
+          <div className="absolute top-0 left-0 w-1 h-full bg-success opacity-20 group-hover/sla:opacity-100 transition-opacity" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center border border-success/20">
+                <ShieldCheck className="w-5 h-5 text-success animate-pulse" />
+              </div>
+              <div>
+                <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mb-0.5">SLA_Integrity</p>
+                <p className="text-sm font-black text-white italic tracking-tight">PROTECTED_MODE</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">SLA_Fulfillment</p>
-              <p className="text-xs font-black text-white italic">STATUS: NOMINAL</p>
-            </div>
+            <Badge variant="outline" className="bg-success/5 text-success border-success/20 text-[9px] font-black italic tracking-widest px-3">OK</Badge>
           </div>
         </CardContent>
       </Card>
