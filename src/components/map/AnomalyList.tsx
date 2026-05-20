@@ -13,7 +13,9 @@ interface Anomaly {
   action: string;
   unit: string;
   time: string;
+  telemetry?: { time: string; bpm: number }[];
 }
+
 
 interface AnomalyListProps {
   anomalies: Anomaly[];
