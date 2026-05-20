@@ -98,9 +98,12 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
         ...values,
         qtd_volumes: Number(values.qtd_volumes),
         peso_estimado_kg: Number(values.peso_estimado_kg),
+        custo_estimado: Number(values.custo_estimado || 0),
         fornecedor_id: values.fornecedor_id || null,
         transportadora_id: values.transportadora_id || null,
         data_prevista_coleta: values.data_prevista_coleta || null,
+        is_reverse: isReverse,
+        is_urgent: isUrgent,
         observacoes: isReverse ? `[LOGÍSTICA_REVERSA] ${values.observacoes}` : values.observacoes
       };
 
