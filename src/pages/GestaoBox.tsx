@@ -45,6 +45,18 @@ const filterConfig: FilterConfig<BoxData> = {
       { value: "livre", label: "Livres" },
       { value: "cross_docking", label: "Cross-docking" }
     ]
+  },
+  select: {
+    zone: {
+      field: "zone" as any,
+      options: [
+        { value: "norte", label: "Zona Norte" },
+        { value: "sul", label: "Zona Sul" },
+        { value: "local", label: "Local" },
+        { value: "expresso", label: "Expresso" }
+      ],
+      label: "Zona de Carga"
+    }
   }
 };
 
