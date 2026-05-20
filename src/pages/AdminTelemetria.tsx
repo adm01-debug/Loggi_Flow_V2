@@ -17,6 +17,7 @@ import { TelemetryTable, type TelemetryRow } from "./admin-telemetria/TelemetryT
 import { TelemetryViewer } from "@/components/admin/TelemetryViewer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 type SeverityFilter = "all" | "slow" | "very_slow" | "error";
 type TimeFilter = "1h" | "6h" | "24h" | "7d" | "custom";
