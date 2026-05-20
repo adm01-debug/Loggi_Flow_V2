@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, Info, ArrowRight, ShieldAlert, X } from "lucide-react";
+import { AlertTriangle, Info, ArrowRight, ShieldAlert, X, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
+
 
 interface Anomaly {
   id: string;
