@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks";
 import { Loader2, Package, Truck, Zap, Calendar, MapPin, Search, Plus, History as HistoryIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Coleta as Pickup, ColetaStatus, ColetaTipo } from "./types";
 import { Database } from "@/integrations/supabase/types";
 import { motion, AnimatePresence } from "framer-motion";
