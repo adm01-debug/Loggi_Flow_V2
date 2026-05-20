@@ -35,6 +35,31 @@ export default function MapaRotas() {
   const [isDroneView, setIsDroneView] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
+  const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'warn' | 'crit' }[]>([
+    { id: '1', time: '14:20:01', msg: 'NEXUS_CORE_INITIALIZED', type: 'info' },
+    { id: '2', time: '14:20:05', msg: 'SYNCING_FLEET_GRID...', type: 'info' },
+    { id: '3', time: '14:20:12', msg: 'WEATHER_SHIELD_ACTIVE', type: 'info' },
+  ]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newLog = {
+        id: Math.random().toString(),
+        time: new Date().toLocaleTimeString([], { hour12: false }),
+        msg: [
+          'NOMINAL_FLOW_DETECTED',
+          'REROUTING_UNIT_452',
+          'TELEMETRY_PACKET_RECEIVED',
+          'SIGNAL_LATENCY_0.4MS',
+          'BIO_SYNC_UPDATE_RECEIVED',
+          'ANOMALY_SCAN_COMPLETE'
+        ][Math.floor(Math.random() * 6)],
+        type: 'info' as const
+      };
+      setLogs(prev => [newLog, ...prev].slice(0, 10));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Sync state with simulator
   useEffect(() => {
@@ -300,8 +325,32 @@ export default function MapaRotas() {
                     <Activity className="w-3 h-3 mr-1.5" />
                     Bio_Sync
                   </Button>
-                </div>
-              </div>
+                    </div>
+                  </div>
+                  
+                  {/* Nexus Tactical Log */}
+                  <div className="bg-black/90 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-auto min-w-[280px] hidden xl:block">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                      <span className="text-[10px] font-black text-white uppercase tracking-widest italic">Nexus_Tactical_Log</span>
+                    </div>
+                    <div className="space-y-2 max-h-[120px] overflow-hidden">
+                      <AnimatePresence mode="popLayout">
+                        {logs.map((log) => (
+                          <motion.div 
+                            key={log.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            className="flex items-start gap-3"
+                          >
+                            <span className="text-[8px] font-black text-white/20 font-monospace">{log.time}</span>
+                            <span className="text-[8px] font-black text-cyan-500/80 uppercase tracking-tighter truncate">{log.msg}</span>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  </div>
 
               <MapIntelligenceOverlay />
               <MapboxMap
