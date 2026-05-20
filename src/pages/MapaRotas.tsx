@@ -134,8 +134,9 @@ export default function MapaRotas() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={cn("p-6 rounded-[2rem] border border-white/5 bg-black/40 backdrop-blur-xl shadow-2xl group hover:border-white/10 transition-all", stat.bg)}
+              className={cn("p-6 rounded-[2rem] border border-white/5 bg-black/40 backdrop-blur-xl shadow-2xl group hover:border-white/10 hover:bg-black/60 transition-all duration-500 relative overflow-hidden", stat.bg)}
             >
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12 blur-3xl group-hover:bg-cyan-500/10 transition-colors" />
               <div className="flex items-center justify-between mb-4">
                 <div className={cn("p-3 rounded-2xl bg-black/50 border border-white/5 group-hover:scale-110 transition-transform", stat.color)}>
                   <stat.icon className="w-6 h-6" />
@@ -178,16 +179,29 @@ export default function MapaRotas() {
                   <div className="bg-black/80 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 flex items-center gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
                     <div className="flex -space-x-3">
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="w-10 h-10 rounded-full border-2 border-black bg-cyan-500/20 flex items-center justify-center backdrop-blur-md">
-                          <Truck className="w-5 h-5 text-cyan-400" />
+                        <div key={i} className="w-10 h-10 rounded-full border-2 border-black bg-cyan-500/20 flex items-center justify-center backdrop-blur-md relative group/truck">
+                          <Truck className="w-5 h-5 text-cyan-400 group-hover/truck:scale-110 transition-transform" />
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-500 rounded-full border-2 border-black animate-pulse" />
                         </div>
                       ))}
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-0.5">Fleet_Health_Protocol</p>
+                      <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-0.5">Nexus_Fleet_Dynamics</p>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                        <p className="text-sm font-black text-white italic">OPERANDO EM CAPACIDADE MÁXIMA</p>
+                        <p className="text-sm font-black text-white italic tracking-tight">OPERANDO EM CAPACIDADE MÁXIMA</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-black/80 backdrop-blur-2xl p-4 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto hidden md:block">
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-0.5">ETA_Global_Média</p>
+                        <p className="text-xl font-black text-cyan-400 italic">~42.8 MIN</p>
+                      </div>
+                      <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                        <Clock className="w-5 h-5 text-cyan-500 animate-pulse" />
                       </div>
                     </div>
                   </div>

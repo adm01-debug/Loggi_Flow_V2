@@ -58,10 +58,14 @@ export function MapIntelligenceOverlay() {
             </div>
           </div>
 
-          <div className="pt-2 border-t border-white/5">
+          <div className="pt-2 border-t border-white/5 space-y-2">
             <div className="flex items-center gap-2 text-amber-500">
               <AlertTriangle className="w-3 h-3 animate-bounce" />
-              <span className="text-[8px] font-black uppercase tracking-tighter">1 Anomalia em Rota Detectada</span>
+              <span className="text-[8px] font-black uppercase tracking-tighter">Fluxo Intenso em Rota B-12</span>
+            </div>
+            <div className="flex items-center gap-2 text-cyan-500">
+              <Zap className="w-3 h-3" />
+              <span className="text-[8px] font-black uppercase tracking-tighter">Re-roteamento Otimizado via Nexus</span>
             </div>
           </div>
         </CardContent>
