@@ -135,7 +135,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
         ['Status Atual', statusConfig[pickup.status]?.label || pickup.status],
       ],
       theme: 'striped',
-      headStyles: { fillStyle: [31, 41, 55] }
+      headStyles: { fillColor: [31, 41, 55] }
     });
     
     doc.setFontSize(14);
