@@ -182,23 +182,29 @@ export function MapboxMap({
     });
 
     if (isDroneView && markers.length > 0) {
-      const target = markers[0]; // Follow first vehicle for demo
+      const target = markers[0]; 
       map.current.flyTo({
         center: [target.lng, target.lat],
         zoom: 16,
         pitch: 60,
         bearing: 0,
-        duration: 3000
+        duration: 2000
       });
       
       let bearing = 0;
       const rotateCamera = () => {
         if (!isDroneView || !map.current) return;
-        bearing += 0.1;
+        bearing += 0.05;
         map.current.setBearing(bearing % 360);
+        
+        // Sync center in case it moves due to time travel
+        if (markers.length > 0) {
+          map.current.setCenter([markers[0].lng, markers[0].lat]);
+        }
+        
         requestAnimationFrame(rotateCamera);
       };
-      setTimeout(rotateCamera, 3000);
+      setTimeout(rotateCamera, 2000);
     }
 
     const updateTraffic = () => {
