@@ -507,7 +507,20 @@ export default function MapaRotas() {
                       </div>
                     </div>
 
+                    <div className="flex gap-2 mb-4">
+                      <select 
+                        className="bg-white/5 border border-white/10 rounded-xl text-[8px] font-black text-white/40 uppercase p-1 outline-none focus:border-cyan-500/50 transition-all flex-1"
+                        value={vehicleFilter}
+                        onChange={(e) => setVehicleFilter(e.target.value)}
+                      >
+                        <option value="all">TODOS_VEICULOS</option>
+                        <option value="UNIT_1">UNIT_01</option>
+                        <option value="UNIT_5">UNIT_05</option>
+                        <option value="UNIT_10">UNIT_10</option>
+                      </select>
+                    </div>
                     <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+
                       <AnimatePresence mode="popLayout">
                         {filteredLogs.map((log) => (
 
