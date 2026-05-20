@@ -14,6 +14,7 @@ import {
   Wand2, FileSpreadsheet, Loader2, DollarSign, Truck, Package,
   RefreshCw, Eye
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks';
