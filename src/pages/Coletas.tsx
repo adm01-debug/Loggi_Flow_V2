@@ -309,6 +309,7 @@ export default function Coletas() {
                 </div>
               </Card>
             </motion.div>
+          </div>
           ) : (
             <motion.div 
               key="stats"
