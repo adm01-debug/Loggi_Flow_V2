@@ -1312,6 +1312,36 @@ export type Database = {
         }
         Relationships: []
       }
+      bio_sync_telemetry: {
+        Row: {
+          created_at: string
+          driver_id: string
+          fatigue_index: string
+          heart_rate: number
+          id: string
+          timestamp: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          driver_id: string
+          fatigue_index: string
+          heart_rate: number
+          id?: string
+          timestamp?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string
+          fatigue_index?: string
+          heart_rate?: number
+          id?: string
+          timestamp?: string
+          vehicle_id?: string
+        }
+        Relationships: []
+      }
       bitrix_sync_config: {
         Row: {
           access_token: string | null
@@ -2933,6 +2963,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      nexus_tactical_logs: {
+        Row: {
+          created_at: string
+          event_time: string
+          id: string
+          message: string
+          metadata: Json | null
+          type: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_time?: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          type: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_time?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          type?: string
+          vehicle_id?: string | null
+        }
+        Relationships: []
       }
       notificacoes_custo: {
         Row: {

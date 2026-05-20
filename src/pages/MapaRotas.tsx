@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { MapIntelligenceOverlay } from "@/components/map/MapIntelligenceOverlay";
 import { motion, AnimatePresence } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
 
@@ -39,31 +40,100 @@ export default function MapaRotas() {
   const [isDroneView, setIsDroneView] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
-  const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'warn' | 'crit' }[]>([
-    { id: '1', time: '14:20:01', msg: 'NEXUS_CORE_INITIALIZED', type: 'info' },
-    { id: '2', time: '14:20:05', msg: 'SYNCING_FLEET_GRID...', type: 'info' },
-    { id: '3', time: '14:20:12', msg: 'WEATHER_SHIELD_ACTIVE', type: 'info' },
-  ]);
+  const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'warn' | 'crit' }[]>([]);
+  const [bioData, setBioData] = useState<{ heart_rate: number; fatigue_index: string } | null>(null);
+  const [weatherData, setWeatherData] = useState<any>(null);
+  const [selectedAnomaly, setSelectedAnomaly] = useState<{ id: string; level: 'info' | 'crit'; cause: string; action: string } | null>(null);
 
+  // Load tactical logs from DB
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newLog = {
-        id: Math.random().toString(),
-        time: new Date().toLocaleTimeString([], { hour12: false }),
-        msg: [
-          'NOMINAL_FLOW_DETECTED',
-          'REROUTING_UNIT_452',
-          'TELEMETRY_PACKET_RECEIVED',
-          'SIGNAL_LATENCY_0.4MS',
-          'BIO_SYNC_UPDATE_RECEIVED',
-          'ANOMALY_SCAN_COMPLETE'
-        ][Math.floor(Math.random() * 6)],
-        type: 'info' as const
-      };
-      setLogs(prev => [newLog, ...prev].slice(0, 10));
-    }, 5000);
+    const fetchLogs = async () => {
+      const { data } = await supabase
+        .from('nexus_tactical_logs')
+        .select('*')
+        .order('event_time', { ascending: false })
+        .limit(15);
+      
+      if (data) {
+        setLogs(data.map(l => ({
+          id: l.id,
+          time: new Date(l.event_time).toLocaleTimeString([], { hour12: false }),
+          msg: l.message,
+          type: l.type as any
+        })));
+      }
+    };
+    fetchLogs();
+
+    const channel = supabase
+      .channel('tactical-logs')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nexus_tactical_logs' }, payload => {
+        const newLog = payload.new;
+        setLogs(prev => [{
+          id: newLog.id,
+          time: new Date(newLog.event_time).toLocaleTimeString([], { hour12: false }),
+          msg: newLog.message,
+          type: newLog.type as any
+        }, ...prev].slice(0, 15));
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  // Fetch real BioSync data
+  useEffect(() => {
+    const fetchBio = async () => {
+      const { data } = await supabase
+        .from('bio_sync_telemetry')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (data) setBioData({ heart_rate: data.heart_rate, fatigue_index: data.fatigue_index });
+    };
+    fetchBio();
+
+    const interval = setInterval(async () => {
+      // For demo, we still trigger the ingest function to get "live" feel, 
+      // but the data is persisted and retrieved from DB.
+      await supabase.functions.invoke('ingest-biosync', {
+        body: { driver_id: 'DRV-001', vehicle_id: 'VH-452' }
+      });
+      fetchBio();
+    }, 10000);
+
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch real Weather data
+  useEffect(() => {
+    if (!activeLayers.weather) return;
+
+    const fetchWeather = async () => {
+      try {
+        const { data } = await supabase.functions.invoke('get-weather-data', {
+          method: 'GET'
+        });
+        if (data) {
+          setWeatherData(data);
+          // Update risk zones based on weather
+          if (data.weather[0].main === 'Rain' || data.weather[0].main === 'Storm') {
+            setRiskZones(prev => [
+              ...prev,
+              { id: 'weather-risk', center: [ORIGIN_COORDINATES.lng + 0.1, ORIGIN_COORDINATES.lat + 0.1], radius: 2000, severity: 'medium' }
+            ]);
+          }
+        }
+      } catch (err) {
+        console.error("Weather fetch failed:", err);
+      }
+    };
+    fetchWeather();
+    const interval = setInterval(fetchWeather, 300000); // 5 min
+    return () => clearInterval(interval);
+  }, [activeLayers.weather]);
 
   // Sync state with simulator
   useEffect(() => {
@@ -120,14 +190,14 @@ export default function MapaRotas() {
         }
 
         const bioMetrics = activeLayers.bio ? `
-          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);display:grid;grid-cols:2;gap:8px">
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <div style="display:flex;flex-direction:column;gap:2px">
               <span style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase">Heart_Rate</span>
-              <span style="font-size:12px;color:#f43f5e;font-weight:900;font-family:monospace">72 BPM</span>
+              <span style="font-size:12px;color:#f43f5e;font-weight:900;font-family:monospace">${bioData?.heart_rate || '--'} BPM</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:2px">
               <span style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase">Fatigue_Index</span>
-              <span style="font-size:12px;color:#fbbf24;font-weight:900;font-family:monospace">LOW</span>
+              <span style="font-size:12px;color:#fbbf24;font-weight:900;font-family:monospace">${bioData?.fatigue_index || 'FETCHING'}</span>
             </div>
           </div>
         ` : '';
@@ -187,7 +257,7 @@ export default function MapaRotas() {
           `,
         };
       });
-  }, [filteredData, timeTravelValue, activeLayers.bio, lastSync, isLiveData]);
+  }, [filteredData, timeTravelValue, activeLayers.bio, bioData, lastSync, isLiveData]);
 
   const handleClearFilters = () => {
     clearFilters();
@@ -392,10 +462,21 @@ export default function MapaRotas() {
                 pitch={mapPitch}
                 showTraffic={activeLayers.nexus}
                 showWeather={activeLayers.weather}
-                isDroneView={isDroneView}
-                riskZones={activeLayers.risks ? riskZones : []}
-                className="h-[650px] w-full"
-              />
+                 isDroneView={isDroneView}
+                 riskZones={activeLayers.risks ? riskZones : []}
+                 className="h-[650px] w-full"
+                 onMarkerClick={(id) => {
+                   const point = points.find(p => p.id === id);
+                   if (point && point.order % 5 === 0) {
+                     setSelectedAnomaly({
+                       id: point.id,
+                       level: 'crit',
+                       cause: 'FALHA_CONEXÃO_TELEMETRIA',
+                       action: 'REINICIAR_GATEWAY_OBDII'
+                     });
+                   }
+                 }}
+               />
 
               {/* predictive risk alerts overlay */}
               <AnimatePresence>
@@ -446,6 +527,43 @@ export default function MapaRotas() {
                     <div className="bg-rose-500/10 backdrop-blur-3xl border border-rose-500/20 px-6 py-2 rounded-full flex items-center gap-4 shadow-2xl">
                       <Activity className="w-4 h-4 text-rose-500 animate-bounce" />
                       <span className="text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Nexus_BioSync: Scanning_Vitals...</span>
+                    </div>
+                  </motion.div>
+                )}
+                {selectedAnomaly && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 min-w-[320px]"
+                  >
+                    <div className="bg-black/95 backdrop-blur-3xl border-2 border-red-500/30 p-8 rounded-[2.5rem] shadow-[0_40px_100px_rgba(239,68,68,0.3)]">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <AlertTriangle className="w-6 h-6 text-red-500 animate-pulse" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-black text-white italic tracking-tighter">ANOMALY_DETAIL</h3>
+                            <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">CRITICAL_LEVEL</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="icon" onClick={() => setSelectedAnomaly(null)} className="text-white/20 hover:text-white">×</Button>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                          <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Causa Provável</p>
+                          <p className="text-sm font-bold text-white uppercase">{selectedAnomaly.cause}</p>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20">
+                          <p className="text-[9px] font-black text-cyan-500 uppercase tracking-widest mb-1">Ação Sugerida</p>
+                          <p className="text-sm font-bold text-cyan-400 uppercase">{selectedAnomaly.action}</p>
+                        </div>
+                        <Button className="w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-widest h-12 rounded-2xl" onClick={() => setSelectedAnomaly(null)}>
+                          EXECUTAR_PROTOCOLO_RESGATE
+                        </Button>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -503,9 +621,26 @@ export default function MapaRotas() {
                         className="cursor-pointer"
                       />
                     </div>
-                    <div className="flex justify-between items-center text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">
-                      <span className="group-hover/simulator:text-cyan-500/50 transition-colors">Historical_Log</span>
-                      <span className="group-hover/simulator:text-cyan-500/50 transition-colors">Nexus_Forecast</span>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-4 text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">
+                        <span className="group-hover/simulator:text-cyan-500/50 transition-colors cursor-pointer" onClick={() => {
+                          const blob = new Blob([JSON.stringify(logs)], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `nexus_logs_${new Date().toISOString()}.json`;
+                          a.click();
+                        }}>Export_Logs</span>
+                        <span className="group-hover/simulator:text-cyan-500/50 transition-colors">Nexus_Forecast</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {weatherData && (
+                          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                            <CloudRain className="w-2.5 h-2.5 text-blue-400" />
+                            <span className="text-[8px] font-black text-white/60 uppercase">{weatherData.main.temp}°C {weatherData.weather[0].main}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
