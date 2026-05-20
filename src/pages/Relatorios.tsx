@@ -186,7 +186,6 @@ export default function Relatorios() {
               </div>
             </h1>
           </div>
-        </div>
 
           <div className="flex gap-2">
             <Button 
