@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { ColetaStatus } from "./types";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Truck, Package, MapPin, Calendar, Clock, CheckCircle2, 
   History, Info, Zap, MessageSquare, Phone, FileText, 
-  ExternalLink, CreditCard, DollarSign, Navigation
+  ExternalLink, CreditCard, DollarSign, Navigation, Plus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -100,6 +102,53 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
     } else {
       window.location.href = `mailto:?subject=Coleta ${pickup.numero_coleta}&body=${encodeURIComponent(message)}`;
     }
+  };
+
+  const generateManifestoPDF = () => {
+    playSuccess();
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFillColor(31, 41, 55);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text("MANIFESTO DE COLETA NEXUS", 20, 25);
+    doc.setFontSize(10);
+    doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33);
+    
+    // Body
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.text("DADOS DA OPERAÇÃO", 20, 55);
+    
+    autoTable(doc, {
+      startY: 60,
+      head: [['Campo', 'Informação']],
+      body: [
+        ['Fornecedor', pickup.fornecedores?.nome_fantasia || pickup.fornecedores?.razao_social || 'N/A'],
+        ['Endereço', pickup.endereco_coleta],
+        ['Data Prevista', pickup.data_prevista_coleta ? format(new Date(pickup.data_prevista_coleta), "dd/MM/yyyy") : 'N/A'],
+        ['Volumes', pickup.qtd_volumes?.toString() || '0'],
+        ['Peso Estimado', `${pickup.peso_estimado_kg} KG`],
+        ['Transporte', pickup.tipo_coleta === 'lalamove' ? 'Lalamove' : (pickup.transportadoras?.nome_fantasia || 'Frota Terceirizada')],
+        ['Status Atual', statusConfig[pickup.status]?.label || pickup.status],
+      ],
+      theme: 'striped',
+      headStyles: { fillColor: [31, 41, 55] }
+    });
+    
+    doc.setFontSize(14);
+    doc.text("NOTAS E OBSERVAÇÕES", 20, (doc as any).lastAutoTable.finalY + 20);
+    doc.setFontSize(10);
+    doc.text(pickup.observacoes || "Nenhuma observação registrada.", 20, (doc as any).lastAutoTable.finalY + 30, { maxWidth: 170 });
+    
+    // Footer
+    doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 20, 280);
+    doc.text("Protocolo Digital Nexus Logistics - Autenticação por Hash", 120, 280);
+
+    doc.save(`Manifesto_${pickup.numero_coleta}.pdf`);
+    toast.success("Manifesto de Coleta gerado com sucesso!");
   };
 
   // Simulação de custos (Etapa 7)
@@ -245,13 +294,40 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                     </p>
                   </div>
                 </div>
+                
+                <div className="bg-white/[0.01] p-6 rounded-[2rem] border border-white/5 backdrop-blur-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
+                      <FileText className="w-4 h-4" /> GED_Nexus Documentos
+                    </h3>
+                    <Button variant="ghost" size="sm" className="h-7 px-3 rounded-lg text-[8px] font-black uppercase tracking-widest text-primary hover:bg-primary/10">
+                      <Plus className="w-3 h-3 mr-1" /> Anexar_Doc
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5 hover:border-primary/30 transition-all cursor-pointer group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary"><FileText className="w-3.5 h-3.5" /></div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Nota_Fiscal.pdf</span>
+                      </div>
+                      <ExternalLink className="w-3 h-3 text-white/20 group-hover:text-primary transition-colors" />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5 hover:border-warning/30 transition-all cursor-pointer group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-warning/10 text-warning"><Package className="w-3.5 h-3.5" /></div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Romaneio_Grid.xlsx</span>
+                      </div>
+                      <ExternalLink className="w-3 h-3 text-white/20 group-hover:text-warning transition-colors" />
+                    </div>
+                  </div>
+                </div>
 
                 <div className="pt-6 border-t border-white/5 space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
                       <Zap className="w-5 h-5 animate-pulse" /> Ações de Protocolo
                     </h3>
-                    <Button variant="ghost" className="h-8 px-3 rounded-lg text-[9px] font-black uppercase tracking-widest text-white/30 hover:text-primary" onClick={() => toast.success("Manifesto gerado com sucesso!")}>
+                    <Button variant="ghost" className="h-8 px-3 rounded-lg text-[9px] font-black uppercase tracking-widest text-white/30 hover:text-primary" onClick={generateManifestoPDF}>
                       <FileText className="w-3.5 h-3.5 mr-2" /> Gerar Manifesto_PDF
                     </Button>
                   </div>

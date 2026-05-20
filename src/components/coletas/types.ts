@@ -18,6 +18,10 @@ export interface Coleta {
   codigo_rastreamento: string | null;
   status: ColetaStatus;
   observacoes: string | null;
+  is_reverse?: boolean;
+  is_urgent?: boolean;
+  custo_estimado?: number;
+  custo_real?: number;
   created_at: string;
   fornecedores?: {
     razao_social: string;

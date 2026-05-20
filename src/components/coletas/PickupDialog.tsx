@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks";
 import { Loader2, Package, Truck, Zap, Calendar, MapPin, Search, Plus, History as HistoryIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Coleta as Pickup, ColetaStatus, ColetaTipo } from "./types";
 import { Database } from "@/integrations/supabase/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,7 +40,8 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
   const [loading, setLoading] = useState(false);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [transportadoras, setTransportadoras] = useState<Transportadora[]>([]);
-  const [isReverse, setIsReverse] = useState(false);
+  const [isReverse, setIsReverse] = useState(pickup?.is_reverse || false);
+  const [isUrgent, setIsUrgent] = useState(pickup?.is_urgent || false);
 
   const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: pickup || {
@@ -53,6 +55,9 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
       peso_estimado_kg: 0,
       status: "aguardando_liberacao",
       observacoes: "",
+      is_reverse: false,
+      is_urgent: false,
+      custo_estimado: 0,
     }
   });
 
@@ -94,9 +99,12 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
         ...values,
         qtd_volumes: Number(values.qtd_volumes),
         peso_estimado_kg: Number(values.peso_estimado_kg),
+        custo_estimado: Number(values.custo_estimado || 0),
         fornecedor_id: values.fornecedor_id || null,
         transportadora_id: values.transportadora_id || null,
         data_prevista_coleta: values.data_prevista_coleta || null,
+        is_reverse: isReverse,
+        is_urgent: isUrgent,
         observacoes: isReverse ? `[LOGÍSTICA_REVERSA] ${values.observacoes}` : values.observacoes
       };
 
@@ -153,6 +161,18 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
                 className="h-8 px-4 rounded-full text-[9px] font-black uppercase tracking-widest gap-2"
               >
                 <HistoryIcon className="w-3 h-3" /> Reversa
+              </Button>
+              <Button 
+                type="button"
+                variant={isUrgent ? "destructive" : "ghost"} 
+                size="sm" 
+                onClick={() => setIsUrgent(!isUrgent)}
+                className={cn(
+                  "h-8 px-4 rounded-full text-[9px] font-black uppercase tracking-widest gap-2",
+                  isUrgent && "bg-orange-500 text-white hover:bg-orange-600 border-none"
+                )}
+              >
+                <Zap className="w-3 h-3" /> Urgente
               </Button>
             </div>
           </div>
