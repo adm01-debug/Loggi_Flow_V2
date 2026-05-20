@@ -516,7 +516,7 @@ export default function Transportadoras() {
           />
         )}
         </div>
-    </MainLayout>
+      </MainLayout>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
@@ -532,6 +532,5 @@ export default function Transportadoras() {
           <DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate}>Salvar Alterações</Button></DialogFooter>
         </DialogContent>
       </Dialog>
-    </MainLayout>
   );
 }
