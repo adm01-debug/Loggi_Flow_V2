@@ -472,15 +472,21 @@ export function MapboxMap({
         const latDiff = mk.lat - originMarker.lat;
         const dist = Math.sqrt(lngDiff * lngDiff + latDiff * latDiff);
         
-        // Arc calculation for visual excellence - dynamic curvature based on distance
+        // Arc calculation for visual excellence
         const midLng = originMarker.lng + lngDiff / 2;
-        const midLat = originMarker.lat + latDiff / 2 + (dist * 0.15); // Add arc height
+        const midLat = originMarker.lat + latDiff / 2 + (dist * 0.15);
 
-        // Simulate risk-based rerouting in visual representation
-        const hasRisk = Math.random() > 0.8; 
+        // Check for intersection with risk zones to trigger "rerouting"
+        const affectingRiskZone = riskZones.find(zone => {
+          const dLng = zone.center[0] - midLng;
+          const dLat = zone.center[1] - midLat;
+          return Math.sqrt(dLng * dLng + dLat * dLat) < 0.5; // Simple proximity check
+        });
+
+        const hasRisk = !!affectingRiskZone;
         const routePoints = [
           [originMarker.lng, originMarker.lat],
-          hasRisk ? [midLng + 0.5, midLat + 0.2] : [midLng, midLat],
+          hasRisk ? [midLng + (affectingRiskZone.severity === 'high' ? 0.8 : 0.4), midLat + 0.3] : [midLng, midLat],
           [mk.lng, mk.lat],
         ];
 
@@ -567,7 +573,7 @@ export function MapboxMap({
     } else {
       map.current.on('style.load', addRouteLayer);
     }
-  }, [markers, originMarker, showRoute, loading]);
+  }, [markers, originMarker, showRoute, loading, riskZones]);
 
   if (error) {
     return (
