@@ -89,6 +89,19 @@ export default function MapaRotas() {
           lng = ORIGIN_COORDINATES.lng + (lng - ORIGIN_COORDINATES.lng) * (1 - factor);
         }
 
+        const bioMetrics = activeLayers.bio ? `
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);display:grid;grid-cols:2;gap:8px">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase">Heart_Rate</span>
+              <span style="font-size:12px;color:#f43f5e;font-weight:900;font-family:monospace">72 BPM</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase">Fatigue_Index</span>
+              <span style="font-size:12px;color:#fbbf24;font-weight:900;font-family:monospace">LOW</span>
+            </div>
+          </div>
+        ` : '';
+
         return {
           id: p.id,
           lat,
@@ -96,16 +109,25 @@ export default function MapaRotas() {
           label: `#${p.order} — ${p.address}`,
           color: getStatusColor(p.status),
           popupHTML: `
-            <div style="padding:6px;font-size:12px;color:#111;max-width:220px">
-              <strong style="font-size:13px">#${p.order}</strong>
-              <div style="margin:4px 0;color:#555">${p.address}</div>
-              <span style="display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;color:#fff;background:${getStatusColor(p.status)}">${getStatusLabel(p.status)}</span>
-              ${isHistorical ? '<div style="margin-top:4px;font-size:9px;color:#666;font-weight:bold">POSIÇÃO_HISTÓRICA_SIMULADA</div>' : ''}
+            <div style="padding:16px;background:#000;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.8);max-width:240px;overflow:hidden;position:relative;">
+              <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${getStatusColor(p.status)}"></div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:${getStatusColor(p.status)}22;display:flex;align-items:center;justify-content:center;border:1px solid ${getStatusColor(p.status)}44">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${getStatusColor(p.status)}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+                <strong style="font-size:14px;color:#fff;font-family:system-ui, -apple-system, sans-serif;font-weight:900;letter-spacing:-0.5px">UNIT_${p.order}</strong>
+              </div>
+              <p style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;line-height:1.4;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:0.5px">${p.address}</p>
+              <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${getStatusColor(p.status)};background:${getStatusColor(p.status)}15;border:1px solid ${getStatusColor(p.status)}33;text-transform:uppercase;letter-spacing:1px">
+                STATUS: ${getStatusLabel(p.status).toUpperCase()}
+              </div>
+              ${bioMetrics}
+              ${isHistorical ? '<div style="margin-top:12px;font-size:9px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase;letter-spacing:1px">--- DATA_RESTORED_LOG ---</div>' : ''}
             </div>
           `,
         };
       });
-  }, [filteredData, timeTravelValue]);
+  }, [filteredData, timeTravelValue, activeLayers.bio]);
 
   const handleClearFilters = () => {
     clearFilters();
@@ -315,6 +337,20 @@ export default function MapaRotas() {
                         <Badge variant="outline" className="text-[8px] font-black bg-red-500/10 text-red-500 border-red-500/30">CRÍTICO</Badge>
                       </div>
                       <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase tracking-tight">Área de alta periculosidade detectada (Satelite_Fusion AI). Protocolo Nexus_Shield ativo.</p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeLayers.bio && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="absolute top-4 left-1/2 -translate-x-1/2 z-20"
+                  >
+                    <div className="bg-rose-500/10 backdrop-blur-3xl border border-rose-500/20 px-6 py-2 rounded-full flex items-center gap-4 shadow-2xl">
+                      <Activity className="w-4 h-4 text-rose-500 animate-bounce" />
+                      <span className="text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Nexus_BioSync: Scanning_Vitals...</span>
                     </div>
                   </motion.div>
                 )}
