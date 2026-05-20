@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks";
-import { Loader2, Package, Truck, Zap, Calendar, MapPin, Search } from "lucide-react";
+import { Loader2, Package, Truck, Zap, Calendar, MapPin, Search, Plus, History as HistoryIcon } from "lucide-react";
 import { Coleta as Pickup, ColetaStatus, ColetaTipo } from "./types";
 import { Database } from "@/integrations/supabase/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -152,7 +152,7 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
                 onClick={() => setIsReverse(true)}
                 className="h-8 px-4 rounded-full text-[9px] font-black uppercase tracking-widest gap-2"
               >
-                <History className="w-3 h-3" /> Reversa
+                <HistoryIcon className="w-3 h-3" /> Reversa
               </Button>
             </div>
           </div>
