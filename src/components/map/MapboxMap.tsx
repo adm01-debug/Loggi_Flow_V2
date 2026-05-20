@@ -87,8 +87,10 @@ export function MapboxMap({
       setLoading(false);
       
       if (map.current) {
-        // Add custom pulsing dot for animations
+        // Add custom pulsing dot for animations using a closure for context
         const size = 150;
+        let ctx: CanvasRenderingContext2D | null = null;
+
         const pulsingDot = {
           width: size,
           height: size,
@@ -97,30 +99,30 @@ export function MapboxMap({
             const canvas = document.createElement('canvas');
             canvas.width = this.width;
             canvas.height = this.height;
-            this.context = canvas.getContext('2d');
+            ctx = canvas.getContext('2d', { willReadFrequently: true });
           },
           render: function () {
+            if (!ctx) return false;
             const duration = 1500;
             const t = (performance.now() % duration) / duration;
             const radius = (size / 2) * 0.3;
             const outerRadius = (size / 2) * 0.7 * t + radius;
-            const context = this.context;
             
-            context.clearRect(0, 0, this.width, this.height);
-            context.beginPath();
-            context.arc(this.width / 2, this.height / 2, outerRadius, 0, Math.PI * 2);
-            context.fillStyle = `rgba(6, 182, 212, ${1 - t})`;
-            context.fill();
+            ctx.clearRect(0, 0, this.width, this.height);
+            ctx.beginPath();
+            ctx.arc(this.width / 2, this.height / 2, outerRadius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(6, 182, 212, ${1 - t})`;
+            ctx.fill();
             
-            context.beginPath();
-            context.arc(this.width / 2, this.height / 2, radius, 0, Math.PI * 2);
-            context.fillStyle = 'rgba(6, 182, 212, 1)';
-            context.strokeStyle = 'white';
-            context.lineWidth = 2 + 4 * (1 - t);
-            context.fill();
-            context.stroke();
+            ctx.beginPath();
+            ctx.arc(this.width / 2, this.height / 2, radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(6, 182, 212, 1)';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2 + 4 * (1 - t);
+            ctx.fill();
+            ctx.stroke();
             
-            this.data = context.getImageData(0, 0, this.width, this.height).data;
+            this.data = ctx.getImageData(0, 0, this.width, this.height).data;
             map.current?.triggerRepaint();
             return true;
           }
