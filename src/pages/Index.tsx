@@ -160,7 +160,6 @@ export default function Index() {
                 </div>
               </h1>
             </div>
-          </div>
             
             {/* Actions - Scrollable on mobile */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none animate-in fade-in duration-500 delay-100">
