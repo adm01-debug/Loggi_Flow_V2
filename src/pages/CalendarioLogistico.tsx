@@ -39,15 +39,26 @@ export default function CalendarioLogistico() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-display flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
-                <Calendar className="w-6 h-6 text-accent-foreground" />
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accent/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-accent-foreground animate-pulse" />
+                </div>
               </div>
-              Calendário Logístico
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Agenda Logística</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20">
+                    <div className="w-2 h-2 rounded-full bg-accent animate-ping" />
+                    <span className="text-[10px] font-black text-accent-foreground uppercase tracking-[0.3em]">Master_Scheduler</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">CONTROLE TEMPORAL • SLA FOCUS</span>
+                </div>
+              </div>
             </h1>
-            <p className="text-muted-foreground mt-1">Visualize entregas e coletas agendadas</p>
           </div>
         </div>
 
