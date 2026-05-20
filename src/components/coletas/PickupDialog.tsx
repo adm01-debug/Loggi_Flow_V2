@@ -39,7 +39,8 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
   const [loading, setLoading] = useState(false);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [transportadoras, setTransportadoras] = useState<Transportadora[]>([]);
-  const [isReverse, setIsReverse] = useState(false);
+  const [isReverse, setIsReverse] = useState(pickup?.is_reverse || false);
+  const [isUrgent, setIsUrgent] = useState(pickup?.is_urgent || false);
 
   const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: pickup || {
@@ -53,6 +54,9 @@ export function PickupDialog({ open, onOpenChange, onSuccess, pickup }: PickupDi
       peso_estimado_kg: 0,
       status: "aguardando_liberacao",
       observacoes: "",
+      is_reverse: false,
+      is_urgent: false,
+      custo_estimado: 0,
     }
   });
 
