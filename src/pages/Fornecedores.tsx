@@ -155,18 +155,34 @@ export default function Fornecedores() {
 
   return (
     <MainLayout>
-      <PageTransition>
-        <div className="space-y-6">
-          <PageHeader
-            title="Fornecedores"
-            description="Gerencie sua base de fornecedores e acompanhe as solicitações de coleta."
-            icon={Building2}
-            actions={
-              <Button onClick={() => { setForm(emptyForm); setDlgCreate(true); }} size="sm" className="gap-2">
-                <Plus className="w-4 h-4" />Novo
-              </Button>
-            }
-          />
+      <div className="space-y-8 max-w-[1600px] mx-auto pb-12 p-6">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Supply Matrix</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Supplier_Nexus_Core</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">LOGÍSTICA DE ENTRADA • PICKUP HUB</span>
+                </div>
+              </div>
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button size="lg" onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="h-14 px-8 rounded-2xl bg-primary text-black hover:bg-primary/90 font-black uppercase tracking-widest text-[11px] gap-3 transition-all shadow-lg shadow-primary/20">
+              <Plus className="w-5 h-5" /> Novo Fornecedor
+            </Button>
+          </div>
+        </div>
 
           <StaggeredContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StaggeredItem><StatsCard title="Total" value={stats.total} icon={Building2} color="primary" /></StaggeredItem>
@@ -254,7 +270,6 @@ export default function Fornecedores() {
         <Dialog open={dlgView} onOpenChange={setDlgView}><DialogContent><DialogHeader><DialogTitle>Detalhes do Fornecedor</DialogTitle></DialogHeader>{sel && <div className="space-y-4"><p className="text-lg font-semibold">{sel.nome_fantasia || sel.razao_social}</p>{sel.cnpj && <p className="font-mono">{fmtCNPJ(sel.cnpj)}</p>}<div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Endereço</p><p>{sel.endereco_completo}</p></div><div><p className="text-muted-foreground">Cidade/UF</p><p>{sel.cidade} - {sel.estado}</p></div></div>{sel.contato_nome && <div className="text-sm"><p className="text-muted-foreground">Contato</p><p>{sel.contato_nome} - {sel.contato_telefone}</p></div>}</div>}</DialogContent></Dialog>
         <AlertDialog open={dlgDel} onOpenChange={setDlgDel}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Excluir fornecedor?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => sel && deleteMut.mutate(sel.id)}>Excluir</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
       </div>
-    </PageTransition>
     </MainLayout>
   );
 }

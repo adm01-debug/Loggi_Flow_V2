@@ -258,27 +258,34 @@ export default function Envios() {
 
   return (
     <MainLayout>
+      <div className="space-y-8 max-w-[1600px] mx-auto pb-12">
       {showConfetti && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} gravity={0.3} />}
       <div className="space-y-6">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="animate-in slide-in-from-left-6 duration-700 ease-out-expo">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
-              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
-                <Send className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Send className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-pulse" />
+                </div>
               </div>
               <div className="flex flex-col">
-                <span className="truncate drop-shadow-sm">Envios</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Expedição Nexus</span>
+                <span className="drop-shadow-2xl">Envios de Elite</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last_Mile_Command</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">SMART EXPEDITION • NEXUS FLOW</span>
                 </div>
               </div>
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Controle total de saídas, entregas ao cliente final e logística de última milha.</p>
           </div>
-          <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
-            <Button variant={showLabels ? "default" : "outline"} size="lg" onClick={() => setShowLabels(!showLabels)} className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 transition-all">
-              <QrCode className="w-4 h-4" />
-              <span className="hidden sm:inline">Etiquetas</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant={showLabels ? "default" : "outline"} size="lg" onClick={() => setShowLabels(!showLabels)} className="h-14 px-8 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[11px] gap-3 hover:bg-white/5 transition-all">
+              <QrCode className="w-4 h-4 text-primary" />
+              Etiquetas
             </Button>
             <ScannerButton
               onScan={(result: ScanResult) => {
@@ -291,19 +298,13 @@ export default function Envios() {
                 }
               }}
               variant="outline"
-              className="h-12 w-12 rounded-xl border-2"
+              className="h-14 w-14 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl transition-all hover:bg-white/5"
             />
-            <OnboardingTooltip
-              id="envios-novo-btn"
-              title="Crie sua primeira entrega"
-              description="Registre uma nova entrega e acompanhe todo o ciclo de envio. Ganhe XP a cada entrega finalizada!"
-              position="left"
-            >
-              <Button size="lg" onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all">
-                <Plus className="w-5 h-5" /> Novo Envio
-              </Button>
-            </OnboardingTooltip>
+            <Button size="lg" onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="h-14 px-8 rounded-2xl bg-primary text-black hover:bg-primary/90 font-black uppercase tracking-widest text-[11px] gap-3 transition-all shadow-lg shadow-primary/20">
+              <Plus className="w-5 h-5" /> Novo Envio
+            </Button>
           </div>
+        </div>
         </div>
 
         {showLabels && <MaterialLabelPrinter />}

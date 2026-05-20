@@ -323,23 +323,29 @@ export default function Transportadoras() {
 
   return (
     <MainLayout>
-      <PageTransition>
-        <div className="space-y-6">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="flex-1 min-w-0 animate-in slide-in-from-left-6 duration-700 ease-out-expo">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-foreground flex items-center gap-3 sm:gap-4 tracking-tighter">
-                <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-xl shadow-primary/20 group cursor-pointer transition-transform hover:rotate-6">
-                  <Truck className="w-6 h-6 sm:w-9 sm:h-9 text-white animate-pulse" />
+      <div className="space-y-8 max-w-[1600px] mx-auto pb-12 p-6">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Truck className="w-8 h-8 sm:w-10 sm:h-10 text-primary animate-pulse" />
                 </div>
-                <div className="flex flex-col">
-                  <span className="truncate drop-shadow-sm">Transportadoras</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Malha e Rede Nexus</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Gestão Malha</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Fleet_Matrix_Active</span>
                   </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">SMART CARRIERS • MULTI-API SYNC</span>
                 </div>
-              </h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Gestão estratégica de parceiros logísticos, conformidade e monitoramento de rede.</p>
-            </div>
+              </div>
+            </h1>
+          </div>
+        </div>
             <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -510,7 +516,7 @@ export default function Transportadoras() {
           />
         )}
         </div>
-      </PageTransition>
+      </MainLayout>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
@@ -526,6 +532,6 @@ export default function Transportadoras() {
           <DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate}>Salvar Alterações</Button></DialogFooter>
         </DialogContent>
       </Dialog>
-    </MainLayout>
+    </>
   );
 }
