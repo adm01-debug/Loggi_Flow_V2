@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Truck, Package, MapPin, Calendar, Clock, CheckCircle2, 
   History, Info, Zap, MessageSquare, Phone, FileText, 
-  ExternalLink, CreditCard, DollarSign, Navigation
+  ExternalLink, CreditCard, DollarSign, Navigation, Plus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
