@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { MapIntelligenceOverlay } from "@/components/map/MapIntelligenceOverlay";
 import { motion, AnimatePresence } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
 
