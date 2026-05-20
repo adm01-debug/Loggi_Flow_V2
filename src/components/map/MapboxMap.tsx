@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Info, Navigation, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export interface MapMarker {
   id: string;
@@ -11,6 +12,9 @@ export interface MapMarker {
   label?: string;
   color?: string;
   popupHTML?: string;
+  type?: 'truck' | 'delivery' | 'pickup' | 'origin';
+  status?: string;
+  heading?: number;
 }
 
 interface MapboxMapProps {
@@ -21,6 +25,7 @@ interface MapboxMapProps {
   originMarker?: { lat: number; lng: number; label?: string };
   className?: string;
   onMarkerClick?: (id: string) => void;
+  showTraffic?: boolean;
 }
 
 export function MapboxMap({
@@ -70,13 +75,26 @@ export function MapboxMap({
       center,
       zoom,
       attributionControl: false,
+      antialias: true
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.current.addControl(new mapboxgl.NavigationControl({ showCompass: true }), 'top-right');
     map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+    map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
     map.current.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
 
-    map.current.on('load', () => setLoading(false));
+    map.current.on('load', () => {
+      setLoading(false);
+      // Add a soft glow effect to the style
+      if (map.current) {
+        map.current.setFog({
+          'range': [0.5, 10],
+          'color': '#000',
+          'horizon-blend': 0.1,
+          'star-intensity': 0.15
+        });
+      }
+    });
 
     return () => {
       map.current?.remove();
@@ -111,12 +129,30 @@ export function MapboxMap({
     markers.forEach(mk => {
       const el = document.createElement('div');
       const color = mk.color || '#3b82f6';
-      el.style.cssText = `width:14px;height:14px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35);cursor:pointer;transition:transform .15s;`;
-      el.addEventListener('mouseenter', () => { el.style.transform = 'scale(1.4)'; });
-      el.addEventListener('mouseleave', () => { el.style.transform = 'scale(1)'; });
+      
+      if (mk.type === 'truck') {
+        el.className = 'mapbox-truck-marker';
+        el.style.cssText = `width:30px;height:30px;background:white;border-radius:50%;display:flex;align-items:center;justify-center;box-shadow:0 0 15px ${color};border:2px solid ${color};cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:10;`;
+        el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${mk.heading || 0}deg)"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`;
+      } else {
+        el.style.cssText = `width:16px;height:16px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 10px ${color}66;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);`;
+      }
 
-      const popup = new mapboxgl.Popup({ offset: 20, closeButton: false }).setHTML(
-        mk.popupHTML || `<div style="padding:4px;font-size:12px;color:#111"><strong>${mk.label || mk.id}</strong></div>`
+      el.addEventListener('mouseenter', () => { 
+        el.style.transform = 'scale(1.25)';
+        el.style.zIndex = '50';
+      });
+      el.addEventListener('mouseleave', () => { 
+        el.style.transform = 'scale(1)';
+        el.style.zIndex = mk.type === 'truck' ? '10' : '1';
+      });
+
+      const popup = new mapboxgl.Popup({ 
+        offset: mk.type === 'truck' ? 35 : 20, 
+        closeButton: false,
+        className: 'nexus-map-popup'
+      }).setHTML(
+        mk.popupHTML || `<div style="padding:8px;font-size:12px;color:#fff;background:#000;border-radius:8px"><strong>${mk.label || mk.id}</strong></div>`
       );
 
       const marker = new mapboxgl.Marker({ element: el })
