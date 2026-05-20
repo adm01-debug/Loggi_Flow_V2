@@ -9,7 +9,7 @@ import {
   Truck, Package, MapPin, Clock, CheckCircle2, AlertTriangle, 
   ArrowLeft, RefreshCw, User, Calendar, History, Navigation,
   ChevronRight, MoreVertical, ExternalLink, Share2, Copy, Check,
-  Zap, Brain, ShieldCheck, Map as MapIcon, Globe, Info
+  Zap, Brain, ShieldCheck, Map as MapIcon, Globe, Info, Route
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
@@ -87,18 +87,79 @@ export default function RastreamentoRealTime() {
   }, [shipment, geocodeAddress, analyzeDelays]);
 
   const mapMarkers: MapMarker[] = useMemo(() => {
-    if (!destCoords) return [];
-    return [
-      {
+    const markers: MapMarker[] = [];
+    
+    // Add destination
+    if (destCoords) {
+      markers.push({
         id: 'dest',
         lat: destCoords.lat,
         lng: destCoords.lng,
         label: 'Destino Final',
+        type: 'delivery',
         color: shipment?.statusColor || '#3b82f6',
-        popupHTML: `<div class="p-2 font-bold text-xs uppercase">${shipment?.destino}</div>`
+        popupHTML: `
+          <div class="p-3 bg-black/90 border border-white/10 rounded-xl backdrop-blur-md min-w-[200px]">
+            <div class="text-[9px] font-black text-primary uppercase tracking-widest mb-1">Destino Protocolado</div>
+            <div class="text-xs font-bold text-white mb-2">${shipment?.destino}</div>
+            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+              <span class="text-[8px] font-medium text-white/40 uppercase">Status</span>
+              <span class="text-[9px] font-black px-2 py-0.5 rounded-full bg-primary/10 text-primary">${shipment?.statusLabel}</span>
+            </div>
+          </div>
+        `
+      });
+    }
+
+    // Add truck/driver simulated marker if in transit
+    if (shipment.status === 'em_transito' || shipment.status === 'saiu_entrega') {
+      // Simulate truck position between origin and destination
+      if (originCoords && destCoords) {
+        const factor = shipment.status === 'saiu_entrega' ? 0.85 : 0.45;
+        const truckLat = originCoords.lat + (destCoords.lat - originCoords.lat) * factor;
+        const truckLng = originCoords.lng + (destCoords.lng - originCoords.lng) * factor;
+        
+        markers.push({
+          id: 'truck',
+          lat: truckLat,
+          lng: truckLng,
+          label: 'Veículo em Movimento',
+          type: 'truck',
+          color: '#06b6d4',
+          heading: 45,
+          popupHTML: `
+            <div class="p-4 bg-black/95 border-2 border-primary/20 rounded-[1.5rem] shadow-2xl min-w-[240px]">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+                </div>
+                <div>
+                  <div class="text-[10px] font-black text-primary uppercase tracking-widest">Veículo_Nexus</div>
+                  <div class="text-sm font-black text-white italic">EM DESLOCAMENTO</div>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase">
+                  <span>Velocidade</span>
+                  <span class="text-primary font-black">48 km/h</span>
+                </div>
+                <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase">
+                  <span>Sinal GPS</span>
+                  <span class="text-success font-black">EXCELENTE</span>
+                </div>
+                <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase pt-2 border-t border-white/5">
+                  <span>Próximo Checkpoint</span>
+                  <span class="text-white">Unidade Santana</span>
+                </div>
+              </div>
+            </div>
+          `
+        });
       }
-    ];
-  }, [destCoords, shipment]);
+    }
+
+    return markers;
+  }, [destCoords, originCoords, shipment]);
 
   if (isLoadingTracking) {
     return (
@@ -234,13 +295,16 @@ export default function RastreamentoRealTime() {
                 <p className="text-lg font-black text-white italic">{formatDate(shipment.previsao)}</p>
               </div>
             </div>
-            <div className="relative h-4 bg-white/5 rounded-full overflow-hidden border border-white/5">
+            <div className="relative h-4 bg-white/5 rounded-full overflow-hidden border border-white/5 p-[2px]">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary/40 via-primary to-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.5)]"
-              />
+                className="relative h-full rounded-full bg-gradient-to-r from-primary/40 via-primary to-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.5)] flex items-center justify-end pr-2 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.1)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[pulse_2s_linear_infinite]" />
+                {progressPercent > 5 && <Zap className="w-2.5 h-2.5 text-white animate-pulse relative z-10" />}
+              </motion.div>
             </div>
             <div className="grid grid-cols-4 gap-4">
               {['Coletado', 'Em Transferência', 'Saiu para Entrega', 'Entregue'].map((step, i) => (
@@ -288,9 +352,9 @@ export default function RastreamentoRealTime() {
                   <MapboxMap 
                     className="h-[500px] w-full"
                     markers={mapMarkers}
-                    originMarker={originCoords ? { lat: originCoords.lat, lng: originCoords.lng, label: 'Origem_CD' } : undefined}
+                    originMarker={originCoords ? { lat: originCoords.lat, lng: originCoords.lng, label: 'Centro de Distribuição_CD' } : undefined}
                     showRoute={true}
-                    zoom={10}
+                    zoom={12}
                   />
                   <div className="absolute bottom-6 left-6 right-6 z-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-black/80 backdrop-blur-xl p-5 rounded-[1.5rem] border border-white/10 flex items-center gap-4 group/item hover:bg-black transition-all">

@@ -122,16 +122,50 @@ export default function MapaRotas() {
 
         {/* Map + Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <MapboxMap
-              markers={mapMarkers}
-              originMarker={{ ...ORIGIN_COORDINATES, label: "🏭 Promobrindes — SP" }}
-              showRoute={showRouteLines}
-              className="h-[500px] card-base"
-            />
+          <div className="lg:col-span-2 space-y-4">
+            <div className="relative group overflow-hidden rounded-[2.5rem] border-2 border-white/5 bg-black shadow-2xl transition-all hover:border-cyan-500/30">
+              <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
+                <Badge className="bg-black/80 backdrop-blur-xl text-cyan-400 border-cyan-500/20 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl">
+                  <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+                  Mapeamento_Otimizado
+                </Badge>
+                <Badge className="bg-black/80 backdrop-blur-xl text-white/70 border-white/10 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-2xl">
+                  <Globe className="w-3 h-3 text-cyan-500" />
+                  Visualização_Live
+                </Badge>
+              </div>
+
+              <MapboxMap
+                markers={mapMarkers}
+                originMarker={{ ...ORIGIN_COORDINATES, label: "🏭 CD Central — SP" }}
+                showRoute={showRouteLines}
+                className="h-[600px] w-full"
+              />
+
+              <div className="absolute bottom-6 left-6 right-6 z-10 pointer-events-none">
+                <div className="flex justify-between items-end">
+                  <div className="bg-black/80 backdrop-blur-2xl p-4 rounded-2xl border border-white/10 flex items-center gap-4 shadow-2xl pointer-events-auto">
+                    <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-500">
+                      <Route className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-white/30 uppercase tracking-widest">Rotas Processadas</p>
+                      <p className="text-sm font-black text-white italic">{stats.total} Pontos Ativos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {isGeocoding && deliveryRoutes?.geocodingProgress && (
-              <div className="mt-2 text-xs text-muted-foreground text-center">
-                Geocodificando endereços: {deliveryRoutes.geocodingProgress.current}/{deliveryRoutes.geocodingProgress.total}
+              <div className="p-4 bg-cyan-500/5 border border-cyan-500/10 rounded-2xl flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <RefreshCw className="w-4 h-4 text-cyan-500 animate-spin" />
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Geocodificando Endereços Nexus...</span>
+                </div>
+                <div className="text-[10px] font-black text-cyan-500 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+                  {deliveryRoutes.geocodingProgress.current} / {deliveryRoutes.geocodingProgress.total}
+                </div>
               </div>
             )}
           </div>
