@@ -32,6 +32,10 @@ export default function MapaRotas() {
   const [mapPitch, setMapPitch] = useState(0);
   const [timeTravelValue, setTimeTravelValue] = useState(100);
   const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true, weather: false, bio: false });
+  const [riskZones, setRiskZones] = useState<{ id: string; center: [number, number]; radius: number; severity: 'low' | 'medium' | 'high' }[]>([
+    { id: '1', center: [-46.6333, -23.5505], radius: 1000, severity: 'high' }, // SP Center
+    { id: '2', center: [-46.8, -23.6], radius: 1000, severity: 'medium' }
+  ]);
   const [isDroneView, setIsDroneView] = useState(false);
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
@@ -129,6 +133,11 @@ export default function MapaRotas() {
         ` : '';
 
         const isAnomaly = p.order % 5 === 0; // Simulate anomaly for every 5th unit
+        
+        // Dynamic time stamp based on time travel
+        const syncTime = new Date(lastSync);
+        const isRecent = isLiveData;
+        const syncLabel = syncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
         return {
           id: p.id,
@@ -138,25 +147,47 @@ export default function MapaRotas() {
           label: `#${p.order} — ${p.address}`,
           color: isAnomaly ? '#ef4444' : getStatusColor(p.status),
           popupHTML: `
-            <div style="padding:16px;background:#000;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.8);max-width:240px;overflow:hidden;position:relative;">
-              <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${getStatusColor(p.status)}"></div>
-              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <div style="width:32px;height:32px;border-radius:8px;background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}22;display:flex;align-items:center;justify-center;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}44">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isAnomaly ? '#ef4444' : getStatusColor(p.status)}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <div style="padding:16px;background:#000;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.8);max-width:260px;overflow:hidden;position:relative;backdrop-filter:blur(20px);">
+              <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}"></div>
+              
+              <div style="display:flex;justify-between;align-items:start;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:36px;height:36px;border-radius:10px;background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}22;display:flex;align-items:center;justify-center;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}44">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isAnomaly ? '#ef4444' : getStatusColor(p.status)}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  </div>
+                  <div>
+                    <strong style="font-size:14px;color:#fff;font-family:system-ui;font-weight:900;letter-spacing:-0.5px;display:block">UNIT_${p.order}</strong>
+                    <div style="display:flex;align-items:center;gap:4px;">
+                      <div style="width:6px;height:6px;border-radius:50%;background:${isRecent ? '#22c55e' : 'rgba(255,255,255,0.2)'};${isRecent ? 'box-shadow:0 0 8px #22c55e;' : ''} ${isRecent ? 'animation:pulse 2s infinite;' : ''}"></div>
+                      <span style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase">SYNC: ${syncLabel}</span>
+                    </div>
+                  </div>
                 </div>
-                <strong style="font-size:14px;color:#fff;font-family:system-ui, -apple-system, sans-serif;font-weight:900;letter-spacing:-0.5px">UNIT_${p.order} ${isAnomaly ? '[ANOMALY]' : ''}</strong>
               </div>
+
               <p style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;line-height:1.4;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:0.5px">${p.address}</p>
-              <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${isAnomaly ? '#ef4444' : getStatusColor(p.status)};background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}15;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}33;text-transform:uppercase;letter-spacing:1px">
-                STATUS: ${isAnomaly ? 'CRITICAL_DELAY' : getStatusLabel(p.status).toUpperCase()}
+              
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div style="padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${isAnomaly ? '#ef4444' : getStatusColor(p.status)};background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}15;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}33;text-transform:uppercase;letter-spacing:1px">
+                  ${isAnomaly ? 'CRITICAL_DELAY' : getStatusLabel(p.status).toUpperCase()}
+                </div>
+                ${isAnomaly ? '<div style="padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:#ef4444;background:#ef444415;border:1px solid #ef444433;text-transform:uppercase;letter-spacing:1px">RISK_DETECTOR</div>' : ''}
               </div>
+
               ${bioMetrics}
-              ${isHistorical ? '<div style="margin-top:12px;font-size:9px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase;letter-spacing:1px">--- DATA_RESTORED_LOG ---</div>' : ''}
+              ${isHistorical ? '<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);font-size:9px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> HISTORICAL_RESTORE</div>' : ''}
             </div>
+            <style>
+              @keyframes pulse {
+                0% { opacity: 0.4; }
+                50% { opacity: 1; }
+                100% { opacity: 0.4; }
+              }
+            </style>
           `,
         };
       });
-  }, [filteredData, timeTravelValue, activeLayers.bio]);
+  }, [filteredData, timeTravelValue, activeLayers.bio, lastSync, isLiveData]);
 
   const handleClearFilters = () => {
     clearFilters();
@@ -362,6 +393,7 @@ export default function MapaRotas() {
                 showTraffic={activeLayers.nexus}
                 showWeather={activeLayers.weather}
                 isDroneView={isDroneView}
+                riskZones={activeLayers.risks ? riskZones : []}
                 className="h-[650px] w-full"
               />
 

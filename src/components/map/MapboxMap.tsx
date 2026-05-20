@@ -32,6 +32,7 @@ interface MapboxMapProps {
   isDroneView?: boolean;
   mapStyle?: 'dark' | 'satellite';
   pitch?: number;
+  riskZones?: { id: string; center: [number, number]; radius: number; severity: 'low' | 'medium' | 'high' }[];
 }
 
 export function MapboxMap({
@@ -47,6 +48,7 @@ export function MapboxMap({
   isDroneView = false,
   mapStyle = 'dark',
   pitch = 0,
+  riskZones = [],
 }: MapboxMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -283,6 +285,79 @@ export function MapboxMap({
     }
   }, [mapStyle, pitch, showTraffic, showWeather]);
 
+  // Risk Zones Visualization
+  useEffect(() => {
+    if (!map.current || loading) return;
+
+    const sourceId = 'risk-zones';
+    const updateRiskZones = () => {
+      if (!map.current) return;
+
+      if (map.current.getSource(sourceId)) {
+        map.current.removeLayer('risk-zones-layer');
+        map.current.removeLayer('risk-zones-label');
+        map.current.removeSource(sourceId);
+      }
+
+      if (riskZones.length === 0) return;
+
+      const features = riskZones.map(zone => ({
+        type: 'Feature' as const,
+        properties: { 
+          severity: zone.severity,
+          color: zone.severity === 'high' ? '#ef4444' : zone.severity === 'medium' ? '#f59e0b' : '#3b82f6',
+          label: zone.severity.toUpperCase() + ' RISK ZONE'
+        },
+        geometry: {
+          type: 'Point' as const,
+          coordinates: zone.center,
+        },
+      }));
+
+      map.current.addSource(sourceId, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features },
+      });
+
+      map.current.addLayer({
+        id: 'risk-zones-layer',
+        type: 'circle',
+        source: sourceId,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 20, 15, 100],
+          'circle-color': ['get', 'color'],
+          'circle-opacity': 0.15,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': ['get', 'color'],
+          'circle-stroke-opacity': 0.5
+        }
+      });
+
+      map.current.addLayer({
+        id: 'risk-zones-label',
+        type: 'symbol',
+        source: sourceId,
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+          'text-size': 10,
+          'text-offset': [0, 1.5]
+        },
+        paint: {
+          'text-color': ['get', 'color'],
+          'text-halo-color': 'rgba(0,0,0,0.8)',
+          'text-halo-width': 1
+        }
+      });
+    };
+
+    if (map.current.isStyleLoaded()) {
+      updateRiskZones();
+    } else {
+      map.current.once('style.load', updateRiskZones);
+    }
+  }, [riskZones, loading]);
+
   // Update markers
   useEffect(() => {
     if (!map.current || loading) return;
@@ -397,15 +472,21 @@ export function MapboxMap({
         const latDiff = mk.lat - originMarker.lat;
         const dist = Math.sqrt(lngDiff * lngDiff + latDiff * latDiff);
         
-        // Arc calculation for visual excellence - dynamic curvature based on distance
+        // Arc calculation for visual excellence
         const midLng = originMarker.lng + lngDiff / 2;
-        const midLat = originMarker.lat + latDiff / 2 + (dist * 0.15); // Add arc height
+        const midLat = originMarker.lat + latDiff / 2 + (dist * 0.15);
 
-        // Simulate risk-based rerouting in visual representation
-        const hasRisk = Math.random() > 0.8; 
+        // Check for intersection with risk zones to trigger "rerouting"
+        const affectingRiskZone = riskZones.find(zone => {
+          const dLng = zone.center[0] - midLng;
+          const dLat = zone.center[1] - midLat;
+          return Math.sqrt(dLng * dLng + dLat * dLat) < 0.5; // Simple proximity check
+        });
+
+        const hasRisk = !!affectingRiskZone;
         const routePoints = [
           [originMarker.lng, originMarker.lat],
-          hasRisk ? [midLng + 0.5, midLat + 0.2] : [midLng, midLat],
+          hasRisk ? [midLng + (affectingRiskZone.severity === 'high' ? 0.8 : 0.4), midLat + 0.3] : [midLng, midLat],
           [mk.lng, mk.lat],
         ];
 
@@ -492,7 +573,7 @@ export function MapboxMap({
     } else {
       map.current.on('style.load', addRouteLayer);
     }
-  }, [markers, originMarker, showRoute, loading]);
+  }, [markers, originMarker, showRoute, loading, riskZones]);
 
   if (error) {
     return (
