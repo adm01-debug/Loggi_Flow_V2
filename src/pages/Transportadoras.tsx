@@ -385,7 +385,8 @@ export default function Transportadoras() {
                 </Dialog>
               </OnboardingTooltip>
             </div>
-          </div>
+
+
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
             <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
