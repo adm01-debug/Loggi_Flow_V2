@@ -204,6 +204,7 @@ export function MapboxMap({
               'features': [
                 {
                   'type': 'Feature',
+                  'properties': {},
                   'geometry': {
                     'type': 'Polygon',
                     'coordinates': [[
