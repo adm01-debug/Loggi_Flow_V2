@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, Plus, MoreVertical, Eye, Edit, CheckCircle2, Clock, Loader2, AlertCircle, FileText, Package, Send, Calendar, MessageSquare, ArrowUpDown, ChevronUp, ChevronDown, Camera } from "lucide-react";
