@@ -113,14 +113,34 @@ export default function ConciliacaoFinanceira() {
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div className="p-3 rounded-lg bg-muted/50 text-center"><FileText className="w-5 h-5 mx-auto mb-1 text-muted-foreground" /><p className="text-lg font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Importados</p></div>
-                    <div className="p-3 rounded-lg bg-success/10 text-center"><CheckCircle2 className="w-5 h-5 mx-auto mb-1 text-success" /><p className="text-lg font-bold text-success">{stats.conciliados}</p><p className="text-xs text-muted-foreground">Conciliados</p></div>
-                    <div className="p-3 rounded-lg bg-warning/10 text-center"><AlertTriangle className="w-5 h-5 mx-auto mb-1 text-warning" /><p className="text-lg font-bold text-warning">{stats.divergencias}</p><p className="text-xs text-muted-foreground">Divergências</p></div>
-                    <div className="p-3 rounded-lg bg-muted/50 text-center"><Clock className="w-5 h-5 mx-auto mb-1 text-muted-foreground" /><p className="text-lg font-bold">{stats.pendentes}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-                    <div className={cn("p-3 rounded-lg text-center", stats.diferenca === 0 ? "bg-success/10" : stats.diferenca > 0 ? "bg-warning/10" : "bg-info/10")}>
-                      {stats.diferenca === 0 ? <Minus className="w-5 h-5 mx-auto mb-1 text-success" /> : stats.diferenca > 0 ? <TrendingUp className="w-5 h-5 mx-auto mb-1 text-warning" /> : <TrendingDown className="w-5 h-5 mx-auto mb-1 text-info" />}
-                      <p className="text-lg font-bold">{formatCurrency(stats.diferenca)}</p>
-                      <p className="text-xs text-muted-foreground">Diferença</p>
+                    <div className="p-4 rounded-2xl bg-muted/30 border border-white/5 text-center group hover:bg-muted/50 transition-all">
+                      <FileText className="w-5 h-5 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <p className="text-2xl font-black tracking-tighter italic">{stats.total}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Itens Importados</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center group hover:bg-emerald-500/20 transition-all">
+                      <CheckCircle2 className="w-5 h-5 mx-auto mb-2 text-emerald-500 animate-pulse" />
+                      <p className="text-2xl font-black tracking-tighter italic text-emerald-500">{stats.conciliados}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/70">Reconciliados OK</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center group hover:bg-amber-500/20 transition-all">
+                      <AlertTriangle className="w-5 h-5 mx-auto mb-2 text-amber-500" />
+                      <p className="text-2xl font-black tracking-tighter italic text-amber-500">{stats.divergencias}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500/70">Divergências</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-muted/30 border border-white/5 text-center group hover:bg-muted/50 transition-all">
+                      <Clock className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-2xl font-black tracking-tighter italic">{stats.pendentes}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Em Análise</p>
+                    </div>
+                    <div className={cn("p-4 rounded-2xl border transition-all text-center group", stats.diferenca === 0 ? "bg-emerald-500/10 border-emerald-500/20" : "bg-rose-500/10 border-rose-500/20")}>
+                      {stats.diferenca === 0 ? <Minus className="w-5 h-5 mx-auto mb-2 text-emerald-500" /> : <TrendingUp className="w-5 h-5 mx-auto mb-2 text-rose-500 animate-bounce" />}
+                      <p className={cn("text-2xl font-black tracking-tighter italic", stats.diferenca === 0 ? "text-emerald-500" : "text-rose-500")}>
+                        {formatCurrency(stats.diferenca)}
+                      </p>
+                      <p className={cn("text-[10px] font-bold uppercase tracking-widest", stats.diferenca === 0 ? "text-emerald-500/70" : "text-rose-500/70")}>
+                        Gap de Auditoria
+                      </p>
                     </div>
                   </div>
 
