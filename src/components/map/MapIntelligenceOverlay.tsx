@@ -78,7 +78,7 @@ export function MapIntelligenceOverlay() {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-white/5 space-y-2.5">
+          <div className="pt-3 border-t border-white/5 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-amber-500">
                 <AlertTriangle className="w-3.5 h-3.5 animate-bounce" />
@@ -86,11 +86,30 @@ export function MapIntelligenceOverlay() {
               </div>
               <span className="text-[8px] font-bold text-white/20 tracking-tighter">04:12m</span>
             </div>
+            
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-[7px] font-black text-white/20 uppercase tracking-widest">
+                <span>Security_Integrity</span>
+                <span className="text-success">DEEP_ENCRYPTION_ON</span>
+              </div>
+              <div className="h-0.5 w-full bg-white/5 rounded-full overflow-hidden">
+                <motion.div 
+                  animate={{ 
+                    x: ['-100%', '100%'],
+                    backgroundColor: ['#22c55e', '#06b6d4', '#22c55e']
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  className="h-full w-1/3"
+                />
+              </div>
+            </div>
+
             <div className="flex items-center gap-2 text-cyan-500">
               <Zap className="w-3.5 h-3.5" />
               <span className="text-[8px] font-black uppercase tracking-widest">Recalculando Grid Preditivo</span>
             </div>
           </div>
+
         </CardContent>
       </Card>
 

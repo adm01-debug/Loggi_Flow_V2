@@ -16,7 +16,11 @@ import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import { AnomalyList } from "@/components/map/AnomalyList";
+import { TacticalTerminal } from "@/components/map/TacticalTerminal";
+import { CinematicHUD } from "@/components/map/CinematicHUD";
 import { toast } from "sonner";
+
+
 
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
@@ -407,9 +411,15 @@ export default function MapaRotas() {
                   <Button 
                     size="sm" 
                     onClick={() => {
-                      setMapStyle(mapStyle === 'dark' ? 'satellite' : 'dark');
-                      setMapPitch(mapStyle === 'dark' ? 45 : 0);
+                      const newStyle = mapStyle === 'dark' ? 'satellite' : 'dark';
+                      setMapStyle(newStyle);
+                      setMapPitch(newStyle === 'satellite' ? 45 : 0);
+                      toast.info(`MODO_${newStyle.toUpperCase()}_FUSION_ATIVADO`, {
+                        description: `Ajustando renderização e profundidade do Grid Tático...`,
+                        className: 'bg-black/90 border-cyan-500/20 text-cyan-400 font-black uppercase tracking-tighter'
+                      });
                     }}
+
                     className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-cyan-500/20 transition-all border shadow-2xl"
                   >
                     {mapStyle === 'dark' ? <Satellite className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
@@ -562,9 +572,12 @@ export default function MapaRotas() {
                      });
                    }
                  }}
-               />
+                 />
+               
+               <CinematicHUD />
 
               {/* predictive risk alerts overlay */}
+
               <AnimatePresence>
                 {activeLayers.risks && (
                   <motion.div 
@@ -835,7 +848,10 @@ export default function MapaRotas() {
           />
         )}
       </AnimatePresence>
+      
+      <TacticalTerminal />
     </MainLayout>
+
 
   );
 }
