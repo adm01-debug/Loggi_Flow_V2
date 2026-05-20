@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Terminal, ChevronRight, Zap, ShieldCheck, Cpu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 
 interface LogEntry {
   id: string;
