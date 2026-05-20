@@ -103,24 +103,27 @@ export default function MapaRotas() {
           </div>
         ` : '';
 
+        const isAnomaly = p.order % 5 === 0; // Simulate anomaly for every 5th unit
+
         return {
           id: p.id,
           lat,
           lng,
+          isAnomaly,
           label: `#${p.order} — ${p.address}`,
-          color: getStatusColor(p.status),
+          color: isAnomaly ? '#ef4444' : getStatusColor(p.status),
           popupHTML: `
             <div style="padding:16px;background:#000;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.8);max-width:240px;overflow:hidden;position:relative;">
               <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${getStatusColor(p.status)}"></div>
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <div style="width:32px;height:32px;border-radius:8px;background:${getStatusColor(p.status)}22;display:flex;align-items:center;justify-content:center;border:1px solid ${getStatusColor(p.status)}44">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${getStatusColor(p.status)}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <div style="width:32px;height:32px;border-radius:8px;background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}22;display:flex;align-items:center;justify-center;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}44">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isAnomaly ? '#ef4444' : getStatusColor(p.status)}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 </div>
-                <strong style="font-size:14px;color:#fff;font-family:system-ui, -apple-system, sans-serif;font-weight:900;letter-spacing:-0.5px">UNIT_${p.order}</strong>
+                <strong style="font-size:14px;color:#fff;font-family:system-ui, -apple-system, sans-serif;font-weight:900;letter-spacing:-0.5px">UNIT_${p.order} ${isAnomaly ? '[ANOMALY]' : ''}</strong>
               </div>
               <p style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;line-height:1.4;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:0.5px">${p.address}</p>
-              <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${getStatusColor(p.status)};background:${getStatusColor(p.status)}15;border:1px solid ${getStatusColor(p.status)}33;text-transform:uppercase;letter-spacing:1px">
-                STATUS: ${getStatusLabel(p.status).toUpperCase()}
+              <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${isAnomaly ? '#ef4444' : getStatusColor(p.status)};background:${isAnomaly ? '#ef4444' : getStatusColor(p.status)}15;border:1px solid ${isAnomaly ? '#ef4444' : getStatusColor(p.status)}33;text-transform:uppercase;letter-spacing:1px">
+                STATUS: ${isAnomaly ? 'CRITICAL_DELAY' : getStatusLabel(p.status).toUpperCase()}
               </div>
               ${bioMetrics}
               ${isHistorical ? '<div style="margin-top:12px;font-size:9px;color:rgba(255,255,255,0.4);font-weight:900;text-transform:uppercase;letter-spacing:1px">--- DATA_RESTORED_LOG ---</div>' : ''}

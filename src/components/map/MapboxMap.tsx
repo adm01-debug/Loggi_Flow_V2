@@ -15,6 +15,7 @@ export interface MapMarker {
   type?: 'truck' | 'delivery' | 'pickup' | 'origin';
   status?: string;
   heading?: number;
+  isAnomaly?: boolean;
 }
 
 interface MapboxMapProps {
@@ -311,11 +312,16 @@ export function MapboxMap({
       const color = mk.color || '#3b82f6';
       
       if (mk.type === 'truck') {
-        el.className = 'mapbox-truck-marker';
+        el.className = cn('mapbox-truck-marker', mk.isAnomaly && 'nexus-anomaly-glitch');
         el.style.cssText = `width:30px;height:30px;background:white;border-radius:50%;display:flex;align-items:center;justify-center;box-shadow:0 0 15px ${color};border:2px solid ${color};cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:10;`;
-        el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${mk.heading || 0}deg)"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`;
+        if (mk.isAnomaly) {
+          el.style.boxShadow = `0 0 30px #ef4444, inset 0 0 10px #ef4444`;
+          el.style.borderColor = '#ef4444';
+        }
+        el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${mk.isAnomaly ? '#ef4444' : color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${mk.heading || 0}deg)"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`;
       } else {
-        el.style.cssText = `width:16px;height:16px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 10px ${color}66;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);`;
+        el.className = mk.isAnomaly ? 'nexus-anomaly-pulse' : '';
+        el.style.cssText = `width:16px;height:16px;border-radius:50%;background:${mk.isAnomaly ? '#ef4444' : color};border:2px solid #fff;box-shadow:0 0 10px ${mk.isAnomaly ? '#ef4444' : color}66;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);`;
       }
 
       el.addEventListener('mouseenter', () => { 
