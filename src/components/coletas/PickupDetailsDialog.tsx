@@ -245,8 +245,6 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
                     </p>
                   </div>
                 </div>
-
-                </div>
                 
                 <div className="bg-white/[0.01] p-6 rounded-[2rem] border border-white/5 backdrop-blur-sm space-y-4">
                   <div className="flex items-center justify-between">
