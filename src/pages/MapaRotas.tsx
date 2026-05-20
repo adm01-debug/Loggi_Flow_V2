@@ -17,7 +17,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import { AnomalyList } from "@/components/map/AnomalyList";
 import { TacticalTerminal } from "@/components/map/TacticalTerminal";
+import { CinematicHUD } from "@/components/map/CinematicHUD";
 import { toast } from "sonner";
+
 
 
 
