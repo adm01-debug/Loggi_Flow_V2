@@ -322,6 +322,7 @@ export default function Transportadoras() {
   );
 
   return (
+    <>
     <MainLayout>
       <div className="space-y-8 max-w-[1600px] mx-auto pb-12 p-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
@@ -384,7 +385,8 @@ export default function Transportadoras() {
                 </Dialog>
               </OnboardingTooltip>
             </div>
-          </div>
+
+
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-1000 delay-200">
             <div className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/90 shadow-xl border-none transition-all hover:-translate-y-1">
