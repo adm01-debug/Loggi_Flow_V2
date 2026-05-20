@@ -32,6 +32,7 @@ interface MapboxMapProps {
   isDroneView?: boolean;
   mapStyle?: 'dark' | 'satellite';
   pitch?: number;
+  riskZones?: { id: string; center: [number, number]; radius: number; severity: 'low' | 'medium' | 'high' }[];
 }
 
 export function MapboxMap({
