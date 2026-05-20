@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MapIntelligenceOverlay } from "@/components/map/MapIntelligenceOverlay";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
 
