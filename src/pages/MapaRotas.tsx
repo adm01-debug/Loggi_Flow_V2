@@ -114,8 +114,7 @@ export default function MapaRotas() {
     const fetchWeather = async () => {
       try {
         const { data } = await supabase.functions.invoke('get-weather-data', {
-          method: 'GET',
-          query: { lat: String(ORIGIN_COORDINATES.lat), lon: String(ORIGIN_COORDINATES.lng) }
+          method: 'GET'
         });
         if (data) {
           setWeatherData(data);
