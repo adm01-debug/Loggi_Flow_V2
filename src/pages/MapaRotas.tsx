@@ -160,56 +160,55 @@ export default function MapaRotas() {
           <div className="lg:col-span-2 space-y-4">
             <div className="relative group overflow-hidden rounded-[2.5rem] border-2 border-white/5 bg-black shadow-2xl transition-all hover:border-cyan-500/30">
               <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      onClick={() => {
-                        setMapStyle(mapStyle === 'dark' ? 'satellite' : 'dark');
-                        setMapPitch(mapStyle === 'dark' ? 45 : 0);
-                      }}
-                      className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-cyan-500/20 transition-all border shadow-2xl"
-                    >
-                      {mapStyle === 'dark' ? <Satellite className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
-                      {mapStyle === 'dark' ? 'Satellite_Fusion' : 'Tactical_Grid'}
-                    </Button>
-                    
-                    <Badge className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
-                      <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse" />
-                      Live_Telemetry: Active
-                    </Badge>
-                  </div>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    onClick={() => {
+                      setMapStyle(mapStyle === 'dark' ? 'satellite' : 'dark');
+                      setMapPitch(mapStyle === 'dark' ? 45 : 0);
+                    }}
+                    className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-cyan-500/20 transition-all border shadow-2xl"
+                  >
+                    {mapStyle === 'dark' ? <Satellite className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
+                    {mapStyle === 'dark' ? 'Satellite_Fusion' : 'Tactical_Grid'}
+                  </Button>
                   
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setActiveLayers(prev => ({ ...prev, fleet: !prev.fleet }))}
-                      className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.fleet ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
-                    >
-                      Fleet
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setActiveLayers(prev => ({ ...prev, deliveries: !prev.deliveries }))}
-                      className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.deliveries ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
-                    >
-                      Deliveries
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setActiveLayers(prev => ({ ...prev, nexus: !prev.nexus }))}
-                      className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.nexus ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
-                    >
-                      Nexus_Grid
-                    </Button>
-                  </div>
+                  <Badge className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
+                    <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse" />
+                    Live_Telemetry: Active
+                  </Badge>
                 </div>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, fleet: !prev.fleet }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.fleet ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                  >
+                    Fleet
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, deliveries: !prev.deliveries }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.deliveries ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                  >
+                    Deliveries
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveLayers(prev => ({ ...prev, nexus: !prev.nexus }))}
+                    className={cn("bg-black/80 backdrop-blur-xl border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest px-3 h-8", activeLayers.nexus ? "text-cyan-400 border-cyan-500/30" : "text-white/40")}
+                  >
+                    Nexus_Grid
+                  </Button>
+                </div>
+              </div>
 
-                <MapIntelligenceOverlay />
-                <MapboxMap
+              <MapIntelligenceOverlay />
+              <MapboxMap
                 markers={activeLayers.deliveries ? mapMarkers : []}
                 originMarker={{ ...ORIGIN_COORDINATES, label: "🏭 CD Central — SP" }}
                 showRoute={showRouteLines}
@@ -235,6 +234,7 @@ export default function MapaRotas() {
                         <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                         <p className="text-sm font-black text-white italic tracking-tight">OPERANDO EM CAPACIDADE MÁXIMA</p>
                       </div>
+                    </div>
                   </div>
                   
                   <div className="bg-black/90 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-auto min-w-[300px]">
@@ -330,7 +330,6 @@ export default function MapaRotas() {
                     >
                       <span className="text-xs">{String(p.order).padStart(2, '0')}</span>
                       <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-success rounded-full border-2 border-black animate-pulse" />
-                    </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-black text-white/90 truncate uppercase tracking-tight">{p.address || "ENDEREÇO_NÃO_INFORMADO"}</p>
