@@ -532,6 +532,6 @@ export default function Transportadoras() {
           <DialogFooter><Button variant="outline" onClick={() => setEditDialog(false)}>Cancelar</Button><Button onClick={handleUpdate}>Salvar Alterações</Button></DialogFooter>
         </DialogContent>
       </Dialog>
-    </MainLayout>
     </>
+  );
 }
