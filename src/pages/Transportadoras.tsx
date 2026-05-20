@@ -345,6 +345,7 @@ export default function Transportadoras() {
               </div>
             </h1>
           </div>
+        </div>
             <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
