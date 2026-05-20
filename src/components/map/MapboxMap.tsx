@@ -138,7 +138,7 @@ export function MapboxMap({
             
             // Fix: Cast the clamped array to Uint8Array for Mapbox compatibility
             const imageData = ctx.getImageData(0, 0, this.width, this.height).data;
-            this.data = new Uint8Array(imageData.buffer);
+            this.data = new Uint8Array(imageData.buffer as ArrayBuffer);
             
             map.current?.triggerRepaint();
             return true;

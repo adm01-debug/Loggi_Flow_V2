@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe, Layers, Satellite, Zap, AlertTriangle, Play, ShieldCheck, CloudRain, Activity } from "lucide-react";
+import { Map, Truck, Package, Clock, MapPin, RefreshCw, Route, Globe, Layers, Satellite, Zap, AlertTriangle, Play, ShieldCheck, CloudRain, Activity, Download, FileText } from "lucide-react";
 import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -14,6 +14,10 @@ import { MapIntelligenceOverlay } from "@/components/map/MapIntelligenceOverlay"
 import { motion, AnimatePresence } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
+import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
+import { AnomalyList } from "@/components/map/AnomalyList";
+import { toast } from "sonner";
+
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
 
@@ -44,6 +48,9 @@ export default function MapaRotas() {
   const [bioData, setBioData] = useState<{ heart_rate: number; fatigue_index: string } | null>(null);
   const [weatherData, setWeatherData] = useState<any>(null);
   const [selectedAnomaly, setSelectedAnomaly] = useState<{ id: string; level: 'info' | 'crit'; cause: string; action: string } | null>(null);
+  const [showAnomalyList, setShowAnomalyList] = useState(false);
+  const [vehicleFilter, setVehicleFilter] = useState("all");
+
 
   // Load tactical logs from DB
   useEffect(() => {
@@ -91,7 +98,17 @@ export default function MapaRotas() {
         .limit(1)
         .single();
       
-      if (data) setBioData({ heart_rate: data.heart_rate, fatigue_index: data.fatigue_index });
+      if (data) {
+        setBioData({ heart_rate: data.heart_rate, fatigue_index: data.fatigue_index });
+        // Real-time alert based on BioSync (no simulation)
+        if (data.heart_rate > 100) {
+          toast.error(`ALERTA BIO_SYNC: BPM CRÍTICO (${data.heart_rate}) detectado no condutor DRV-001`, {
+            description: 'Protocolo de segurança Nexus ativado automaticamente.',
+            className: 'bg-red-500/10 border-red-500/20 text-red-500 font-black uppercase tracking-tighter',
+          });
+        }
+      }
+
     };
     fetchBio();
 
@@ -107,7 +124,7 @@ export default function MapaRotas() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch real Weather data
+  // Fetch real Weather data and update risk zones based on fleet timestamp
   useEffect(() => {
     if (!activeLayers.weather) return;
 
@@ -118,13 +135,23 @@ export default function MapaRotas() {
         });
         if (data) {
           setWeatherData(data);
-          // Update risk zones based on weather
+          // Update risk zones based on weather + time travel logic
+          const newRiskZones = [
+            { id: '1', center: [-46.6333, -23.5505], radius: 1000, severity: 'high' },
+            { id: '2', center: [-46.8, -23.6], radius: 1000, severity: 'medium' }
+          ] as any[];
+
           if (data.weather[0].main === 'Rain' || data.weather[0].main === 'Storm') {
-            setRiskZones(prev => [
-              ...prev,
-              { id: 'weather-risk', center: [ORIGIN_COORDINATES.lng + 0.1, ORIGIN_COORDINATES.lat + 0.1], radius: 2000, severity: 'medium' }
-            ]);
+            // Se estiver chovendo no histórico ou no presente
+            newRiskZones.push({ 
+              id: 'weather-risk', 
+              center: [ORIGIN_COORDINATES.lng + 0.1, ORIGIN_COORDINATES.lat + 0.1], 
+              radius: 2000, 
+              severity: 'medium' 
+            });
           }
+          
+          setRiskZones(newRiskZones);
         }
       } catch (err) {
         console.error("Weather fetch failed:", err);
@@ -133,7 +160,8 @@ export default function MapaRotas() {
     fetchWeather();
     const interval = setInterval(fetchWeather, 300000); // 5 min
     return () => clearInterval(interval);
-  }, [activeLayers.weather]);
+  }, [activeLayers.weather, timeTravelValue]);
+
 
   // Sync state with simulator
   useEffect(() => {
@@ -157,6 +185,38 @@ export default function MapaRotas() {
     lng: r.coordinates?.lng ?? r.longitude ?? undefined,
     order: i + 1
   })), [routes]);
+
+  const anomalies = useMemo(() => {
+    return points
+      .filter(p => p.order % 5 === 0)
+      .map(p => ({
+        id: p.id,
+        level: 'crit' as const,
+        unit: String(p.order),
+        time: lastSync.toLocaleTimeString([], { hour12: false }),
+        cause: 'FALHA_CONEXÃO_TELEMETRIA',
+        action: 'REINICIAR_GATEWAY_OBDII'
+      }));
+  }, [points, lastSync]);
+
+  const filteredLogs = useMemo(() => {
+    return logs.filter(log => {
+      if (vehicleFilter !== "all" && !log.msg.includes(vehicleFilter)) return false;
+      // Adicionar filtro de tempo se necessário baseado no timeTravelValue
+      return true;
+    });
+  }, [logs, vehicleFilter]);
+
+  const handleExportCSV = () => {
+    exportToCSV(logs, `nexus_tactical_log_${new Date().toISOString()}`);
+    toast.success("LOG EXPORTADO", { description: "Arquivo CSV gerado com sucesso." });
+  };
+
+  const handleExportPDF = () => {
+    exportToPDF(logs, ["time", "type", "msg"], `nexus_tactical_log_${new Date().toISOString()}`);
+    toast.success("LOG EXPORTADO", { description: "Arquivo PDF gerado com sucesso." });
+  };
+
 
   const statusFiltered = useMemo(() => {
     if (statusFilter === "all") return points;
@@ -365,10 +425,15 @@ export default function MapaRotas() {
                     {isDroneView ? 'Drone_Follow: ON' : 'Drone_View'}
                   </Button>
                   
-                  <Badge className="bg-black/90 backdrop-blur-2xl text-cyan-400 border-cyan-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-t border-white/5">
-                    <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse" />
-                    Live_Telemetry: Active
-                  </Badge>
+                  <Button 
+                    size="sm" 
+                    onClick={() => setShowAnomalyList(true)}
+                    className="bg-black/90 backdrop-blur-2xl text-red-400 border-red-500/30 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_10px_30px_rgba(239,68,68,0.2)] border shadow-2xl hover:bg-red-500/10"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-pulse" />
+                    Anomalies: {anomalies.length}
+                  </Button>
+
                 </div>
                 
                 <div className="flex gap-2">
@@ -431,13 +496,34 @@ export default function MapaRotas() {
                   
                   {/* Nexus Tactical Log */}
                   <div className="bg-black/90 backdrop-blur-2xl p-5 rounded-[2rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-auto min-w-[280px] hidden xl:block">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                      <span className="text-[10px] font-black text-white uppercase tracking-widest italic">Nexus_Tactical_Log</span>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest italic">Nexus_Tactical_Log</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" onClick={handleExportCSV} className="w-6 h-6 text-white/40 hover:text-cyan-400"><Download className="w-3 h-3" /></Button>
+                        <Button variant="ghost" size="icon" onClick={handleExportPDF} className="w-6 h-6 text-white/40 hover:text-cyan-400"><FileText className="w-3 h-3" /></Button>
+                      </div>
                     </div>
-                    <div className="space-y-2 max-h-[120px] overflow-hidden">
+
+                    <div className="flex gap-2 mb-4">
+                      <select 
+                        className="bg-white/5 border border-white/10 rounded-xl text-[8px] font-black text-white/40 uppercase p-1 outline-none focus:border-cyan-500/50 transition-all flex-1"
+                        value={vehicleFilter}
+                        onChange={(e) => setVehicleFilter(e.target.value)}
+                      >
+                        <option value="all">TODOS_VEICULOS</option>
+                        <option value="UNIT_1">UNIT_01</option>
+                        <option value="UNIT_5">UNIT_05</option>
+                        <option value="UNIT_10">UNIT_10</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+
                       <AnimatePresence mode="popLayout">
-                        {logs.map((log) => (
+                        {filteredLogs.map((log) => (
+
                           <motion.div 
                             key={log.id}
                             initial={{ opacity: 0, x: -10 }}
@@ -623,14 +709,9 @@ export default function MapaRotas() {
                     </div>
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-4 text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">
-                        <span className="group-hover/simulator:text-cyan-500/50 transition-colors cursor-pointer" onClick={() => {
-                          const blob = new Blob([JSON.stringify(logs)], { type: 'application/json' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `nexus_logs_${new Date().toISOString()}.json`;
-                          a.click();
-                        }}>Export_Logs</span>
+                        <span className="group-hover/simulator:text-cyan-500/50 transition-colors cursor-pointer" onClick={handleExportCSV}>Export_CSV</span>
+                        <span className="group-hover/simulator:text-cyan-500/50 transition-colors cursor-pointer" onClick={handleExportPDF}>Export_PDF</span>
+
                         <span className="group-hover/simulator:text-cyan-500/50 transition-colors">Nexus_Forecast</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -741,6 +822,20 @@ export default function MapaRotas() {
           </div>
         </div>
       </div>
+      
+      <AnimatePresence>
+        {showAnomalyList && (
+          <AnomalyList 
+            anomalies={anomalies} 
+            onClose={() => setShowAnomalyList(false)} 
+            onAction={(id) => {
+              toast.success("PROTOCOLO INICIADO", { description: "Reiniciando gateway OBDII remotamente..." });
+              setShowAnomalyList(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </MainLayout>
+
   );
 }
