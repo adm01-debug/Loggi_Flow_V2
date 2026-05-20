@@ -345,12 +345,6 @@ export default function Transportadoras() {
               </div>
             </h1>
           </div>
-                    <span className="text-xs sm:text-sm font-bold text-primary uppercase tracking-[0.2em]">Malha e Rede Nexus</span>
-                  </div>
-                </div>
-              </h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl font-medium">Gestão estratégica de parceiros logísticos, conformidade e monitoramento de rede.</p>
-            </div>
             <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
