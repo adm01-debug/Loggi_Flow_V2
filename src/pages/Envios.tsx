@@ -304,35 +304,6 @@ export default function Envios() {
             </Button>
           </div>
         </div>
-          <div className="flex gap-3 animate-in slide-in-from-right-6 duration-700 ease-out-expo">
-            <Button variant={showLabels ? "default" : "outline"} size="lg" onClick={() => setShowLabels(!showLabels)} className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 transition-all">
-              <QrCode className="w-4 h-4" />
-              <span className="hidden sm:inline">Etiquetas</span>
-            </Button>
-            <ScannerButton
-              onScan={(result: ScanResult) => {
-                const entrega = list.find(e => e.codigo_rastreamento === result.text || e.numero_entrega === result.text);
-                if (entrega) {
-                  setSel(entrega);
-                  setDlgView(true);
-                } else {
-                  toast.error(`Código não encontrado: ${result.text}`);
-                }
-              }}
-              variant="outline"
-              className="h-12 w-12 rounded-xl border-2"
-            />
-            <OnboardingTooltip
-              id="envios-novo-btn"
-              title="Crie sua primeira entrega"
-              description="Registre uma nova entrega e acompanhe todo o ciclo de envio. Ganhe XP a cada entrega finalizada!"
-              position="left"
-            >
-              <Button size="lg" onClick={() => { setForm(emptyForm); setDlgCreate(true); }} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[11px] gap-2 bg-gradient-to-r from-primary via-primary/90 to-primary/80 shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all">
-                <Plus className="w-5 h-5" /> Novo Envio
-              </Button>
-            </OnboardingTooltip>
-          </div>
         </div>
 
         {showLabels && <MaterialLabelPrinter />}
