@@ -114,12 +114,13 @@ export function MapboxMap({
     if (originMarker) {
       const el = document.createElement('div');
       el.className = 'mapbox-origin-marker';
-      el.style.cssText = 'width:20px;height:20px;border-radius:50%;background:#22c55e;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);';
+      el.style.cssText = 'width:24px;height:24px;border-radius:8px;background:#06b6d4;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px #06b6d4;border:2px solid #fff;';
+      el.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
 
       const m = new mapboxgl.Marker({ element: el })
         .setLngLat([originMarker.lng, originMarker.lat])
         .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(
-          `<div style="padding:4px;font-size:13px;font-weight:600;color:#111">${originMarker.label || 'Origem'}</div>`
+          `<div style="padding:8px;font-size:12px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:1px">${originMarker.label || 'Nexus CD Central'}</div>`
         ))
         .addTo(map.current);
       markersRef.current.push(m);
@@ -176,7 +177,7 @@ export function MapboxMap({
     }
   }, [markers, originMarker, loading, onMarkerClick]);
 
-  // Draw route lines from origin to each marker
+  // Draw route lines from origin to each marker (Smarter curved paths)
   useEffect(() => {
     if (!map.current || !showRoute || !originMarker || markers.length === 0 || loading) return;
 
@@ -184,25 +185,49 @@ export function MapboxMap({
     
     const addRouteLayer = () => {
       if (map.current!.getSource(sourceId)) {
+        map.current!.removeLayer('route-layer-glow');
         map.current!.removeLayer('route-layer');
         map.current!.removeSource(sourceId);
       }
 
-      const features = markers.map(mk => ({
-        type: 'Feature' as const,
-        properties: { color: mk.color || '#3b82f6' },
-        geometry: {
-          type: 'LineString' as const,
-          coordinates: [
-            [originMarker.lng, originMarker.lat],
-            [mk.lng, mk.lat],
-          ],
-        },
-      }));
+      const features = markers.map(mk => {
+        // Simple arc calculation for visual excellence
+        const lngDiff = mk.lng - originMarker.lng;
+        const latDiff = mk.lat - originMarker.lat;
+        const midLng = originMarker.lng + lngDiff / 2;
+        const midLat = originMarker.lat + latDiff / 2 + (Math.abs(lngDiff) * 0.1); // add curve
+
+        return {
+          type: 'Feature' as const,
+          properties: { color: mk.color || '#3b82f6' },
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: [
+              [originMarker.lng, originMarker.lat],
+              [midLng, midLat],
+              [mk.lng, mk.lat],
+            ],
+          },
+        };
+      });
 
       map.current!.addSource(sourceId, {
         type: 'geojson',
         data: { type: 'FeatureCollection', features },
+      });
+
+      // Glow Layer
+      map.current!.addLayer({
+        id: 'route-layer-glow',
+        type: 'line',
+        source: sourceId,
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        paint: {
+          'line-color': ['get', 'color'],
+          'line-width': 4,
+          'line-opacity': 0.15,
+          'line-blur': 3,
+        },
       });
 
       map.current!.addLayer({
@@ -212,9 +237,9 @@ export function MapboxMap({
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
           'line-color': ['get', 'color'],
-          'line-width': 1.5,
-          'line-opacity': 0.4,
-          'line-dasharray': [2, 4],
+          'line-width': 2,
+          'line-opacity': 0.6,
+          'line-dasharray': [1, 2],
         },
       });
     };
