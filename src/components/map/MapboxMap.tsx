@@ -48,6 +48,7 @@ export function MapboxMap({
   isDroneView = false,
   mapStyle = 'dark',
   pitch = 0,
+  riskZones = [],
 }: MapboxMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -283,6 +284,79 @@ export function MapboxMap({
       });
     }
   }, [mapStyle, pitch, showTraffic, showWeather]);
+
+  // Risk Zones Visualization
+  useEffect(() => {
+    if (!map.current || loading) return;
+
+    const sourceId = 'risk-zones';
+    const updateRiskZones = () => {
+      if (!map.current) return;
+
+      if (map.current.getSource(sourceId)) {
+        map.current.removeLayer('risk-zones-layer');
+        map.current.removeLayer('risk-zones-label');
+        map.current.removeSource(sourceId);
+      }
+
+      if (riskZones.length === 0) return;
+
+      const features = riskZones.map(zone => ({
+        type: 'Feature' as const,
+        properties: { 
+          severity: zone.severity,
+          color: zone.severity === 'high' ? '#ef4444' : zone.severity === 'medium' ? '#f59e0b' : '#3b82f6',
+          label: zone.severity.toUpperCase() + ' RISK ZONE'
+        },
+        geometry: {
+          type: 'Point' as const,
+          coordinates: zone.center,
+        },
+      }));
+
+      map.current.addSource(sourceId, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features },
+      });
+
+      map.current.addLayer({
+        id: 'risk-zones-layer',
+        type: 'circle',
+        source: sourceId,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 20, 15, 100],
+          'circle-color': ['get', 'color'],
+          'circle-opacity': 0.15,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': ['get', 'color'],
+          'circle-stroke-opacity': 0.5
+        }
+      });
+
+      map.current.addLayer({
+        id: 'risk-zones-label',
+        type: 'symbol',
+        source: sourceId,
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+          'text-size': 10,
+          'text-offset': [0, 1.5]
+        },
+        paint: {
+          'text-color': ['get', 'color'],
+          'text-halo-color': 'rgba(0,0,0,0.8)',
+          'text-halo-width': 1
+        }
+      });
+    };
+
+    if (map.current.isStyleLoaded()) {
+      updateRiskZones();
+    } else {
+      map.current.once('style.load', updateRiskZones);
+    }
+  }, [riskZones, loading]);
 
   // Update markers
   useEffect(() => {
