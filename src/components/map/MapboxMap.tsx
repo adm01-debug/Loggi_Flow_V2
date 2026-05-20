@@ -153,7 +153,21 @@ export function MapboxMap({
         closeButton: false,
         className: 'nexus-map-popup'
       }).setHTML(
-        mk.popupHTML || `<div style="padding:8px;font-size:12px;color:#fff;background:#000;border-radius:8px"><strong>${mk.label || mk.id}</strong></div>`
+        mk.popupHTML || `
+          <div style="padding:16px;background:#000;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.8);max-width:240px;overflow:hidden;position:relative;">
+            <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${color}"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              <div style="width:32px;height:32px;border-radius:8px;background:${color}22;display:flex;align-items:center;justify-content:center;border:1px solid ${color}44">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              </div>
+              <strong style="font-size:14px;color:#fff;font-family:system-ui, -apple-system, sans-serif;font-weight:900;letter-spacing:-0.5px">DESTINO_UNIT</strong>
+            </div>
+            <p style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;line-height:1.4;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:0.5px">${mk.label || mk.id}</p>
+            <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${color};background:${color}15;border:1px solid ${color}33;text-transform:uppercase;letter-spacing:1px">
+              LIVE_STATUS: NOMINAL
+            </div>
+          </div>
+        `
       );
 
       const marker = new mapboxgl.Marker({ element: el })
