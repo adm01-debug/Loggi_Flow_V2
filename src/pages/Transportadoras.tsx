@@ -322,8 +322,9 @@ export default function Transportadoras() {
   );
 
   return (
-    <>
+  return (
     <MainLayout>
+      <div className="space-y-8 max-w-[1600px] mx-auto pb-12 p-6">
       <div className="space-y-8 max-w-[1600px] mx-auto pb-12 p-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
           <div className="space-y-2">
