@@ -159,11 +159,16 @@ export function MapboxMap({
     if (!map.current) return;
     
     const newStyle = mapStyle === 'satellite' ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/dark-v11';
-    map.current.setStyle(newStyle);
     
+    // Smooth transition between styles
+    map.current.setStyle(newStyle, { diff: true });
+    
+    // Continual animation for pitch/bearing
     map.current.easeTo({
       pitch: pitch,
-      duration: 1200,
+      bearing: mapStyle === 'satellite' ? 15 : 0,
+      duration: 2500,
+      easing: (t) => t * (2 - t), // easeOutQuad for silky smoothness
       essential: true
     });
 
@@ -303,16 +308,23 @@ export function MapboxMap({
         const midLng = originMarker.lng + lngDiff / 2;
         const midLat = originMarker.lat + latDiff / 2 + (dist * 0.15); // Add arc height
 
+        // Simulate risk-based rerouting in visual representation
+        const hasRisk = Math.random() > 0.8; 
+        const routePoints = [
+          [originMarker.lng, originMarker.lat],
+          hasRisk ? [midLng + 0.5, midLat + 0.2] : [midLng, midLat],
+          [mk.lng, mk.lat],
+        ];
+
         return {
           type: 'Feature' as const,
-          properties: { color: mk.color || '#06b6d4' },
+          properties: { 
+            color: hasRisk ? '#F59E0B' : (mk.color || '#06b6d4'),
+            isRerouted: hasRisk 
+          },
           geometry: {
             type: 'LineString' as const,
-            coordinates: [
-              [originMarker.lng, originMarker.lat],
-              [midLng, midLat],
-              [mk.lng, mk.lat],
-            ],
+            coordinates: routePoints,
           },
         };
       });

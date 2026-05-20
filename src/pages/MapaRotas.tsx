@@ -33,6 +33,21 @@ export default function MapaRotas() {
   const [timeTravelValue, setTimeTravelValue] = useState(100);
   const [activeLayers, setActiveLayers] = useState({ fleet: true, deliveries: true, nexus: false, risks: true });
   const [lastSync, setLastSync] = useState(new Date());
+  const [isLiveData, setIsLiveData] = useState(true);
+
+  // Sync state with simulator
+  useEffect(() => {
+    // If slider is at 100, we are in "Real Time"
+    setIsLiveData(timeTravelValue >= 95);
+    if (timeTravelValue >= 95) {
+      setLastSync(new Date());
+    } else {
+      // Simulate historical sync based on time travel
+      const historyDate = new Date();
+      historyDate.setMinutes(historyDate.getMinutes() - (100 - timeTravelValue));
+      setLastSync(historyDate);
+    }
+  }, [timeTravelValue]);
 
   const points: DeliveryPoint[] = useMemo(() => (routes || []).map((r, i) => ({
     id: r.id,
@@ -57,26 +72,40 @@ export default function MapaRotas() {
     entregues: points.filter(p => p.status === "entregue" || p.status === "finalizado").length
   };
 
-  // Convert filtered points to map markers
-  const mapMarkers: MapMarker[] = useMemo(() =>
-    filteredData
+  // Convert filtered points to map markers with time travel simulation
+  const mapMarkers: MapMarker[] = useMemo(() => {
+    const isHistorical = timeTravelValue < 95;
+    
+    return filteredData
       .filter(p => p.lat && p.lng)
-      .map(p => ({
-        id: p.id,
-        lat: p.lat!,
-        lng: p.lng!,
-        label: `#${p.order} — ${p.address}`,
-        color: getStatusColor(p.status),
-        popupHTML: `
-          <div style="padding:6px;font-size:12px;color:#111;max-width:220px">
-            <strong style="font-size:13px">#${p.order}</strong>
-            <div style="margin:4px 0;color:#555">${p.address}</div>
-            <span style="display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;color:#fff;background:${getStatusColor(p.status)}">${getStatusLabel(p.status)}</span>
-          </div>
-        `,
-      })),
-    [filteredData]
-  );
+      .map(p => {
+        let lat = p.lat!;
+        let lng = p.lng!;
+        
+        // Simular posição histórica para caminhões/entregas em trânsito
+        if (isHistorical && (p.status === 'em_transito' || p.status === 'despachado')) {
+          const factor = (100 - timeTravelValue) / 100;
+          lat = ORIGIN_COORDINATES.lat + (lat - ORIGIN_COORDINATES.lat) * (1 - factor);
+          lng = ORIGIN_COORDINATES.lng + (lng - ORIGIN_COORDINATES.lng) * (1 - factor);
+        }
+
+        return {
+          id: p.id,
+          lat,
+          lng,
+          label: `#${p.order} — ${p.address}`,
+          color: getStatusColor(p.status),
+          popupHTML: `
+            <div style="padding:6px;font-size:12px;color:#111;max-width:220px">
+              <strong style="font-size:13px">#${p.order}</strong>
+              <div style="margin:4px 0;color:#555">${p.address}</div>
+              <span style="display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;color:#fff;background:${getStatusColor(p.status)}">${getStatusLabel(p.status)}</span>
+              ${isHistorical ? '<div style="margin-top:4px;font-size:9px;color:#666;font-weight:bold">POSIÇÃO_HISTÓRICA_SIMULADA</div>' : ''}
+            </div>
+          `,
+        };
+      });
+  }, [filteredData, timeTravelValue]);
 
   const handleClearFilters = () => {
     clearFilters();
@@ -239,15 +268,34 @@ export default function MapaRotas() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="absolute top-24 right-4 z-20 flex flex-col gap-3 max-w-[280px]"
+                    className="absolute top-24 right-4 z-20 flex flex-col gap-3 max-w-[300px]"
                   >
-                    <div className="bg-amber-500/10 backdrop-blur-3xl border border-amber-500/20 p-4 rounded-2xl shadow-2xl relative overflow-hidden group">
-                      <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
-                      <div className="flex items-center gap-3 mb-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Alerta_Preditivo_Nexus</span>
+                    <div className="bg-amber-500/10 backdrop-blur-3xl border border-amber-500/20 p-5 rounded-3xl shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-500" />
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <AlertTriangle className="w-4 h-4 text-amber-500 animate-pulse" />
+                          <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Alerta_Preditivo_Nexus</span>
+                        </div>
+                        <Badge variant="outline" className="text-[8px] font-black bg-amber-500/10 text-amber-500 border-amber-500/30">RISCO_ALTO</Badge>
                       </div>
-                      <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase tracking-tight">Bloqueio detectado na BR-116. Recalculando rotas em 2.4s...</p>
+                      <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase tracking-tight mb-3">Bloqueio total na BR-116 (Km 245). Obstrução por acidente grave.</p>
+                      <div className="flex items-center gap-2 p-2 rounded-xl bg-black/40 border border-white/5">
+                        <Route className="w-3.5 h-3.5 text-cyan-400" />
+                        <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Recalculando_Via_Alternativa_SP-070</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-red-500/10 backdrop-blur-3xl border border-red-500/20 p-5 rounded-3xl shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 left-0 w-1.5 h-full bg-red-500" />
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <ShieldCheck className="w-4 h-4 text-red-500" />
+                          <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Zona_De_Risco_Segurança</span>
+                        </div>
+                        <Badge variant="outline" className="text-[8px] font-black bg-red-500/10 text-red-500 border-red-500/30">CRÍTICO</Badge>
+                      </div>
+                      <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase tracking-tight">Área de alta periculosidade detectada (Satelite_Fusion AI). Protocolo Nexus_Shield ativo.</p>
                     </div>
                   </motion.div>
                 )}
@@ -267,9 +315,15 @@ export default function MapaRotas() {
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em]">Nexus_Fleet_Dynamics</p>
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-                          <Zap className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />
-                          <span className="text-[8px] font-black text-cyan-400 uppercase tracking-widest">Sync_{lastSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                        <div className={cn(
+                          "flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors",
+                          isLiveData ? "bg-cyan-500/10 border-cyan-500/20" : "bg-white/5 border-white/10"
+                        )}>
+                          <Zap className={cn("w-2.5 h-2.5", isLiveData ? "text-cyan-400 animate-pulse" : "text-white/40")} />
+                          <span className={cn("text-[8px] font-black uppercase tracking-widest", isLiveData ? "text-cyan-400" : "text-white/40")}>
+                            {isLiveData ? "LIVE_" : "LOG_"}
+                            {lastSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
