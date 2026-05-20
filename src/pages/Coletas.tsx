@@ -168,7 +168,9 @@ export default function Coletas() {
 
         <AnimatePresence mode="wait">
           {activeView === "insights" ? (
-            <motion.div 
+            <div className="space-y-6">
+              <motion.div 
+
               key="insights"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
