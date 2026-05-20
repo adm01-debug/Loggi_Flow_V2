@@ -1607,6 +1607,8 @@ export type Database = {
           comprovante_coleta_url: string | null
           contato_coleta: string | null
           created_at: string
+          custo_estimado: number | null
+          custo_real: number | null
           data_efetiva_coleta: string | null
           data_prevista_coleta: string | null
           data_recebimento: string | null
@@ -1615,6 +1617,8 @@ export type Database = {
           endereco_coleta: string
           fornecedor_id: string | null
           id: string
+          is_reverse: boolean | null
+          is_urgent: boolean | null
           link_rastreamento: string | null
           nf_anexo_url: string | null
           nf_fornecedor: string | null
@@ -1635,6 +1639,8 @@ export type Database = {
           comprovante_coleta_url?: string | null
           contato_coleta?: string | null
           created_at?: string
+          custo_estimado?: number | null
+          custo_real?: number | null
           data_efetiva_coleta?: string | null
           data_prevista_coleta?: string | null
           data_recebimento?: string | null
@@ -1643,6 +1649,8 @@ export type Database = {
           endereco_coleta: string
           fornecedor_id?: string | null
           id?: string
+          is_reverse?: boolean | null
+          is_urgent?: boolean | null
           link_rastreamento?: string | null
           nf_anexo_url?: string | null
           nf_fornecedor?: string | null
@@ -1663,6 +1671,8 @@ export type Database = {
           comprovante_coleta_url?: string | null
           contato_coleta?: string | null
           created_at?: string
+          custo_estimado?: number | null
+          custo_real?: number | null
           data_efetiva_coleta?: string | null
           data_prevista_coleta?: string | null
           data_recebimento?: string | null
@@ -1671,6 +1681,8 @@ export type Database = {
           endereco_coleta?: string
           fornecedor_id?: string | null
           id?: string
+          is_reverse?: boolean | null
+          is_urgent?: boolean | null
           link_rastreamento?: string | null
           nf_anexo_url?: string | null
           nf_fornecedor?: string | null
