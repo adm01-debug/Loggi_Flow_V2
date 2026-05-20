@@ -77,12 +77,41 @@ export default function RastreamentoMotorista() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><h1 className="text-display flex items-center gap-3"><div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-info/20 to-info/5"><Navigation className="w-6 h-6 text-info" /></div>Rastreamento Motorista</h1><p className="text-muted-foreground mt-1">Acompanhe entregas em tempo real via Lalamove</p></div>
-          <div className="flex gap-2">
-            <Select value={selectedOrder} onValueChange={setSelectedOrder}><SelectTrigger className="w-56"><SelectValue placeholder="Selecione pedido" /></SelectTrigger><SelectContent>{(orders || []).map((o) => <SelectItem key={o.id} value={o.id}>#{o.id.slice(0, 8)} - {o.cliente}</SelectItem>)}</SelectContent></Select>
-            <Button variant={isLive ? "destructive" : "default"} onClick={() => setIsLive(!isLive)}><Radio className={cn("w-4 h-4 mr-2", isLive && "animate-pulse")} />{isLive ? "Parar" : "Ao Vivo"}</Button>
-            <Button variant="outline" onClick={() => refetchDriverLocation?.()}><RefreshCw className="w-4 h-4" /></Button>
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-info to-info/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black border border-white/10 shadow-2xl transition-transform hover:scale-110">
+                  <Navigation className="w-8 h-8 sm:w-10 sm:h-10 text-info animate-pulse" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="drop-shadow-2xl">Telemetria Viva</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-info/10 border border-info/20">
+                    <div className="w-2 h-2 rounded-full bg-info animate-ping" />
+                    <span className="text-[10px] font-black text-info uppercase tracking-[0.3em]">Driver_Monitor_Nexus</span>
+                  </div>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">LAST MILE • REAL-TIME TRACKING</span>
+                </div>
+              </div>
+            </h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={selectedOrder} onValueChange={setSelectedOrder}>
+              <SelectTrigger className="w-56 h-14 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl font-black uppercase tracking-widest text-[10px]"><SelectValue placeholder="Selecione pedido" /></SelectTrigger>
+              <SelectContent className="rounded-2xl border-white/10 bg-black/90 backdrop-blur-xl">
+                {(orders || []).map((o) => <SelectItem key={o.id} value={o.id} className="text-xs font-bold">#{o.id.slice(0, 8)} - {o.cliente}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button variant={isLive ? "destructive" : "default"} size="lg" onClick={() => setIsLive(!isLive)} className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[11px] gap-3 transition-all shadow-lg">
+              <Radio className={cn("w-4 h-4", isLive && "animate-pulse")} />
+              {isLive ? "Parar Live" : "Iniciar Live"}
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => refetchDriverLocation?.()} className="h-14 w-14 p-0 rounded-2xl border-white/10 bg-black/40 backdrop-blur-xl">
+              <RefreshCw className="w-4 h-4 text-primary" />
+            </Button>
           </div>
         </div>
         {selectedOrder ? (
