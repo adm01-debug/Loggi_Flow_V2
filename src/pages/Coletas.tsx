@@ -8,8 +8,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Plus, Package, Truck, Clock, CheckCircle2, AlertTriangle, 
   MapPin, Calendar, Download, Loader2, LucideIcon, Building2, 
-  Search, Filter, TrendingUp, Zap, Target, History, BarChart3
+  Search, Filter, TrendingUp, Zap, Target, History, BarChart3,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from "lucide-react";
+import { 
+  ResponsiveContainer as RechartsContainer, 
+  AreaChart as ReAreaChart, 
+  Area as ReArea, 
+  XAxis as ReXAxis, 
+  YAxis as ReYAxis, 
+  CartesianGrid as ReCartesianGrid, 
+  Tooltip as ReTooltip,
+  BarChart as ReBarChart,
+  Bar as ReBar,
+  Cell as ReCell
+} from 'recharts';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks";
 import { useExport } from "@/hooks";
