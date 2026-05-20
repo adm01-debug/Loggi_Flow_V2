@@ -302,10 +302,24 @@ export function MapboxMap({
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
           'line-color': ['get', 'color'],
-          'line-width': 2,
-          'line-opacity': 0.8,
-          'line-dasharray': [2, 2],
+          'line-width': 2.5,
+          'line-opacity': 0.9,
+          'line-dasharray': [3, 2],
         },
+      });
+
+      // City-to-City Connection Points (Visual enhancement)
+      map.current!.addLayer({
+        id: 'route-points',
+        type: 'circle',
+        source: sourceId,
+        paint: {
+          'circle-radius': 4,
+          'circle-color': ['get', 'color'],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#fff',
+          'circle-opacity': 0.8
+        }
       });
 
       // Directional Flow Animation (using symbols)
