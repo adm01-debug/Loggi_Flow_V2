@@ -38,6 +38,7 @@ export function MapboxMap({
   originMarker,
   className = '',
   onMarkerClick,
+  showTraffic = false,
   mapStyle = 'dark',
   pitch = 0,
 }: MapboxMapProps) {
@@ -153,19 +154,41 @@ export function MapboxMap({
     };
   }, [token, center, zoom]); // Re-init if core props change significantly
 
-  // Handle Style and Pitch changes without full re-init
+  // Handle Style, Pitch and Traffic changes
   useEffect(() => {
     if (!map.current) return;
     
-    // Simply trigger style change - Mapbox handles the check internally or we can use a ref
     const newStyle = mapStyle === 'satellite' ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/dark-v11';
     map.current.setStyle(newStyle);
     
     map.current.easeTo({
       pitch: pitch,
-      duration: 1000
+      duration: 1200,
+      essential: true
     });
-  }, [mapStyle, pitch]);
+
+    const updateTraffic = () => {
+      if (!map.current) return;
+      try {
+        const layers = map.current.getStyle()?.layers;
+        if (layers) {
+          layers.forEach(layer => {
+            if (layer.id.includes('traffic')) {
+              map.current?.setLayoutProperty(layer.id, 'visibility', showTraffic ? 'visible' : 'none');
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Traffic layer error:', e);
+      }
+    };
+
+    if (map.current.isStyleLoaded()) {
+      updateTraffic();
+    } else {
+      map.current.once('style.load', updateTraffic);
+    }
+  }, [mapStyle, pitch, showTraffic]);
 
   // Update markers
   useEffect(() => {
