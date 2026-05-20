@@ -113,12 +113,33 @@ export default function MapaRotas() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card text-center"><MapPin className="w-5 h-5 text-cyan-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.total}</p><p className="text-xs text-muted-foreground">Pontos</p></div>
-          <div className="stat-card text-center"><Clock className="w-5 h-5 text-amber-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.pendentes}</p><p className="text-xs text-muted-foreground">Pendentes</p></div>
-          <div className="stat-card text-center"><Truck className="w-5 h-5 text-blue-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.emRota}</p><p className="text-xs text-muted-foreground">Em Rota</p></div>
-          <div className="stat-card text-center"><Package className="w-5 h-5 text-green-500 mx-auto mb-2" /><p className="text-2xl font-bold">{stats.entregues}</p><p className="text-xs text-muted-foreground">Entregues</p></div>
+        {/* Nexus KPI Cluster */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+          {[
+            { label: "PONTOS_ATIVOS", value: stats.total, icon: MapPin, color: "text-cyan-500", bg: "bg-cyan-500/5" },
+            { label: "BACKLOG_PENDENTE", value: stats.pendentes, icon: Clock, color: "text-amber-500", bg: "bg-amber-500/5" },
+            { label: "FLUXO_TRANSITO", value: stats.emRota, icon: Truck, color: "text-blue-500", bg: "bg-blue-500/5" },
+            { label: "SLA_ENTREGUE", value: stats.entregues, icon: Package, color: "text-green-500", bg: "bg-green-500/5" }
+          ].map((stat, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className={cn("p-6 rounded-[2rem] border border-white/5 bg-black/40 backdrop-blur-xl shadow-2xl group hover:border-white/10 transition-all", stat.bg)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className={cn("p-3 rounded-2xl bg-black/50 border border-white/5 group-hover:scale-110 transition-transform", stat.color)}>
+                  <stat.icon className="w-6 h-6" />
+                </div>
+                <div className="h-1 w-12 bg-white/5 rounded-full overflow-hidden">
+                  <div className={cn("h-full w-2/3 rounded-full", stat.color.replace('text', 'bg'))} />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-white italic tracking-tighter mb-1">{stat.value}</p>
+              <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{stat.label}</p>
+            </motion.div>
+          ))}
         </div>
 
         {/* Map + Sidebar */}
@@ -199,33 +220,47 @@ export default function MapaRotas() {
               totalFiltered={filteredData.length}
               totalOriginal={points.length}
             />
-            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-              {filteredData.map((p) => (
-                <div key={p.id} className="card-interactive flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-                    style={{ backgroundColor: getStatusColor(p.status) }}
-                  >
-                    {p.order}
+            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+              {filteredData.map((p, i) => (
+                <motion.div 
+                  key={p.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="group relative bg-black/40 backdrop-blur-xl border border-white/5 p-4 rounded-3xl hover:border-cyan-500/30 transition-all cursor-pointer overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black text-white shrink-0 italic border-t border-white/10 shadow-2xl group-hover:scale-110 transition-transform"
+                      style={{ backgroundColor: `${getStatusColor(p.status)}33`, color: getStatusColor(p.status), border: `1px solid ${getStatusColor(p.status)}22` }}
+                    >
+                      {String(p.order).padStart(2, '0')}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-black text-white/90 truncate uppercase tracking-tight">{p.address || "ENDEREÇO_NÃO_INFORMADO"}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                          {p.lat && p.lng ? `GPS: ${p.lat.toFixed(4)} / ${p.lng.toFixed(4)}` : 'COORDENADAS_AUSENTES'}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge
+                      className="text-[9px] font-black uppercase tracking-tighter shrink-0 rounded-full px-3 py-1 border-none shadow-lg"
+                      style={{ backgroundColor: `${getStatusColor(p.status)}22`, color: getStatusColor(p.status) }}
+                    >
+                      {getStatusLabel(p.status)}
+                    </Badge>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{p.address || "Sem endereço"}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {p.lat && p.lng ? `${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}` : 'Sem coordenadas'}
-                    </p>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] shrink-0"
-                    style={{ borderColor: getStatusColor(p.status), color: getStatusColor(p.status) }}
-                  >
-                    {getStatusLabel(p.status)}
-                  </Badge>
-                </div>
+                </motion.div>
               ))}
               {filteredData.length === 0 && (
-                <div className="text-center text-muted-foreground py-8 text-sm">
-                  Nenhuma entrega encontrada
+                <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
+                    <MapPin className="w-8 h-8 text-white/20" />
+                  </div>
+                  <p className="text-xs font-black text-white/20 uppercase tracking-[0.3em]">Nenhum registro no radar</p>
                 </div>
               )}
             </div>

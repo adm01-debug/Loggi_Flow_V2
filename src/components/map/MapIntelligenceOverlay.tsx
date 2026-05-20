@@ -34,18 +34,26 @@ export function MapIntelligenceOverlay() {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/5 p-2 rounded-xl border border-white/5">
-              <p className="text-[7px] font-black text-white/30 uppercase mb-1">Tráfego</p>
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="w-3 h-3 text-success" />
+            <div className="bg-white/5 p-3 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+              <p className="text-[7px] font-black text-white/30 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                <TrendingUp className="w-2 h-2" /> Tráfego
+              </p>
+              <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black text-white italic">FLUIDO</span>
+                <div className="flex gap-0.5">
+                  <div className="w-1 h-3 bg-cyan-500/50 rounded-full" />
+                  <div className="w-1 h-2 bg-cyan-500/30 rounded-full mt-auto" />
+                  <div className="w-1 h-4 bg-cyan-500 rounded-full mt-auto" />
+                </div>
               </div>
             </div>
-            <div className="bg-white/5 p-2 rounded-xl border border-white/5">
-              <p className="text-[7px] font-black text-white/30 uppercase mb-1">Clima</p>
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3 h-3 text-cyan-500" />
+            <div className="bg-white/5 p-3 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+              <p className="text-[7px] font-black text-white/30 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                <ShieldCheck className="w-2 h-2" /> Clima
+              </p>
+              <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black text-white italic">ESTÁVEL</span>
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
               </div>
             </div>
           </div>
