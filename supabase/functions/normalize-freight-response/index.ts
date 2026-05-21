@@ -116,9 +116,18 @@ serve(async (req) => {
       );
 
       const aiData = await aiResponse.json();
-      const extracted = JSON.parse(aiData.choices[0].message.content);
-      price = price || extracted.price;
-      days = days || extracted.days;
+      const aiContent = aiData?.choices?.[0]?.message?.content;
+      if (aiContent) {
+        try {
+          const extracted = JSON.parse(aiContent);
+          price = price ?? extracted.price ?? null;
+          days = days ?? extracted.days ?? null;
+        } catch {
+          log.warn("AI returned non-JSON content", {
+            sample: String(aiContent).slice(0, 120),
+          });
+        }
+      }
     }
 
     // 4. Update the quote if cotacao_id is provided

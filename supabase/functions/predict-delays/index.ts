@@ -8,71 +8,80 @@ import { checkRateLimit } from "../_shared/rateLimiter.ts";
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
 export const handler = async (req: Request) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { allowed, message } = await checkRateLimit(req, 'predict-delays', { 
+    const { allowed, message } = await checkRateLimit(req, "predict-delays", {
       maxRequests: 10, // Limit to 10 requests per minute
-      windowMs: 60 * 1000 
+      windowMs: 60 * 1000,
     });
-    
+
     if (!allowed) {
-      log('WARN', 'Rate limit exceeded for predict-delays', { message });
-      return new Response(JSON.stringify({ error: message || 'Rate limit exceeded' }), {
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      log("WARN", "Rate limit exceeded for predict-delays", { message });
+      return new Response(
+        JSON.stringify({ error: message || "Rate limit exceeded" }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     // 1. Check for recent cached predictions (last 6 hours)
     const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
     const { data: cachedPredictions } = await supabase
-      .from('ai_delay_predictions')
-      .select('*')
-      .gte('analyzed_at', sixHoursAgo);
+      .from("ai_delay_predictions")
+      .select("*")
+      .gte("analyzed_at", sixHoursAgo);
 
     if (cachedPredictions && cachedPredictions.length > 0) {
-      log('INFO', 'Returning cached predictions', { count: cachedPredictions.length });
-      
-      const predictions = cachedPredictions.map(p => ({
+      log("INFO", "Returning cached predictions", {
+        count: cachedPredictions.length,
+      });
+
+      const predictions = cachedPredictions.map((p) => ({
         ...p.prediction_data,
         risco: p.risco,
         probabilidade_atraso: p.probabilidade_atraso,
-        analyzed_at: p.analyzed_at
+        analyzed_at: p.analyzed_at,
       }));
 
       const summary = {
         total_analisados: predictions.length,
-        criticos: predictions.filter((p: any) => p.risco === 'critico').length,
-        altos: predictions.filter((p: any) => p.risco === 'alto').length,
-        medios: predictions.filter((p: any) => p.risco === 'medio').length,
-        baixos: predictions.filter((p: any) => p.risco === 'baixo').length,
+        criticos: predictions.filter((p: any) => p.risco === "critico").length,
+        altos: predictions.filter((p: any) => p.risco === "alto").length,
+        medios: predictions.filter((p: any) => p.risco === "medio").length,
+        baixos: predictions.filter((p: any) => p.risco === "baixo").length,
       };
 
-      return new Response(JSON.stringify({ 
-        success: true, 
-        predictions, 
-        summary, 
-        analyzed_at: cachedPredictions[0].analyzed_at,
-        cached: true 
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          predictions,
+          summary,
+          analyzed_at: cachedPredictions[0].analyzed_at,
+          cached: true,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
-    log('INFO', 'Starting new delay prediction analysis');
+    log("INFO", "Starting new delay prediction analysis");
 
     // Fetch active deliveries
     const { data: entregas, error: entregasError } = await supabase
-      .from('entregas')
-      .select(`
+      .from("entregas")
+      .select(
+        `
         id,
         numero_entrega,
         endereco_entrega,
@@ -81,16 +90,18 @@ export const handler = async (req: Request) => {
         created_at,
         data_despacho,
         transportadoras (nome_fantasia)
-      `)
-      .in('status', ['despachado', 'em_transito', 'saiu_entrega'])
-      .order('previsao_entrega', { ascending: true });
+      `,
+      )
+      .in("status", ["despachado", "em_transito", "saiu_entrega"])
+      .order("previsao_entrega", { ascending: true });
 
     if (entregasError) throw entregasError;
 
     // Fetch active pickups
     const { data: coletas, error: coletasError } = await supabase
-      .from('coletas')
-      .select(`
+      .from("coletas")
+      .select(
+        `
         id,
         numero_coleta,
         endereco_coleta,
@@ -98,9 +109,10 @@ export const handler = async (req: Request) => {
         status,
         created_at,
         transportadoras (nome_fantasia)
-      `)
-      .in('status', ['solicitada', 'em_transito'])
-      .order('data_prevista_coleta', { ascending: true });
+      `,
+      )
+      .in("status", ["solicitada", "em_transito"])
+      .order("data_prevista_coleta", { ascending: true });
 
     if (coletasError) throw coletasError;
 
@@ -109,22 +121,26 @@ export const handler = async (req: Request) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const { data: historicalDeliveries } = await supabase
-      .from('entregas')
-      .select('status, previsao_entrega, data_entrega_efetiva, endereco_entrega')
-      .eq('status', 'entregue')
-      .gte('created_at', thirtyDaysAgo.toISOString())
+      .from("entregas")
+      .select(
+        "status, previsao_entrega, data_entrega_efetiva, endereco_entrega",
+      )
+      .eq("status", "entregue")
+      .gte("created_at", thirtyDaysAgo.toISOString())
       .limit(100);
 
     const { data: occurrences } = await supabase
-      .from('ocorrencias')
-      .select('tipo_ocorrencia, entrega_id, coleta_id')
-      .gte('created_at', thirtyDaysAgo.toISOString());
+      .from("ocorrencias")
+      .select("tipo_ocorrencia, entrega_id, coleta_id")
+      .gte("created_at", thirtyDaysAgo.toISOString());
 
     let delayRate = 0;
     if (historicalDeliveries && historicalDeliveries.length > 0) {
-      const delayed = historicalDeliveries.filter(d => 
-        d.previsao_entrega && d.data_entrega_efetiva && 
-        new Date(d.data_entrega_efetiva) > new Date(d.previsao_entrega)
+      const delayed = historicalDeliveries.filter(
+        (d) =>
+          d.previsao_entrega &&
+          d.data_entrega_efetiva &&
+          new Date(d.data_entrega_efetiva) > new Date(d.previsao_entrega),
       ).length;
       delayRate = (delayed / historicalDeliveries.length) * 100;
     }
@@ -135,9 +151,12 @@ export const handler = async (req: Request) => {
       endereco: e.endereco_entrega,
       previsao: e.previsao_entrega,
       status: e.status,
-      transportadora: e.transportadoras?.nome_fantasia || 'N/A',
-      dias_em_transito: e.data_despacho 
-        ? Math.floor((Date.now() - new Date(e.data_despacho).getTime()) / (1000 * 60 * 60 * 24))
+      transportadora: e.transportadoras?.nome_fantasia || "N/A",
+      dias_em_transito: e.data_despacho
+        ? Math.floor(
+            (Date.now() - new Date(e.data_despacho).getTime()) /
+              (1000 * 60 * 60 * 24),
+          )
         : 0,
     }));
 
@@ -147,23 +166,24 @@ export const handler = async (req: Request) => {
       endereco: c.endereco_coleta,
       previsao: c.data_prevista_coleta,
       status: c.status,
-      transportadora: c.transportadoras?.nome_fantasia || 'N/A',
+      transportadora: c.transportadoras?.nome_fantasia || "N/A",
     }));
 
     const occurrenceStats = {
       total: occurrences?.length || 0,
-      tipos: occurrences?.reduce((acc: Record<string, number>, o) => {
-        acc[o.tipo_ocorrencia] = (acc[o.tipo_ocorrencia] || 0) + 1;
-        return acc;
-      }, {}) || {},
+      tipos:
+        occurrences?.reduce((acc: Record<string, number>, o) => {
+          acc[o.tipo_ocorrencia] = (acc[o.tipo_ocorrencia] || 0) + 1;
+          return acc;
+        }, {}) || {},
     };
 
     const now = new Date();
     const prompt = `Analise os dados logísticos e preveja riscos de atraso:
-    DADOS: ${JSON.stringify({ 
-      entregas: entregasForAnalysis, 
-      coletas: coletasForAnalysis, 
-      stats: { delayRate: delayRate.toFixed(1), occurrences: occurrenceStats } 
+    DADOS: ${JSON.stringify({
+      entregas: entregasForAnalysis,
+      coletas: coletasForAnalysis,
+      stats: { delayRate: delayRate.toFixed(1), occurrences: occurrenceStats },
     })}
     Retorne um JSON array (max 10 itens críticos):
     [{
@@ -177,30 +197,45 @@ export const handler = async (req: Request) => {
       "horas_estimadas_atraso": number
     }]`;
 
-    const aiResponse = await withCircuitBreaker('ai-gateway', async () => {
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
+    const aiResponse = await withCircuitBreaker("ai-gateway", async () => {
+      const response = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.0-flash",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "Especialista em logística preditiva. Retorne APENAS JSON.",
+              },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.2,
+          }),
         },
-        body: JSON.stringify({
-          model: 'google/gemini-2.0-flash',
-          messages: [
-            { role: 'system', content: 'Especialista em logística preditiva. Retorne APENAS JSON.' },
-            { role: 'user', content: prompt },
-          ],
-          temperature: 0.2,
-        }),
-      });
+      );
 
       if (!response.ok) throw new Error(`AI Gateway Error: ${response.status}`);
       return await response.json();
     });
 
-    const content = aiResponse.choices?.[0]?.message?.content || '[]';
-    const cleanContent = content.replace(/```json\n?|```/g, '').trim();
-    const predictions = JSON.parse(cleanContent);
+    const content = aiResponse.choices?.[0]?.message?.content || "[]";
+    const cleanContent = content.replace(/```json\n?|```/g, "").trim();
+    let predictions: any[] = [];
+    try {
+      const parsed = JSON.parse(cleanContent);
+      predictions = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      log("WARN", "AI returned non-JSON content for predictions", {
+        sample: cleanContent.slice(0, 120),
+      });
+    }
 
     // 2. Cache new predictions
     if (predictions.length > 0) {
@@ -210,57 +245,67 @@ export const handler = async (req: Request) => {
         risco: p.risco,
         probabilidade_atraso: p.probabilidade_atraso,
         prediction_data: p,
-        analyzed_at: now.toISOString()
+        analyzed_at: now.toISOString(),
       }));
 
       // Clear old cache first
-      await supabase.from('ai_delay_predictions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-      
-      const { error: cacheError } = await supabase.from('ai_delay_predictions').insert(cacheData);
-      if (cacheError) log('ERROR', 'Failed to cache predictions', cacheError);
+      await supabase
+        .from("ai_delay_predictions")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000");
+
+      const { error: cacheError } = await supabase
+        .from("ai_delay_predictions")
+        .insert(cacheData);
+      if (cacheError) log("ERROR", "Failed to cache predictions", cacheError);
     }
 
     const summary = {
       total_analisados: entregasForAnalysis.length + coletasForAnalysis.length,
-      criticos: predictions.filter((p: any) => p.risco === 'critico').length,
-      altos: predictions.filter((p: any) => p.risco === 'alto').length,
-      medios: predictions.filter((p: any) => p.risco === 'medio').length,
-      baixos: predictions.filter((p: any) => p.risco === 'baixo').length,
+      criticos: predictions.filter((p: any) => p.risco === "critico").length,
+      altos: predictions.filter((p: any) => p.risco === "alto").length,
+      medios: predictions.filter((p: any) => p.risco === "medio").length,
+      baixos: predictions.filter((p: any) => p.risco === "baixo").length,
       taxa_atraso_historica: delayRate,
     };
 
     // 3. Trigger WhatsApp alerts for Critical risks
-    const criticals = predictions.filter((p: any) => p.risco === 'critico');
+    const criticals = predictions.filter((p: any) => p.risco === "critico");
     if (criticals.length > 0) {
-      log('INFO', 'Triggering WhatsApp alerts for critical delays', { count: criticals.length });
-      
+      log("INFO", "Triggering WhatsApp alerts for critical delays", {
+        count: criticals.length,
+      });
+
       // Fetch users with WhatsApp notifications enabled for SLA
       const { data: usersToNotify } = await supabase
-        .from('user_notification_preferences')
-        .select('user_id, profiles(phone)')
-        .eq('notifications_whatsapp', true)
-        .eq('notifications_sla', true);
+        .from("user_notification_preferences")
+        .select("user_id, profiles(phone)")
+        .eq("notifications_whatsapp", true)
+        .eq("notifications_sla", true);
 
       if (usersToNotify && usersToNotify.length > 0) {
         for (const prediction of criticals) {
-          const originalItem = prediction.tipo === 'entrega' 
-            ? entregasForAnalysis.find(e => e.id === prediction.id)
-            : coletasForAnalysis.find(c => c.id === prediction.id);
+          const originalItem =
+            prediction.tipo === "entrega"
+              ? entregasForAnalysis.find((e) => e.id === prediction.id)
+              : coletasForAnalysis.find((c) => c.id === prediction.id);
 
           for (const user of usersToNotify) {
             const phone = (user.profiles as any)?.phone;
             if (phone) {
-              await supabase.functions.invoke('whatsapp-notification', {
+              await supabase.functions.invoke("whatsapp-notification", {
                 body: {
-                  action: 'send_delay_alert',
+                  action: "send_delay_alert",
                   phone,
-                  entrega_id: prediction.tipo === 'entrega' ? prediction.id : undefined,
-                  coleta_id: prediction.tipo === 'coleta' ? prediction.id : undefined,
+                  entrega_id:
+                    prediction.tipo === "entrega" ? prediction.id : undefined,
+                  coleta_id:
+                    prediction.tipo === "coleta" ? prediction.id : undefined,
                   variables: {
                     numero: prediction.numero,
-                    transportadora: originalItem?.transportadora || "N/A"
-                  }
-                }
+                    transportadora: originalItem?.transportadora || "N/A",
+                  },
+                },
               });
             }
           }
@@ -268,22 +313,27 @@ export const handler = async (req: Request) => {
       }
     }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      predictions, 
-      summary, 
-      analyzed_at: now.toISOString(),
-      cached: false 
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        predictions,
+        summary,
+        analyzed_at: now.toISOString(),
+        cached: false,
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   } catch (error) {
-    log('ERROR', 'Predict-delays failure', { error: error.message });
-    return new Response(JSON.stringify({ success: false, message: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    log("ERROR", "Predict-delays failure", { error: error.message });
+    return new Response(
+      JSON.stringify({ success: false, message: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 };
 
