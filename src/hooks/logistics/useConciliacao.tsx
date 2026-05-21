@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
+import { parseImportRows, readSheetRows } from "@/lib/conciliacaoImport";
 
 export interface Conciliacao {
   id: string;
@@ -55,24 +55,30 @@ export interface ItemSistema {
 export function useConciliacao() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [selectedConciliacao, setSelectedConciliacao] = useState<Conciliacao | null>(null);
+  const [selectedConciliacao, setSelectedConciliacao] =
+    useState<Conciliacao | null>(null);
 
   // Fetch all conciliacoes
-  const { data: conciliacoes = [], isLoading: isLoadingConciliacoes } = useQuery({
-    queryKey: ["conciliacoes", user?.id],
-    queryFn: async (): Promise<Conciliacao[]> => {
-      const { data, error } = await supabase
-        .from("conciliacoes")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as Conciliacao[];
-    },
-    enabled: !!user?.id,
-  });
+  const { data: conciliacoes = [], isLoading: isLoadingConciliacoes } =
+    useQuery({
+      queryKey: ["conciliacoes", user?.id],
+      queryFn: async (): Promise<Conciliacao[]> => {
+        const { data, error } = await supabase
+          .from("conciliacoes")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        return data as Conciliacao[];
+      },
+      enabled: !!user?.id,
+    });
 
   // Fetch items for selected conciliacao
-  const { data: itensImportados = [], isLoading: isLoadingItens, refetch: refetchItens } = useQuery({
+  const {
+    data: itensImportados = [],
+    isLoading: isLoadingItens,
+    refetch: refetchItens,
+  } = useQuery({
     queryKey: ["conciliacao_itens", selectedConciliacao?.id],
     queryFn: async (): Promise<ItemImportado[]> => {
       if (!selectedConciliacao) return [];
@@ -89,10 +95,14 @@ export function useConciliacao() {
 
   // Fetch entregas for matching (sistema)
   const { data: entregasSistema = [] } = useQuery({
-    queryKey: ["entregas_para_conciliacao", selectedConciliacao?.periodo_inicio, selectedConciliacao?.periodo_fim],
+    queryKey: [
+      "entregas_para_conciliacao",
+      selectedConciliacao?.periodo_inicio,
+      selectedConciliacao?.periodo_fim,
+    ],
     queryFn: async (): Promise<ItemSistema[]> => {
       if (!selectedConciliacao) return [];
-      
+
       interface EntregaRaw {
         id: string;
         numero_entrega: string;
@@ -103,7 +113,9 @@ export function useConciliacao() {
 
       let query = supabase
         .from("entregas")
-        .select("id, numero_entrega, created_at, valor_frete, transportadora:transportadoras(nome_fantasia)")
+        .select(
+          "id, numero_entrega, created_at, valor_frete, transportadora:transportadoras(nome_fantasia)",
+        )
         .not("valor_frete", "is", null);
 
       if (selectedConciliacao.periodo_inicio) {
@@ -113,7 +125,9 @@ export function useConciliacao() {
         query = query.lte("created_at", selectedConciliacao.periodo_fim);
       }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error } = await query.order("created_at", {
+        ascending: false,
+      });
       if (error) throw error;
 
       return (data || []).map((e: EntregaRaw) => ({
@@ -130,7 +144,13 @@ export function useConciliacao() {
 
   // Create conciliacao
   const createConciliacao = useMutation({
-    mutationFn: async (data: { tipo: Conciliacao["tipo"]; nome: string; descricao?: string; periodo_inicio?: string; periodo_fim?: string }) => {
+    mutationFn: async (data: {
+      tipo: Conciliacao["tipo"];
+      nome: string;
+      descricao?: string;
+      periodo_inicio?: string;
+      periodo_fim?: string;
+    }) => {
       const { data: newConciliacao, error } = await supabase
         .from("conciliacoes")
         .insert({
@@ -155,81 +175,45 @@ export function useConciliacao() {
   });
 
   // Import file
-  const importFile = useCallback(async (file: File, conciliacaoId: string) => {
-    try {
-      const reader = new FileReader();
-      
-      return new Promise<void>((resolve, reject) => {
-        reader.onload = async (e) => {
-          try {
-            const data = e.target?.result;
-            const workbook = XLSX.read(data, { type: "binary" });
-            const sheetName = workbook.SheetNames[0];
-            const sheet = workbook.Sheets[sheetName];
-            const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet);
+  const importFile = useCallback(
+    async (file: File, conciliacaoId: string) => {
+      try {
+        const rows = await readSheetRows(file);
+        if (rows.length === 0) {
+          toast.error("Arquivo vazio ou formato inválido");
+          throw new Error("Arquivo vazio");
+        }
 
-            if (rows.length === 0) {
-              toast.error("Arquivo vazio ou formato inválido");
-              reject(new Error("Arquivo vazio"));
-              return;
-            }
+        // Map rows to items (localized money/date parsing handled in the helper)
+        const items = parseImportRows(rows, conciliacaoId);
 
-            // Map rows to items
-            const items = rows.map((row, idx) => {
-              const referencia = String(row["numero"] || row["referencia"] || row["documento"] || row["id"] || "");
-              const descricao = String(row["descricao"] || row["observacao"] || row["historico"] || "");
-              const valorRaw = row["valor"] || row["valor_frete"] || row["total"] || row["amount"] || 0;
-              const valor = typeof valorRaw === "number" ? valorRaw : parseFloat(String(valorRaw).replace(/[^\d.,\-]/g, "").replace(",", ".")) || 0;
-              const dataDoc = row["data"] || row["data_documento"] || row["date"] || null;
-              const transportadora = String(row["transportadora"] || row["fornecedor"] || row["carrier"] || "");
+        const { error: insertError } = await supabase
+          .from("conciliacao_itens_importados")
+          .insert(items);
+        if (insertError) throw insertError;
 
-              return {
-                conciliacao_id: conciliacaoId,
-                linha_arquivo: idx + 2,
-                referencia_externa: referencia,
-                descricao: descricao,
-                data_documento: dataDoc ? new Date(dataDoc as string).toISOString().split("T")[0] : null,
-                valor: valor,
-                transportadora_nome: transportadora,
-                dados_originais: row as unknown as Record<string, never>,
-                status: "pendente" as const,
-              };
-            });
+        const totalImportado = items.reduce((sum, item) => sum + item.valor, 0);
+        await supabase
+          .from("conciliacoes")
+          .update({
+            total_itens_importados: items.length,
+            valor_total_importado: totalImportado,
+            status: "em_andamento",
+          })
+          .eq("id", conciliacaoId);
 
-            // Insert items
-            const { error: insertError } = await supabase
-              .from("conciliacao_itens_importados")
-              .insert(items);
-
-            if (insertError) throw insertError;
-
-            // Update conciliacao totals
-            const totalImportado = items.reduce((sum, item) => sum + item.valor, 0);
-            await supabase
-              .from("conciliacoes")
-              .update({
-                total_itens_importados: items.length,
-                valor_total_importado: totalImportado,
-                status: "em_andamento",
-              })
-              .eq("id", conciliacaoId);
-
-            queryClient.invalidateQueries({ queryKey: ["conciliacoes"] });
-            queryClient.invalidateQueries({ queryKey: ["conciliacao_itens", conciliacaoId] });
-            toast.success(`${items.length} itens importados!`);
-            resolve();
-          } catch (err) {
-            reject(err);
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsBinaryString(file);
-      });
-    } catch (error) {
-      toast.error("Erro ao importar: " + (error as Error).message);
-      throw error;
-    }
-  }, [queryClient]);
+        queryClient.invalidateQueries({ queryKey: ["conciliacoes"] });
+        queryClient.invalidateQueries({
+          queryKey: ["conciliacao_itens", conciliacaoId],
+        });
+        toast.success(`${items.length} itens importados!`);
+      } catch (error) {
+        toast.error("Erro ao importar: " + (error as Error).message);
+        throw error;
+      }
+    },
+    [queryClient],
+  );
 
   // Auto-match items
   const autoMatch = useMutation({
@@ -250,15 +234,20 @@ export function useConciliacao() {
       for (const item of items) {
         // Try to find matching entrega by reference or value
         const matchingEntrega = entregasSistema.find((e) => {
-          const refMatch = item.referencia_externa && e.numero.toLowerCase().includes(item.referencia_externa.toLowerCase());
+          const refMatch =
+            item.referencia_externa &&
+            e.numero
+              .toLowerCase()
+              .includes(item.referencia_externa.toLowerCase());
           const valorMatch = Math.abs(e.valor - item.valor) < 0.01;
           return refMatch || valorMatch;
         });
 
         if (matchingEntrega) {
           const diferenca = item.valor - matchingEntrega.valor;
-          const status = Math.abs(diferenca) < 0.01 ? "conciliado" : "divergencia";
-          
+          const status =
+            Math.abs(diferenca) < 0.01 ? "conciliado" : "divergencia";
+
           await supabase
             .from("conciliacao_itens_importados")
             .update({
@@ -281,9 +270,13 @@ export function useConciliacao() {
         .select("status, diferenca_valor")
         .eq("conciliacao_id", conciliacaoId);
 
-      const totalConciliados = updatedItems?.filter((i) => i.status === "conciliado").length || 0;
-      const totalDivergencias = updatedItems?.filter((i) => i.status === "divergencia").length || 0;
-      const diferencaTotal = updatedItems?.reduce((sum, i) => sum + (i.diferenca_valor || 0), 0) || 0;
+      const totalConciliados =
+        updatedItems?.filter((i) => i.status === "conciliado").length || 0;
+      const totalDivergencias =
+        updatedItems?.filter((i) => i.status === "divergencia").length || 0;
+      const diferencaTotal =
+        updatedItems?.reduce((sum, i) => sum + (i.diferenca_valor || 0), 0) ||
+        0;
 
       await supabase
         .from("conciliacoes")
@@ -299,14 +292,26 @@ export function useConciliacao() {
     onSuccess: ({ matched, divergencias }) => {
       queryClient.invalidateQueries({ queryKey: ["conciliacoes"] });
       queryClient.invalidateQueries({ queryKey: ["conciliacao_itens"] });
-      toast.success(`Matching: ${matched} conciliados, ${divergencias} divergências`);
+      toast.success(
+        `Matching: ${matched} conciliados, ${divergencias} divergências`,
+      );
     },
     onError: (e: Error) => toast.error("Erro: " + e.message),
   });
 
   // Manual match
   const manualMatch = useMutation({
-    mutationFn: async ({ itemId, sistemaId, status, observacoes }: { itemId: string; sistemaId?: string; status: "conciliado" | "divergencia" | "ignorado"; observacoes?: string }) => {
+    mutationFn: async ({
+      itemId,
+      sistemaId,
+      status,
+      observacoes,
+    }: {
+      itemId: string;
+      sistemaId?: string;
+      status: "conciliado" | "divergencia" | "ignorado";
+      observacoes?: string;
+    }) => {
       const updates: Record<string, unknown> = {
         status,
         conciliado_em: new Date().toISOString(),
@@ -331,7 +336,7 @@ export function useConciliacao() {
         .eq("id", itemId);
 
       if (error) throw error;
-      
+
       // Update conciliacao summary
       if (selectedConciliacao) {
         const { data: updatedItems } = await supabase
@@ -339,9 +344,13 @@ export function useConciliacao() {
           .select("status, diferenca_valor")
           .eq("conciliacao_id", selectedConciliacao.id);
 
-        const totalConciliados = updatedItems?.filter((i) => i.status === "conciliado").length || 0;
-        const totalDivergencias = updatedItems?.filter((i) => i.status === "divergencia").length || 0;
-        const diferencaTotal = updatedItems?.reduce((sum, i) => sum + (i.diferenca_valor || 0), 0) || 0;
+        const totalConciliados =
+          updatedItems?.filter((i) => i.status === "conciliado").length || 0;
+        const totalDivergencias =
+          updatedItems?.filter((i) => i.status === "divergencia").length || 0;
+        const diferencaTotal =
+          updatedItems?.reduce((sum, i) => sum + (i.diferenca_valor || 0), 0) ||
+          0;
 
         await supabase
           .from("conciliacoes")
@@ -380,7 +389,10 @@ export function useConciliacao() {
   // Delete conciliacao
   const deleteConciliacao = useMutation({
     mutationFn: async (conciliacaoId: string) => {
-      const { error } = await supabase.from("conciliacoes").delete().eq("id", conciliacaoId);
+      const { error } = await supabase
+        .from("conciliacoes")
+        .delete()
+        .eq("id", conciliacaoId);
       if (error) throw error;
     },
     onSuccess: () => {
