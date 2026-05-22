@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { useUnifiedTracking, UnifiedShipment, useMapWeatherSync, useBiometricAnomalies } from "@/hooks";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -65,10 +66,13 @@ export function LogisticsMapWidget() {
                            (statusFilter === "high_variance" && (s.atrasado || (s.valorFrete && s.valorFrete > 500) || s.status === "ocorrencia"));
 
       const matchesType = typeFilter === "all" || s.tipo === typeFilter;
+      
+      const sTime = s.previsao ? new Date(s.previsao).getHours() : 12;
+      const matchesTime = sTime >= timeTravelRange[0] && sTime <= timeTravelRange[1];
 
-      return s.coordinates && matchesSearch && matchesStatus && matchesType;
+      return s.coordinates && matchesSearch && matchesStatus && matchesType && matchesTime;
     });
-  }, [shipments, searchTerm, statusFilter, typeFilter]);
+  }, [shipments, searchTerm, statusFilter, typeFilter, timeTravelRange]);
 
   const activeShipments = shipments.filter(s => 
     ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)
@@ -199,7 +203,10 @@ export function LogisticsMapWidget() {
                   setTimeout(() => {
                     setIsExporting(false);
                     const csvContent = "data:text/csv;charset=utf-8,ID,Modulo,Nivel,Mensagem,Veiculo,Data\n" + 
-                      shipments.slice(0, 10).map(s => `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.atrasado}`).join("\n");
+                      shipments.filter(s => {
+                        const sTime = s.previsao ? new Date(s.previsao).getHours() : 12;
+                        return sTime >= timeTravelRange[0] && sTime <= timeTravelRange[1];
+                      }).map(s => `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.previsao}`).join("\n");
                     const encodedUri = encodeURI(csvContent);
                     const link = document.createElement("a");
                     link.setAttribute("href", encodedUri);
@@ -242,6 +249,22 @@ export function LogisticsMapWidget() {
                 <Layers className="w-3 h-3" />
                 Camadas
               </Button>
+            </div>
+
+            <div className="flex bg-white/5 p-2 rounded-2xl border border-white/10 w-full md:w-64 flex-col gap-2">
+              <div className="flex justify-between text-[8px] font-black text-white/40 uppercase tracking-widest">
+                <span>Time-Travel</span>
+                <span>{timeTravelRange[0]}h - {timeTravelRange[1]}h</span>
+              </div>
+              <div className="px-2">
+                <Slider 
+                  value={timeTravelRange} 
+                  onValueChange={(val: any) => setTimeTravelRange(val)} 
+                  max={24} 
+                  step={1} 
+                  minStepsBetweenThumbs={1}
+                />
+              </div>
             </div>
           </div>
         </CardHeader>
