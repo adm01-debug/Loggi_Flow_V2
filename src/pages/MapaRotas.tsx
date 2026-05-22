@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,40 +76,39 @@ export default function MapaRotas() {
   const [vehicleFilter, setVehicleFilter] = useState("all");
   const [selectedLogTime, setSelectedLogTime] = useState<string | null>(null);
 
-  // Load tactical logs
+  const fetchLogs = useCallback(async () => {
+    let query = supabase
+      .from('nexus_tactical_logs')
+      .select('*')
+      .order('event_time', { ascending: false });
+
+    if (timeTravelValue < 95) {
+      const historyDate = new Date();
+      historyDate.setMinutes(historyDate.getMinutes() - (100 - timeTravelValue));
+      const hourAgo = new Date(historyDate);
+      hourAgo.setMinutes(hourAgo.getMinutes() - 30);
+      query = query.lte('event_time', historyDate.toISOString())
+                   .gte('event_time', hourAgo.toISOString());
+    } else {
+      query = query.limit(50);
+    }
+
+    const { data } = await query;
+    
+    if (data) {
+      setLogs(data.map(l => ({
+        id: l.id,
+        time: new Date(l.event_time).toLocaleTimeString([], { hour12: false }),
+        event_time: l.event_time,
+        msg: l.message,
+        type: l.type as any,
+        vehicle: l.target_vehicle
+      })));
+    }
+  }, [timeTravelValue]);
+
   useEffect(() => {
-    const fetchLogs = async () => {
-      let query = supabase
-        .from('nexus_tactical_logs')
-        .select('*')
-        .order('event_time', { ascending: false });
-
-      if (timeTravelValue < 95) {
-        const historyDate = new Date();
-        historyDate.setMinutes(historyDate.getMinutes() - (100 - timeTravelValue));
-        const hourAgo = new Date(historyDate);
-        hourAgo.setMinutes(hourAgo.getMinutes() - 30);
-        query = query.lte('event_time', historyDate.toISOString())
-                     .gte('event_time', hourAgo.toISOString());
-      } else {
-        query = query.limit(50);
-      }
-
-      const { data } = await query;
-      
-      if (data) {
-        setLogs(data.map(l => ({
-          id: l.id,
-          time: new Date(l.event_time).toLocaleTimeString([], { hour12: false }),
-          event_time: l.event_time,
-          msg: l.message,
-          type: l.type as any,
-          vehicle: l.target_vehicle
-        })));
-      }
-    };
     fetchLogs();
-
     const channel = supabase
       .channel('tactical-logs')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nexus_tactical_logs' }, () => {
@@ -118,14 +117,13 @@ export default function MapaRotas() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [timeTravelValue]);
+  }, [fetchLogs, timeTravelValue]);
 
   const bioAlertRules = async () => {
-    const { data } = await supabase.from('bio_sync_alert_rules').select('*').limit(1).single();
+    const { data } = await supabase.from('bio_sync_alert_rules').select('*').limit(1).maybeSingle();
     return data || { bpm_warning_threshold: 95, bpm_critical_threshold: 110 };
   };
 
-  // BioSync and Alerts
   useEffect(() => {
     const fetchBio = async () => {
       const { data } = await supabase
@@ -133,13 +131,13 @@ export default function MapaRotas() {
         .select('*')
         .order('timestamp', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (data) {
         setBioData({ heart_rate: data.heart_rate, fatigue_index: data.fatigue_index });
         const rules = await bioAlertRules();
         
-        if (data.heart_rate > rules.bpm_critical_threshold) {
+        if (rules && data.heart_rate > (rules.bpm_critical_threshold || 110)) {
           toast.error("BIOSYNC_CRITICAL: Limite excedido!", {
             description: `BPM: ${data.heart_rate} (Limite: ${rules.bpm_critical_threshold})`,
             className: "bg-red-500/90 border-red-500 text-white font-black",
@@ -173,6 +171,8 @@ export default function MapaRotas() {
     order: i + 1
   })), [routes]);
 
+  const { filteredData } = useFilters(points, filterConfig);
+
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
       if (vehicleFilter !== "all" && log.vehicle !== vehicleFilter) return false;
@@ -190,6 +190,28 @@ export default function MapaRotas() {
     toast.info("TIME_TRAVEL: Sincronizando mapa", {
       description: `Saltando para ${new Date(isoString).toLocaleTimeString()}`
     });
+  };
+
+  const handleExportCSV = () => {
+    const dataToExport = filteredLogs.map(l => ({
+      Timestamp: l.time,
+      Unidade: l.vehicle || 'N/A',
+      Tipo: l.type.toUpperCase(),
+      Mensagem: l.msg
+    }));
+    exportToCSV(dataToExport, `nexus_tactical_log_${vehicleFilter}_${new Date().toISOString()}`);
+    toast.success("LOG EXPORTADO", { description: "Filtros aplicados via Time-Travel e Veículo." });
+  };
+
+  const handleExportPDF = () => {
+    const dataToExport = filteredLogs.map(l => ({
+      time: l.time,
+      vehicle: l.vehicle || 'N/A',
+      type: l.type.toUpperCase(),
+      msg: l.msg
+    }));
+    exportToPDF(dataToExport, ["time", "vehicle", "type", "msg"], `nexus_tactical_log_${new Date().toISOString()}`);
+    toast.success("LOG PDF GERADO", { description: "Relatório tático consolidado." });
   };
 
   const mapMarkers: MapMarker[] = useMemo(() => {
@@ -215,8 +237,6 @@ export default function MapaRotas() {
       });
   }, [filteredData, timeTravelValue]);
 
-  const { filteredData, setSearch, clearFilters } = useFilters(points, filterConfig);
-
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -239,7 +259,7 @@ export default function MapaRotas() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[70vh]">
           <div className="lg:col-span-3 relative rounded-[2.5rem] overflow-hidden border border-white/10 bg-black shadow-2xl group">
-             <MapboxMap markers={mapMarkers} style={mapStyle} pitch={mapPitch} showRouteLines={showRouteLines} riskZones={riskZones} activeLayers={activeLayers} />
+             <MapboxMap markers={mapMarkers} showRouteLines={showRouteLines} riskZones={riskZones} activeLayers={activeLayers} />
              <CinematicHUD isLiveData={isLiveData} lastSync={lastSync} />
              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[85%] z-50">
                 <div className="px-10 py-8 bg-black/80 backdrop-blur-3xl rounded-3xl border border-white/10 shadow-2xl space-y-6 relative overflow-hidden">
@@ -300,6 +320,7 @@ export default function MapaRotas() {
             </div>
           </div>
         </div>
+        <AdminBioRules />
       </div>
     </MainLayout>
   );
@@ -312,12 +333,12 @@ function AdminBioRules() {
     if (!error) toast.success("REGRAS ATUALIZADAS", { description: "Aplicado imediatamente a toda frota." });
   };
   return (
-    <Card className="bg-black/40 border-white/10 p-6 space-y-4">
+    <Card className="bg-black/40 border-white/10 p-6 space-y-4 max-w-2xl mx-auto rounded-3xl">
        <div className="flex items-center gap-3"><Settings2 className="w-5 h-5 text-cyan-500" /><h3 className="text-sm font-black text-white uppercase tracking-widest">BioSync_Configuration</h3></div>
        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2"><Label className="text-[10px] font-black text-white/40 uppercase">Warning_BPM</Label><Input type="number" value={rules.bpm_warning} onChange={e => setRules({...rules, bpm_warning: Number(e.target.value)})} className="bg-black/50 border-white/10 text-cyan-500 font-bold" /></div>
           <div className="space-y-2"><Label className="text-[10px] font-black text-white/40 uppercase">Critical_BPM</Label><Input type="number" value={rules.bpm_critical} onChange={e => setRules({...rules, bpm_critical: Number(e.target.value)})} className="bg-black/50 border-white/10 text-rose-500 font-bold" /></div>
-          <div className="space-y-2"><Label className="text-[10px] font-black text-white/40 uppercase">Cooldown_Min</Label><Input type="number" value={rules.cooldown} onChange={e => setRules({...rules, cooldown: Number(e.target.value)})} className="bg-black/50 border-white/10 font-bold" /></div>
+          <div className="space-y-2"><Label className="text-[10px] font-black text-white/40 uppercase">Cooldown_Min</Label><Input type="number" value={rules.cooldown} onChange={e => setRules({...rules, cooldown: Number(e.target.value)})} className="bg-black/50 border-white/10 font-bold text-white" /></div>
        </div>
        <Button onClick={saveRules} className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-black uppercase tracking-widest h-12 rounded-xl">COMMIT_RULES</Button>
     </Card>

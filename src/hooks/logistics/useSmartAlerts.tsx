@@ -10,7 +10,8 @@ type OcorrenciaRow = Database['public']['Tables']['ocorrencias']['Row'];
 
 export interface SystemAlert {
   id: string;
-  type: 'coleta_atrasada' | 'divergencia' | 'ocorrencia' | 'prazo_critico' | 'entrega_atrasada';
+  type: 'coleta_atrasada' | 'divergencia' | 'ocorrencia' | 'prazo_critico' | 'entrega_atrasada' | 'nexus_tactical';
+
   title: string;
   message: string;
   severity: 'info' | 'warning' | 'error';
@@ -148,6 +149,29 @@ export function useSmartAlerts() {
     const interval = setInterval(checkCriticalDeadlines, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [checkCriticalDeadlines]);
+  
+  // Real-time listener for Nexus Tactical Logs
+  useEffect(() => {
+    const channel = supabase
+      .channel('nexus-tactical-realtime-alerts')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nexus_tactical_logs' }, (payload) => {
+        const newLog = payload.new as any;
+        addAlert({
+          type: 'nexus_tactical',
+          title: `TÁTICO: ${newLog.type === 'crit' ? 'CRÍTICO' : 'AVISO'}`,
+          message: `${newLog.target_vehicle || 'SISTEMA'}: ${newLog.message}`,
+          severity: newLog.type === 'crit' ? 'error' : 'warning',
+          entityId: newLog.id,
+          entityType: 'ocorrencia'
+        });
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
 
   const markAsRead = useCallback((alertId: string) => {
     alertsStore = alertsStore.map(a => 
