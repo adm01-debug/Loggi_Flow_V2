@@ -35,3 +35,15 @@ createRoot(rootElement).render(
     </ErrorBoundary>
   </StrictMode>
 );
+
+// Remove branded splash screen once React has mounted.
+// Uses rAF to wait for the first paint of the React tree, then fades it out.
+const hideSplash = () => {
+  const splash = document.getElementById("splash-screen");
+  if (!splash) return;
+  splash.classList.add("splash-hidden");
+  window.setTimeout(() => splash.remove(), 400);
+};
+requestAnimationFrame(() => requestAnimationFrame(hideSplash));
+// Safety net: ensure it never stays stuck even if rAF doesn't fire.
+window.setTimeout(hideSplash, 5000);
