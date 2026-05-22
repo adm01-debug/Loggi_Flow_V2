@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUnifiedTracking, UnifiedShipment } from "@/hooks";
+import { useMapWeatherSync, RiskZone } from "@/hooks/logistics/useMapWeatherSync";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MissionDetail } from "./MissionDetail";
@@ -17,11 +18,13 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { PerformanceChart } from "./PerformanceChart";
+import { supabase } from "@/integrations/supabase/client";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
 
 export function LogisticsMapWidget() {
   const { allShipments: shipments, summary, isLoading } = useUnifiedTracking();
+  const { riskZones } = useMapWeatherSync();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [selectedShipment, setSelectedShipment] = React.useState<UnifiedShipment | null>(null);
@@ -32,6 +35,7 @@ export function LogisticsMapWidget() {
   const [isOptimizing, setIsOptimizing] = React.useState(false);
   const [showPerformance, setShowPerformance] = React.useState(false);
   const [isExporting, setIsExporting] = React.useState(false);
+  const [timeTravelRange, setTimeTravelRange] = React.useState<[number, number]>([0, 24]);
   
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,

@@ -5,14 +5,15 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 
-interface Anomaly {
+export interface Anomaly {
   id: string;
-  level: 'info' | 'crit';
+  level: 'info' | 'warn' | 'crit';
   cause: string;
   action: string;
   unit: string;
   time: string;
   telemetry?: { bpm: number }[];
+  vehicle_id?: string;
 }
 
 interface AnomalyListProps {
