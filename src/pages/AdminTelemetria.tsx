@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug, Info, Rocket, ShieldAlert } from "lucide-react";
+import { Activity, RefreshCw, Trash2, Download, FileText, CalendarIcon, Bug, Info, Rocket, ShieldAlert, HeartPulse } from "lucide-react";
 import { TelemetryCharts } from "@/components/admin/telemetry/TelemetryCharts";
 import { DORAMetrics } from "@/components/admin/DORAMetrics";
 import { PostMortemDashboard } from "@/features/incidents/components/PostMortemDashboard";
@@ -15,6 +15,7 @@ import { TelemetryStatsCards } from "./admin-telemetria/TelemetryStatsCards";
 import { TelemetryTopOffenders } from "./admin-telemetria/TelemetryTopOffenders";
 import { TelemetryTable, type TelemetryRow } from "./admin-telemetria/TelemetryTable";
 import { TelemetryViewer } from "@/components/admin/TelemetryViewer";
+import { BioSyncConfig } from "@/components/admin/telemetry/BioSyncConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -149,6 +150,10 @@ export default function AdminTelemetriaPage() {
               <Activity className="h-4 w-4" />
               Banco de Dados
             </TabsTrigger>
+            <TabsTrigger value="biosync" className="gap-2">
+              <HeartPulse className="h-4 w-4" />
+              Bio_Sync
+            </TabsTrigger>
             <TabsTrigger value="application" className="gap-2">
               <Bug className="h-4 w-4" />
               Aplicação & Erros
@@ -199,6 +204,10 @@ export default function AdminTelemetriaPage() {
             </div>
 
             <TelemetryTable rows={rows} isLoading={isLoading} />
+          </TabsContent>
+
+          <TabsContent value="biosync" className="space-y-6">
+            <BioSyncConfig />
           </TabsContent>
 
           <TabsContent value="application" className="space-y-6">

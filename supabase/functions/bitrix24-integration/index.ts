@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface BitrixRequest {
-  action: "sync_deals" | "update_deal" | "get_deals" | "create_deal" | "webhook";
+  action: "sync_deals" | "update_deal" | "get_deals" | "create_deal" | "webhook" | "notify_alert";
   deal_id?: string;
   deal_data?: Record<string, unknown>;
   spa_id?: number;
@@ -205,6 +205,35 @@ serve(async (req) => {
 
         return new Response(
           JSON.stringify({ success: true, processed: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      case "notify_alert": {
+        const { message, severity, vehicle_id, driver_id } = body.deal_data || {};
+        
+        // In Bitrix24, we can create a "Timeline Item" or a "Notification"
+        // Here we'll create a CRM activity/task for the assigned user of a default deal or unit
+        const response = await fetch(`${bitrixWebhookUrl}/crm.activity.add`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fields: {
+              OWNER_TYPE_ID: 2, // Deal
+              OWNER_ID: 1, // Default CCO Deal or similar
+              TYPE_ID: 2, // Call/Meeting/Task
+              SUBJECT: `BIO_SYNC ALERT: ${severity === 'crit' ? 'CRITICAL' : 'WARNING'}`,
+              COMPLETED: "N",
+              PRIORITY: severity === 'crit' ? 2 : 1,
+              DESCRIPTION: `${message}\nVehicle: ${vehicle_id}\nDriver: ${driver_id}\nTime: ${new Date().toLocaleString()}`,
+              RESPONSIBLE_ID: 1 // Default Admin/CCO
+            }
+          }),
+        });
+
+        const data = await response.json();
+        return new Response(
+          JSON.stringify({ success: !data.error, result: data.result }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
