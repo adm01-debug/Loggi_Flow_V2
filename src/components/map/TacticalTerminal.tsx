@@ -69,7 +69,7 @@ export function TacticalTerminal() {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="w-[450px] h-[220px] bg-black/90 backdrop-blur-3xl border border-cyan-500/20 rounded-[1.5rem] shadow-[0_30px_60px_rgba(0,0,0,0.8)] pointer-events-auto overflow-hidden flex flex-col"
+            className="w-[90vw] sm:w-[450px] h-[220px] bg-black/90 backdrop-blur-3xl border border-cyan-500/20 rounded-[1.5rem] shadow-[0_30px_60px_rgba(0,0,0,0.8)] pointer-events-auto overflow-hidden flex flex-col"
           >
             <div className="px-4 py-2 border-b border-white/5 bg-white/5 flex items-center justify-between">
               <div className="flex items-center gap-2">

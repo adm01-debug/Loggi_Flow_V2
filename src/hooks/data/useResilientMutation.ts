@@ -1,6 +1,7 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { logisticsBreaker } from "@/services/resilience/CircuitBreaker";
 import { useTelemetry } from "@/hooks";
+import { toast } from "sonner";
 
 export function useResilientMutation<TData, TError, TVariables, TContext>(
   mutationFn: (variables: TVariables) => Promise<TData>,
@@ -13,13 +14,20 @@ export function useResilientMutation<TData, TError, TVariables, TContext>(
     mutationFn: async (variables: TVariables) => {
       try {
         return await logisticsBreaker.execute(() => mutationFn(variables));
-      } catch (error) {
+      } catch (error: any) {
+        const message = error?.message || "Ocorreu um erro inesperado";
+        
         logTelemetry({
           severity: 'critical',
           category: 'resilience_failure',
-          message: `Mutação falhou após retentativas e Circuit Breaker. Estado: ${logisticsBreaker.getState()}`,
+          message: `Mutação falhou após retentativas e Circuit Breaker: ${message}. Estado: ${logisticsBreaker.getState()}`,
           metadata: { error, variables }
         });
+
+        toast.error("Falha na Operação", {
+          description: message,
+        });
+
         throw error;
       }
     },

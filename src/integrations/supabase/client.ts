@@ -10,6 +10,10 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const REQUEST_ID_HEADER = 'x-request-id';
 
+const getGlobalHeaders = () => ({
+  [REQUEST_ID_HEADER]: crypto.randomUUID(),
+});
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
@@ -17,8 +21,8 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
   },
   global: {
-    headers: {
-      [REQUEST_ID_HEADER]: crypto.randomUUID(),
+    get headers() {
+      return getGlobalHeaders();
     },
   },
 });

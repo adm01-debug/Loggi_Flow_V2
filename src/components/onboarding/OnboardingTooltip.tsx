@@ -82,7 +82,7 @@ export function OnboardingTooltip({
   };
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block w-full">
       {children}
       
       <AnimatePresence>

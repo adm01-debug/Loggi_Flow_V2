@@ -5,12 +5,14 @@ export function useTouchGestures() {
   const navigate = useNavigate();
   const location = useLocation();
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       // Ignore if touching elements that should handle their own gestures
       if ((e.target as HTMLElement).closest('[data-no-swipe], .no-swipe')) return;
       touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -19,12 +21,13 @@ export function useTouchGestures() {
       const touchEndX = e.changedTouches[0].clientX;
       const deltaX = touchEndX - touchStartX.current;
       
-      // Get touchStartY if available, otherwise 0
-      const target = e.target as any;
-      const deltaY = Math.abs(e.changedTouches[0].clientY - (target.dataset?.touchStartY || 0));
+      const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
       
       // Vertical scroll check to avoid accidental back navigation while scrolling
-      if (deltaY > 50) return;
+      if (deltaY > 60) {
+        touchStartX.current = 0;
+        return;
+      }
 
       // Swipe from left to right (at least 120px) and starting near the edge (0-40px)
       if (deltaX > 120 && touchStartX.current < 40) {

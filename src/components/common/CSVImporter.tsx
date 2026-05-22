@@ -108,8 +108,10 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
       await onImport(result.success);
       setProgress(100);
       setTimeout(() => { setResult(null); setProgress(0); }, 2000);
-    } catch {
-      // Silent fail on import error
+    } catch (err: any) {
+      toast.error("Erro na Importação", {
+        description: err?.message || "Falha ao processar os dados no servidor.",
+      });
     } finally {
       setIsImporting(false);
     }
