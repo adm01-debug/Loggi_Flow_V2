@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Terminal, ChevronRight, Zap, ShieldCheck, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import { supabase } from "@/integrations/supabase/client";
 
 interface LogEntry {
   id: string;
@@ -10,6 +10,7 @@ interface LogEntry {
   module: string;
   message: string;
   level: 'info' | 'warn' | 'crit';
+  target_vehicle?: string;
 }
 
 export function TacticalTerminal() {
@@ -17,32 +18,41 @@ export function TacticalTerminal() {
   const [isOpen, setIsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const fetchLogs = async () => {
+    const { data, error } = await supabase
+      .from('nexus_tactical_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) return;
+
+    if (data) {
+      const normalized = data.map(log => ({
+        id: log.id,
+        timestamp: new Date(log.created_at).toLocaleTimeString([], { hour12: false, fractionalSecondDigits: 3 }),
+        module: log.type, // Map 'type' to 'module'
+        message: log.message,
+        level: 'info' as const, // Map to a default level if not in DB
+        target_vehicle: log.target_vehicle || undefined
+      }));
+      setEntries(normalized.reverse());
+    }
+  };
+
   useEffect(() => {
-    const modules = ["GEO_INT", "BIO_SYNC", "ROUTE_OPT", "NEXUS_CORE", "SAT_FUSION"];
-    const messages = [
-      "Broadcasting telemetry packet to NODE_SP_01",
-      "Analyzing atmospheric interference for Sat_Fusion",
-      "Bio_Sync: Heart_rate variance within nominal parameters",
-      "Nexus_Grid: Recalculating topology for optimal routing",
-      "Scanning risk zones via high-altitude SAR imaging",
-      "Encrypted handshake successful with CD_CENTRAL",
-      "Buffer overflow prevented in telemetry gateway",
-      "Drone_Follow: Adjusting gimbal for high-speed tracking"
-    ];
+    fetchLogs();
 
-    const interval = setInterval(() => {
-      const newEntry: LogEntry = {
-        id: Math.random().toString(36).substr(2, 9),
-        timestamp: new Date().toLocaleTimeString([], { hour12: false, fractionalSecondDigits: 3 }),
-        module: modules[Math.floor(Math.random() * modules.length)],
-        message: messages[Math.floor(Math.random() * messages.length)],
-        level: Math.random() > 0.9 ? 'warn' : 'info'
-      };
+    const channel = supabase
+      .channel('tactical-logs')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nexus_tactical_logs' }, () => {
+        fetchLogs();
+      })
+      .subscribe();
 
-      setEntries(prev => [...prev.slice(-49), newEntry]);
-    }, 2000);
-
-    return () => clearInterval(interval);
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {

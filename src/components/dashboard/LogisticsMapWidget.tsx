@@ -9,7 +9,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useUnifiedTracking, UnifiedShipment } from "@/hooks";
+import { Slider } from "@/components/ui/slider";
+import { useUnifiedTracking, UnifiedShipment, useMapWeatherSync, useBiometricAnomalies } from "@/hooks";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MissionDetail } from "./MissionDetail";
@@ -17,11 +18,18 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { PerformanceChart } from "./PerformanceChart";
+import { supabase } from "@/integrations/supabase/client";
+import { AnomalyList } from "../map/AnomalyList";
+import { TacticalTerminal } from "../map/TacticalTerminal";
+import { CinematicHUD } from "../map/CinematicHUD";
+import { MapIntelligenceOverlay } from "../map/MapIntelligenceOverlay";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
 
 export function LogisticsMapWidget() {
   const { allShipments: shipments, summary, isLoading } = useUnifiedTracking();
+  const { riskZones } = useMapWeatherSync();
+  const { data: anomalies = [] } = useBiometricAnomalies();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [selectedShipment, setSelectedShipment] = React.useState<UnifiedShipment | null>(null);
@@ -32,6 +40,8 @@ export function LogisticsMapWidget() {
   const [isOptimizing, setIsOptimizing] = React.useState(false);
   const [showPerformance, setShowPerformance] = React.useState(false);
   const [isExporting, setIsExporting] = React.useState(false);
+  const [showAnomalies, setShowAnomalies] = React.useState(false);
+  const [timeTravelRange, setTimeTravelRange] = React.useState<[number, number]>([0, 24]);
   
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,
@@ -56,10 +66,13 @@ export function LogisticsMapWidget() {
                            (statusFilter === "high_variance" && (s.atrasado || (s.valorFrete && s.valorFrete > 500) || s.status === "ocorrencia"));
 
       const matchesType = typeFilter === "all" || s.tipo === typeFilter;
+      
+      const sTime = s.previsao ? new Date(s.previsao).getHours() : 12;
+      const matchesTime = sTime >= timeTravelRange[0] && sTime <= timeTravelRange[1];
 
-      return s.coordinates && matchesSearch && matchesStatus && matchesType;
+      return s.coordinates && matchesSearch && matchesStatus && matchesType && matchesTime;
     });
-  }, [shipments, searchTerm, statusFilter, typeFilter]);
+  }, [shipments, searchTerm, statusFilter, typeFilter, timeTravelRange]);
 
   const activeShipments = shipments.filter(s => 
     ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)
@@ -189,23 +202,39 @@ export function LogisticsMapWidget() {
                   setIsExporting(true);
                   setTimeout(() => {
                     setIsExporting(false);
-                    const csvContent = "data:text/csv;charset=utf-8,ID,Numero,Status,Tipo,Valor,Atrasado\n" + 
-                      shipments.slice(0, 10).map(s => `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.atrasado}`).join("\n");
+                    const csvContent = "data:text/csv;charset=utf-8,ID,Modulo,Nivel,Mensagem,Veiculo,Data\n" + 
+                      shipments.filter(s => {
+                        const sTime = s.previsao ? new Date(s.previsao).getHours() : 12;
+                        return sTime >= timeTravelRange[0] && sTime <= timeTravelRange[1];
+                      }).map(s => `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.previsao}`).join("\n");
                     const encodedUri = encodeURI(csvContent);
                     const link = document.createElement("a");
                     link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", `auditoria_nexus_${new Date().toISOString().slice(0,10)}.csv`);
+                    link.setAttribute("download", `nexus_tactical_log_${new Date().toISOString().slice(0,10)}.csv`);
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    toast.success("Relatório Auditoria Nexus Gerado (CSV)!");
+                    toast.success("Relatório Tático Nexus Gerado (CSV)!");
                   }, 1500);
                 }}
                 disabled={isExporting}
                 className="h-9 rounded-full bg-white/5 border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2"
               >
                 {isExporting ? <RefreshCw className="w-3 h-3 animate-spin" /> : <FileText className="w-3 h-3" />}
-                Exportar
+                Exportar Logs
+              </Button>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowAnomalies(true)}
+                className={cn(
+                  "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
+                  anomalies.some(a => a.level === 'crit') ? "bg-red-500/20 border-red-500 animate-pulse" : "bg-white/5"
+                )}
+              >
+                <AlertTriangle className="w-3 h-3" />
+                Anomalias ({anomalies.length})
               </Button>
 
               <Button 
@@ -220,6 +249,22 @@ export function LogisticsMapWidget() {
                 <Layers className="w-3 h-3" />
                 Camadas
               </Button>
+            </div>
+
+            <div className="flex bg-white/5 p-2 rounded-2xl border border-white/10 w-full md:w-64 flex-col gap-2">
+              <div className="flex justify-between text-[8px] font-black text-white/40 uppercase tracking-widest">
+                <span>Time-Travel</span>
+                <span>{timeTravelRange[0]}h - {timeTravelRange[1]}h</span>
+              </div>
+              <div className="px-2">
+                <Slider 
+                  value={timeTravelRange} 
+                  onValueChange={(val: any) => setTimeTravelRange(val)} 
+                  max={24} 
+                  step={1} 
+                  minStepsBetweenThumbs={1}
+                />
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -663,6 +708,35 @@ export function LogisticsMapWidget() {
           </div>
         </CardContent>
       </div>
+
+      <AnimatePresence>
+        {showAnomalies && (
+          <AnomalyList 
+            anomalies={anomalies} 
+            onClose={() => setShowAnomalies(false)} 
+            onAction={async (id) => {
+              const anomaly = anomalies.find(a => a.id === id);
+              if (anomaly?.vehicle_id) {
+                const { data, error } = await supabase.functions.invoke('execute-protocol', {
+                  body: { 
+                    vehicle_id: anomaly.vehicle_id,
+                    protocol_name: 'REBOOT_OBD_GATEWAY'
+                  }
+                });
+                if (error) {
+                  toast.error("Erro ao executar protocolo: " + error.message);
+                } else {
+                  toast.success("Protocolo REBOOT_OBD_GATEWAY executado com sucesso!");
+                }
+              }
+            }} 
+          />
+        )}
+      </AnimatePresence>
+
+      <TacticalTerminal />
+      <CinematicHUD />
+      <MapIntelligenceOverlay />
 
       <Sheet open={showMission} onOpenChange={setShowMission}>
         <SheetContent side="right" className="w-full sm:w-[540px] bg-black/95 backdrop-blur-3xl border-l border-white/10 p-0 overflow-hidden">
