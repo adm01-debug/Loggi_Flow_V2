@@ -24,7 +24,8 @@ import {
   ChevronRight,
   Filter,
   Eye,
-  Crosshair
+  Crosshair,
+  HeartPulse
 } from "lucide-react";
 import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks";
 import { MapboxMap, MapMarker } from "@/components/map";
@@ -47,6 +48,7 @@ import { ptBR } from "date-fns/locale";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DeliveryPoint { id: string; address: string; status: string; lat?: number; lng?: number; order: number; }
 
