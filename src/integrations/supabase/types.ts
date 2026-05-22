@@ -1312,6 +1312,42 @@ export type Database = {
         }
         Relationships: []
       }
+      bio_sync_alert_rules: {
+        Row: {
+          bpm_critical_threshold: number | null
+          bpm_warning_threshold: number | null
+          cooldown_minutes: number | null
+          created_at: string | null
+          fatigue_warning_threshold: string | null
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          bpm_critical_threshold?: number | null
+          bpm_warning_threshold?: number | null
+          cooldown_minutes?: number | null
+          created_at?: string | null
+          fatigue_warning_threshold?: string | null
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          bpm_critical_threshold?: number | null
+          bpm_warning_threshold?: number | null
+          cooldown_minutes?: number | null
+          created_at?: string | null
+          fatigue_warning_threshold?: string | null
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: []
+      }
       bio_sync_telemetry: {
         Row: {
           cause: string | null
@@ -2981,6 +3017,7 @@ export type Database = {
       }
       nexus_tactical_logs: {
         Row: {
+          alert_metadata: Json | null
           created_at: string
           event_time: string
           id: string
@@ -2992,6 +3029,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          alert_metadata?: Json | null
           created_at?: string
           event_time?: string
           id?: string
@@ -3003,6 +3041,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          alert_metadata?: Json | null
           created_at?: string
           event_time?: string
           id?: string
