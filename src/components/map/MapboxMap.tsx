@@ -24,6 +24,8 @@ interface MapboxMapProps {
   center?: [number, number]; // [lng, lat]
   zoom?: number;
   showRoute?: boolean;
+  showRouteLines?: boolean;
+
   originMarker?: { lat: number; lng: number; label?: string };
   className?: string;
   onMarkerClick?: (id: string) => void;
@@ -40,6 +42,8 @@ export function MapboxMap({
   center = [-46.6333, -23.5505], // São Paulo default
   zoom = 5,
   showRoute = false,
+  showRouteLines = false,
+
   originMarker,
   className = '',
   onMarkerClick,
@@ -460,7 +464,8 @@ export function MapboxMap({
 
   // Draw route lines from origin to each marker (Smarter curved paths with flow animation)
   useEffect(() => {
-    if (!map.current || !showRoute || !originMarker || markers.length === 0 || loading) return;
+    if (!map.current || (!showRoute && !showRouteLines) || !originMarker || markers.length === 0 || loading) return;
+
 
     const sourceId = 'route-lines';
     const arrowLayerId = 'route-arrows';

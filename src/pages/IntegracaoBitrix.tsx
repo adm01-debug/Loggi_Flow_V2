@@ -193,7 +193,9 @@ export default function IntegracaoBitrix() {
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="logs">Log de Eventos</TabsTrigger>
             <TabsTrigger value="mapping">Mapeamento</TabsTrigger>
+            <TabsTrigger value="alerts">Alertas Táticos</TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
