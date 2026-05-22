@@ -9,8 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useUnifiedTracking, UnifiedShipment } from "@/hooks";
-import { useMapWeatherSync, RiskZone } from "@/hooks/logistics/useMapWeatherSync";
+import { useUnifiedTracking, UnifiedShipment, useMapWeatherSync, useBiometricAnomalies } from "@/hooks";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MissionDetail } from "./MissionDetail";
@@ -20,7 +19,6 @@ import { toast } from "sonner";
 import { PerformanceChart } from "./PerformanceChart";
 import { supabase } from "@/integrations/supabase/client";
 import { AnomalyList } from "../map/AnomalyList";
-import { useBiometricAnomalies } from "@/hooks/logistics/useBiometricAnomalies";
 import { TacticalTerminal } from "../map/TacticalTerminal";
 import { CinematicHUD } from "../map/CinematicHUD";
 import { MapIntelligenceOverlay } from "../map/MapIntelligenceOverlay";
