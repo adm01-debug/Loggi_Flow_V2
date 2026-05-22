@@ -30,7 +30,7 @@ export function AnomalyList({ anomalies, onClose, onAction }: AnomalyListProps) 
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
-      className="fixed top-0 right-0 h-full w-full md:w-[450px] bg-black/95 backdrop-blur-3xl border-l border-white/10 z-[100] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] flex flex-col"
+      className="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-black/95 backdrop-blur-3xl border-l border-white/10 z-[100] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] flex flex-col"
     >
       <div className="p-8 border-b border-white/5 flex items-center justify-between">
         <div>
