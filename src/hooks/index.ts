@@ -124,6 +124,9 @@ export * from './logistics/useLalamoveOrders';
 export * from './logistics/useBusinessRuleEngine';
 export * from './logistics/useTrackingAnalytics';
 export * from './logistics/useUnifiedTracking';
+export * from './logistics/useBiometricAnomalies';
+export * from './logistics/useMapWeatherSync';
+
 
 // ============================================
 // Integrations
