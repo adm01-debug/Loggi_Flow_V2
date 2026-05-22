@@ -1314,29 +1314,38 @@ export type Database = {
       }
       bio_sync_telemetry: {
         Row: {
+          cause: string | null
           created_at: string
           driver_id: string
           fatigue_index: string
           heart_rate: number
           id: string
+          severity: string | null
+          suggested_action: string | null
           timestamp: string
           vehicle_id: string
         }
         Insert: {
+          cause?: string | null
           created_at?: string
           driver_id: string
           fatigue_index: string
           heart_rate: number
           id?: string
+          severity?: string | null
+          suggested_action?: string | null
           timestamp?: string
           vehicle_id: string
         }
         Update: {
+          cause?: string | null
           created_at?: string
           driver_id?: string
           fatigue_index?: string
           heart_rate?: number
           id?: string
+          severity?: string | null
+          suggested_action?: string | null
           timestamp?: string
           vehicle_id?: string
         }
@@ -2184,6 +2193,7 @@ export type Database = {
           geocoded_at: string | null
           id: string
           is_cross_docking: boolean | null
+          last_weather_update: string | null
           latitude: number | null
           link_rastreamento: string | null
           longitude: number | null
@@ -2201,6 +2211,7 @@ export type Database = {
           updated_at: string
           valor_frete: number | null
           version: number | null
+          weather_risk_score: number | null
         }
         Insert: {
           box_alocado?: string | null
@@ -2217,6 +2228,7 @@ export type Database = {
           geocoded_at?: string | null
           id?: string
           is_cross_docking?: boolean | null
+          last_weather_update?: string | null
           latitude?: number | null
           link_rastreamento?: string | null
           longitude?: number | null
@@ -2234,6 +2246,7 @@ export type Database = {
           updated_at?: string
           valor_frete?: number | null
           version?: number | null
+          weather_risk_score?: number | null
         }
         Update: {
           box_alocado?: string | null
@@ -2250,6 +2263,7 @@ export type Database = {
           geocoded_at?: string | null
           id?: string
           is_cross_docking?: boolean | null
+          last_weather_update?: string | null
           latitude?: number | null
           link_rastreamento?: string | null
           longitude?: number | null
@@ -2267,6 +2281,7 @@ export type Database = {
           updated_at?: string
           valor_frete?: number | null
           version?: number | null
+          weather_risk_score?: number | null
         }
         Relationships: [
           {
@@ -3918,6 +3933,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      risk_zones: {
+        Row: {
+          cause: string | null
+          center_lat: number
+          center_lng: number
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          radius: number
+          severity: string | null
+          suggested_action: string | null
+        }
+        Insert: {
+          cause?: string | null
+          center_lat: number
+          center_lng: number
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          radius: number
+          severity?: string | null
+          suggested_action?: string | null
+        }
+        Update: {
+          cause?: string | null
+          center_lat?: number
+          center_lng?: number
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          radius?: number
+          severity?: string | null
+          suggested_action?: string | null
+        }
+        Relationships: []
       }
       role_permissions: {
         Row: {
