@@ -259,7 +259,7 @@ export default function MapaRotas() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[70vh]">
           <div className="lg:col-span-3 relative rounded-[2.5rem] overflow-hidden border border-white/10 bg-black shadow-2xl group">
-             <MapboxMap markers={mapMarkers} showRouteLines={showRouteLines} riskZones={riskZones} activeLayers={activeLayers} />
+             <MapboxMap markers={mapMarkers} showRouteLines={showRouteLines} riskZones={riskZones} activeLayers={activeLayers} mapStyle={mapStyle} pitch={mapPitch} />
              <CinematicHUD isLiveData={isLiveData} lastSync={lastSync} />
              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[85%] z-50">
                 <div className="px-10 py-8 bg-black/80 backdrop-blur-3xl rounded-3xl border border-white/10 shadow-2xl space-y-6 relative overflow-hidden">

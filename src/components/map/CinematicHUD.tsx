@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Satellite, Navigation, Crosshair, Wifi } from "lucide-react";
 
-export function CinematicHUD() {
+export function CinematicHUD({ isLiveData, lastSync }: { isLiveData?: boolean; lastSync?: Date }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
       {/* Corner Brackets */}
@@ -18,12 +18,13 @@ export function CinematicHUD() {
       >
         <div className="flex items-center gap-2">
           <Satellite className="w-3.5 h-3.5 text-cyan-500 animate-pulse" />
-          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">SAT_LOCK: 14_FIXED</span>
+          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{isLiveData ? "SAT_LOCK: 14_FIXED" : "RESTORED_DATA"}</span>
         </div>
         <div className="w-px h-4 bg-white/10" />
         <div className="flex items-center gap-2">
           <Navigation className="w-3.5 h-3.5 text-amber-500" />
-          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">HDOP: 0.82</span>
+          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{isLiveData ? "HDOP: 0.82" : lastSync?.toLocaleTimeString()}</span>
+
         </div>
         <div className="w-px h-4 bg-white/10" />
         <div className="flex items-center gap-2">
