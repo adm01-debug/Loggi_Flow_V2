@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks';
+import { toast } from 'sonner';
 import { useCallback, useEffect, useState } from 'react';
 import { QUERY_STALE_TIME } from '@/lib/queryConfig';
 
@@ -208,6 +209,7 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
     setGeocodingProgress({ current: 0, total: toGeocode.length });
 
     const updatedDeliveries = [...deliveries];
+    const failedIds = new Set<string>();
     
     // Process in batches of 3 to avoid rate limiting
     const batchSize = 3;
@@ -215,7 +217,6 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
       const batch = toGeocode.slice(i, i + batchSize);
       
       const batchPromises = batch.map(async (delivery) => {
-        // Build full address for geocoding
         const fullAddress = [
           delivery.endereco_entrega,
           delivery.cliente?.cidade,
@@ -225,9 +226,10 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
 
         const coords = await geocodeAddress(fullAddress);
         
-        // Save to database if successful
         if (coords) {
           await saveCoordinatesToDB(delivery.id, coords.lat, coords.lng);
+        } else {
+          failedIds.add(delivery.id);
         }
         
         return { id: delivery.id, coords };
@@ -248,7 +250,6 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
               geocoded_at: new Date().toISOString(),
             };
           } else {
-            // Keep fallback coordinates but mark as geocoded (failed)
             updatedDeliveries[index] = {
               ...updatedDeliveries[index],
               geocoded: true,
@@ -259,7 +260,6 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
 
       setGeocodingProgress({ current: Math.min(i + batchSize, toGeocode.length), total: toGeocode.length });
       
-      // Small delay between batches
       if (i + batchSize < toGeocode.length) {
         await new Promise(resolve => setTimeout(resolve, 300));
       }
@@ -267,6 +267,12 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
 
     setGeocodedDeliveries(updatedDeliveries);
     setIsGeocoding(false);
+
+    if (failedIds.size > 0) {
+      toast.warning(`Geocodificação incompleta`, {
+        description: `${failedIds.size} endereços não foram localizados no mapa.`
+      });
+    }
   }, [enableGeocoding]);
 
   // Trigger geocoding when data loads
