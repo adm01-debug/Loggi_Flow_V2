@@ -160,7 +160,7 @@ export function MapboxMap({
       map.current?.remove();
       map.current = null;
     };
-  }, [token, center, zoom]); // Re-init if core props change significantly
+  }, [token, center, zoom, riskZones]); // Re-init if core props change significantly
 
   // Handle Style, Pitch and Traffic changes
   useEffect(() => {
