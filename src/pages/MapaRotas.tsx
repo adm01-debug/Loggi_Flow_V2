@@ -74,6 +74,7 @@ export default function MapaRotas() {
   const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'warn' | 'crit'; vehicle?: string | null; event_time: string }[]>([]);
   const [bioData, setBioData] = useState<{ heart_rate: number; fatigue_index: string } | null>(null);
   const [vehicleFilter, setVehicleFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedLogTime, setSelectedLogTime] = useState<string | null>(null);
 
   const fetchLogs = useCallback(async () => {
@@ -176,9 +177,10 @@ export default function MapaRotas() {
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
       if (vehicleFilter !== "all" && log.vehicle !== vehicleFilter) return false;
+      if (typeFilter !== "all" && log.type !== typeFilter) return false;
       return true;
     });
-  }, [logs, vehicleFilter]);
+  }, [logs, vehicleFilter, typeFilter]);
 
   const jumpToTime = (isoString: string) => {
     const eventDate = new Date(isoString);
@@ -277,13 +279,39 @@ export default function MapaRotas() {
 
           <div className="space-y-6 flex flex-col">
             <Card className="flex-1 bg-black/60 backdrop-blur-xl border-white/10 rounded-[2rem] overflow-hidden flex flex-col">
-              <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+              <CardHeader className="border-b border-white/5 bg-white/[0.02] space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <History className="w-5 h-5 text-cyan-500" />
                     <CardTitle className="text-sm font-black uppercase tracking-widest text-white">Event_Timeline</CardTitle>
                   </div>
                   <Badge variant="outline" className="text-[9px] font-black border-white/10 uppercase">{filteredLogs.length} LOGS</Badge>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="h-8 bg-black/40 border-white/10 text-[9px] font-black uppercase tracking-widest">
+                      <SelectValue placeholder="TIPO" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-black border-white/10">
+                      <SelectItem value="all">TODOS</SelectItem>
+                      <SelectItem value="info">INFO</SelectItem>
+                      <SelectItem value="warn">AVISO</SelectItem>
+                      <SelectItem value="crit">CRÍTICO</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={vehicleFilter} onValueChange={setVehicleFilter}>
+                    <SelectTrigger className="h-8 bg-black/40 border-white/10 text-[9px] font-black uppercase tracking-widest">
+                      <SelectValue placeholder="VEÍCULO" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-black border-white/10">
+                      <SelectItem value="all">FROTA_TOTAL</SelectItem>
+                      {Array.from(new Set(logs.map(l => l.vehicle).filter(Boolean))).map(v => (
+                        <SelectItem key={v} value={v!}>{v}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardHeader>
               <CardContent className="p-0 flex-1 overflow-y-auto">
@@ -320,27 +348,7 @@ export default function MapaRotas() {
             </div>
           </div>
         </div>
-        <AdminBioRules />
       </div>
     </MainLayout>
-  );
-}
-
-function AdminBioRules() {
-  const [rules, setRules] = useState({ bpm_warning: 95, bpm_critical: 110, cooldown: 5 });
-  const saveRules = async () => {
-    const { error } = await supabase.from('bio_sync_alert_rules').upsert({ id: '00000000-0000-0000-0000-000000000000', bpm_warning_threshold: rules.bpm_warning, bpm_critical_threshold: rules.bpm_critical, cooldown_minutes: rules.cooldown });
-    if (!error) toast.success("REGRAS ATUALIZADAS", { description: "Aplicado imediatamente a toda frota." });
-  };
-  return (
-    <Card className="bg-black/40 border-white/10 p-6 space-y-4 max-w-2xl mx-auto rounded-3xl">
-       <div className="flex items-center gap-3"><Settings2 className="w-5 h-5 text-cyan-500" /><h3 className="text-sm font-black text-white uppercase tracking-widest">BioSync_Configuration</h3></div>
-       <div className="grid grid-cols-3 gap-4">
-          <div className="space-y-2"><Label className="text-[10px] font-black text-white/40 uppercase">Warning_BPM</Label><Input type="number" value={rules.bpm_warning} onChange={e => setRules({...rules, bpm_warning: Number(e.target.value)})} className="bg-black/50 border-white/10 text-cyan-500 font-bold" /></div>
-          <div className="space-y-2"><Label className="text-[10px] font-black text-white/40 uppercase">Critical_BPM</Label><Input type="number" value={rules.bpm_critical} onChange={e => setRules({...rules, bpm_critical: Number(e.target.value)})} className="bg-black/50 border-white/10 text-rose-500 font-bold" /></div>
-          <div className="space-y-2"><Label className="text-[10px] font-black text-white/40 uppercase">Cooldown_Min</Label><Input type="number" value={rules.cooldown} onChange={e => setRules({...rules, cooldown: Number(e.target.value)})} className="bg-black/50 border-white/10 font-bold text-white" /></div>
-       </div>
-       <Button onClick={saveRules} className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-black uppercase tracking-widest h-12 rounded-xl">COMMIT_RULES</Button>
-    </Card>
   );
 }
