@@ -31,10 +31,10 @@ export function TacticalTerminal() {
       const normalized = data.map(log => ({
         id: log.id,
         timestamp: new Date(log.created_at).toLocaleTimeString([], { hour12: false, fractionalSecondDigits: 3 }),
-        module: log.module,
+        module: log.type, // Map 'type' to 'module'
         message: log.message,
-        level: log.level as any,
-        target_vehicle: log.target_vehicle
+        level: 'info' as const, // Map to a default level if not in DB
+        target_vehicle: log.target_vehicle || undefined
       }));
       setEntries(normalized.reverse());
     }

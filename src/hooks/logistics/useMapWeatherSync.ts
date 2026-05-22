@@ -27,11 +27,11 @@ export function useMapWeatherSync() {
       if (data) {
         setRiskZones(data.map(z => ({
           id: z.id,
-          center: [z.center_lng, z.center_lat],
+          center: [z.center_lng, z.center_lat] as [number, number],
           radius: z.radius,
           severity: z.severity as any,
-          cause: z.cause,
-          action: z.suggested_action
+          cause: z.cause || undefined,
+          action: z.suggested_action || undefined
         })));
       }
     } catch (err) {
