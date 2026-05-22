@@ -35,10 +35,16 @@ export default function Configuracoes() {
 
   const handleSave = async () => { 
     setSaving(true); 
-    await new Promise(r => setTimeout(r, 1000)); 
-    toast.success("Configurações salvas!"); 
-    setSaving(false);
-    setIsDirty(false);
+    try {
+      // In a real app, this would call an API or update Supabase
+      await new Promise(r => setTimeout(r, 1000)); 
+      toast.success("Configurações salvas!"); 
+      setIsDirty(false);
+    } catch (error) {
+      toast.error("Erro ao salvar configurações");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const integrationsList = [
