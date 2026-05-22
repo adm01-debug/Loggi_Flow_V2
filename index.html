@@ -47,65 +47,63 @@
   <meta name="twitter:description" content="Sistema de gestão logística premium para Promo Brindes.">
 </head>
   <body>
-    <div id="root">
-      <!-- Branded Splash Screen — removed by React on mount -->
-      <div id="splash-screen" style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: hsl(220 20% 7%);
-        color: hsl(210 40% 98%);
-        font-family: 'Outfit', system-ui, sans-serif;
-        gap: 1.5rem;
+    <div id="root"></div>
+    <!-- Branded Splash Screen — outside #root so React mount can't leave it stuck -->
+    <div id="splash-screen" style="
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: hsl(220 20% 7%);
+      color: hsl(210 40% 98%);
+      font-family: 'Outfit', system-ui, sans-serif;
+      gap: 1.5rem;
+      transition: opacity 0.35s ease-out;
+    ">
+      <div style="
+        width: 56px; height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, hsl(25 95% 53%), hsl(38 92% 50%));
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 30px hsl(25 95% 53% / 0.35);
+        animation: splash-pulse 2s ease-in-out infinite;
+      ">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+          <path d="M15 18H9"/>
+          <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
+          <circle cx="17" cy="18" r="2"/>
+          <circle cx="7" cy="18" r="2"/>
+        </svg>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;">LogiFlow</div>
+        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.5; margin-top: 4px;">Logística Gamificada</div>
+      </div>
+      <div style="
+        width: 120px; height: 3px;
+        border-radius: 4px;
+        background: hsl(220 15% 18%);
+        overflow: hidden;
+        margin-top: 0.5rem;
       ">
         <div style="
-          width: 56px; height: 56px;
-          border-radius: 16px;
-          background: linear-gradient(135deg, hsl(25 95% 53%), hsl(38 92% 50%));
-          display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 0 30px hsl(25 95% 53% / 0.35);
-          animation: splash-pulse 2s ease-in-out infinite;
-        ">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
-            <path d="M15 18H9"/>
-            <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
-            <circle cx="17" cy="18" r="2"/>
-            <circle cx="7" cy="18" r="2"/>
-          </svg>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;">LogiFlow</div>
-          <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.5; margin-top: 4px;">Logística Gamificada</div>
-        </div>
-        <div style="
-          width: 120px; height: 3px;
+          width: 40%; height: 100%;
           border-radius: 4px;
-          background: hsl(220 15% 18%);
-          overflow: hidden;
-          margin-top: 0.5rem;
-        ">
-          <div style="
-            width: 40%; height: 100%;
-            border-radius: 4px;
-            background: linear-gradient(90deg, hsl(25 95% 53%), hsl(38 92% 50%));
-            animation: splash-loading 1.2s ease-in-out infinite;
-          "></div>
-        </div>
+          background: linear-gradient(90deg, hsl(25 95% 53%), hsl(38 92% 50%));
+          animation: splash-loading 1.2s ease-in-out infinite;
+        "></div>
       </div>
-      <style>
-        @keyframes splash-pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-        @keyframes splash-loading {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(350%); }
-        }
-      </style>
     </div>
+    <style>
+      @keyframes splash-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      @keyframes splash-loading {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(350%); }
+      }
+      #splash-screen.splash-hidden { opacity: 0; pointer-events: none; }
+    </style>
     <script type="module" src="/src/main.tsx"></script>
     
     <!-- Service Worker Registration -->
