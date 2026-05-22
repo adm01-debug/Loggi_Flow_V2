@@ -688,6 +688,35 @@ export function LogisticsMapWidget() {
         </CardContent>
       </div>
 
+      <AnimatePresence>
+        {showAnomalies && (
+          <AnomalyList 
+            anomalies={anomalies} 
+            onClose={() => setShowAnomalies(false)} 
+            onAction={async (id) => {
+              const anomaly = anomalies.find(a => a.id === id);
+              if (anomaly?.vehicle_id) {
+                const { data, error } = await supabase.functions.invoke('execute-protocol', {
+                  body: { 
+                    vehicle_id: anomaly.vehicle_id,
+                    protocol_name: 'REBOOT_OBD_GATEWAY'
+                  }
+                });
+                if (error) {
+                  toast.error("Erro ao executar protocolo: " + error.message);
+                } else {
+                  toast.success("Protocolo REBOOT_OBD_GATEWAY executado com sucesso!");
+                }
+              }
+            }} 
+          />
+        )}
+      </AnimatePresence>
+
+      <TacticalTerminal />
+      <CinematicHUD />
+      <MapIntelligenceOverlay />
+
       <Sheet open={showMission} onOpenChange={setShowMission}>
         <SheetContent side="right" className="w-full sm:w-[540px] bg-black/95 backdrop-blur-3xl border-l border-white/10 p-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
