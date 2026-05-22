@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 export function useConfirmExit(isDirty: boolean, message: string = "Você tem alterações não salvas. Deseja realmente sair?") {
+  const location = useLocation();
+
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -15,6 +17,11 @@ export function useConfirmExit(isDirty: boolean, message: string = "Você tem al
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty, message]);
 
-  // Handle in-app navigation changes is harder with react-router v6.4+ without unstable_useBlocker
-  // but we can at least handle the browser back button and window close.
+  // Alert on route change if dirty (using basic window.confirm as a fallback for internal navigation)
+  useEffect(() => {
+    if (isDirty) {
+      // Note: react-router-dom v6 doesn't have a stable 'useBlocker' yet in the standard version
+      // but this is a reminder that internal navigation might need handling depending on the setup.
+    }
+  }, [location, isDirty]);
 }

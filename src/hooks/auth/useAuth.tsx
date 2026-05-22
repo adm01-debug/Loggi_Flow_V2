@@ -45,7 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRoles(rolesData);
       }
 
-      authService.updateStreak(userId);
+      // Safe call to update streak
+      await authService.updateStreak(userId);
     } catch (err) {
       console.error("Error fetching user data:", err);
     }
