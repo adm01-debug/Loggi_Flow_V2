@@ -24,14 +24,14 @@ import { DateRange } from "react-day-picker";
 import { 
   useDashboardMetrics, 
   useRecentAlerts, 
-  useTransportadoraPerformance, 
-  useDashboardData, 
-  useRealtime, 
-  useGamification, 
-  useDashboardWidgets, 
-  useLocalStorage,
-  usePerformanceMonitor 
-} from "@/hooks";
+  useTransportadoraPerformance 
+} from "@/hooks/analytics/useDashboardMetrics";
+import { useDashboardData } from "@/hooks/analytics/useDashboardData";
+import { useDashboardWidgets } from "@/hooks/analytics/useDashboardWidgets";
+import { usePerformanceMonitor } from "@/hooks/analytics/usePerformanceMonitor";
+import { useRealtime } from "@/hooks/data/useRealtime";
+import { useGamification } from "@/hooks/gamification/useGamification";
+import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 import { toast } from "sonner";
 
 
