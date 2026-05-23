@@ -33,85 +33,85 @@
     --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
     --font-display: 'Outfit', system-ui, sans-serif;
 
-    /* ===== BASE - Dark Theme as Default ===== */
-    --background: 220 20% 6%;
-    --foreground: 210 40% 98%;
+    /* ===== BASE - Cyberpunk / Dark Tech Mode ===== */
+    --background: 222 47% 4%;
+    --foreground: 214 32% 91%;
 
-    /* ===== CARDS ===== */
-    --card: 220 18% 10%;
-    --card-foreground: 210 40% 98%;
-    --card-elevated: 220 18% 13%;
+    /* ===== CARDS & CONTAINERS ===== */
+    --card: 222 47% 7%;
+    --card-foreground: 214 32% 91%;
+    --card-elevated: 222 47% 10%;
 
     /* ===== POPOVER/DIALOG ===== */
-    --popover: 220 18% 10%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 222 47% 6%;
+    --popover-foreground: 214 32% 91%;
 
-    /* ===== CORES PRIMÁRIAS - Orange/Amber ===== */
-    --primary: 25 95% 53%;
+    /* ===== PRIMARY - Deep Tech Blue / Cyan Glow ===== */
+    --primary: 199 89% 48%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 25 100% 60%;
+    --primary-glow: 199 100% 60%;
 
-    /* ===== CORES SECUNDÁRIAS ===== */
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 210 40% 90%;
+    /* ===== SECONDARY - Steel Grey ===== */
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 214 32% 91%;
 
-    /* ===== MUTED ===== */
-    --muted: 220 15% 18%;
-    --muted-foreground: 215 20% 70%;
+    /* ===== MUTED - Subtle Grey ===== */
+    --muted: 222 47% 12%;
+    --muted-foreground: 215 20% 65%;
     
     /* ===== HIGH CONTRAST MODE ===== */
-    --high-contrast-muted-foreground: 215 20% 80%;
+    --high-contrast-muted-foreground: 215 20% 85%;
 
-    /* ===== ACCENT ===== */
-    --accent: 220 15% 18%;
-    --accent-foreground: 210 40% 98%;
+    /* ===== ACCENT - Cyber Cyan ===== */
+    --accent: 188 100% 50%;
+    --accent-foreground: 222 47% 4%;
 
-    /* ===== DESTRUCTIVE ===== */
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    /* ===== DESTRUCTIVE - Neon Red ===== */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
 
     /* ===== BORDAS E INPUTS ===== */
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 25 95% 53%;
+    --border: 222 47% 15%;
+    --input: 222 47% 12%;
+    --ring: 199 89% 48%;
 
     /* ===== STATUS COLORS ===== */
-    --success: 142 70% 45%;
-    --success-foreground: 144 60% 98%;
-    --warning: 48 96% 53%;
-    --warning-foreground: 48 96% 10%;
+    --success: 160 84% 39%;
+    --success-foreground: 160 84% 98%;
+    --warning: 45 93% 47%;
+    --warning-foreground: 45 93% 5%;
     --info: 199 89% 48%;
     --info-foreground: 199 89% 98%;
     
     /* ===== GAMIFICATION COLORS ===== */
     --coins: 45 100% 50%;
-    --xp: 25 95% 53%;
+    --xp: 199 89% 48%;
     --streak: 0 91% 60%;
     --rank-gold: 45 100% 50%;
     --rank-silver: 0 0% 75%;
     --rank-bronze: 30 50% 45%;
     
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
   .light {
-    --background: 210 20% 98%;
-    --foreground: 220 20% 6%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 4%;
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 6%;
-    --card-elevated: 210 20% 96%;
+    --card-foreground: 222 47% 4%;
+    --card-elevated: 210 40% 95%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 6%;
-    --primary: 25 95% 53%;
+    --popover-foreground: 222 47% 4%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 20% 92%;
-    --secondary-foreground: 220 20% 10%;
-    --muted: 210 20% 94%;
-    --muted-foreground: 215 16% 40%;
-    --accent: 210 20% 94%;
-    --accent-foreground: 220 20% 6%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11.2%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
   }
   
   /* HIGH CONTRAST MODE */
@@ -158,17 +158,17 @@
   --shadow-glow-success: 0 0 15px -3px hsl(var(--success) / 0.4);
   --shadow-header: 0 4px 20px -5px rgb(0 0 0 / 0.05);
 
-  /* Spacing System */
-  --spacing-card: 1.25rem;
-  --spacing-card-sm: 1rem;
-  --spacing-card-lg: 2rem;
-  --spacing-section: 2.5rem;
-  --spacing-section-lg: 4rem;
+  /* Spacing System - Compact for Power Users */
+  --spacing-card: 0.75rem;
+  --spacing-card-sm: 0.5rem;
+  --spacing-card-lg: 1.25rem;
+  --spacing-section: 1.5rem;
+  --spacing-section-lg: 2.5rem;
 
   /* Sidebar Config */
-  --sidebar-width: 280px;
-  --sidebar-collapsed-width: 80px;
-  --sidebar-background: 220 18% 10%;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --sidebar-background: 222 47% 5%;
   --sidebar-foreground: 210 40% 98%;
   --sidebar-primary: 25 95% 53%;
   --sidebar-primary-foreground: 0 0% 100%;
@@ -186,7 +186,8 @@
 }
 
 body {
-  font-size: calc(var(--base-font-size, 0.875rem) * var(--font-scale));
+  font-size: 0.8125rem; /* Reduced base font size for SaaS density */
+  line-height: 1.4;
 }
 
 .p-4 { padding: var(--ui-padding) !important; }
@@ -249,13 +250,21 @@ body {
   background: hsl(var(--muted-foreground) / 0.4);
 }
 
-/* Glassmorphism Utilities */
+/* Cyberpunk Glass Effects */
 .glass {
-  @apply bg-background/60 backdrop-blur-xl border border-white/10 shadow-lg;
+  @apply bg-background/40 backdrop-blur-md border border-primary/10 shadow-lg shadow-primary/5;
 }
 
 .glass-dark {
-  @apply bg-black/40 backdrop-blur-2xl border border-white/5 shadow-2xl;
+  @apply bg-black/60 backdrop-blur-xl border border-white/5 shadow-2xl;
+}
+
+.neon-border {
+  @apply border-primary/30 shadow-[0_0_15px_-3px_hsl(var(--primary)/0.2)];
+}
+
+.neon-text {
+  @apply text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)];
 }
 
 /* Animation Utilities */
@@ -267,14 +276,20 @@ body {
   @apply active:scale-95 transition-transform duration-150;
 }
 
-/* Responsive Font Scaling */
+/* Modern SaaS Typography Scaling */
 html {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 @screen sm {
   html {
-    font-size: 16px;
+    font-size: 14px;
+  }
+}
+
+@screen lg {
+  html {
+    font-size: 14px;
   }
 }
 
