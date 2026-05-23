@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { usePermissions } from "@/hooks";
-import { useAuth } from "@/hooks";
+import { usePermissions } from "@/hooks/auth/usePermissions";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { AlertTriangle, Lock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Satellite, Navigation, Crosshair, Wifi } from "lucide-react";
-import { useIsMobile } from "@/hooks";
+import { useIsMobile } from "@/hooks/common/useMediaQuery";
 
 export function CinematicHUD({ isLiveData, lastSync }: { isLiveData?: boolean; lastSync?: Date }) {
   const isMobile = useIsMobile();

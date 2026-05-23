@@ -7,13 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useGamification, Achievement as DbAchievement } from "@/hooks";
+import { useGamification, Achievement } from "@/hooks/gamification/useGamification";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
-import { usePagination } from "@/hooks";
-import { useFilters, FilterConfig } from "@/hooks";
-import { useSorting } from "@/hooks";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
+import { useSorting } from "@/hooks/common/useSorting";
 
 interface AchievementDisplay { 
   id: string; 

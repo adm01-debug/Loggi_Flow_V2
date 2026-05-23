@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocalStorage } from '@/hooks';
+import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 
 export type Density = 'compact' | 'standard' | 'comfortable';
 

@@ -23,19 +23,19 @@ import {
   Cell
 } from 'recharts';
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks";
-import { useExport } from "@/hooks";
+import { useToast } from "@/hooks/ui/use-toast";
+import { useExport } from "@/hooks/common/useExport";
 import { cn } from "@/lib/utils";
-import { useAudioFeedback } from "@/hooks";
+import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { VirtualizedList } from "@/components/common/VirtualizedList";
 import { RealtimeBadge } from "@/components/common/RealtimeBadge";
-import { usePagination } from "@/hooks";
-import { useFilters, FilterConfig } from "@/hooks";
-import { useSorting } from "@/hooks";
-import { useRealtime } from "@/hooks";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
+import { useSorting } from "@/hooks/common/useSorting";
+import { useRealtime } from "@/hooks/data/useRealtime";
 import { PickupDialog } from "@/components/coletas/PickupDialog";
 import { PickupDetailsDialog } from "@/components/coletas/PickupDetailsDialog";
 

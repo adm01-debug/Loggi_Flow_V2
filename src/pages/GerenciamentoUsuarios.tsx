@@ -30,8 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks";
-import { useAuth } from "@/hooks";
+import { useToast } from "@/hooks/ui/use-toast";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { 
   Users, 
   Shield, 

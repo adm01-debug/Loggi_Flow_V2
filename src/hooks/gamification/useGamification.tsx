@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks";
-import { useToast } from "@/hooks";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useToast } from "@/hooks/ui/use-toast";
 import { playCelebrationSound } from "@/utils/celebrationSounds";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 

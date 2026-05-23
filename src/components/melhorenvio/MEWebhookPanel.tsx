@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Webhook, Plus, Trash2, CheckCircle, XCircle, RefreshCw } from "lucide-react";
-import { useLocalStorage } from "@/hooks";
+import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";

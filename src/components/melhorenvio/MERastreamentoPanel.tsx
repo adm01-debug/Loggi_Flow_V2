@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { useMelhorEnvio } from '@/hooks';
+import { useMelhorEnvio } from "@/hooks/logistics/useMelhorEnvio";
 import { MapPin, Loader2, Search, Package, Plus, Trash2 } from 'lucide-react';
 import type { METrackingInfo, METrackingEvent } from './types';
 

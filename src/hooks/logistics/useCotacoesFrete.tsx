@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/hooks';
+import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
 import { logisticsService, type CotacaoFrete } from '@/services/api/logisticsService';
 

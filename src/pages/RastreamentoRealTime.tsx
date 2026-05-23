@@ -21,8 +21,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useUnifiedTracking, UnifiedShipment } from '@/hooks';
-import { useRecordHistory } from '@/hooks';
+import { useUnifiedTracking, UnifiedShipment } from "@/hooks/logistics/useUnifiedTracking";
+import { useRecordHistory } from "@/hooks/security/useAuditLogs";
 import { useGeocoding } from '@/hooks/integrations/useGeocoding';
 import { useDelayPrediction } from '@/hooks/logistics/useDelayPrediction';
 import { format, parseISO } from 'date-fns';

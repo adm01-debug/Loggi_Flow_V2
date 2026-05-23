@@ -3,7 +3,7 @@ import { History, Plus, Pencil, Trash2, User, Calendar, ChevronDown, ChevronUp, 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuditLogs, AuditLog, tableNameLabels, actionLabels } from "@/hooks";
+import { useAuditLogs, AuditLog, tableNameLabels, actionLabels } from "@/hooks/security/useAuditLogs";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
@@ -11,13 +11,13 @@ import { toast } from "sonner";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
-import { useSelection } from "@/hooks";
-import { usePagination } from "@/hooks";
-import { useFilters } from "@/hooks";
-import { useSorting } from "@/hooks";
-import { useRealtime } from "@/hooks";
-import { useExport } from "@/hooks";
-import { useVirtualTable } from "@/hooks";
+import { useSelection } from "@/hooks/common/useSelection";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useFilters } from "@/hooks/common/useFilters";
+import { useSorting } from "@/hooks/common/useSorting";
+import { useRealtime } from "@/hooks/data/useRealtime";
+import { useExport } from "@/hooks/common/useExport";
+import { useVirtualTable } from "@/hooks/ui/useVirtualTable";
 
 interface AuditTrailViewerProps { 
   recordId?: string; 

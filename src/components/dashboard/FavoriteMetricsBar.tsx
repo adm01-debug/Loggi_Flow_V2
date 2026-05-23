@@ -40,11 +40,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useFavoriteMetrics, AVAILABLE_METRICS } from "@/hooks";
-import { useDashboardMetrics } from "@/hooks";
-import { useSLAMetrics } from "@/hooks";
-import { useLogisticsCosts } from "@/hooks";
-import { useGamification } from "@/hooks";
+import { useFavoriteMetrics, AVAILABLE_METRICS } from "@/hooks/analytics/useFavoriteMetrics";
+import { useDashboardMetrics } from "@/hooks/analytics/useDashboardMetrics";
+import { useSLAMetrics } from "@/hooks/logistics/useSLAMetrics";
+import { useLogisticsCosts } from "@/hooks/logistics/useLogisticsCosts";
+import { useGamification } from "@/hooks/gamification/useGamification";
 import { cn } from "@/lib/utils";
 import { subMonths, startOfMonth, endOfMonth } from "date-fns";
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks';
+import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
 
 interface DeviceInfo {

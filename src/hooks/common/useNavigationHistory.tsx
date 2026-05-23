@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLocalStorage } from "@/hooks";
+import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 interface VisitedPage {
   path: string;

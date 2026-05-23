@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks";
+import { useToast } from "@/hooks/ui/use-toast";
 import { differenceInHours, parseISO } from "date-fns";
 
 export type NotificationPermissionState = "default" | "granted" | "denied";

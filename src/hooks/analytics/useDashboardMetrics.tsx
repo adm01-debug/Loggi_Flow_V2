@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useExecutiveMetrics } from "@/hooks";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useExecutiveMetrics } from "@/hooks/analytics/useExecutiveMetrics";
 import { QUERY_KEYS } from "@/lib/queryKeys";
 import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
 

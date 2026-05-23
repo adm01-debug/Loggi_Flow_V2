@@ -1,4 +1,4 @@
-import { useSecurityPushNotifications } from '@/hooks';
+import { useSecurityPushNotifications } from "@/hooks/notifications/useSecurityPushNotifications";
 
 export function SecurityPushNotificationProvider() {
   // This hook sets up realtime subscriptions for security events

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { useFreightIntelligence } from "@/hooks";
+import { useFreightIntelligence } from "@/hooks/logistics/useFreightIntelligence";
 import { formatCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";

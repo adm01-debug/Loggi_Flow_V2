@@ -10,7 +10,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useUnifiedTracking, UnifiedShipment, useMapWeatherSync, useBiometricAnomalies } from "@/hooks";
+import { useUnifiedTracking, UnifiedShipment } from "@/hooks/logistics/useUnifiedTracking";
+import { useMapWeatherSync } from "@/hooks/logistics/useMapWeatherSync";
+import { useBiometricAnomalies } from "@/hooks/logistics/useBiometricAnomalies";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MissionDetail } from "./MissionDetail";

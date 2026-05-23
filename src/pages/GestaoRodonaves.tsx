@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { useRodonavesTracking } from '@/hooks';
+import { useRodonavesTracking } from "@/hooks/logistics/useRodonavesTracking";
 import { RTETrackingPanel } from '@/components/rodonaves/RTETrackingPanel';
 import { RTEDeliveryReceipts } from '@/components/rodonaves/RTEDeliveryReceipts';
 import { RTEOrdersPanel } from '@/components/rodonaves/RTEOrdersPanel';

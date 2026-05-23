@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, X, FileText, CheckCircle2, Loader2, Camera, Download, Eye, ShieldCheck, Search } from "lucide-react";
-import { useAuth } from "@/hooks";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";

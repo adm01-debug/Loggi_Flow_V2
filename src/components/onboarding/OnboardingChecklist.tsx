@@ -7,7 +7,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { useOnboarding } from '@/hooks';
+import { useOnboarding } from "@/hooks/ui/useOnboarding";
 import { useNavigate } from 'react-router-dom';
 
 export function OnboardingChecklist() {

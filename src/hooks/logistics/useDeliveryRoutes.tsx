@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks';
+import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
 import { useCallback, useEffect, useState } from 'react';
 import { QUERY_STALE_TIME } from '@/lib/queryConfig';

@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, Star, X, Coins } from "lucide-react";
-import { useAchievementNotifications } from "@/hooks";
+import { useAchievementNotifications } from "@/hooks/gamification/useAchievementNotifications";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 

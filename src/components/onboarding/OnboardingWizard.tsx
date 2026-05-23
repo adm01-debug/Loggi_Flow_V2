@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useOnboarding, OnboardingStep } from '@/hooks';
+import { useOnboarding, OnboardingStep } from "@/hooks/ui/useOnboarding";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   User, Users, Truck, Package, LayoutDashboard, Bell

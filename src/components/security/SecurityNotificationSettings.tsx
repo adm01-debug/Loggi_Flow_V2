@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Bell, BellOff, BellRing, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
-import { useSecurityPushNotifications } from '@/hooks';
+import { useSecurityPushNotifications } from "@/hooks/notifications/useSecurityPushNotifications";
 
 export function SecurityNotificationSettings() {
   const { isEnabled, permission, requestPermission } = useSecurityPushNotifications();

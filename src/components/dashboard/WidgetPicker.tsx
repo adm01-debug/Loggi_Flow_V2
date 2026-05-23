@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { WidgetDefinition } from "@/hooks";
+import { WidgetDefinition } from "@/hooks/analytics/useDashboardWidgets";
 
 interface WidgetPickerProps {
   availableWidgets: WidgetDefinition[];

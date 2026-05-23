@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { useQRScanner, ScanResult } from "@/hooks";
+import { useQRScanner, ScanResult } from "@/hooks/ui/useQRScanner";
 import { cn } from "@/lib/utils";
 
 interface QRScannerModalProps {

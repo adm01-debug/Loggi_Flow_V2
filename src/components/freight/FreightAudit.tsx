@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileCheck, AlertTriangle, CheckCircle2, Search } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatters';
-import { useFreightQuotation } from '@/hooks';
+import { useFreightQuotation } from "@/hooks/logistics/useFreightQuotation";
 import { toast } from 'sonner';
 import { Decimal } from 'decimal.js';
 import { useQuery } from '@tanstack/react-query';

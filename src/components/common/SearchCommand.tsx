@@ -15,7 +15,7 @@ import {
   CommandSeparator,
   CommandShortcut
 } from "@/components/ui/command";
-import { useGlobalSearch, getSearchTypeLabel, getSearchTypeColor } from "@/hooks";
+import { useGlobalSearch, getSearchTypeLabel, getSearchTypeColor } from "@/hooks/common/useGlobalSearch";
 import { Badge } from "@/components/ui/badge";
 
 export function SearchCommand() {

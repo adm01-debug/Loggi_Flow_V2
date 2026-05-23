@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { useLogisticaReversaReal, type LogisticaReversa } from "@/hooks";
+import { useLogisticaReversaReal } from "@/hooks/logistics/useLogisticaReversaReal";
+import { type LogisticaReversa } from "@/hooks";
 import { 
   RotateCcw, 
   Plus, 

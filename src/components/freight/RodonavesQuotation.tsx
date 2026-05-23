@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Clock, Star, Search, Loader2, Truck, Package } from 'lucide-react';
-import { useRodonavesTracking } from '@/hooks';
+import { useRodonavesTracking } from "@/hooks/logistics/useRodonavesTracking";
 import { toast } from 'sonner';
 import { formatCEP } from '@/lib/validations';
 

@@ -1,4 +1,4 @@
-import { useDeviceSessions } from "@/hooks";
+import { useDeviceSessions } from "@/hooks/auth/useDeviceSessions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
