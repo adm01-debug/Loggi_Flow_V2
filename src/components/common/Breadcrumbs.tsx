@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useNavigationHistory } from "@/hooks";
+import { useNavigationHistory } from "@/hooks/common/useNavigationHistory";
 import {
   DropdownMenu,
   DropdownMenuContent,

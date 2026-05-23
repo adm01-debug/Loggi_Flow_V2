@@ -13,9 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/hooks";
-import { useGamification } from "@/hooks";
-import { useNavigationHistory } from "@/hooks";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useGamification } from "@/hooks/gamification/useGamification";
+import { useNavigationHistory } from "@/hooks/common/useNavigationHistory";
 import { RecentlyVisited } from "@/components/common/RecentlyVisited";
 import { supabase } from "@/integrations/supabase/client";
 import { hapticFeedback } from "@/utils/haptics";
