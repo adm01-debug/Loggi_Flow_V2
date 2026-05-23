@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useMelhorEnvio } from '@/hooks';
+import { useMelhorEnvio } from "@/hooks/logistics/useMelhorEnvio";
 import { ShoppingCart, Trash2, CreditCard, Loader2, RefreshCw, RotateCcw, Eye } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
@@ -15,7 +15,7 @@ import { MEDetailDialog } from './MEDetailDialog';
 import { MEErrorState } from './MEErrorState';
 import { MECepAutoFill } from './MECepAutoFill';
 import { MEFormField } from './MEFormField';
-import { usePagination } from '@/hooks';
+import { usePagination } from "@/hooks/common/usePagination";
 import { Pagination } from '@/components/common/Pagination';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { formatPhone, formatCPFCNPJ } from '@/lib/validations';

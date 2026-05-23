@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks';
-import { useGamification } from '@/hooks';
-import { useAchievementNotifications } from '@/hooks';
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useGamification } from "@/hooks/gamification/useGamification";
+import { useAchievementNotifications } from "@/hooks/gamification/useAchievementNotifications";
 import { toast } from 'sonner';
 
 export interface OnboardingStep {

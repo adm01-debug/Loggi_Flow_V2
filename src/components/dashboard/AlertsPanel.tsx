@@ -2,13 +2,13 @@ import * as React from "react";
 import { AlertTriangle, AlertCircle, Info, Clock, X, ShieldCheck, ArrowRight, Brain, Zap, ShieldAlert, Activity, Settings2, SlidersHorizontal, BarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { RecentAlert } from "@/hooks";
+import { RecentAlert } from "@/hooks/analytics/useDashboardMetrics";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { useLocalStorage } from "@/hooks";
+import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 
 interface AlertsPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   alerts: RecentAlert[];

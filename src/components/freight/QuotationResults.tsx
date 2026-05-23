@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, Star, Package, TrendingDown, Award } from 'lucide-react';
 import { EmptyState } from '@/components/common/EmptyState';
 import { cn } from '@/lib/utils';
-import { type QuotationResult } from '@/hooks';
+import { type QuotationResult } from "@/hooks";
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface QuotationResultsProps {

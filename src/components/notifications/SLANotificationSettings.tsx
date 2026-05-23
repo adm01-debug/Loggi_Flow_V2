@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useSLANotifications } from "@/hooks";
+import { useSLANotifications } from "@/hooks/logistics/useSLANotifications";
 
 export function SLANotificationSettings() {
   const [open, setOpen] = useState(false);

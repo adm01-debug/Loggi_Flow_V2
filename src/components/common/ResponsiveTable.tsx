@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { useMediaQuery } from "@/hooks";
+import { useMediaQuery } from "@/hooks/common/useMediaQuery";
 import {
   Table,
   TableBody,

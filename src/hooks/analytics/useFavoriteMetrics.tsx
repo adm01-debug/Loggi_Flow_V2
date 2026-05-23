@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useLocalStorage } from "@/hooks";
+import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 
 export interface FavoriteMetric {
   id: string;

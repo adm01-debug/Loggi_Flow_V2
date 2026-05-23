@@ -4,7 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useOnboarding } from '@/hooks';
+import { useOnboarding } from "@/hooks/ui/useOnboarding";
 
 interface OnboardingProgressProps {
   variant?: 'compact' | 'full';

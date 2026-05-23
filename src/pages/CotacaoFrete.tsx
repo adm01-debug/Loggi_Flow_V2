@@ -5,7 +5,8 @@ import { Calculator, TrendingUp, MapPin, Truck, Clock, Bookmark, SplitSquareVert
 import { PageHeader } from '@/components/common/PageHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { DataExporter } from '@/components/common/DataExporter';
-import { useQuotationFlow, type TabelaFrete } from '@/hooks';
+import { useQuotationFlow } from "@/hooks/logistics/useQuotationFlow";
+import { type TabelaFrete } from "@/hooks";
 import {
   QuotationForm,
   QuotationResults,

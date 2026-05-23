@@ -31,10 +31,10 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { useGlobalSearch } from "@/hooks";
-import { useAuth } from "@/hooks";
+import { useGlobalSearch } from "@/hooks/common/useGlobalSearch";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useTheme } from "next-themes";
-import { useToast } from "@/hooks";
+import { useToast } from "@/hooks/ui/use-toast";
 
 export function GlobalSearch() {
   const navigate = useNavigate();

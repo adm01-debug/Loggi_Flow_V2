@@ -1,6 +1,6 @@
 import { WifiOff, RefreshCw, CloudOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useOnlineStatus } from "@/hooks";
+import { useOnlineStatus } from "@/hooks/common/useOnlineStatus";
 import { motion } from "framer-motion";
 
 export function OfflineBanner() {

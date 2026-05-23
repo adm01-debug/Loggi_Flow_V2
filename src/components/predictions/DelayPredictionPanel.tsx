@@ -17,7 +17,7 @@ import {
   Lightbulb,
   Zap
 } from 'lucide-react';
-import { useDelayPrediction, DelayPrediction } from '@/hooks';
+import { useDelayPrediction, DelayPrediction } from "@/hooks/logistics/useDelayPrediction";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 

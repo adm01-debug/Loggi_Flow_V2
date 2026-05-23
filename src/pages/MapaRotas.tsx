@@ -27,10 +27,10 @@ import {
   Crosshair,
   HeartPulse
 } from "lucide-react";
-import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks";
+import { useDeliveryRoutes, ORIGIN_COORDINATES, getStatusColor, getStatusLabel } from "@/hooks/logistics/useDeliveryRoutes";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { FilterBar } from "@/components/common/FilterBar";
-import { useFilters, FilterConfig } from "@/hooks";
+import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";

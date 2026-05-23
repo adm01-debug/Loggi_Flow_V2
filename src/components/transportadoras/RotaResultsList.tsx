@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { TransportadoraRota } from '@/hooks';
+import { TransportadoraRota } from "@/hooks/logistics/useTransportadoraRotas";
 import { formatCurrency } from '@/lib/formatters';
 
 interface RotaResultsListProps {

@@ -7,21 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import {
-  useBusinessRules,
-  EntityType,
-  TriggerEvent,
-  RuleCondition,
-  RuleAction,
-  ActionType,
-  ConditionOperator,
-  ENTITY_FIELDS,
-  TRIGGER_EVENTS,
-  CONDITION_OPERATORS,
-  ACTION_TYPES,
-  CreateRuleInput,
-  BusinessRule,
-} from "@/hooks";
+import { useBusinessRules, EntityType, TriggerEvent, RuleCondition, RuleAction, ActionType, ConditionOperator, ENTITY_FIELDS, TRIGGER_EVENTS, CONDITION_OPERATORS, ACTION_TYPES, CreateRuleInput, BusinessRule } from "@/hooks/logistics/useBusinessRules";
 
 const actionIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Bell, RefreshCw, Mail, AlertTriangle, Shield,

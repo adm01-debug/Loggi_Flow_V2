@@ -2,7 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { useNavigationHistory } from "@/hooks";
+import { useNavigationHistory } from "@/hooks/common/useNavigationHistory";
 
 interface PageBackButtonProps {
   fallbackPath?: string;

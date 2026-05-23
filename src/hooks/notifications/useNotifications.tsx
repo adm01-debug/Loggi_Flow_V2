@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { useNotificationPreferences } from "@/hooks";
+import { useNotificationPreferences } from "@/hooks/notifications/useNotificationPreferences";
 import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
 
 export interface Notification {

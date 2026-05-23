@@ -1,4 +1,4 @@
-import { useSessionTimeout } from "@/hooks";
+import { useSessionTimeout } from "@/hooks/auth/useSessionTimeout";
 import {
   AlertDialog,
   AlertDialogAction,

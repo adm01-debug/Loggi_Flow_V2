@@ -11,7 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useAudioFeedback, useAuth } from "@/hooks";
+import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { Database } from "@/integrations/supabase/types";
 
 type EntregaStatus = Database["public"]["Enums"]["entrega_status"];

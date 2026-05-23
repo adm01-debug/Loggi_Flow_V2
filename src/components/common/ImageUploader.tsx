@@ -3,7 +3,7 @@ import { Upload, X, Loader2, ZoomIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useImageUpload } from "@/hooks";
+import { useImageUpload } from "@/hooks/data/useImageUpload";
 
 interface ImageUploaderProps {
   images: string[];

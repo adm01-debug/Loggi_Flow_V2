@@ -2,7 +2,7 @@ import { useRef, useCallback } from "react";
 import { Upload, X, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useDocumentUpload } from "@/hooks";
+import { useDocumentUpload } from "@/hooks/data/useDocumentUpload";
 import { cn } from "@/lib/utils";
 
 interface DocumentUploadFieldProps {

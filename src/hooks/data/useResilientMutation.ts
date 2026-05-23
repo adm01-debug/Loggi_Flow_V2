@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { logisticsBreaker } from "@/services/resilience/CircuitBreaker";
-import { useTelemetry } from "@/hooks";
+import { useTelemetry } from "@/hooks/analytics/useTelemetry";
 import { toast } from "sonner";
 
 export function useResilientMutation<TData, TError, TVariables, TContext>(

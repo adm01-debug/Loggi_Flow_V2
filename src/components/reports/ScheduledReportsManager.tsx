@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useScheduledReports, ScheduledReportFormData } from '@/hooks';
+import { useScheduledReports, ScheduledReportFormData } from "@/hooks/analytics/useScheduledReports";
 import { toast } from 'sonner';
 
 const REPORT_TYPES = [

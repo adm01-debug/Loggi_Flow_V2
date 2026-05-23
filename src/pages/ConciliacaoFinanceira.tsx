@@ -6,7 +6,8 @@ import {
   FileSpreadsheet, Plus, Upload, Wand2, CheckCircle2, AlertTriangle,
   Clock, MoreVertical, Minus, TrendingUp, TrendingDown, Download, Loader2, FileCheck, FileText
 } from "lucide-react";
-import { useConciliacao, type Conciliacao, type ItemImportado } from "@/hooks";
+import { useConciliacao } from "@/hooks/logistics/useConciliacao";
+import { type Conciliacao, type ItemImportado } from "@/hooks";
 import { formatCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";

@@ -22,7 +22,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNotifications, Notification } from "@/hooks";
+import { useNotifications, Notification } from "@/hooks/notifications/useNotifications";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

@@ -1,6 +1,6 @@
 import { History, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useNavigationHistory } from "@/hooks";
+import { useNavigationHistory } from "@/hooks/common/useNavigationHistory";
 import {
   DropdownMenu,
   DropdownMenuContent,

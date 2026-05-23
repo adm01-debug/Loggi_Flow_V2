@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useTelemetry } from '@/hooks';
+import { useTelemetry } from "@/hooks/analytics/useTelemetry";
 
 export function usePerformanceMonitor() {
   const { logTelemetry } = useTelemetry();

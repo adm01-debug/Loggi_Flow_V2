@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { useBusinessRules, BusinessRule } from "@/hooks";
+import { useBusinessRules, BusinessRule } from "@/hooks/logistics/useBusinessRules";
 import { cn } from "@/lib/utils";
 import { RuleEditor } from "./RuleEditor";
 

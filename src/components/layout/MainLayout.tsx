@@ -15,7 +15,8 @@ import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
 import { useUserPreferences } from "@/features/preferences";
-import { useTouchGestures, usePerformanceMonitor } from "@/hooks";
+import { useTouchGestures } from "@/hooks/ui/useTouchGestures";
+import { usePerformanceMonitor } from "@/hooks/analytics/usePerformanceMonitor";
 
 
 const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));

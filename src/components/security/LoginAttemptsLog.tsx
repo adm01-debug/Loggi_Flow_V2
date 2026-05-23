@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAuth } from "@/hooks";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { 
   Activity, 
   Loader2,

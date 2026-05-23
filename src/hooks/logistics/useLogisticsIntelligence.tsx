@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useDashboardMetrics } from '@/hooks';
-import { useDelayPrediction } from '@/hooks';
+import { useDashboardMetrics } from "@/hooks/analytics/useDashboardMetrics";
+import { useDelayPrediction } from "@/hooks/logistics/useDelayPrediction";
 
 export function useLogisticsIntelligence() {
   const { data: metrics } = useDashboardMetrics();

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGamification } from "@/hooks";
+import { useGamification } from "@/hooks/gamification/useGamification";
 import { 
   Dialog, 
   DialogContent,

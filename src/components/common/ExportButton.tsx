@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Download, FileSpreadsheet, FileText, FileJson, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useExport } from "@/hooks";
+import { useExport } from "@/hooks/common/useExport";
 
 interface ExportButtonProps {
   data: Record<string, unknown>[];

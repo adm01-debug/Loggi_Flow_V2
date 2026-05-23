@@ -12,7 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks';
+import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
 import type jsPDF from 'jspdf';
 

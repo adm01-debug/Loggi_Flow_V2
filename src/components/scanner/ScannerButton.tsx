@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { QRScannerModal } from "./QRScannerModal";
-import { ScanResult } from "@/hooks";
+import { ScanResult } from "@/hooks/ui/useQRScanner";
 import { toast } from "sonner";
 
 interface ScannerButtonProps {

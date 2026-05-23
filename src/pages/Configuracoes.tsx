@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { useConfirmExit, useIntegrationValidation, useNotificationPreferences, type NotificationPreferences } from "@/hooks";
+import { useConfirmExit } from "@/hooks/common/useConfirmExit";
+import { useIntegrationValidation } from "@/hooks/security/useIntegrationValidation";
+import { useNotificationPreferences } from "@/hooks/notifications/useNotificationPreferences";
+import { type NotificationPreferences } from "@/hooks";
 import { format } from "date-fns";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";

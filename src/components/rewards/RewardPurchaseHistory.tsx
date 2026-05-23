@@ -1,4 +1,4 @@
-import { useRewardPurchases } from '@/hooks';
+import { useRewardPurchases } from "@/hooks/gamification/useRewardPurchases";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ShoppingBag, Coins, Gift, Award, Crown, Coffee, Shirt, Mouse, Fuel, UtensilsCrossed, Package, Sparkles } from 'lucide-react';

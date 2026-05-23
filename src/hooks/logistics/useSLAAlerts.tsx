@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks';
+import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
 import { differenceInHours, parseISO, isPast, addHours } from 'date-fns';
 

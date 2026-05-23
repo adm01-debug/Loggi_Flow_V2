@@ -9,17 +9,17 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertTriangle, Bell, Plus, Trash2, DollarSign, MapPin, TrendingUp, CheckCircle2, XCircle, RefreshCw, ArrowUpDown, ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
-import { useCostAlerts } from '@/hooks';
-import { useSmartAlerts } from '@/hooks';
+import { useCostAlerts } from "@/hooks/logistics/useCostAlerts";
+import { useSmartAlerts } from "@/hooks/logistics/useSmartAlerts";
 import { cn } from '@/lib/utils';
 
 import { Pagination } from '@/components/common/Pagination';
 import { FilterBar } from '@/components/common/FilterBar';
 import { BulkActions } from '@/components/common/BulkActions';
-import { useSelection } from '@/hooks';
-import { usePagination } from '@/hooks';
-import { useFilters } from '@/hooks';
-import { useSorting } from '@/hooks';
+import { useSelection } from "@/hooks/common/useSelection";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useFilters } from "@/hooks/common/useFilters";
+import { useSorting } from "@/hooks/common/useSorting";
 
 const ESTADOS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks';
+import { useAuth } from "@/hooks/auth/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, XCircle, Activity } from 'lucide-react';
 import { SecurityScoreCard } from './SecurityScoreCard';

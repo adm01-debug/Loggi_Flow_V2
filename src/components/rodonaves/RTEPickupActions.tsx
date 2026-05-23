@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { useRodonavesTracking } from '@/hooks';
+import { useRodonavesTracking } from "@/hooks/logistics/useRodonavesTracking";
 import { Truck, CalendarDays, XCircle, RefreshCw, Search, Loader2, Calendar, MapPin, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 

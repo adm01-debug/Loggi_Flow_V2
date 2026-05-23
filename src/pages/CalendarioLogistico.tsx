@@ -3,7 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ChevronLeft, ChevronRight, Truck, Package, Clock, AlertTriangle, Loader2 } from "lucide-react";
-import { useLogisticsCalendar } from "@/hooks";
+import { useLogisticsCalendar } from "@/hooks/logistics/useLogisticsCalendar";
 import { cn } from "@/lib/utils";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
