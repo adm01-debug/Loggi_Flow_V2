@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { AchievementProvider } from "@/hooks";
+import { AchievementProvider } from "@/hooks/gamification/useAchievementNotifications";
 import { AchievementNotificationContainer } from "@/components/achievements/AchievementNotification";
-import { TimezoneProvider } from "@/hooks";
+import { TimezoneProvider } from "@/hooks/common/useTimezone";
 import { SessionTimeoutWarning } from "@/components/security/SessionTimeoutWarning";
 import { NewDeviceDetector } from "@/components/security/NewDeviceDetector";
 import { SecurityPushNotificationProvider } from "@/components/security/SecurityPushNotificationProvider";
