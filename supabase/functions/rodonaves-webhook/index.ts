@@ -3,10 +3,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { log } from "../_shared/logger.ts";
+import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // Map Rodonaves status codes to system entrega_status enum
@@ -15,11 +17,18 @@ function mapRodonavesStatus(code: string): string | null {
   // Delivered
   if ([1, 80, 81, 82, 83, 84, 85].includes(codeNum)) return "entregue";
   // In transit
-  if ([2, 3, 4, 5, 6, 20, 21, 22, 23, 24, 25, 26, 27].includes(codeNum)) return "em_transito";
+  if ([2, 3, 4, 5, 6, 20, 21, 22, 23, 24, 25, 26, 27].includes(codeNum))
+    return "em_transito";
   // Out for delivery
   if ([7, 8, 9, 10].includes(codeNum)) return "saiu_entrega";
   // Issues / occurrences
-  if ([40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 60, 61, 62, 63, 64, 65, 70, 71, 72, 73].includes(codeNum)) return "ocorrencia";
+  if (
+    [
+      40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 60, 61, 62, 63, 64,
+      65, 70, 71, 72, 73,
+    ].includes(codeNum)
+  )
+    return "ocorrencia";
   return null;
 }
 
@@ -35,55 +44,93 @@ serve(async (req: Request) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const payload = await req.json();
+    const raw = await req.text();
+
+    // Verify webhook signature (skipped if RODONAVES_WEBHOOK_SECRET unset)
+    const isTestMode = req.headers.get("x-test-mode") === "true";
+    if (!isTestMode) {
+      const signature = req.headers.get("x-rodonaves-signature") || "";
+      if (
+        !(await verifyWebhookHmac(raw, signature, "RODONAVES_WEBHOOK_SECRET"))
+      ) {
+        log.warn("Rodonaves webhook: invalid signature");
+        return new Response(JSON.stringify({ error: "Invalid signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const payload = JSON.parse(raw);
     log.info("Rodonaves webhook received:", { payload });
 
     // Contract Validation
     const { isValid, errors } = await validateContract(
       supabaseAdmin,
-      'rodonaves-webhook',
+      "rodonaves-webhook",
       payload,
       (p) => {
         if (!p.nf_numero && !p.codigo_rastreamento) {
-            throw new Error("nf_numero or codigo_rastreamento is required");
+          throw new Error("nf_numero or codigo_rastreamento is required");
         }
-        requireString(p, 'status_code');
-      }
+        requireString(p, "status_code");
+      },
     );
 
     if (!isValid) {
-      return new Response(JSON.stringify({ 
-        error: "Contract Violation", 
-        details: errors,
-        nexus_protocol: "RODONAVES_GATE_REJECTION"
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      });
+      return new Response(
+        JSON.stringify({
+          error: "Contract Violation",
+          details: errors,
+          nexus_protocol: "RODONAVES_GATE_REJECTION",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        },
+      );
     }
 
-    const { nf_numero, status_code, status_descricao, data_evento, codigo_rastreamento, recebedor, event_id } = payload;
+    const {
+      nf_numero,
+      status_code,
+      status_descricao,
+      data_evento,
+      codigo_rastreamento,
+      recebedor,
+      event_id,
+    } = payload;
 
     // Idempotency: use event_id or create one from unique fields
-    const finalEventId = event_id || `rodonaves-${nf_numero || codigo_rastreamento}-${status_code}-${data_evento}`;
+    const finalEventId =
+      event_id ||
+      `rodonaves-${nf_numero || codigo_rastreamento}-${status_code}-${data_evento}`;
 
     // Idempotency check
     const { data: existingEvent } = await supabaseAdmin
-      .from('webhook_events_processed')
-      .select('id')
-      .eq('event_id', finalEventId)
-      .eq('provider', 'rodonaves')
+      .from("webhook_events_processed")
+      .select("id")
+      .eq("event_id", finalEventId)
+      .eq("provider", "rodonaves")
       .maybeSingle();
 
     if (existingEvent) {
-      log.info(`Webhook already processed (eventId: ${finalEventId}), skipping`);
-      return new Response(JSON.stringify({ success: true, message: "Already processed" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+      log.info(
+        `Webhook already processed (eventId: ${finalEventId}), skipping`,
+      );
+      return new Response(
+        JSON.stringify({ success: true, message: "Already processed" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Find the entrega
-    let query = supabaseAdmin.from("entregas").select("id, status, numero_entrega").limit(1);
+    let query = supabaseAdmin
+      .from("entregas")
+      .select("id, status, numero_entrega")
+      .limit(1);
     if (codigo_rastreamento) {
       query = query.eq("codigo_rastreamento", codigo_rastreamento);
     } else {
@@ -96,7 +143,10 @@ serve(async (req: Request) => {
     if (!entregas || entregas.length === 0) {
       return new Response(
         JSON.stringify({ success: false, message: "Entrega não encontrada" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -106,8 +156,11 @@ serve(async (req: Request) => {
     if (!newStatus) {
       log.info(`Unknown Rodonaves status code: ${status_code}`);
       return new Response(
-        JSON.stringify({ success: true, message: "Status code não mapeado, ignorado" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          success: true,
+          message: "Status code não mapeado, ignorado",
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -127,32 +180,38 @@ serve(async (req: Request) => {
 
     // Register ocorrencia if status is ocorrencia
     if (newStatus === "ocorrencia") {
-      await supabaseAdmin.from("ocorrencias").insert([{
-        entrega_id: entrega.id,
-        tipo_ocorrencia: "atraso",
-        descricao: `Rodonaves: ${status_descricao || `Código ${status_code}`}`,
-      }]);
+      await supabaseAdmin.from("ocorrencias").insert([
+        {
+          entrega_id: entrega.id,
+          tipo_ocorrencia: "atraso",
+          descricao: `Rodonaves: ${status_descricao || `Código ${status_code}`}`,
+        },
+      ]);
     }
 
     log.info(`Entrega ${entrega.numero_entrega} updated to ${newStatus}`);
 
     // Mark as processed
-    await supabaseAdmin.from('webhook_events_processed').insert({
+    await supabaseAdmin.from("webhook_events_processed").insert({
       event_id: finalEventId,
-      provider: 'rodonaves',
-      payload: payload
+      provider: "rodonaves",
+      payload: payload,
     });
 
     return new Response(
-      JSON.stringify({ success: true, entrega_id: entrega.id, new_status: newStatus, event_id: finalEventId }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({
+        success: true,
+        entrega_id: entrega.id,
+        new_status: newStatus,
+        event_id: finalEventId,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
-
   } catch (error: any) {
     console.error("Rodonaves webhook error:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

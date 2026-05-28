@@ -43,9 +43,9 @@ export function AIAssistant() {
           if (content) {
             currentContent += content;
             setMessages(prev => {
-              const newMessages = [...prev];
-              newMessages[newMessages.length - 1].content = currentContent;
-              return newMessages;
+              if (prev.length === 0) return prev;
+              const lastIndex = prev.length - 1;
+              return prev.map((msg, i) => (i === lastIndex ? { ...msg, content: currentContent } : msg));
             });
           }
         } catch { /* ignore chunk error */ }

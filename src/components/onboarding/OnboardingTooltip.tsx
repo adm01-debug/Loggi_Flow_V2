@@ -18,6 +18,16 @@ interface OnboardingTooltipProps {
 
 const DISMISSED_TOOLTIPS_KEY = 'loggi-flow-dismissed-tooltips';
 
+function readDismissedTooltips(): string[] {
+  try {
+    const dismissed = localStorage.getItem(DISMISSED_TOOLTIPS_KEY);
+    const parsed = dismissed ? JSON.parse(dismissed) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export function OnboardingTooltip({
   id,
   title,
@@ -34,9 +44,8 @@ export function OnboardingTooltip({
 
   useEffect(() => {
     // Check if tooltip was already dismissed
-    const dismissed = localStorage.getItem(DISMISSED_TOOLTIPS_KEY);
-    const dismissedList: string[] = dismissed ? JSON.parse(dismissed) : [];
-    
+    const dismissedList = readDismissedTooltips();
+
     if (showOnce && dismissedList.includes(id)) {
       setIsDismissed(true);
       return;
@@ -55,9 +64,8 @@ export function OnboardingTooltip({
     setIsDismissed(true);
 
     if (showOnce) {
-      const dismissed = localStorage.getItem(DISMISSED_TOOLTIPS_KEY);
-      const dismissedList: string[] = dismissed ? JSON.parse(dismissed) : [];
-      dismissedList.push(id);
+      const dismissedList = readDismissedTooltips();
+      if (!dismissedList.includes(id)) dismissedList.push(id);
       localStorage.setItem(DISMISSED_TOOLTIPS_KEY, JSON.stringify(dismissedList));
     }
   };

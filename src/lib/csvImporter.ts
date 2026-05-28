@@ -13,42 +13,45 @@ export interface ImportResult<T> {
   total: number;
 }
 
+function collectRowErrors(error: unknown, rowNumber: number): ImportError[] {
+  if (error instanceof z.ZodError) {
+    return error.errors.map((err) => ({
+      row: rowNumber,
+      field: err.path.join('.') || 'row',
+      error: err.message,
+    }));
+  }
+  return [{
+    row: rowNumber,
+    field: 'row',
+    error: error instanceof Error ? error.message : 'Unknown error',
+  }];
+}
+
 export async function importCSV<T>(
   file: File,
   schema: z.ZodSchema<T>,
   options?: { skipFirstRow?: boolean; delimiter?: string }
 ): Promise<ImportResult<T>> {
-  return new Promise((resolve) => {
-    Papa.parse(file, {
+  return new Promise((resolve, reject) => {
+    Papa.parse<Record<string, unknown>>(file, {
       header: true,
       skipEmptyLines: true,
       delimiter: options?.delimiter ?? ',',
       transformHeader: (header) => header.trim().toLowerCase().replace(/\s+/g, '_'),
+      error: (error) => reject(error),
       complete: (results) => {
         const success: T[] = [];
         const errors: ImportError[] = [];
-        
-        results.data.forEach((row: any, index: number) => {
-          try {
-            // Attempt to parse/validate the row
-            const validated = schema.parse(row);
-            success.push(validated);
-          } catch (error) {
-            if (error instanceof z.ZodError) {
-              error.errors.forEach((err) => {
-                errors.push({ 
-                  row: index + 2, 
-                  field: err.path.join('.') || 'row', 
-                  error: err.message 
-                });
-              });
-            } else {
-              errors.push({ 
-                row: index + 2, 
-                field: 'row', 
-                error: error instanceof Error ? error.message : 'Unknown error' 
-              });
-            }
+
+        results.data.forEach((row, index) => {
+          // +2 accounts for the header row and 1-based numbering for users.
+          const rowNumber = index + 2;
+          const parsed = schema.safeParse(row);
+          if (parsed.success) {
+            success.push(parsed.data);
+          } else {
+            errors.push(...collectRowErrors(parsed.error, rowNumber));
           }
         });
 
@@ -66,8 +69,10 @@ export function generateCSVTemplate(columns: { key: string; label: string; examp
 
 export function downloadCSV(data: string, filename: string) {
   const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
+  link.href = url;
   link.download = `${filename}.csv`;
   link.click();
+  URL.revokeObjectURL(url);
 }
