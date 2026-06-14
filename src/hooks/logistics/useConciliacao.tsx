@@ -116,6 +116,7 @@ export function useConciliacao() {
         .select(
           "id, numero_entrega, created_at, valor_frete, transportadora:transportadoras(nome_fantasia)",
         )
+        .is("deleted_at", null)
         .not("valor_frete", "is", null);
 
       if (selectedConciliacao.periodo_inicio) {
@@ -125,9 +126,9 @@ export function useConciliacao() {
         query = query.lte("created_at", selectedConciliacao.periodo_fim);
       }
 
-      const { data, error } = await query.order("created_at", {
-        ascending: false,
-      });
+      const { data, error } = await query
+        .order("created_at", { ascending: false })
+        .limit(2000);
       if (error) throw error;
 
       return (data || []).map((e: EntregaRaw) => ({

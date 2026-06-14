@@ -84,9 +84,10 @@ export function useAnalytics(dateRange?: DateRange) {
       const { data: entregas } = await supabase
         .from("entregas")
         .select("endereco_entrega, created_at")
+        .is("deleted_at", null)
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString())
-        .limit(500); // Reduced limit for performance
+        .limit(500);
 
       const patterns: Record<string, Record<number, number>> = {};
 

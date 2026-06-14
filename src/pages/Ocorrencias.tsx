@@ -150,6 +150,7 @@ export default function Ocorrencias() {
       const { data } = await supabase
         .from("coletas")
         .select("id, numero_coleta")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(50);
       return data || [];
@@ -161,6 +162,7 @@ export default function Ocorrencias() {
       const { data } = await supabase
         .from("entregas")
         .select("id, numero_entrega")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(50);
       return data || [];
