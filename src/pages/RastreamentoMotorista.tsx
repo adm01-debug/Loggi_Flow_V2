@@ -56,6 +56,7 @@ export default function RastreamentoMotorista() {
         .select(
           "id, numero_coleta, codigo_rastreamento, fornecedor:fornecedores(razao_social)",
         )
+        .is("deleted_at", null)
         .eq("tipo_coleta", "lalamove")
         .not("codigo_rastreamento", "is", null)
         .order("created_at", { ascending: false })

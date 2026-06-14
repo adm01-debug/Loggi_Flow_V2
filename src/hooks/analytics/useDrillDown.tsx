@@ -35,7 +35,12 @@ export function useDrillDown() {
   const openDrillDown = useCallback(async (params: DrillDownParams) => {
     setIsOpen(true);
     setIsLoading(true);
-    setData({ title: params.title, category: params.category, value: params.value, items: [] });
+    setData({
+      title: params.title,
+      category: params.category,
+      value: params.value,
+      items: [],
+    });
 
     try {
       let dateStart: string | undefined;
@@ -58,42 +63,68 @@ export function useDrillDown() {
       let rawItems: Record<string, unknown>[] = [];
 
       if (params.category === "coletas") {
-        let query = supabase.from("coletas").select("*");
+        let query = supabase.from("coletas").select("*").is("deleted_at", null);
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
-        if (params.filter?.transportadora_id) query = query.eq("transportadora_id", params.filter.transportadora_id);
-        const { data: result, error } = await query.order("created_at", { ascending: false }).limit(100);
+        if (params.filter?.transportadora_id)
+          query = query.eq(
+            "transportadora_id",
+            params.filter.transportadora_id,
+          );
+        const { data: result, error } = await query
+          .order("created_at", { ascending: false })
+          .limit(100);
         if (error) throw error;
         rawItems = (result || []) as Record<string, unknown>[];
       } else if (params.category === "entregas") {
-        let query = supabase.from("entregas").select("*");
+        let query = supabase
+          .from("entregas")
+          .select("*")
+          .is("deleted_at", null);
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
-        if (params.filter?.transportadora_id) query = query.eq("transportadora_id", params.filter.transportadora_id);
-        const { data: result, error } = await query.order("created_at", { ascending: false }).limit(100);
+        if (params.filter?.transportadora_id)
+          query = query.eq(
+            "transportadora_id",
+            params.filter.transportadora_id,
+          );
+        const { data: result, error } = await query
+          .order("created_at", { ascending: false })
+          .limit(100);
         if (error) throw error;
         rawItems = (result || []) as Record<string, unknown>[];
       } else {
-        let query = supabase.from("fretes_internos").select("*");
+        let query = supabase
+          .from("fretes_internos")
+          .select("*")
+          .is("deleted_at", null);
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
-        const { data: result, error } = await query.order("created_at", { ascending: false }).limit(100);
+        const { data: result, error } = await query
+          .order("created_at", { ascending: false })
+          .limit(100);
         if (error) throw error;
         rawItems = (result || []) as Record<string, unknown>[];
       }
 
       // Filter by status in memory if provided
       if (params.filter?.status) {
-        rawItems = rawItems.filter((item) => item.status === params.filter?.status);
+        rawItems = rawItems.filter(
+          (item) => item.status === params.filter?.status,
+        );
       }
 
       // Map items to common format
       const mappedItems = rawItems.map((item) => ({
         id: item.id as string,
-        numero: (item.numero_coleta || item.numero_entrega || item.id) as string,
+        numero: (item.numero_coleta ||
+          item.numero_entrega ||
+          item.id) as string,
         status: item.status as string,
         created_at: item.created_at as string,
-        endereco: (item.endereco_coleta || item.endereco_entrega || item.destino) as string,
+        endereco: (item.endereco_coleta ||
+          item.endereco_entrega ||
+          item.destino) as string,
         ...item,
       }));
 

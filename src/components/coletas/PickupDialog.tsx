@@ -117,10 +117,14 @@ export function PickupDialog({
   const fetchDropdowns = async () => {
     const { data: forn } = await supabase
       .from("fornecedores")
-      .select("id, nome_fantasia, razao_social");
+      .select("id, nome_fantasia, razao_social")
+      .is("deleted_at", null)
+      .limit(500);
     const { data: trans } = await supabase
       .from("transportadoras")
-      .select("id, nome_fantasia");
+      .select("id, nome_fantasia")
+      .is("deleted_at", null)
+      .limit(200);
     if (forn) setFornecedores(forn);
     if (trans) setTransportadoras(trans);
   };

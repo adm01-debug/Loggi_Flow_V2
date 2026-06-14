@@ -123,7 +123,9 @@ export default function FreightConfig() {
       const { data, error } = await supabase
         .from("transportadoras")
         .select("*")
-        .order("nome_fantasia");
+        .is("deleted_at", null)
+        .order("nome_fantasia")
+        .limit(200);
       if (error) throw error;
       return (data || []) as any;
     },

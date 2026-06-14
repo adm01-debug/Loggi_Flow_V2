@@ -34,8 +34,10 @@ export default function RotasTransportadoras() {
       const { data, error } = await supabase
         .from("transportadoras")
         .select("id, nome_fantasia")
+        .is("deleted_at", null)
         .eq("homologada", true)
-        .order("nome_fantasia");
+        .order("nome_fantasia")
+        .limit(200);
 
       if (error) throw error;
       return data;
