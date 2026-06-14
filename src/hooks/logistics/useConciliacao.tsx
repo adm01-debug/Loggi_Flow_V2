@@ -189,7 +189,7 @@ export function useConciliacao() {
 
         const { error: insertError } = await supabase
           .from("conciliacao_itens_importados")
-          .insert(items);
+          .insert(items as never[]);
         if (insertError) throw insertError;
 
         const totalImportado = items.reduce((sum, item) => sum + item.valor, 0);

@@ -286,20 +286,22 @@ export default function KanbanEntregas() {
     }) => {
       const { error, count } = await supabase
         .from("entregas")
-        .update({
-          status,
-          updated_at: new Date().toISOString(),
-          version: version + 1,
-          ...(status === "entregue"
-            ? { data_entrega_efetiva: new Date().toISOString() }
-            : {}),
-          ...(status === "despachado"
-            ? { data_despacho: new Date().toISOString() }
-            : {}),
-        })
+        .update(
+          {
+            status,
+            updated_at: new Date().toISOString(),
+            version: version + 1,
+            ...(status === "entregue"
+              ? { data_entrega_efetiva: new Date().toISOString() }
+              : {}),
+            ...(status === "despachado"
+              ? { data_despacho: new Date().toISOString() }
+              : {}),
+          },
+          { count: "exact" },
+        )
         .eq("id", id)
-        .eq("version", version)
-        .select("id", { count: "exact", head: true });
+        .eq("version", version);
       if (error) throw error;
       if (count === 0)
         throw new Error(
