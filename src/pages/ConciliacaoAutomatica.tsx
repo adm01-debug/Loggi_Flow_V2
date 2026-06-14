@@ -67,8 +67,10 @@ export default function ConciliacaoAutomatica() {
           transportadora:transportadoras (nome_fantasia)
         `,
         )
+        .is("deleted_at", null)
         .not("valor_frete", "is", null)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(2000);
       if (error) throw error;
       return data;
     },

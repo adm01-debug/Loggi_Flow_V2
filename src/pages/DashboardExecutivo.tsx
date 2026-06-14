@@ -71,14 +71,18 @@ export default function DashboardExecutivo() {
           .select(
             "status, valor_frete, previsao_entrega, data_entrega_efetiva, created_at, transportadora_id",
           )
-          .gte("created_at", thisMonth.toISOString()),
+          .is("deleted_at", null)
+          .gte("created_at", thisMonth.toISOString())
+          .limit(2000),
         supabase
           .from("entregas")
           .select(
             "status, valor_frete, previsao_entrega, data_entrega_efetiva, created_at",
           )
+          .is("deleted_at", null)
           .gte("created_at", lastMonth.toISOString())
-          .lte("created_at", endLastMonth.toISOString()),
+          .lte("created_at", endLastMonth.toISOString())
+          .limit(2000),
       ]);
       return { current: current.data || [], previous: previous.data || [] };
     },
@@ -94,7 +98,9 @@ export default function DashboardExecutivo() {
         .select(
           "status, qtd_volumes, qtd_recebida, divergencia_percentual, created_at",
         )
-        .gte("created_at", thisMonth.toISOString());
+        .is("deleted_at", null)
+        .gte("created_at", thisMonth.toISOString())
+        .limit(1000);
       return data || [];
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
@@ -107,7 +113,8 @@ export default function DashboardExecutivo() {
       const { data } = await supabase
         .from("ocorrencias")
         .select("tipo_ocorrencia, resolvida, created_at")
-        .gte("created_at", thisMonth.toISOString());
+        .gte("created_at", thisMonth.toISOString())
+        .limit(500);
       return data || [];
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,

@@ -171,14 +171,16 @@ export default function Fornecedores() {
         .from("fornecedores")
         .select("*")
         .is("deleted_at", null)
-        .order("razao_social");
+        .order("razao_social")
+        .limit(1000);
 
       if (error) throw error;
 
       const { data: coletas } = await supabase
         .from("coletas")
         .select("fornecedor_id, status, created_at")
-        .is("deleted_at", null);
+        .is("deleted_at", null)
+        .limit(2000);
 
       return (data || []).map((f) => {
         const fc = coletas?.filter((c) => c.fornecedor_id === f.id) || [];
@@ -225,20 +227,18 @@ export default function Fornecedores() {
 
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
-      const { error } = await supabase
-        .from("fornecedores")
-        .insert({
-          razao_social: d.razao_social,
-          nome_fantasia: d.nome_fantasia || null,
-          cnpj: d.cnpj || null,
-          endereco_completo: d.endereco_completo,
-          cidade: d.cidade || null,
-          estado: d.estado || null,
-          cep: d.cep || null,
-          contato_nome: d.contato_nome || null,
-          contato_email: d.contato_email || null,
-          contato_telefone: d.contato_telefone || null,
-        });
+      const { error } = await supabase.from("fornecedores").insert({
+        razao_social: d.razao_social,
+        nome_fantasia: d.nome_fantasia || null,
+        cnpj: d.cnpj || null,
+        endereco_completo: d.endereco_completo,
+        cidade: d.cidade || null,
+        estado: d.estado || null,
+        cep: d.cep || null,
+        contato_nome: d.contato_nome || null,
+        contato_email: d.contato_email || null,
+        contato_telefone: d.contato_telefone || null,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
