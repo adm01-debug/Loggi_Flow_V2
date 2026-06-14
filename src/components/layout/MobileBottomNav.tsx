@@ -1,10 +1,29 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, LayoutDashboard, Package, Truck, Trophy, Menu, X,
-  BarChart3, Settings, Bell, DollarSign, Calculator,
-  Users, Shield, Map, Send, Box, AlertTriangle,
-  PackageSearch, Target, Building2, FileCheck, Search,
+import {
+  ArrowLeft,
+  LayoutDashboard,
+  Package,
+  Truck,
+  Trophy,
+  Menu,
+  X,
+  BarChart3,
+  Settings,
+  Bell,
+  DollarSign,
+  Calculator,
+  Users,
+  Shield,
+  Map,
+  Send,
+  Box,
+  AlertTriangle,
+  PackageSearch,
+  Target,
+  Building2,
+  FileCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -45,7 +64,11 @@ const moreCategories: NavCategory[] = [
       { icon: Send, label: "Despachos", path: "/despachos" },
       { icon: Box, label: "BOX", path: "/gestao-box" },
       { icon: AlertTriangle, label: "Ocorrências", path: "/ocorrencias" },
-      { icon: PackageSearch, label: "Rastreamento", path: "/central-rastreamento" },
+      {
+        icon: PackageSearch,
+        label: "Rastreamento",
+        path: "/central-rastreamento",
+      },
     ],
   },
   {
@@ -95,7 +118,7 @@ export function MobileBottomNav() {
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50 md:hidden",
           "bg-background/80 backdrop-blur-xl border-t border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]",
-          "pb-[env(safe-area-inset-bottom)]"
+          "pb-[env(safe-area-inset-bottom)]",
         )}
         role="navigation"
         aria-label="Mobile navigation"
@@ -104,7 +127,7 @@ export function MobileBottomNav() {
           {/* Dynamic Mobile Back/Home Button */}
           <button
             onClick={() => {
-              hapticFeedback('medium');
+              hapticFeedback("medium");
               if (canGoBack) {
                 goBack();
               } else {
@@ -113,7 +136,9 @@ export function MobileBottomNav() {
             }}
             className={cn(
               "flex flex-col items-center justify-center flex-1 py-2 px-1 relative transition-all duration-300 active:scale-90",
-              !canGoBack && location.pathname === "/" ? "text-primary" : "text-muted-foreground"
+              !canGoBack && location.pathname === "/"
+                ? "text-primary"
+                : "text-muted-foreground",
             )}
           >
             <motion.div
@@ -125,7 +150,14 @@ export function MobileBottomNav() {
               {canGoBack ? (
                 <ArrowLeft className="w-5 h-5" />
               ) : (
-                <LayoutDashboard className={cn("w-5 h-5", location.pathname === "/" ? "text-primary" : "text-muted-foreground")} />
+                <LayoutDashboard
+                  className={cn(
+                    "w-5 h-5",
+                    location.pathname === "/"
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                  )}
+                />
               )}
             </motion.div>
             <span className="text-[10px] mt-1 font-bold uppercase tracking-tighter">
@@ -139,12 +171,12 @@ export function MobileBottomNav() {
               <NavLink
                 key={item.path}
                 to={item.path}
-                onClick={() => hapticFeedback('light')}
+                onClick={() => hapticFeedback("light")}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 py-2 px-1 relative",
                   "transition-all duration-300",
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-lg",
-                  "active:scale-90"
+                  "active:scale-90",
                 )}
                 aria-current={active ? "page" : undefined}
               >
@@ -156,7 +188,11 @@ export function MobileBottomNav() {
                       initial={{ opacity: 0, scaleX: 0 }}
                       animate={{ opacity: 1, scaleX: 1 }}
                       exit={{ opacity: 0, scaleX: 0 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
                     />
                   )}
                 </AnimatePresence>
@@ -171,7 +207,7 @@ export function MobileBottomNav() {
                   <item.icon
                     className={cn(
                       "w-5 h-5 transition-colors",
-                      active ? "text-primary" : "text-muted-foreground"
+                      active ? "text-primary" : "text-muted-foreground",
                     )}
                   />
                 </motion.div>
@@ -179,7 +215,7 @@ export function MobileBottomNav() {
                 <span
                   className={cn(
                     "text-[10px] mt-1 font-bold uppercase tracking-tighter transition-colors",
-                    active ? "text-primary" : "text-muted-foreground"
+                    active ? "text-primary" : "text-muted-foreground",
                   )}
                 >
                   {item.label}
@@ -201,7 +237,7 @@ export function MobileBottomNav() {
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 py-2 px-1",
                   "transition-all duration-200 rounded-lg",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset",
                 )}
                 aria-label="Mais opções"
               >
@@ -215,15 +251,20 @@ export function MobileBottomNav() {
                     <Menu className="w-5 h-5 text-muted-foreground" />
                   )}
                 </motion.div>
-                <span className={cn(
-                  "text-[10px] mt-1 font-medium",
-                  isMoreOpen ? "text-primary" : "text-muted-foreground"
-                )}>
+                <span
+                  className={cn(
+                    "text-[10px] mt-1 font-medium",
+                    isMoreOpen ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
                   Mais
                 </span>
               </button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[75vh] rounded-t-3xl overflow-hidden flex flex-col p-0 border-t-2 border-primary/20">
+            <SheetContent
+              side="bottom"
+              className="h-[75vh] rounded-t-3xl overflow-hidden flex flex-col p-0 border-t-2 border-primary/20"
+            >
               <div className="w-12 h-1.5 bg-muted rounded-full mx-auto my-3 shrink-0" />
               <div className="flex-1 overflow-y-auto px-4 pb-10">
                 {moreCategories.map((cat) => (
@@ -240,11 +281,13 @@ export function MobileBottomNav() {
                           className={cn(
                             "flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
                             "hover:bg-accent active:scale-95",
-                            isActive(item.path) && "bg-primary/10 text-primary"
+                            isActive(item.path) && "bg-primary/10 text-primary",
                           )}
                         >
                           <item.icon className="w-5 h-5" />
-                          <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
+                          <span className="text-xs font-medium text-center leading-tight">
+                            {item.label}
+                          </span>
                         </NavLink>
                       ))}
                     </div>
@@ -257,7 +300,10 @@ export function MobileBottomNav() {
       </nav>
 
       {/* Spacer */}
-      <div className="h-[calc(4rem+env(safe-area-inset-bottom))] md:hidden" aria-hidden="true" />
+      <div
+        className="h-[calc(4rem+env(safe-area-inset-bottom))] md:hidden"
+        aria-hidden="true"
+      />
     </>
   );
 }

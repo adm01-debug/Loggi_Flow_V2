@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  FileText, 
-  AlertOctagon, 
-  CheckCircle2, 
-  Clock, 
+import {
+  FileText,
+  CheckCircle2,
+  Clock,
   ChevronRight,
   ShieldAlert,
   Search,
-  Plus
+  Plus,
 } from "lucide-react";
 import { IncidentReport } from "../types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,10 +21,13 @@ export function PostMortemDashboard() {
       severity: "high",
       status: "resolved",
       rootCause: "Subdimensionamento da Edge Function durante pico de demanda.",
-      actionItems: ["Migrar para cache distribuído", "Ajustar limites de memória da função"],
+      actionItems: [
+        "Migrar para cache distribuído",
+        "Ajustar limites de memória da função",
+      ],
       startTime: "2026-05-12T14:20:00Z",
       resolvedAt: "2026-05-12T15:05:00Z",
-      relatedTelemetryIds: ["TEL-123", "TEL-124"]
+      relatedTelemetryIds: ["TEL-123", "TEL-124"],
     },
     {
       id: "INC-2026-002",
@@ -34,10 +35,13 @@ export function PostMortemDashboard() {
       severity: "critical",
       status: "identified",
       rootCause: "Alteração não documentada no schema da API de rastreamento.",
-      actionItems: ["Implementar camada de validação de schema (Zod)", "Adicionar alerta de divergência de schema"],
+      actionItems: [
+        "Implementar camada de validação de schema (Zod)",
+        "Adicionar alerta de divergência de schema",
+      ],
       startTime: "2026-05-16T08:00:00Z",
-      relatedTelemetryIds: ["TEL-999"]
-    }
+      relatedTelemetryIds: ["TEL-999"],
+    },
   ]);
 
   const severityColors = {
@@ -52,7 +56,9 @@ export function PostMortemDashboard() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldAlert className="h-6 w-6 text-primary" />
-          <h2 className="text-xl font-bold">Central de Incidentes & Post-Mortems</h2>
+          <h2 className="text-xl font-bold">
+            Central de Incidentes & Post-Mortems
+          </h2>
         </div>
         <Button size="sm" className="gap-2">
           <Plus className="h-4 w-4" /> Novo Relatório
@@ -71,10 +77,15 @@ export function PostMortemDashboard() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className={severityColors[incident.severity]}>
+                    <Badge
+                      variant="outline"
+                      className={severityColors[incident.severity]}
+                    >
                       {incident.severity.toUpperCase()}
                     </Badge>
-                    <span className="text-xs font-mono text-muted-foreground">{incident.id}</span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {incident.id}
+                    </span>
                   </div>
                   <h3 className="text-lg font-bold group-hover:text-primary transition-colors">
                     {incident.title}
@@ -82,12 +93,19 @@ export function PostMortemDashboard() {
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      Início: {new Date(incident.startTime).toLocaleString('pt-BR')}
+                      Início:{" "}
+                      {new Date(incident.startTime).toLocaleString("pt-BR")}
                     </div>
                     {incident.resolvedAt && (
                       <div className="flex items-center gap-1 text-success">
                         <CheckCircle2 className="h-3 w-3" />
-                        Resolvido em {Math.round((new Date(incident.resolvedAt).getTime() - new Date(incident.startTime).getTime()) / 60000)}min
+                        Resolvido em{" "}
+                        {Math.round(
+                          (new Date(incident.resolvedAt).getTime() -
+                            new Date(incident.startTime).getTime()) /
+                            60000,
+                        )}
+                        min
                       </div>
                     )}
                   </div>
@@ -95,8 +113,12 @@ export function PostMortemDashboard() {
 
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden md:block">
-                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Status</p>
-                    <p className="text-sm font-black">{incident.status.toUpperCase()}</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                      Status
+                    </p>
+                    <p className="text-sm font-black">
+                      {incident.status.toUpperCase()}
+                    </p>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -107,13 +129,19 @@ export function PostMortemDashboard() {
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 flex items-center gap-1">
                     <Search className="h-3 w-3" /> Root Cause Analysis
                   </p>
-                  <p className="text-sm text-zinc-400 italic">"{incident.rootCause}"</p>
+                  <p className="text-sm text-zinc-400 italic">
+                    "{incident.rootCause}"
+                  </p>
                 </div>
               )}
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {incident.actionItems.map((item, i) => (
-                  <Badge key={i} variant="secondary" className="text-[10px] font-medium bg-primary/5 text-primary border-primary/20">
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="text-[10px] font-medium bg-primary/5 text-primary border-primary/20"
+                  >
                     Task: {item}
                   </Badge>
                 ))}
@@ -130,7 +158,8 @@ export function PostMortemDashboard() {
         <div>
           <h4 className="font-bold">Cultura Blameless</h4>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Nossos post-mortems focam na melhoria de processos e sistemas, não na atribuição de culpa individual.
+            Nossos post-mortems focam na melhoria de processos e sistemas, não
+            na atribuição de culpa individual.
           </p>
         </div>
       </div>

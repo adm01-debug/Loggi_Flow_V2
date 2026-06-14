@@ -1,22 +1,60 @@
 import * as React from "react";
-import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, GeolocateControl, Source, Layer } from "react-map-gl/mapbox";
+import Map, {
+  Marker,
+  NavigationControl,
+  FullscreenControl,
+  ScaleControl,
+  GeolocateControl,
+  Source,
+  Layer,
+} from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Truck, Package, Activity, Navigation2, Satellite, 
-  Search, AlertTriangle, CheckCircle2, Layers, Info, X, Zap, ExternalLink, Clock, Flame, Gauge, FileText, Download, Share2, RefreshCw, Star
+import {
+  Truck,
+  Package,
+  Activity,
+  Navigation2,
+  Satellite,
+  Search,
+  AlertTriangle,
+  CheckCircle2,
+  Layers,
+  Info,
+  X,
+  Zap,
+  Clock,
+  Gauge,
+  FileText,
+  RefreshCw,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useUnifiedTracking, UnifiedShipment } from "@/hooks/logistics/useUnifiedTracking";
+import {
+  useUnifiedTracking,
+  UnifiedShipment,
+} from "@/hooks/logistics/useUnifiedTracking";
 import { useMapWeatherSync } from "@/hooks/logistics/useMapWeatherSync";
 import { useBiometricAnomalies } from "@/hooks/logistics/useBiometricAnomalies";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MissionDetail } from "./MissionDetail";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { PerformanceChart } from "./PerformanceChart";
@@ -26,7 +64,7 @@ import { TacticalTerminal } from "../map/TacticalTerminal";
 import { CinematicHUD } from "../map/CinematicHUD";
 import { MapIntelligenceOverlay } from "../map/MapIntelligenceOverlay";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ";
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "";
 
 export function LogisticsMapWidget() {
   const { allShipments: shipments, summary, isLoading } = useUnifiedTracking();
@@ -34,50 +72,80 @@ export function LogisticsMapWidget() {
   const { data: anomalies = [] } = useBiometricAnomalies();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
-  const [selectedShipment, setSelectedShipment] = React.useState<UnifiedShipment | null>(null);
+  const [selectedShipment, setSelectedShipment] =
+    React.useState<UnifiedShipment | null>(null);
   const [showLayers, setShowLayers] = React.useState(false);
-  const [typeFilter, setTypeFilter] = React.useState<"all" | "entrega" | "coleta">("all");
+  const [typeFilter, setTypeFilter] = React.useState<
+    "all" | "entrega" | "coleta"
+  >("all");
   const [showMission, setShowMission] = React.useState(false);
   const [showHeatmap, setShowHeatmap] = React.useState(false);
   const [isOptimizing, setIsOptimizing] = React.useState(false);
   const [showPerformance, setShowPerformance] = React.useState(false);
   const [isExporting, setIsExporting] = React.useState(false);
   const [showAnomalies, setShowAnomalies] = React.useState(false);
-  const [timeTravelRange, setTimeTravelRange] = React.useState<[number, number]>([0, 24]);
-  
+  const [timeTravelRange, setTimeTravelRange] = React.useState<
+    [number, number]
+  >([0, 24]);
+
   const [viewState, setViewState] = React.useState({
     latitude: -23.5505,
     longitude: -46.6333,
-    zoom: 4
+    zoom: 4,
   });
 
-  const [mapStyle, setMapStyle] = React.useState<string>("mapbox://styles/mapbox/dark-v11");
+  const [mapStyle, setMapStyle] = React.useState<string>(
+    "mapbox://styles/mapbox/dark-v11",
+  );
 
   const filteredShipments = React.useMemo(() => {
-    return shipments.filter(s => {
-      const matchesSearch = s.numero.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           s.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            s.transportadora.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === "all" || 
-                           (statusFilter === "in_transit" && ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)) ||
-                           (statusFilter === "delayed" && s.atrasado) ||
-                           (statusFilter === "completed" && ["entregue", "finalizado", "recebido"].includes(s.status)) ||
-                           (statusFilter === "pending" && ["aguardando_producao", "pronto_despacho", "pendente", "cotacao_frete"].includes(s.status)) ||
-                           (statusFilter === "problems" && ["ocorrencia", "divergencia"].includes(s.status)) ||
-                           (statusFilter === "high_variance" && (s.atrasado || (s.valorFrete && s.valorFrete > 500) || s.status === "ocorrencia"));
+    return shipments.filter((s) => {
+      const matchesSearch =
+        s.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.transportadora.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "in_transit" &&
+          ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(
+            s.status,
+          )) ||
+        (statusFilter === "delayed" && s.atrasado) ||
+        (statusFilter === "completed" &&
+          ["entregue", "finalizado", "recebido"].includes(s.status)) ||
+        (statusFilter === "pending" &&
+          [
+            "aguardando_producao",
+            "pronto_despacho",
+            "pendente",
+            "cotacao_frete",
+          ].includes(s.status)) ||
+        (statusFilter === "problems" &&
+          ["ocorrencia", "divergencia"].includes(s.status)) ||
+        (statusFilter === "high_variance" &&
+          (s.atrasado ||
+            (s.valorFrete && s.valorFrete > 500) ||
+            s.status === "ocorrencia"));
 
       const matchesType = typeFilter === "all" || s.tipo === typeFilter;
-      
-      const sTime = s.previsao ? new Date(s.previsao).getHours() : 12;
-      const matchesTime = sTime >= timeTravelRange[0] && sTime <= timeTravelRange[1];
 
-      return s.coordinates && matchesSearch && matchesStatus && matchesType && matchesTime;
+      const sTime = s.previsao ? new Date(s.previsao).getHours() : 12;
+      const matchesTime =
+        sTime >= timeTravelRange[0] && sTime <= timeTravelRange[1];
+
+      return (
+        s.coordinates &&
+        matchesSearch &&
+        matchesStatus &&
+        matchesType &&
+        matchesTime
+      );
     });
   }, [shipments, searchTerm, statusFilter, typeFilter, timeTravelRange]);
 
-  const activeShipments = shipments.filter(s => 
-    ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status)
+  const activeShipments = shipments.filter((s) =>
+    ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(s.status),
   );
 
   // Focus on selected shipment
@@ -86,7 +154,7 @@ export function LogisticsMapWidget() {
       setViewState({
         latitude: selectedShipment.coordinates.lat,
         longitude: selectedShipment.coordinates.lng,
-        zoom: 12
+        zoom: 12,
       });
     }
   }, [selectedShipment]);
@@ -114,26 +182,29 @@ export function LogisticsMapWidget() {
                   Nexus Tracking Core
                 </CardTitle>
                 <CardDescription className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-2 flex items-center gap-2">
-                  <Activity className="w-3 h-3" /> Monitoramento Global em Tempo Real
+                  <Activity className="w-3 h-3" /> Monitoramento Global em Tempo
+                  Real
                 </CardDescription>
               </div>
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex bg-white/5 p-1 rounded-full border border-white/10">
                 {[
-                  { id: 'all', label: 'TODOS', icon: Activity },
-                  { id: 'in_transit', label: 'TRÂNSITO', icon: Truck },
-                  { id: 'delayed', label: 'ATRASADOS', icon: AlertTriangle },
-                  { id: 'completed', label: 'OK', icon: CheckCircle2 },
-                  { id: 'high_variance', label: 'VARIAÇÃO', icon: Star }
+                  { id: "all", label: "TODOS", icon: Activity },
+                  { id: "in_transit", label: "TRÂNSITO", icon: Truck },
+                  { id: "delayed", label: "ATRASADOS", icon: AlertTriangle },
+                  { id: "completed", label: "OK", icon: CheckCircle2 },
+                  { id: "high_variance", label: "VARIAÇÃO", icon: Star },
                 ].map((f) => (
                   <button
                     key={f.id}
                     onClick={() => setStatusFilter(f.id)}
                     className={cn(
                       "flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
-                      statusFilter === f.id ? "bg-primary text-white shadow-lg" : "text-white/40 hover:text-white/70"
+                      statusFilter === f.id
+                        ? "bg-primary text-white shadow-lg"
+                        : "text-white/40 hover:text-white/70",
                     )}
                   >
                     <f.icon className="w-3 h-3" />
@@ -144,7 +215,7 @@ export function LogisticsMapWidget() {
 
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
-                <Input 
+                <Input
                   placeholder="BUSCAR REMESSA..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -152,67 +223,101 @@ export function LogisticsMapWidget() {
                 />
               </div>
 
-               <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setMapStyle(prev => prev.includes("dark") ? "mapbox://styles/mapbox/satellite-v9" : "mapbox://styles/mapbox/dark-v11")}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setMapStyle((prev) =>
+                    prev.includes("dark")
+                      ? "mapbox://styles/mapbox/satellite-v9"
+                      : "mapbox://styles/mapbox/dark-v11",
+                  )
+                }
                 className="h-9 rounded-full bg-white/5 border-white/10 text-white hover:bg-white/10 gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2"
               >
-                {mapStyle.includes("dark") ? <Satellite className="w-3 h-3 text-primary" /> : <Activity className="w-3 h-3 text-primary" />}
+                {mapStyle.includes("dark") ? (
+                  <Satellite className="w-3 h-3 text-primary" />
+                ) : (
+                  <Activity className="w-3 h-3 text-primary" />
+                )}
                 {mapStyle.includes("dark") ? "Satélite" : "Tático"}
               </Button>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   setIsOptimizing(true);
-                  toast.promise(new Promise(r => setTimeout(r, 2000)), {
-                    loading: 'Calculando rotas neurais...',
-                    success: 'Logística otimizada via IA!',
-                    error: 'Falha na otimização',
+                  toast.promise(new Promise((r) => setTimeout(r, 2000)), {
+                    loading: "Calculando rotas neurais...",
+                    success: "Logística otimizada via IA!",
+                    error: "Falha na otimização",
                   });
                   setTimeout(() => setIsOptimizing(false), 2000);
                 }}
                 disabled={isOptimizing}
                 className={cn(
                   "h-9 rounded-full bg-primary/10 border-primary/20 text-primary gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
-                  isOptimizing && "animate-pulse"
+                  isOptimizing && "animate-pulse",
                 )}
               >
-                <Zap className={cn("w-3 h-3", isOptimizing && "fill-current")} />
+                <Zap
+                  className={cn("w-3 h-3", isOptimizing && "fill-current")}
+                />
                 {isOptimizing ? "Otimizando..." : "Auto-Otimizar"}
               </Button>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowPerformance(!showPerformance)}
                 className={cn(
                   "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
-                  showPerformance ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" : "bg-white/5"
+                  showPerformance
+                    ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]"
+                    : "bg-white/5",
                 )}
               >
-                <Gauge className={cn("w-3 h-3", showPerformance && "animate-spin-slow")} />
+                <Gauge
+                  className={cn(
+                    "w-3 h-3",
+                    showPerformance && "animate-spin-slow",
+                  )}
+                />
                 Performance
               </Button>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   setIsExporting(true);
                   setTimeout(() => {
                     setIsExporting(false);
-                    const csvContent = "data:text/csv;charset=utf-8,ID,Modulo,Nivel,Mensagem,Veiculo,Data\n" + 
-                      shipments.filter(s => {
-                        const sTime = s.previsao ? new Date(s.previsao).getHours() : 12;
-                        return sTime >= timeTravelRange[0] && sTime <= timeTravelRange[1];
-                      }).map(s => `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.previsao}`).join("\n");
+                    const csvContent =
+                      "data:text/csv;charset=utf-8,ID,Modulo,Nivel,Mensagem,Veiculo,Data\n" +
+                      shipments
+                        .filter((s) => {
+                          const sTime = s.previsao
+                            ? new Date(s.previsao).getHours()
+                            : 12;
+                          return (
+                            sTime >= timeTravelRange[0] &&
+                            sTime <= timeTravelRange[1]
+                          );
+                        })
+                        .map(
+                          (s) =>
+                            `${s.id},${s.numero},${s.status},${s.tipo},${s.valorFrete || 0},${s.previsao}`,
+                        )
+                        .join("\n");
                     const encodedUri = encodeURI(csvContent);
                     const link = document.createElement("a");
                     link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", `nexus_tactical_log_${new Date().toISOString().slice(0,10)}.csv`);
+                    link.setAttribute(
+                      "download",
+                      `nexus_tactical_log_${new Date().toISOString().slice(0, 10)}.csv`,
+                    );
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -222,30 +327,38 @@ export function LogisticsMapWidget() {
                 disabled={isExporting}
                 className="h-9 rounded-full bg-white/5 border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2"
               >
-                {isExporting ? <RefreshCw className="w-3 h-3 animate-spin" /> : <FileText className="w-3 h-3" />}
+                {isExporting ? (
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                ) : (
+                  <FileText className="w-3 h-3" />
+                )}
                 Exportar Logs
               </Button>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowAnomalies(true)}
                 className={cn(
                   "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
-                  anomalies.some(a => a.level === 'crit') ? "bg-red-500/20 border-red-500 animate-pulse" : "bg-white/5"
+                  anomalies.some((a) => a.level === "crit")
+                    ? "bg-red-500/20 border-red-500 animate-pulse"
+                    : "bg-white/5",
                 )}
               >
                 <AlertTriangle className="w-3 h-3" />
                 Anomalias ({anomalies.length})
               </Button>
 
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowLayers(!showLayers)}
                 className={cn(
                   "h-9 rounded-full border-white/10 text-white gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
-                  showLayers ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" : "bg-white/5"
+                  showLayers
+                    ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]"
+                    : "bg-white/5",
                 )}
               >
                 <Layers className="w-3 h-3" />
@@ -256,14 +369,16 @@ export function LogisticsMapWidget() {
             <div className="flex bg-white/5 p-2 rounded-2xl border border-white/10 w-full md:w-64 flex-col gap-2">
               <div className="flex justify-between text-[8px] font-black text-white/40 uppercase tracking-widest">
                 <span>Time-Travel</span>
-                <span>{timeTravelRange[0]}h - {timeTravelRange[1]}h</span>
+                <span>
+                  {timeTravelRange[0]}h - {timeTravelRange[1]}h
+                </span>
               </div>
               <div className="px-2">
-                <Slider 
-                  value={timeTravelRange} 
-                  onValueChange={(val: any) => setTimeTravelRange(val)} 
-                  max={24} 
-                  step={1} 
+                <Slider
+                  value={timeTravelRange}
+                  onValueChange={(val: any) => setTimeTravelRange(val)}
+                  max={24}
+                  step={1}
                   minStepsBetweenThumbs={1}
                 />
               </div>
@@ -282,10 +397,19 @@ export function LogisticsMapWidget() {
               >
                 <div className="flex justify-between items-center mb-8">
                   <div>
-                    <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">Nexus Performance Engine</h3>
-                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2">Métricas táticas em tempo real</p>
+                    <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">
+                      Nexus Performance Engine
+                    </h3>
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2">
+                      Métricas táticas em tempo real
+                    </p>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => setShowPerformance(false)} className="rounded-full text-white/40 hover:text-white">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowPerformance(false)}
+                    className="rounded-full text-white/40 hover:text-white"
+                  >
                     <X className="w-6 h-6" />
                   </Button>
                 </div>
@@ -294,41 +418,59 @@ export function LogisticsMapWidget() {
                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
                     <div className="flex items-center gap-3 mb-4 text-primary">
                       <Zap className="w-5 h-5" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Velocidade de Fluxo</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">
+                        Velocidade de Fluxo
+                      </span>
                     </div>
-                    <p className="text-4xl font-black text-white italic tracking-tighter">94.2%</p>
-                    <p className="text-[10px] font-bold text-success uppercase mt-2">↑ 2.4% vs ontem</p>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">
+                      94.2%
+                    </p>
+                    <p className="text-[10px] font-bold text-success uppercase mt-2">
+                      ↑ 2.4% vs ontem
+                    </p>
                   </div>
                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
                     <div className="flex items-center gap-3 mb-4 text-primary">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Taxa de Conclusão</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">
+                        Taxa de Conclusão
+                      </span>
                     </div>
-                    <p className="text-4xl font-black text-white italic tracking-tighter">98.8%</p>
-                    <p className="text-[10px] font-bold text-success uppercase mt-2">Nominal</p>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">
+                      98.8%
+                    </p>
+                    <p className="text-[10px] font-bold text-success uppercase mt-2">
+                      Nominal
+                    </p>
                   </div>
                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
                     <div className="flex items-center gap-3 mb-4 text-primary">
                       <Clock className="w-5 h-5" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">SLA Médio</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">
+                        SLA Médio
+                      </span>
                     </div>
-                    <p className="text-4xl font-black text-white italic tracking-tighter">1.4d</p>
-                    <p className="text-[10px] font-bold text-white/40 uppercase mt-2">Meta: 2.0d</p>
+                    <p className="text-4xl font-black text-white italic tracking-tighter">
+                      1.4d
+                    </p>
+                    <p className="text-[10px] font-bold text-white/40 uppercase mt-2">
+                      Meta: 2.0d
+                    </p>
                   </div>
                 </div>
 
                 <div className="h-[300px] w-full bg-white/5 rounded-[2rem] border border-white/10 p-6">
-                  <PerformanceChart 
-                    title="Análise de Vazão Logística" 
+                  <PerformanceChart
+                    title="Análise de Vazão Logística"
                     subtitle="Volume de remessas vs Capacidade de processamento"
                     data={[
-                      { name: '00h', v: 12, c: 80 },
-                      { name: '04h', v: 8, c: 80 },
-                      { name: '08h', v: 45, c: 90 },
-                      { name: '12h', v: 82, c: 95 },
-                      { name: '16h', v: 65, c: 90 },
-                      { name: '20h', v: 30, c: 85 },
-                      { name: '23h', v: 15, c: 80 },
+                      { name: "00h", v: 12, c: 80 },
+                      { name: "04h", v: 8, c: 80 },
+                      { name: "08h", v: 45, c: 90 },
+                      { name: "12h", v: 82, c: 95 },
+                      { name: "16h", v: 65, c: 90 },
+                      { name: "20h", v: 30, c: 85 },
+                      { name: "23h", v: 15, c: 80 },
                     ]}
                     dataKey="v"
                     secondaryDataKey="c"
@@ -340,54 +482,77 @@ export function LogisticsMapWidget() {
             )}
 
             {showLayers && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 className="absolute top-20 right-6 z-50 w-64 bg-black/90 backdrop-blur-3xl border border-white/10 rounded-3xl p-6 shadow-2xl space-y-6"
               >
                 <div className="flex justify-between items-center">
-                  <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Nexus Layer Engine</h4>
-                  <button onClick={() => setShowLayers(false)} className="text-white/40 hover:text-white"><X className="w-4 h-4" /></button>
+                  <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
+                    Nexus Layer Engine
+                  </h4>
+                  <button
+                    onClick={() => setShowLayers(false)}
+                    className="text-white/40 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Tipo de Fluxo</p>
+                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
+                      Tipo de Fluxo
+                    </p>
                     <div className="grid grid-cols-3 gap-2">
-                      {['all', 'entrega', 'coleta'].map((type) => (
+                      {["all", "entrega", "coleta"].map((type) => (
                         <button
                           key={type}
                           onClick={() => setTypeFilter(type as any)}
                           className={cn(
                             "h-8 rounded-xl border text-[8px] font-black uppercase transition-all",
-                            typeFilter === type ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/5 text-white/40 hover:text-white/60"
+                            typeFilter === type
+                              ? "bg-primary/20 border-primary text-primary"
+                              : "bg-white/5 border-white/5 text-white/40 hover:text-white/60",
                           )}
                         >
-                          {type === 'all' ? 'Tudo' : type}
+                          {type === "all" ? "Tudo" : type}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Filtros Táticos</p>
+                    <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
+                      Filtros Táticos
+                    </p>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { id: 'all', label: 'Global', icon: Activity },
-                        { id: 'in_transit', label: 'Transito', icon: Truck },
-                        { id: 'pending', label: 'Pendente', icon: Clock },
-                        { id: 'completed', label: 'Sucesso', icon: CheckCircle2 },
-                        { id: 'delayed', label: 'Atraso', icon: AlertTriangle },
-                        { id: 'problems', label: 'Crítico', icon: AlertTriangle },
-                        { id: 'high_variance', label: 'Variação', icon: Star },
+                        { id: "all", label: "Global", icon: Activity },
+                        { id: "in_transit", label: "Transito", icon: Truck },
+                        { id: "pending", label: "Pendente", icon: Clock },
+                        {
+                          id: "completed",
+                          label: "Sucesso",
+                          icon: CheckCircle2,
+                        },
+                        { id: "delayed", label: "Atraso", icon: AlertTriangle },
+                        {
+                          id: "problems",
+                          label: "Crítico",
+                          icon: AlertTriangle,
+                        },
+                        { id: "high_variance", label: "Variação", icon: Star },
                       ].map((f) => (
                         <button
                           key={f.id}
                           onClick={() => setStatusFilter(f.id)}
                           className={cn(
                             "flex items-center gap-2 p-2 rounded-xl border text-[8px] font-black uppercase transition-all",
-                            statusFilter === f.id ? "bg-primary/20 border-primary text-primary" : "bg-white/5 border-white/5 text-white/40 hover:text-white/60"
+                            statusFilter === f.id
+                              ? "bg-primary/20 border-primary text-primary"
+                              : "bg-white/5 border-white/5 text-white/40 hover:text-white/60",
                           )}
                         >
                           <f.icon className="w-3 h-3" />
@@ -409,12 +574,20 @@ export function LogisticsMapWidget() {
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-black/40 p-2.5 rounded-xl border border-white/5">
-                  <p className="text-[8px] font-bold text-white/40 uppercase tracking-tighter">Ativos</p>
-                  <p className="text-xl font-black text-white italic">{activeShipments.length}</p>
+                  <p className="text-[8px] font-bold text-white/40 uppercase tracking-tighter">
+                    Ativos
+                  </p>
+                  <p className="text-xl font-black text-white italic">
+                    {activeShipments.length}
+                  </p>
                 </div>
                 <div className="bg-black/40 p-2.5 rounded-xl border border-white/5">
-                  <p className="text-[8px] font-bold text-white/40 uppercase tracking-tighter">Filtrados</p>
-                  <p className="text-xl font-black text-primary italic">{filteredShipments.length}</p>
+                  <p className="text-[8px] font-bold text-white/40 uppercase tracking-tighter">
+                    Filtrados
+                  </p>
+                  <p className="text-xl font-black text-primary italic">
+                    {filteredShipments.length}
+                  </p>
                 </div>
               </div>
             </div>
@@ -426,25 +599,38 @@ export function LogisticsMapWidget() {
                   onClick={() => setSelectedShipment(s)}
                   className={cn(
                     "w-full text-left p-3 rounded-xl border transition-all duration-300 group/item",
-                    selectedShipment?.id === s.id 
-                      ? "bg-primary/20 border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)]" 
-                      : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20"
+                    selectedShipment?.id === s.id
+                      ? "bg-primary/20 border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)]"
+                      : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20",
                   )}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <span className="text-[10px] font-black text-white uppercase tracking-tighter">{s.numero}</span>
-                    <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", s.atrasado ? "bg-destructive" : "bg-success")} />
+                    <span className="text-[10px] font-black text-white uppercase tracking-tighter">
+                      {s.numero}
+                    </span>
+                    <div
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full animate-pulse",
+                        s.atrasado ? "bg-destructive" : "bg-success",
+                      )}
+                    />
                   </div>
-                  <p className="text-[9px] font-medium text-white/60 truncate uppercase">{s.cliente || s.transportadora}</p>
+                  <p className="text-[9px] font-medium text-white/60 truncate uppercase">
+                    {s.cliente || s.transportadora}
+                  </p>
                   <div className="mt-2 flex items-center justify-between">
-                    <Badge className={cn("text-[7px] font-black uppercase tracking-tighter h-4", 
-                      s.atrasado ? "bg-destructive" : "bg-primary")}>
+                    <Badge
+                      className={cn(
+                        "text-[7px] font-black uppercase tracking-tighter h-4",
+                        s.atrasado ? "bg-destructive" : "bg-primary",
+                      )}
+                    >
                       {s.statusLabel}
                     </Badge>
                     <div className="flex gap-2">
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
+                      <Button
+                        size="icon"
+                        variant="ghost"
                         className="h-6 w-6 text-white/40 hover:text-primary transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -454,7 +640,9 @@ export function LogisticsMapWidget() {
                       >
                         <Info className="w-3.5 h-3.5" />
                       </Button>
-                      <span className="text-[8px] font-bold text-white/40 italic">{s.tipo === 'entrega' ? 'ENT' : 'COL'}</span>
+                      <span className="text-[8px] font-bold text-white/40 italic">
+                        {s.tipo === "entrega" ? "ENT" : "COL"}
+                      </span>
                     </div>
                   </div>
                 </button>
@@ -462,7 +650,9 @@ export function LogisticsMapWidget() {
               {filteredShipments.length === 0 && (
                 <div className="text-center py-8 opacity-40">
                   <Package className="w-8 h-8 mx-auto mb-2 text-white" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-white">Nenhuma remessa encontrada</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-white">
+                    Nenhuma remessa encontrada
+                  </p>
                 </div>
               )}
             </div>
@@ -472,14 +662,20 @@ export function LogisticsMapWidget() {
           <div className="flex-1 rounded-[1.5rem] overflow-hidden border border-white/10 relative shadow-inner group/map">
             <Map
               {...viewState}
-              onMove={evt => setViewState(evt.viewState)}
+              onMove={(evt) => setViewState(evt.viewState)}
               mapStyle={mapStyle}
               mapboxAccessToken={MAPBOX_TOKEN}
               style={{ width: "100%", height: "100%" }}
-              terrain={{ source: 'mapbox-dem', exaggeration: 1.5 }}
+              terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
             >
-              <Source id="mapbox-dem" type="raster-dem" url="mapbox://mapbox.mapbox-terrain-dem-v1" tileSize={512} maxzoom={14} />
-              
+              <Source
+                id="mapbox-dem"
+                type="raster-dem"
+                url="mapbox://mapbox.mapbox-terrain-dem-v1"
+                tileSize={512}
+                maxzoom={14}
+              />
+
               <GeolocateControl position="top-right" />
               <NavigationControl position="top-right" />
               <FullscreenControl position="top-right" />
@@ -492,28 +688,44 @@ export function LogisticsMapWidget() {
                 data={{
                   type: "FeatureCollection",
                   features: shipments
-                    .filter(s => (s.atrasado || s.diasAtraso > 2) && s.coordinates)
-                    .map(s => ({
+                    .filter(
+                      (s) => (s.atrasado || s.diasAtraso > 2) && s.coordinates,
+                    )
+                    .map((s) => ({
                       type: "Feature",
-                      properties: { 
-                        severity: s.diasAtraso > 5 ? 'critical' : 'warning',
-                        dias: s.diasAtraso
+                      properties: {
+                        severity: s.diasAtraso > 5 ? "critical" : "warning",
+                        dias: s.diasAtraso,
                       },
                       geometry: {
                         type: "Point",
-                        coordinates: [s.coordinates!.lng, s.coordinates!.lat]
-                      }
-                    }))
+                        coordinates: [s.coordinates!.lng, s.coordinates!.lat],
+                      },
+                    })),
                 }}
               >
                 <Layer
                   id="variation-glow"
                   type="circle"
                   paint={{
-                    'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 8, 12, 25],
-                    'circle-color': ['match', ['get', 'severity'], 'critical', '#ef4444', '#f59e0b'],
-                    'circle-opacity': 0.4,
-                    'circle-blur': 1,
+                    "circle-radius": [
+                      "interpolate",
+                      ["linear"],
+                      ["zoom"],
+                      4,
+                      8,
+                      12,
+                      25,
+                    ],
+                    "circle-color": [
+                      "match",
+                      ["get", "severity"],
+                      "critical",
+                      "#ef4444",
+                      "#f59e0b",
+                    ],
+                    "circle-opacity": 0.4,
+                    "circle-blur": 1,
                   }}
                 />
               </Source>
@@ -526,34 +738,74 @@ export function LogisticsMapWidget() {
                   data={{
                     type: "FeatureCollection",
                     features: shipments
-                      .filter(s => s.atrasado && s.coordinates)
-                      .map(s => ({
+                      .filter((s) => s.atrasado && s.coordinates)
+                      .map((s) => ({
                         type: "Feature",
                         properties: { intensity: s.diasAtraso },
                         geometry: {
                           type: "Point",
-                          coordinates: [s.coordinates!.lng, s.coordinates!.lat]
-                        }
-                      }))
+                          coordinates: [s.coordinates!.lng, s.coordinates!.lat],
+                        },
+                      })),
                   }}
                 >
                   <Layer
                     id="heatmap-layer"
                     type="heatmap"
                     paint={{
-                      'heatmap-weight': ['interpolate', ['linear'], ['get', 'intensity'], 0, 0, 10, 1],
-                      'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 9, 3],
-                      'heatmap-color': [
-                        'interpolate', ['linear'], ['heatmap-density'],
-                        0, 'rgba(33,102,172,0)',
-                        0.2, 'rgb(103,169,207)',
-                        0.4, 'rgb(209,229,240)',
-                        0.6, 'rgb(253,219,199)',
-                        0.8, 'rgb(239,138,98)',
-                        1, 'rgb(178,24,43)'
+                      "heatmap-weight": [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "intensity"],
+                        0,
+                        0,
+                        10,
+                        1,
                       ],
-                      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 20],
-                      'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 9, 0]
+                      "heatmap-intensity": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        0,
+                        1,
+                        9,
+                        3,
+                      ],
+                      "heatmap-color": [
+                        "interpolate",
+                        ["linear"],
+                        ["heatmap-density"],
+                        0,
+                        "rgba(33,102,172,0)",
+                        0.2,
+                        "rgb(103,169,207)",
+                        0.4,
+                        "rgb(209,229,240)",
+                        0.6,
+                        "rgb(253,219,199)",
+                        0.8,
+                        "rgb(239,138,98)",
+                        1,
+                        "rgb(178,24,43)",
+                      ],
+                      "heatmap-radius": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        0,
+                        2,
+                        9,
+                        20,
+                      ],
+                      "heatmap-opacity": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        7,
+                        1,
+                        9,
+                        0,
+                      ],
                     }}
                   />
                 </Source>
@@ -565,7 +817,7 @@ export function LogisticsMapWidget() {
                   latitude={s.coordinates!.lat}
                   longitude={s.coordinates!.lng}
                   anchor="bottom"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.originalEvent.stopPropagation();
                     setSelectedShipment(s);
                   }}
@@ -573,28 +825,50 @@ export function LogisticsMapWidget() {
                   <div className="group/marker cursor-pointer relative">
                     {/* Variational Alert Rings */}
                     {(s.atrasado || (s.valorFrete && s.valorFrete > 500)) && (
-                      <div className={cn(
-                        "absolute -inset-8 rounded-full animate-ping",
-                        s.atrasado ? "bg-destructive/30" : "bg-primary/30"
-                      )} />
+                      <div
+                        className={cn(
+                          "absolute -inset-8 rounded-full animate-ping",
+                          s.atrasado ? "bg-destructive/30" : "bg-primary/30",
+                        )}
+                      />
                     )}
-                    <div className={cn(
-                      "absolute -inset-4 rounded-full animate-ping opacity-20",
-                      ["em_transito", "despachado", "saiu_entrega"].includes(s.status) ? "bg-primary" : 
-                      ["entregue", "finalizado", "recebido"].includes(s.status) ? "bg-success" : "bg-destructive"
-                    )} />
-                    
-                    <div className={cn(
-                      "relative p-2 rounded-xl border-2 shadow-2xl transition-all duration-500 group-hover/marker:scale-125 group-hover/marker:-translate-y-2",
-                      selectedShipment?.id === s.id ? "scale-125 -translate-y-2 border-white ring-4 ring-primary/30" : "border-primary/50",
-                      ["em_transito", "despachado", "saiu_entrega"].includes(s.status) ? "bg-black border-primary text-primary" : 
-                      ["entregue", "finalizado", "recebido"].includes(s.status) ? "bg-black border-success text-success" : "bg-black border-destructive text-destructive"
-                    )}>
+                    <div
+                      className={cn(
+                        "absolute -inset-4 rounded-full animate-ping opacity-20",
+                        ["em_transito", "despachado", "saiu_entrega"].includes(
+                          s.status,
+                        )
+                          ? "bg-primary"
+                          : ["entregue", "finalizado", "recebido"].includes(
+                                s.status,
+                              )
+                            ? "bg-success"
+                            : "bg-destructive",
+                      )}
+                    />
+
+                    <div
+                      className={cn(
+                        "relative p-2 rounded-xl border-2 shadow-2xl transition-all duration-500 group-hover/marker:scale-125 group-hover/marker:-translate-y-2",
+                        selectedShipment?.id === s.id
+                          ? "scale-125 -translate-y-2 border-white ring-4 ring-primary/30"
+                          : "border-primary/50",
+                        ["em_transito", "despachado", "saiu_entrega"].includes(
+                          s.status,
+                        )
+                          ? "bg-black border-primary text-primary"
+                          : ["entregue", "finalizado", "recebido"].includes(
+                                s.status,
+                              )
+                            ? "bg-black border-success text-success"
+                            : "bg-black border-destructive text-destructive",
+                      )}
+                    >
                       {s.atrasado ? (
                         <AlertTriangle className="w-5 h-5 animate-bounce" />
-                      ) : (s.valorFrete && s.valorFrete > 500) ? (
+                      ) : s.valorFrete && s.valorFrete > 500 ? (
                         <Star className="w-5 h-5 animate-pulse text-primary fill-primary" />
-                      ) : s.tipo === 'entrega' ? (
+                      ) : s.tipo === "entrega" ? (
                         <Truck className="w-5 h-5" />
                       ) : (
                         <Package className="w-5 h-5" />
@@ -605,25 +879,41 @@ export function LogisticsMapWidget() {
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 group-hover/marker:opacity-100 transition-opacity pointer-events-none z-50">
                       <div className="bg-black/90 border-2 border-primary/30 backdrop-blur-xl p-4 rounded-2xl shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] min-w-[220px]">
                         <div className="flex justify-between items-start mb-2">
-                          <p className="text-[10px] font-black uppercase text-primary tracking-widest">{s.numero}</p>
+                          <p className="text-[10px] font-black uppercase text-primary tracking-widest">
+                            {s.numero}
+                          </p>
                           <div className="flex gap-1">
-                            {s.atrasado && <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce uppercase">Atraso</Badge>}
-                            {(s.valorFrete && s.valorFrete > 500) && <Badge className="bg-primary text-[8px] font-black px-1 h-4 animate-pulse uppercase">Variação</Badge>}
+                            {s.atrasado && (
+                              <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce uppercase">
+                                Atraso
+                              </Badge>
+                            )}
+                            {s.valorFrete && s.valorFrete > 500 && (
+                              <Badge className="bg-primary text-[8px] font-black px-1 h-4 animate-pulse uppercase">
+                                Variação
+                              </Badge>
+                            )}
                           </div>
                         </div>
-                        <p className="text-sm font-black text-white mb-1 uppercase tracking-tighter italic">{s.cliente || 'CLIENTE NÃO INFORMADO'}</p>
-                        <p className="text-[9px] font-bold text-white/50 mb-3 uppercase tracking-widest">{s.transportadora}</p>
-                        
+                        <p className="text-sm font-black text-white mb-1 uppercase tracking-tighter italic">
+                          {s.cliente || "CLIENTE NÃO INFORMADO"}
+                        </p>
+                        <p className="text-[9px] font-bold text-white/50 mb-3 uppercase tracking-widest">
+                          {s.transportadora}
+                        </p>
+
                         <div className="h-px bg-white/10 mb-3" />
-                        
+
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-1.5">
                             <Activity className="w-3 h-3 text-primary" />
-                            <span className="text-[8px] font-black text-white uppercase">{s.statusLabel}</span>
+                            <span className="text-[8px] font-black text-white uppercase">
+                              {s.statusLabel}
+                            </span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               className="h-6 px-3 bg-primary text-[8px] font-black uppercase rounded-lg pointer-events-auto"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -642,31 +932,34 @@ export function LogisticsMapWidget() {
 
               {/* Rota Visualization if selected */}
               {selectedShipment?.coordinates && (
-                <Source 
-                  id="route" 
-                  type="geojson" 
+                <Source
+                  id="route"
+                  type="geojson"
                   data={{
-                    type: 'Feature',
+                    type: "Feature",
                     properties: {},
                     geometry: {
-                      type: 'LineString',
+                      type: "LineString",
                       coordinates: [
                         [-46.6333, -23.5505], // Mock origin (SP Central)
-                        [selectedShipment.coordinates.lng, selectedShipment.coordinates.lat]
-                      ]
-                    }
+                        [
+                          selectedShipment.coordinates.lng,
+                          selectedShipment.coordinates.lat,
+                        ],
+                      ],
+                    },
                   }}
                 >
                   <Layer
                     id="route-line"
                     type="line"
                     source="route"
-                    layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+                    layout={{ "line-join": "round", "line-cap": "round" }}
                     paint={{
-                      'line-color': '#9b87f5',
-                      'line-width': 4,
-                      'line-dasharray': [2, 2],
-                      'line-opacity': 0.6
+                      "line-color": "#9b87f5",
+                      "line-width": 4,
+                      "line-dasharray": [2, 2],
+                      "line-opacity": 0.6,
                     }}
                   />
                 </Source>
@@ -678,14 +971,20 @@ export function LogisticsMapWidget() {
               <div className="bg-black/60 backdrop-blur-xl border-2 border-white/10 p-5 rounded-[2rem] shadow-2xl pointer-events-auto">
                 <div className="flex items-center gap-4 mb-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-primary animate-ping" />
-                  <span className="text-[10px] font-black uppercase text-white/70 tracking-[0.3em]">Nexus Intelligence Grid</span>
+                  <span className="text-[10px] font-black uppercase text-white/70 tracking-[0.3em]">
+                    Nexus Intelligence Grid
+                  </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-white italic tracking-tighter">{activeShipments.length}</span>
-                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Fluxos em Trânsito</span>
+                  <span className="text-4xl font-black text-white italic tracking-tighter">
+                    {activeShipments.length}
+                  </span>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+                    Fluxos em Trânsito
+                  </span>
                 </div>
               </div>
-              
+
               {selectedShipment && (
                 <div className="bg-primary/10 backdrop-blur-xl border-2 border-primary/30 p-4 rounded-3xl shadow-2xl pointer-events-auto max-w-xs animate-in slide-in-from-bottom-4 duration-500">
                   <div className="flex items-center gap-3 mb-2">
@@ -693,12 +992,16 @@ export function LogisticsMapWidget() {
                       <Truck className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Tracking Selecionado</p>
-                      <p className="text-xs font-black text-white tracking-tighter">{selectedShipment.numero}</p>
+                      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+                        Tracking Selecionado
+                      </p>
+                      <p className="text-xs font-black text-white tracking-tighter">
+                        {selectedShipment.numero}
+                      </p>
                     </div>
                   </div>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     onClick={() => setSelectedShipment(null)}
                     className="w-full h-8 bg-primary hover:bg-primary/80 text-[10px] font-black uppercase tracking-widest rounded-xl"
                   >
@@ -713,25 +1016,30 @@ export function LogisticsMapWidget() {
 
       <AnimatePresence>
         {showAnomalies && (
-          <AnomalyList 
-            anomalies={anomalies} 
-            onClose={() => setShowAnomalies(false)} 
+          <AnomalyList
+            anomalies={anomalies}
+            onClose={() => setShowAnomalies(false)}
             onAction={async (id) => {
-              const anomaly = anomalies.find(a => a.id === id);
+              const anomaly = anomalies.find((a) => a.id === id);
               if (anomaly?.vehicle_id) {
-                const { data, error } = await supabase.functions.invoke('execute-protocol', {
-                  body: { 
-                    vehicle_id: anomaly.vehicle_id,
-                    protocol_name: 'REBOOT_OBD_GATEWAY'
-                  }
-                });
+                const { data, error } = await supabase.functions.invoke(
+                  "execute-protocol",
+                  {
+                    body: {
+                      vehicle_id: anomaly.vehicle_id,
+                      protocol_name: "REBOOT_OBD_GATEWAY",
+                    },
+                  },
+                );
                 if (error) {
                   toast.error("Erro ao executar protocolo: " + error.message);
                 } else {
-                  toast.success("Protocolo REBOOT_OBD_GATEWAY executado com sucesso!");
+                  toast.success(
+                    "Protocolo REBOOT_OBD_GATEWAY executado com sucesso!",
+                  );
                 }
               }
-            }} 
+            }}
           />
         )}
       </AnimatePresence>
@@ -741,7 +1049,10 @@ export function LogisticsMapWidget() {
       <MapIntelligenceOverlay />
 
       <Sheet open={showMission} onOpenChange={setShowMission}>
-        <SheetContent side="right" className="w-full sm:w-[540px] bg-black/95 backdrop-blur-3xl border-l border-white/10 p-0 overflow-hidden">
+        <SheetContent
+          side="right"
+          className="w-full sm:w-[540px] bg-black/95 backdrop-blur-3xl border-l border-white/10 p-0 overflow-hidden"
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
           <ScrollArea className="h-full">
             <SheetHeader className="p-8 pb-4">
@@ -754,7 +1065,8 @@ export function LogisticsMapWidget() {
                     Dossiê de Missão
                   </SheetTitle>
                   <SheetDescription className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2">
-                    Célula de Inteligência Nexus Protocolo {selectedShipment?.numero}
+                    Célula de Inteligência Nexus Protocolo{" "}
+                    {selectedShipment?.numero}
                   </SheetDescription>
                 </div>
               </div>
@@ -762,11 +1074,15 @@ export function LogisticsMapWidget() {
             </SheetHeader>
             <div className="p-8 pt-0">
               {selectedShipment && (
-                <MissionDetail 
-                  shipment={selectedShipment} 
+                <MissionDetail
+                  shipment={selectedShipment}
                   onOpenBitrix={() => {
                     toast.info("Sincronizando com Bitrix24...");
-                    window.open('https://bitrix24.com', '_blank');
+                    window.open(
+                      "https://bitrix24.com",
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
                   }}
                 />
               )}
@@ -780,5 +1096,3 @@ export function LogisticsMapWidget() {
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-
-

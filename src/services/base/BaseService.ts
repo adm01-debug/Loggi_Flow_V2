@@ -1,10 +1,9 @@
-import { supabase } from "@/integrations/supabase/client";
 import { logisticsBreaker } from "../resilience/CircuitBreaker";
 
 export class BaseService {
   protected static async call<T>(
     operation: () => Promise<{ data: T | null; error: any }>,
-    metadata: { category: string; message: string }
+    metadata: { category: string; message: string },
   ): Promise<T> {
     return await logisticsBreaker.execute(async () => {
       const startTime = Date.now();

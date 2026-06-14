@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, Package, AlertTriangle, CheckCircle2, Truck, RefreshCw } from "lucide-react";
+import {
+  Activity,
+  Package,
+  AlertTriangle,
+  Truck,
+  RefreshCw,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface PulseEvent {
   id: string;
-  type: 'delivery' | 'occurrence' | 'collection' | 'system';
+  type: "delivery" | "occurrence" | "collection" | "system";
   title: string;
   timestamp: Date;
-  status: 'info' | 'warning' | 'success' | 'error';
+  status: "info" | "warning" | "success" | "error";
 }
 
 export function OperationalPulse() {
@@ -46,53 +52,65 @@ export function OperationalPulse() {
   useEffect(() => {
     const newEvents: PulseEvent[] = [];
 
-    recentDeliveries?.forEach(d => {
+    recentDeliveries?.forEach((d) => {
       newEvents.push({
         id: `delivery-${d.id}`,
-        type: 'delivery',
+        type: "delivery",
         title: `Entrega #${d.numero_entrega} atualizada para ${d.status}`,
         timestamp: new Date(d.created_at),
-        status: d.status === 'entregue' ? 'success' : 'info'
+        status: d.status === "entregue" ? "success" : "info",
       });
     });
 
-    recentOccurrences?.forEach(o => {
+    recentOccurrences?.forEach((o) => {
       newEvents.push({
         id: `occurrence-${o.id}`,
-        type: 'occurrence',
+        type: "occurrence",
         title: `Nova ocorrência: ${o.tipo_ocorrencia}`,
         timestamp: new Date(o.created_at),
-        status: 'warning'
+        status: "warning",
       });
     });
 
     // Add some "system" events to make it look active
     newEvents.push({
-      id: 'system-sync',
-      type: 'system',
-      title: 'Sincronização com transportadoras concluída',
+      id: "system-sync",
+      type: "system",
+      title: "Sincronização com transportadoras concluída",
       timestamp: new Date(),
-      status: 'success'
+      status: "success",
     });
 
-    setEvents(newEvents.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 8));
+    setEvents(
+      newEvents
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+        .slice(0, 8),
+    );
   }, [recentDeliveries, recentOccurrences]);
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'delivery': return <Truck className="w-3 h-3" />;
-      case 'occurrence': return <AlertTriangle className="w-3 h-3" />;
-      case 'collection': return <Package className="w-3 h-3" />;
-      default: return <Activity className="w-3 h-3" />;
+      case "delivery":
+        return <Truck className="w-3 h-3" />;
+      case "occurrence":
+        return <AlertTriangle className="w-3 h-3" />;
+      case "collection":
+        return <Package className="w-3 h-3" />;
+      default:
+        return <Activity className="w-3 h-3" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success': return 'text-success bg-success/10 border-success/20';
-      case 'warning': return 'text-warning bg-warning/10 border-warning/20';
-      case 'error': return 'text-destructive bg-destructive/10 border-destructive/20';
-      default: return 'text-primary bg-primary/10 border-primary/20';
+      case "success":
+        return "text-success bg-success/10 border-success/20";
+      case "warning":
+        return "text-warning bg-warning/10 border-warning/20";
+      case "error":
+        return "text-destructive bg-destructive/10 border-destructive/20";
+      default:
+        return "text-primary bg-primary/10 border-primary/20";
     }
   };
 
@@ -108,15 +126,17 @@ export function OperationalPulse() {
 
       <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
         {events.map((event, i) => (
-          <div 
-            key={event.id} 
+          <div
+            key={event.id}
             className="flex items-start gap-3 group animate-in slide-in-from-right duration-300"
             style={{ animationDelay: `${i * 100}ms` }}
           >
-            <div className={cn(
-              "p-2 rounded-lg border transition-all duration-300 group-hover:scale-110",
-              getStatusColor(event.status)
-            )}>
+            <div
+              className={cn(
+                "p-2 rounded-lg border transition-all duration-300 group-hover:scale-110",
+                getStatusColor(event.status),
+              )}
+            >
               {getIcon(event.type)}
             </div>
             <div className="flex-1 min-w-0">
@@ -124,7 +144,8 @@ export function OperationalPulse() {
                 {event.title}
               </p>
               <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mt-0.5">
-                {format(event.timestamp, "HH:mm:ss", { locale: ptBR })} • {event.type}
+                {format(event.timestamp, "HH:mm:ss", { locale: ptBR })} •{" "}
+                {event.type}
               </p>
             </div>
           </div>
@@ -133,7 +154,9 @@ export function OperationalPulse() {
         {events.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full py-12 opacity-20">
             <Activity className="w-12 h-12 mb-4" />
-            <p className="text-[10px] font-black uppercase tracking-widest">Aguardando Dados...</p>
+            <p className="text-[10px] font-black uppercase tracking-widest">
+              Aguardando Dados...
+            </p>
           </div>
         )}
       </div>
@@ -142,9 +165,13 @@ export function OperationalPulse() {
         <div className="flex items-center justify-between">
           <div className="flex gap-1">
             <div className="w-1 h-1 rounded-full bg-success animate-ping" />
-            <span className="text-[8px] font-black uppercase tracking-widest text-white/40">Sistemas_OK</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-white/40">
+              Sistemas_OK
+            </span>
           </div>
-          <span className="text-[8px] font-black uppercase tracking-widest text-primary/60">v4.0.Nexus</span>
+          <span className="text-[8px] font-black uppercase tracking-widest text-primary/60">
+            v4.0.Nexus
+          </span>
         </div>
       </div>
     </div>

@@ -1,22 +1,15 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Calculator,
-  Calendar,
-  CreditCard,
-  Settings,
-  Smile,
   User,
   Truck,
   Package,
   Users,
   Building2,
-  AlertCircle,
   Search,
   Plus,
   Moon,
   Sun,
-  Bot,
   Activity,
   LogOut,
   Map,
@@ -41,15 +34,9 @@ export function GlobalSearch() {
   const { user, signOut, isAdmin } = useAuth();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-  
-  const {
-    query,
-    setQuery,
-    results,
-    isOpen,
-    setIsOpen,
-    clearSearch,
-  } = useGlobalSearch();
+
+  const { query, setQuery, results, isOpen, setIsOpen, clearSearch } =
+    useGlobalSearch();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -83,43 +70,63 @@ export function GlobalSearch() {
       </button>
 
       <CommandDialog open={isOpen} onOpenChange={setIsOpen}>
-        <CommandInput 
-          placeholder="Busque entregas, coletas ou digite um comando..." 
+        <CommandInput
+          placeholder="Busque entregas, coletas ou digite um comando..."
           value={query}
           onValueChange={setQuery}
         />
         <CommandList>
           <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
-          
+
           {query.length > 0 && results.length > 0 && (
             <CommandGroup heading="Resultados da Busca">
               {results.map((result) => (
                 <CommandItem
                   key={result.id}
-                  onSelect={() => handleCommand(() => navigate(`${result.url}?highlight=${result.id}`))}
+                  onSelect={() =>
+                    handleCommand(() =>
+                      navigate(`${result.url}?highlight=${result.id}`),
+                    )
+                  }
                 >
-                  {result.type === 'entrega' && <Truck className="mr-2 h-4 w-4" />}
-                  {result.type === 'coleta' && <Package className="mr-2 h-4 w-4" />}
-                  {result.type === 'cliente' && <Users className="mr-2 h-4 w-4" />}
-                  {result.type === 'fornecedor' && <Building2 className="mr-2 h-4 w-4" />}
+                  {result.type === "entrega" && (
+                    <Truck className="mr-2 h-4 w-4" />
+                  )}
+                  {result.type === "coleta" && (
+                    <Package className="mr-2 h-4 w-4" />
+                  )}
+                  {result.type === "cliente" && (
+                    <Users className="mr-2 h-4 w-4" />
+                  )}
+                  {result.type === "fornecedor" && (
+                    <Building2 className="mr-2 h-4 w-4" />
+                  )}
                   <span>{result.title}</span>
-                  <span className="ml-2 text-xs text-muted-foreground">{result.subtitle}</span>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {result.subtitle}
+                  </span>
                 </CommandItem>
               ))}
             </CommandGroup>
           )}
 
           <CommandGroup heading="Ações Rápidas">
-            <CommandItem onSelect={() => handleCommand(() => navigate("/despachos"))}>
+            <CommandItem
+              onSelect={() => handleCommand(() => navigate("/despachos"))}
+            >
               <Plus className="mr-2 h-4 w-4" />
               <span>Novo Despacho</span>
               <CommandShortcut>⌘N</CommandShortcut>
             </CommandItem>
-            <CommandItem onSelect={() => handleCommand(() => navigate("/coletas"))}>
+            <CommandItem
+              onSelect={() => handleCommand(() => navigate("/coletas"))}
+            >
               <Package className="mr-2 h-4 w-4" />
               <span>Nova Coleta</span>
             </CommandItem>
-            <CommandItem onSelect={() => handleCommand(() => navigate("/rastreamento"))}>
+            <CommandItem
+              onSelect={() => handleCommand(() => navigate("/rastreamento"))}
+            >
               <Map className="mr-2 h-4 w-4" />
               <span>Central de Rastreamento</span>
             </CommandItem>
@@ -128,25 +135,47 @@ export function GlobalSearch() {
           <CommandSeparator />
 
           <CommandGroup heading="Configurações e Ferramentas">
-            <CommandItem onSelect={() => handleCommand(() => setTheme(theme === "dark" ? "light" : "dark"))}>
-              {theme === "dark" ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-              <span>Alternar Tema ({theme === "dark" ? "Claro" : "Escuro"})</span>
+            <CommandItem
+              onSelect={() =>
+                handleCommand(() =>
+                  setTheme(theme === "dark" ? "light" : "dark"),
+                )
+              }
+            >
+              {theme === "dark" ? (
+                <Sun className="mr-2 h-4 w-4" />
+              ) : (
+                <Moon className="mr-2 h-4 w-4" />
+              )}
+              <span>
+                Alternar Tema ({theme === "dark" ? "Claro" : "Escuro"})
+              </span>
             </CommandItem>
-            <CommandItem onSelect={() => handleCommand(() => navigate("/profile"))}>
+            <CommandItem
+              onSelect={() => handleCommand(() => navigate("/profile"))}
+            >
               <User className="mr-2 h-4 w-4" />
               <span>Meu Perfil</span>
               <CommandShortcut>⌘P</CommandShortcut>
             </CommandItem>
             {isAdmin && (
-              <CommandItem onSelect={() => handleCommand(() => navigate("/admin/telemetria"))}>
+              <CommandItem
+                onSelect={() =>
+                  handleCommand(() => navigate("/admin/telemetria"))
+                }
+              >
                 <Activity className="mr-2 h-4 w-4" />
                 <span>Telemetria do Sistema</span>
               </CommandItem>
             )}
-            <CommandItem onSelect={() => handleCommand(() => {
-              signOut();
-              toast({ title: "Sessão encerrada" });
-            })}>
+            <CommandItem
+              onSelect={() =>
+                handleCommand(() => {
+                  signOut();
+                  toast({ title: "Sessão encerrada" });
+                })
+              }
+            >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sair do Sistema</span>
             </CommandItem>

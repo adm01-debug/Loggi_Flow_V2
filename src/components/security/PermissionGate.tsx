@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { usePermissions } from "@/hooks/auth/usePermissions";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { AlertTriangle, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface PermissionGateProps {
@@ -23,7 +23,8 @@ export function PermissionGate({
   fallback,
   showAccessDenied = false,
 }: PermissionGateProps) {
-  const { hasPermission, hasAnyPermission, hasAllPermissions, isLoading } = usePermissions();
+  const { hasPermission, hasAnyPermission, hasAllPermissions, isLoading } =
+    usePermissions();
   const { isAdmin, user } = useAuth();
 
   // If not authenticated, don't show anything
@@ -33,7 +34,7 @@ export function PermissionGate({
 
   // Check admin requirement
   if (requireAdmin && !isAdmin) {
-    return showAccessDenied ? <AccessDenied /> : (fallback || null);
+    return showAccessDenied ? <AccessDenied /> : fallback || null;
   }
 
   // If loading, optionally show nothing or a skeleton
@@ -43,7 +44,11 @@ export function PermissionGate({
 
   // Check single permission
   if (permission && !hasPermission(permission)) {
-    return showAccessDenied ? <AccessDenied permission={permission} /> : (fallback || null);
+    return showAccessDenied ? (
+      <AccessDenied permission={permission} />
+    ) : (
+      fallback || null
+    );
   }
 
   // Check multiple permissions
@@ -53,7 +58,11 @@ export function PermissionGate({
       : hasAnyPermission(permissions);
 
     if (!hasAccess) {
-      return showAccessDenied ? <AccessDenied permissions={permissions} /> : (fallback || null);
+      return showAccessDenied ? (
+        <AccessDenied permissions={permissions} />
+      ) : (
+        fallback || null
+      );
     }
   }
 
@@ -90,7 +99,7 @@ function AccessDenied({ permission, permissions }: AccessDeniedProps) {
 export function withPermission<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   permission: string,
-  fallback?: ReactNode
+  fallback?: ReactNode,
 ) {
   return function WithPermissionComponent(props: P) {
     return (

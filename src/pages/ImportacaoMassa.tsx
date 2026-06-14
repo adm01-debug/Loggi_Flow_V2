@@ -1,11 +1,21 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Stepper } from "@/components/ui/stepper";
 import { Progress } from "@/components/ui/progress";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Upload, Package, Truck, Users, Building2, FileSpreadsheet, FileText, CheckCircle2, AlertTriangle } from "lucide-react";
+import {
+  Upload,
+  Package,
+  Truck,
+  Users,
+  Building2,
+  FileSpreadsheet,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
+} from "lucide-react";
 import { CSVImporter } from "@/components/common/CSVImporter";
 import { ExcelImporter } from "@/components/common/ExcelImporter";
 import { supabase } from "@/integrations/supabase/client";
@@ -110,7 +120,10 @@ export default function ImportacaoMassa() {
     { title: "Finalizado", description: "Veja os resultados" },
   ];
 
-  const handleImport = async (entity: ImportEntity, data: Record<string, unknown>[]) => {
+  const handleImport = async (
+    entity: ImportEntity,
+    data: Record<string, unknown>[],
+  ) => {
     setIsImporting(true);
     setImportProgress(0);
     setCurrentStep(2); // Processamento
@@ -122,13 +135,13 @@ export default function ImportacaoMassa() {
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
       const { error } = await supabase.from(entity).insert(batch as never[]);
-      
+
       if (error) {
         errorCount += batch.length;
       } else {
         successCount += batch.length;
       }
-      
+
       const progress = Math.min(((i + batchSize) / data.length) * 100, 100);
       setImportProgress(progress);
     }
@@ -157,7 +170,11 @@ export default function ImportacaoMassa() {
     setTimeout(() => setCurrentStep(0), 5000);
   };
 
-  const entities: { id: ImportEntity; label: string; icon: React.ElementType }[] = [
+  const entities: {
+    id: ImportEntity;
+    label: string;
+    icon: React.ElementType;
+  }[] = [
     { id: "entregas", label: "Entregas", icon: Package },
     { id: "coletas", label: "Coletas", icon: Truck },
     { id: "fornecedores", label: "Fornecedores", icon: Building2 },
@@ -174,13 +191,19 @@ export default function ImportacaoMassa() {
             </div>
             Importação em Massa
           </h1>
-          <p className="text-muted-foreground mt-1">Importe dados via CSV ou Excel com validação automática</p>
+          <p className="text-muted-foreground mt-1">
+            Importe dados via CSV ou Excel com validação automática
+          </p>
         </div>
 
         <Card className="mb-6 overflow-hidden border-primary/20">
           <CardContent className="p-0">
-            <Stepper steps={importSteps} currentStep={currentStep} className="px-6 py-8" />
-            
+            <Stepper
+              steps={importSteps}
+              currentStep={currentStep}
+              className="px-6 py-8"
+            />
+
             {isImporting && (
               <div className="px-6 pb-6 animate-in fade-in duration-500">
                 <div className="flex justify-between text-sm mb-2 font-medium">
@@ -196,8 +219,13 @@ export default function ImportacaoMassa() {
         <Tabs defaultValue="entregas" onValueChange={() => setCurrentStep(1)}>
           <TabsList className="grid grid-cols-4 w-full max-w-lg">
             {entities.map((e) => (
-              <TabsTrigger key={e.id} value={e.id} className="flex items-center gap-2">
-                <e.icon className="w-4 h-4" />{e.label}
+              <TabsTrigger
+                key={e.id}
+                value={e.id}
+                className="flex items-center gap-2"
+              >
+                <e.icon className="w-4 h-4" />
+                {e.label}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -205,15 +233,34 @@ export default function ImportacaoMassa() {
           <TabsContent value="entregas" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="w-4 h-4" />Importar CSV</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Importar CSV
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <CSVImporter schema={entregaSchema} columns={entregaCols} templateName="entregas" onImport={(data) => handleImport("entregas", data)} />
+                  <CSVImporter
+                    schema={entregaSchema}
+                    columns={entregaCols}
+                    templateName="entregas"
+                    onImport={(data) => handleImport("entregas", data)}
+                  />
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileSpreadsheet className="w-4 h-4" />Importar Excel</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4" />
+                    Importar Excel
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <ExcelImporter schema={entregaSchema} templateName="entregas" onImport={(data) => handleImport("entregas", data)} />
+                  <ExcelImporter
+                    schema={entregaSchema}
+                    templateName="entregas"
+                    onImport={(data) => handleImport("entregas", data)}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -222,15 +269,34 @@ export default function ImportacaoMassa() {
           <TabsContent value="coletas" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="w-4 h-4" />Importar CSV</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Importar CSV
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <CSVImporter schema={coletaSchema} columns={coletaCols} templateName="coletas" onImport={(data) => handleImport("coletas", data)} />
+                  <CSVImporter
+                    schema={coletaSchema}
+                    columns={coletaCols}
+                    templateName="coletas"
+                    onImport={(data) => handleImport("coletas", data)}
+                  />
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileSpreadsheet className="w-4 h-4" />Importar Excel</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4" />
+                    Importar Excel
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <ExcelImporter schema={coletaSchema} templateName="coletas" onImport={(data) => handleImport("coletas", data)} />
+                  <ExcelImporter
+                    schema={coletaSchema}
+                    templateName="coletas"
+                    onImport={(data) => handleImport("coletas", data)}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -239,15 +305,34 @@ export default function ImportacaoMassa() {
           <TabsContent value="fornecedores" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="w-4 h-4" />Importar CSV</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Importar CSV
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <CSVImporter schema={fornecedorSchema} columns={fornecedorCols} templateName="fornecedores" onImport={(data) => handleImport("fornecedores", data)} />
+                  <CSVImporter
+                    schema={fornecedorSchema}
+                    columns={fornecedorCols}
+                    templateName="fornecedores"
+                    onImport={(data) => handleImport("fornecedores", data)}
+                  />
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileSpreadsheet className="w-4 h-4" />Importar Excel</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4" />
+                    Importar Excel
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <ExcelImporter schema={fornecedorSchema} templateName="fornecedores" onImport={(data) => handleImport("fornecedores", data)} />
+                  <ExcelImporter
+                    schema={fornecedorSchema}
+                    templateName="fornecedores"
+                    onImport={(data) => handleImport("fornecedores", data)}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -256,15 +341,34 @@ export default function ImportacaoMassa() {
           <TabsContent value="clientes" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="w-4 h-4" />Importar CSV</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Importar CSV
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <CSVImporter schema={clienteSchema} columns={fornecedorCols} templateName="clientes" onImport={(data) => handleImport("clientes", data)} />
+                  <CSVImporter
+                    schema={clienteSchema}
+                    columns={fornecedorCols}
+                    templateName="clientes"
+                    onImport={(data) => handleImport("clientes", data)}
+                  />
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileSpreadsheet className="w-4 h-4" />Importar Excel</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4" />
+                    Importar Excel
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <ExcelImporter schema={clienteSchema} templateName="clientes" onImport={(data) => handleImport("clientes", data)} />
+                  <ExcelImporter
+                    schema={clienteSchema}
+                    templateName="clientes"
+                    onImport={(data) => handleImport("clientes", data)}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -274,20 +378,35 @@ export default function ImportacaoMassa() {
         {/* Import History */}
         {history.length > 0 && (
           <Card>
-            <CardHeader><CardTitle className="text-base">Histórico de Importações</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">
+                Histórico de Importações
+              </CardTitle>
+            </CardHeader>
             <CardContent className="space-y-2">
               {history.map((h, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-2 border-b last:border-0"
+                >
                   <div className="flex items-center gap-3">
-                    {h.errors === 0 ? <CheckCircle2 className="w-4 h-4 text-primary" /> : <AlertTriangle className="w-4 h-4 text-destructive" />}
+                    {h.errors === 0 ? (
+                      <CheckCircle2 className="w-4 h-4 text-primary" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                    )}
                     <div>
                       <p className="font-medium capitalize">{h.entity}</p>
-                      <p className="text-xs text-muted-foreground">{h.timestamp.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {h.timestamp.toLocaleString()}
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <Badge variant="secondary">{h.success} importados</Badge>
-                    {h.errors > 0 && <Badge variant="destructive">{h.errors} erros</Badge>}
+                    {h.errors > 0 && (
+                      <Badge variant="destructive">{h.errors} erros</Badge>
+                    )}
                   </div>
                 </div>
               ))}

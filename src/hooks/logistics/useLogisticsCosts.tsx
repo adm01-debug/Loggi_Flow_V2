@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { startOfMonth, endOfMonth, subMonths, format, parseISO } from 'date-fns';
+import { startOfMonth, endOfMonth, format, parseISO } from "date-fns";
 
 export interface CostByCarrier {
   transportadora_id: string;
@@ -37,11 +37,17 @@ export interface CostSummary {
 export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
   const { user } = useAuth();
   const { data: entregas, isLoading } = useQuery({
-    queryKey: ['logistics-costs', user?.id, startDate.toISOString(), endDate.toISOString()],
+    queryKey: [
+      "logistics-costs",
+      user?.id,
+      startDate.toISOString(),
+      endDate.toISOString(),
+    ],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('entregas')
-        .select(`
+        .from("entregas")
+        .select(
+          `
           id,
           numero_entrega,
           valor_frete,
@@ -52,10 +58,11 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
           status,
           transportadora:transportadoras(id, nome_fantasia),
           cliente:clientes(id, razao_social, estado)
-        `)
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())
-        .not('valor_frete', 'is', null);
+        `,
+        )
+        .gte("created_at", startDate.toISOString())
+        .lte("created_at", endDate.toISOString())
+        .not("valor_frete", "is", null);
 
       if (error) throw error;
       return data;
@@ -68,12 +75,19 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
   const costsByCarrier: CostByCarrier[] = (() => {
     if (!entregas) return [];
 
-    const carrierMap = new Map<string, { nome: string; total: number; count: number }>();
+    const carrierMap = new Map<
+      string,
+      { nome: string; total: number; count: number }
+    >();
 
     entregas.forEach((e) => {
       if (e.transportadora && e.valor_frete) {
         const id = e.transportadora.id;
-        const existing = carrierMap.get(id) || { nome: e.transportadora.nome_fantasia, total: 0, count: 0 };
+        const existing = carrierMap.get(id) || {
+          nome: e.transportadora.nome_fantasia,
+          total: 0,
+          count: 0,
+        };
         existing.total += Number(e.valor_frete);
         existing.count += 1;
         carrierMap.set(id, existing);
@@ -127,7 +141,7 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
     const months: string[] = [];
     let current = startOfMonth(startDate);
     while (current <= endOfMonth(endDate)) {
-      months.push(format(current, 'yyyy-MM'));
+      months.push(format(current, "yyyy-MM"));
       current = new Date(current.getFullYear(), current.getMonth() + 1, 1);
     }
 
@@ -135,7 +149,7 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
 
     entregas.forEach((e) => {
       if (e.valor_frete && e.data_despacho) {
-        const month = format(parseISO(e.data_despacho), 'yyyy-MM');
+        const month = format(parseISO(e.data_despacho), "yyyy-MM");
         const existing = periodMap.get(month);
         if (existing) {
           existing.total += Number(e.valor_frete);
@@ -147,7 +161,7 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
     return Array.from(periodMap.entries())
       .map(([period, data]) => ({
         period,
-        month: format(parseISO(period + '-01'), 'MMM/yy'),
+        month: format(parseISO(period + "-01"), "MMM/yy"),
         total_value: data.total,
         total_deliveries: data.count,
       }))
@@ -161,22 +175,28 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
         total_spent: 0,
         total_deliveries: 0,
         avg_per_delivery: 0,
-        most_expensive_carrier: 'N/A',
-        most_used_carrier: 'N/A',
-        top_route: 'N/A',
+        most_expensive_carrier: "N/A",
+        most_used_carrier: "N/A",
+        top_route: "N/A",
       };
     }
 
-    const totalSpent = entregas.reduce((sum, e) => sum + (Number(e.valor_frete) || 0), 0);
+    const totalSpent = entregas.reduce(
+      (sum, e) => sum + (Number(e.valor_frete) || 0),
+      0,
+    );
     const totalDeliveries = entregas.length;
 
     return {
       total_spent: totalSpent,
       total_deliveries: totalDeliveries,
       avg_per_delivery: totalSpent / totalDeliveries,
-      most_expensive_carrier: costsByCarrier[0]?.transportadora_nome || 'N/A',
-      most_used_carrier: [...costsByCarrier].sort((a, b) => b.total_deliveries - a.total_deliveries)[0]?.transportadora_nome || 'N/A',
-      top_route: costsByRoute[0]?.estado_destino || 'N/A',
+      most_expensive_carrier: costsByCarrier[0]?.transportadora_nome || "N/A",
+      most_used_carrier:
+        [...costsByCarrier].sort(
+          (a, b) => b.total_deliveries - a.total_deliveries,
+        )[0]?.transportadora_nome || "N/A",
+      top_route: costsByRoute[0]?.estado_destino || "N/A",
     };
   })();
 

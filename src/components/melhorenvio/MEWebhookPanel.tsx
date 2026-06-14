@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Webhook, Plus, Trash2, CheckCircle, XCircle, RefreshCw } from "lucide-react";
+import { Webhook, Plus, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -30,7 +30,10 @@ const AVAILABLE_EVENTS = [
 ];
 
 export function MEWebhookPanel() {
-  const [webhooks, setWebhooks] = useLocalStorage<WebhookConfig[]>("me-webhooks", []);
+  const [webhooks, setWebhooks] = useLocalStorage<WebhookConfig[]>(
+    "me-webhooks",
+    [],
+  );
   const [newUrl, setNewUrl] = useState("");
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [showAdd, setShowAdd] = useState(false);
@@ -68,19 +71,21 @@ export function MEWebhookPanel() {
   };
 
   const handleToggle = (id: string) => {
-    setWebhooks(webhooks.map(w => w.id === id ? { ...w, active: !w.active } : w));
+    setWebhooks(
+      webhooks.map((w) => (w.id === id ? { ...w, active: !w.active } : w)),
+    );
   };
 
   const handleDelete = () => {
     if (!deleteId) return;
-    setWebhooks(webhooks.filter(w => w.id !== deleteId));
+    setWebhooks(webhooks.filter((w) => w.id !== deleteId));
     setDeleteId(null);
     toast.success("Webhook removido");
   };
 
   const toggleEvent = (event: string) => {
-    setSelectedEvents(prev =>
-      prev.includes(event) ? prev.filter(e => e !== event) : [...prev, event]
+    setSelectedEvents((prev) =>
+      prev.includes(event) ? prev.filter((e) => e !== event) : [...prev, event],
     );
   };
 
@@ -90,9 +95,15 @@ export function MEWebhookPanel() {
         <div className="flex items-center gap-2">
           <Webhook className="w-5 h-5 text-primary" />
           <h3 className="font-semibold text-lg">Webhooks</h3>
-          <Badge variant="outline" className="text-xs">{webhooks.length} configurados</Badge>
+          <Badge variant="outline" className="text-xs">
+            {webhooks.length} configurados
+          </Badge>
         </div>
-        <Button size="sm" onClick={() => setShowAdd(!showAdd)} variant={showAdd ? "secondary" : "default"}>
+        <Button
+          size="sm"
+          onClick={() => setShowAdd(!showAdd)}
+          variant={showAdd ? "secondary" : "default"}
+        >
           <Plus className="w-4 h-4 mr-1" />
           {showAdd ? "Cancelar" : "Novo Webhook"}
         </Button>
@@ -105,7 +116,7 @@ export function MEWebhookPanel() {
               <Label>URL do Webhook</Label>
               <Input
                 value={newUrl}
-                onChange={e => setNewUrl(e.target.value)}
+                onChange={(e) => setNewUrl(e.target.value)}
                 placeholder="https://seu-servidor.com/webhook"
                 type="url"
               />
@@ -113,10 +124,14 @@ export function MEWebhookPanel() {
             <div className="space-y-2">
               <Label>Eventos</Label>
               <div className="flex flex-wrap gap-2">
-                {AVAILABLE_EVENTS.map(event => (
+                {AVAILABLE_EVENTS.map((event) => (
                   <Badge
                     key={event.value}
-                    variant={selectedEvents.includes(event.value) ? "default" : "outline"}
+                    variant={
+                      selectedEvents.includes(event.value)
+                        ? "default"
+                        : "outline"
+                    }
                     className="cursor-pointer transition-all"
                     onClick={() => toggleEvent(event.value)}
                   >
@@ -141,7 +156,7 @@ export function MEWebhookPanel() {
         />
       ) : (
         <div className="space-y-2">
-          {webhooks.map(webhook => (
+          {webhooks.map((webhook) => (
             <Card key={webhook.id} className="overflow-hidden">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -152,21 +167,32 @@ export function MEWebhookPanel() {
                       ) : (
                         <XCircle className="w-4 h-4 text-muted-foreground shrink-0" />
                       )}
-                      <code className="text-sm font-mono truncate block">{webhook.url}</code>
+                      <code className="text-sm font-mono truncate block">
+                        {webhook.url}
+                      </code>
                     </div>
                     <div className="flex flex-wrap gap-1">
-                      {webhook.events.map(event => (
-                        <Badge key={event} variant="secondary" className="text-[10px]">
-                          {AVAILABLE_EVENTS.find(e => e.value === event)?.label || event}
+                      {webhook.events.map((event) => (
+                        <Badge
+                          key={event}
+                          variant="secondary"
+                          className="text-[10px]"
+                        >
+                          {AVAILABLE_EVENTS.find((e) => e.value === event)
+                            ?.label || event}
                         </Badge>
                       ))}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Criado em {new Date(webhook.createdAt).toLocaleDateString("pt-BR")}
+                      Criado em{" "}
+                      {new Date(webhook.createdAt).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Switch checked={webhook.active} onCheckedChange={() => handleToggle(webhook.id)} />
+                    <Switch
+                      checked={webhook.active}
+                      onCheckedChange={() => handleToggle(webhook.id)}
+                    />
                     <Button
                       variant="ghost"
                       size="icon"

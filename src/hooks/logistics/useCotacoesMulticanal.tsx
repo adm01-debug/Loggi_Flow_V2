@@ -1,15 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { toast } from 'sonner';
-import { useEffect } from 'react';
+import { toast } from "sonner";
 
 export interface CotacaoMulticanal {
   id: string;
   user_id: string;
   transportadora_id: string;
-  canal: 'api' | 'whatsapp' | 'email';
-  status: 'pendente' | 'respondido' | 'expirado' | 'selecionado';
+  canal: "api" | "whatsapp" | "email";
+  status: "pendente" | "respondido" | "expirado" | "selecionado";
   origem_estado: string;
   origem_cidade: string | null;
   destino_estado: string;
@@ -39,18 +38,25 @@ export const useCotacoesMulticanal = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: cotacoes, isLoading, error, refetch } = useQuery({
-    queryKey: ['cotacoes-multicanal'],
+  const {
+    data: cotacoes,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["cotacoes-multicanal"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('cotacoes_multicanal')
-        .select(`
+        .from("cotacoes_multicanal")
+        .select(
+          `
           *,
           transportadora:transportadoras (
             id, nome_fantasia, razao_social, score_performance
           )
-        `)
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as CotacaoMulticanal[];
@@ -62,7 +68,7 @@ export const useCotacoesMulticanal = () => {
   const createCotacao = useMutation({
     mutationFn: async (data: {
       transportadora_id: string;
-      canal: 'api' | 'whatsapp' | 'email';
+      canal: "api" | "whatsapp" | "email";
       origem_estado: string;
       origem_cidade?: string;
       destino_estado: string;
@@ -76,34 +82,50 @@ export const useCotacoesMulticanal = () => {
       status?: string;
     }) => {
       const { data: result, error } = await supabase
-        .from('cotacoes_multicanal')
-        .insert([{
-          ...data,
-          user_id: user!.id,
-          status: data.status || 'pendente',
-        }])
-        .select(`*, transportadora:transportadoras (id, nome_fantasia, razao_social, score_performance)`)
+        .from("cotacoes_multicanal")
+        .insert([
+          {
+            ...data,
+            user_id: user!.id,
+            status: data.status || "pendente",
+          },
+        ])
+        .select(
+          `*, transportadora:transportadoras (id, nome_fantasia, razao_social, score_performance)`,
+        )
         .single();
 
       if (error) throw error;
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cotacoes-multicanal'] });
+      queryClient.invalidateQueries({ queryKey: ["cotacoes-multicanal"] });
     },
   });
 
   const updateCotacao = useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; valor_cotado?: number; prazo_dias?: number; observacoes?: string; status?: string }) => {
-      const updateData: Record<string, unknown> = { ...data, updated_at: new Date().toISOString() };
-      if (data.status === 'respondido') {
+    mutationFn: async ({
+      id,
+      ...data
+    }: {
+      id: string;
+      valor_cotado?: number;
+      prazo_dias?: number;
+      observacoes?: string;
+      status?: string;
+    }) => {
+      const updateData: Record<string, unknown> = {
+        ...data,
+        updated_at: new Date().toISOString(),
+      };
+      if (data.status === "respondido") {
         updateData.responded_at = new Date().toISOString();
       }
 
       const { data: result, error } = await supabase
-        .from('cotacoes_multicanal')
+        .from("cotacoes_multicanal")
         .update(updateData)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
@@ -111,32 +133,36 @@ export const useCotacoesMulticanal = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cotacoes-multicanal'] });
-      toast.success('Cotação atualizada!');
+      queryClient.invalidateQueries({ queryKey: ["cotacoes-multicanal"] });
+      toast.success("Cotação atualizada!");
     },
   });
 
   const selectCotacao = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('cotacoes_multicanal')
-        .update({ status: 'selecionado', updated_at: new Date().toISOString() })
-        .eq('id', id);
+        .from("cotacoes_multicanal")
+        .update({ status: "selecionado", updated_at: new Date().toISOString() })
+        .eq("id", id);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cotacoes-multicanal'] });
-      toast.success('Cotação selecionada!');
+      queryClient.invalidateQueries({ queryKey: ["cotacoes-multicanal"] });
+      toast.success("Cotação selecionada!");
     },
   });
 
   // Derived stats
-  const ativas = cotacoes?.filter(c => c.status === 'pendente' || c.status === 'respondido') || [];
-  const pendentes = cotacoes?.filter(c => c.status === 'pendente') || [];
-  const respondidas = cotacoes?.filter(c => c.status === 'respondido') || [];
-  const expiradas = cotacoes?.filter(c => c.status === 'expirado') || [];
-  const selecionadas = cotacoes?.filter(c => c.status === 'selecionado') || [];
+  const ativas =
+    cotacoes?.filter(
+      (c) => c.status === "pendente" || c.status === "respondido",
+    ) || [];
+  const pendentes = cotacoes?.filter((c) => c.status === "pendente") || [];
+  const respondidas = cotacoes?.filter((c) => c.status === "respondido") || [];
+  const expiradas = cotacoes?.filter((c) => c.status === "expirado") || [];
+  const selecionadas =
+    cotacoes?.filter((c) => c.status === "selecionado") || [];
 
   return {
     cotacoes: cotacoes || [],

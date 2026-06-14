@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 
 export interface WidgetConfig {
@@ -137,10 +137,13 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
 ];
 
 export function useDashboardWidgets() {
-  const [layout, setLayout] = useLocalStorage<WidgetConfig[]>("dashboard-layout", DEFAULT_LAYOUT);
+  const [layout, setLayout] = useLocalStorage<WidgetConfig[]>(
+    "dashboard-layout",
+    DEFAULT_LAYOUT,
+  );
   const [activeWidgets, setActiveWidgets] = useLocalStorage<string[]>(
     "dashboard-active-widgets",
-    DEFAULT_LAYOUT.map((w) => w.i)
+    DEFAULT_LAYOUT.map((w) => w.i),
   );
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -148,7 +151,7 @@ export function useDashboardWidgets() {
     (newLayout: WidgetConfig[]) => {
       setLayout(newLayout);
     },
-    [setLayout]
+    [setLayout],
   );
 
   const addWidget = useCallback(
@@ -158,7 +161,10 @@ export function useDashboardWidgets() {
       const widgetDef = AVAILABLE_WIDGETS.find((w) => w.id === widgetId);
       if (!widgetDef) return;
 
-      const maxY = layout.reduce((max, item) => Math.max(max, item.y + item.h), 0);
+      const maxY = layout.reduce(
+        (max, item) => Math.max(max, item.y + item.h),
+        0,
+      );
 
       const newWidget: WidgetConfig = {
         i: widgetId,
@@ -175,7 +181,7 @@ export function useDashboardWidgets() {
       setLayout([...layout, newWidget]);
       setActiveWidgets([...activeWidgets, widgetId]);
     },
-    [layout, activeWidgets, setLayout, setActiveWidgets]
+    [layout, activeWidgets, setLayout, setActiveWidgets],
   );
 
   const removeWidget = useCallback(
@@ -183,7 +189,7 @@ export function useDashboardWidgets() {
       setLayout(layout.filter((w) => w.i !== widgetId));
       setActiveWidgets(activeWidgets.filter((id) => id !== widgetId));
     },
-    [layout, activeWidgets, setLayout, setActiveWidgets]
+    [layout, activeWidgets, setLayout, setActiveWidgets],
   );
 
   const resetLayout = useCallback(() => {

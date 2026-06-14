@@ -1,8 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { toast } from "sonner";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useNotificationPreferences } from "@/hooks/notifications/useNotificationPreferences";
 import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
@@ -24,7 +23,8 @@ export function useNotifications() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
-  const { shouldShowNotification, shouldShowBrowserNotification, preferences } = useNotificationPreferences();
+  const { shouldShowNotification, shouldShowBrowserNotification, preferences } =
+    useNotificationPreferences();
 
   // Fetch notifications
   const { data: notifications = [], isLoading } = useQuery({
@@ -94,25 +94,28 @@ export function useNotifications() {
     if (!("Notification" in window)) {
       return false;
     }
-    
+
     if (window.Notification.permission === "granted") {
       return true;
     }
-    
+
     if (window.Notification.permission !== "denied") {
       const permission = await window.Notification.requestPermission();
       return permission === "granted";
     }
-    
+
     return false;
   }, []);
 
   // Show browser notification
-  const showBrowserNotification = useCallback((title: string, options?: NotificationOptions) => {
-    if (window.Notification.permission === "granted") {
-      new window.Notification(title, options);
-    }
-  }, []);
+  const showBrowserNotification = useCallback(
+    (title: string, options?: NotificationOptions) => {
+      if (window.Notification.permission === "granted") {
+        new window.Notification(title, options);
+      }
+    },
+    [],
+  );
 
   // Computed values
   const unreadCount = notifications.filter((n) => !n.read).length;

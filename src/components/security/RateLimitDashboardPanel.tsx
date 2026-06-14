@@ -1,17 +1,22 @@
 import { useRateLimitLogs } from "@/hooks/security/useRateLimitLogs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Loader2, 
-  Gauge, 
-  Ban, 
-  Trash2, 
-  RefreshCw,
+import {
+  Loader2,
+  Gauge,
+  Ban,
+  Trash2,
   TrendingUp,
   AlertTriangle,
-  Globe
+  Globe,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -46,9 +51,10 @@ export function RateLimitDashboardPanel() {
     isBlocking,
   } = useRateLimitLogs();
 
-  const blockedPercentage = stats.totalRequests > 0
-    ? ((stats.blockedRequests / stats.totalRequests) * 100).toFixed(1)
-    : "0";
+  const blockedPercentage =
+    stats.totalRequests > 0
+      ? ((stats.blockedRequests / stats.totalRequests) * 100).toFixed(1)
+      : "0";
 
   return (
     <div className="space-y-6">
@@ -62,7 +68,9 @@ export function RateLimitDashboardPanel() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.totalRequests}</p>
-                <p className="text-sm text-muted-foreground">Total de Requisições</p>
+                <p className="text-sm text-muted-foreground">
+                  Total de Requisições
+                </p>
               </div>
             </div>
           </CardContent>
@@ -75,8 +83,12 @@ export function RateLimitDashboardPanel() {
                 <Ban className="h-5 w-5 text-destructive" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-destructive">{stats.blockedRequests}</p>
-                <p className="text-sm text-muted-foreground">Bloqueadas ({blockedPercentage}%)</p>
+                <p className="text-2xl font-bold text-destructive">
+                  {stats.blockedRequests}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Bloqueadas ({blockedPercentage}%)
+                </p>
               </div>
             </div>
           </CardContent>
@@ -103,8 +115,12 @@ export function RateLimitDashboardPanel() {
                 <Gauge className="h-5 w-5 text-info" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.topEndpoints.length}</p>
-                <p className="text-sm text-muted-foreground">Endpoints Ativos</p>
+                <p className="text-2xl font-bold">
+                  {stats.topEndpoints.length}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Endpoints Ativos
+                </p>
               </div>
             </div>
           </CardContent>
@@ -225,8 +241,8 @@ export function RateLimitDashboardPanel() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Limpar Logs Antigos?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Isso irá remover todos os logs com mais de 7 dias. 
-                      Esta ação não pode ser desfeita.
+                      Isso irá remover todos os logs com mais de 7 dias. Esta
+                      ação não pode ser desfeita.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

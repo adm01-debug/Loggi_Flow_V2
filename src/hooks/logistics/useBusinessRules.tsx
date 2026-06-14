@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
@@ -6,9 +6,29 @@ import { toast } from "sonner";
 import { Json } from "@/integrations/supabase/types";
 
 export type EntityType = "coleta" | "entrega" | "ocorrencia" | "frete";
-export type TriggerEvent = "on_create" | "on_update" | "on_status_change" | "low_performance" | "high_cost";
-export type ConditionOperator = "equals" | "not_equals" | "contains" | "greater_than" | "less_than" | "is_empty" | "is_not_empty" | "below_threshold";
-export type ActionType = "send_notification" | "change_status" | "send_email" | "add_tag" | "assign_user" | "create_alert" | "block_carrier";
+export type TriggerEvent =
+  | "on_create"
+  | "on_update"
+  | "on_status_change"
+  | "low_performance"
+  | "high_cost";
+export type ConditionOperator =
+  | "equals"
+  | "not_equals"
+  | "contains"
+  | "greater_than"
+  | "less_than"
+  | "is_empty"
+  | "is_not_empty"
+  | "below_threshold";
+export type ActionType =
+  | "send_notification"
+  | "change_status"
+  | "send_email"
+  | "add_tag"
+  | "assign_user"
+  | "create_alert"
+  | "block_carrier";
 
 export interface RuleCondition {
   id: string;
@@ -50,7 +70,10 @@ export interface CreateRuleInput {
 }
 
 // Configurações de campos disponíveis por entidade
-export const ENTITY_FIELDS: Record<EntityType, { field: string; label: string; type: string }[]> = {
+export const ENTITY_FIELDS: Record<
+  EntityType,
+  { field: string; label: string; type: string }[]
+> = {
   coleta: [
     { field: "status", label: "Status", type: "select" },
     { field: "tipo_coleta", label: "Tipo de Coleta", type: "select" },
@@ -86,7 +109,10 @@ export const TRIGGER_EVENTS: { value: TriggerEvent; label: string }[] = [
   { value: "high_cost", label: "Custo Acima da Média" },
 ];
 
-export const CONDITION_OPERATORS: { value: ConditionOperator; label: string }[] = [
+export const CONDITION_OPERATORS: {
+  value: ConditionOperator;
+  label: string;
+}[] = [
   { value: "equals", label: "é igual a" },
   { value: "not_equals", label: "é diferente de" },
   { value: "contains", label: "contém" },
@@ -96,7 +122,11 @@ export const CONDITION_OPERATORS: { value: ConditionOperator; label: string }[] 
   { value: "is_not_empty", label: "não está vazio" },
 ];
 
-export const ACTION_TYPES: { value: ActionType; label: string; icon: string }[] = [
+export const ACTION_TYPES: {
+  value: ActionType;
+  label: string;
+  icon: string;
+}[] = [
   { value: "send_notification", label: "Enviar Notificação", icon: "Bell" },
   { value: "change_status", label: "Alterar Status", icon: "RefreshCw" },
   { value: "send_email", label: "Enviar Email", icon: "Mail" },
@@ -108,14 +138,18 @@ export function useBusinessRules() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: rules = [], isLoading, error } = useQuery({
+  const {
+    data: rules = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["business-rules", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("business_rules")
         .select("*")
         .order("priority", { ascending: false });
-      
+
       if (error) throw error;
       return (data || []).map((rule) => ({
         ...rule,
@@ -133,19 +167,21 @@ export function useBusinessRules() {
       const { data: user } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from("business_rules")
-        .insert([{
-          name: input.name,
-          description: input.description,
-          entity_type: input.entity_type,
-          trigger_event: input.trigger_event,
-          conditions: JSON.parse(JSON.stringify(input.conditions)) as Json,
-          actions: JSON.parse(JSON.stringify(input.actions)) as Json,
-          priority: input.priority || 0,
-          created_by: user?.user?.id,
-        }])
+        .insert([
+          {
+            name: input.name,
+            description: input.description,
+            entity_type: input.entity_type,
+            trigger_event: input.trigger_event,
+            conditions: JSON.parse(JSON.stringify(input.conditions)) as Json,
+            actions: JSON.parse(JSON.stringify(input.actions)) as Json,
+            priority: input.priority || 0,
+            created_by: user?.user?.id,
+          },
+        ])
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -159,16 +195,26 @@ export function useBusinessRules() {
   });
 
   const updateRule = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<BusinessRule> & { id: string }) => {
+    mutationFn: async ({
+      id,
+      ...updates
+    }: Partial<BusinessRule> & { id: string }) => {
       const updateData: Record<string, unknown> = {};
       if (updates.name !== undefined) updateData.name = updates.name;
-      if (updates.description !== undefined) updateData.description = updates.description;
-      if (updates.entity_type !== undefined) updateData.entity_type = updates.entity_type;
-      if (updates.trigger_event !== undefined) updateData.trigger_event = updates.trigger_event;
-      if (updates.conditions !== undefined) updateData.conditions = JSON.parse(JSON.stringify(updates.conditions));
-      if (updates.actions !== undefined) updateData.actions = JSON.parse(JSON.stringify(updates.actions));
-      if (updates.is_active !== undefined) updateData.is_active = updates.is_active;
-      if (updates.priority !== undefined) updateData.priority = updates.priority;
+      if (updates.description !== undefined)
+        updateData.description = updates.description;
+      if (updates.entity_type !== undefined)
+        updateData.entity_type = updates.entity_type;
+      if (updates.trigger_event !== undefined)
+        updateData.trigger_event = updates.trigger_event;
+      if (updates.conditions !== undefined)
+        updateData.conditions = JSON.parse(JSON.stringify(updates.conditions));
+      if (updates.actions !== undefined)
+        updateData.actions = JSON.parse(JSON.stringify(updates.actions));
+      if (updates.is_active !== undefined)
+        updateData.is_active = updates.is_active;
+      if (updates.priority !== undefined)
+        updateData.priority = updates.priority;
 
       const { data, error } = await supabase
         .from("business_rules")
@@ -176,7 +222,7 @@ export function useBusinessRules() {
         .eq("id", id)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -195,7 +241,7 @@ export function useBusinessRules() {
         .from("business_rules")
         .delete()
         .eq("id", id);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -211,7 +257,7 @@ export function useBusinessRules() {
     async (id: string, isActive: boolean) => {
       await updateRule.mutateAsync({ id, is_active: isActive });
     },
-    [updateRule]
+    [updateRule],
   );
 
   return {

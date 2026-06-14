@@ -1,31 +1,39 @@
-import { motion } from 'framer-motion';
-import { Rocket, ChevronRight, CheckCircle2, Sparkles, Target } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { motion } from "framer-motion";
+import {
+  Rocket,
+  ChevronRight,
+  CheckCircle2,
+  Sparkles,
+  Target,
+} from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useOnboarding } from "@/hooks/ui/useOnboarding";
 
 interface OnboardingProgressProps {
-  variant?: 'compact' | 'full';
+  variant?: "compact" | "full";
   className?: string;
 }
 
-export function OnboardingProgress({ variant = 'compact', className }: OnboardingProgressProps) {
+export function OnboardingProgress({
+  variant = "compact",
+  className,
+}: OnboardingProgressProps) {
   const {
     steps,
     completedSteps,
     progressPercentage,
     isCompleted,
     openWizard,
-    isLoading
+    isLoading,
   } = useOnboarding();
 
   if (isLoading || isCompleted) return null;
 
-  const nextStep = steps.find(s => !completedSteps.includes(s.id));
+  const nextStep = steps.find((s) => !completedSteps.includes(s.id));
 
-  if (variant === 'compact') {
+  if (variant === "compact") {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -34,7 +42,7 @@ export function OnboardingProgress({ variant = 'compact', className }: Onboardin
         whileTap={{ scale: 0.98 }}
         className={cn(
           "flex items-center gap-4 px-4 py-2.5 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-2xl cursor-pointer hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group",
-          className
+          className,
         )}
         onClick={openWizard}
       >
@@ -44,17 +52,20 @@ export function OnboardingProgress({ variant = 'compact', className }: Onboardin
             <Rocket className="w-5 h-5" />
           </div>
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-black uppercase tracking-widest text-primary truncate">
-              {nextStep?.title || 'Setup Workspace'}
+              {nextStep?.title || "Setup Workspace"}
             </span>
             <span className="text-[10px] font-black tabular-nums bg-primary/10 text-primary px-2 py-0.5 rounded-full">
               {Math.round(progressPercentage)}%
             </span>
           </div>
-          <Progress value={progressPercentage} className="h-1.5 rounded-full bg-primary/10" />
+          <Progress
+            value={progressPercentage}
+            className="h-1.5 rounded-full bg-primary/10"
+          />
         </div>
 
         <div className="w-8 h-8 rounded-full bg-accent/50 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all">
@@ -70,7 +81,7 @@ export function OnboardingProgress({ variant = 'compact', className }: Onboardin
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "relative p-6 bg-gradient-to-br from-primary/5 via-background to-transparent border-2 border-primary/10 rounded-3xl overflow-hidden group",
-        className
+        className,
       )}
     >
       <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -88,9 +99,12 @@ export function OnboardingProgress({ variant = 'compact', className }: Onboardin
         <div className="flex-1 min-w-0 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
-              <h4 className="text-xl font-black tracking-tight text-foreground">Acelere seu Setup</h4>
+              <h4 className="text-xl font-black tracking-tight text-foreground">
+                Acelere seu Setup
+              </h4>
               <p className="text-sm text-muted-foreground font-medium mt-1">
-                Complete os módulos para desbloquear o ranking e ganhar recompensas.
+                Complete os módulos para desbloquear o ranking e ganhar
+                recompensas.
               </p>
             </div>
             <div className="flex items-center justify-center gap-2 bg-primary/10 px-4 py-2 rounded-2xl border border-primary/20">
@@ -101,7 +115,7 @@ export function OnboardingProgress({ variant = 'compact', className }: Onboardin
           </div>
 
           <div className="relative h-3 w-full bg-muted/50 rounded-full overflow-hidden mb-6">
-            <motion.div 
+            <motion.div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary-glow"
               initial={{ width: 0 }}
               animate={{ width: `${progressPercentage}%` }}
@@ -119,7 +133,7 @@ export function OnboardingProgress({ variant = 'compact', className }: Onboardin
                     "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all",
                     completed
                       ? "bg-success/10 text-success border-success/20"
-                      : "bg-muted/50 text-muted-foreground border-border/50"
+                      : "bg-muted/50 text-muted-foreground border-border/50",
                   )}
                 >
                   {completed ? (
@@ -133,8 +147,8 @@ export function OnboardingProgress({ variant = 'compact', className }: Onboardin
             })}
           </div>
 
-          <Button 
-            onClick={openWizard} 
+          <Button
+            onClick={openWizard}
             className="font-black text-xs uppercase tracking-widest px-8 h-12 rounded-2xl shadow-xl shadow-primary/25 gap-3"
           >
             Configurar Módulo Seguinte
