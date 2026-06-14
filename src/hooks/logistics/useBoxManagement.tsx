@@ -38,12 +38,17 @@ export function useBoxManagement() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: deliveries = [], isLoading, refetch } = useQuery({
+  const {
+    data: deliveries = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["box-deliveries", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("entregas")
-        .select(`
+        .select(
+          `
           id,
           numero_entrega,
           endereco_entrega,
@@ -55,9 +60,12 @@ export function useBoxManagement() {
           updated_at,
           cliente:clientes(razao_social),
           transportadora:transportadoras(nome_fantasia)
-        `)
+        `,
+        )
+        .is("deleted_at", null)
         .in("status", ["pronto_despacho", "nf_emitida", "cotacao_frete"])
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(500);
 
       if (error) throw error;
 
@@ -76,10 +84,14 @@ export function useBoxManagement() {
   // Enable realtime for boxes
   useEffect(() => {
     const channel = supabase
-      .channel('box-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'entregas' }, () => {
-        refetch();
-      })
+      .channel("box-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "entregas" },
+        () => {
+          refetch();
+        },
+      )
       .subscribe();
 
     return () => {
@@ -107,11 +119,23 @@ export function useBoxManagement() {
 
   // Allocate delivery to box
   const allocateMutation = useMutation({
-    mutationFn: async ({ boxNumber, deliveryId, version }: { boxNumber: number; deliveryId: string; version: number }) => {
+    mutationFn: async ({
+      boxNumber,
+      deliveryId,
+      version,
+    }: {
+      boxNumber: number;
+      deliveryId: string;
+      version: number;
+    }) => {
       const boxId = boxNumber.toString().padStart(2, "0");
 
-      const { data: currentDelivery } = await supabase.from("entregas").select("status").eq("id", deliveryId).single();
-      
+      const { data: currentDelivery } = await supabase
+        .from("entregas")
+        .select("status")
+        .eq("id", deliveryId)
+        .single();
+
       const { error } = await supabase
         .from("entregas")
         .update({ box_alocado: boxId })
@@ -124,14 +148,16 @@ export function useBoxManagement() {
       await supabase.from("kanban_history").insert({
         delivery_id: deliveryId,
         from_status: currentDelivery?.status || null,
-        to_status: currentDelivery?.status || 'desconhecido',
+        to_status: currentDelivery?.status || "desconhecido",
         action_by: user?.id,
-        notes: `Alocado ao BOX ${boxId}`
+        notes: `Alocado ao BOX ${boxId}`,
       });
     },
     onSuccess: (_, { boxNumber }) => {
       queryClient.invalidateQueries({ queryKey: ["box-deliveries"] });
-      toast.success(`Entrega alocada no BOX ${boxNumber.toString().padStart(2, "0")}`);
+      toast.success(
+        `Entrega alocada no BOX ${boxNumber.toString().padStart(2, "0")}`,
+      );
     },
     onError: () => {
       toast.error("Erro ao alocar entrega no box");
@@ -140,7 +166,13 @@ export function useBoxManagement() {
 
   // Toggle Cross-docking
   const toggleCrossDockingMutation = useMutation({
-    mutationFn: async ({ deliveryId, isCrossDocking }: { deliveryId: string, isCrossDocking: boolean }) => {
+    mutationFn: async ({
+      deliveryId,
+      isCrossDocking,
+    }: {
+      deliveryId: string;
+      isCrossDocking: boolean;
+    }) => {
       const { error } = await supabase
         .from("entregas")
         .update({ is_cross_docking: isCrossDocking })
@@ -161,7 +193,11 @@ export function useBoxManagement() {
   const removeMutation = useMutation({
     mutationFn: async (boxNumber: number) => {
       const boxId = boxNumber.toString().padStart(2, "0");
-      const { data: delivery } = await supabase.from("entregas").select("id, status").eq("box_alocado", boxId).single();
+      const { data: delivery } = await supabase
+        .from("entregas")
+        .select("id, status")
+        .eq("box_alocado", boxId)
+        .single();
 
       const { error } = await supabase
         .from("entregas")
@@ -176,7 +212,7 @@ export function useBoxManagement() {
           from_status: delivery.status,
           to_status: delivery.status,
           action_by: user?.id,
-          notes: `Removido do BOX ${boxId}`
+          notes: `Removido do BOX ${boxId}`,
         });
       }
     },
@@ -189,7 +225,11 @@ export function useBoxManagement() {
     },
   });
 
-  const allocateToBox = (boxNumber: number, deliveryId: string, version: number) => {
+  const allocateToBox = (
+    boxNumber: number,
+    deliveryId: string,
+    version: number,
+  ) => {
     return allocateMutation.mutateAsync({ boxNumber, deliveryId, version });
   };
 
@@ -198,7 +238,10 @@ export function useBoxManagement() {
   };
 
   const toggleCrossDocking = (deliveryId: string, isCrossDocking: boolean) => {
-    return toggleCrossDockingMutation.mutateAsync({ deliveryId, isCrossDocking });
+    return toggleCrossDockingMutation.mutateAsync({
+      deliveryId,
+      isCrossDocking,
+    });
   };
 
   return {

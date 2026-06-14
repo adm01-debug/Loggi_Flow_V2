@@ -77,6 +77,7 @@ export function MaterialLabelPrinter() {
         .select(
           "id, numero_entrega, endereco_entrega, nf_remessa, status, created_at, data_despacho, valor_frete, codigo_rastreamento, cliente:clientes(razao_social, nome_fantasia), transportadora:transportadoras(nome_fantasia)",
         )
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
