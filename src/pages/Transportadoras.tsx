@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,6 +163,7 @@ const emptyForm = {
 
 export default function Transportadoras() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { exportToCSV, exportToJSON } = useExport();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
@@ -171,16 +172,17 @@ export default function Transportadoras() {
   const [estadoFilter, setEstadoFilter] = useState("");
   const [ativaFilter, setAtivaFilter] = useState("");
 
-  const {
-    data: list = [],
-    isLoading: loading,
-    refetch: fetchData,
-  } = useQuery({
+  const { data: list = [], isLoading: loading } = useQuery({
     queryKey: ["transportadoras-list"],
     queryFn: async () => {
       // Parallel fetch for transportadoras and their performance stats
       const [tRes, statsRes] = await Promise.all([
-        supabase.from("transportadoras").select("*").order("nome_fantasia"),
+        supabase
+          .from("transportadoras")
+          .select("*")
+          .is("deleted_at", null)
+          .order("nome_fantasia")
+          .limit(500),
         supabase.rpc("get_carrier_performance_stats"),
       ]);
 
@@ -227,40 +229,14 @@ export default function Transportadoras() {
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } =
     useSelection(pagination.paginatedData);
 
-  const handleSubmit = async () => {
-    const { error } = await supabase.from("transportadoras").insert({
-      razao_social: form.razao_social,
-      nome_fantasia: form.nome_fantasia,
-      cnpj: form.cnpj || "",
-      contato_comercial: form.contato_comercial || "",
-      email_comercial: form.email_comercial || "",
-      whatsapp_operacional: form.whatsapp_operacional,
-      url_rastreamento: form.url_rastreamento,
-      observacoes: form.observacoes,
-      homologada: form.homologada,
-      credentials: form.credentials,
-      non_api_config: form.non_api_config,
-      coverage_details: form.coverage_details,
-    });
-    if (error) {
-      toast({
-        title: "Erro",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-    toast({ title: "Sucesso", description: "Transportadora cadastrada!" });
-    setDialogOpen(false);
-    fetchData();
-    setForm(emptyForm);
-  };
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  const handleUpdate = async () => {
-    if (!selected) return;
-    const { error } = await supabase
-      .from("transportadoras")
-      .update({
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ["transportadoras-list"] });
+
+  const insertMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("transportadoras").insert({
         razao_social: form.razao_social,
         nome_fantasia: form.nome_fantasia,
         cnpj: form.cnpj || "",
@@ -273,61 +249,111 @@ export default function Transportadoras() {
         credentials: form.credentials,
         non_api_config: form.non_api_config,
         coverage_details: form.coverage_details,
-      })
-      .eq("id", selected.id);
-    if (error) {
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "Sucesso", description: "Transportadora cadastrada!" });
+      setDialogOpen(false);
+      setForm(emptyForm);
+      invalidate();
+    },
+    onError: (error: any) =>
       toast({
         title: "Erro",
         description: error.message,
         variant: "destructive",
-      });
-      return;
-    }
-    toast({ title: "Sucesso", description: "Atualizado!" });
-    setEditDialog(false);
-    fetchData();
-  };
+      }),
+  });
 
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase
-      .from("transportadoras")
-      .delete()
-      .eq("id", id);
-    if (error)
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      if (!selected) return;
+      const { error } = await supabase
+        .from("transportadoras")
+        .update({
+          razao_social: form.razao_social,
+          nome_fantasia: form.nome_fantasia,
+          cnpj: form.cnpj || "",
+          contato_comercial: form.contato_comercial || "",
+          email_comercial: form.email_comercial || "",
+          whatsapp_operacional: form.whatsapp_operacional,
+          url_rastreamento: form.url_rastreamento,
+          observacoes: form.observacoes,
+          homologada: form.homologada,
+          credentials: form.credentials,
+          non_api_config: form.non_api_config,
+          coverage_details: form.coverage_details,
+        })
+        .eq("id", selected.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "Sucesso", description: "Atualizado!" });
+      setEditDialog(false);
+      invalidate();
+    },
+    onError: (error: any) =>
       toast({
         title: "Erro",
         description: error.message,
         variant: "destructive",
-      });
-    else {
+      }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("transportadoras")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
       toast({ title: "Sucesso", description: "Excluído!" });
-      fetchData();
-    }
-    setDeleteTarget(null);
-  };
-
-  const bulkToggleAtiva = async (ids: string[], homologada: boolean) => {
-    const { error } = await supabase
-      .from("transportadoras")
-      .update({ homologada })
-      .in("id", ids);
-    if (error)
+      setDeleteTarget(null);
+      invalidate();
+    },
+    onError: (error: any) => {
       toast({
         title: "Erro",
         description: error.message,
         variant: "destructive",
       });
-    else {
+      setDeleteTarget(null);
+    },
+  });
+
+  const bulkToggleMutation = useMutation({
+    mutationFn: async ({
+      ids,
+      homologada,
+    }: {
+      ids: string[];
+      homologada: boolean;
+    }) => {
+      const { error } = await supabase
+        .from("transportadoras")
+        .update({ homologada })
+        .in("id", ids);
+      if (error) throw error;
+      return { ids, homologada };
+    },
+    onSuccess: ({ ids, homologada }) => {
       toast({
         title: "Sucesso",
         description: `${ids.length} transportadora(s) ${homologada ? "ativada(s)" : "desativada(s)"}!`,
       });
       clearSelection();
-      fetchData();
-    }
-  };
+      invalidate();
+    },
+    onError: (error: any) =>
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      }),
+  });
 
   const openEdit = (t: Transportadora) => {
     setSelected(t);
@@ -790,10 +816,17 @@ export default function Transportadoras() {
                       Cancelar
                     </Button>
                     <Button
-                      onClick={handleSubmit}
-                      disabled={!form.razao_social || !form.nome_fantasia}
+                      onClick={() => insertMutation.mutate()}
+                      disabled={
+                        !form.razao_social ||
+                        !form.nome_fantasia ||
+                        insertMutation.isPending
+                      }
                       className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary text-white"
                     >
+                      {insertMutation.isPending ? (
+                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                      ) : null}
                       Cadastrar
                     </Button>
                   </DialogFooter>
@@ -906,14 +939,16 @@ export default function Transportadoras() {
                   id: "ativar",
                   label: "Ativar",
                   icon: CheckCircle2,
-                  onClick: (ids) => bulkToggleAtiva(ids, true),
+                  onClick: (ids) =>
+                    bulkToggleMutation.mutate({ ids, homologada: true }),
                 },
                 {
                   id: "desativar",
                   label: "Desativar",
                   icon: XCircle,
                   variant: "destructive",
-                  onClick: (ids) => bulkToggleAtiva(ids, false),
+                  onClick: (ids) =>
+                    bulkToggleMutation.mutate({ ids, homologada: false }),
                 },
               ]}
             />
@@ -1110,9 +1145,15 @@ export default function Transportadoras() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deleteTarget && handleDelete(deleteTarget)}
+              onClick={() =>
+                deleteTarget && deleteMutation.mutate(deleteTarget)
+              }
+              disabled={deleteMutation.isPending}
               className="bg-destructive text-destructive-foreground"
             >
+              {deleteMutation.isPending ? (
+                <Loader2 className="w-3 h-3 animate-spin mr-1" />
+              ) : null}
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1129,7 +1170,15 @@ export default function Transportadoras() {
             <Button variant="outline" onClick={() => setEditDialog(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleUpdate}>Salvar Alterações</Button>
+            <Button
+              onClick={() => updateMutation.mutate()}
+              disabled={updateMutation.isPending}
+            >
+              {updateMutation.isPending ? (
+                <Loader2 className="w-3 h-3 animate-spin mr-1" />
+              ) : null}
+              Salvar Alterações
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

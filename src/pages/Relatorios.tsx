@@ -67,7 +67,8 @@ export default function Relatorios() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("performance_metrics")
-        .select("*");
+        .select("*")
+        .limit(1000);
       if (error) throw error;
       return data || [];
     },
@@ -83,7 +84,9 @@ export default function Relatorios() {
       const { data, error } = await supabase
         .from("coletas")
         .select("id, status, created_at, data_efetiva_coleta")
-        .gte("created_at", startDate.toISOString());
+        .is("deleted_at", null)
+        .gte("created_at", startDate.toISOString())
+        .limit(5000);
       if (error) throw error;
       return data || [];
     },
@@ -95,7 +98,9 @@ export default function Relatorios() {
       const { data, error } = await supabase
         .from("entregas")
         .select("id, status, created_at, data_entrega_efetiva, tipo_frete")
-        .gte("created_at", startDate.toISOString());
+        .is("deleted_at", null)
+        .gte("created_at", startDate.toISOString())
+        .limit(5000);
       if (error) throw error;
       return data || [];
     },
@@ -107,7 +112,9 @@ export default function Relatorios() {
       const { data, error } = await supabase
         .from("fretes_internos")
         .select("id, status, created_at, data_entrega_efetiva")
-        .gte("created_at", startDate.toISOString());
+        .is("deleted_at", null)
+        .gte("created_at", startDate.toISOString())
+        .limit(5000);
       if (error) throw error;
       return data || [];
     },
@@ -214,14 +221,12 @@ export default function Relatorios() {
   }, [entregas]);
 
   const driverPerformance = useMemo(() => {
-    return userLevels
-      .slice(0, 5)
-      .map((u) => ({
-        name: u.name?.split(" ")[0] || "User",
-        xp: u.total_xp,
-        nivel: u.level,
-        eficiencia: Math.min(100, 80 + Math.floor(Math.random() * 20)),
-      }));
+    return userLevels.slice(0, 5).map((u) => ({
+      name: u.name?.split(" ")[0] || "User",
+      xp: u.total_xp,
+      nivel: u.level,
+      eficiencia: Math.min(100, 80 + Math.floor(Math.random() * 20)),
+    }));
   }, [userLevels]);
 
   // Stats
