@@ -1,12 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { typeConfig } from "./ConfirmProvider";
 
-export type ConfirmType = "danger" | "warning" | "info" | "success" | "critical";
+export type ConfirmType =
+  | "danger"
+  | "warning"
+  | "info"
+  | "success"
+  | "critical";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -22,34 +36,63 @@ interface ConfirmDialogProps {
 }
 
 export function ConfirmDialog({
-  open, onOpenChange, title, description, confirmText = "Confirmar", cancelText = "Cancelar",
-  type = "warning", onConfirm, isLoading = false, requireTyping,
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmText = "Confirmar",
+  cancelText = "Cancelar",
+  type = "warning",
+  onConfirm,
+  isLoading = false,
+  requireTyping,
 }: ConfirmDialogProps) {
   const [typedValue, setTypedValue] = useState("");
   const config = typeConfig[type];
+
+  useEffect(() => {
+    if (!open) setTypedValue("");
+  }, [open]);
   const Icon = config.icon;
   const canConfirm = !requireTyping || typedValue === requireTyping;
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-3">
-              <div className={cn("p-2 rounded-full", config.bgClass)}><Icon className={cn("w-5 h-5", config.iconClass)} /></div>
+              <div className={cn("p-2 rounded-full", config.bgClass)}>
+                <Icon className={cn("w-5 h-5", config.iconClass)} />
+              </div>
               {title}
             </AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>
           </AlertDialogHeader>
           {requireTyping && (
             <div className="my-4">
-              <Input value={typedValue} onChange={(e) => setTypedValue(e.target.value)} placeholder={`Digite "${requireTyping}" para confirmar`} className="font-mono" />
+              <Input
+                value={typedValue}
+                onChange={(e) => setTypedValue(e.target.value)}
+                placeholder={`Digite "${requireTyping}" para confirmar`}
+                className="font-mono"
+              />
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>{cancelText}</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirm} disabled={isLoading || !canConfirm} className={config.buttonClass}>
-              {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}{confirmText}
+            <AlertDialogCancel disabled={isLoading}>
+              {cancelText}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onConfirm}
+              disabled={isLoading || !canConfirm}
+              className={config.buttonClass}
+            >
+              {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {confirmText}
             </AlertDialogAction>
           </AlertDialogFooter>
         </motion.div>

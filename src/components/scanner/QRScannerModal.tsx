@@ -72,9 +72,7 @@ export function QRScannerModal({
       startScanning();
     }
     return () => {
-      if (!open) {
-        stopScanning();
-      }
+      stopScanning();
     };
   }, [open, hasPermission]);
 

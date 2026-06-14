@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { authService, Profile } from "@/services/api/authService";
@@ -6,7 +12,6 @@ import { authService, Profile } from "@/services/api/authService";
 interface UserRole {
   role: "admin" | "user";
 }
-
 
 interface AuthContextType {
   user: User | null;
@@ -16,12 +21,15 @@ interface AuthContextType {
   isAdmin: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -34,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const [profileData, rolesData] = await Promise.all([
         authService.fetchProfile(userId),
-        authService.fetchRoles(userId)
+        authService.fetchRoles(userId),
       ]);
 
       if (profileData) {
@@ -52,29 +60,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-
   useEffect(() => {
     let isMounted = true;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) return;
+
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        await fetchUserData(session.user.id);
         if (!isMounted) return;
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-          await fetchUserData(session.user.id);
-        } else {
-          setProfile(null);
-          setRoles([]);
-        }
-
-        if (event === "INITIAL_SESSION") {
-          setIsLoading(false);
-        }
+      } else {
+        setProfile(null);
+        setRoles([]);
       }
-    );
+
+      setIsLoading(false);
+    });
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!isMounted) return;
@@ -104,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
-    
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -125,7 +131,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setRoles([]);
   };
-
 
   const isAdmin = roles.includes("admin");
 

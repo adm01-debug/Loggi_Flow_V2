@@ -11,7 +11,8 @@ export function SystemHealthWidget() {
       const { data, error } = await supabase
         .from("system_heartbeat")
         .select("*")
-        .order("service_name", { ascending: true });
+        .order("service_name", { ascending: true })
+        .limit(50);
       if (error) throw error;
       return data;
     },

@@ -16,41 +16,45 @@ export interface CotacaoFrete {
 export const logisticsService = {
   async fetchCotacoes(): Promise<CotacaoFrete[]> {
     const { data, error } = await supabase
-      .from('cotacoes_frete')
-      .select(`
+      .from("cotacoes_frete")
+      .select(
+        `
         *,
         transportadora:transportadoras(nome_fantasia),
         entrega:entregas(numero_entrega, endereco_entrega)
-      `)
-      .order('created_at', { ascending: false })
+      `,
+      )
+      .order("created_at", { ascending: false })
       .limit(200);
-    
+
     if (error) throw error;
     return data as CotacaoFrete[];
   },
 
   async selectCotacao(id: string, entregaId: string): Promise<void> {
     // Deselect all others for same entrega
-    await supabase
-      .from('cotacoes_frete')
+    const { error: deselectError } = await supabase
+      .from("cotacoes_frete")
       .update({ selecionada: false })
-      .eq('entrega_id', entregaId);
+      .eq("entrega_id", entregaId);
+
+    if (deselectError) throw deselectError;
 
     // Select this one
     const { error } = await supabase
-      .from('cotacoes_frete')
+      .from("cotacoes_frete")
       .update({ selecionada: true })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
   },
 
   async deleteCotacao(id: string): Promise<void> {
     const { error } = await supabase
-      .from('cotacoes_frete')
+      .from("cotacoes_frete")
       .delete()
-      .eq('id', id);
-    
+      .eq("id", id);
+
     if (error) throw error;
-  }
+  },
 };

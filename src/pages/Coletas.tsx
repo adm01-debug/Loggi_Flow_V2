@@ -118,6 +118,7 @@ export default function Coletas() {
         .select(
           "*, fornecedores!fk_coletas_fornecedor(razao_social, nome_fantasia), transportadoras!fk_coletas_transportadora(nome_fantasia)",
         )
+        .is("deleted_at", null)
         .order("created_at", { ascending: false });
 
       if (error) throw error;

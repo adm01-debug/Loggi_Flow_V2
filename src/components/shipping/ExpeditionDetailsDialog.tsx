@@ -88,7 +88,8 @@ export function ExpeditionDetailsDialog({
       `,
       )
       .eq("delivery_id", delivery.id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(100);
 
     if (data) setTimeline(data as unknown as TimelineEvent[]);
     setLoadingTimeline(false);
@@ -96,9 +97,10 @@ export function ExpeditionDetailsDialog({
 
   useEffect(() => {
     if (open && delivery) {
+      setActiveTab("detalhes");
       fetchTimeline();
     }
-  }, [open, delivery, fetchTimeline]);
+  }, [open, delivery?.id, fetchTimeline]);
 
   if (!delivery) return null;
 
@@ -184,7 +186,7 @@ export function ExpeditionDetailsDialog({
             onValueChange={handleTabChange}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
+            <TabsList className="grid w-full grid-cols-3 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
               <TabsTrigger
                 value="detalhes"
                 className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"

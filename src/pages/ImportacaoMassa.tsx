@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Stepper } from "@/components/ui/stepper";
 import { Progress } from "@/components/ui/progress";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -108,6 +109,7 @@ interface ImportStats {
 }
 
 export default function ImportacaoMassa() {
+  const queryClient = useQueryClient();
   const [history, setHistory] = useState<ImportStats[]>([]);
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
@@ -165,6 +167,9 @@ export default function ImportacaoMassa() {
     } else {
       toast.error(`Falha ao importar ${errorCount} registros`);
     }
+
+    // Invalidate related caches so list pages reflect the new data
+    queryClient.invalidateQueries({ queryKey: [entity] });
 
     // Reset step after some time
     setTimeout(() => setCurrentStep(0), 5000);

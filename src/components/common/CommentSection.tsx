@@ -89,17 +89,17 @@ export function CommentSection({
             <div
               key={comment.id}
               className={cn(
-                "flex gap-3 p-3 rounded-lg",
+                "group flex gap-3 p-3 rounded-lg",
                 comment.user_id === user?.id
                   ? "bg-primary/5 ml-8"
-                  : "bg-muted/50 mr-8"
+                  : "bg-muted/50 mr-8",
               )}
             >
               <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarFallback className="text-xs">
                   {getInitials(
                     comment.user?.email || "",
-                    comment.user?.full_name
+                    comment.user?.full_name,
                   )}
                 </AvatarFallback>
               </Avatar>

@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface SendResetRequest {
@@ -32,21 +33,24 @@ serve(async (req: Request) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       console.error("No authorization header provided");
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
+
     if (authError || !user) {
       console.error("Auth error:", authError);
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Check if user is admin
@@ -60,20 +64,23 @@ serve(async (req: Request) => {
       console.error("User is not an admin");
       return new Response(
         JSON.stringify({ error: "Forbidden - Admin access required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
     const { requestId }: SendResetRequest = await req.json();
 
     if (!requestId) {
-      return new Response(
-        JSON.stringify({ error: "Request ID is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Request ID is required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    log.info(`Processing password reset request: ${requestId}`);
+    console.log(`Processing password reset request: ${requestId}`);
 
     // Get the request details
     const { data: resetRequest, error: fetchError } = await supabaseAdmin
@@ -86,23 +93,31 @@ serve(async (req: Request) => {
       console.error("Error fetching request:", fetchError);
       return new Response(
         JSON.stringify({ error: "Reset request not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
     if (resetRequest.status !== "pending") {
       return new Response(
         JSON.stringify({ error: "Request has already been processed" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
     // Get the origin from the request headers or use a default
-    const origin = req.headers.get("origin") || "https://uwbpzfcysppwikfpnzok.lovableproject.com";
+    const origin =
+      req.headers.get("origin") ||
+      "https://uwbpzfcysppwikfpnzok.lovableproject.com";
     const redirectTo = `${origin}/reset-password`;
 
-    log.info(`Sending password reset email to: ${resetRequest.email}`);
-    log.info(`Redirect URL: ${redirectTo}`);
+    console.log(`Sending password reset email to: ${resetRequest.email}`);
+    console.log(`Redirect URL: ${redirectTo}`);
 
     // Send the password reset email using admin API
     const { error: resetError } = await supabaseAdmin.auth.admin.generateLink({
@@ -116,8 +131,13 @@ serve(async (req: Request) => {
     if (resetError) {
       console.error("Error generating reset link:", resetError);
       return new Response(
-        JSON.stringify({ error: `Failed to send reset email: ${resetError.message}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: `Failed to send reset email: ${resetError.message}`,
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -135,18 +155,24 @@ serve(async (req: Request) => {
       console.error("Error updating request status:", updateError);
     }
 
-    log.info(`Password reset approved and email sent for request: ${requestId}`);
+    console.log(
+      `Password reset approved and email sent for request: ${requestId}`,
+    );
 
     return new Response(
       JSON.stringify({ success: true, message: "Password reset email sent" }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     console.error("Unexpected error:", error);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

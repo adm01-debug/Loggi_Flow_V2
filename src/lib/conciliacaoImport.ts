@@ -9,7 +9,7 @@ export interface ConciliacaoImportItem {
   data_documento: string | null;
   valor: number;
   transportadora_nome: string;
-  dados_originais: Record<string, never>;
+  dados_originais: Record<string, unknown>;
   status: "pendente";
 }
 
@@ -50,7 +50,7 @@ export function toISODate(value: unknown): string | null {
     const s = String(value).trim();
     const br = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     date = br
-      ? new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]))
+      ? new Date(Date.UTC(Number(br[3]), Number(br[2]) - 1, Number(br[1])))
       : new Date(s);
   }
   return Number.isNaN(date.getTime()) ? null : date.toISOString().split("T")[0];

@@ -248,11 +248,14 @@ export const handler = async (req: Request) => {
         analyzed_at: now.toISOString(),
       }));
 
-      // Clear old cache first
+      // Clear predictions older than 6 hours
+      const sixHoursAgo = new Date(
+        Date.now() - 6 * 60 * 60 * 1000,
+      ).toISOString();
       await supabase
         .from("ai_delay_predictions")
         .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000");
+        .lt("analyzed_at", sixHoursAgo);
 
       const { error: cacheError } = await supabase
         .from("ai_delay_predictions")

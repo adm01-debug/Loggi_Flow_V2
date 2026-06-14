@@ -216,6 +216,9 @@ export function MapboxMap({
       essential: true,
     });
 
+    let rotateRafId: number;
+    let rotateTimeoutId: ReturnType<typeof setTimeout>;
+
     if (isDroneView && markers.length > 0) {
       const target = markers[0];
       map.current.flyTo({
@@ -232,14 +235,15 @@ export function MapboxMap({
         bearing += 0.05;
         map.current.setBearing(bearing % 360);
 
-        // Sync center in case it moves due to time travel
         if (markers.length > 0) {
           map.current.setCenter([markers[0].lng, markers[0].lat]);
         }
 
-        requestAnimationFrame(rotateCamera);
+        rotateRafId = requestAnimationFrame(rotateCamera);
       };
-      setTimeout(rotateCamera, 2000);
+      rotateTimeoutId = setTimeout(() => {
+        rotateRafId = requestAnimationFrame(rotateCamera);
+      }, 2000);
     }
 
     const updateTraffic = () => {
@@ -308,6 +312,7 @@ export function MapboxMap({
           // Pulse effect for weather
           let opacity = 0.15;
           let direction = 1;
+          let weatherRafId: number;
           const animateWeather = () => {
             if (!map.current?.getLayer("weather-layer")) return;
             opacity += 0.005 * direction;
@@ -317,9 +322,9 @@ export function MapboxMap({
               "fill-opacity",
               opacity,
             );
-            requestAnimationFrame(animateWeather);
+            weatherRafId = requestAnimationFrame(animateWeather);
           };
-          animateWeather();
+          weatherRafId = requestAnimationFrame(animateWeather);
         }
       } else {
         if (map.current.getLayer("weather-layer")) {
@@ -338,7 +343,12 @@ export function MapboxMap({
         updateWeather();
       });
     }
-  }, [mapStyle, pitch, showTraffic, showWeather]);
+
+    return () => {
+      clearTimeout(rotateTimeoutId);
+      cancelAnimationFrame(rotateRafId);
+    };
+  }, [mapStyle, pitch, showTraffic, showWeather, isDroneView, markers]);
 
   // Risk Zones Visualization
   useEffect(() => {

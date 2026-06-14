@@ -23,18 +23,13 @@ serve(async (req) => {
 
     const raw = await req.text();
 
-    // Verify webhook signature (skipped if CARRIER_WEBHOOK_SECRET unset)
-    const isTestMode = req.headers.get("x-test-mode") === "true";
-    if (!isTestMode) {
-      const signature = req.headers.get("x-webhook-signature") || "";
-      if (
-        !(await verifyWebhookHmac(raw, signature, "CARRIER_WEBHOOK_SECRET"))
-      ) {
-        return new Response(JSON.stringify({ error: "Invalid signature" }), {
-          status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    // Verify webhook signature
+    const signature = req.headers.get("x-webhook-signature") || "";
+    if (!(await verifyWebhookHmac(raw, signature, "CARRIER_WEBHOOK_SECRET"))) {
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const payload = JSON.parse(raw);
@@ -80,9 +75,10 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("[carrier-webhook-receiver] Error:", error.message);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
+      status: 500,
     });
   }
 });

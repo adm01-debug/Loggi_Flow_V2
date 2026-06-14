@@ -78,7 +78,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
@@ -416,19 +416,17 @@ export default function Envios() {
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
       const numero = `ENT-${Date.now().toString().slice(-8)}`;
-      const { error } = await supabase
-        .from("entregas")
-        .insert({
-          numero_entrega: numero,
-          cliente_id: d.cliente_id || null,
-          endereco_entrega: d.endereco_entrega,
-          contato_cliente: d.contato_cliente || null,
-          tipo_frete: d.tipo_frete,
-          transportadora_id: d.transportadora_id || null,
-          previsao_entrega: d.previsao_entrega || null,
-          observacoes: d.observacoes || null,
-          status: "aguardando_producao",
-        });
+      const { error } = await supabase.from("entregas").insert({
+        numero_entrega: numero,
+        cliente_id: d.cliente_id || null,
+        endereco_entrega: d.endereco_entrega,
+        contato_cliente: d.contato_cliente || null,
+        tipo_frete: d.tipo_frete,
+        transportadora_id: d.transportadora_id || null,
+        previsao_entrega: d.previsao_entrega || null,
+        observacoes: d.observacoes || null,
+        status: "aguardando_producao",
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -474,7 +472,10 @@ export default function Envios() {
 
   const deleteMut = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("entregas").delete().eq("id", id);
+      const { error } = await supabase
+        .from("entregas")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -832,7 +833,8 @@ export default function Envios() {
                           <Calendar className="w-4 h-4 text-primary" />
                         </div>
                         <span className="uppercase text-[11px] tracking-tight">
-                          {e.previsao_entrega
+                          {e.previsao_entrega &&
+                          isValid(new Date(e.previsao_entrega))
                             ? format(new Date(e.previsao_entrega), "dd MMM", {
                                 locale: ptBR,
                               })
