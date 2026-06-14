@@ -1,33 +1,42 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Route, Plus, Truck, Upload } from 'lucide-react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader } from '@/components/common/PageHeader';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RotaSearchFilter } from '@/components/transportadoras/RotaSearchFilter';
-import { RotaResultsList } from '@/components/transportadoras/RotaResultsList';
-import { RotaFormDialog } from '@/components/transportadoras/RotaFormDialog';
-import { BulkRouteImport } from '@/components/transportadoras/BulkRouteImport';
-import { useTransportadoraRotas, RotaFilter, TransportadoraRota } from "@/hooks/logistics/useTransportadoraRotas";
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Route, Truck, Upload } from "lucide-react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { PageHeader } from "@/components/common/PageHeader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RotaSearchFilter } from "@/components/transportadoras/RotaSearchFilter";
+import { RotaResultsList } from "@/components/transportadoras/RotaResultsList";
+import { RotaFormDialog } from "@/components/transportadoras/RotaFormDialog";
+import { BulkRouteImport } from "@/components/transportadoras/BulkRouteImport";
+import {
+  useTransportadoraRotas,
+  RotaFilter,
+  TransportadoraRota,
+} from "@/hooks/logistics/useTransportadoraRotas";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function RotasTransportadoras() {
-  const [activeFilters, setActiveFilters] = useState<RotaFilter>({ apenas_ativas: true });
-  const [searchResults, setSearchResults] = useState<TransportadoraRota[] | null>(null);
-  
-  const { rotas, isLoading, addRota, deleteRota } = useTransportadoraRotas(activeFilters);
+  const [activeFilters, setActiveFilters] = useState<RotaFilter>({
+    apenas_ativas: true,
+  });
+  const [searchResults, setSearchResults] = useState<
+    TransportadoraRota[] | null
+  >(null);
+
+  const { rotas, isLoading, addRota, deleteRota } =
+    useTransportadoraRotas(activeFilters);
 
   // Fetch transportadoras for the form
   const { data: transportadoras = [] } = useQuery({
-    queryKey: ['transportadoras-list'],
+    queryKey: ["transportadoras-list"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('transportadoras')
-        .select('id, nome_fantasia')
-        .eq('homologada', true)
-        .order('nome_fantasia');
-      
+        .from("transportadoras")
+        .select("id, nome_fantasia")
+        .eq("homologada", true)
+        .order("nome_fantasia");
+
       if (error) throw error;
       return data;
     },
@@ -44,7 +53,9 @@ export default function RotasTransportadoras() {
   };
 
   const handleSelectRota = (rota: TransportadoraRota) => {
-    toast.success(`Transportadora ${rota.transportadora?.nome_fantasia} selecionada!`);
+    toast.success(
+      `Transportadora ${rota.transportadora?.nome_fantasia} selecionada!`,
+    );
     // Here you could emit an event or call a callback to use this carrier
   };
 
@@ -107,10 +118,7 @@ export default function RotasTransportadoras() {
             />
           </div>
 
-          <RotaResultsList
-            rotas={rotas}
-            isLoading={isLoading}
-          />
+          <RotaResultsList rotas={rotas} isLoading={isLoading} />
         </TabsContent>
         <TabsContent value="importar" className="space-y-6">
           <BulkRouteImport />

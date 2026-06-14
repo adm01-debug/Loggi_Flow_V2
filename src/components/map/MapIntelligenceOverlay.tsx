@@ -1,30 +1,48 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Zap, Clock, ShieldCheck, TrendingUp, AlertTriangle, Activity } from "lucide-react";
+import {
+  Brain,
+  Zap,
+  ShieldCheck,
+  TrendingUp,
+  AlertTriangle,
+  Activity,
+} from "lucide-react";
 import { motion } from "framer-motion";
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 const mockSystemLoad = [
-  { val: 40 }, { val: 45 }, { val: 42 }, { val: 48 }, { val: 55 }, { val: 50 }, { val: 47 }, { val: 52 }, { val: 49 }, { val: 45 }
+  { val: 40 },
+  { val: 45 },
+  { val: 42 },
+  { val: 48 },
+  { val: 55 },
+  { val: 50 },
+  { val: 47 },
+  { val: 52 },
+  { val: 49 },
+  { val: 45 },
 ];
 
 export function MapIntelligenceOverlay() {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       className="absolute top-4 right-4 z-10 w-72 space-y-3 pointer-events-none"
     >
       <Card className="bg-black/90 backdrop-blur-3xl border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)] pointer-events-auto overflow-hidden rounded-[2rem]">
         <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 animate-pulse" />
-        
+
         <CardHeader className="p-5 pb-2">
           <CardTitle className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 flex items-center justify-between">
             <span className="flex items-center gap-2 italic">
               <Brain className="w-4 h-4 animate-pulse" />
               Nexus_Core_AI
             </span>
-            <Badge className="bg-cyan-500/10 text-cyan-400 text-[8px] font-black border-cyan-500/20">V.4.0_STABLE</Badge>
+            <Badge className="bg-cyan-500/10 text-cyan-400 text-[8px] font-black border-cyan-500/20">
+              V.4.0_STABLE
+            </Badge>
           </CardTitle>
         </CardHeader>
 
@@ -33,21 +51,32 @@ export function MapIntelligenceOverlay() {
           <div className="space-y-3">
             <div className="flex justify-between items-end">
               <div>
-                <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest block mb-1">Grid_Efficiency</span>
-                <span className="text-2xl font-black text-white italic leading-none tracking-tighter">98.4<span className="text-cyan-500/50">%</span></span>
+                <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest block mb-1">
+                  Grid_Efficiency
+                </span>
+                <span className="text-2xl font-black text-white italic leading-none tracking-tighter">
+                  98.4<span className="text-cyan-500/50">%</span>
+                </span>
               </div>
               <div className="h-8 w-24">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={mockSystemLoad}>
-                    <Line type="monotone" dataKey="val" stroke="#06b6d4" strokeWidth={2} dot={false} isAnimationActive={true} />
+                    <Line
+                      type="monotone"
+                      dataKey="val"
+                      stroke="#06b6d4"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={true}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
             <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-              <motion.div 
+              <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: '98.4%' }}
+                animate={{ width: "98.4%" }}
                 className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.5)]"
               />
             </div>
@@ -59,7 +88,9 @@ export function MapIntelligenceOverlay() {
                 <TrendingUp className="w-3 h-3 text-cyan-500" /> Latência
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-white italic tracking-tight">12ms</span>
+                <span className="text-xs font-black text-white italic tracking-tight">
+                  12ms
+                </span>
                 <div className="flex gap-0.5 items-end h-3">
                   <div className="w-0.5 h-full bg-cyan-500/50 rounded-full animate-pulse" />
                   <div className="w-0.5 h-2/3 bg-cyan-500/30 rounded-full" />
@@ -72,7 +103,9 @@ export function MapIntelligenceOverlay() {
                 <Activity className="w-3 h-3 text-rose-500" /> Bio_Sync
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-white italic tracking-tight">ACTIVE</span>
+                <span className="text-xs font-black text-white italic tracking-tight">
+                  ACTIVE
+                </span>
                 <div className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
               </div>
             </div>
@@ -82,21 +115,25 @@ export function MapIntelligenceOverlay() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-amber-500">
                 <AlertTriangle className="w-3.5 h-3.5 animate-bounce" />
-                <span className="text-[8px] font-black uppercase tracking-widest">Atenção em Rota B-12</span>
+                <span className="text-[8px] font-black uppercase tracking-widest">
+                  Atenção em Rota B-12
+                </span>
               </div>
-              <span className="text-[8px] font-bold text-white/20 tracking-tighter">04:12m</span>
+              <span className="text-[8px] font-bold text-white/20 tracking-tighter">
+                04:12m
+              </span>
             </div>
-            
+
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-[7px] font-black text-white/20 uppercase tracking-widest">
                 <span>Security_Integrity</span>
                 <span className="text-success">DEEP_ENCRYPTION_ON</span>
               </div>
               <div className="h-0.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div 
-                  animate={{ 
-                    x: ['-100%', '100%'],
-                    backgroundColor: ['#22c55e', '#06b6d4', '#22c55e']
+                <motion.div
+                  animate={{
+                    x: ["-100%", "100%"],
+                    backgroundColor: ["#22c55e", "#06b6d4", "#22c55e"],
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                   className="h-full w-1/3"
@@ -106,10 +143,11 @@ export function MapIntelligenceOverlay() {
 
             <div className="flex items-center gap-2 text-cyan-500">
               <Zap className="w-3.5 h-3.5" />
-              <span className="text-[8px] font-black uppercase tracking-widest">Recalculando Grid Preditivo</span>
+              <span className="text-[8px] font-black uppercase tracking-widest">
+                Recalculando Grid Preditivo
+              </span>
             </div>
           </div>
-
         </CardContent>
       </Card>
 
@@ -122,11 +160,20 @@ export function MapIntelligenceOverlay() {
                 <ShieldCheck className="w-5 h-5 text-success animate-pulse" />
               </div>
               <div>
-                <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mb-0.5">SLA_Integrity</p>
-                <p className="text-sm font-black text-white italic tracking-tight">PROTECTED_MODE</p>
+                <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mb-0.5">
+                  SLA_Integrity
+                </p>
+                <p className="text-sm font-black text-white italic tracking-tight">
+                  PROTECTED_MODE
+                </p>
               </div>
             </div>
-            <Badge variant="outline" className="bg-success/5 text-success border-success/20 text-[9px] font-black italic tracking-widest px-3">OK</Badge>
+            <Badge
+              variant="outline"
+              className="bg-success/5 text-success border-success/20 text-[9px] font-black italic tracking-widest px-3"
+            >
+              OK
+            </Badge>
           </div>
         </CardContent>
       </Card>

@@ -3,7 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, Wand2, CheckCircle2, AlertTriangle, RefreshCw, Send, Trash2, Zap } from "lucide-react";
+import {
+  MessageSquare,
+  Wand2,
+  CheckCircle2,
+  AlertTriangle,
+  RefreshCw,
+  Zap,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -31,10 +38,12 @@ export function ResponseConsole() {
         { event: "*", schema: "public", table: "cotacoes_multicanal" },
         () => {
           fetchIncoming();
-        }
+        },
       )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchIncoming = async () => {
@@ -44,9 +53,9 @@ export function ResponseConsole() {
       .select("*, transportadora:transportadoras(nome_fantasia)")
       .order("created_at", { ascending: false })
       .limit(10);
-    
+
     if (data) {
-      const formatted = data.map(c => ({
+      const formatted = data.map((c) => ({
         id: c.id,
         source: c.canal as any,
         carrier_id: c.transportadora_id,
@@ -54,7 +63,7 @@ export function ResponseConsole() {
         raw_text: c.observacoes || "Sem texto original",
         processed: c.status === "respondido",
         extracted_data: { price: c.valor_cotado, days: c.prazo_dias },
-        created_at: c.created_at
+        created_at: c.created_at,
       }));
       setResponses(formatted);
     }
@@ -63,9 +72,16 @@ export function ResponseConsole() {
   const handleNormalize = async (res: RawResponse) => {
     setIsProcessing(res.id);
     try {
-      const { data, error } = await supabase.functions.invoke("normalize-freight-response", {
-        body: { text: res.raw_text, transportadora_id: res.carrier_id, cotacao_id: res.id }
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "normalize-freight-response",
+        {
+          body: {
+            text: res.raw_text,
+            transportadora_id: res.carrier_id,
+            cotacao_id: res.id,
+          },
+        },
+      );
 
       if (error) throw error;
       toast.success("Normalização concluída com sucesso!");
@@ -85,7 +101,10 @@ export function ResponseConsole() {
             <MessageSquare className="w-5 h-5 text-primary" />
             Central de Respostas & Normalização IA
           </div>
-          <Badge variant="outline" className="animate-pulse bg-success/10 text-success border-success/20">
+          <Badge
+            variant="outline"
+            className="animate-pulse bg-success/10 text-success border-success/20"
+          >
             AUTO-SYNC ON
           </Badge>
         </CardTitle>
@@ -99,17 +118,27 @@ export function ResponseConsole() {
           ) : (
             <div className="divide-y">
               {responses.map((res) => (
-                <div key={res.id} className="p-4 hover:bg-muted/30 transition-colors">
+                <div
+                  key={res.id}
+                  className="p-4 hover:bg-muted/30 transition-colors"
+                >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-[10px] uppercase">{res.source}</Badge>
-                      <span className="text-xs font-bold">{res.carrier_name}</span>
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] uppercase"
+                      >
+                        {res.source}
+                      </Badge>
+                      <span className="text-xs font-bold">
+                        {res.carrier_name}
+                      </span>
                     </div>
                     <span className="text-[10px] text-muted-foreground">
                       {new Date(res.created_at).toLocaleTimeString()}
                     </span>
                   </div>
-                  
+
                   <div className="bg-black/5 p-2 rounded text-[11px] font-mono mb-3 border border-dashed border-primary/10 italic">
                     "{res.raw_text}"
                   </div>
@@ -119,23 +148,26 @@ export function ResponseConsole() {
                       {res.processed ? (
                         <div className="flex gap-2">
                           <div className="flex items-center gap-1 text-[10px] font-black text-success">
-                            <CheckCircle2 className="w-3 h-3" /> R$ {res.extracted_data?.price?.toFixed(2) || "—"}
+                            <CheckCircle2 className="w-3 h-3" /> R${" "}
+                            {res.extracted_data?.price?.toFixed(2) || "—"}
                           </div>
                           <div className="flex items-center gap-1 text-[10px] font-black text-success">
-                            <CheckCircle2 className="w-3 h-3" /> {res.extracted_data?.days || "—"} dias
+                            <CheckCircle2 className="w-3 h-3" />{" "}
+                            {res.extracted_data?.days || "—"} dias
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1 text-[10px] text-warning italic">
-                          <AlertTriangle className="w-3 h-3" /> Aguardando normalização...
+                          <AlertTriangle className="w-3 h-3" /> Aguardando
+                          normalização...
                         </div>
                       )}
                     </div>
-                    
+
                     {!res.processed && (
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
+                      <Button
+                        size="sm"
+                        variant="ghost"
                         className="h-7 gap-2 text-[10px] hover:bg-primary/10 hover:text-primary"
                         onClick={() => handleNormalize(res)}
                         disabled={isProcessing === res.id}
@@ -155,8 +187,8 @@ export function ResponseConsole() {
           )}
         </ScrollArea>
         <div className="p-3 bg-primary/5 border-t text-[10px] text-muted-foreground flex items-center gap-2">
-          <Zap className="w-3 h-3 text-warning" />
-          O sistema utiliza GPT-4o para processar respostas complexas de WhatsApp e E-mail automaticamente.
+          <Zap className="w-3 h-3 text-warning" />O sistema utiliza GPT-4o para
+          processar respostas complexas de WhatsApp e E-mail automaticamente.
         </div>
       </CardContent>
     </Card>

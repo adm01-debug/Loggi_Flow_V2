@@ -1,10 +1,18 @@
-import { useCallback } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calculator, TrendingUp, MapPin, Truck, Clock, Bookmark, SplitSquareVertical, FileCheck, TrendingDown } from 'lucide-react';
-import { PageHeader } from '@/components/common/PageHeader';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { DataExporter } from '@/components/common/DataExporter';
+import { useCallback } from "react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Calculator,
+  TrendingUp,
+  MapPin,
+  Truck,
+  Clock,
+  Bookmark,
+  SplitSquareVertical,
+  FileCheck,
+  TrendingDown,
+} from "lucide-react";
+import { DataExporter } from "@/components/common/DataExporter";
 import { useQuotationFlow } from "@/hooks/logistics/useQuotationFlow";
 import { type TabelaFrete } from "@/hooks";
 import {
@@ -16,35 +24,49 @@ import {
   QuotationHistory,
   CargoTemplates,
   ScenarioSimulator,
-} from '@/components/freight';
-import { TransportadoraRanking } from '@/components/dashboard/TransportadoraRanking';
-import { CotacoesFreteManager } from '@/components/freight/CotacoesFreteManager';
-import type { QuotationFormData } from '@/components/freight/QuotationForm';
+} from "@/components/freight";
+import { TransportadoraRanking } from "@/components/dashboard/TransportadoraRanking";
+import { CotacoesFreteManager } from "@/components/freight/CotacoesFreteManager";
+import type { QuotationFormData } from "@/components/freight/QuotationForm";
 
 export default function CotacaoFrete() {
   const flow = useQuotationFlow();
 
-  const handleCalculate = useCallback((data: QuotationFormData) => {
-    flow.calculate(data);
-  }, [flow]);
+  const handleCalculate = useCallback(
+    (data: QuotationFormData) => {
+      flow.calculate(data);
+    },
+    [flow],
+  );
 
-  const handleAddTable = useCallback((data: Omit<TabelaFrete, 'id' | 'created_at' | 'updated_at' | 'transportadora'>) => {
-    flow.addTabelaFrete?.mutate(data);
-  }, [flow.addTabelaFrete]);
+  const handleAddTable = useCallback(
+    (
+      data: Omit<
+        TabelaFrete,
+        "id" | "created_at" | "updated_at" | "transportadora"
+      >,
+    ) => {
+      flow.addTabelaFrete?.mutate(data);
+    },
+    [flow.addTabelaFrete],
+  );
 
-  const handleDeleteTable = useCallback((id: string) => {
-    flow.deleteTabelaFrete?.mutate(id);
-  }, [flow.deleteTabelaFrete]);
+  const handleDeleteTable = useCallback(
+    (id: string) => {
+      flow.deleteTabelaFrete?.mutate(id);
+    },
+    [flow.deleteTabelaFrete],
+  );
 
   // Export data for results
-  const exportData = flow.quotationResults.map(r => ({
+  const exportData = flow.quotationResults.map((r) => ({
     transportadora: r.transportadora_nome,
     valor_total: `R$ ${r.valor_total?.toFixed(2)}`,
     preco_kg: `R$ ${r.preco_por_kg?.toFixed(2)}`,
     taxa_fixa: `R$ ${r.taxa_fixa?.toFixed(2)}`,
     prazo_dias: r.prazo_dias,
-    melhor_preco: r.melhor_preco ? 'Sim' : '',
-    melhor_prazo: r.melhor_prazo ? 'Sim' : '',
+    melhor_preco: r.melhor_preco ? "Sim" : "",
+    melhor_prazo: r.melhor_prazo ? "Sim" : "",
   }));
 
   return (
@@ -64,9 +86,13 @@ export default function CotacaoFrete() {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                     <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Quotation_Engine_Elite</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
+                      Quotation_Engine_Elite
+                    </span>
                   </div>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">MULTICARRIER • SMART COMPARISON</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
+                    MULTICARRIER • SMART COMPARISON
+                  </span>
                 </div>
               </div>
             </h1>
@@ -99,13 +125,34 @@ export default function CotacaoFrete() {
 
         <Tabs defaultValue="cotacao">
           <TabsList className="flex-wrap">
-            <TabsTrigger value="cotacao"><Calculator className="w-4 h-4 mr-1" />Cotação</TabsTrigger>
-            <TabsTrigger value="rodonaves"><Truck className="w-4 h-4 mr-1" />Rodonaves RTE</TabsTrigger>
-            <TabsTrigger value="tabelas"><MapPin className="w-4 h-4 mr-1" />Tabelas de Frete</TabsTrigger>
-            <TabsTrigger value="historico"><Clock className="w-4 h-4 mr-1" />Histórico</TabsTrigger>
-            <TabsTrigger value="templates"><Bookmark className="w-4 h-4 mr-1" />Templates</TabsTrigger>
-            <TabsTrigger value="cenarios"><SplitSquareVertical className="w-4 h-4 mr-1" />Cenários</TabsTrigger>
-            <TabsTrigger value="cotacoes-salvas"><FileCheck className="w-4 h-4 mr-1" />Cotações Salvas</TabsTrigger>
+            <TabsTrigger value="cotacao">
+              <Calculator className="w-4 h-4 mr-1" />
+              Cotação
+            </TabsTrigger>
+            <TabsTrigger value="rodonaves">
+              <Truck className="w-4 h-4 mr-1" />
+              Rodonaves RTE
+            </TabsTrigger>
+            <TabsTrigger value="tabelas">
+              <MapPin className="w-4 h-4 mr-1" />
+              Tabelas de Frete
+            </TabsTrigger>
+            <TabsTrigger value="historico">
+              <Clock className="w-4 h-4 mr-1" />
+              Histórico
+            </TabsTrigger>
+            <TabsTrigger value="templates">
+              <Bookmark className="w-4 h-4 mr-1" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="cenarios">
+              <SplitSquareVertical className="w-4 h-4 mr-1" />
+              Cenários
+            </TabsTrigger>
+            <TabsTrigger value="cotacoes-salvas">
+              <FileCheck className="w-4 h-4 mr-1" />
+              Cotações Salvas
+            </TabsTrigger>
             <TabsTrigger value="ia">🤖 IA Recomendação</TabsTrigger>
           </TabsList>
 
@@ -133,7 +180,10 @@ export default function CotacaoFrete() {
           </TabsContent>
 
           <TabsContent value="historico" className="space-y-4">
-            <QuotationHistory history={flow.history} onReuse={async (data) => await flow.calculate(data)} />
+            <QuotationHistory
+              history={flow.history}
+              onReuse={async (data) => await flow.calculate(data)}
+            />
           </TabsContent>
 
           <TabsContent value="templates" className="space-y-4">
@@ -147,7 +197,10 @@ export default function CotacaoFrete() {
           </TabsContent>
 
           <TabsContent value="cenarios" className="space-y-4">
-            <ScenarioSimulator cargoData={flow.cargoData} simulateScenario={flow.simulateScenario} />
+            <ScenarioSimulator
+              cargoData={flow.cargoData}
+              simulateScenario={flow.simulateScenario}
+            />
           </TabsContent>
 
           <TabsContent value="cotacoes-salvas" className="space-y-4">
@@ -157,19 +210,23 @@ export default function CotacaoFrete() {
           <TabsContent value="ia" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <SmartCarrierSelector onSelect={(r) => flow.selectAndAdvance({
-                  transportadora_id: r.id,
-                  transportadora_nome: r.nome,
-                  valor_total: r.valorTotal,
-                  prazo_dias: r.prazoDias,
-                  score_performance: r.scorePerformance,
-                  preco_por_kg: r.precoPorKg,
-                  taxa_fixa: r.taxaFixa,
-                  regiao_destino: r.regiao,
-                  melhor_preco: false,
-                  melhor_prazo: false,
-                  melhor_custo_beneficio: true
-                })} />
+                <SmartCarrierSelector
+                  onSelect={(r) =>
+                    flow.selectAndAdvance({
+                      transportadora_id: r.id,
+                      transportadora_nome: r.nome,
+                      valor_total: r.valorTotal,
+                      prazo_dias: r.prazoDias,
+                      score_performance: r.scorePerformance,
+                      preco_por_kg: r.precoPorKg,
+                      taxa_fixa: r.taxaFixa,
+                      regiao_destino: r.regiao,
+                      melhor_preco: false,
+                      melhor_prazo: false,
+                      melhor_custo_beneficio: true,
+                    })
+                  }
+                />
               </div>
               <div className="space-y-6">
                 <div className="card-base p-6 border-primary/20 bg-primary/5">
@@ -178,20 +235,29 @@ export default function CotacaoFrete() {
                     Economia Garantida
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Nossa IA compara automaticamente tabelas e histórico do Bitrix24 para encontrar discrepâncias de até 50%.
+                    Nossa IA compara automaticamente tabelas e histórico do
+                    Bitrix24 para encontrar discrepâncias de até 50%.
                   </p>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg">
-                      <span className="text-xs uppercase font-bold">Média Mensal</span>
+                      <span className="text-xs uppercase font-bold">
+                        Média Mensal
+                      </span>
                       <span className="font-bold">R$ 12.450,00</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-success/20 rounded-lg border border-success/30">
-                      <span className="text-xs uppercase font-bold text-success">Economia IA</span>
-                      <span className="font-bold text-success">- R$ 3.120,00</span>
+                      <span className="text-xs uppercase font-bold text-success">
+                        Economia IA
+                      </span>
+                      <span className="font-bold text-success">
+                        - R$ 3.120,00
+                      </span>
                     </div>
                   </div>
                 </div>
-                <TransportadoraRanking transportadoras={flow.transportadoras || []} />
+                <TransportadoraRanking
+                  transportadoras={flow.transportadoras || []}
+                />
               </div>
             </div>
           </TabsContent>

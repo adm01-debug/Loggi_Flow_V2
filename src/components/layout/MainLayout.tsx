@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, lazy, ErrorInfo } from "react";
+import { ReactNode, Suspense, lazy } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Header } from "./Header";
 import { MobileBottomNav } from "./MobileBottomNav";
@@ -18,14 +18,41 @@ import { useUserPreferences } from "@/features/preferences";
 import { useTouchGestures } from "@/hooks/ui/useTouchGestures";
 import { usePerformanceMonitor } from "@/hooks/analytics/usePerformanceMonitor";
 
-
-const OnboardingWizard = lazy(() => import("@/components/onboarding/OnboardingWizard").then(m => ({ default: m.OnboardingWizard })));
-const OnboardingProgress = lazy(() => import("@/components/onboarding/OnboardingProgress").then(m => ({ default: m.OnboardingProgress })));
-const BrowserNotificationPrompt = lazy(() => import("@/components/notifications/BrowserNotificationPrompt").then(m => ({ default: m.BrowserNotificationPrompt })));
-const KeyboardShortcutsHelp = lazy(() => import("@/components/common/KeyboardShortcutsHelp").then(m => ({ default: m.KeyboardShortcutsHelp })));
-const SearchCommand = lazy(() => import("@/components/common/SearchCommand").then(m => ({ default: m.SearchCommand })));
-const InstallPrompt = lazy(() => import("@/components/pwa/InstallPrompt").then(m => ({ default: m.InstallPrompt })));
-const UpdatePrompt = lazy(() => import("@/components/pwa/UpdatePrompt").then(m => ({ default: m.UpdatePrompt })));
+const OnboardingWizard = lazy(() =>
+  import("@/components/onboarding/OnboardingWizard").then((m) => ({
+    default: m.OnboardingWizard,
+  })),
+);
+const OnboardingProgress = lazy(() =>
+  import("@/components/onboarding/OnboardingProgress").then((m) => ({
+    default: m.OnboardingProgress,
+  })),
+);
+const BrowserNotificationPrompt = lazy(() =>
+  import("@/components/notifications/BrowserNotificationPrompt").then((m) => ({
+    default: m.BrowserNotificationPrompt,
+  })),
+);
+const KeyboardShortcutsHelp = lazy(() =>
+  import("@/components/common/KeyboardShortcutsHelp").then((m) => ({
+    default: m.KeyboardShortcutsHelp,
+  })),
+);
+const SearchCommand = lazy(() =>
+  import("@/components/common/SearchCommand").then((m) => ({
+    default: m.SearchCommand,
+  })),
+);
+const InstallPrompt = lazy(() =>
+  import("@/components/pwa/InstallPrompt").then((m) => ({
+    default: m.InstallPrompt,
+  })),
+);
+const UpdatePrompt = lazy(() =>
+  import("@/components/pwa/UpdatePrompt").then((m) => ({
+    default: m.UpdatePrompt,
+  })),
+);
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -36,30 +63,36 @@ export function MainLayout({ children }: MainLayoutProps) {
   useTouchGestures();
   usePerformanceMonitor();
 
-
   return (
     <div className="flex min-h-screen w-full bg-background">
       <GlobalLoadingBar />
       <SkipLinks />
       <OfflineBanner />
       <ScrollRestoration />
-      
-      <aside className="hidden md:block" aria-label="Navegação principal" id="main-navigation">
+
+      <aside
+        className="hidden md:block"
+        aria-label="Navegação principal"
+        id="main-navigation"
+      >
         <AppSidebar />
       </aside>
-      
+
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <div className="flex-1 flex overflow-hidden">
-          <main 
-            id="main-content" 
-            className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 scroll-smooth overscroll-contain bg-gradient-to-tr from-background via-background to-primary/5" 
+          <main
+            id="main-content"
+            className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 scroll-smooth overscroll-contain bg-gradient-to-tr from-background via-background to-primary/5"
             tabIndex={-1}
             role="main"
             aria-label="Conteúdo principal"
           >
             <div className="max-w-[1600px] mx-auto w-full min-h-full flex flex-col">
-              <nav aria-label="Navegação breadcrumb" className="flex items-center gap-4 mb-8 animate-in fade-in slide-in-from-left-4 duration-500 ease-out-expo">
+              <nav
+                aria-label="Navegação breadcrumb"
+                className="flex items-center gap-4 mb-8 animate-in fade-in slide-in-from-left-4 duration-500 ease-out-expo"
+              >
                 <PageBackButton className="md:flex" />
                 <Breadcrumbs className="flex-1" />
               </nav>
@@ -67,25 +100,23 @@ export function MainLayout({ children }: MainLayoutProps) {
               <Suspense fallback={null}>
                 <OnboardingProgress variant="full" className="mb-6" />
               </Suspense>
-              
+
               <div className="flex-1 h-full">
                 <WidgetErrorBoundary widgetName="MainLayout Content">
-                  <Suspense fallback={<PageSkeleton />}>
-                    {children}
-                  </Suspense>
+                  <Suspense fallback={<PageSkeleton />}>{children}</Suspense>
                 </WidgetErrorBoundary>
               </div>
             </div>
           </main>
         </div>
       </div>
-      
+
       <MobileBottomNav />
       <MobileQuickActions />
       <LevelUpModal />
       <AchievementNotificationContainer />
       <ScrollToTop />
-      
+
       <Suspense fallback={null}>
         <InstallPrompt />
         <UpdatePrompt />

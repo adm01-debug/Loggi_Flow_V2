@@ -1,22 +1,27 @@
 import { useEffect, useCallback, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-type ColetaRow = Database['public']['Tables']['coletas']['Row'];
-type EntregaRow = Database['public']['Tables']['entregas']['Row'];
-type OcorrenciaRow = Database['public']['Tables']['ocorrencias']['Row'];
+type ColetaRow = Database["public"]["Tables"]["coletas"]["Row"];
+type EntregaRow = Database["public"]["Tables"]["entregas"]["Row"];
+type OcorrenciaRow = Database["public"]["Tables"]["ocorrencias"]["Row"];
 
 export interface SystemAlert {
   id: string;
-  type: 'coleta_atrasada' | 'divergencia' | 'ocorrencia' | 'prazo_critico' | 'entrega_atrasada' | 'nexus_tactical';
+  type:
+    | "coleta_atrasada"
+    | "divergencia"
+    | "ocorrencia"
+    | "prazo_critico"
+    | "entrega_atrasada"
+    | "nexus_tactical";
 
   title: string;
   message: string;
-  severity: 'info' | 'warning' | 'error';
+  severity: "info" | "warning" | "error";
   entityId?: string;
-  entityType?: 'coleta' | 'entrega' | 'ocorrencia';
+  entityType?: "coleta" | "entrega" | "ocorrencia";
   createdAt: Date;
   read: boolean;
 }
@@ -26,41 +31,46 @@ let alertsStore: SystemAlert[] = [];
 let alertListeners: ((alerts: SystemAlert[]) => void)[] = [];
 
 const notifyListeners = () => {
-  alertListeners.forEach(listener => listener([...alertsStore]));
+  alertListeners.forEach((listener) => listener([...alertsStore]));
 };
 
-const addAlert = (alert: Omit<SystemAlert, 'id' | 'createdAt' | 'read'>) => {
+const addAlert = (alert: Omit<SystemAlert, "id" | "createdAt" | "read">) => {
   const newAlert: SystemAlert = {
     ...alert,
     id: `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     createdAt: new Date(),
     read: false,
   };
-  
+
   // Avoid duplicates
   const isDuplicate = alertsStore.some(
-    a => a.entityId === newAlert.entityId && a.type === newAlert.type
+    (a) => a.entityId === newAlert.entityId && a.type === newAlert.type,
   );
-  
+
   if (!isDuplicate) {
     alertsStore = [newAlert, ...alertsStore].slice(0, 50); // Keep last 50 alerts
     notifyListeners();
-    
+
     // Show toast notification
-    const toastFn = alert.severity === 'error' ? toast.error : 
-                    alert.severity === 'warning' ? toast.warning : 
-                    toast.info;
-    
+    const toastFn =
+      alert.severity === "error"
+        ? toast.error
+        : alert.severity === "warning"
+          ? toast.warning
+          : toast.info;
+
     toastFn(alert.title, {
       description: alert.message,
-      duration: alert.severity === 'error' ? 8000 : 5000,
-      action: alert.entityId ? {
-        label: 'Ver detalhes',
-        onClick: () => {
-          // Navigate to entity
-          window.location.href = `/${alert.entityType}`;
-        },
-      } : undefined,
+      duration: alert.severity === "error" ? 8000 : 5000,
+      action: alert.entityId
+        ? {
+            label: "Ver detalhes",
+            onClick: () => {
+              // Navigate to entity
+              window.location.href = `/${alert.entityType}`;
+            },
+          }
+        : undefined,
     });
   }
 };
@@ -73,70 +83,71 @@ export function useSmartAlerts() {
     // Subscribe to alert updates
     const listener = (newAlerts: SystemAlert[]) => {
       setAlerts(newAlerts);
-      setUnreadCount(newAlerts.filter(a => !a.read).length);
+      setUnreadCount(newAlerts.filter((a) => !a.read).length);
     };
-    
+
     alertListeners.push(listener);
     listener(alertsStore);
-    
+
     return () => {
-      alertListeners = alertListeners.filter(l => l !== listener);
+      alertListeners = alertListeners.filter((l) => l !== listener);
     };
   }, []);
 
   // Check for critical deadlines periodically
   const checkCriticalDeadlines = useCallback(async () => {
     const now = new Date();
-    
+
     // Check coletas approaching 48h limit
     const { data: coletas } = await supabase
-      .from('coletas')
-      .select('id, numero_coleta, created_at, status')
-      .not('status', 'in', '("finalizada","conferencia_ok")');
-    
-    coletas?.forEach(coleta => {
+      .from("coletas")
+      .select("id, numero_coleta, created_at, status")
+      .not("status", "in", '("finalizada","conferencia_ok")');
+
+    coletas?.forEach((coleta) => {
       const created = new Date(coleta.created_at);
-      const hoursElapsed = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
-      
+      const hoursElapsed =
+        (now.getTime() - created.getTime()) / (1000 * 60 * 60);
+
       if (hoursElapsed > 48) {
         addAlert({
-          type: 'coleta_atrasada',
-          title: 'Coleta Atrasada',
+          type: "coleta_atrasada",
+          title: "Coleta Atrasada",
           message: `Coleta ${coleta.numero_coleta} ultrapassou 48h sem finalização`,
-          severity: 'error',
+          severity: "error",
           entityId: coleta.id,
-          entityType: 'coleta',
+          entityType: "coleta",
         });
       } else if (hoursElapsed > 40 && hoursElapsed <= 48) {
         addAlert({
-          type: 'prazo_critico',
-          title: 'Prazo Crítico',
+          type: "prazo_critico",
+          title: "Prazo Crítico",
           message: `Coleta ${coleta.numero_coleta} está próxima do limite de 48h`,
-          severity: 'warning',
+          severity: "warning",
           entityId: coleta.id,
-          entityType: 'coleta',
+          entityType: "coleta",
         });
       }
     });
-    
+
     // Check entregas with overdue delivery
     const { data: entregas } = await supabase
-      .from('entregas')
-      .select('id, numero_entrega, previsao_entrega, status')
-      .not('status', 'in', '("entregue","finalizado")')
-      .not('previsao_entrega', 'is', null);
-    
-    entregas?.forEach(entrega => {
+      .from("entregas")
+      .select("id, numero_entrega, previsao_entrega, status")
+      .not("status", "in", '("entregue","finalizado")')
+      .not("previsao_entrega", "is", null);
+
+    entregas?.forEach((entrega) => {
       if (entrega.previsao_entrega) {
         const previsao = new Date(entrega.previsao_entrega);
         if (now > previsao) {
           addAlert({
-            type: 'entrega_atrasada',
-            title: 'Entrega Atrasada',
+            type: "entrega_atrasada",
+            title: "Entrega Atrasada",
             message: `Entrega ${entrega.numero_entrega} passou da previsão`,
-            severity: 'error',
+            severity: "error",
             entityId: entrega.id,
-            entityType: 'entrega',
+            entityType: "entrega",
           });
         }
       }
@@ -149,44 +160,47 @@ export function useSmartAlerts() {
     const interval = setInterval(checkCriticalDeadlines, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [checkCriticalDeadlines]);
-  
+
   // Real-time listener for Nexus Tactical Logs
   useEffect(() => {
     const channel = supabase
-      .channel('nexus-tactical-realtime-alerts')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'nexus_tactical_logs' }, (payload) => {
-        const newLog = payload.new as any;
-        addAlert({
-          type: 'nexus_tactical',
-          title: `TÁTICO: ${newLog.type === 'crit' ? 'CRÍTICO' : 'AVISO'}`,
-          message: `${newLog.target_vehicle || 'SISTEMA'}: ${newLog.message}`,
-          severity: newLog.type === 'crit' ? 'error' : 'warning',
-          entityId: newLog.id,
-          entityType: 'ocorrencia'
-        });
-      })
+      .channel("nexus-tactical-realtime-alerts")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "nexus_tactical_logs" },
+        (payload) => {
+          const newLog = payload.new as any;
+          addAlert({
+            type: "nexus_tactical",
+            title: `TÁTICO: ${newLog.type === "crit" ? "CRÍTICO" : "AVISO"}`,
+            message: `${newLog.target_vehicle || "SISTEMA"}: ${newLog.message}`,
+            severity: newLog.type === "crit" ? "error" : "warning",
+            entityId: newLog.id,
+            entityType: "ocorrencia",
+          });
+        },
+      )
       .subscribe();
-      
+
     return () => {
       supabase.removeChannel(channel);
     };
   }, []);
 
-
   const markAsRead = useCallback((alertId: string) => {
-    alertsStore = alertsStore.map(a => 
-      a.id === alertId ? { ...a, read: true } : a
+    alertsStore = alertsStore.map((a) =>
+      a.id === alertId ? { ...a, read: true } : a,
     );
     notifyListeners();
   }, []);
 
   const markAllAsRead = useCallback(() => {
-    alertsStore = alertsStore.map(a => ({ ...a, read: true }));
+    alertsStore = alertsStore.map((a) => ({ ...a, read: true }));
     notifyListeners();
   }, []);
 
   const clearAlert = useCallback((alertId: string) => {
-    alertsStore = alertsStore.filter(a => a.id !== alertId);
+    alertsStore = alertsStore.filter((a) => a.id !== alertId);
     notifyListeners();
   }, []);
 

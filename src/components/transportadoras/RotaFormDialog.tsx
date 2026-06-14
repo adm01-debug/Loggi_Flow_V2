@@ -1,54 +1,57 @@
-import { useState } from 'react';
-import { Plus, Edit, Trash2, MapPin, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { useState } from "react";
+import { Plus, MapPin, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { RotaFormData, TransportadoraRota } from "@/hooks/logistics/useTransportadoraRotas";
+} from "@/components/ui/select";
+import {
+  RotaFormData,
+  TransportadoraRota,
+} from "@/hooks/logistics/useTransportadoraRotas";
 
 const ESTADOS_BRASIL = [
-  { sigla: 'AC', nome: 'Acre' },
-  { sigla: 'AL', nome: 'Alagoas' },
-  { sigla: 'AP', nome: 'Amapá' },
-  { sigla: 'AM', nome: 'Amazonas' },
-  { sigla: 'BA', nome: 'Bahia' },
-  { sigla: 'CE', nome: 'Ceará' },
-  { sigla: 'DF', nome: 'Distrito Federal' },
-  { sigla: 'ES', nome: 'Espírito Santo' },
-  { sigla: 'GO', nome: 'Goiás' },
-  { sigla: 'MA', nome: 'Maranhão' },
-  { sigla: 'MT', nome: 'Mato Grosso' },
-  { sigla: 'MS', nome: 'Mato Grosso do Sul' },
-  { sigla: 'MG', nome: 'Minas Gerais' },
-  { sigla: 'PA', nome: 'Pará' },
-  { sigla: 'PB', nome: 'Paraíba' },
-  { sigla: 'PR', nome: 'Paraná' },
-  { sigla: 'PE', nome: 'Pernambuco' },
-  { sigla: 'PI', nome: 'Piauí' },
-  { sigla: 'RJ', nome: 'Rio de Janeiro' },
-  { sigla: 'RN', nome: 'Rio Grande do Norte' },
-  { sigla: 'RS', nome: 'Rio Grande do Sul' },
-  { sigla: 'RO', nome: 'Rondônia' },
-  { sigla: 'RR', nome: 'Roraima' },
-  { sigla: 'SC', nome: 'Santa Catarina' },
-  { sigla: 'SP', nome: 'São Paulo' },
-  { sigla: 'SE', nome: 'Sergipe' },
-  { sigla: 'TO', nome: 'Tocantins' },
+  { sigla: "AC", nome: "Acre" },
+  { sigla: "AL", nome: "Alagoas" },
+  { sigla: "AP", nome: "Amapá" },
+  { sigla: "AM", nome: "Amazonas" },
+  { sigla: "BA", nome: "Bahia" },
+  { sigla: "CE", nome: "Ceará" },
+  { sigla: "DF", nome: "Distrito Federal" },
+  { sigla: "ES", nome: "Espírito Santo" },
+  { sigla: "GO", nome: "Goiás" },
+  { sigla: "MA", nome: "Maranhão" },
+  { sigla: "MT", nome: "Mato Grosso" },
+  { sigla: "MS", nome: "Mato Grosso do Sul" },
+  { sigla: "MG", nome: "Minas Gerais" },
+  { sigla: "PA", nome: "Pará" },
+  { sigla: "PB", nome: "Paraíba" },
+  { sigla: "PR", nome: "Paraná" },
+  { sigla: "PE", nome: "Pernambuco" },
+  { sigla: "PI", nome: "Piauí" },
+  { sigla: "RJ", nome: "Rio de Janeiro" },
+  { sigla: "RN", nome: "Rio Grande do Norte" },
+  { sigla: "RS", nome: "Rio Grande do Sul" },
+  { sigla: "RO", nome: "Rondônia" },
+  { sigla: "RR", nome: "Roraima" },
+  { sigla: "SC", nome: "Santa Catarina" },
+  { sigla: "SP", nome: "São Paulo" },
+  { sigla: "SE", nome: "Sergipe" },
+  { sigla: "TO", nome: "Tocantins" },
 ];
 
 interface Transportadora {
@@ -64,21 +67,21 @@ interface RotaFormDialogProps {
   trigger?: React.ReactNode;
 }
 
-export function RotaFormDialog({ 
-  transportadoras, 
-  rota, 
-  onSubmit, 
+export function RotaFormDialog({
+  transportadoras,
+  rota,
+  onSubmit,
   isLoading,
-  trigger 
+  trigger,
 }: RotaFormDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<RotaFormData>({
-    transportadora_id: rota?.transportadora_id || '',
-    origem_estado: rota?.origem_estado || '',
+    transportadora_id: rota?.transportadora_id || "",
+    origem_estado: rota?.origem_estado || "",
     origem_cidade: rota?.origem_cidade || undefined,
     origem_cep_inicio: rota?.origem_cep_inicio || undefined,
     origem_cep_fim: rota?.origem_cep_fim || undefined,
-    destino_estado: rota?.destino_estado || '',
+    destino_estado: rota?.destino_estado || "",
     destino_cidade: rota?.destino_cidade || undefined,
     destino_cep_inicio: rota?.destino_cep_inicio || undefined,
     destino_cep_fim: rota?.destino_cep_fim || undefined,
@@ -109,7 +112,7 @@ export function RotaFormDialog({
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Editar Rota' : 'Nova Rota'}</DialogTitle>
+          <DialogTitle>{isEdit ? "Editar Rota" : "Nova Rota"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -118,7 +121,9 @@ export function RotaFormDialog({
             <Label>Transportadora *</Label>
             <Select
               value={formData.transportadora_id}
-              onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, transportadora_id: value })
+              }
               required
             >
               <SelectTrigger>
@@ -145,7 +150,9 @@ export function RotaFormDialog({
                 <Label>Estado *</Label>
                 <Select
                   value={formData.origem_estado}
-                  onValueChange={(value) => setFormData({ ...formData, origem_estado: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, origem_estado: value })
+                  }
                   required
                 >
                   <SelectTrigger>
@@ -163,16 +170,26 @@ export function RotaFormDialog({
               <div className="space-y-2">
                 <Label>Cidade</Label>
                 <Input
-                  value={formData.origem_cidade || ''}
-                  onChange={(e) => setFormData({ ...formData, origem_cidade: e.target.value || undefined })}
+                  value={formData.origem_cidade || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      origem_cidade: e.target.value || undefined,
+                    })
+                  }
                   placeholder="Ex: Curitiba"
                 />
               </div>
               <div className="space-y-2">
                 <Label>CEP Início</Label>
                 <Input
-                  value={formData.origem_cep_inicio || ''}
-                  onChange={(e) => setFormData({ ...formData, origem_cep_inicio: e.target.value || undefined })}
+                  value={formData.origem_cep_inicio || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      origem_cep_inicio: e.target.value || undefined,
+                    })
+                  }
                   placeholder="80000-000"
                   maxLength={9}
                 />
@@ -180,8 +197,13 @@ export function RotaFormDialog({
               <div className="space-y-2">
                 <Label>CEP Fim</Label>
                 <Input
-                  value={formData.origem_cep_fim || ''}
-                  onChange={(e) => setFormData({ ...formData, origem_cep_fim: e.target.value || undefined })}
+                  value={formData.origem_cep_fim || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      origem_cep_fim: e.target.value || undefined,
+                    })
+                  }
                   placeholder="82999-999"
                   maxLength={9}
                 />
@@ -205,7 +227,9 @@ export function RotaFormDialog({
                 <Label>Estado *</Label>
                 <Select
                   value={formData.destino_estado}
-                  onValueChange={(value) => setFormData({ ...formData, destino_estado: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, destino_estado: value })
+                  }
                   required
                 >
                   <SelectTrigger>
@@ -223,16 +247,26 @@ export function RotaFormDialog({
               <div className="space-y-2">
                 <Label>Cidade</Label>
                 <Input
-                  value={formData.destino_cidade || ''}
-                  onChange={(e) => setFormData({ ...formData, destino_cidade: e.target.value || undefined })}
+                  value={formData.destino_cidade || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      destino_cidade: e.target.value || undefined,
+                    })
+                  }
                   placeholder="Ex: São Paulo"
                 />
               </div>
               <div className="space-y-2">
                 <Label>CEP Início</Label>
                 <Input
-                  value={formData.destino_cep_inicio || ''}
-                  onChange={(e) => setFormData({ ...formData, destino_cep_inicio: e.target.value || undefined })}
+                  value={formData.destino_cep_inicio || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      destino_cep_inicio: e.target.value || undefined,
+                    })
+                  }
                   placeholder="01000-000"
                   maxLength={9}
                 />
@@ -240,8 +274,13 @@ export function RotaFormDialog({
               <div className="space-y-2">
                 <Label>CEP Fim</Label>
                 <Input
-                  value={formData.destino_cep_fim || ''}
-                  onChange={(e) => setFormData({ ...formData, destino_cep_fim: e.target.value || undefined })}
+                  value={formData.destino_cep_fim || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      destino_cep_fim: e.target.value || undefined,
+                    })
+                  }
                   placeholder="09999-999"
                   maxLength={9}
                 />
@@ -257,7 +296,12 @@ export function RotaFormDialog({
                 type="number"
                 min={1}
                 value={formData.prazo_dias || 5}
-                onChange={(e) => setFormData({ ...formData, prazo_dias: parseInt(e.target.value) || 5 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    prazo_dias: parseInt(e.target.value) || 5,
+                  })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -267,7 +311,12 @@ export function RotaFormDialog({
                 step="0.01"
                 min={0}
                 value={formData.taxa_fixa || 0}
-                onChange={(e) => setFormData({ ...formData, taxa_fixa: parseFloat(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    taxa_fixa: parseFloat(e.target.value) || 0,
+                  })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -277,7 +326,12 @@ export function RotaFormDialog({
                 step="0.01"
                 min={0}
                 value={formData.preco_por_kg || 0}
-                onChange={(e) => setFormData({ ...formData, preco_por_kg: parseFloat(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    preco_por_kg: parseFloat(e.target.value) || 0,
+                  })
+                }
               />
             </div>
           </div>
@@ -286,8 +340,13 @@ export function RotaFormDialog({
           <div className="space-y-2">
             <Label>Observações</Label>
             <Textarea
-              value={formData.observacoes || ''}
-              onChange={(e) => setFormData({ ...formData, observacoes: e.target.value || undefined })}
+              value={formData.observacoes || ""}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  observacoes: e.target.value || undefined,
+                })
+              }
               placeholder="Observações sobre esta rota..."
               rows={2}
             />
@@ -297,18 +356,24 @@ export function RotaFormDialog({
           <div className="flex items-center gap-2">
             <Switch
               checked={formData.ativo}
-              onCheckedChange={(checked) => setFormData({ ...formData, ativo: checked })}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, ativo: checked })
+              }
             />
             <Label>Rota ativa</Label>
           </div>
 
           {/* Submit */}
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isEdit ? 'Salvar' : 'Adicionar Rota'}
+              {isEdit ? "Salvar" : "Adicionar Rota"}
             </Button>
           </div>
         </form>

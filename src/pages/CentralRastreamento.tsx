@@ -1,41 +1,62 @@
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { StatsCard } from '@/components/common/StatsCard';
-import { EmptyState } from '@/components/common/EmptyState';
-import { DetailSheet } from '@/components/common/DetailSheet';
-import { Pagination } from '@/components/common/Pagination';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { StatsCard } from "@/components/common/StatsCard";
+import { EmptyState } from "@/components/common/EmptyState";
+import { Pagination } from "@/components/common/Pagination";
 import { usePagination } from "@/hooks/common/usePagination";
-import { useUnifiedTracking, UnifiedShipment, TrackingFilter } from "@/hooks/logistics/useUnifiedTracking";
+import {
+  useUnifiedTracking,
+  UnifiedShipment,
+  TrackingFilter,
+} from "@/hooks/logistics/useUnifiedTracking";
 import { useDelayPrediction } from "@/hooks/logistics/useDelayPrediction";
 import {
-  Radar, Truck, Package, AlertTriangle, Clock, CheckCircle2,
-  Search, RefreshCw, MapPin, DollarSign, TrendingDown, Eye,
-  Brain, ArrowRight, Navigation
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { motion } from 'framer-motion';
+  Radar,
+  Truck,
+  Package,
+  AlertTriangle,
+  Clock,
+  CheckCircle2,
+  Search,
+  RefreshCw,
+  Eye,
+  Brain,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { motion } from "framer-motion";
 
-const FILTER_TABS: { value: TrackingFilter; label: string; icon: React.ElementType }[] = [
-  { value: 'all', label: 'Todos', icon: Package },
-  { value: 'em_transito', label: 'Em Trânsito', icon: Truck },
-  { value: 'atrasados', label: 'Atrasados', icon: AlertTriangle },
-  { value: 'pendentes', label: 'Pendentes', icon: Clock },
-  { value: 'entregue', label: 'Entregues', icon: CheckCircle2 },
+const FILTER_TABS: {
+  value: TrackingFilter;
+  label: string;
+  icon: React.ElementType;
+}[] = [
+  { value: "all", label: "Todos", icon: Package },
+  { value: "em_transito", label: "Em Trânsito", icon: Truck },
+  { value: "atrasados", label: "Atrasados", icon: AlertTriangle },
+  { value: "pendentes", label: "Pendentes", icon: Clock },
+  { value: "entregue", label: "Entregues", icon: CheckCircle2 },
 ];
 
 function formatDate(date: string | null): string {
-  if (!date) return '—';
+  if (!date) return "—";
   try {
-    return format(parseISO(date), 'dd/MM/yy HH:mm', { locale: ptBR });
+    return format(parseISO(date), "dd/MM/yy HH:mm", { locale: ptBR });
   } catch {
     return date;
   }
@@ -44,13 +65,26 @@ function formatDate(date: string | null): string {
 export default function CentralRastreamento() {
   const navigate = useNavigate();
   const {
-    shipments, summary, isLoading, filter, setFilter,
-    searchTerm, setSearchTerm, refetch, getStatusLabel,
+    shipments,
+    summary,
+    isLoading,
+    filter,
+    setFilter,
+    searchTerm,
+    setSearchTerm,
+    refetch,
+    getStatusLabel,
   } = useUnifiedTracking();
 
-  const { isLoading: isPredicting, analyzeDelays, predictions, summary: predSummary } = useDelayPrediction();
+  const {
+    isLoading: isPredicting,
+    analyzeDelays,
+    predictions,
+    summary: predSummary,
+  } = useDelayPrediction();
 
-  const [selectedShipment, setSelectedShipment] = useState<UnifiedShipment | null>(null);
+  const [selectedShipment, setSelectedShipment] =
+    useState<UnifiedShipment | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
   const pagination = usePagination(shipments, { initialPageSize: 20 });
@@ -77,7 +111,8 @@ export default function CentralRastreamento() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={refetch}>
-              <RefreshCw className="w-4 h-4 mr-2" />Atualizar
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Atualizar
             </Button>
             <Button
               variant="secondary"
@@ -85,7 +120,9 @@ export default function CentralRastreamento() {
               onClick={() => analyzeDelays()}
               disabled={isPredicting}
             >
-              <Brain className={cn("w-4 h-4 mr-2", isPredicting && "animate-pulse")} />
+              <Brain
+                className={cn("w-4 h-4 mr-2", isPredicting && "animate-pulse")}
+              />
               Predição IA
             </Button>
           </div>
@@ -93,16 +130,36 @@ export default function CentralRastreamento() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <StatsCard title="Total" value={summary.total} icon={Package} color="primary" />
-          <StatsCard title="Em Trânsito" value={summary.emTransito} icon={Truck} color="info" />
+          <StatsCard
+            title="Total"
+            value={summary.total}
+            icon={Package}
+            color="primary"
+          />
+          <StatsCard
+            title="Em Trânsito"
+            value={summary.emTransito}
+            icon={Truck}
+            color="info"
+          />
           <StatsCard
             title="Atrasados"
             value={summary.atrasados}
             icon={AlertTriangle}
-            color={summary.atrasados > 0 ? 'destructive' : 'success'}
+            color={summary.atrasados > 0 ? "destructive" : "success"}
           />
-          <StatsCard title="Pendentes" value={summary.pendentes} icon={Clock} color="warning" />
-          <StatsCard title="Entregues" value={summary.entregues} icon={CheckCircle2} color="success" />
+          <StatsCard
+            title="Pendentes"
+            value={summary.pendentes}
+            icon={Clock}
+            color="warning"
+          />
+          <StatsCard
+            title="Entregues"
+            value={summary.entregues}
+            icon={CheckCircle2}
+            color="success"
+          />
         </div>
 
         {/* Exception Alert */}
@@ -126,7 +183,7 @@ export default function CentralRastreamento() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => setFilter('atrasados')}
+              onClick={() => setFilter("atrasados")}
             >
               Ver Atrasados
             </Button>
@@ -139,10 +196,16 @@ export default function CentralRastreamento() {
             <CardContent className="pt-4 flex items-center gap-4 flex-wrap">
               <Brain className="w-5 h-5 text-primary" />
               <span className="text-sm font-medium">Predição IA:</span>
-              <Badge variant="destructive">{predSummary.criticos} Críticos</Badge>
-              <Badge className="bg-warning/10 text-warning border-warning/20">{predSummary.altos} Altos</Badge>
+              <Badge variant="destructive">
+                {predSummary.criticos} Críticos
+              </Badge>
+              <Badge className="bg-warning/10 text-warning border-warning/20">
+                {predSummary.altos} Altos
+              </Badge>
               <Badge variant="secondary">{predSummary.medios} Médios</Badge>
-              <Badge className="bg-success/10 text-success">{predSummary.baixos} Baixos</Badge>
+              <Badge className="bg-success/10 text-success">
+                {predSummary.baixos} Baixos
+              </Badge>
               <span className="text-xs text-muted-foreground ml-auto">
                 {predSummary.total_analisados} analisados
               </span>
@@ -161,13 +224,20 @@ export default function CentralRastreamento() {
               className="pl-10"
             />
           </div>
-          <Tabs value={filter} onValueChange={(v) => setFilter(v as TrackingFilter)}>
+          <Tabs
+            value={filter}
+            onValueChange={(v) => setFilter(v as TrackingFilter)}
+          >
             <TabsList>
               {FILTER_TABS.map((tab) => (
-                <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 text-xs">
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="gap-1.5 text-xs"
+                >
                   <tab.icon className="w-3.5 h-3.5" />
                   {tab.label}
-                  {tab.value === 'atrasados' && summary.atrasados > 0 && (
+                  {tab.value === "atrasados" && summary.atrasados > 0 && (
                     <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
                       {summary.atrasados}
                     </span>
@@ -189,7 +259,11 @@ export default function CentralRastreamento() {
               <EmptyState
                 icon={Package}
                 title="Nenhuma remessa encontrada"
-                description={searchTerm ? 'Tente alterar os filtros' : 'Cadastre entregas ou coletas para rastrear'}
+                description={
+                  searchTerm
+                    ? "Tente alterar os filtros"
+                    : "Cadastre entregas ou coletas para rastrear"
+                }
               />
             ) : (
               <div className="overflow-x-auto">
@@ -214,31 +288,43 @@ export default function CentralRastreamento() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.02 }}
                         className={cn(
-                          'border-b cursor-pointer hover:bg-muted/50 transition-colors',
-                          s.atrasado && 'bg-destructive/5'
+                          "border-b cursor-pointer hover:bg-muted/50 transition-colors",
+                          s.atrasado && "bg-destructive/5",
                         )}
                         onClick={() => openDetail(s)}
                       >
                         <TableCell>
                           <Badge variant="outline" className="text-[10px]">
-                            {s.tipo === 'entrega' ? '📦 Entrega' : '🚚 Coleta'}
+                            {s.tipo === "entrega" ? "📦 Entrega" : "🚚 Coleta"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-mono text-sm font-medium">{s.numero}</TableCell>
+                        <TableCell className="font-mono text-sm font-medium">
+                          {s.numero}
+                        </TableCell>
                         <TableCell>
-                          <div className="max-w-[200px] truncate text-sm" title={s.destino}>
+                          <div
+                            className="max-w-[200px] truncate text-sm"
+                            title={s.destino}
+                          >
                             {s.destino}
                           </div>
                           {s.cliente && (
-                            <span className="text-xs text-muted-foreground">{s.cliente}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {s.cliente}
+                            </span>
                           )}
                         </TableCell>
-                        <TableCell className="text-sm">{s.transportadora}</TableCell>
+                        <TableCell className="text-sm">
+                          {s.transportadora}
+                        </TableCell>
                         <TableCell className="text-center">
                           <Badge
                             variant="outline"
                             className="text-[10px]"
-                            style={{ borderColor: s.statusColor, color: s.statusColor }}
+                            style={{
+                              borderColor: s.statusColor,
+                              color: s.statusColor,
+                            }}
                           >
                             {s.statusLabel}
                           </Badge>
@@ -248,7 +334,10 @@ export default function CentralRastreamento() {
                         </TableCell>
                         <TableCell className="text-center">
                           {s.atrasado ? (
-                            <Badge variant="destructive" className="text-[10px]">
+                            <Badge
+                              variant="destructive"
+                              className="text-[10px]"
+                            >
                               {s.diasAtraso}d
                             </Badge>
                           ) : (
@@ -256,7 +345,15 @@ export default function CentralRastreamento() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); navigate(`/rastreamento/${s.id}`); }}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/rastreamento/${s.id}`);
+                            }}
+                          >
                             <Eye className="w-3.5 h-3.5" />
                           </Button>
                         </TableCell>
@@ -277,7 +374,10 @@ export default function CentralRastreamento() {
             pageSize={pagination.pageSize}
             totalItems={shipments.length}
             startIndex={(pagination.currentPage - 1) * pagination.pageSize + 1}
-            endIndex={Math.min(pagination.currentPage * pagination.pageSize, shipments.length)}
+            endIndex={Math.min(
+              pagination.currentPage * pagination.pageSize,
+              shipments.length,
+            )}
             pageSizeOptions={[20, 50, 100]}
             onPageChange={pagination.setPage}
             onPageSizeChange={pagination.setPageSize}
@@ -290,7 +390,6 @@ export default function CentralRastreamento() {
           />
         )}
       </div>
-
     </MainLayout>
   );
 }

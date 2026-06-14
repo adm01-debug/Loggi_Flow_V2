@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 
 export interface TransportadoraRota {
   id: string;
@@ -65,12 +64,18 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
   const { user } = useAuth();
 
   // Fetch routes with optional filters
-  const { data: rotas, isLoading, error, refetch } = useQuery({
-    queryKey: ['transportadora-rotas', filters],
+  const {
+    data: rotas,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["transportadora-rotas", filters],
     queryFn: async () => {
       let query = supabase
-        .from('transportadora_rotas')
-        .select(`
+        .from("transportadora_rotas")
+        .select(
+          `
           *,
           transportadora:transportadoras (
             id,
@@ -79,27 +84,28 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
             score_performance,
             homologada
           )
-        `)
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .order("created_at", { ascending: false });
 
       // Apply filters
       if (filters?.origem_estado) {
-        query = query.eq('origem_estado', filters.origem_estado);
+        query = query.eq("origem_estado", filters.origem_estado);
       }
       if (filters?.origem_cidade) {
-        query = query.ilike('origem_cidade', `%${filters.origem_cidade}%`);
+        query = query.ilike("origem_cidade", `%${filters.origem_cidade}%`);
       }
       if (filters?.destino_estado) {
-        query = query.eq('destino_estado', filters.destino_estado);
+        query = query.eq("destino_estado", filters.destino_estado);
       }
       if (filters?.destino_cidade) {
-        query = query.ilike('destino_cidade', `%${filters.destino_cidade}%`);
+        query = query.ilike("destino_cidade", `%${filters.destino_cidade}%`);
       }
       if (filters?.transportadora_id) {
-        query = query.eq('transportadora_id', filters.transportadora_id);
+        query = query.eq("transportadora_id", filters.transportadora_id);
       }
       if (filters?.apenas_ativas) {
-        query = query.eq('ativo', true);
+        query = query.eq("ativo", true);
       }
 
       const { data, error } = await query;
@@ -110,21 +116,21 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
       let result = data as TransportadoraRota[];
 
       if (filters?.cep_origem) {
-        const cepNum = parseInt(filters.cep_origem.replace(/\D/g, ''));
-        result = result.filter(rota => {
+        const cepNum = parseInt(filters.cep_origem.replace(/\D/g, ""));
+        result = result.filter((rota) => {
           if (!rota.origem_cep_inicio || !rota.origem_cep_fim) return true;
-          const inicio = parseInt(rota.origem_cep_inicio.replace(/\D/g, ''));
-          const fim = parseInt(rota.origem_cep_fim.replace(/\D/g, ''));
+          const inicio = parseInt(rota.origem_cep_inicio.replace(/\D/g, ""));
+          const fim = parseInt(rota.origem_cep_fim.replace(/\D/g, ""));
           return cepNum >= inicio && cepNum <= fim;
         });
       }
 
       if (filters?.cep_destino) {
-        const cepNum = parseInt(filters.cep_destino.replace(/\D/g, ''));
-        result = result.filter(rota => {
+        const cepNum = parseInt(filters.cep_destino.replace(/\D/g, ""));
+        result = result.filter((rota) => {
           if (!rota.destino_cep_inicio || !rota.destino_cep_fim) return true;
-          const inicio = parseInt(rota.destino_cep_inicio.replace(/\D/g, ''));
-          const fim = parseInt(rota.destino_cep_fim.replace(/\D/g, ''));
+          const inicio = parseInt(rota.destino_cep_inicio.replace(/\D/g, ""));
+          const fim = parseInt(rota.destino_cep_fim.replace(/\D/g, ""));
           return cepNum >= inicio && cepNum <= fim;
         });
       }
@@ -139,11 +145,12 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
     origemEstado: string,
     destinoEstado: string,
     origemCidade?: string,
-    destinoCidade?: string
+    destinoCidade?: string,
   ) => {
     let query = supabase
-      .from('transportadora_rotas')
-      .select(`
+      .from("transportadora_rotas")
+      .select(
+        `
         *,
         transportadora:transportadoras (
           id,
@@ -156,16 +163,17 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
           whatsapp_operacional,
           api_disponivel
         )
-      `)
-      .eq('origem_estado', origemEstado)
-      .eq('destino_estado', destinoEstado)
-      .eq('ativo', true);
+      `,
+      )
+      .eq("origem_estado", origemEstado)
+      .eq("destino_estado", destinoEstado)
+      .eq("ativo", true);
 
     if (origemCidade) {
-      query = query.ilike('origem_cidade', `%${origemCidade}%`);
+      query = query.ilike("origem_cidade", `%${origemCidade}%`);
     }
     if (destinoCidade) {
-      query = query.ilike('destino_cidade', `%${destinoCidade}%`);
+      query = query.ilike("destino_cidade", `%${destinoCidade}%`);
     }
 
     const { data, error } = await query;
@@ -175,8 +183,10 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
     }
 
     // Sort by score_performance descending
-    return (data as TransportadoraRota[]).sort((a, b) => 
-      (b.transportadora?.score_performance || 0) - (a.transportadora?.score_performance || 0)
+    return (data as TransportadoraRota[]).sort(
+      (a, b) =>
+        (b.transportadora?.score_performance || 0) -
+        (a.transportadora?.score_performance || 0),
     );
   };
 
@@ -184,7 +194,7 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
   const addRota = useMutation({
     mutationFn: async (formData: RotaFormData) => {
       const { data, error } = await supabase
-        .from('transportadora_rotas')
+        .from("transportadora_rotas")
         .insert([formData])
         .select()
         .single();
@@ -193,11 +203,11 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transportadora-rotas'] });
-      toast.success('Rota adicionada com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ["transportadora-rotas"] });
+      toast.success("Rota adicionada com sucesso!");
     },
     onError: () => {
-      toast.error('Erro ao adicionar rota');
+      toast.error("Erro ao adicionar rota");
     },
   });
 
@@ -205,9 +215,9 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
   const updateRota = useMutation({
     mutationFn: async ({ id, ...formData }: RotaFormData & { id: string }) => {
       const { data, error } = await supabase
-        .from('transportadora_rotas')
+        .from("transportadora_rotas")
         .update(formData)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
@@ -215,11 +225,11 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transportadora-rotas'] });
-      toast.success('Rota atualizada com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ["transportadora-rotas"] });
+      toast.success("Rota atualizada com sucesso!");
     },
     onError: () => {
-      toast.error('Erro ao atualizar rota');
+      toast.error("Erro ao atualizar rota");
     },
   });
 
@@ -227,34 +237,34 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
   const deleteRota = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('transportadora_rotas')
+        .from("transportadora_rotas")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transportadora-rotas'] });
-      toast.success('Rota removida com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ["transportadora-rotas"] });
+      toast.success("Rota removida com sucesso!");
     },
     onError: () => {
-      toast.error('Erro ao remover rota');
+      toast.error("Erro ao remover rota");
     },
   });
 
   // Get unique cities from routes
   const { data: cidades } = useQuery({
-    queryKey: ['transportadora-rotas-cidades'],
+    queryKey: ["transportadora-rotas-cidades"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('transportadora_rotas')
-        .select('origem_cidade, destino_cidade')
-        .eq('ativo', true);
+        .from("transportadora_rotas")
+        .select("origem_cidade, destino_cidade")
+        .eq("ativo", true);
 
       if (error) throw error;
 
       const cidadesSet = new Set<string>();
-      data.forEach(rota => {
+      data.forEach((rota) => {
         if (rota.origem_cidade) cidadesSet.add(rota.origem_cidade);
         if (rota.destino_cidade) cidadesSet.add(rota.destino_cidade);
       });

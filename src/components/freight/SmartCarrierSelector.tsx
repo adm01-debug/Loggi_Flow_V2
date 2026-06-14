@@ -1,38 +1,76 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Brain, 
-  Truck, 
-  Clock, 
-  DollarSign, 
-  Star, 
-  TrendingUp,
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import {
+  Brain,
+  Truck,
+  Clock,
+  DollarSign,
+  Star,
   Zap,
   CheckCircle2,
   AlertCircle,
   Sparkles,
-  Target
-} from 'lucide-react';
-import { useSmartCarrierSelection, CarrierRecommendation } from "@/hooks/logistics/useSmartCarrierSelection";
-import { motion, AnimatePresence } from 'framer-motion';
+  Target,
+} from "lucide-react";
+import {
+  useSmartCarrierSelection,
+  CarrierRecommendation,
+} from "@/hooks/logistics/useSmartCarrierSelection";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ESTADOS_BRASIL = [
-  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
-  'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
-  'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
 ];
 
 const URGENCIAS = [
-  { value: 'baixa', label: 'Baixa', color: 'text-success' },
-  { value: 'normal', label: 'Normal', color: 'text-primary' },
-  { value: 'alta', label: 'Alta', color: 'text-warning' },
-  { value: 'urgente', label: 'Urgente', color: 'text-destructive' },
+  { value: "baixa", label: "Baixa", color: "text-success" },
+  { value: "normal", label: "Normal", color: "text-primary" },
+  { value: "alta", label: "Alta", color: "text-warning" },
+  { value: "urgente", label: "Urgente", color: "text-destructive" },
 ];
 
 interface SmartCarrierSelectorProps {
@@ -40,20 +78,21 @@ interface SmartCarrierSelectorProps {
 }
 
 export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
-  const { isLoading, result, analyzeCarriers, clearResult } = useSmartCarrierSelection();
-  
+  const { isLoading, result, analyzeCarriers, clearResult } =
+    useSmartCarrierSelection();
+
   const [formData, setFormData] = useState({
-    estado_destino: '',
-    peso_kg: '',
-    urgencia: 'normal' as 'baixa' | 'normal' | 'alta' | 'urgente',
-    tipo_carga: '',
+    estado_destino: "",
+    peso_kg: "",
+    urgencia: "normal" as "baixa" | "normal" | "alta" | "urgente",
+    tipo_carga: "",
   });
 
   const handleAnalyze = () => {
     if (!formData.estado_destino || !formData.peso_kg) {
       return;
     }
-    
+
     analyzeCarriers({
       estado_destino: formData.estado_destino,
       peso_kg: parseFloat(formData.peso_kg),
@@ -63,22 +102,23 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(value);
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return 'text-success';
-    if (confidence >= 60) return 'text-warning';
-    return 'text-destructive';
+    if (confidence >= 80) return "text-success";
+    if (confidence >= 60) return "text-warning";
+    return "text-destructive";
   };
 
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return { bg: 'bg-warning', text: '🥇 Recomendado' };
-    if (rank === 2) return { bg: 'bg-muted-foreground', text: '🥈 Alternativa' };
-    return { bg: 'bg-accent', text: '🥉 Opção' };
+    if (rank === 1) return { bg: "bg-warning", text: "🥇 Recomendado" };
+    if (rank === 2)
+      return { bg: "bg-muted-foreground", text: "🥈 Alternativa" };
+    return { bg: "bg-accent", text: "🥉 Opção" };
   };
 
   return (
@@ -97,12 +137,18 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
               </CardDescription>
             </div>
             <div className="flex gap-2">
-               <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30 gap-1">
-                 <Zap className="w-3 h-3" /> SLA Engine Active
-               </Badge>
-               <Badge variant="outline" className="bg-success/5 text-success border-success/30 gap-1">
-                 <Target className="w-3 h-3" /> Precision: 98.4%
-               </Badge>
+              <Badge
+                variant="outline"
+                className="bg-primary/5 text-primary border-primary/30 gap-1"
+              >
+                <Zap className="w-3 h-3" /> SLA Engine Active
+              </Badge>
+              <Badge
+                variant="outline"
+                className="bg-success/5 text-success border-success/30 gap-1"
+              >
+                <Target className="w-3 h-3" /> Precision: 98.4%
+              </Badge>
             </div>
           </div>
         </CardHeader>
@@ -110,9 +156,11 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
           <div className="grid gap-4 md:grid-cols-5">
             <div className="space-y-2">
               <Label>Estado de Destino</Label>
-              <Select 
-                value={formData.estado_destino} 
-                onValueChange={(v) => setFormData({ ...formData, estado_destino: v })}
+              <Select
+                value={formData.estado_destino}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, estado_destino: v })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione" />
@@ -135,15 +183,19 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                 step="0.1"
                 placeholder="Ex: 15.5"
                 value={formData.peso_kg}
-                onChange={(e) => setFormData({ ...formData, peso_kg: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, peso_kg: e.target.value })
+                }
               />
             </div>
 
             <div className="space-y-2">
               <Label>Urgência</Label>
-              <Select 
-                value={formData.urgencia} 
-                onValueChange={(v: 'baixa' | 'normal' | 'alta' | 'urgente') => setFormData({ ...formData, urgencia: v })}
+              <Select
+                value={formData.urgencia}
+                onValueChange={(v: "baixa" | "normal" | "alta" | "urgente") =>
+                  setFormData({ ...formData, urgencia: v })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -163,14 +215,18 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
               <Input
                 placeholder="Ex: Eletrônicos"
                 value={formData.tipo_carga}
-                onChange={(e) => setFormData({ ...formData, tipo_carga: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, tipo_carga: e.target.value })
+                }
               />
             </div>
 
             <div className="flex items-end">
-              <Button 
-                onClick={handleAnalyze} 
-                disabled={isLoading || !formData.estado_destino || !formData.peso_kg}
+              <Button
+                onClick={handleAnalyze}
+                disabled={
+                  isLoading || !formData.estado_destino || !formData.peso_kg
+                }
                 className="w-full gap-2"
               >
                 {isLoading ? (
@@ -208,12 +264,16 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                       <Brain className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium text-sm text-primary">Análise IA</p>
+                      <p className="font-medium text-sm text-primary">
+                        Análise IA
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
                         {result.generalAnalysis}
                       </p>
                       <Badge variant="outline" className="mt-2">
-                        {result.analysisType === 'ai' ? 'Powered by AI' : 'Análise Algorítmica'}
+                        {result.analysisType === "ai"
+                          ? "Powered by AI"
+                          : "Análise Algorítmica"}
                       </Badge>
                     </div>
                   </div>
@@ -225,7 +285,7 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
             <div className="grid gap-4 md:grid-cols-3">
               {result.recommendations.map((rec, index) => {
                 const rankInfo = getRankBadge(rec.rank);
-                
+
                 return (
                   <motion.div
                     key={rec.id}
@@ -233,9 +293,9 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Card 
+                    <Card
                       className={`relative overflow-hidden transition-all hover:shadow-lg cursor-pointer ${
-                        rec.rank === 1 ? 'ring-2 ring-primary' : ''
+                        rec.rank === 1 ? "ring-2 ring-primary" : ""
                       }`}
                       onClick={() => onSelect?.(rec)}
                     >
@@ -246,13 +306,13 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                           </div>
                         </div>
                       )}
-                      
+
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
-                          <Badge className={rankInfo.bg}>
-                            {rankInfo.text}
-                          </Badge>
-                          <div className={`text-sm font-medium ${getConfidenceColor(rec.confidence)}`}>
+                          <Badge className={rankInfo.bg}>{rankInfo.text}</Badge>
+                          <div
+                            className={`text-sm font-medium ${getConfidenceColor(rec.confidence)}`}
+                          >
                             {rec.confidence}% confiança
                           </div>
                         </div>
@@ -268,33 +328,49 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
                           <div className="flex items-center gap-2">
                             <DollarSign className="h-4 w-4 text-success" />
                             <div>
-                              <p className="text-xs text-muted-foreground">Valor Total</p>
-                              <p className="font-semibold">{formatCurrency(rec.valorTotal)}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Valor Total
+                              </p>
+                              <p className="font-semibold">
+                                {formatCurrency(rec.valorTotal)}
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4 text-primary" />
                             <div>
-                              <p className="text-xs text-muted-foreground">Prazo</p>
-                              <p className="font-semibold">{rec.prazoDias} dias</p>
+                              <p className="text-xs text-muted-foreground">
+                                Prazo
+                              </p>
+                              <p className="font-semibold">
+                                {rec.prazoDias} dias
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
                             <Star className="h-4 w-4 text-warning" />
                             <div>
-                              <p className="text-xs text-muted-foreground">Score</p>
-                              <p className="font-semibold">{rec.scorePerformance}/100</p>
+                              <p className="text-xs text-muted-foreground">
+                                Score
+                              </p>
+                              <p className="font-semibold">
+                                {rec.scorePerformance}/100
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2">
                             <Target className="h-4 w-4 text-primary" />
                             <div>
-                              <p className="text-xs text-muted-foreground">On-Time</p>
+                              <p className="text-xs text-muted-foreground">
+                                On-Time
+                              </p>
                               <p className="font-semibold">
-                                {rec.onTimeRate ? `${rec.onTimeRate.toFixed(0)}%` : 'N/A'}
+                                {rec.onTimeRate
+                                  ? `${rec.onTimeRate.toFixed(0)}%`
+                                  : "N/A"}
                               </p>
                             </div>
                           </div>
@@ -325,9 +401,9 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
 
                         {/* Select Button */}
                         {onSelect && (
-                          <Button 
-                            className="w-full" 
-                            variant={rec.rank === 1 ? 'default' : 'outline'}
+                          <Button
+                            className="w-full"
+                            variant={rec.rank === 1 ? "default" : "outline"}
                             onClick={(e) => {
                               e.stopPropagation();
                               onSelect(rec);
@@ -347,17 +423,19 @@ export function SmartCarrierSelector({ onSelect }: SmartCarrierSelectorProps) {
         )}
 
         {result && !result.success && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Card className="border-destructive/30 bg-destructive/5">
               <CardContent className="pt-6 text-center">
                 <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  {result.error || 'Nenhuma transportadora disponível para este destino e peso.'}
+                  {result.error ||
+                    "Nenhuma transportadora disponível para este destino e peso."}
                 </p>
-                <Button variant="outline" className="mt-4" onClick={clearResult}>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={clearResult}
+                >
                   Tentar novamente
                 </Button>
               </CardContent>

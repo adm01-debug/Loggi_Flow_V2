@@ -1,34 +1,47 @@
-import { useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Bell, BellOff, BellRing, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  Bell,
+  BellOff,
+  BellRing,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react";
 import { useSecurityPushNotifications } from "@/hooks/notifications/useSecurityPushNotifications";
 
 export function SecurityNotificationSettings() {
-  const { isEnabled, permission, requestPermission } = useSecurityPushNotifications();
+  const { isEnabled, permission, requestPermission } =
+    useSecurityPushNotifications();
 
   const getPermissionStatus = () => {
     switch (permission) {
-      case 'granted':
+      case "granted":
         return {
           icon: <CheckCircle2 className="h-5 w-5 text-success" />,
-          text: 'Ativadas',
-          color: 'bg-success/10 text-success border-success/20',
+          text: "Ativadas",
+          color: "bg-success/10 text-success border-success/20",
         };
-      case 'denied':
+      case "denied":
         return {
           icon: <XCircle className="h-5 w-5 text-destructive" />,
-          text: 'Bloqueadas',
-          color: 'bg-destructive/10 text-destructive border-destructive/20',
+          text: "Bloqueadas",
+          color: "bg-destructive/10 text-destructive border-destructive/20",
         };
       default:
         return {
           icon: <AlertTriangle className="h-5 w-5 text-warning" />,
-          text: 'Não configurado',
-          color: 'bg-warning/10 text-warning border-warning/20',
+          text: "Não configurado",
+          color: "bg-warning/10 text-warning border-warning/20",
         };
     }
   };
@@ -63,14 +76,13 @@ export function SecurityNotificationSettings() {
               </Badge>
             </div>
           </div>
-          {permission !== 'granted' && permission !== 'denied' && (
-            <Button onClick={requestPermission}>
-              Ativar Notificações
-            </Button>
+          {permission !== "granted" && permission !== "denied" && (
+            <Button onClick={requestPermission}>Ativar Notificações</Button>
           )}
-          {permission === 'denied' && (
+          {permission === "denied" && (
             <p className="text-sm text-muted-foreground max-w-xs">
-              As notificações foram bloqueadas. Para ativá-las, acesse as configurações do seu navegador.
+              As notificações foram bloqueadas. Para ativá-las, acesse as
+              configurações do seu navegador.
             </p>
           )}
         </div>
@@ -80,22 +92,59 @@ export function SecurityNotificationSettings() {
           <h4 className="text-sm font-medium">Tipos de Alertas</h4>
           <div className="space-y-3">
             {[
-              { id: 'new_device', label: 'Novo dispositivo detectado', description: 'Quando um login ocorre de um dispositivo desconhecido', enabled: true },
-              { id: 'failed_login', label: 'Tentativas de login falhadas', description: 'Quando há tentativas de login mal-sucedidas', enabled: true },
-              { id: 'password_change', label: 'Alteração de senha', description: 'Quando sua senha é alterada', enabled: true },
-              { id: 'mfa_change', label: 'Alteração de MFA', description: 'Quando o MFA é ativado ou desativado', enabled: true },
-              { id: 'suspicious', label: 'Atividade suspeita', description: 'Quando comportamento incomum é detectado', enabled: true },
-              { id: 'rate_limit', label: 'Rate limit excedido', description: 'Quando um IP é bloqueado por excesso de requisições', enabled: true },
+              {
+                id: "new_device",
+                label: "Novo dispositivo detectado",
+                description:
+                  "Quando um login ocorre de um dispositivo desconhecido",
+                enabled: true,
+              },
+              {
+                id: "failed_login",
+                label: "Tentativas de login falhadas",
+                description: "Quando há tentativas de login mal-sucedidas",
+                enabled: true,
+              },
+              {
+                id: "password_change",
+                label: "Alteração de senha",
+                description: "Quando sua senha é alterada",
+                enabled: true,
+              },
+              {
+                id: "mfa_change",
+                label: "Alteração de MFA",
+                description: "Quando o MFA é ativado ou desativado",
+                enabled: true,
+              },
+              {
+                id: "suspicious",
+                label: "Atividade suspeita",
+                description: "Quando comportamento incomum é detectado",
+                enabled: true,
+              },
+              {
+                id: "rate_limit",
+                label: "Rate limit excedido",
+                description:
+                  "Quando um IP é bloqueado por excesso de requisições",
+                enabled: true,
+              },
             ].map((item) => (
               <div
                 key={item.id}
                 className="flex items-center justify-between p-3 rounded-lg border"
               >
                 <div className="space-y-0.5">
-                  <Label htmlFor={item.id} className="text-sm font-medium cursor-pointer">
+                  <Label
+                    htmlFor={item.id}
+                    className="text-sm font-medium cursor-pointer"
+                  >
                     {item.label}
                   </Label>
-                  <p className="text-xs text-muted-foreground">{item.description}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.description}
+                  </p>
                 </div>
                 <Switch
                   id={item.id}
@@ -116,9 +165,10 @@ export function SecurityNotificationSettings() {
                 Notificações em Tempo Real
               </p>
               <p className="text-xs text-muted-foreground">
-                As notificações push são enviadas instantaneamente quando eventos de segurança
-                são detectados. Mantenha a aba aberta para receber alertas em tempo real,
-                mesmo quando estiver em outra aba ou aplicativo.
+                As notificações push são enviadas instantaneamente quando
+                eventos de segurança são detectados. Mantenha a aba aberta para
+                receber alertas em tempo real, mesmo quando estiver em outra aba
+                ou aplicativo.
               </p>
             </div>
           </div>

@@ -4,7 +4,6 @@ import {
   Camera,
   CameraOff,
   SwitchCamera,
-  X,
   QrCode,
   Barcode,
   CheckCircle,
@@ -27,7 +26,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useQRScanner, ScanResult } from "@/hooks/ui/useQRScanner";
-import { cn } from "@/lib/utils";
 
 interface QRScannerModalProps {
   open: boolean;
@@ -123,7 +121,9 @@ export function QRScannerModal({
               <DialogTitle className="font-black text-2xl tracking-tighter uppercase italic text-white leading-none">
                 {title}
               </DialogTitle>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/70 mt-1">{description}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/70 mt-1">
+                {description}
+              </p>
             </div>
           </div>
         </DialogHeader>
@@ -136,7 +136,7 @@ export function QRScannerModal({
             playsInline
             muted
           />
-          
+
           {/* Hidden canvas for processing */}
           <canvas ref={canvasRef} className="hidden" />
 
@@ -153,13 +153,17 @@ export function QRScannerModal({
                 <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-primary rounded-bl-3xl shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
                 {/* Bottom-right */}
                 <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-primary rounded-br-3xl shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
-                
+
                 {/* Scanning line animation */}
                 {isScanning && (
                   <motion.div
                     className="absolute left-2 right-2 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_rgba(var(--primary-rgb),0.8)] rounded-full z-10"
                     animate={{ top: ["5%", "95%", "5%"] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                   />
                 )}
               </div>
@@ -214,7 +218,9 @@ export function QRScannerModal({
                       {lastResult.format}
                     </Badge>
                   </div>
-                  <p className="text-sm font-mono truncate">{lastResult.text}</p>
+                  <p className="text-sm font-mono truncate">
+                    {lastResult.text}
+                  </p>
                 </div>
               </motion.div>
             )}
@@ -241,7 +247,8 @@ export function QRScannerModal({
                   <SelectContent>
                     {availableCameras.map((camera) => (
                       <SelectItem key={camera.deviceId} value={camera.deviceId}>
-                        {camera.label || `Câmera ${camera.deviceId.slice(0, 8)}`}
+                        {camera.label ||
+                          `Câmera ${camera.deviceId.slice(0, 8)}`}
                       </SelectItem>
                     ))}
                   </SelectContent>

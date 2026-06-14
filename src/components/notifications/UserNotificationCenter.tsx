@@ -1,13 +1,10 @@
 import { useState } from "react";
-import { 
-  Bell, 
-  X, 
-  CheckCheck,
+import {
+  X,
   Trophy,
   AlertTriangle,
   AlertCircle,
   CheckCircle,
-  Info,
   ExternalLink,
   Mail,
   Filter,
@@ -22,79 +19,87 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNotifications, Notification } from "@/hooks/notifications/useNotifications";
+import {
+  useNotifications,
+  Notification,
+} from "@/hooks/notifications/useNotifications";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function UserNotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
-  const { 
+  const {
     notifications,
     unreadNotifications,
-    unreadCount, 
+    unreadCount,
     isLoading,
-    markAsRead, 
-    markAllAsRead, 
+    markAsRead,
+    markAllAsRead,
     deleteNotification,
   } = useNotifications();
 
-  const getTypeIcon = (type: Notification['type']) => {
+  const getTypeIcon = (type: Notification["type"]) => {
     switch (type) {
-      case 'success':
+      case "success":
         return CheckCircle;
-      case 'warning':
+      case "warning":
         return AlertTriangle;
-      case 'error':
+      case "error":
         return AlertCircle;
-      case 'achievement':
+      case "achievement":
         return Trophy;
       default:
         return Mail;
     }
   };
 
-  const getTypeStyles = (type: Notification['type']) => {
+  const getTypeStyles = (type: Notification["type"]) => {
     switch (type) {
-      case 'success':
+      case "success":
         return {
-          bg: 'bg-success/10',
-          border: 'border-success/20',
-          icon: 'text-success',
-          dot: 'bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]',
-          gradient: 'from-success/5 to-transparent',
+          bg: "bg-success/10",
+          border: "border-success/20",
+          icon: "text-success",
+          dot: "bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]",
+          gradient: "from-success/5 to-transparent",
         };
-      case 'warning':
+      case "warning":
         return {
-          bg: 'bg-warning/10',
-          border: 'border-warning/20',
-          icon: 'text-warning',
-          dot: 'bg-warning shadow-[0_0_8px_rgba(245,158,11,0.5)]',
-          gradient: 'from-warning/5 to-transparent',
+          bg: "bg-warning/10",
+          border: "border-warning/20",
+          icon: "text-warning",
+          dot: "bg-warning shadow-[0_0_8px_rgba(245,158,11,0.5)]",
+          gradient: "from-warning/5 to-transparent",
         };
-      case 'error':
+      case "error":
         return {
-          bg: 'bg-destructive/10',
-          border: 'border-destructive/20',
-          icon: 'text-destructive',
-          dot: 'bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]',
-          gradient: 'from-destructive/5 to-transparent',
+          bg: "bg-destructive/10",
+          border: "border-destructive/20",
+          icon: "text-destructive",
+          dot: "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]",
+          gradient: "from-destructive/5 to-transparent",
         };
-      case 'achievement':
+      case "achievement":
         return {
-          bg: 'bg-coins/10',
-          border: 'border-coins/20',
-          icon: 'text-coins',
-          dot: 'bg-coins shadow-[0_0_8px_rgba(234,179,8,0.5)]',
-          gradient: 'from-coins/5 to-transparent',
+          bg: "bg-coins/10",
+          border: "border-coins/20",
+          icon: "text-coins",
+          dot: "bg-coins shadow-[0_0_8px_rgba(234,179,8,0.5)]",
+          gradient: "from-coins/5 to-transparent",
         };
       default:
         return {
-          bg: 'bg-primary/10',
-          border: 'border-primary/20',
-          icon: 'text-primary',
-          dot: 'bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]',
-          gradient: 'from-primary/5 to-transparent',
+          bg: "bg-primary/10",
+          border: "border-primary/20",
+          icon: "text-primary",
+          dot: "bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]",
+          gradient: "from-primary/5 to-transparent",
         };
     }
   };
@@ -112,8 +117,10 @@ export function UserNotificationCenter() {
         exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
         className={cn(
           "group relative p-4 transition-all duration-300",
-          !notification.read ? cn("bg-gradient-to-r", styles.gradient) : "hover:bg-muted/30",
-          "cursor-pointer border-b border-border/30"
+          !notification.read
+            ? cn("bg-gradient-to-r", styles.gradient)
+            : "hover:bg-muted/30",
+          "cursor-pointer border-b border-border/30",
         )}
         onClick={() => {
           if (!notification.read) markAsRead(notification.id);
@@ -123,27 +130,35 @@ export function UserNotificationCenter() {
         }}
       >
         <div className="flex gap-4">
-          <div className={cn(
-            "relative flex items-center justify-center w-11 h-11 rounded-2xl shrink-0 transition-all group-hover:rotate-6 group-hover:scale-110",
-            styles.bg,
-            "border border-white/5"
-          )}>
+          <div
+            className={cn(
+              "relative flex items-center justify-center w-11 h-11 rounded-2xl shrink-0 transition-all group-hover:rotate-6 group-hover:scale-110",
+              styles.bg,
+              "border border-white/5",
+            )}
+          >
             <TypeIcon className={cn("w-5 h-5", styles.icon)} />
             {!notification.read && (
-              <span className={cn(
-                "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-background animate-pulse",
-                styles.dot
-              )} />
+              <span
+                className={cn(
+                  "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-background animate-pulse",
+                  styles.dot,
+                )}
+              />
             )}
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <p className={cn(
-                  "text-sm tracking-tight",
-                  !notification.read ? "font-bold text-foreground" : "font-medium text-muted-foreground"
-                )}>
+                <p
+                  className={cn(
+                    "text-sm tracking-tight",
+                    !notification.read
+                      ? "font-bold text-foreground"
+                      : "font-medium text-muted-foreground",
+                  )}
+                >
                   {notification.title}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
@@ -172,9 +187,9 @@ export function UserNotificationCenter() {
                   </span>
                 )}
                 <span className="text-[10px] font-medium text-muted-foreground opacity-60">
-                  {formatDistanceToNow(new Date(notification.created_at), { 
-                    addSuffix: true, 
-                    locale: ptBR 
+                  {formatDistanceToNow(new Date(notification.created_at), {
+                    addSuffix: true,
+                    locale: ptBR,
                   })}
                 </span>
               </div>
@@ -191,17 +206,23 @@ export function UserNotificationCenter() {
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className={cn(
                   "relative h-9 w-9 sm:h-10 sm:w-10 rounded-full transition-all duration-300",
                   isOpen ? "bg-accent" : "hover:bg-accent/50",
-                  unreadCount > 0 && "after:content-[''] after:absolute after:inset-[-2px] after:rounded-full after:border-2 after:border-primary/30 after:animate-ping after:pointer-events-none"
+                  unreadCount > 0 &&
+                    "after:content-[''] after:absolute after:inset-[-2px] after:rounded-full after:border-2 after:border-primary/30 after:animate-ping after:pointer-events-none",
                 )}
                 aria-label="Notificações pessoais"
               >
-                <Mail className={cn("h-5 w-5 transition-transform", isOpen && "scale-110")} />
+                <Mail
+                  className={cn(
+                    "h-5 w-5 transition-transform",
+                    isOpen && "scale-110",
+                  )}
+                />
                 <AnimatePresence>
                   {unreadCount > 0 && (
                     <motion.span
@@ -210,7 +231,7 @@ export function UserNotificationCenter() {
                       exit={{ scale: 0, opacity: 0 }}
                       className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black bg-primary text-primary-foreground rounded-full ring-2 ring-background z-10"
                     >
-                      {unreadCount > 99 ? '99+' : unreadCount}
+                      {unreadCount > 99 ? "99+" : unreadCount}
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -218,15 +239,18 @@ export function UserNotificationCenter() {
             </PopoverTrigger>
           </TooltipTrigger>
           {!isOpen && (
-            <TooltipContent side="bottom" className="font-bold text-[10px] uppercase tracking-wider">
+            <TooltipContent
+              side="bottom"
+              className="font-bold text-[10px] uppercase tracking-wider"
+            >
               Minhas Notificações
             </TooltipContent>
           )}
         </Tooltip>
       </TooltipProvider>
 
-      <PopoverContent 
-        className="w-[420px] p-0 border-2 border-primary/5 bg-black/95 backdrop-blur-xl shadow-2xl overflow-hidden rounded-2xl animate-in zoom-in-95 duration-200" 
+      <PopoverContent
+        className="w-[420px] p-0 border-2 border-primary/5 bg-black/95 backdrop-blur-xl shadow-2xl overflow-hidden rounded-2xl animate-in zoom-in-95 duration-200"
         align="end"
         sideOffset={12}
       >
@@ -237,8 +261,12 @@ export function UserNotificationCenter() {
                 <Mail className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-black text-base tracking-tight leading-none">Notificações</h3>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-70">Mensagens e Conquistas</p>
+                <h3 className="font-black text-base tracking-tight leading-none">
+                  Notificações
+                </h3>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-70">
+                  Mensagens e Conquistas
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -264,13 +292,13 @@ export function UserNotificationCenter() {
 
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="w-full h-9 bg-accent/30 p-1 rounded-xl">
-              <TabsTrigger 
-                value="all" 
+              <TabsTrigger
+                value="all"
                 className="flex-1 rounded-lg text-[10px] font-black uppercase tracking-wider data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 Todas ({notifications.length})
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="unread"
                 className="flex-1 rounded-lg text-[10px] font-black uppercase tracking-wider data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
@@ -295,16 +323,19 @@ export function UserNotificationCenter() {
                       <div className="w-20 h-20 rounded-3xl bg-muted/30 flex items-center justify-center mb-6 border border-border/50 rotate-3">
                         <Mail className="w-10 h-10 text-muted-foreground/30" />
                       </div>
-                      <p className="font-black text-base text-foreground tracking-tight">Inbox Vazio</p>
+                      <p className="font-black text-base text-foreground tracking-tight">
+                        Inbox Vazio
+                      </p>
                       <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-[220px]">
-                        Fique tranquilo! Você receberá mensagens aqui quando houver novidades.
+                        Fique tranquilo! Você receberá mensagens aqui quando
+                        houver novidades.
                       </p>
                     </div>
                   ) : (
                     <div className="pb-4">
                       <AnimatePresence mode="popLayout" initial={false}>
-                        {notifications.map((notification, index) => 
-                          renderNotification(notification, index)
+                        {notifications.map((notification, index) =>
+                          renderNotification(notification, index),
                         )}
                       </AnimatePresence>
                     </div>
@@ -312,7 +343,10 @@ export function UserNotificationCenter() {
                 </ScrollArea>
               </TabsContent>
 
-              <TabsContent value="unread" className="m-0 border-none outline-none">
+              <TabsContent
+                value="unread"
+                className="m-0 border-none outline-none"
+              >
                 <ScrollArea className="h-[380px] -mx-4 px-4">
                   {unreadNotifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 px-8 text-center animate-in fade-in duration-500">
@@ -322,16 +356,19 @@ export function UserNotificationCenter() {
                           <CheckCircle className="w-10 h-10 text-success opacity-50" />
                         </div>
                       </div>
-                      <p className="font-black text-base text-foreground tracking-tight">Zero Pendências</p>
+                      <p className="font-black text-base text-foreground tracking-tight">
+                        Zero Pendências
+                      </p>
                       <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-[220px]">
-                        Ótimo trabalho! Você leu todas as suas notificações importantes.
+                        Ótimo trabalho! Você leu todas as suas notificações
+                        importantes.
                       </p>
                     </div>
                   ) : (
                     <div className="pb-4">
                       <AnimatePresence mode="popLayout" initial={false}>
-                        {unreadNotifications.map((notification, index) => 
-                          renderNotification(notification, index)
+                        {unreadNotifications.map((notification, index) =>
+                          renderNotification(notification, index),
                         )}
                       </AnimatePresence>
                     </div>
@@ -341,9 +378,13 @@ export function UserNotificationCenter() {
             </div>
           </Tabs>
         </div>
-        
+
         <div className="p-3 bg-muted/10 border-t border-border/30 flex items-center justify-center gap-2">
-          <Button variant="ghost" size="sm" className="w-full text-[10px] font-black uppercase tracking-widest h-8 hover:bg-background/50">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full text-[10px] font-black uppercase tracking-widest h-8 hover:bg-background/50"
+          >
             <Filter className="w-3 h-3 mr-2" />
             Preferências de Email
           </Button>

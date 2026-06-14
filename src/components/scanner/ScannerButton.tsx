@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { QrCode, ScanLine } from "lucide-react";
+import { ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,

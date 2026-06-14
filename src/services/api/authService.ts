@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { User, Session } from "@supabase/supabase-js";
 
 export interface Profile {
   id: string;
@@ -47,5 +46,5 @@ export const authService = {
 
   async signOut(): Promise<void> {
     await supabase.auth.signOut();
-  }
+  },
 };

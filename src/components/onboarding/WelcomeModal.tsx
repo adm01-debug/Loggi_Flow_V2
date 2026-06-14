@@ -1,12 +1,19 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Rocket, Package, TrendingUp, Trophy, Users, Zap,
-  ChevronRight, X, Sparkles
-} from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Rocket,
+  Package,
+  TrendingUp,
+  Trophy,
+  Users,
+  Zap,
+  ChevronRight,
+  X,
+  Sparkles,
+} from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface WelcomeModalProps {
   userName?: string;
@@ -19,30 +26,39 @@ const welcomeSteps = [
   {
     icon: Package,
     title: "Gerencie Entregas",
-    description: "Rastreie todas suas entregas e coletas em tempo real com visibilidade completa.",
-    color: "from-blue-500 to-cyan-500"
+    description:
+      "Rastreie todas suas entregas e coletas em tempo real com visibilidade completa.",
+    color: "from-blue-500 to-cyan-500",
   },
   {
     icon: TrendingUp,
     title: "Analytics Avançados",
-    description: "Tome decisões baseadas em dados com dashboards e relatórios inteligentes.",
-    color: "from-green-500 to-emerald-500"
+    description:
+      "Tome decisões baseadas em dados com dashboards e relatórios inteligentes.",
+    color: "from-green-500 to-emerald-500",
   },
   {
     icon: Trophy,
     title: "Gamificação",
-    description: "Motive sua equipe com XP, conquistas e um sistema de recompensas divertido.",
-    color: "from-amber-500 to-orange-500"
+    description:
+      "Motive sua equipe com XP, conquistas e um sistema de recompensas divertido.",
+    color: "from-amber-500 to-orange-500",
   },
   {
     icon: Users,
     title: "Colaboração",
-    description: "Trabalhe em equipe com comentários, menções e notificações em tempo real.",
-    color: "from-purple-500 to-pink-500"
-  }
+    description:
+      "Trabalhe em equipe com comentários, menções e notificações em tempo real.",
+    color: "from-purple-500 to-pink-500",
+  },
 ];
 
-export function WelcomeModal({ userName, isOpen, onClose, onStartTour }: WelcomeModalProps) {
+export function WelcomeModal({
+  userName,
+  isOpen,
+  onClose,
+  onStartTour,
+}: WelcomeModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [showFeatures, setShowFeatures] = useState(false);
 
@@ -78,11 +94,14 @@ export function WelcomeModal({ userName, isOpen, onClose, onStartTour }: Welcome
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <motion.div
                   className="absolute w-64 h-64 rounded-full blur-3xl opacity-20"
-                  style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}
+                  style={{
+                    background:
+                      "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+                  }}
                   animate={{
                     x: [0, 50, 0],
                     y: [0, -30, 0],
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.1, 1],
                   }}
                   transition={{ duration: 8, repeat: Infinity }}
                 />
@@ -105,7 +124,7 @@ export function WelcomeModal({ userName, isOpen, onClose, onStartTour }: Welcome
                 transition={{ delay: 0.3 }}
               >
                 <h2 className="text-3xl font-display font-bold mb-2">
-                  Bem-vindo{userName ? `, ${userName.split(' ')[0]}` : ''}! 🎉
+                  Bem-vindo{userName ? `, ${userName.split(" ")[0]}` : ""}! 🎉
                 </h2>
                 <p className="text-muted-foreground text-lg mb-6">
                   Estamos felizes em ter você no LogiFlow
@@ -121,17 +140,25 @@ export function WelcomeModal({ userName, isOpen, onClose, onStartTour }: Welcome
               >
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">5 min</div>
-                  <div className="text-xs text-muted-foreground">Setup rápido</div>
+                  <div className="text-xs text-muted-foreground">
+                    Setup rápido
+                  </div>
                 </div>
                 <div className="h-8 w-px bg-border" />
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-amber-500">500 XP</div>
-                  <div className="text-xs text-muted-foreground">Para ganhar</div>
+                  <div className="text-2xl font-bold text-amber-500">
+                    500 XP
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Para ganhar
+                  </div>
                 </div>
                 <div className="h-8 w-px bg-border" />
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-500">6</div>
-                  <div className="text-xs text-muted-foreground">Conquistas</div>
+                  <div className="text-xs text-muted-foreground">
+                    Conquistas
+                  </div>
                 </div>
               </motion.div>
 
@@ -181,10 +208,12 @@ export function WelcomeModal({ userName, isOpen, onClose, onStartTour }: Welcome
                 >
                   {/* Icon with gradient background */}
                   <div className="relative mb-6">
-                    <div className={cn(
-                      "w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-lg",
-                      welcomeSteps[currentStep].color
-                    )}>
+                    <div
+                      className={cn(
+                        "w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-lg",
+                        welcomeSteps[currentStep].color,
+                      )}
+                    >
                       {(() => {
                         const Icon = welcomeSteps[currentStep].icon;
                         return <Icon className="w-10 h-10 text-white" />;
@@ -210,9 +239,9 @@ export function WelcomeModal({ userName, isOpen, onClose, onStartTour }: Welcome
                         onClick={() => setCurrentStep(i)}
                         className={cn(
                           "w-2 h-2 rounded-full transition-all",
-                          i === currentStep 
-                            ? "w-6 bg-primary" 
-                            : "bg-muted hover:bg-muted-foreground/50"
+                          i === currentStep
+                            ? "w-6 bg-primary"
+                            : "bg-muted hover:bg-muted-foreground/50",
                         )}
                       />
                     ))}
@@ -220,7 +249,11 @@ export function WelcomeModal({ userName, isOpen, onClose, onStartTour }: Welcome
 
                   {/* Actions */}
                   <div className="flex gap-3">
-                    <Button variant="outline" className="flex-1" onClick={handleSkip}>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={handleSkip}
+                    >
                       Pular
                     </Button>
                     <Button className="flex-1 gap-2" onClick={handleNext}>

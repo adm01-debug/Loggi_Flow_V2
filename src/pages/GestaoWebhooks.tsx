@@ -1,8 +1,6 @@
-import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader } from '@/components/common/PageHeader';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { WebhookManager } from '@/components/integrations/WebhookManager';
-import { Webhook } from 'lucide-react';
+import { MainLayout } from "@/components/layout/MainLayout";
+import { WebhookManager } from "@/components/integrations/WebhookManager";
+import { Webhook } from "lucide-react";
 
 export default function GestaoWebhooks() {
   return (
@@ -22,9 +20,13 @@ export default function GestaoWebhooks() {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                     <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Webhook_Engine_Active</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
+                      Webhook_Engine_Active
+                    </span>
                   </div>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">GATILHOS • AUTOMAÇÃO • EXTERNAL_SYNC</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
+                    GATILHOS • AUTOMAÇÃO • EXTERNAL_SYNC
+                  </span>
                 </div>
               </div>
             </h1>

@@ -1,22 +1,42 @@
-import { useMemo } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { StatsCard } from '@/components/common/StatsCard';
-import { EmptyState } from '@/components/common/EmptyState';
+import { useMemo } from "react";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
-  Target, Truck, Clock, DollarSign, TrendingUp, Award,
-  CheckCircle2, AlertTriangle, BarChart3, Timer
-} from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { EmptyState } from "@/components/common/EmptyState";
+import {
+  Target,
+  Truck,
+  DollarSign,
+  Award,
+  CheckCircle2,
+  BarChart3,
+  Timer,
+} from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { motion } from 'framer-motion';
-import { differenceInDays, parseISO } from 'date-fns';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, RadialBarChart, RadialBar, Legend } from 'recharts';
-import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
+import { motion } from "framer-motion";
+import { differenceInDays, parseISO } from "date-fns";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 interface TransportadoraOTIF {
   id: string;
@@ -36,16 +56,23 @@ export default function PainelOTIF() {
   const { user } = useAuth();
 
   const { data: entregas, isLoading } = useQuery({
-    queryKey: ['otif-entregas'],
+    queryKey: ["otif-entregas"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('entregas')
-        .select(`
+        .from("entregas")
+        .select(
+          `
           id, status, previsao_entrega, data_entrega_efetiva, data_despacho,
           valor_frete, transportadora_id,
           transportadora:transportadoras (id, nome_fantasia, score_performance)
-        `)
-        .in('status', ['entregue', 'despachado', 'em_transito', 'saiu_entrega']);
+        `,
+        )
+        .in("status", [
+          "entregue",
+          "despachado",
+          "em_transito",
+          "saiu_entrega",
+        ]);
 
       if (error) throw error;
       return data;
@@ -59,13 +86,17 @@ export default function PainelOTIF() {
     const map: Record<string, TransportadoraOTIF> = {};
 
     entregas.forEach((e) => {
-      const t = e.transportadora as { id: string; nome_fantasia: string; score_performance: number | null } | null;
+      const t = e.transportadora as {
+        id: string;
+        nome_fantasia: string;
+        score_performance: number | null;
+      } | null;
       if (!t) return;
 
       if (!map[t.id]) {
         map[t.id] = {
           id: t.id,
-          nome_fantasia: t.nome_fantasia || 'N/A',
+          nome_fantasia: t.nome_fantasia || "N/A",
           score_performance: t.score_performance,
           total_entregas: 0,
           entregas_no_prazo: 0,
@@ -82,7 +113,11 @@ export default function PainelOTIF() {
       stat.total_entregas++;
       stat.custo_total += e.valor_frete || 0;
 
-      if (e.status === 'entregue' && e.data_entrega_efetiva && e.previsao_entrega) {
+      if (
+        e.status === "entregue" &&
+        e.data_entrega_efetiva &&
+        e.previsao_entrega
+      ) {
         const efetiva = parseISO(e.data_entrega_efetiva);
         const prevista = parseISO(e.previsao_entrega);
         if (efetiva <= prevista) {
@@ -93,57 +128,94 @@ export default function PainelOTIF() {
       }
 
       if (e.data_despacho && e.data_entrega_efetiva) {
-        const dias = differenceInDays(parseISO(e.data_entrega_efetiva), parseISO(e.data_despacho));
+        const dias = differenceInDays(
+          parseISO(e.data_entrega_efetiva),
+          parseISO(e.data_despacho),
+        );
         stat.tempo_medio_dias += Math.max(0, dias);
       }
     });
 
-    return Object.values(map).map(stat => {
-      const entregasComPrazo = stat.entregas_no_prazo + stat.entregas_atrasadas;
-      stat.otif_rate = entregasComPrazo > 0 ? (stat.entregas_no_prazo / entregasComPrazo) * 100 : 0;
-      stat.custo_por_kg = stat.peso_total_kg > 0 ? stat.custo_total / stat.peso_total_kg : 0;
-      const entregasEntregues = stat.entregas_no_prazo + stat.entregas_atrasadas;
-      stat.tempo_medio_dias = entregasEntregues > 0 ? stat.tempo_medio_dias / entregasEntregues : 0;
-      return stat;
-    }).sort((a, b) => b.otif_rate - a.otif_rate);
+    return Object.values(map)
+      .map((stat) => {
+        const entregasComPrazo =
+          stat.entregas_no_prazo + stat.entregas_atrasadas;
+        stat.otif_rate =
+          entregasComPrazo > 0
+            ? (stat.entregas_no_prazo / entregasComPrazo) * 100
+            : 0;
+        stat.custo_por_kg =
+          stat.peso_total_kg > 0 ? stat.custo_total / stat.peso_total_kg : 0;
+        const entregasEntregues =
+          stat.entregas_no_prazo + stat.entregas_atrasadas;
+        stat.tempo_medio_dias =
+          entregasEntregues > 0 ? stat.tempo_medio_dias / entregasEntregues : 0;
+        return stat;
+      })
+      .sort((a, b) => b.otif_rate - a.otif_rate);
   }, [entregas]);
 
   const globalOTIF = useMemo(() => {
-    const total = transportadoraStats.reduce((sum, t) => sum + t.entregas_no_prazo + t.entregas_atrasadas, 0);
-    const noPrazo = transportadoraStats.reduce((sum, t) => sum + t.entregas_no_prazo, 0);
+    const total = transportadoraStats.reduce(
+      (sum, t) => sum + t.entregas_no_prazo + t.entregas_atrasadas,
+      0,
+    );
+    const noPrazo = transportadoraStats.reduce(
+      (sum, t) => sum + t.entregas_no_prazo,
+      0,
+    );
     return total > 0 ? (noPrazo / total) * 100 : 0;
   }, [transportadoraStats]);
 
   const custoMedioGlobal = useMemo(() => {
-    const total = transportadoraStats.reduce((sum, t) => sum + t.custo_total, 0);
-    const entregas_total = transportadoraStats.reduce((sum, t) => sum + t.total_entregas, 0);
+    const total = transportadoraStats.reduce(
+      (sum, t) => sum + t.custo_total,
+      0,
+    );
+    const entregas_total = transportadoraStats.reduce(
+      (sum, t) => sum + t.total_entregas,
+      0,
+    );
     return entregas_total > 0 ? total / entregas_total : 0;
   }, [transportadoraStats]);
 
-  const chartData = transportadoraStats.slice(0, 10).map(t => ({
-    name: t.nome_fantasia.length > 12 ? t.nome_fantasia.substring(0, 12) + '…' : t.nome_fantasia,
+  const chartData = transportadoraStats.slice(0, 10).map((t) => ({
+    name:
+      t.nome_fantasia.length > 12
+        ? t.nome_fantasia.substring(0, 12) + "…"
+        : t.nome_fantasia,
     otif: Math.round(t.otif_rate),
     entregas: t.total_entregas,
     custo_medio: t.total_entregas > 0 ? t.custo_total / t.total_entregas : 0,
   }));
 
   const getOTIFColor = (rate: number) => {
-    if (rate >= 95) return 'text-primary';
-    if (rate >= 85) return 'text-warning';
-    return 'text-destructive';
+    if (rate >= 95) return "text-primary";
+    if (rate >= 85) return "text-warning";
+    return "text-destructive";
   };
 
   const getOTIFBadge = (rate: number) => {
-    if (rate >= 95) return <Badge className="bg-primary/10 text-primary border-primary/20">Excelente</Badge>;
-    if (rate >= 85) return <Badge className="bg-warning/10 text-warning border-warning/20">Bom</Badge>;
+    if (rate >= 95)
+      return (
+        <Badge className="bg-primary/10 text-primary border-primary/20">
+          Excelente
+        </Badge>
+      );
+    if (rate >= 85)
+      return (
+        <Badge className="bg-warning/10 text-warning border-warning/20">
+          Bom
+        </Badge>
+      );
     if (rate >= 70) return <Badge variant="secondary">Regular</Badge>;
     return <Badge variant="destructive">Crítico</Badge>;
   };
 
   const getRankIcon = (index: number) => {
-    if (index === 0) return '🥇';
-    if (index === 1) return '🥈';
-    if (index === 2) return '🥉';
+    if (index === 0) return "🥇";
+    if (index === 1) return "🥈";
+    if (index === 2) return "🥉";
     return `#${index + 1}`;
   };
 
@@ -165,9 +237,13 @@ export default function PainelOTIF() {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                     <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Operational_Elite</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
+                      Operational_Elite
+                    </span>
                   </div>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">ON TIME • IN FULL • AT COST</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
+                    ON TIME • IN FULL • AT COST
+                  </span>
                 </div>
               </div>
             </h1>
@@ -176,42 +252,106 @@ export default function PainelOTIF() {
 
         {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-6 rounded-[2.5rem] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all"
+          >
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-primary/20"><Target className="w-6 h-6 text-primary" /></div>
-              <Badge variant="outline" className={cn("text-[10px] font-black uppercase tracking-widest italic border-current", globalOTIF >= 95 ? 'text-emerald-500' : 'text-amber-500')}>
-                {globalOTIF >= 95 ? 'Nível Elite' : 'Abaixo da Meta'}
+              <div className="p-3 rounded-2xl bg-primary/20">
+                <Target className="w-6 h-6 text-primary" />
+              </div>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-[10px] font-black uppercase tracking-widest italic border-current",
+                  globalOTIF >= 95 ? "text-emerald-500" : "text-amber-500",
+                )}
+              >
+                {globalOTIF >= 95 ? "Nível Elite" : "Abaixo da Meta"}
               </Badge>
             </div>
-            <p className="text-4xl font-black tracking-tighter italic text-white">{globalOTIF.toFixed(1)}%</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">OTIF Global do Ecossistema</p>
+            <p className="text-4xl font-black tracking-tighter italic text-white">
+              {globalOTIF.toFixed(1)}%
+            </p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">
+              OTIF Global do Ecossistema
+            </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-indigo-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="p-6 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-indigo-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all"
+          >
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-indigo-500/20"><Truck className="w-6 h-6 text-indigo-500" /></div>
-              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-indigo-500 border-indigo-500/20 italic">Malha Ativa</Badge>
+              <div className="p-3 rounded-2xl bg-indigo-500/20">
+                <Truck className="w-6 h-6 text-indigo-500" />
+              </div>
+              <Badge
+                variant="outline"
+                className="text-[10px] font-black uppercase tracking-widest text-indigo-500 border-indigo-500/20 italic"
+              >
+                Malha Ativa
+              </Badge>
             </div>
-            <p className="text-4xl font-black tracking-tighter italic text-white">{transportadoraStats.length}</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500/80">Transportadoras Monitoradas</p>
+            <p className="text-4xl font-black tracking-tighter italic text-white">
+              {transportadoraStats.length}
+            </p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500/80">
+              Transportadoras Monitoradas
+            </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="p-6 rounded-[2.5rem] bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all"
+          >
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-emerald-500/20"><DollarSign className="w-6 h-6 text-emerald-500" /></div>
-              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-emerald-500 border-emerald-500/20 italic">Ticket Médio</Badge>
+              <div className="p-3 rounded-2xl bg-emerald-500/20">
+                <DollarSign className="w-6 h-6 text-emerald-500" />
+              </div>
+              <Badge
+                variant="outline"
+                className="text-[10px] font-black uppercase tracking-widest text-emerald-500 border-emerald-500/20 italic"
+              >
+                Ticket Médio
+              </Badge>
             </div>
-            <p className="text-4xl font-black tracking-tighter italic text-white">R$ {custoMedioGlobal.toFixed(0)}</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">Custo Médio por Entrega</p>
+            <p className="text-4xl font-black tracking-tighter italic text-white">
+              R$ {custoMedioGlobal.toFixed(0)}
+            </p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">
+              Custo Médio por Entrega
+            </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="p-6 rounded-[2.5rem] bg-gradient-to-br from-sky-500/10 to-sky-500/5 border border-sky-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="p-6 rounded-[2.5rem] bg-gradient-to-br from-sky-500/10 to-sky-500/5 border border-sky-500/20 shadow-xl backdrop-blur-xl group hover:scale-[1.02] transition-all"
+          >
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-sky-500/20"><CheckCircle2 className="w-6 h-6 text-sky-500" /></div>
-              <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest text-sky-500 border-sky-500/20 italic">Fluxo Total</Badge>
+              <div className="p-3 rounded-2xl bg-sky-500/20">
+                <CheckCircle2 className="w-6 h-6 text-sky-500" />
+              </div>
+              <Badge
+                variant="outline"
+                className="text-[10px] font-black uppercase tracking-widest text-sky-500 border-sky-500/20 italic"
+              >
+                Fluxo Total
+              </Badge>
             </div>
-            <p className="text-4xl font-black tracking-tighter italic text-white">{transportadoraStats.reduce((s, t) => s + t.total_entregas, 0)}</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-500/80">Entregas Processadas</p>
+            <p className="text-4xl font-black tracking-tighter italic text-white">
+              {transportadoraStats.reduce((s, t) => s + t.total_entregas, 0)}
+            </p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-500/80">
+              Entregas Processadas
+            </p>
           </motion.div>
         </div>
 
@@ -229,19 +369,35 @@ export default function PainelOTIF() {
               {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      className="stroke-muted"
+                    />
                     <XAxis dataKey="name" className="text-xs" />
                     <YAxis domain={[0, 100]} unit="%" />
                     <Tooltip formatter={(val: number) => `${val}%`} />
                     <Bar dataKey="otif" name="OTIF %" radius={[4, 4, 0, 0]}>
                       {chartData.map((entry, index) => (
-                        <Cell key={index} fill={entry.otif >= 95 ? 'hsl(142 76% 36%)' : entry.otif >= 85 ? 'hsl(45 93% 47%)' : 'hsl(0 84% 60%)'} />
+                        <Cell
+                          key={index}
+                          fill={
+                            entry.otif >= 95
+                              ? "hsl(142 76% 36%)"
+                              : entry.otif >= 85
+                                ? "hsl(45 93% 47%)"
+                                : "hsl(0 84% 60%)"
+                          }
+                        />
                       ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <EmptyState icon={BarChart3} title="Sem dados" description="Nenhuma entrega encontrada" />
+                <EmptyState
+                  icon={BarChart3}
+                  title="Sem dados"
+                  description="Nenhuma entrega encontrada"
+                />
               )}
             </CardContent>
           </Card>
@@ -258,15 +414,29 @@ export default function PainelOTIF() {
               {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      className="stroke-muted"
+                    />
                     <XAxis dataKey="name" className="text-xs" />
                     <YAxis />
-                    <Tooltip formatter={(val: number) => `R$ ${val.toFixed(2)}`} />
-                    <Bar dataKey="custo_medio" name="Custo Médio" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    <Tooltip
+                      formatter={(val: number) => `R$ ${val.toFixed(2)}`}
+                    />
+                    <Bar
+                      dataKey="custo_medio"
+                      name="Custo Médio"
+                      fill="hsl(var(--primary))"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <EmptyState icon={DollarSign} title="Sem dados" description="Nenhum dado de custo" />
+                <EmptyState
+                  icon={DollarSign}
+                  title="Sem dados"
+                  description="Nenhum dado de custo"
+                />
               )}
             </CardContent>
           </Card>
@@ -282,7 +452,11 @@ export default function PainelOTIF() {
           </CardHeader>
           <CardContent>
             {transportadoraStats.length === 0 ? (
-              <EmptyState icon={Truck} title="Sem transportadoras" description="Cadastre entregas com transportadoras" />
+              <EmptyState
+                icon={Truck}
+                title="Sem transportadoras"
+                description="Cadastre entregas com transportadoras"
+              />
             ) : (
               <div className="overflow-x-auto">
                 <Table>
@@ -296,7 +470,9 @@ export default function PainelOTIF() {
                       <TableHead className="text-center">OTIF</TableHead>
                       <TableHead className="text-center">Tempo Médio</TableHead>
                       <TableHead className="text-right">Custo Total</TableHead>
-                      <TableHead className="text-center">Classificação</TableHead>
+                      <TableHead className="text-center">
+                        Classificação
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -308,19 +484,31 @@ export default function PainelOTIF() {
                         transition={{ delay: index * 0.05 }}
                         className="border-b"
                       >
-                        <TableCell className="font-bold text-lg">{getRankIcon(index)}</TableCell>
+                        <TableCell className="font-bold text-lg">
+                          {getRankIcon(index)}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Truck className="w-4 h-4 text-muted-foreground" />
-                            <span className="font-medium">{t.nome_fantasia}</span>
+                            <span className="font-medium">
+                              {t.nome_fantasia}
+                            </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center">{t.total_entregas}</TableCell>
-                        <TableCell className="text-center text-success font-medium">{t.entregas_no_prazo}</TableCell>
-                        <TableCell className="text-center text-destructive font-medium">{t.entregas_atrasadas}</TableCell>
+                        <TableCell className="text-center">
+                          {t.total_entregas}
+                        </TableCell>
+                        <TableCell className="text-center text-success font-medium">
+                          {t.entregas_no_prazo}
+                        </TableCell>
+                        <TableCell className="text-center text-destructive font-medium">
+                          {t.entregas_atrasadas}
+                        </TableCell>
                         <TableCell className="text-center">
                           <div className="space-y-1">
-                            <span className={`font-bold ${getOTIFColor(t.otif_rate)}`}>
+                            <span
+                              className={`font-bold ${getOTIFColor(t.otif_rate)}`}
+                            >
                               {t.otif_rate.toFixed(1)}%
                             </span>
                             <Progress value={t.otif_rate} className="h-1.5" />
@@ -333,9 +521,14 @@ export default function PainelOTIF() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right font-medium">
-                          R$ {t.custo_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          R${" "}
+                          {t.custo_total.toLocaleString("pt-BR", {
+                            minimumFractionDigits: 2,
+                          })}
                         </TableCell>
-                        <TableCell className="text-center">{getOTIFBadge(t.otif_rate)}</TableCell>
+                        <TableCell className="text-center">
+                          {getOTIFBadge(t.otif_rate)}
+                        </TableCell>
                       </motion.tr>
                     ))}
                   </TableBody>

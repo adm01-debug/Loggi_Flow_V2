@@ -1,14 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Shield, Save } from "lucide-react";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface Permission {
   id: string;
@@ -34,7 +40,9 @@ const ROLES: { value: AppRole; label: string; color: string }[] = [
 export function PermissionMatrix() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
-  const [pendingChanges, setPendingChanges] = useState<Map<string, boolean>>(new Map());
+  const [pendingChanges, setPendingChanges] = useState<Map<string, boolean>>(
+    new Map(),
+  );
 
   // Fetch all permissions
   const { data: permissions = [], isLoading: isLoadingPermissions } = useQuery({
@@ -52,27 +60,31 @@ export function PermissionMatrix() {
   });
 
   // Fetch role permissions
-  const { data: rolePermissions = [], isLoading: isLoadingRolePermissions } = useQuery({
-    queryKey: ["role-permissions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("role_permissions")
-        .select("*");
+  const { data: rolePermissions = [], isLoading: isLoadingRolePermissions } =
+    useQuery({
+      queryKey: ["role-permissions"],
+      queryFn: async () => {
+        const { data, error } = await supabase
+          .from("role_permissions")
+          .select("*");
 
-      if (error) throw error;
-      return data as RolePermission[];
-    },
-    enabled: isAdmin,
-  });
+        if (error) throw error;
+        return data as RolePermission[];
+      },
+      enabled: isAdmin,
+    });
 
   // Group permissions by module
-  const permissionsByModule = permissions.reduce((acc, permission) => {
-    if (!acc[permission.module]) {
-      acc[permission.module] = [];
-    }
-    acc[permission.module].push(permission);
-    return acc;
-  }, {} as Record<string, Permission[]>);
+  const permissionsByModule = permissions.reduce(
+    (acc, permission) => {
+      if (!acc[permission.module]) {
+        acc[permission.module] = [];
+      }
+      acc[permission.module].push(permission);
+      return acc;
+    },
+    {} as Record<string, Permission[]>,
+  );
 
   // Check if role has permission
   const hasRolePermission = (role: AppRole, permissionId: string): boolean => {
@@ -81,7 +93,7 @@ export function PermissionMatrix() {
       return pendingChanges.get(key)!;
     }
     return rolePermissions.some(
-      (rp) => rp.role === role && rp.permission_id === permissionId
+      (rp) => rp.role === role && rp.permission_id === permissionId,
     );
   };
 
@@ -102,7 +114,7 @@ export function PermissionMatrix() {
       for (const [key, shouldHave] of pendingChanges.entries()) {
         const [role, permissionId] = key.split("-") as [AppRole, string];
         const currentlyHas = rolePermissions.some(
-          (rp) => rp.role === role && rp.permission_id === permissionId
+          (rp) => rp.role === role && rp.permission_id === permissionId,
         );
 
         if (shouldHave && !currentlyHas) {
@@ -194,56 +206,76 @@ export function PermissionMatrix() {
         ) : (
           <ScrollArea className="h-[500px]">
             <div className="space-y-6">
-              {Object.entries(permissionsByModule).map(([module, modulePermissions]) => (
-                <div key={module} className="space-y-3">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Badge variant="outline">{getModuleLabel(module)}</Badge>
-                  </h3>
-                  
-                  <div className="border rounded-lg overflow-hidden">
-                    <table className="w-full">
-                      <thead className="bg-muted/50">
-                        <tr>
-                          <th className="text-left p-3 font-medium">Permissão</th>
-                          {ROLES.map((role) => (
-                            <th key={role.value} className="text-center p-3 font-medium w-32">
-                              <div className="flex items-center justify-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${role.color}`} />
-                                {role.label}
-                              </div>
+              {Object.entries(permissionsByModule).map(
+                ([module, modulePermissions]) => (
+                  <div key={module} className="space-y-3">
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <Badge variant="outline">{getModuleLabel(module)}</Badge>
+                    </h3>
+
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="text-left p-3 font-medium">
+                              Permissão
                             </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {modulePermissions.map((permission) => (
-                          <tr key={permission.id} className="border-t">
-                            <td className="p-3">
-                              <div>
-                                <p className="font-medium text-sm">{permission.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {permission.description}
-                                </p>
-                              </div>
-                            </td>
                             {ROLES.map((role) => (
-                              <td key={role.value} className="text-center p-3">
-                                <Checkbox
-                                  checked={hasRolePermission(role.value, permission.id)}
-                                  onCheckedChange={() =>
-                                    togglePermission(role.value, permission.id)
-                                  }
-                                  disabled={role.value === "admin"} // Admin sempre tem tudo
-                                />
-                              </td>
+                              <th
+                                key={role.value}
+                                className="text-center p-3 font-medium w-32"
+                              >
+                                <div className="flex items-center justify-center gap-2">
+                                  <div
+                                    className={`w-2 h-2 rounded-full ${role.color}`}
+                                  />
+                                  {role.label}
+                                </div>
+                              </th>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {modulePermissions.map((permission) => (
+                            <tr key={permission.id} className="border-t">
+                              <td className="p-3">
+                                <div>
+                                  <p className="font-medium text-sm">
+                                    {permission.name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {permission.description}
+                                  </p>
+                                </div>
+                              </td>
+                              {ROLES.map((role) => (
+                                <td
+                                  key={role.value}
+                                  className="text-center p-3"
+                                >
+                                  <Checkbox
+                                    checked={hasRolePermission(
+                                      role.value,
+                                      permission.id,
+                                    )}
+                                    onCheckedChange={() =>
+                                      togglePermission(
+                                        role.value,
+                                        permission.id,
+                                      )
+                                    }
+                                    disabled={role.value === "admin"} // Admin sempre tem tudo
+                                  />
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </ScrollArea>
         )}
