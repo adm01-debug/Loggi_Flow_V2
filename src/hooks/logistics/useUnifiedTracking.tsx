@@ -147,6 +147,7 @@ export function useUnifiedTracking() {
           cliente:clientes(razao_social)
         `,
         )
+        .is("deleted_at", null)
         .order("updated_at", { ascending: false })
         .limit(200);
       if (error) throw error;
@@ -173,6 +174,7 @@ export function useUnifiedTracking() {
           fornecedor:fornecedores!fk_coletas_fornecedor(razao_social)
         `,
         )
+        .is("deleted_at", null)
         .order("updated_at", { ascending: false })
         .limit(200);
       if (error) throw error;
