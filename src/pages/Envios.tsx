@@ -352,7 +352,9 @@ export default function Envios() {
         .select(
           "*, cliente:clientes(id, razao_social, nome_fantasia), transportadora:transportadoras(id, nome_fantasia)",
         )
-        .order("created_at", { ascending: false });
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
       return data as Entrega[];
     },
@@ -366,7 +368,9 @@ export default function Envios() {
         .select(
           "id, razao_social, nome_fantasia, endereco_completo, contato_telefone",
         )
-        .order("razao_social");
+        .is("deleted_at", null)
+        .order("razao_social")
+        .limit(500);
       return data || [];
     },
   });
@@ -376,7 +380,9 @@ export default function Envios() {
       const { data } = await supabase
         .from("transportadoras")
         .select("id, nome_fantasia")
-        .order("nome_fantasia");
+        .is("deleted_at", null)
+        .order("nome_fantasia")
+        .limit(200);
       return data || [];
     },
   });
@@ -1150,11 +1156,12 @@ export default function Envios() {
                   <DocumentUploadField
                     value={sel.comprovante_entrega_url}
                     onChange={async (url) => {
-                      await supabase
+                      const { error } = await supabase
                         .from("entregas")
                         .update({ comprovante_entrega_url: url })
                         .eq("id", sel.id);
-                      refetch();
+                      if (error) toast.error(error.message);
+                      else refetch();
                     }}
                     folder={`entregas/${sel.id}/comprovantes`}
                     label="Comprovante de Entrega"
@@ -1162,11 +1169,12 @@ export default function Envios() {
                   <DocumentUploadField
                     value={sel.nf_remessa_url}
                     onChange={async (url) => {
-                      await supabase
+                      const { error } = await supabase
                         .from("entregas")
                         .update({ nf_remessa_url: url })
                         .eq("id", sel.id);
-                      refetch();
+                      if (error) toast.error(error.message);
+                      else refetch();
                     }}
                     folder={`entregas/${sel.id}/nf`}
                     label="NF Remessa"
