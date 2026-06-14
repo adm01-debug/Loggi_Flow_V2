@@ -24,12 +24,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { parseLocaleNumber } from "@/lib/formatters";
 import { toast } from "sonner";
 
-interface NormalizationConfig {
+export type NormalizationConfig = {
   price_pattern?: string;
   term_pattern?: string;
   fallback_strategy?: string;
   ai_prompt?: string;
-}
+};
 
 // Local regex extraction for instant preview feedback (mirrors the edge function).
 function extractWithRegex(

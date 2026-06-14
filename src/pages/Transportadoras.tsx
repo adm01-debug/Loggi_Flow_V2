@@ -20,7 +20,7 @@ import { MaskedInput } from "@/components/ui/MaskedInput";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatsCard } from "@/components/common/StatsCard";
 import { PageTransition, StaggeredContent, StaggeredItem } from "@/components/common/PageTransition";
-import { NormalizationMapping } from "@/components/transportadoras/NormalizationMapping";
+import { NormalizationMapping, NormalizationConfig } from "@/components/transportadoras/NormalizationMapping";
 
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
@@ -78,7 +78,7 @@ const emptyForm = {
     recipient: "", 
     portal_url: "", 
     portal_user: "",
-    normalization: { price_pattern: "", term_pattern: "", fallback_strategy: "ai_extraction", ai_prompt: "" }
+    normalization: { price_pattern: "", term_pattern: "", fallback_strategy: "ai_extraction", ai_prompt: "" } as NormalizationConfig
   },
   coverage_details: { states: [] as string[], cities: [] as string[] }
 };
