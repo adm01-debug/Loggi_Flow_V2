@@ -86,16 +86,29 @@ const coletaCols = [
 ];
 
 const fornecedorCols = [
-  { key: "razao_social", label: "Razão Social", example: "Empresa LTDA" },
+  { key: "razao_social", label: "Razão Social", example: "Fornecedor LTDA" },
   { key: "endereco_completo", label: "Endereço", example: "Rua C, 789" },
   { key: "cnpj", label: "CNPJ", example: "12.345.678/0001-90" },
-  { key: "nome_fantasia", label: "Nome Fantasia", example: "Empresa" },
+  { key: "nome_fantasia", label: "Nome Fantasia", example: "Fornecedor" },
   { key: "contato_nome", label: "Contato", example: "Maria" },
-  { key: "contato_email", label: "Email", example: "email@empresa.com" },
+  { key: "contato_email", label: "Email", example: "email@fornecedor.com" },
   { key: "contato_telefone", label: "Telefone", example: "(11) 99999-9999" },
   { key: "cidade", label: "Cidade", example: "São Paulo" },
   { key: "estado", label: "Estado", example: "SP" },
   { key: "cep", label: "CEP", example: "01001-000" },
+];
+
+const clienteCols = [
+  { key: "razao_social", label: "Razão Social", example: "Cliente LTDA" },
+  { key: "endereco_completo", label: "Endereço", example: "Av. D, 321" },
+  { key: "cnpj", label: "CNPJ", example: "98.765.432/0001-10" },
+  { key: "nome_fantasia", label: "Nome Fantasia", example: "Cliente" },
+  { key: "contato_nome", label: "Contato", example: "João" },
+  { key: "contato_email", label: "Email", example: "email@cliente.com" },
+  { key: "contato_telefone", label: "Telefone", example: "(21) 88888-8888" },
+  { key: "cidade", label: "Cidade", example: "Rio de Janeiro" },
+  { key: "estado", label: "Estado", example: "RJ" },
+  { key: "cep", label: "CEP", example: "20040-020" },
 ];
 
 type ImportEntity = "entregas" | "coletas" | "fornecedores" | "clientes";
@@ -134,45 +147,51 @@ export default function ImportacaoMassa() {
     let errorCount = 0;
     const batchSize = 50;
 
-    for (let i = 0; i < data.length; i += batchSize) {
-      const batch = data.slice(i, i + batchSize);
-      const { error } = await supabase.from(entity).insert(batch as never[]);
+    try {
+      for (let i = 0; i < data.length; i += batchSize) {
+        const batch = data.slice(i, i + batchSize);
+        const { error } = await supabase.from(entity).insert(batch as never[]);
 
-      if (error) {
-        errorCount += batch.length;
-      } else {
-        successCount += batch.length;
+        if (error) {
+          errorCount += batch.length;
+        } else {
+          successCount += batch.length;
+        }
+
+        const progress = Math.min(((i + batchSize) / data.length) * 100, 100);
+        setImportProgress(progress);
       }
 
-      const progress = Math.min(((i + batchSize) / data.length) * 100, 100);
-      setImportProgress(progress);
+      const stat: ImportStats = {
+        entity,
+        total: data.length,
+        success: successCount,
+        errors: errorCount,
+        timestamp: new Date(),
+      };
+      setHistory((h) => [stat, ...h]);
+      setImportProgress(100);
+      setCurrentStep(3); // Finalizado
+
+      if (errorCount === 0) {
+        toast.success(`${successCount} registros importados com sucesso!`);
+      } else if (successCount > 0) {
+        toast.warning(`${successCount} importados, ${errorCount} falharam`);
+      } else {
+        toast.error(`Falha ao importar ${errorCount} registros`);
+      }
+
+      // Invalidate related caches so list pages reflect the new data
+      queryClient.invalidateQueries({ queryKey: [entity] });
+
+      // Reset step after some time
+      setTimeout(() => setCurrentStep(0), 5000);
+    } catch (err) {
+      toast.error("Erro inesperado durante a importação");
+      setCurrentStep(0);
+    } finally {
+      setIsImporting(false);
     }
-
-    const stat: ImportStats = {
-      entity,
-      total: data.length,
-      success: successCount,
-      errors: errorCount,
-      timestamp: new Date(),
-    };
-    setHistory((h) => [stat, ...h]);
-    setIsImporting(false);
-    setImportProgress(100);
-    setCurrentStep(3); // Finalizado
-
-    if (errorCount === 0) {
-      toast.success(`${successCount} registros importados com sucesso!`);
-    } else if (successCount > 0) {
-      toast.warning(`${successCount} importados, ${errorCount} falharam`);
-    } else {
-      toast.error(`Falha ao importar ${errorCount} registros`);
-    }
-
-    // Invalidate related caches so list pages reflect the new data
-    queryClient.invalidateQueries({ queryKey: [entity] });
-
-    // Reset step after some time
-    setTimeout(() => setCurrentStep(0), 5000);
   };
 
   const entities: {
@@ -355,7 +374,7 @@ export default function ImportacaoMassa() {
                 <CardContent>
                   <CSVImporter
                     schema={clienteSchema}
-                    columns={fornecedorCols}
+                    columns={clienteCols}
                     templateName="clientes"
                     onImport={(data) => handleImport("clientes", data)}
                   />

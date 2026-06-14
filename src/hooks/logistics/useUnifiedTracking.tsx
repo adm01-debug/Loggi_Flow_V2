@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useMemo, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useRealtime } from "@/hooks/data/useRealtime";
 import { useAuth } from "@/hooks/auth/useAuth";
 
@@ -14,15 +14,15 @@ export interface TrackingEvent {
   status: string;
   statusLabel: string;
   description: string;
-  source: 'lalamove' | 'rodonaves' | 'interno' | 'manual';
+  source: "lalamove" | "rodonaves" | "interno" | "manual";
   location?: { lat: number; lng: number; city?: string; uf?: string };
-  severity: 'info' | 'success' | 'warning' | 'error';
+  severity: "info" | "success" | "warning" | "error";
 }
 
 export interface UnifiedShipment {
   id: string;
   numero: string;
-  tipo: 'entrega' | 'coleta';
+  tipo: "entrega" | "coleta";
   status: string;
   statusLabel: string;
   statusColor: string;
@@ -42,42 +42,47 @@ export interface UnifiedShipment {
   coordinates?: { lat: number; lng: number };
 }
 
-export type TrackingFilter = 'all' | 'atrasados' | 'em_transito' | 'entregue' | 'pendentes';
+export type TrackingFilter =
+  | "all"
+  | "atrasados"
+  | "em_transito"
+  | "entregue"
+  | "pendentes";
 
 const STATUS_LABELS: Record<string, string> = {
-  aguardando_producao: 'Aguardando Produção',
-  pronto_despacho: 'Pronto p/ Despacho',
-  despachado: 'Despachado',
-  em_transito: 'Em Trânsito',
-  saiu_entrega: 'Saiu p/ Entrega',
-  entregue: 'Entregue',
-  finalizado: 'Finalizado',
-  cancelado: 'Cancelado',
-  devolvido: 'Devolvido',
-  aguardando_liberacao: 'Aguardando Liberação',
-  solicitada: 'Solicitada',
-  em_rota: 'Em Rota',
-  coletado: 'Coletado',
-  recebido: 'Recebido',
-  recebido_divergencia: 'Recebido c/ Divergência',
+  aguardando_producao: "Aguardando Produção",
+  pronto_despacho: "Pronto p/ Despacho",
+  despachado: "Despachado",
+  em_transito: "Em Trânsito",
+  saiu_entrega: "Saiu p/ Entrega",
+  entregue: "Entregue",
+  finalizado: "Finalizado",
+  cancelado: "Cancelado",
+  devolvido: "Devolvido",
+  aguardando_liberacao: "Aguardando Liberação",
+  solicitada: "Solicitada",
+  em_rota: "Em Rota",
+  coletado: "Coletado",
+  recebido: "Recebido",
+  recebido_divergencia: "Recebido c/ Divergência",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  aguardando_producao: 'hsl(var(--muted-foreground))',
-  pronto_despacho: 'hsl(var(--warning))',
-  despachado: 'hsl(var(--info))',
-  em_transito: 'hsl(var(--primary))',
-  saiu_entrega: 'hsl(var(--accent-foreground))',
-  entregue: 'hsl(var(--success))',
-  finalizado: 'hsl(var(--success))',
-  cancelado: 'hsl(var(--destructive))',
-  devolvido: 'hsl(var(--destructive))',
-  aguardando_liberacao: 'hsl(var(--muted-foreground))',
-  solicitada: 'hsl(var(--warning))',
-  em_rota: 'hsl(var(--primary))',
-  coletado: 'hsl(var(--success))',
-  recebido: 'hsl(var(--success))',
-  recebido_divergencia: 'hsl(var(--destructive))',
+  aguardando_producao: "hsl(var(--muted-foreground))",
+  pronto_despacho: "hsl(var(--warning))",
+  despachado: "hsl(var(--info))",
+  em_transito: "hsl(var(--primary))",
+  saiu_entrega: "hsl(var(--accent-foreground))",
+  entregue: "hsl(var(--success))",
+  finalizado: "hsl(var(--success))",
+  cancelado: "hsl(var(--destructive))",
+  devolvido: "hsl(var(--destructive))",
+  aguardando_liberacao: "hsl(var(--muted-foreground))",
+  solicitada: "hsl(var(--warning))",
+  em_rota: "hsl(var(--primary))",
+  coletado: "hsl(var(--success))",
+  recebido: "hsl(var(--success))",
+  recebido_divergencia: "hsl(var(--destructive))",
 };
 
 function getStatusLabel(status: string): string {
@@ -85,12 +90,20 @@ function getStatusLabel(status: string): string {
 }
 
 function getStatusColor(status: string): string {
-  return STATUS_COLORS[status] || 'hsl(var(--muted-foreground))';
+  return STATUS_COLORS[status] || "hsl(var(--muted-foreground))";
 }
 
-function isAtrasado(previsao: string | null, status: string, dataEfetiva: string | null): boolean {
+function isAtrasado(
+  previsao: string | null,
+  status: string,
+  dataEfetiva: string | null,
+): boolean {
   if (!previsao) return false;
-  if (['entregue', 'finalizado', 'cancelado', 'devolvido', 'recebido'].includes(status)) {
+  if (
+    ["entregue", "finalizado", "cancelado", "devolvido", "recebido"].includes(
+      status,
+    )
+  ) {
     if (dataEfetiva) return new Date(dataEfetiva) > new Date(previsao);
     return false;
   }
@@ -98,8 +111,11 @@ function isAtrasado(previsao: string | null, status: string, dataEfetiva: string
 }
 
 function calcDiasAtraso(previsao: string | null, status: string): number {
-  if (!previsao || ['entregue', 'finalizado', 'cancelado'].includes(status)) return 0;
-  const diff = Math.ceil((Date.now() - new Date(previsao).getTime()) / (1000 * 60 * 60 * 24));
+  if (!previsao || ["entregue", "finalizado", "cancelado"].includes(status))
+    return 0;
+  const diff = Math.ceil(
+    (Date.now() - new Date(previsao).getTime()) / (1000 * 60 * 60 * 24),
+  );
   return Math.max(0, diff);
 }
 
@@ -109,23 +125,29 @@ function calcDiasAtraso(previsao: string | null, status: string): number {
 
 export function useUnifiedTracking() {
   const { user } = useAuth();
-  const [filter, setFilter] = useState<TrackingFilter>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState<TrackingFilter>("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch entregas with transportadora info
-  const { data: entregas, isLoading: loadingEntregas, refetch: refetchEntregas } = useQuery({
-    queryKey: ['unified-tracking-entregas'],
+  const {
+    data: entregas,
+    isLoading: loadingEntregas,
+    refetch: refetchEntregas,
+  } = useQuery({
+    queryKey: ["unified-tracking-entregas"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('entregas')
-        .select(`
+        .from("entregas")
+        .select(
+          `
           id, numero_entrega, status, endereco_entrega, previsao_entrega,
           data_entrega_efetiva, data_despacho, codigo_rastreamento, nf_remessa,
           valor_frete, latitude, longitude, transportadora_id,
           transportadora:transportadoras(nome_fantasia),
           cliente:clientes(razao_social)
-        `)
-        .order('updated_at', { ascending: false })
+        `,
+        )
+        .order("updated_at", { ascending: false })
         .limit(200);
       if (error) throw error;
       return data;
@@ -134,18 +156,24 @@ export function useUnifiedTracking() {
   });
 
   // Fetch coletas with fornecedor info
-  const { data: coletas, isLoading: loadingColetas, refetch: refetchColetas } = useQuery({
-    queryKey: ['unified-tracking-coletas'],
+  const {
+    data: coletas,
+    isLoading: loadingColetas,
+    refetch: refetchColetas,
+  } = useQuery({
+    queryKey: ["unified-tracking-coletas"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('coletas')
-        .select(`
+        .from("coletas")
+        .select(
+          `
           id, numero_coleta, status, endereco_coleta, data_prevista_coleta,
           data_efetiva_coleta, codigo_rastreamento, tipo_coleta, transportadora_id,
           transportadora:transportadoras!fk_coletas_transportadora(nome_fantasia),
           fornecedor:fornecedores!fk_coletas_fornecedor(razao_social)
-        `)
-        .order('updated_at', { ascending: false })
+        `,
+        )
+        .order("updated_at", { ascending: false })
         .limit(200);
       if (error) throw error;
       return data;
@@ -153,9 +181,25 @@ export function useUnifiedTracking() {
     enabled: !!user?.id,
   });
 
+  // Stable realtime callbacks — inline arrows would cause infinite re-subscription
+  const onEntregaChange = useCallback(() => {
+    refetchEntregas();
+  }, [refetchEntregas]);
+  const onColetaChange = useCallback(() => {
+    refetchColetas();
+  }, [refetchColetas]);
+
   // Realtime subscriptions
-  useRealtime({ table: 'entregas', onInsert: () => refetchEntregas(), onUpdate: () => refetchEntregas() });
-  useRealtime({ table: 'coletas', onInsert: () => refetchColetas(), onUpdate: () => refetchColetas() });
+  useRealtime({
+    table: "entregas",
+    onInsert: onEntregaChange,
+    onUpdate: onEntregaChange,
+  });
+  useRealtime({
+    table: "coletas",
+    onInsert: onColetaChange,
+    onUpdate: onColetaChange,
+  });
 
   // Normalize all data into UnifiedShipment[]
   const shipments: UnifiedShipment[] = useMemo(() => {
@@ -165,18 +209,22 @@ export function useUnifiedTracking() {
     (entregas || []).forEach((e: any) => {
       const t = e.transportadora as { nome_fantasia: string } | null;
       const c = e.cliente as { razao_social: string } | null;
-      const atrasado = isAtrasado(e.previsao_entrega, e.status, e.data_entrega_efetiva);
+      const atrasado = isAtrasado(
+        e.previsao_entrega,
+        e.status,
+        e.data_entrega_efetiva,
+      );
 
       result.push({
         id: e.id,
         numero: e.numero_entrega,
-        tipo: 'entrega',
+        tipo: "entrega",
         status: e.status,
         statusLabel: getStatusLabel(e.status),
         statusColor: getStatusColor(e.status),
-        origem: 'Promobrindes SP',
+        origem: "Promobrindes SP",
         destino: e.endereco_entrega,
-        transportadora: t?.nome_fantasia || 'N/A',
+        transportadora: t?.nome_fantasia || "N/A",
         transportadoraId: e.transportadora_id,
         previsao: e.previsao_entrega,
         dataEfetiva: e.data_entrega_efetiva,
@@ -187,7 +235,10 @@ export function useUnifiedTracking() {
         atrasado,
         diasAtraso: calcDiasAtraso(e.previsao_entrega, e.status),
         events: [],
-        coordinates: e.latitude && e.longitude ? { lat: e.latitude, lng: e.longitude } : undefined,
+        coordinates:
+          e.latitude && e.longitude
+            ? { lat: e.latitude, lng: e.longitude }
+            : undefined,
       });
     });
 
@@ -195,18 +246,24 @@ export function useUnifiedTracking() {
     (coletas || []).forEach((c: any) => {
       const t = c.transportadora as { nome_fantasia: string } | null;
       const f = c.fornecedor as { razao_social: string } | null;
-      const atrasado = isAtrasado(c.data_prevista_coleta, c.status, c.data_efetiva_coleta);
+      const atrasado = isAtrasado(
+        c.data_prevista_coleta,
+        c.status,
+        c.data_efetiva_coleta,
+      );
 
       result.push({
         id: c.id,
         numero: c.numero_coleta,
-        tipo: 'coleta',
+        tipo: "coleta",
         status: c.status,
         statusLabel: getStatusLabel(c.status),
         statusColor: getStatusColor(c.status),
         origem: c.endereco_coleta,
-        destino: 'Promobrindes SP',
-        transportadora: t?.nome_fantasia || (c.tipo_coleta === 'lalamove' ? 'Lalamove' : 'N/A'),
+        destino: "Promobrindes SP",
+        transportadora:
+          t?.nome_fantasia ||
+          (c.tipo_coleta === "lalamove" ? "Lalamove" : "N/A"),
         transportadoraId: c.transportadora_id,
         previsao: c.data_prevista_coleta,
         dataEfetiva: c.data_efetiva_coleta,
@@ -230,30 +287,44 @@ export function useUnifiedTracking() {
 
     // Status filter
     switch (filter) {
-      case 'atrasados':
-        filtered = filtered.filter(s => s.atrasado);
+      case "atrasados":
+        filtered = filtered.filter((s) => s.atrasado);
         break;
-      case 'em_transito':
-        filtered = filtered.filter(s => ['em_transito', 'despachado', 'saiu_entrega', 'em_rota'].includes(s.status));
+      case "em_transito":
+        filtered = filtered.filter((s) =>
+          ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(
+            s.status,
+          ),
+        );
         break;
-      case 'entregue':
-        filtered = filtered.filter(s => ['entregue', 'finalizado', 'recebido', 'coletado'].includes(s.status));
+      case "entregue":
+        filtered = filtered.filter((s) =>
+          ["entregue", "finalizado", "recebido", "coletado"].includes(s.status),
+        );
         break;
-      case 'pendentes':
-        filtered = filtered.filter(s => ['aguardando_producao', 'pronto_despacho', 'aguardando_liberacao', 'solicitada'].includes(s.status));
+      case "pendentes":
+        filtered = filtered.filter((s) =>
+          [
+            "aguardando_producao",
+            "pronto_despacho",
+            "aguardando_liberacao",
+            "solicitada",
+          ].includes(s.status),
+        );
         break;
     }
 
     // Search
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(s =>
-        s.numero.toLowerCase().includes(term) ||
-        s.destino.toLowerCase().includes(term) ||
-        s.transportadora.toLowerCase().includes(term) ||
-        s.cliente?.toLowerCase().includes(term) ||
-        s.codigoRastreamento?.toLowerCase().includes(term) ||
-        s.nfRemessa?.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (s) =>
+          s.numero.toLowerCase().includes(term) ||
+          s.destino.toLowerCase().includes(term) ||
+          s.transportadora.toLowerCase().includes(term) ||
+          s.cliente?.toLowerCase().includes(term) ||
+          s.codigoRastreamento?.toLowerCase().includes(term) ||
+          s.nfRemessa?.toLowerCase().includes(term),
       );
     }
 
@@ -261,14 +332,30 @@ export function useUnifiedTracking() {
   }, [shipments, filter, searchTerm]);
 
   // Summary stats
-  const summary = useMemo(() => ({
-    total: shipments.length,
-    emTransito: shipments.filter(s => ['em_transito', 'despachado', 'saiu_entrega', 'em_rota'].includes(s.status)).length,
-    atrasados: shipments.filter(s => s.atrasado).length,
-    entregues: shipments.filter(s => ['entregue', 'finalizado', 'recebido', 'coletado'].includes(s.status)).length,
-    pendentes: shipments.filter(s => ['aguardando_producao', 'pronto_despacho', 'aguardando_liberacao', 'solicitada'].includes(s.status)).length,
-    custoTotal: shipments.reduce((sum, s) => sum + (s.valorFrete || 0), 0),
-  }), [shipments]);
+  const summary = useMemo(
+    () => ({
+      total: shipments.length,
+      emTransito: shipments.filter((s) =>
+        ["em_transito", "despachado", "saiu_entrega", "em_rota"].includes(
+          s.status,
+        ),
+      ).length,
+      atrasados: shipments.filter((s) => s.atrasado).length,
+      entregues: shipments.filter((s) =>
+        ["entregue", "finalizado", "recebido", "coletado"].includes(s.status),
+      ).length,
+      pendentes: shipments.filter((s) =>
+        [
+          "aguardando_producao",
+          "pronto_despacho",
+          "aguardando_liberacao",
+          "solicitada",
+        ].includes(s.status),
+      ).length,
+      custoTotal: shipments.reduce((sum, s) => sum + (s.valorFrete || 0), 0),
+    }),
+    [shipments],
+  );
 
   const refetch = useCallback(() => {
     refetchEntregas();

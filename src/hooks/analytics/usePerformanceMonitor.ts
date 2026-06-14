@@ -1,26 +1,28 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from "react";
 import { useTelemetry } from "@/hooks/analytics/useTelemetry";
 
 export function usePerformanceMonitor() {
   const { logTelemetry } = useTelemetry();
+  const logRef = useRef(logTelemetry);
+  logRef.current = logTelemetry;
 
   useEffect(() => {
-    if (!('PerformanceObserver' in window)) return;
+    if (!("PerformanceObserver" in window)) return;
 
     // Observe Largest Contentful Paint (LCP)
     const lcpObserver = new PerformanceObserver((entryList) => {
       const entries = entryList.getEntries();
       const lastEntry = entries[entries.length - 1];
-      
-      logTelemetry({
-        severity: 'info',
-        category: 'performance_lcp',
+
+      logRef.current({
+        severity: "info",
+        category: "performance_lcp",
         message: `LCP detectado: ${lastEntry.startTime.toFixed(2)}ms`,
         metadata: {
-          metric: 'LCP',
+          metric: "LCP",
           value: lastEntry.startTime,
           element: (lastEntry as any).element?.tagName,
-        }
+        },
       });
     });
 
@@ -28,15 +30,15 @@ export function usePerformanceMonitor() {
     const fidObserver = new PerformanceObserver((entryList) => {
       entryList.getEntries().forEach((entry) => {
         const delay = (entry as any).processingStart - entry.startTime;
-        logTelemetry({
-          severity: 'info',
-          category: 'performance_fid',
+        logRef.current({
+          severity: "info",
+          category: "performance_fid",
           message: `FID detectado: ${delay.toFixed(2)}ms`,
           metadata: {
-            metric: 'FID',
+            metric: "FID",
             value: delay,
             name: entry.name,
-          }
+          },
         });
       });
     });
@@ -51,24 +53,24 @@ export function usePerformanceMonitor() {
       });
 
       if (clsValue > 0.1) {
-        logTelemetry({
-          severity: 'warning',
-          category: 'performance_cls',
+        logRef.current({
+          severity: "warning",
+          category: "performance_cls",
           message: `CLS Alto detectado: ${clsValue.toFixed(4)}`,
           metadata: {
-            metric: 'CLS',
+            metric: "CLS",
             value: clsValue,
-          }
+          },
         });
       }
     });
 
     try {
-      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-      fidObserver.observe({ type: 'first-input', buffered: true });
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
+      lcpObserver.observe({ type: "largest-contentful-paint", buffered: true });
+      fidObserver.observe({ type: "first-input", buffered: true });
+      clsObserver.observe({ type: "layout-shift", buffered: true });
     } catch (e) {
-      console.warn('PerformanceObserver observation failed:', e);
+      console.warn("PerformanceObserver observation failed:", e);
     }
 
     return () => {
@@ -76,5 +78,5 @@ export function usePerformanceMonitor() {
       fidObserver.disconnect();
       clsObserver.disconnect();
     };
-  }, [logTelemetry]);
+  }, []);
 }

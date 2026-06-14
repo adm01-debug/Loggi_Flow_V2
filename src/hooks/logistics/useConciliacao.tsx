@@ -230,9 +230,19 @@ export function useConciliacao() {
 
       let matched = 0;
       let divergencias = 0;
+      const now = new Date().toISOString();
+
+      // Compute all matches in memory first, then batch-upsert — avoids N sequential DB calls
+      const updates: {
+        id: string;
+        status: string;
+        item_sistema_id: string;
+        diferenca_valor: number;
+        conciliado_em: string;
+        conciliado_por: string | undefined;
+      }[] = [];
 
       for (const item of items) {
-        // Try to find matching entrega by reference or value
         const matchingEntrega = entregasSistema.find((e) => {
           const refMatch =
             item.referencia_externa &&
@@ -247,21 +257,23 @@ export function useConciliacao() {
           const diferenca = item.valor - matchingEntrega.valor;
           const status =
             Math.abs(diferenca) < 0.01 ? "conciliado" : "divergencia";
-
-          await supabase
-            .from("conciliacao_itens_importados")
-            .update({
-              status,
-              item_sistema_id: matchingEntrega.id,
-              diferenca_valor: diferenca,
-              conciliado_em: new Date().toISOString(),
-              conciliado_por: user?.id,
-            })
-            .eq("id", item.id);
-
+          updates.push({
+            id: item.id,
+            status,
+            item_sistema_id: matchingEntrega.id,
+            diferenca_valor: diferenca,
+            conciliado_em: now,
+            conciliado_por: user?.id,
+          });
           if (status === "conciliado") matched++;
           else divergencias++;
         }
+      }
+
+      if (updates.length > 0) {
+        await supabase
+          .from("conciliacao_itens_importados")
+          .upsert(updates as never[]);
       }
 
       // Update conciliacao totals

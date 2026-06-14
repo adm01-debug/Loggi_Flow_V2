@@ -82,17 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     });
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!isMounted) return;
-
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        await fetchUserData(session.user.id);
-      }
-      if (isMounted) setIsLoading(false);
-    });
+    // onAuthStateChange always fires INITIAL_SESSION as its first event,
+    // so getSession() here would double-invoke fetchUserData. Removed.
 
     return () => {
       isMounted = false;
