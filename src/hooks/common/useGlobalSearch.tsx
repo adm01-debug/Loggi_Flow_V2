@@ -58,6 +58,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         .select(
           "id, numero_entrega, endereco_entrega, status, codigo_rastreamento",
         )
+        .is("deleted_at", null)
         .or(
           `numero_entrega.ilike.%${searchQuery}%,endereco_entrega.ilike.%${searchQuery}%,codigo_rastreamento.ilike.%${searchQuery}%`,
         )
@@ -76,6 +77,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         .select(
           "id, numero_coleta, endereco_coleta, status, codigo_rastreamento",
         )
+        .is("deleted_at", null)
         .or(
           `numero_coleta.ilike.%${searchQuery}%,endereco_coleta.ilike.%${searchQuery}%,codigo_rastreamento.ilike.%${searchQuery}%`,
         )
@@ -92,6 +94,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
       const { data } = await supabase
         .from("clientes")
         .select("id, razao_social, nome_fantasia, cnpj, cidade, estado")
+        .is("deleted_at", null)
         .or(
           `razao_social.ilike.%${searchQuery}%,nome_fantasia.ilike.%${searchQuery}%,cnpj.ilike.%${searchQuery}%`,
         )
@@ -108,6 +111,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
       const { data } = await supabase
         .from("fornecedores")
         .select("id, razao_social, nome_fantasia, cnpj, cidade, estado")
+        .is("deleted_at", null)
         .or(
           `razao_social.ilike.%${searchQuery}%,nome_fantasia.ilike.%${searchQuery}%,cnpj.ilike.%${searchQuery}%`,
         )
@@ -124,6 +128,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
       const { data } = await supabase
         .from("transportadoras")
         .select("id, razao_social, nome_fantasia, cnpj")
+        .is("deleted_at", null)
         .or(
           `razao_social.ilike.%${searchQuery}%,nome_fantasia.ilike.%${searchQuery}%,cnpj.ilike.%${searchQuery}%`,
         )

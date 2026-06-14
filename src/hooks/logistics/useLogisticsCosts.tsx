@@ -60,9 +60,11 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
           cliente:clientes(id, razao_social, estado)
         `,
         )
+        .is("deleted_at", null)
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString())
-        .not("valor_frete", "is", null);
+        .not("valor_frete", "is", null)
+        .limit(2000);
 
       if (error) throw error;
       return data;
