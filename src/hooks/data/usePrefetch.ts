@@ -7,15 +7,22 @@ import { QUERY_STALE_TIME } from "@/lib/queryConfig";
  * Route-to-query mapping for sidebar prefetch.
  * Maps route paths to their primary query keys and fetch functions.
  */
-const ROUTE_PREFETCH_MAP: Record<string, {
-  queryKey: string[];
-  queryFn: () => Promise<unknown>;
-  staleTime: number;
-}> = {
+const ROUTE_PREFETCH_MAP: Record<
+  string,
+  {
+    queryKey: string[];
+    queryFn: () => Promise<unknown>;
+    staleTime: number;
+  }
+> = {
   "/": {
     queryKey: ["dashboard-metrics"],
     queryFn: async () => {
-      const { data } = await supabase.from("entregas").select("status", { count: "exact" });
+      const { data } = await supabase
+        .from("entregas")
+        .select("status", { count: "exact" })
+        .is("deleted_at", null)
+        .limit(1);
       return data;
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
@@ -23,9 +30,12 @@ const ROUTE_PREFETCH_MAP: Record<string, {
   "/envios": {
     queryKey: ["entregas"],
     queryFn: async () => {
-      const { data } = await supabase.from("entregas")
+      const { data } = await supabase
+        .from("entregas")
         .select("id, numero_entrega, status, endereco_entrega, created_at")
-        .order("created_at", { ascending: false }).limit(50);
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(50);
       return data;
     },
     staleTime: QUERY_STALE_TIME.DYNAMIC,
@@ -33,9 +43,12 @@ const ROUTE_PREFETCH_MAP: Record<string, {
   "/coletas": {
     queryKey: ["coletas"],
     queryFn: async () => {
-      const { data } = await supabase.from("coletas")
+      const { data } = await supabase
+        .from("coletas")
         .select("id, numero_coleta, status, endereco_coleta, created_at")
-        .order("created_at", { ascending: false }).limit(50);
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(50);
       return data;
     },
     staleTime: QUERY_STALE_TIME.DYNAMIC,
@@ -43,8 +56,12 @@ const ROUTE_PREFETCH_MAP: Record<string, {
   "/transportadoras": {
     queryKey: ["transportadoras"],
     queryFn: async () => {
-      const { data } = await supabase.from("transportadoras")
-        .select("id, nome_fantasia, cnpj, homologada").order("nome_fantasia");
+      const { data } = await supabase
+        .from("transportadoras")
+        .select("id, nome_fantasia, cnpj, homologada")
+        .is("deleted_at", null)
+        .order("nome_fantasia")
+        .limit(200);
       return data;
     },
     staleTime: QUERY_STALE_TIME.STATIC,
@@ -52,8 +69,12 @@ const ROUTE_PREFETCH_MAP: Record<string, {
   "/clientes": {
     queryKey: ["clientes"],
     queryFn: async () => {
-      const { data } = await supabase.from("clientes")
-        .select("id, razao_social, cnpj, cidade").order("razao_social");
+      const { data } = await supabase
+        .from("clientes")
+        .select("id, razao_social, cnpj, cidade")
+        .is("deleted_at", null)
+        .order("razao_social")
+        .limit(500);
       return data;
     },
     staleTime: QUERY_STALE_TIME.STATIC,
@@ -61,7 +82,11 @@ const ROUTE_PREFETCH_MAP: Record<string, {
   "/analytics": {
     queryKey: ["analytics-summary"],
     queryFn: async () => {
-      const { data } = await supabase.from("entregas").select("status, created_at").limit(200);
+      const { data } = await supabase
+        .from("entregas")
+        .select("status, created_at")
+        .is("deleted_at", null)
+        .limit(200);
       return data;
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
@@ -89,7 +114,7 @@ export function usePrefetch() {
         staleTime: config.staleTime,
       });
     },
-    [queryClient]
+    [queryClient],
   );
 
   return { prefetch };
