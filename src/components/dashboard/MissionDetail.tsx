@@ -36,26 +36,35 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchBitrixInfo() {
       if (!shipment.id) return;
       setIsLoading(true);
       try {
-        const { data, error } = await (supabase as any)
-          .from("integracoes_bitrix")
+        const { data, error } = await supabase
+          .from("integracoes_bitrix" as never)
           .select("*")
           .eq("entidade_id", shipment.id)
-          .single();
+          .maybeSingle();
 
-        if (data) {
+        if (cancelled) return;
+        if (error) {
+          console.warn("Bitrix fetch:", error.message);
+        } else if (data) {
           setBitrixData(data);
         }
       } catch (err) {
-        console.error("Error fetching bitrix data:", err);
+        if (!cancelled) console.error("Error fetching bitrix data:", err);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
+
     fetchBitrixInfo();
+    return () => {
+      cancelled = true;
+    };
   }, [shipment.id]);
   // Mock timeline events based on status
   const mockTimeline = [

@@ -8,6 +8,33 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
+// RFC 4180 quote-aware CSV field parser — handles commas inside quoted fields
+function parseCSVRow(row: string): string[] {
+  const cols: string[] = [];
+  let cur = "";
+  let inQuotes = false;
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i];
+    if (c === '"') {
+      if (inQuotes && row[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (c === "," && !inQuotes) {
+      cols.push(cur.trim());
+      cur = "";
+    } else {
+      cur += c;
+    }
+  }
+  cols.push(cur.trim());
+  return cols;
+}
+
+const BULK_BATCH_SIZE = 200;
+
 export function BulkRouteImport() {
   const [isUploading, setIsUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -27,55 +54,64 @@ export function BulkRouteImport() {
 
     setIsUploading(true);
     try {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const text = event.target?.result as string;
-        const rows = text.split("\n").slice(1); // Skip header
+      // Read file as Promise so loading state is correct
+      const text = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(file);
+      });
 
-        const routesToInsert = [];
-        for (const row of rows) {
-          const [
+      const lines = text.split(/\r?\n/);
+      const rows = lines.slice(1).filter((r) => r.trim()); // skip header + blanks
+
+      const routesToInsert = [];
+      for (const row of rows) {
+        const [
+          transportadora_id,
+          origem_estado,
+          destino_estado,
+          origem_cidade,
+          destino_cidade,
+          prazo_dias,
+          preco_por_kg,
+          taxa_fixa,
+        ] = parseCSVRow(row);
+
+        if (transportadora_id && origem_estado && destino_estado) {
+          routesToInsert.push({
             transportadora_id,
             origem_estado,
             destino_estado,
-            origem_cidade,
-            destino_cidade,
-            prazo_dias,
-            preco_por_kg,
-            taxa_fixa,
-          ] = row.split(",").map((s) => s.trim());
-
-          if (transportadora_id && origem_estado && destino_estado) {
-            routesToInsert.push({
-              transportadora_id,
-              origem_estado,
-              destino_estado,
-              origem_cidade: origem_cidade || null,
-              destino_cidade: destino_cidade || null,
-              prazo_dias: parseInt(prazo_dias) || 5,
-              preco_por_kg: parseFloat(preco_por_kg) || 0,
-              taxa_fixa: parseFloat(taxa_fixa) || 0,
-              ativo: true,
-            });
-          }
+            origem_cidade: origem_cidade || null,
+            destino_cidade: destino_cidade || null,
+            prazo_dias: parseInt(prazo_dias) || 5,
+            preco_por_kg: parseFloat(preco_por_kg) || 0,
+            taxa_fixa: parseFloat(taxa_fixa) || 0,
+            ativo: true,
+          });
         }
+      }
 
-        if (routesToInsert.length === 0) {
-          toast.error("Nenhuma rota válida encontrada no arquivo");
-          return;
-        }
+      if (routesToInsert.length === 0) {
+        toast.error("Nenhuma rota válida encontrada no arquivo");
+        return;
+      }
 
+      // Batch insert to avoid DB timeout on large imports
+      let inserted = 0;
+      for (let i = 0; i < routesToInsert.length; i += BULK_BATCH_SIZE) {
+        const batch = routesToInsert.slice(i, i + BULK_BATCH_SIZE);
         const { error } = await supabase
           .from("transportadora_rotas")
-          .insert(routesToInsert);
-
+          .insert(batch as never[]);
         if (error) throw error;
+        inserted += batch.length;
+      }
 
-        toast.success(`${routesToInsert.length} rotas importadas com sucesso!`);
-        queryClient.invalidateQueries({ queryKey: ["transportadora-rotas"] });
-        setFile(null);
-      };
-      reader.readAsText(file);
+      toast.success(`${inserted} rotas importadas com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ["transportadora-rotas"] });
+      setFile(null);
     } catch (error: any) {
       toast.error(`Erro na importação: ${error.message}`);
     } finally {
