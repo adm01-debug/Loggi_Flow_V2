@@ -169,7 +169,9 @@ export default function FretesInternos() {
       const { data, error } = await supabase
         .from("fretes_internos")
         .select("*")
-        .order("created_at", { ascending: false });
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
       return data as FreteInterno[];
     },
@@ -200,18 +202,16 @@ export default function FretesInternos() {
 
   const createMut = useMutation({
     mutationFn: async (data: typeof emptyForm) => {
-      const { error } = await supabase
-        .from("fretes_internos")
-        .insert({
-          origem: data.origem,
-          destino: data.destino,
-          motorista: data.motorista || null,
-          quantidade_itens: data.quantidade_itens,
-          previsao_entrega: data.previsao_entrega || null,
-          xp_reward: data.xp_reward,
-          observacoes: data.observacoes || null,
-          status: "pendente",
-        });
+      const { error } = await supabase.from("fretes_internos").insert({
+        origem: data.origem,
+        destino: data.destino,
+        motorista: data.motorista || null,
+        quantidade_itens: data.quantidade_itens,
+        previsao_entrega: data.previsao_entrega || null,
+        xp_reward: data.xp_reward,
+        observacoes: data.observacoes || null,
+        status: "pendente",
+      });
       if (error) throw error;
     },
     onSuccess: () => {
