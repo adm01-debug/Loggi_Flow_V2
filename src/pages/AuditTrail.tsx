@@ -1,14 +1,46 @@
+import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AuditTrailViewer } from "@/components/audit/AuditTrailViewer";
 import { DecisionAudit } from "@/components/freight/DecisionAudit";
-import { History, Shield, Download, Brain, Database } from "lucide-react";
+import {
+  History,
+  Shield,
+  Download,
+  Brain,
+  Database,
+  Loader2,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Navigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useExport } from "@/hooks/common/useExport";
+import { toast } from "sonner";
 
 export default function AuditTrail() {
   const { isAdmin, isLoading } = useAuth();
+  const { exportToCSV } = useExport();
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportLogs = async () => {
+    setIsExporting(true);
+    try {
+      const { data, error } = await supabase
+        .from("audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(5000);
+      if (error) throw error;
+      exportToCSV(data as unknown as Record<string, unknown>[], {
+        filename: "audit-logs-completo",
+      });
+    } catch (err: any) {
+      toast.error(`Erro ao exportar: ${err.message}`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -42,16 +74,28 @@ export default function AuditTrail() {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                     <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Compliance_Nexus</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
+                      Compliance_Nexus
+                    </span>
                   </div>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">HISTÓRICO IMUTÁVEL • GOVERNANÇA 10/10</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
+                    HISTÓRICO IMUTÁVEL • GOVERNANÇA 10/10
+                  </span>
                 </div>
               </div>
             </h1>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
-              <Download className="w-4 h-4 mr-2" />
+            <Button
+              variant="outline"
+              onClick={handleExportLogs}
+              disabled={isExporting}
+            >
+              {isExporting ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
               Exportar Logs
             </Button>
           </div>
@@ -65,9 +109,9 @@ export default function AuditTrail() {
               Acesso Restrito
             </p>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Este módulo registra automaticamente todas as operações de criação, atualização e 
-              exclusão realizadas no sistema. Os logs são imutáveis e apenas administradores 
-              têm acesso a esta visualização.
+              Este módulo registra automaticamente todas as operações de
+              criação, atualização e exclusão realizadas no sistema. Os logs são
+              imutáveis e apenas administradores têm acesso a esta visualização.
             </p>
           </div>
         </div>

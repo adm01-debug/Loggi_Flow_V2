@@ -137,7 +137,8 @@ export default function Ocorrencias() {
         .select(
           "*, coleta:coletas(numero_coleta), entrega:entregas(numero_entrega)",
         )
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
       return data as Ocorrencia[];
     },
@@ -149,6 +150,7 @@ export default function Ocorrencias() {
       const { data } = await supabase
         .from("coletas")
         .select("id, numero_coleta")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(50);
       return data || [];
@@ -160,6 +162,7 @@ export default function Ocorrencias() {
       const { data } = await supabase
         .from("entregas")
         .select("id, numero_entrega")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(50);
       return data || [];
@@ -197,17 +200,15 @@ export default function Ocorrencias() {
 
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm & { fotos_urls?: string[] }) => {
-      const { error } = await supabase
-        .from("ocorrencias")
-        .insert({
-          tipo_ocorrencia: d.tipo_ocorrencia,
-          descricao: d.descricao || null,
-          acao_tomada: d.acao_tomada || null,
-          coleta_id: d.coleta_id || null,
-          entrega_id: d.entrega_id || null,
-          fotos_urls: d.fotos_urls || null,
-          resolvida: false,
-        });
+      const { error } = await supabase.from("ocorrencias").insert({
+        tipo_ocorrencia: d.tipo_ocorrencia,
+        descricao: d.descricao || null,
+        acao_tomada: d.acao_tomada || null,
+        coleta_id: d.coleta_id || null,
+        entrega_id: d.entrega_id || null,
+        fotos_urls: d.fotos_urls || null,
+        resolvida: false,
+      });
       if (error) throw error;
     },
     onSuccess: () => {

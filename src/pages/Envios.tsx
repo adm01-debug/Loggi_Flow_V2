@@ -78,7 +78,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
@@ -352,7 +352,9 @@ export default function Envios() {
         .select(
           "*, cliente:clientes(id, razao_social, nome_fantasia), transportadora:transportadoras(id, nome_fantasia)",
         )
-        .order("created_at", { ascending: false });
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
       return data as Entrega[];
     },
@@ -366,7 +368,9 @@ export default function Envios() {
         .select(
           "id, razao_social, nome_fantasia, endereco_completo, contato_telefone",
         )
-        .order("razao_social");
+        .is("deleted_at", null)
+        .order("razao_social")
+        .limit(500);
       return data || [];
     },
   });
@@ -376,7 +380,9 @@ export default function Envios() {
       const { data } = await supabase
         .from("transportadoras")
         .select("id, nome_fantasia")
-        .order("nome_fantasia");
+        .is("deleted_at", null)
+        .order("nome_fantasia")
+        .limit(200);
       return data || [];
     },
   });
@@ -416,19 +422,17 @@ export default function Envios() {
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
       const numero = `ENT-${Date.now().toString().slice(-8)}`;
-      const { error } = await supabase
-        .from("entregas")
-        .insert({
-          numero_entrega: numero,
-          cliente_id: d.cliente_id || null,
-          endereco_entrega: d.endereco_entrega,
-          contato_cliente: d.contato_cliente || null,
-          tipo_frete: d.tipo_frete,
-          transportadora_id: d.transportadora_id || null,
-          previsao_entrega: d.previsao_entrega || null,
-          observacoes: d.observacoes || null,
-          status: "aguardando_producao",
-        });
+      const { error } = await supabase.from("entregas").insert({
+        numero_entrega: numero,
+        cliente_id: d.cliente_id || null,
+        endereco_entrega: d.endereco_entrega,
+        contato_cliente: d.contato_cliente || null,
+        tipo_frete: d.tipo_frete,
+        transportadora_id: d.transportadora_id || null,
+        previsao_entrega: d.previsao_entrega || null,
+        observacoes: d.observacoes || null,
+        status: "aguardando_producao",
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -474,7 +478,10 @@ export default function Envios() {
 
   const deleteMut = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("entregas").delete().eq("id", id);
+      const { error } = await supabase
+        .from("entregas")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -832,7 +839,8 @@ export default function Envios() {
                           <Calendar className="w-4 h-4 text-primary" />
                         </div>
                         <span className="uppercase text-[11px] tracking-tight">
-                          {e.previsao_entrega
+                          {e.previsao_entrega &&
+                          isValid(new Date(e.previsao_entrega))
                             ? format(new Date(e.previsao_entrega), "dd MMM", {
                                 locale: ptBR,
                               })
@@ -1148,11 +1156,12 @@ export default function Envios() {
                   <DocumentUploadField
                     value={sel.comprovante_entrega_url}
                     onChange={async (url) => {
-                      await supabase
+                      const { error } = await supabase
                         .from("entregas")
                         .update({ comprovante_entrega_url: url })
                         .eq("id", sel.id);
-                      refetch();
+                      if (error) toast.error(error.message);
+                      else refetch();
                     }}
                     folder={`entregas/${sel.id}/comprovantes`}
                     label="Comprovante de Entrega"
@@ -1160,11 +1169,12 @@ export default function Envios() {
                   <DocumentUploadField
                     value={sel.nf_remessa_url}
                     onChange={async (url) => {
-                      await supabase
+                      const { error } = await supabase
                         .from("entregas")
                         .update({ nf_remessa_url: url })
                         .eq("id", sel.id);
-                      refetch();
+                      if (error) toast.error(error.message);
+                      else refetch();
                     }}
                     folder={`entregas/${sel.id}/nf`}
                     label="NF Remessa"

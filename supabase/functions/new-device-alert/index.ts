@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface NewDeviceAlertRequest {
@@ -26,14 +27,19 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { user_id, user_email, device_info, login_time }: NewDeviceAlertRequest = await req.json();
+    const {
+      user_id,
+      user_email,
+      device_info,
+      login_time,
+    }: NewDeviceAlertRequest = await req.json();
 
-    log.info(`Sending new device alert to ${user_email}`);
+    console.log(`Sending new device alert to ${user_email}`);
 
-    const formattedDate = new Date(login_time).toLocaleString('pt-BR', {
-      dateStyle: 'full',
-      timeStyle: 'short',
-      timeZone: 'America/Sao_Paulo'
+    const formattedDate = new Date(login_time).toLocaleString("pt-BR", {
+      dateStyle: "full",
+      timeStyle: "short",
+      timeZone: "America/Sao_Paulo",
     });
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
@@ -45,7 +51,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${resendApiKey}`,
+        Authorization: `Bearer ${resendApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -160,7 +166,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     const emailResult = await emailResponse.json();
-    log.info("Email sent successfully:", emailResult);
+    console.log("Email sent successfully:", emailResult);
 
     // Log security event
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -173,7 +179,7 @@ const handler = async (req: Request): Promise<Response> => {
       severity: "warning",
       description: `Novo dispositivo detectado: ${device_info.browser} em ${device_info.os}`,
       ip_address: device_info.ip_address,
-      metadata: { device_info, email_sent: true }
+      metadata: { device_info, email_sent: true },
     });
 
     return new Response(JSON.stringify({ success: true, emailResult }), {
@@ -182,13 +188,10 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error in new-device-alert function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
 };
 

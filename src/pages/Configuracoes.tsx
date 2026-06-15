@@ -54,10 +54,10 @@ export default function Configuracoes() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // In a real app, this would call an API or update Supabase
-      await new Promise((r) => setTimeout(r, 1000));
-      toast.success("Configurações salvas!");
+      // Notification preferences are saved automatically via updatePreference.
+      // If additional page-level settings are added, persist them here.
       setIsDirty(false);
+      toast.success("Configurações salvas!");
     } catch (error) {
       toast.error("Erro ao salvar configurações");
     } finally {

@@ -102,7 +102,9 @@ export function useSmartAlerts() {
     const { data: coletas } = await supabase
       .from("coletas")
       .select("id, numero_coleta, created_at, status")
-      .not("status", "in", '("finalizada","conferencia_ok")');
+      .is("deleted_at", null)
+      .not("status", "in", '("finalizada","conferencia_ok")')
+      .limit(500);
 
     coletas?.forEach((coleta) => {
       const created = new Date(coleta.created_at);
@@ -134,8 +136,10 @@ export function useSmartAlerts() {
     const { data: entregas } = await supabase
       .from("entregas")
       .select("id, numero_entrega, previsao_entrega, status")
+      .is("deleted_at", null)
       .not("status", "in", '("entregue","finalizado")')
-      .not("previsao_entrega", "is", null);
+      .not("previsao_entrega", "is", null)
+      .limit(500);
 
     entregas?.forEach((entrega) => {
       if (entrega.previsao_entrega) {

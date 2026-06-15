@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ import { useRealtime } from "@/hooks/data/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { cn } from "@/lib/utils";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -95,8 +94,6 @@ const validTransitions: Record<string, string> = {
 };
 
 export default function Despachos() {
-  const qc = useQueryClient();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [confirmItem, setConfirmItem] = useState<Despacho | null>(null);
   const [selectedItem, setSelectedItem] = useState<Despacho | null>(null);
@@ -192,7 +189,43 @@ export default function Despachos() {
     setDetailsOpen(true);
   };
 
-  const moveToNext = async (item: Despacho) => {
+  const moveToNextMutation = useMutation({
+    mutationFn: async (item: Despacho) => {
+      const nextStatus = validTransitions[item.status];
+      if (!nextStatus) return;
+
+      const { error } = await supabase
+        .from("entregas")
+        .update({ status: nextStatus as any })
+        .eq("id", item.id)
+        .eq("version", item.version);
+      if (error) throw error;
+
+      const { error: histError } = await supabase
+        .from("kanban_history")
+        .insert({
+          delivery_id: item.id,
+          from_status: item.status,
+          to_status: nextStatus,
+          action_by: user?.id,
+          notes: `Transição automática no Kanban: ${item.status} -> ${nextStatus}`,
+        });
+      if (histError) console.warn("kanban_history insert:", histError.message);
+
+      return nextStatus;
+    },
+    onSuccess: (nextStatus) => {
+      if (!nextStatus) return;
+      playSuccess();
+      toast.success(
+        `Movido para ${statusConfig[nextStatus]?.label || nextStatus}`,
+      );
+      refetch();
+    },
+    onError: (error: any) => toast.error(error.message),
+  });
+
+  const moveToNext = (item: Despacho) => {
     const nextStatus = validTransitions[item.status];
     if (!nextStatus) return;
 
@@ -208,56 +241,44 @@ export default function Despachos() {
       return;
     }
 
-    const { error } = await supabase
-      .from("entregas")
-      .update({ status: nextStatus as any })
-      .eq("id", item.id)
-      .eq("version", item.version);
-
-    if (!error) {
-      // Record history
-      await supabase.from("kanban_history").insert({
-        delivery_id: item.id,
-        from_status: item.status,
-        to_status: nextStatus,
-        action_by: user?.id,
-        notes: `Transição automática no Kanban: ${item.status} -> ${nextStatus}`,
-      });
-
-      playSuccess();
-      toast.success(
-        `Movido para ${statusConfig[nextStatus]?.label || nextStatus}`,
-      );
-      refetch();
-    }
+    moveToNextMutation.mutate(item);
   };
 
-  const confirmDispatch = async () => {
-    if (!confirmItem) return;
-    const { error } = await supabase
-      .from("entregas")
-      .update({
-        status: "despachado" as any,
-        data_despacho: new Date().toISOString(),
-      })
-      .eq("id", confirmItem.id)
-      .eq("version", confirmItem.version);
+  const confirmDispatchMutation = useMutation({
+    mutationFn: async (item: Despacho) => {
+      const { error } = await supabase
+        .from("entregas")
+        .update({
+          status: "despachado" as any,
+          data_despacho: new Date().toISOString(),
+        })
+        .eq("id", item.id)
+        .eq("version", item.version);
+      if (error) throw error;
 
-    if (!error) {
-      // Record history
-      await supabase.from("kanban_history").insert({
-        delivery_id: confirmItem.id,
-        from_status: confirmItem.status,
-        to_status: "despachado",
-        action_by: user?.id,
-        notes: "Despacho final autorizado",
-      });
-
+      const { error: histError } = await supabase
+        .from("kanban_history")
+        .insert({
+          delivery_id: item.id,
+          from_status: item.status,
+          to_status: "despachado",
+          action_by: user?.id,
+          notes: "Despacho final autorizado",
+        });
+      if (histError) console.warn("kanban_history insert:", histError.message);
+    },
+    onSuccess: () => {
       playSuccess();
       toast.success("Entrega despachada com sucesso!");
       setConfirmItem(null);
       refetch();
-    }
+    },
+    onError: (error: any) => toast.error(error.message),
+  });
+
+  const confirmDispatch = () => {
+    if (!confirmItem) return;
+    confirmDispatchMutation.mutate(confirmItem);
   };
 
   return (
@@ -474,6 +495,7 @@ export default function Despachos() {
                               <Button
                                 variant="ghost"
                                 size="sm"
+                                disabled={moveToNextMutation.isPending}
                                 className="h-9 px-4 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all font-black text-[10px] uppercase tracking-widest gap-2 group/btn"
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -520,6 +542,7 @@ export default function Despachos() {
           title="AUTORIZAR DESPACHO FINAL"
           description={`Confirmar saída do material ${confirmItem?.numero_entrega}? Esta ação é irreversível e registrará o timestamp de saída na malha logistica.`}
           onConfirm={confirmDispatch}
+          isLoading={confirmDispatchMutation.isPending}
         />
       </div>
     </MainLayout>

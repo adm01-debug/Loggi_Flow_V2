@@ -216,14 +216,16 @@ export default function Clientes() {
         .from("clientes")
         .select("*")
         .is("deleted_at", null)
-        .order("razao_social");
+        .order("razao_social")
+        .limit(1000);
 
       if (error) throw error;
 
       const { data: entregas } = await supabase
         .from("entregas")
         .select("cliente_id, status")
-        .is("deleted_at", null);
+        .is("deleted_at", null)
+        .limit(2000);
 
       return (data || []).map((c) => {
         const ec = entregas?.filter((e) => e.cliente_id === c.id) || [];
@@ -272,22 +274,20 @@ export default function Clientes() {
 
   const createMut = useMutation({
     mutationFn: async (d: typeof emptyForm) => {
-      const { error } = await supabase
-        .from("clientes")
-        .insert({
-          razao_social: d.razao_social,
-          nome_fantasia: d.nome_fantasia || null,
-          cnpj: d.cnpj || null,
-          endereco_completo: d.endereco_completo,
-          cidade: d.cidade || null,
-          estado: d.estado || null,
-          cep: d.cep || null,
-          contato_nome: d.contato_nome || null,
-          contato_email: d.contato_email || null,
-          contato_telefone: d.contato_telefone || null,
-          horario_entrega: d.horario_entrega || null,
-          restricoes_entrega: d.restricoes_entrega || null,
-        });
+      const { error } = await supabase.from("clientes").insert({
+        razao_social: d.razao_social,
+        nome_fantasia: d.nome_fantasia || null,
+        cnpj: d.cnpj || null,
+        endereco_completo: d.endereco_completo,
+        cidade: d.cidade || null,
+        estado: d.estado || null,
+        cep: d.cep || null,
+        contato_nome: d.contato_nome || null,
+        contato_email: d.contato_email || null,
+        contato_telefone: d.contato_telefone || null,
+        horario_entrega: d.horario_entrega || null,
+        restricoes_entrega: d.restricoes_entrega || null,
+      });
       if (error) throw error;
     },
     onSuccess: () => {

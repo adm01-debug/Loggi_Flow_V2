@@ -67,12 +67,9 @@ export default function PainelOTIF() {
           transportadora:transportadoras (id, nome_fantasia, score_performance)
         `,
         )
-        .in("status", [
-          "entregue",
-          "despachado",
-          "em_transito",
-          "saiu_entrega",
-        ]);
+        .is("deleted_at", null)
+        .in("status", ["entregue", "despachado", "em_transito", "saiu_entrega"])
+        .limit(2000);
 
       if (error) throw error;
       return data;

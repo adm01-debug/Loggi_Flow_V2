@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface LogAttemptRequest {
@@ -32,16 +33,22 @@ serve(async (req: Request) => {
       },
     });
 
-    const { email, ip_address, user_agent, success, failure_reason }: LogAttemptRequest = await req.json();
+    const {
+      email,
+      ip_address,
+      user_agent,
+      success,
+      failure_reason,
+    }: LogAttemptRequest = await req.json();
 
     if (!email) {
-      return new Response(
-        JSON.stringify({ error: "Email is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Email is required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    log.info(`Logging login attempt for: ${email}, success: ${success}`);
+    console.log(`Logging login attempt for: ${email}, success: ${success}`);
 
     const { error } = await supabaseAdmin.from("login_attempts").insert({
       email,
@@ -56,16 +63,17 @@ serve(async (req: Request) => {
       throw error;
     }
 
-    return new Response(
-      JSON.stringify({ logged: true }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ logged: true }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     console.error("Unexpected error:", error);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

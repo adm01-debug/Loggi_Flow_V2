@@ -31,11 +31,15 @@ export function ImageUploader({
     const remainingSlots = maxImages - images.length;
     const filesToUpload = Array.from(files).slice(0, remainingSlots);
 
+    const newUrls: string[] = [];
     for (const file of filesToUpload) {
       const result = await uploadImage(file);
       if (result) {
-        onImagesChange([...images, result.url]);
+        newUrls.push(result.url);
       }
+    }
+    if (newUrls.length > 0) {
+      onImagesChange([...images, ...newUrls]);
     }
 
     // Reset input
@@ -94,7 +98,7 @@ export function ImageUploader({
             disabled={uploading}
             className={cn(
               "w-20 h-20 rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary hover:text-primary transition-colors",
-              uploading && "opacity-50 cursor-not-allowed"
+              uploading && "opacity-50 cursor-not-allowed",
             )}
           >
             {uploading ? (

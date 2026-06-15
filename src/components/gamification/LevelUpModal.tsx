@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGamification } from "@/hooks/gamification/useGamification";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -11,17 +11,21 @@ import { useWindowSize } from "react-use";
 export function LevelUpModal() {
   const { userLevel, levelProgress } = useGamification();
   const [show, setShow] = useState(false);
-  const [lastLevel, setLastLevel] = useState<number | null>(null);
+  const prevLevelRef = useRef<number | null>(null);
   const { width, height } = useWindowSize();
 
   useEffect(() => {
-    if (userLevel?.level && lastLevel !== null && userLevel.level > lastLevel) {
+    if (
+      prevLevelRef.current !== null &&
+      userLevel?.level &&
+      userLevel.level > prevLevelRef.current
+    ) {
       setShow(true);
     }
     if (userLevel?.level) {
-      setLastLevel(userLevel.level);
+      prevLevelRef.current = userLevel.level;
     }
-  }, [userLevel?.level, lastLevel]);
+  }, [userLevel?.level]);
 
   if (!userLevel) return null;
 

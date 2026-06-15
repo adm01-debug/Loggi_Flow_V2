@@ -33,9 +33,11 @@ export const useSLAAlerts = () => {
           cliente:clientes (razao_social)
         `,
         )
+        .is("deleted_at", null)
         .in("status", ["despachado", "em_transito", "saiu_entrega"])
         .not("previsao_entrega", "is", null)
-        .order("previsao_entrega", { ascending: true });
+        .order("previsao_entrega", { ascending: true })
+        .limit(500);
 
       if (error) throw error;
       return data;

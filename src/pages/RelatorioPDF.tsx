@@ -89,8 +89,10 @@ export default function RelatorioPDF() {
         .select(
           `*, transportadora:transportadoras(nome_fantasia), cliente:clientes(razao_social)`,
         )
+        .is("deleted_at", null)
         .gte("created_at", start.toISOString())
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(2000);
       if (error) throw error;
       return data;
     },

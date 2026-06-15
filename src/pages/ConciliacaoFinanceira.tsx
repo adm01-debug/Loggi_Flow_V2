@@ -2,6 +2,16 @@ import { useState, useRef } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -65,6 +75,7 @@ export default function ConciliacaoFinanceira() {
     periodo_fim: "",
   });
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [dlgDelete, setDlgDelete] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCreateConciliacao = () => {
@@ -72,14 +83,17 @@ export default function ConciliacaoFinanceira() {
       toast.error("Nome é obrigatório");
       return;
     }
-    createConciliacao.mutate(form);
-    setDlgNova(false);
-    setForm({
-      tipo: "faturas_entregas",
-      nome: "",
-      descricao: "",
-      periodo_inicio: "",
-      periodo_fim: "",
+    createConciliacao.mutate(form, {
+      onSuccess: () => {
+        setDlgNova(false);
+        setForm({
+          tipo: "faturas_entregas",
+          nome: "",
+          descricao: "",
+          periodo_inicio: "",
+          periodo_fim: "",
+        });
+      },
     });
   };
 
@@ -100,14 +114,15 @@ export default function ConciliacaoFinanceira() {
     observacoes?: string,
   ) => {
     if (!selectedItem) return;
-    manualMatch.mutate({
-      itemId: selectedItem.id,
-      sistemaId,
-      status,
-      observacoes,
-    });
-    setDlgMatch(false);
-    setSelectedItem(null);
+    manualMatch.mutate(
+      { itemId: selectedItem.id, sistemaId, status, observacoes },
+      {
+        onSuccess: () => {
+          setDlgMatch(false);
+          setSelectedItem(null);
+        },
+      },
+    );
   };
 
   const filteredItens =
@@ -197,9 +212,7 @@ export default function ConciliacaoFinanceira() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() =>
-                            deleteConciliacao.mutate(selectedConciliacao.id)
-                          }
+                          onClick={() => setDlgDelete(true)}
                         >
                           <FileSpreadsheet className="w-4 h-4 mr-2" />
                           Excluir
@@ -383,6 +396,33 @@ export default function ConciliacaoFinanceira() {
         entregasSistema={entregasSistema}
         onMatch={handleManualMatch}
       />
+
+      <AlertDialog open={dlgDelete} onOpenChange={setDlgDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir conciliação?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível. A conciliação{" "}
+              <strong>{selectedConciliacao?.nome}</strong> e todos os seus itens
+              serão permanentemente excluídos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (selectedConciliacao) {
+                  deleteConciliacao.mutate(selectedConciliacao.id);
+                }
+                setDlgDelete(false);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MainLayout>
   );
 }

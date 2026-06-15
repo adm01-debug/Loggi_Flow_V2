@@ -21,7 +21,7 @@ import {
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useRealtime } from "@/hooks/data/useRealtime";
@@ -162,7 +162,8 @@ function EntregaCard({
             <div className="flex items-center gap-1">
               <Clock className="w-3 h-3 text-muted-foreground/50" />
               <span className="text-[9px] text-muted-foreground">
-                {entrega.previsao_entrega
+                {entrega.previsao_entrega &&
+                isValid(new Date(entrega.previsao_entrega))
                   ? format(new Date(entrega.previsao_entrega), "dd/MM", {
                       locale: ptBR,
                     })
@@ -266,7 +267,8 @@ export default function KanbanEntregas() {
         )
         .is("deleted_at", null)
         .not("status", "eq", "finalizado")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(500);
 
       if (error) throw error;
       return data as KanbanEntrega[];
@@ -283,21 +285,29 @@ export default function KanbanEntregas() {
       status: EntregaStatus;
       version: number;
     }) => {
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("entregas")
-        .update({
-          status,
-          updated_at: new Date().toISOString(),
-          ...(status === "entregue"
-            ? { data_entrega_efetiva: new Date().toISOString() }
-            : {}),
-          ...(status === "despachado"
-            ? { data_despacho: new Date().toISOString() }
-            : {}),
-        })
+        .update(
+          {
+            status,
+            updated_at: new Date().toISOString(),
+            version: version + 1,
+            ...(status === "entregue"
+              ? { data_entrega_efetiva: new Date().toISOString() }
+              : {}),
+            ...(status === "despachado"
+              ? { data_despacho: new Date().toISOString() }
+              : {}),
+          },
+          { count: "exact" },
+        )
         .eq("id", id)
         .eq("version", version);
       if (error) throw error;
+      if (count === 0)
+        throw new Error(
+          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
+        );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["kanban-entregas"] });

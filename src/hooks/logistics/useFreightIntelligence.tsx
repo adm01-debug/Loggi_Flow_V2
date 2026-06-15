@@ -48,7 +48,10 @@ export function useFreightIntelligence() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("entregas")
-        .select("id, numero_entrega, status, valor_frete, endereco_entrega, created_at, cliente:clientes(razao_social, nome_fantasia, estado, cidade), transportadora:transportadoras(nome_fantasia)")
+        .select(
+          "id, numero_entrega, status, valor_frete, endereco_entrega, created_at, cliente:clientes(razao_social, nome_fantasia, estado, cidade), transportadora:transportadoras(nome_fantasia)",
+        )
+        .is("deleted_at", null)
         .not("valor_frete", "is", null)
         .order("created_at", { ascending: false })
         .limit(1000);
@@ -57,13 +60,21 @@ export function useFreightIntelligence() {
       return (data || []).map((d: Record<string, unknown>) => ({
         id: d.id as string,
         numero_entrega: (d.numero_entrega as string) || "",
-        cliente: (d.cliente as Record<string, string>)?.nome_fantasia || (d.cliente as Record<string, string>)?.razao_social || "Cliente",
-        estado: (d.cliente as Record<string, string>)?.estado || extractEstado(d.endereco_entrega as string) || "N/D",
+        cliente:
+          (d.cliente as Record<string, string>)?.nome_fantasia ||
+          (d.cliente as Record<string, string>)?.razao_social ||
+          "Cliente",
+        estado:
+          (d.cliente as Record<string, string>)?.estado ||
+          extractEstado(d.endereco_entrega as string) ||
+          "N/D",
         cidade: (d.cliente as Record<string, string>)?.cidade || "N/D",
         valor_frete: (d.valor_frete as number) || 0,
         status: (d.status as string) || "",
         created_at: d.created_at as string,
-        transportadora: (d.transportadora as Record<string, string>)?.nome_fantasia || "Sem transportadora",
+        transportadora:
+          (d.transportadora as Record<string, string>)?.nome_fantasia ||
+          "Sem transportadora",
       })) as FreightImpactEntry[];
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
@@ -72,12 +83,19 @@ export function useFreightIntelligence() {
 
   // Historical averages per state for abusive freight detection
   const regionAnalysis = useMemo((): RegionAnalysis[] => {
-    const byState: Record<string, { entregas: number; custoTotal: number; custoMax: number }> = {};
-    rawData.forEach(e => {
-      if (!byState[e.estado]) byState[e.estado] = { entregas: 0, custoTotal: 0, custoMax: 0 };
+    const byState: Record<
+      string,
+      { entregas: number; custoTotal: number; custoMax: number }
+    > = {};
+    rawData.forEach((e) => {
+      if (!byState[e.estado])
+        byState[e.estado] = { entregas: 0, custoTotal: 0, custoMax: 0 };
       byState[e.estado].entregas++;
       byState[e.estado].custoTotal += e.valor_frete;
-      byState[e.estado].custoMax = Math.max(byState[e.estado].custoMax, e.valor_frete);
+      byState[e.estado].custoMax = Math.max(
+        byState[e.estado].custoMax,
+        e.valor_frete,
+      );
     });
     return Object.entries(byState)
       .map(([estado, v]) => ({
@@ -93,42 +111,68 @@ export function useFreightIntelligence() {
   // Per-carrier per-route comparison for negotiation
   const carrierRouteComparison = useMemo((): CarrierRouteComparison[] => {
     const key = (t: string, e: string) => `${t}|||${e}`;
-    const map: Record<string, { transportadora: string; transportadora_id: string; estado: string; entregas: number; custoTotal: number }> = {};
-    rawData.forEach(e => {
+    const map: Record<
+      string,
+      {
+        transportadora: string;
+        transportadora_id: string;
+        estado: string;
+        entregas: number;
+        custoTotal: number;
+      }
+    > = {};
+    rawData.forEach((e) => {
       const k = key(e.transportadora, e.estado);
-      if (!map[k]) map[k] = { transportadora: e.transportadora, transportadora_id: "", estado: e.estado, entregas: 0, custoTotal: 0 };
+      if (!map[k])
+        map[k] = {
+          transportadora: e.transportadora,
+          transportadora_id: "",
+          estado: e.estado,
+          entregas: 0,
+          custoTotal: 0,
+        };
       map[k].entregas++;
       map[k].custoTotal += e.valor_frete;
     });
     return Object.values(map)
-      .map(v => ({ ...v, custoMedio: v.entregas > 0 ? v.custoTotal / v.entregas : 0 }))
+      .map((v) => ({
+        ...v,
+        custoMedio: v.entregas > 0 ? v.custoTotal / v.entregas : 0,
+      }))
       .sort((a, b) => b.custoTotal - a.custoTotal);
   }, [rawData]);
 
   // Abusive freight detection (>20% above state average)
   const abusiveFreights = useMemo(() => {
     const avgByState: Record<string, number> = {};
-    regionAnalysis.forEach(r => { avgByState[r.estado] = r.custoMedio; });
+    regionAnalysis.forEach((r) => {
+      avgByState[r.estado] = r.custoMedio;
+    });
 
     return rawData
-      .filter(e => {
+      .filter((e) => {
         const avg = avgByState[e.estado];
         if (!avg || avg === 0) return false;
         return e.valor_frete > avg * 1.2;
       })
-      .map(e => ({
+      .map((e) => ({
         ...e,
         avgForState: avgByState[e.estado] || 0,
-        percentAbove: avgByState[e.estado] ? ((e.valor_frete - avgByState[e.estado]) / avgByState[e.estado]) * 100 : 0,
+        percentAbove: avgByState[e.estado]
+          ? ((e.valor_frete - avgByState[e.estado]) / avgByState[e.estado]) *
+            100
+          : 0,
       }))
       .sort((a, b) => b.percentAbove - a.percentAbove);
   }, [rawData, regionAnalysis]);
 
   // Consolidation opportunities (same state+city, pending dispatch)
   const consolidationOpportunities = useMemo((): ConsolidationOpportunity[] => {
-    const pending = rawData.filter(e => ["pronto_despacho", "cotacao_frete", "nf_emitida"].includes(e.status));
+    const pending = rawData.filter((e) =>
+      ["pronto_despacho", "cotacao_frete", "nf_emitida"].includes(e.status),
+    );
     const byCityState: Record<string, FreightImpactEntry[]> = {};
-    pending.forEach(e => {
+    pending.forEach((e) => {
       const k = `${e.estado}|${e.cidade}`;
       if (!byCityState[k]) byCityState[k] = [];
       byCityState[k].push(e);
@@ -148,13 +192,29 @@ export function useFreightIntelligence() {
 
   // Best carrier per state (cheapest average)
   const bestCarrierPerState = useMemo(() => {
-    const stateCarriers: Record<string, { carrier: string; avg: number; count: number }[]> = {};
-    carrierRouteComparison.forEach(c => {
+    const stateCarriers: Record<
+      string,
+      { carrier: string; avg: number; count: number }[]
+    > = {};
+    carrierRouteComparison.forEach((c) => {
       if (!stateCarriers[c.estado]) stateCarriers[c.estado] = [];
-      stateCarriers[c.estado].push({ carrier: c.transportadora, avg: c.custoMedio, count: c.entregas });
+      stateCarriers[c.estado].push({
+        carrier: c.transportadora,
+        avg: c.custoMedio,
+        count: c.entregas,
+      });
     });
 
-    const result: Record<string, { best: string; bestAvg: number; worst: string; worstAvg: number; savings: number }> = {};
+    const result: Record<
+      string,
+      {
+        best: string;
+        bestAvg: number;
+        worst: string;
+        worstAvg: number;
+        savings: number;
+      }
+    > = {};
     Object.entries(stateCarriers).forEach(([estado, carriers]) => {
       if (carriers.length < 2) return;
       const sorted = carriers.sort((a, b) => a.avg - b.avg);
@@ -175,9 +235,17 @@ export function useFreightIntelligence() {
   const summary = useMemo(() => {
     const total = rawData.reduce((acc, e) => acc + e.valor_frete, 0);
     const avg = rawData.length > 0 ? total / rawData.length : 0;
-    const totalAbusive = abusiveFreights.reduce((acc, e) => acc + (e.valor_frete - e.avgForState), 0);
-    const totalConsolidationSavings = consolidationOpportunities.reduce((acc, o) => acc + o.potentialSavings, 0);
-    const potentialNegotiationSavings = Object.values(bestCarrierPerState).reduce((acc, v) => acc + v.savings, 0);
+    const totalAbusive = abusiveFreights.reduce(
+      (acc, e) => acc + (e.valor_frete - e.avgForState),
+      0,
+    );
+    const totalConsolidationSavings = consolidationOpportunities.reduce(
+      (acc, o) => acc + o.potentialSavings,
+      0,
+    );
+    const potentialNegotiationSavings = Object.values(
+      bestCarrierPerState,
+    ).reduce((acc, v) => acc + v.savings, 0);
 
     return {
       totalFreight: total,
@@ -188,9 +256,15 @@ export function useFreightIntelligence() {
       consolidationSavings: totalConsolidationSavings,
       consolidationOpps: consolidationOpportunities.length,
       negotiationSavings: potentialNegotiationSavings,
-      totalPotentialSavings: totalAbusive + totalConsolidationSavings + potentialNegotiationSavings,
+      totalPotentialSavings:
+        totalAbusive + totalConsolidationSavings + potentialNegotiationSavings,
     };
-  }, [rawData, abusiveFreights, consolidationOpportunities, bestCarrierPerState]);
+  }, [
+    rawData,
+    abusiveFreights,
+    consolidationOpportunities,
+    bestCarrierPerState,
+  ]);
 
   return {
     isLoading,

@@ -27,14 +27,16 @@ serve(async (req) => {
       body_summary: body.text?.substring(0, 50),
     });
 
-    // Contract Validation
+    // Contract Validation — transportadora_id is optional (omitted for new/unsaved carriers)
     const { isValid, errors } = await validateContract(
       supabaseClient,
       "normalize-freight-response",
       body,
       (p) => {
         requireString(p, "text", { minLength: 1 });
-        requireString(p, "transportadora_id", { minLength: 36 }); // UUID
+        if (p.transportadora_id !== undefined) {
+          requireString(p, "transportadora_id", { minLength: 36 }); // UUID when provided
+        }
       },
     );
 
@@ -54,33 +56,47 @@ serve(async (req) => {
 
     const { text, transportadora_id, cotacao_id } = body;
 
-    // 1. Fetch normalization config
-    const { data: carrier, error: carrierError } = await supabaseClient
-      .from("transportadoras")
-      .select("non_api_config")
-      .eq("id", transportadora_id)
-      .single();
+    // 1. Fetch normalization config (skip if no carrier ID, e.g. testing a new carrier)
+    let config: Record<string, string> = {};
+    if (transportadora_id) {
+      const { data: carrier, error: carrierError } = await supabaseClient
+        .from("transportadoras")
+        .select("non_api_config")
+        .eq("id", transportadora_id)
+        .single();
 
-    if (carrierError) throw carrierError;
-
-    const config = carrier.non_api_config?.normalization || {};
+      if (carrierError) throw carrierError;
+      config = carrier?.non_api_config?.normalization || {};
+    }
     let price = null;
     let days = null;
 
     // 2. Try Regex if defined
     if (config.price_pattern) {
-      const priceRegex = new RegExp(config.price_pattern, "i");
-      const priceMatch = text.match(priceRegex);
-      if (priceMatch && priceMatch[1]) {
-        price = parseLocaleNumber(priceMatch[1]);
+      try {
+        const priceRegex = new RegExp(config.price_pattern, "i");
+        const priceMatch = text.match(priceRegex);
+        if (priceMatch && priceMatch[1]) {
+          price = parseLocaleNumber(priceMatch[1]);
+        }
+      } catch {
+        log.warn("Invalid price_pattern regex, skipping", {
+          pattern: config.price_pattern,
+        });
       }
     }
 
     if (config.term_pattern) {
-      const termRegex = new RegExp(config.term_pattern, "i");
-      const termMatch = text.match(termRegex);
-      if (termMatch && termMatch[1]) {
-        days = parseInt(termMatch[1]);
+      try {
+        const termRegex = new RegExp(config.term_pattern, "i");
+        const termMatch = text.match(termRegex);
+        if (termMatch && termMatch[1]) {
+          days = parseInt(termMatch[1]);
+        }
+      } catch {
+        log.warn("Invalid term_pattern regex, skipping", {
+          pattern: config.term_pattern,
+        });
       }
     }
 
@@ -188,7 +204,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
+      status: 500,
     });
   }
 });

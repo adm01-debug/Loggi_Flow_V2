@@ -48,15 +48,19 @@ export const useKPIBenchmark = (periodsBack: number = 6) => {
           .select(
             "id, status, data_entrega_efetiva, previsao_entrega, valor_frete, data_despacho",
           )
+          .is("deleted_at", null)
           .gte("created_at", start.toISOString())
-          .lte("created_at", end.toISOString());
+          .lte("created_at", end.toISOString())
+          .limit(1000);
 
         // Fetch coletas for this period
         const { data: coletas } = await supabase
           .from("coletas")
           .select("id, status, data_efetiva_coleta, data_prevista_coleta")
+          .is("deleted_at", null)
           .gte("created_at", start.toISOString())
-          .lte("created_at", end.toISOString());
+          .lte("created_at", end.toISOString())
+          .limit(1000);
 
         // Fetch ocorrencias for this period
         const { data: ocorrencias } = await supabase

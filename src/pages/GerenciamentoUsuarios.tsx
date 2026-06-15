@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -32,14 +38,14 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { 
-  Users, 
-  Shield, 
-  ShieldCheck, 
-  Search, 
+import {
+  Users,
+  Shield,
+  ShieldCheck,
+  Search,
   UserCog,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -87,12 +93,14 @@ export default function GerenciamentoUsuarios() {
       if (rolesError) throw rolesError;
 
       // Merge profiles with roles
-      const usersWithRoles: UserWithRole[] = (profiles || []).map((profile) => ({
-        ...profile,
-        roles: (roles || [])
-          .filter((r) => r.user_id === profile.id)
-          .map((r) => r.role),
-      }));
+      const usersWithRoles: UserWithRole[] = (profiles || []).map(
+        (profile) => ({
+          ...profile,
+          roles: (roles || [])
+            .filter((r) => r.user_id === profile.id)
+            .map((r) => r.role),
+        }),
+      );
 
       return usersWithRoles;
     },
@@ -101,21 +109,19 @@ export default function GerenciamentoUsuarios() {
 
   // Mutation to update user role
   const updateRoleMutation = useMutation({
-    mutationFn: async ({ userId, newRole }: { userId: string; newRole: AppRole }) => {
-      // First, remove existing roles
-      const { error: deleteError } = await supabase
+    mutationFn: async ({
+      userId,
+      newRole,
+    }: {
+      userId: string;
+      newRole: AppRole;
+    }) => {
+      // Upsert avoids non-atomic delete+insert which can strand users with no role on insert failure
+      const { error } = await supabase
         .from("user_roles")
-        .delete()
-        .eq("user_id", userId);
+        .upsert({ user_id: userId, role: newRole }, { onConflict: "user_id" });
 
-      if (deleteError) throw deleteError;
-
-      // Then, add the new role
-      const { error: insertError } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role: newRole });
-
-      if (insertError) throw insertError;
+      if (error) throw error;
 
       return { userId, newRole };
     },
@@ -137,7 +143,7 @@ export default function GerenciamentoUsuarios() {
   const filteredUsers = users?.filter(
     (user) =>
       user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleEditRole = (user: UserWithRole) => {
@@ -148,7 +154,10 @@ export default function GerenciamentoUsuarios() {
 
   const handleSaveRole = () => {
     if (selectedUser) {
-      updateRoleMutation.mutate({ userId: selectedUser.id, newRole: selectedRole });
+      updateRoleMutation.mutate({
+        userId: selectedUser.id,
+        newRole: selectedRole,
+      });
     }
   };
 
@@ -169,11 +178,7 @@ export default function GerenciamentoUsuarios() {
           </Badge>
         );
       default:
-        return (
-          <Badge variant="outline">
-            Sem Role
-          </Badge>
-        );
+        return <Badge variant="outline">Sem Role</Badge>;
     }
   };
 
@@ -209,9 +214,13 @@ export default function GerenciamentoUsuarios() {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                     <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Access_Matrix_Online</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
+                      Access_Matrix_Online
+                    </span>
                   </div>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">RBAC • GOVERNANÇA • USUÁRIOS</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
+                    RBAC • GOVERNANÇA • USUÁRIOS
+                  </span>
                 </div>
               </div>
             </h1>
@@ -222,7 +231,9 @@ export default function GerenciamentoUsuarios() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total de Usuários
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -231,7 +242,9 @@ export default function GerenciamentoUsuarios() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Administradores</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Administradores
+              </CardTitle>
               <ShieldCheck className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
@@ -242,7 +255,9 @@ export default function GerenciamentoUsuarios() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Usuários Comuns</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Usuários Comuns
+              </CardTitle>
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -296,7 +311,10 @@ export default function GerenciamentoUsuarios() {
                   <TableBody>
                     {filteredUsers?.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        <TableCell
+                          colSpan={6}
+                          className="text-center py-8 text-muted-foreground"
+                        >
                           Nenhum usuário encontrado
                         </TableCell>
                       </TableRow>
@@ -320,7 +338,9 @@ export default function GerenciamentoUsuarios() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            {format(new Date(user.created_at), "dd/MM/yyyy", { locale: ptBR })}
+                            {format(new Date(user.created_at), "dd/MM/yyyy", {
+                              locale: ptBR,
+                            })}
                           </TableCell>
                           <TableCell className="text-right">
                             <Button
@@ -348,13 +368,17 @@ export default function GerenciamentoUsuarios() {
             <DialogHeader>
               <DialogTitle>Editar Role do Usuário</DialogTitle>
               <DialogDescription>
-                Altere a role de {selectedUser?.full_name || selectedUser?.email}
+                Altere a role de{" "}
+                {selectedUser?.full_name || selectedUser?.email}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label>Role</Label>
-                <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as AppRole)}>
+                <Select
+                  value={selectedRole}
+                  onValueChange={(value) => setSelectedRole(value as AppRole)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma role" />
                   </SelectTrigger>
@@ -374,8 +398,8 @@ export default function GerenciamentoUsuarios() {
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground">
-                  {selectedRole === "admin" 
-                    ? "Administradores têm acesso total ao sistema" 
+                  {selectedRole === "admin"
+                    ? "Administradores têm acesso total ao sistema"
                     : "Usuários têm acesso limitado às funcionalidades"}
                 </p>
               </div>
@@ -384,7 +408,10 @@ export default function GerenciamentoUsuarios() {
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button onClick={handleSaveRole} disabled={updateRoleMutation.isPending}>
+              <Button
+                onClick={handleSaveRole}
+                disabled={updateRoleMutation.isPending}
+              >
                 {updateRoleMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -29,6 +29,7 @@ export function OperationalPulse() {
       const { data } = await supabase
         .from("entregas")
         .select("id, numero_entrega, status, created_at")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(5);
       return data || [];

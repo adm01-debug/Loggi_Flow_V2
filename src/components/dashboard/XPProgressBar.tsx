@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Zap, Crown, Star, ArrowUpRight, ShieldCheck, Activity } from "lucide-react";
+import {
+  Zap,
+  Crown,
+  Star,
+  ArrowUpRight,
+  ShieldCheck,
+  Activity,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -11,18 +18,25 @@ interface XPProgressBarProps {
   className?: string;
 }
 
-export function XPProgressBar({ currentXP, nextLevelXP, level, className }: XPProgressBarProps) {
-  const progress = (currentXP / nextLevelXP) * 100;
+export function XPProgressBar({
+  currentXP,
+  nextLevelXP,
+  level,
+  className,
+}: XPProgressBarProps) {
+  const progress = nextLevelXP > 0 ? (currentXP / nextLevelXP) * 100 : 0;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("relative overflow-hidden group p-[2px] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl", className)}
+      className={cn(
+        "relative overflow-hidden group p-[2px] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl",
+        className,
+      )}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-white/5 to-primary/10 rounded-[1.5rem] sm:rounded-[2.5rem]" />
       <div className="relative h-full bg-black/95 backdrop-blur-[50px] rounded-[1.4rem] sm:rounded-[2.4rem] p-6 sm:p-8 flex flex-col gap-6 sm:gap-8 border border-white/5">
-        
         {/* Scanning Line Effect */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 animate-scan" />
 
@@ -39,24 +53,38 @@ export function XPProgressBar({ currentXP, nextLevelXP, level, className }: XPPr
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                 <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[9px] font-black uppercase tracking-widest px-3">Elite_Level_Alpha</Badge>
-                 <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-1.5"><Activity className="w-2.5 h-2.5" /> Frequência de Rede Ativa</span>
+                <Badge
+                  variant="outline"
+                  className="bg-primary/10 text-primary border-primary/30 text-[9px] font-black uppercase tracking-widest px-3"
+                >
+                  Elite_Level_Alpha
+                </Badge>
+                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-1.5">
+                  <Activity className="w-2.5 h-2.5" /> Frequência de Rede Ativa
+                </span>
               </div>
-              <h2 className="font-black italic text-2xl sm:text-5xl tracking-tighter text-white uppercase leading-none bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">Nível {level}</h2>
+              <h2 className="font-black italic text-2xl sm:text-5xl tracking-tighter text-white uppercase leading-none bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">
+                Nível {level}
+              </h2>
               <p className="text-xs font-black text-primary/80 mt-3 uppercase tracking-[0.4em] flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" /> Comandante Nexus de Perímetro
+                <ShieldCheck className="w-4 h-4" /> Comandante Nexus de
+                Perímetro
               </p>
             </div>
           </div>
 
           <div className="flex flex-col items-end gap-2 text-right shrink-0">
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-6xl font-black italic text-white tracking-tighter tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">{currentXP.toLocaleString()}</span>
+              <span className="text-3xl sm:text-6xl font-black italic text-white tracking-tighter tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                {currentXP.toLocaleString()}
+              </span>
               <span className="text-xl font-black text-primary italic">XP</span>
             </div>
             <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-2">
               Sincronização em curso <ArrowUpRight className="w-3 h-3" />
-              <span className="text-white/60">META: {nextLevelXP.toLocaleString()}</span>
+              <span className="text-white/60">
+                META: {nextLevelXP.toLocaleString()}
+              </span>
             </p>
           </div>
         </div>
@@ -80,12 +108,18 @@ export function XPProgressBar({ currentXP, nextLevelXP, level, className }: XPPr
             <div className="flex items-center gap-4 bg-white/5 px-6 py-2.5 rounded-2xl border border-white/10 group-hover:border-primary/30 transition-all duration-500">
               <Zap className="w-5 h-5 text-primary animate-pulse" />
               <span className="text-xs font-black uppercase tracking-[0.2em] text-white/80 italic">
-                Faltam <span className="text-primary text-sm font-black">{(nextLevelXP - currentXP).toLocaleString()}</span> XP para o próximo estágio de comando
+                Faltam{" "}
+                <span className="text-primary text-sm font-black">
+                  {(nextLevelXP - currentXP).toLocaleString()}
+                </span>{" "}
+                XP para o próximo estágio de comando
               </span>
             </div>
             <div className="relative group/percent">
-               <div className="absolute inset-0 bg-primary/20 blur-md rounded-full opacity-0 group-hover/percent:opacity-100 transition-opacity" />
-               <span className="relative font-black italic text-primary text-2xl tracking-tighter tabular-nums drop-shadow-[0_0_10px_rgba(234,56,76,0.4)]">{Math.round(progress)}%</span>
+              <div className="absolute inset-0 bg-primary/20 blur-md rounded-full opacity-0 group-hover/percent:opacity-100 transition-opacity" />
+              <span className="relative font-black italic text-primary text-2xl tracking-tighter tabular-nums drop-shadow-[0_0_10px_rgba(234,56,76,0.4)]">
+                {Math.round(progress)}%
+              </span>
             </div>
           </div>
         </div>

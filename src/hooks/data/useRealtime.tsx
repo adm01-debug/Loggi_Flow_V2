@@ -1,10 +1,16 @@
 import { useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import {
+  RealtimeChannel,
+  RealtimePostgresChangesPayload,
+} from "@supabase/supabase-js";
 
 // Simple internal debounce function to avoid external dependencies
-function debounce<T extends (...args: any[]) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
+function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number,
+): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
@@ -19,7 +25,7 @@ const MAX_CACHE_SIZE = 50;
 function isDuplicatePayload(table: string, payload: any): boolean {
   const hash = JSON.stringify(payload);
   if (payloadCache.get(table) === hash) return true;
-  
+
   payloadCache.set(table, hash);
   if (payloadCache.size > MAX_CACHE_SIZE) {
     const firstKey = payloadCache.keys().next().value;
@@ -60,38 +66,47 @@ export function useRealtime<T = Record<string, unknown>>({
   const debouncedInvalidate = useRef(
     debounce((keys: string[]) => {
       // Invalidate specific keys
-      keys.forEach(key => queryClient.invalidateQueries({ queryKey: [key] }));
-      
+      keys.forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
+
       // Force refresh for core dashboard components if relevant
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      
+
       // Update Bitrix24 state if tracking changes
-      if (keys.some(k => ["entregas", "coletas"].includes(k))) {
+      if (keys.some((k) => ["entregas", "coletas"].includes(k))) {
         queryClient.invalidateQueries({ queryKey: ["bitrix-logs"] });
       }
 
       // Sync Gamification XP/Score on critical updates
-      if (keys.some(k => ["entregas", "coletas", "ocorrencias"].includes(k))) {
+      if (
+        keys.some((k) => ["entregas", "coletas", "ocorrencias"].includes(k))
+      ) {
         queryClient.invalidateQueries({ queryKey: ["userLevel"] });
       }
 
       // Provide haptic feedback if supported for real-time updates
-      if ('vibrate' in navigator) {
+      if ("vibrate" in navigator) {
         navigator.vibrate(5);
       }
-    }, 1500)
+    }, 1500),
   ).current;
 
   const handleChange = useCallback(
     (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
       // Avoid processing identical sequential payloads (e.g., from multiple subscriptions)
       if (isDuplicatePayload(table, payload.new || payload.old)) return;
-      
+
       if (queryKey) {
         queryClient.invalidateQueries({ queryKey });
-        
+
         // Specifically invalidate dashboard metrics if related tables change
-        if (["entregas", "coletas", "ocorrencias", "ai_delay_predictions"].includes(table)) {
+        if (
+          [
+            "entregas",
+            "coletas",
+            "ocorrencias",
+            "ai_delay_predictions",
+          ].includes(table)
+        ) {
           debouncedInvalidate(["dashboard-metrics", "recent-alerts"]);
         }
       }
@@ -108,7 +123,7 @@ export function useRealtime<T = Record<string, unknown>>({
           break;
       }
     },
-    [queryKey, queryClient, onInsert, onUpdate, onDelete, table]
+    [queryKey, queryClient, onInsert, onUpdate, onDelete, table],
   );
 
   useEffect(() => {
@@ -143,14 +158,18 @@ export function useRealtime<T = Record<string, unknown>>({
 }
 
 // Hook para múltiplas tabelas
-interface RealtimeTableConfig<T> extends Omit<UseRealtimeOptions<T>, "enabled"> {}
+interface RealtimeTableConfig<T> extends Omit<
+  UseRealtimeOptions<T>,
+  "enabled"
+> {}
 
 export function useMultiTableRealtime<T = Record<string, unknown>>(
   tables: RealtimeTableConfig<T>[],
-  enabled = true
+  enabled = true,
 ) {
   const queryClient = useQueryClient();
   const channelsRef = useRef<RealtimeChannel[]>([]);
+  const tablesKey = JSON.stringify(tables.map((t) => t.table));
 
   useEffect(() => {
     if (!enabled) return;
@@ -168,7 +187,9 @@ export function useMultiTableRealtime<T = Record<string, unknown>>(
         .on(
           "postgres_changes",
           channelConfig,
-          (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
+          (
+            payload: RealtimePostgresChangesPayload<Record<string, unknown>>,
+          ) => {
             if (config.queryKey) {
               queryClient.invalidateQueries({ queryKey: config.queryKey });
             }
@@ -178,13 +199,16 @@ export function useMultiTableRealtime<T = Record<string, unknown>>(
                 config.onInsert?.(payload.new as T);
                 break;
               case "UPDATE":
-                config.onUpdate?.({ old: payload.old as T, new: payload.new as T });
+                config.onUpdate?.({
+                  old: payload.old as T,
+                  new: payload.new as T,
+                });
                 break;
               case "DELETE":
                 config.onDelete?.(payload.old as T);
                 break;
             }
-          }
+          },
         )
         .subscribe();
 
@@ -197,7 +221,9 @@ export function useMultiTableRealtime<T = Record<string, unknown>>(
       });
       channelsRef.current = [];
     };
-  }, [tables, enabled, queryClient]);
+    // tablesKey is the stable serialized form of the tables array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tablesKey, enabled, queryClient]);
 }
 
 export default useRealtime;
