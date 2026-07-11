@@ -63,7 +63,9 @@ export default function Profile() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && user) {
-      const result = await uploadImage(file);
+      // Bucket é privado: envia para pasta do próprio usuário (exigido pelo RLS)
+      // e armazena URL assinada (1 ano) para servir sem expor o bucket.
+      const result = await uploadImage(file, { pathPrefix: user.id, signed: true });
       if (result) {
         await supabase
           .from("profiles")

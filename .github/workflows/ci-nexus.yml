@@ -9,36 +9,46 @@ on:
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
+          cache: 'npm'
+
       - name: Install Dependencies
-        run: npm install
-        
+        run: npm ci
+
       - name: Lint Check
         run: npm run lint
-        
+
       - name: Type Check
         run: npm run typecheck
-        
-      - name: Security Scan
+
+      # 🔒 CSP guard — falha o build se style-src/font-src perderem os domínios das fontes
+      - name: Validate CSP (index.html)
+        run: npm run validate:csp
+
+      # 🔒 Dependency audit (high+critical)
+      - name: Security Scan (npm audit)
         run: npm run security-scan
-        
+
+      # 🔒 RLS access tests — bloqueia se anônimo conseguir ler/escrever tabelas sensíveis
+      - name: RLS Access Tests
+        run: npm run test:rls
+
       - name: Run Unit & Integration Tests
-        run: npm run test
-        
+        run: npm run test -- --run
+
       - name: Run Fuzzing Tests
-        run: npm run test:fuzz
-        
+        run: npm run test:fuzz -- --run
+
       - name: Check Coverage
-        run: npm run test:coverage
-        
+        run: npm run test:coverage -- --run
+
       - name: E2E Tests (Playwright)
         run: |
           npx playwright install --with-deps
