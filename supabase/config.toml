@@ -43,5 +43,6 @@ verify_jwt = false
 [functions.health-check]
 verify_jwt = false
 
-[functions.melhor-envio-webhook]
+[functions.melhor-envio-api]
 verify_jwt = false
+
