@@ -18,7 +18,7 @@ const REQUIRED = {
 };
 
 const html = readFileSync(INDEX, 'utf8');
-const match = html.match(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]+content=["']([^"']+)["']/i);
+const match = html.match(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]+content="([^"]+)"/i);
 
 if (!match) {
   console.error('❌ CSP meta tag not found in index.html');
