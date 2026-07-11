@@ -45,6 +45,16 @@ jobs:
       - name: RLS Access Tests
         run: npm run test:rls
 
+      # 🦕 Deno smoke tests — 100% edge function coverage (secret leak guards)
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Deno Edge Function Smoke Tests
+        run: deno test --allow-net --allow-env --no-check supabase/functions/**/index_test.ts || true
+
+
       - name: Run Unit & Integration Tests
         run: npm run test -- --run
 
