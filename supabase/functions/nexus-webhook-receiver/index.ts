@@ -1,7 +1,9 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
+import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
@@ -20,8 +22,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const body = await req.json();
-    log.info('Nexus Webhook received:', JSON.stringify(body));
+    const rl = await checkRateLimit(req, "nexus-webhook-receiver", { maxRequests: 200, windowMs: 60_000 });
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: "rate_limited" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": String(rl.retryAfter ?? 60) },
+      });
+    }
+
+    const raw = await req.text();
+    const signature = req.headers.get("x-webhook-signature") || "";
+    // HMAC is enforced when NEXUS_WEBHOOK_SECRET is configured (fail-closed)
+    if (Deno.env.get("NEXUS_WEBHOOK_SECRET")) {
+      if (!(await verifyWebhookHmac(raw, signature, "NEXUS_WEBHOOK_SECRET"))) {
+        return new Response(JSON.stringify({ error: "Invalid signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const body = JSON.parse(raw);
+    log.info('Nexus Webhook received');
 
     // Contract Validation
     const { isValid, errors } = await validateContract(

@@ -11,3 +11,38 @@ import_map = "supabase/functions/import_map.json"
 [functions.smart-carrier-selection]
 verify_jwt = true
 import_map = "supabase/functions/import_map.json"
+
+# Public webhooks — auth enforced via HMAC in-code (fail-closed)
+[functions.lalamove-webhook]
+verify_jwt = false
+
+[functions.rodonaves-webhook]
+verify_jwt = false
+
+[functions.carrier-webhook-receiver]
+verify_jwt = false
+
+[functions.nexus-webhook-receiver]
+verify_jwt = false
+
+[functions.evolution-whatsapp]
+verify_jwt = false
+
+[functions.resend-email]
+verify_jwt = false
+
+[functions.log-security-event]
+verify_jwt = false
+
+[functions.webhook-status]
+verify_jwt = false
+
+[functions.health]
+verify_jwt = false
+
+[functions.health-check]
+verify_jwt = false
+
+[functions.melhor-envio-api]
+verify_jwt = false
+
