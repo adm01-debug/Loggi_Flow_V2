@@ -23,6 +23,14 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
+    const rl = await checkRateLimit(req, "carrier-webhook-receiver", { maxRequests: 100, windowMs: 60_000 });
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: "rate_limited" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": String(rl.retryAfter ?? 60) },
+      });
+    }
+
     const raw = await req.text();
 
     // Verify webhook signature
