@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,7 +40,7 @@ serve(async (req: Request) => {
     const prefix = hash.substring(0, 5);
     const suffix = hash.substring(5);
 
-    console.log(`Checking password hash prefix: ${prefix}...`);
+    log.info(`Checking password hash prefix: ${prefix}...`);
 
     // Query HIBP API using k-anonymity model
     // This only sends the first 5 characters of the hash, protecting the actual password
@@ -53,7 +54,7 @@ serve(async (req: Request) => {
     );
 
     if (!response.ok) {
-      console.error(`HIBP API error: ${response.status}`);
+      log.error(`HIBP API error: ${response.status}`);
       // If API fails, allow the password (fail open)
       return new Response(JSON.stringify({ pwned: false, count: 0 }), {
         status: 200,
@@ -76,7 +77,7 @@ serve(async (req: Request) => {
 
     const isPwned = pwnedCount > 0;
 
-    console.log(
+    log.info(
       `Password check result: ${isPwned ? `PWNED (${pwnedCount} times)` : "SAFE"}`,
     );
 
@@ -96,7 +97,7 @@ serve(async (req: Request) => {
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    console.error("Unexpected error:", error);
+    log.error("Unexpected error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

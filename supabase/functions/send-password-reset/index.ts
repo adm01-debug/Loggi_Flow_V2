@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -32,7 +33,7 @@ serve(async (req: Request) => {
     // Verify the caller is an admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      console.error("No authorization header provided");
+      log.error("No authorization header provided");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -46,7 +47,7 @@ serve(async (req: Request) => {
     } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
-      console.error("Auth error:", authError);
+      log.error("Auth error:", authError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -61,7 +62,7 @@ serve(async (req: Request) => {
       .eq("role", "admin");
 
     if (rolesError || !roles || roles.length === 0) {
-      console.error("User is not an admin");
+      log.error("User is not an admin");
       return new Response(
         JSON.stringify({ error: "Forbidden - Admin access required" }),
         {
@@ -80,7 +81,7 @@ serve(async (req: Request) => {
       });
     }
 
-    console.log(`Processing password reset request: ${requestId}`);
+    log.info(`Processing password reset request: ${requestId}`);
 
     // Get the request details
     const { data: resetRequest, error: fetchError } = await supabaseAdmin
@@ -90,7 +91,7 @@ serve(async (req: Request) => {
       .single();
 
     if (fetchError || !resetRequest) {
-      console.error("Error fetching request:", fetchError);
+      log.error("Error fetching request:", fetchError);
       return new Response(
         JSON.stringify({ error: "Reset request not found" }),
         {
@@ -116,8 +117,8 @@ serve(async (req: Request) => {
       "https://uwbpzfcysppwikfpnzok.lovableproject.com";
     const redirectTo = `${origin}/reset-password`;
 
-    console.log(`Sending password reset email to: ${resetRequest.email}`);
-    console.log(`Redirect URL: ${redirectTo}`);
+    log.info(`Sending password reset email to: ${resetRequest.email}`);
+    log.info(`Redirect URL: ${redirectTo}`);
 
     // Send the password reset email using admin API
     const { error: resetError } = await supabaseAdmin.auth.admin.generateLink({
@@ -129,7 +130,7 @@ serve(async (req: Request) => {
     });
 
     if (resetError) {
-      console.error("Error generating reset link:", resetError);
+      log.error("Error generating reset link:", resetError);
       return new Response(
         JSON.stringify({
           error: `Failed to send reset email: ${resetError.message}`,
@@ -152,10 +153,10 @@ serve(async (req: Request) => {
       .eq("id", requestId);
 
     if (updateError) {
-      console.error("Error updating request status:", updateError);
+      log.error("Error updating request status:", updateError);
     }
 
-    console.log(
+    log.info(
       `Password reset approved and email sent for request: ${requestId}`,
     );
 
@@ -169,7 +170,7 @@ serve(async (req: Request) => {
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    console.error("Unexpected error:", error);
+    log.error("Unexpected error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

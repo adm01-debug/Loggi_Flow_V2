@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,7 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
       login_time,
     }: NewDeviceAlertRequest = await req.json();
 
-    console.log(`Sending new device alert to ${user_email}`);
+    log.info(`Sending new device alert to ${user_email}`);
 
     const formattedDate = new Date(login_time).toLocaleString("pt-BR", {
       dateStyle: "full",
@@ -166,7 +167,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     const emailResult = await emailResponse.json();
-    console.log("Email sent successfully:", emailResult);
+    log.info("Email sent successfully:", emailResult);
 
     // Log security event
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -187,7 +188,7 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error in new-device-alert function:", error);
+    log.error("Error in new-device-alert function:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },

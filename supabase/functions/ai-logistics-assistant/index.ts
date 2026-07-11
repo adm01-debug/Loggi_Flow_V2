@@ -85,7 +85,7 @@ export const handler = async (req: Request) => {
     const ocorrenciasAbertas = (resOcorrenciasAbertas.data as Ocorrencia[]) || [];
     const slaError = resSlaStats.error;
 
-    if (slaError) console.warn("Aviso: Falha ao carregar estatísticas de performance via RPC.");
+    if (slaError) log.warn("Aviso: Falha ao carregar estatísticas de performance via RPC.");
 
     // Manual SLA calc fallback
     const totalFrete = custosRecentes.reduce((acc: number, curr: Entrega) => acc + (Number(curr.valor_frete) || 0), 0);
@@ -148,7 +148,7 @@ export const handler = async (req: Request) => {
     });
 
   } catch (error) {
-    console.error("Erro no Assistente IA:", error);
+    log.error("Erro no Assistente IA:", error);
     return new Response(JSON.stringify({ success: false, message: "Erro de processamento na inteligência logística." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

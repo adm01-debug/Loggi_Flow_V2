@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,7 +30,7 @@ async function getCountryFromIP(ip: string): Promise<GeoLocation | null> {
       ip.startsWith("10.") ||
       ip.startsWith("172.")
     ) {
-      console.log(`Skipping geolocation for private/local IP: ${ip}`);
+      log.info(`Skipping geolocation for private/local IP: ${ip}`);
       return null;
     }
 
@@ -39,7 +40,7 @@ async function getCountryFromIP(ip: string): Promise<GeoLocation | null> {
     );
 
     if (!response.ok) {
-      console.error(`Geolocation API error: ${response.status}`);
+      log.error(`Geolocation API error: ${response.status}`);
       return null;
     }
 
@@ -52,12 +53,12 @@ async function getCountryFromIP(ip: string): Promise<GeoLocation | null> {
       };
     }
 
-    console.log(
+    log.info(
       `Geolocation failed for IP ${ip}: ${data.message || "Unknown error"}`,
     );
     return null;
   } catch (error) {
-    console.error(`Error getting geolocation for IP ${ip}:`, error);
+    log.error(`Error getting geolocation for IP ${ip}:`, error);
     return null;
   }
 }
@@ -90,7 +91,7 @@ serve(async (req: Request) => {
       });
     }
 
-    console.log(`Validating login for: ${email} from IP: ${ip_address}`);
+    log.info(`Validating login for: ${email} from IP: ${ip_address}`);
 
     // Check if IP is in blacklist
     if (ip_address) {
@@ -113,7 +114,7 @@ serve(async (req: Request) => {
               failure_reason: "IP bloqueado",
             });
 
-            console.log(`IP ${ip_address} is blacklisted`);
+            log.info(`IP ${ip_address} is blacklisted`);
             return new Response(
               JSON.stringify({
                 allowed: false,
@@ -156,7 +157,7 @@ serve(async (req: Request) => {
             failure_reason: "IP não autorizado",
           });
 
-          console.log(`IP ${ip_address} is not whitelisted`);
+          log.info(`IP ${ip_address} is not whitelisted`);
           return new Response(
             JSON.stringify({
               allowed: false,
@@ -202,7 +203,7 @@ serve(async (req: Request) => {
               failure_reason: `País bloqueado: ${geoLocation.country_name}`,
             });
 
-            console.log(
+            log.info(
               `Access denied for country ${geoLocation.country_name} (${geoLocation.country_code})`,
             );
             return new Response(
@@ -217,9 +218,9 @@ serve(async (req: Request) => {
             );
           }
 
-          console.log(`Country ${geoLocation.country_name} is allowed`);
+          log.info(`Country ${geoLocation.country_name} is allowed`);
         } else {
-          console.log(
+          log.info(
             `Could not determine country for IP ${ip_address}, allowing access`,
           );
         }
@@ -274,7 +275,7 @@ serve(async (req: Request) => {
             failure_reason: `Bloqueado temporariamente (${failureCount} tentativas falhas)`,
           });
 
-          console.log(
+          log.info(
             `IP ${ip_address} is temporarily blocked. ${failureCount} failures, ${remainingMinutes} min remaining`,
           );
 
@@ -292,14 +293,14 @@ serve(async (req: Request) => {
             },
           );
         } else {
-          console.log(
+          log.info(
             `Lockout period expired for IP ${ip_address}, allowing attempt`,
           );
         }
       }
     }
 
-    console.log(`Login validation passed for: ${email}`);
+    log.info(`Login validation passed for: ${email}`);
     return new Response(JSON.stringify({ allowed: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -307,7 +308,7 @@ serve(async (req: Request) => {
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    console.error("Unexpected error:", error);
+    log.error("Unexpected error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

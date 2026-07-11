@@ -4,6 +4,7 @@ import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { requireString, requireNumber, ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
+import { log } from "../_shared/logger.ts";
 
 
 // Rodonaves API Gateways
@@ -987,7 +988,7 @@ Deno.serve(async (req) => {
               }
             }
           } catch (trackErr) {
-            console.error(`[rodonaves-api] Error tracking entrega ${entrega.id}:`, trackErr);
+            log.error(`[rodonaves-api] Error tracking entrega ${entrega.id}:`, trackErr);
           }
         }
         result = { synced: updates.length, updates };
@@ -1005,7 +1006,7 @@ Deno.serve(async (req) => {
     if (error instanceof ValidationError) {
       return validationErrorResponse(error, corsHeaders);
     }
-    console.error("[rodonaves-api] Error:", error);
+    log.error("[rodonaves-api] Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ success: false, error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });

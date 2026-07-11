@@ -4964,9 +4964,21 @@ export type Database = {
         Returns: undefined
       }
       calculate_level: { Args: { xp: number }; Returns: number }
+      cleanup_old_notifications: {
+        Args: { days_to_keep?: number }
+        Returns: number
+      }
       cleanup_old_telemetry_logs:
         | { Args: never; Returns: undefined }
         | { Args: { days_to_keep?: number }; Returns: number }
+      drop_old_partitions: {
+        Args: {
+          p_months_to_keep: number
+          p_parent_table: string
+          p_prefix: string
+        }
+        Returns: number
+      }
       execute_nexus_protocol: {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json

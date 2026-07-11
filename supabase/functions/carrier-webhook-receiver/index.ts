@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,7 +34,7 @@ serve(async (req) => {
     }
 
     const payload = JSON.parse(raw);
-    console.log("Carrier Webhook received:", payload);
+    log.info("Carrier Webhook received:", payload);
 
     // Contract Validation
     const { isValid, errors } = await validateContract(
@@ -75,7 +76,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error: any) {
-    console.error("[carrier-webhook-receiver] Error:", error.message);
+    log.error("[carrier-webhook-receiver] Error:", error.message);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

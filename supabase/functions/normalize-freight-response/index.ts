@@ -199,7 +199,7 @@ serve(async (req) => {
         }
       }
     } catch (alertError) {
-      console.error("Failed to send failure alert:", alertError);
+      log.error("Failed to send failure alert:", alertError);
     }
 
     return new Response(JSON.stringify({ error: error.message }), {

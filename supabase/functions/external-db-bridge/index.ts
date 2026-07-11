@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
+import { log } from "../_shared/logger.ts";
 
 const SLOW_QUERY_THRESHOLD_MS = 3000;
 const VERY_SLOW_QUERY_THRESHOLD_MS = 8000;
@@ -34,13 +35,13 @@ function emitTelemetry(meta: TelemetryMeta) {
     ` count=${meta.countMode ?? "-"}`;
 
   if (meta.status === "very_slow") {
-    console.warn(`⚠️ VERY SLOW QUERY: ${line}`);
+    log.warn(`⚠️ VERY SLOW QUERY: ${line}`);
   } else if (meta.status === "slow") {
-    console.warn(`⚠️ SLOW QUERY: ${line}`);
+    log.warn(`⚠️ SLOW QUERY: ${line}`);
   } else if (meta.status === "error") {
-    console.error(line + ` error=${meta.error}`);
+    log.error(line + ` error=${meta.error}`);
   } else {
-    console.info(line);
+    log.info(line);
   }
 
   // Persist to local DB (fire-and-forget) only if not ok
@@ -67,7 +68,7 @@ function emitTelemetry(meta: TelemetryMeta) {
           })
           .then(({ error: insertErr }) => {
             if (insertErr)
-              console.warn("[telemetry-persist] Insert failed:", insertErr.message);
+              log.warn("[telemetry-persist] Insert failed:", insertErr.message);
           });
       }
     } catch (_e) {
@@ -326,7 +327,7 @@ Deno.serve(async (req) => {
       { status: 400, headers }
     );
   } catch (err) {
-    console.error("[external-db-bridge] Error:", err);
+    log.error("[external-db-bridge] Error:", err);
     return new Response(
       JSON.stringify({ error: err.message || "Internal server error" }),
       { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }

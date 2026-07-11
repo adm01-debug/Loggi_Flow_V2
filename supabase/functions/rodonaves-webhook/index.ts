@@ -4,6 +4,8 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { log } from "../_shared/logger.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -208,7 +210,7 @@ serve(async (req: Request) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error: any) {
-    console.error("Rodonaves webhook error:", error);
+    log.error("Rodonaves webhook error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

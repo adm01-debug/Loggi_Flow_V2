@@ -8,8 +8,10 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/auth/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { useGlobalShortcuts } from "@/hooks/common/useKeyboardShortcuts";
 import { useNavigationHistory } from "@/hooks/common/useNavigationHistory";
+
 
 // Lazy load all pages
 const Index = lazy(() => import("./pages/Index"));
@@ -186,22 +188,27 @@ function AppRoutes() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <NavigationProgressBar />
-          <Suspense fallback={<PageLoader />}>
-            <LazyProviders>
-              <AppRoutes />
-            </LazyProviders>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <NavigationProgressBar />
+            <Suspense fallback={<PageLoader />}>
+              <LazyProviders>
+                <ErrorBoundary>
+                  <AppRoutes />
+                </ErrorBoundary>
+              </LazyProviders>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
+

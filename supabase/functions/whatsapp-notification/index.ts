@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -210,7 +211,7 @@ serve(async (req) => {
     const aTicketData = await aTicketResponse.json();
 
     if (!aTicketResponse.ok) {
-      console.error("A-Ticket API error:", aTicketData);
+      log.error("A-Ticket API error:", aTicketData);
       return new Response(
         JSON.stringify({ success: false, error: "Failed to send WhatsApp message", details: aTicketData }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -230,7 +231,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("WhatsApp notification error:", error);
+    log.error("WhatsApp notification error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

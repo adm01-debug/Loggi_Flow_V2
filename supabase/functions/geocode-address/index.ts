@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,12 +41,12 @@ serve(async (req) => {
     // Call Mapbox Geocoding API
     const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${mapboxToken}&country=BR&limit=1&language=pt`;
 
-    console.log(`Geocoding address: ${address}`);
+    log.info(`Geocoding address: ${address}`);
 
     const response = await fetch(geocodeUrl);
 
     if (!response.ok) {
-      console.error(
+      log.error(
         "Mapbox API error:",
         response.status,
         await response.text(),
@@ -59,7 +60,7 @@ serve(async (req) => {
     const data = await response.json();
 
     if (!data.features || data.features.length === 0) {
-      console.log("No results found for address:", address);
+      log.info("No results found for address:", address);
       return new Response(
         JSON.stringify({ coordinates: null, message: "Address not found" }),
         {
@@ -72,7 +73,7 @@ serve(async (req) => {
     const [lng, lat] = data.features[0].center;
     const placeName = data.features[0].place_name;
 
-    console.log(`Geocoded: ${address} -> ${lat}, ${lng}`);
+    log.info(`Geocoded: ${address} -> ${lat}, ${lng}`);
 
     return new Response(
       JSON.stringify({
@@ -88,7 +89,7 @@ serve(async (req) => {
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    console.error("Geocoding error:", errorMessage);
+    log.error("Geocoding error:", errorMessage);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

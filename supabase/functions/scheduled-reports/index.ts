@@ -97,7 +97,7 @@ export const handler = async (req: Request) => {
         throw new Error(`Unknown action: ${action}`);
     }
   } catch (error) {
-    console.error("[Scheduled Reports] Error:", error);
+    log.error("[Scheduled Reports] Error:", error);
     return new Response(JSON.stringify({ 
       success: false, 
       error: error instanceof Error ? error.message : "Unknown error" 
@@ -255,12 +255,12 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
 
     if (!res.ok) {
       const errorData = await res.json();
-      console.error("[Scheduled Reports] Resend API error:", errorData);
+      log.error("[Scheduled Reports] Resend API error:", errorData);
     } else {
       log.info("[Scheduled Reports] Email sent successfully to:", recipients.join(", "));
     }
   } catch (err) {
-    console.error("[Scheduled Reports] Failed to send email:", err);
+    log.error("[Scheduled Reports] Failed to send email:", err);
   }
 }
 
