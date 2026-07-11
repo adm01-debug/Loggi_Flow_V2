@@ -4963,10 +4963,23 @@ export type Database = {
         }
         Returns: undefined
       }
+      alert_slow_queries: { Args: { threshold_ms?: number }; Returns: number }
       calculate_level: { Args: { xp: number }; Returns: number }
+      cleanup_old_notifications: {
+        Args: { days_to_keep?: number }
+        Returns: number
+      }
       cleanup_old_telemetry_logs:
         | { Args: never; Returns: undefined }
         | { Args: { days_to_keep?: number }; Returns: number }
+      drop_old_partitions: {
+        Args: {
+          p_months_to_keep: number
+          p_parent_table: string
+          p_prefix: string
+        }
+        Returns: number
+      }
       execute_nexus_protocol: {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
@@ -5052,6 +5065,7 @@ export type Database = {
         Returns: Json
       }
       reconcile_pending_freights: { Args: never; Returns: Json }
+      record_heartbeat: { Args: never; Returns: undefined }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       validate_payload_schema: {

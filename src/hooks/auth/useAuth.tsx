@@ -53,8 +53,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRoles(rolesData);
       }
 
-      // Safe call to update streak
-      await authService.updateStreak(userId);
+      // P14: debounce streak — só chama RPC 1x/dia por user
+      const streakKey = `streak_last_${userId}`;
+      const today = new Date().toISOString().slice(0, 10);
+      if (typeof window !== "undefined" && localStorage.getItem(streakKey) !== today) {
+        localStorage.setItem(streakKey, today);
+        await authService.updateStreak(userId);
+      }
+
     } catch (err) {
       console.error("Error fetching user data:", err);
     }

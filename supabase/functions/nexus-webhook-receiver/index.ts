@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +21,7 @@ serve(async (req) => {
     );
 
     const body = await req.json();
-    console.log('Nexus Webhook received:', JSON.stringify(body));
+    log.info('Nexus Webhook received:', JSON.stringify(body));
 
     // Contract Validation
     const { isValid, errors } = await validateContract(
@@ -72,7 +73,7 @@ serve(async (req) => {
         .single();
 
       if (!carrier) {
-        console.log('No carrier found for phone:', phone);
+        log.info('No carrier found for phone:', phone);
         return new Response(JSON.stringify({ success: false, error: 'Carrier not found' }), { headers: corsHeaders });
       }
 
@@ -87,12 +88,12 @@ serve(async (req) => {
         .single();
 
       if (!cotacao) {
-        console.log('No pending quote for carrier:', carrier.nome_fantasia);
+        log.info('No pending quote for carrier:', carrier.nome_fantasia);
         return new Response(JSON.stringify({ success: false, error: 'No pending quote' }), { headers: corsHeaders });
       }
 
       // 4. Normalize response
-      console.log('Normalizing text:', text);
+      log.info('Normalizing text:', text);
       const normalizationResponse = await supabaseClient.functions.invoke('normalize-freight-response', {
         body: { text, transportadora_id: carrier.id, cotacao_id: cotacao.id }
       });
@@ -115,7 +116,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ success: true, message: 'Webhook ignored or not handled' }), { headers: corsHeaders });
 
   } catch (error: any) {
-    console.error('Webhook processing error:', error);
+    log.error('Webhook processing error:', error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

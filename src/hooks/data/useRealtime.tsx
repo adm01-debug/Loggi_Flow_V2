@@ -129,28 +129,55 @@ export function useRealtime<T = Record<string, unknown>>({
   useEffect(() => {
     if (!enabled) return;
 
-    // Supabase Realtime API requires literal types - using type assertion for dynamic config
-    const channelConfig = {
-      event,
-      schema,
-      table,
-      ...(filter && { filter }),
-    } as { event: "*"; schema: "public"; table: string; filter?: string };
+    let attempt = 0;
+    let cleanup: (() => void) | null = null;
+    let cancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const channel = supabase
-      .channel(`realtime:${table}`)
-      .on("postgres_changes", channelConfig, handleChange)
-      .subscribe();
+    const connect = () => {
+      const channelConfig = {
+        event,
+        schema,
+        table,
+        ...(filter && { filter }),
+      } as { event: "*"; schema: "public"; table: string; filter?: string };
 
-    channelRef.current = channel;
+      const channel = supabase
+        .channel(`realtime:${table}:${attempt}`)
+        .on("postgres_changes", channelConfig, handleChange)
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            attempt = 0; // reset on healthy connection
+          }
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+            if (cancelled) return;
+            const delay = Math.min(1000 * 2 ** attempt, 30_000);
+            attempt += 1;
+            retryTimer = setTimeout(() => {
+              if (!cancelled) {
+                supabase.removeChannel(channel);
+                connect();
+              }
+            }, delay);
+          }
+        });
+
+      channelRef.current = channel;
+      cleanup = () => {
+        if (retryTimer) clearTimeout(retryTimer);
+        supabase.removeChannel(channel);
+      };
+    };
+
+    connect();
 
     return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
+      cancelled = true;
+      cleanup?.();
+      channelRef.current = null;
     };
   }, [table, schema, event, filter, enabled, handleChange]);
+
 
   return {
     channel: channelRef.current,

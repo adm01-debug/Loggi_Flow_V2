@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -135,7 +136,7 @@ serve(async (req) => {
               },
             });
           } catch (err) {
-            console.error(`Failed to deliver webhook ${webhook.id}:`, err);
+            log.error(`Failed to deliver webhook ${webhook.id}:`, err);
             results.push({
               webhook_id: webhook.id,
               status: 0,
@@ -198,7 +199,7 @@ serve(async (req) => {
         );
     }
   } catch (error) {
-    console.error("Webhook dispatcher critical failure:", error);
+    log.error("Webhook dispatcher critical failure:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     return new Response(

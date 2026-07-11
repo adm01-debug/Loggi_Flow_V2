@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,7 +49,7 @@ serve(async (req: Request) => {
       });
     }
 
-    console.log(`Logging login attempt for: ${email}, success: ${success}`);
+    log.info(`Logging login attempt for: ${email}, success: ${success}`);
 
     const { error } = await supabaseAdmin.from("login_attempts").insert({
       email,
@@ -59,7 +60,7 @@ serve(async (req: Request) => {
     });
 
     if (error) {
-      console.error("Error logging attempt:", error);
+      log.error("Error logging attempt:", error);
       throw error;
     }
 
@@ -70,7 +71,7 @@ serve(async (req: Request) => {
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    console.error("Unexpected error:", error);
+    log.error("Unexpected error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

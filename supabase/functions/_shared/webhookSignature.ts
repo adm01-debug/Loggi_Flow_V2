@@ -1,7 +1,9 @@
 // Verifies an HMAC-SHA256 (hex) signature of the raw request payload.
-// Safe rollout: when the secret env var is not configured, verification is
-// skipped (returns true) so the integration is not broken before the secret is
-// set. Once the secret is configured, a valid signature is required.
+// FAIL-CLOSED: if the secret env var is not configured, verification returns
+// false so no unauthenticated write is ever accepted in production.
+// To bypass in local/sandbox, set header `x-test-mode: true` upstream.
+import { log } from "./logger.ts";
+
 export async function verifyWebhookHmac(
   payload: string,
   signature: string,
@@ -9,12 +11,13 @@ export async function verifyWebhookHmac(
 ): Promise<boolean> {
   const secret = Deno.env.get(secretEnvVar);
   if (!secret) {
-    console.warn(
-      `${secretEnvVar} não configurado, pulando verificação de assinatura`,
-    );
-    return true;
+    log.error(`${secretEnvVar} missing — refusing webhook (fail-closed)`);
+    return false;
   }
-  if (!signature) return false;
+  if (!signature) {
+    log.warn(`Missing signature header for ${secretEnvVar}`);
+    return false;
+  }
 
   try {
     const enc = new TextEncoder();
@@ -38,7 +41,7 @@ export async function verifyWebhookHmac(
     }
     return diff === 0;
   } catch (e) {
-    console.error("Signature verification error:", e);
+    log.error("Signature verification error", { error: (e as Error).message });
     return false;
   }
 }

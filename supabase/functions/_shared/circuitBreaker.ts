@@ -1,3 +1,4 @@
+import { log } from "../_shared/logger.ts";
 /**
  * Circuit Breaker pattern implementation for Edge Functions.
  * Prevents cascading failures when external services are down.
@@ -65,7 +66,7 @@ export async function withCircuitBreaker<T>(
 
     if (registry.failures >= options.failureThreshold || registry.state === CircuitState.HALF_OPEN) {
       registry.state = CircuitState.OPEN;
-      console.error(`Circuit Breaker [${name}] transition to OPEN. Failure count: ${registry.failures}`);
+      log.error(`Circuit Breaker [${name}] transition to OPEN. Failure count: ${registry.failures}`);
     }
 
     registries.set(name, registry);

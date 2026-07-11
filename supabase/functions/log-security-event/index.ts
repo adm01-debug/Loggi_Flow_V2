@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -46,7 +47,7 @@ serve(async (req: Request) => {
 
     const userAgent = event.user_agent || req.headers.get("user-agent") || null;
 
-    console.log(`Logging security event: ${event.event_type} - ${event.description}`);
+    log.info(`Logging security event: ${event.event_type} - ${event.description}`);
 
     const { data, error } = await supabaseAdmin.from("security_events").insert([{
       user_id: event.user_id || null,
@@ -59,15 +60,54 @@ serve(async (req: Request) => {
     }]).select().single();
 
     if (error) {
-      console.error("Error logging security event:", error);
+      log.error("Error logging security event:", error);
       throw error;
     }
 
-    // For critical events, we could send alerts (email, Slack, etc.)
+    // P24: send real alert on critical events via Resend + Slack webhook
     if (event.severity === "critical") {
-      console.warn("CRITICAL SECURITY EVENT:", event.description);
-      // TODO: Implement alert notifications (email, Slack webhook, etc.)
+      log.warn("CRITICAL SECURITY EVENT:", { description: event.description });
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      const alertEmail = Deno.env.get("SECURITY_ALERT_EMAIL");
+      const slackWebhook = Deno.env.get("SECURITY_SLACK_WEBHOOK_URL");
+
+      const alertPayload = {
+        subject: `🚨 [${event.event_type}] Security Alert`,
+        body: `${event.description}\nIP: ${ipAddress ?? "n/a"}\nUser: ${event.user_id ?? "anon"}\nUA: ${userAgent ?? "n/a"}`,
+      };
+
+      const tasks: Promise<Response>[] = [];
+      if (resendKey && alertEmail) {
+        tasks.push(fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "security@logiflow.app",
+            to: [alertEmail],
+            subject: alertPayload.subject,
+            text: alertPayload.body,
+          }),
+        }));
+      }
+      if (slackWebhook) {
+        tasks.push(fetch(slackWebhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: `${alertPayload.subject}\n\`\`\`${alertPayload.body}\`\`\`` }),
+        }));
+      }
+      if (tasks.length) {
+        const results = await Promise.allSettled(tasks);
+        results.forEach((r) => {
+          if (r.status === "rejected") log.error("Alert dispatch failed", { reason: String(r.reason) });
+          else void r.value.text();
+        });
+      }
     }
+
 
     return new Response(
       JSON.stringify({ success: true, event_id: data.id }),
@@ -76,7 +116,7 @@ serve(async (req: Request) => {
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Security event logging error:", error);
+    log.error("Security event logging error:", error);
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

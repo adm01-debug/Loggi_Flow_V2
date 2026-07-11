@@ -4,6 +4,8 @@ import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
+
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -12,9 +14,14 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 async function verifySignature(payload: string, signature: string): Promise<boolean> {
   const secret = Deno.env.get('LALAMOVE_API_SECRET');
   if (!secret) {
-    console.warn('LALAMOVE_API_SECRET not configured, skipping signature verification');
-    return true; // Allow in development/sandbox
+    log.error('LALAMOVE_API_SECRET missing — refusing webhook (fail-closed)');
+    return false;
   }
+  if (!signature) {
+    log.warn('Missing x-lalamove-signature header');
+    return false;
+  }
+
 
   try {
     const encoder = new TextEncoder();
@@ -36,7 +43,7 @@ async function verifySignature(payload: string, signature: string): Promise<bool
     
     return computedSignature === signature;
   } catch (error) {
-    console.error('Signature verification error:', error);
+    log.error('Signature verification error:', error);
     return false;
   }
 }
@@ -68,11 +75,21 @@ serve(async (req) => {
   }
 
   try {
+    // P13: rate limit per IP (100 req/min for webhooks)
+    const rl = await checkRateLimit(req, "lalamove-webhook", { maxRequests: 100, windowMs: 60_000 });
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: rl.message ?? "rate limited" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const payload = await req.text();
     const signature = req.headers.get('x-lalamove-signature') || '';
     const isTestMode = req.headers.get('x-test-mode') === 'true';
-    
-    log.info('Received Lalamove webhook:', payload);
+
+    log.info('Received Lalamove webhook');
+
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const webhookData = JSON.parse(payload);
@@ -103,7 +120,7 @@ serve(async (req) => {
     if (!isTestMode) {
       const isVerified = await verifySignature(payload, signature);
       if (!isVerified) {
-        console.error('Invalid webhook signature');
+        log.error('Invalid webhook signature');
         return new Response(JSON.stringify({ error: 'Invalid signature' }), {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -145,7 +162,7 @@ serve(async (req) => {
             recorded_at: timestamp || new Date().toISOString(),
           });
 
-        if (historyError) console.error('Error saving status history:', historyError);
+        if (historyError) log.error('Error saving status history:', historyError);
 
         if (status === 'COMPLETED') {
           await supabase

@@ -1,4 +1,5 @@
 import { ValidationError } from "./validate.ts";
+import { log } from "../_shared/logger.ts";
 
 /**
  * Enhanced contract validator for Edge Functions and Webhooks.
@@ -40,7 +41,7 @@ export async function validateContract(
       latency_ms: latencyMs
     })
     .then(({ error }: any) => {
-      if (error) console.error("Failed to log contract test:", error);
+      if (error) log.error("Failed to log contract test:", error);
     });
 
   return { isValid, errors };

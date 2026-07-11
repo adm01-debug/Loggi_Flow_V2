@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
+import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -49,7 +50,7 @@ serve(async (req) => {
     if (downloadError) throw downloadError;
 
     // Simulate OCR Processing
-    console.log(`Processing OCR for delivery ${delivery_id}...`);
+    log.info(`Processing OCR for delivery ${delivery_id}...`);
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const extractedData = {
