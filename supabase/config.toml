@@ -46,3 +46,8 @@ verify_jwt = false
 [functions.melhor-envio-api]
 verify_jwt = false
 
+[functions.secure-store]
+verify_jwt = true
+
+
+
