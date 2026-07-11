@@ -40,6 +40,15 @@ serve(async (req: Request) => {
   }
 
   try {
+    // P13: rate limit
+    const rl = await checkRateLimit(req, "rodonaves-webhook", { maxRequests: 100 });
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: rl.message ?? "rate limited" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
@@ -47,6 +56,7 @@ serve(async (req: Request) => {
     });
 
     const raw = await req.text();
+
 
     // Verify webhook signature (skipped if RODONAVES_WEBHOOK_SECRET unset)
     const isTestMode = req.headers.get("x-test-mode") === "true";
