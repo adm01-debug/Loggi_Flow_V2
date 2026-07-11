@@ -5,7 +5,8 @@ import { execSync } from "node:child_process";
 
 const CMD =
   "rg -n \"console\\.(log|info|warn|error|debug)\" supabase/functions " +
-  "--glob '!*.test.ts' --glob '!_shared/logger.ts' --glob '!_shared/redis.ts'";
+  "--glob '!**/*.test.ts' --glob '!**/_shared/logger.ts' --glob '!**/_shared/redis.ts'";
+
 
 let output = "";
 try {
