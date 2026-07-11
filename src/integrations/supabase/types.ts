@@ -313,7 +313,7 @@ export type Database = {
         }
         Relationships: []
       }
-      audit_logs_old: {
+      audit_logs_y2027m01: {
         Row: {
           action: string
           changed_fields: string[] | null
@@ -361,7 +361,7 @@ export type Database = {
         }
         Relationships: []
       }
-      audit_logs_y2026m01: {
+      audit_logs_y2027m02: {
         Row: {
           action: string
           changed_fields: string[] | null
@@ -409,7 +409,7 @@ export type Database = {
         }
         Relationships: []
       }
-      audit_logs_y2026m02: {
+      audit_logs_y2027m03: {
         Row: {
           action: string
           changed_fields: string[] | null
@@ -457,7 +457,7 @@ export type Database = {
         }
         Relationships: []
       }
-      audit_logs_y2026m03: {
+      audit_logs_y2027m04: {
         Row: {
           action: string
           changed_fields: string[] | null
@@ -505,7 +505,7 @@ export type Database = {
         }
         Relationships: []
       }
-      audit_logs_y2026m04: {
+      audit_logs_y2027m05: {
         Row: {
           action: string
           changed_fields: string[] | null
@@ -553,343 +553,7 @@ export type Database = {
         }
         Relationships: []
       }
-      audit_logs_y2026m05: {
-        Row: {
-          action: string
-          changed_fields: string[] | null
-          created_at: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_email: string | null
-          user_id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          action: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          action?: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_y2026m06: {
-        Row: {
-          action: string
-          changed_fields: string[] | null
-          created_at: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_email: string | null
-          user_id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          action: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          action?: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_y2026m07: {
-        Row: {
-          action: string
-          changed_fields: string[] | null
-          created_at: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_email: string | null
-          user_id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          action: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          action?: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_y2026m08: {
-        Row: {
-          action: string
-          changed_fields: string[] | null
-          created_at: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_email: string | null
-          user_id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          action: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          action?: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_y2026m09: {
-        Row: {
-          action: string
-          changed_fields: string[] | null
-          created_at: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_email: string | null
-          user_id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          action: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          action?: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_y2026m10: {
-        Row: {
-          action: string
-          changed_fields: string[] | null
-          created_at: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_email: string | null
-          user_id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          action: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          action?: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_y2026m11: {
-        Row: {
-          action: string
-          changed_fields: string[] | null
-          created_at: string
-          id: string
-          ip_address: string | null
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_email: string | null
-          user_id: string | null
-          user_name: string | null
-        }
-        Insert: {
-          action: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          action?: string
-          changed_fields?: string[] | null
-          created_at?: string
-          id?: string
-          ip_address?: string | null
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_email?: string | null
-          user_id?: string | null
-          user_name?: string | null
-        }
-        Relationships: []
-      }
-      audit_logs_y2026m12: {
+      audit_logs_y2027m06: {
         Row: {
           action: string
           changed_fields: string[] | null
@@ -3527,6 +3191,546 @@ export type Database = {
         }
         Relationships: []
       }
+      rastreamento_historico_y2026m07: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m08: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m09: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m10: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m11: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2026m12: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2027m01: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2027m02: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2027m03: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2027m04: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2027m05: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      rastreamento_historico_y2027m06: {
+        Row: {
+          coleta_id: string | null
+          created_at: string
+          driver_id: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate: string | null
+          id: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status: string | null
+          recorded_at: string
+        }
+        Insert: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id: string
+          latitude: number
+          longitude: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          coleta_id?: string | null
+          created_at?: string
+          driver_id?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate?: string | null
+          id?: string
+          lalamove_order_id?: string
+          latitude?: number
+          longitude?: number
+          order_status?: string | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
       rate_limit_logs: {
         Row: {
           blocked: boolean
@@ -4643,6 +4847,11 @@ export type Database = {
           p_prefix: string
         }
         Returns: number
+      }
+      ensure_future_partitions: { Args: never; Returns: Json }
+      ensure_monthly_partition: {
+        Args: { p_month: number; p_parent: string; p_year: number }
+        Returns: string
       }
       execute_nexus_protocol: {
         Args: { protocol_name: string; vehicle_id: string }
