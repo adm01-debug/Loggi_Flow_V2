@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { log } from "../_shared/logger.ts";
@@ -65,7 +66,7 @@ async function lalamoveRequest(
 
   log.info(`Making Lalamove request: ${method} ${path}`);
 
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await safeFetch(`${baseUrl}${path}`, {
     method,
     headers: {
       Authorization: `hmac ${token}`,

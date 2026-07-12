@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
@@ -39,7 +40,7 @@ serve(async (req) => {
     switch (body.action) {
       case "get_deals": {
         const spaId = body.spa_id || 1186; // Default: Gestão Compras
-        const response = await fetch(`${bitrixWebhookUrl}/crm.item.list`, {
+        const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -72,7 +73,7 @@ serve(async (req) => {
         }
 
         const spaId = body.spa_id || 1186;
-        const response = await fetch(`${bitrixWebhookUrl}/crm.item.update`, {
+        const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.update`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -105,7 +106,7 @@ serve(async (req) => {
         }
 
         const spaId = body.spa_id || 1234; // Default: Entregas Log
-        const response = await fetch(`${bitrixWebhookUrl}/crm.item.add`, {
+        const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.add`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -130,7 +131,7 @@ serve(async (req) => {
 
       case "sync_deals": {
         // Sync coletas from SPA 1186 (Gestão Compras)
-        const coletasResponse = await fetch(`${bitrixWebhookUrl}/crm.item.list`, {
+        const coletasResponse = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -142,7 +143,7 @@ serve(async (req) => {
         const coletasData = await coletasResponse.json();
 
         // Sync entregas from SPA 1234 (Entregas Log)
-        const entregasResponse = await fetch(`${bitrixWebhookUrl}/crm.item.list`, {
+        const entregasResponse = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -154,7 +155,7 @@ serve(async (req) => {
         const entregasData = await entregasResponse.json();
 
         // Sync Ocorrências from SPA 1050 (New: Ocorrências Log)
-        const ocorrenciasResponse = await fetch(`${bitrixWebhookUrl}/crm.item.list`, {
+        const ocorrenciasResponse = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -215,7 +216,7 @@ serve(async (req) => {
         
         // In Bitrix24, we can create a "Timeline Item" or a "Notification"
         // Here we'll create a CRM activity/task for the assigned user of a default deal or unit
-        const response = await fetch(`${bitrixWebhookUrl}/crm.activity.add`, {
+        const response = await safeFetch(`${bitrixWebhookUrl}/crm.activity.add`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

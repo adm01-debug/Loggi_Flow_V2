@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
@@ -194,7 +195,7 @@ serve(async (req) => {
     }
 
     // Send via A-Ticket WhatsApp API
-    const aTicketResponse = await fetch(`${aTicketApiUrl}/messages/send`, {
+    const aTicketResponse = await safeFetch(`${aTicketApiUrl}/messages/send`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

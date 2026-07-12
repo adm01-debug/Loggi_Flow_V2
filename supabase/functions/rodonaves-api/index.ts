@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
@@ -32,7 +33,7 @@ async function getToken(gateway: string): Promise<string> {
   const password = Deno.env.get("RODONAVES_PASSWORD");
   if (!username || !password) throw new Error("RODONAVES credentials not configured");
 
-  const response = await fetch(`${gateway}/token`, {
+  const response = await safeFetch(`${gateway}/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ auth_type: "DEV", grant_type: "password", username, password }).toString(),
@@ -78,7 +79,7 @@ async function apiGet(gateway: string, path: string, params: Record<string, stri
     const token = await getToken(gateway);
     const qs = buildQS(params);
     const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await safeFetch(url, { headers: { Authorization: `Bearer ${token}` } });
     if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
     return res.json();
   });
@@ -96,7 +97,7 @@ async function apiMutate(gateway: string, method: string, path: string, body?: u
       headers["Content-Type"] = "application/json";
       opts.body = JSON.stringify(body);
     }
-    const res = await fetch(url, opts);
+    const res = await safeFetch(url, opts);
     if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
     const text = await res.text();
     try { return JSON.parse(text); } catch { return { raw: text }; }
@@ -221,7 +222,7 @@ async function getDeliveryReceiptByProtocols(p: Record<string, unknown>) {
   const qs = new URLSearchParams();
   protocols?.forEach(proto => qs.append("requestProtocols", proto));
   const token = await getToken(TRACKING_GATEWAY);
-  const res = await fetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols?${qs}`, {
+  const res = await safeFetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols?${qs}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(`Batch receipts by protocols failed [${res.status}]: ${await res.text()}`);
