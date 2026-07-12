@@ -50,70 +50,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Core React runtime
-          if (id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-router'))) {
-            return 'vendor-react';
-          }
-          if (id.includes('react-router')) {
-            return 'vendor-router';
-          }
-          // Query layer
-          if (id.includes('@tanstack/react-query')) {
-            return 'vendor-query';
-          }
-          // Supabase
-          if (id.includes('@supabase')) {
-            return 'vendor-supabase';
-          }
-          // Radix UI components
-          if (id.includes('@radix-ui')) {
-            return 'vendor-ui';
-          }
-          // Heavy libs - lazy loaded
-          if (id.includes('recharts') || id.includes('d3-')) {
-            return 'vendor-charts';
-          }
-          if (id.includes('framer-motion')) {
-            return 'vendor-motion';
-          }
-          if (id.includes('mapbox-gl')) {
-            return 'vendor-mapbox';
-          }
-          if (id.includes('jspdf') || id.includes('jspdf-autotable')) {
-            return 'vendor-pdf';
-          }
-          if (id.includes('html2canvas')) {
-            return 'vendor-html2canvas';
-          }
-          if (id.includes('xlsx')) {
-            return 'vendor-xlsx';
-          }
-          if (id.includes('dompurify') || id.includes('purify')) {
-            return 'vendor-purify';
-          }
-          if (id.includes('date-fns')) {
-            return 'vendor-dates';
-          }
-          // Embla carousel - used by few pages
-          if (id.includes('embla-carousel')) {
-            return 'vendor-carousel';
-          }
-          // DnD kit - used by dashboard
-          if (id.includes('@dnd-kit')) {
-            return 'vendor-dnd';
-          }
-          // React markdown - used by AI assistant
-          if (id.includes('react-markdown') || id.includes('remark') || id.includes('rehype') || id.includes('unified') || id.includes('mdast') || id.includes('hast') || id.includes('micromark')) {
-            return 'vendor-markdown';
-          }
-          // cmdk - command palette
-          if (id.includes('cmdk')) {
-            return 'vendor-cmdk';
-          }
-          // Zod + react-hook-form
-          if (id.includes('zod') || id.includes('react-hook-form') || id.includes('@hookform')) {
-            return 'vendor-forms';
-          }
+          return resolveVendorChunk(id);
         },
       },
     },
@@ -124,6 +61,7 @@ export default defineConfig(({ mode }) => ({
     // Vendor chunks like mapbox are large but lazy-loaded; suppress warnings
     chunkSizeWarningLimit: 700,
   },
+
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
   },
