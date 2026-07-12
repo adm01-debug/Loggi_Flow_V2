@@ -23,6 +23,8 @@ export { SeqScanHotspotsCard } from "./components/SeqScanHotspotsCard";
 export { UnusedIndexesCard } from "./components/UnusedIndexesCard";
 export { BloatHotspotsCard } from "./components/BloatHotspotsCard";
 export { UnindexedFksCard } from "./components/UnindexedFksCard";
+export { LongRunningQueriesCard } from "./components/LongRunningQueriesCard";
+export { useLongRunningQueries, useCancelQuery } from "./hooks/useLongRunningQueries";
 export { useTableCoaccess } from "./hooks/useTableCoaccess";
 export { useSeqScanHotspots } from "./hooks/useSeqScanHotspots";
 export { useUnusedIndexes } from "./hooks/useUnusedIndexes";
