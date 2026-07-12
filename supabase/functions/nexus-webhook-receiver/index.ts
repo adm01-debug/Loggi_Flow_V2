@@ -76,6 +76,13 @@ serve(async (req) => {
       });
     }
 
+    // Idempotency guard
+    const eventId = String(body.data?.key?.id ?? body.event_id ?? body.id ?? `${body.event ?? body.source}:${Date.now()}`);
+    const idem = await claimIdempotencyKey(`nexus:${body.event ?? body.source ?? "unknown"}`, eventId);
+    if (idem.duplicate) {
+      return new Response(JSON.stringify({ success: true, duplicate: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // 1. Identify source (WhatsApp Evolution API usually sends 'messages-upsert')
     if (body.event === 'messages.upsert') {
       const message = body.data?.message;
