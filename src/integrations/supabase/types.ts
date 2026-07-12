@@ -5574,6 +5574,23 @@ export type Database = {
           sample_count: number
         }[]
       }
+      get_lock_conflicts: {
+        Args: { p_limit?: number }
+        Returns: {
+          blocked_duration_seconds: number
+          blocked_pid: number
+          blocked_query: string
+          blocked_user: string
+          blocking_pid: number
+          blocking_query: string
+          blocking_state: string
+          blocking_user: string
+          lock_mode: string
+          lock_type: string
+          relation: string
+          severity: string
+        }[]
+      }
       get_long_running_queries: {
         Args: { p_limit?: number; p_min_seconds?: number }
         Returns: {
