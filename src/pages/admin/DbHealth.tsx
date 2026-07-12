@@ -25,6 +25,7 @@ import {
   UnusedIndexesCard,
   BloatHotspotsCard,
   UnindexedFksCard,
+  LongRunningQueriesCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -81,6 +82,7 @@ export default function DbHealthPage() {
         <UnusedIndexesCard />
         <BloatHotspotsCard />
         <UnindexedFksCard />
+        <LongRunningQueriesCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
