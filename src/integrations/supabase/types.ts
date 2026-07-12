@@ -5949,6 +5949,18 @@ export type Database = {
           permission_name: string
         }[]
       }
+      get_wal_health: {
+        Args: never
+        Returns: {
+          checkpoint_timeout_s: number
+          db_size_bytes: number
+          max_wal_size_mb: number
+          recommendation: string
+          severity: string
+          wal_size_bytes: number
+          wal_to_db_ratio: number
+        }[]
+      }
       get_wraparound_status: {
         Args: { p_limit?: number }
         Returns: {
