@@ -9,6 +9,8 @@ export { CapacityForecastCard } from "./components/CapacityForecastCard";
 export { RemediationSuggestionsCard } from "./components/RemediationSuggestionsCard";
 export { ExportHealthReportButton } from "./components/ExportHealthReportButton";
 export { RemediationHistoryCard } from "./components/RemediationHistoryCard";
+export { MttrMetricsCard } from "./components/MttrMetricsCard";
+export { useRemediationMttr } from "./hooks/useRemediationMttr";
 export {
   useRemediationActions,
   useApplyRemediation,
