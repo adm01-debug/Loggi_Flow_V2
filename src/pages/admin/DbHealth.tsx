@@ -6,6 +6,8 @@ import {
   CronJobsCard,
   HealthTrendChart,
   PerformanceRunbook,
+  AnomaliesCard,
+  SloTrendCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
