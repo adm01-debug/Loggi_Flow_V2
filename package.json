@@ -13,6 +13,7 @@
     "test:rls": "vitest run tests/security/rls-access.spec.ts tests/security/integrations-access.spec.ts",
     "test:security": "vitest run tests/security/",
     "lint": "eslint .",
+    "lint:budget": "node scripts/check-warning-budget.mjs",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
