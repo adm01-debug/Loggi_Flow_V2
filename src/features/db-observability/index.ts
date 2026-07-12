@@ -35,6 +35,8 @@ export { ActiveSessionsCard } from "./components/ActiveSessionsCard";
 export { TopTablesBySizeCard } from "./components/TopTablesBySizeCard";
 export { RlsAuditCard } from "./components/RlsAuditCard";
 export { ExtensionsAuditCard } from "./components/ExtensionsAuditCard";
+export { TransactionHealthCard } from "./components/TransactionHealthCard";
+export { useTransactionHealth } from "./hooks/useTransactionHealth";
 export { useAutovacuumHealth } from "./hooks/useAutovacuumHealth";
 export { useWraparoundStatus } from "./hooks/useWraparoundStatus";
 export { useActiveSessions } from "./hooks/useActiveSessions";

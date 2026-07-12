@@ -5898,6 +5898,22 @@ export type Database = {
           total_bytes: number
         }[]
       }
+      get_transaction_health: {
+        Args: never
+        Returns: {
+          deadlocks: number
+          hours_since_reset: number
+          recommendation: string
+          rollback_ratio_pct: number
+          rollbacks_per_hour: number
+          severity: string
+          stats_since: string
+          temp_bytes: number
+          temp_files: number
+          total_commits: number
+          total_rollbacks: number
+        }[]
+      }
       get_unindexed_foreign_keys: {
         Args: never
         Returns: {
