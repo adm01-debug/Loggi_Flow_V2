@@ -68,6 +68,7 @@ export default function DbHealthPage() {
         <TopQueriesCard />
         <IndexRoiCard />
         <IndexProposalsCard />
+        <LoadHeatmapCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
