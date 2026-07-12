@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { getCircuitBreaker } from '../_shared/circuitBreaker.ts'
 import { corsHeaders } from '../_shared/cors.ts'
@@ -37,7 +38,7 @@ async function lalamoveRequest(method: string, path: string, body?: object) {
     const bodyStr = body ? JSON.stringify(body) : ''
     const signature = await generateSignature(method, path, timestamp, bodyStr)
     
-    const response = await fetch(`${LALAMOVE_BASE_URL}${path}`, {
+    const response = await safeFetch(`${LALAMOVE_BASE_URL}${path}`, {
       method,
       headers: {
         'Content-Type': 'application/json',

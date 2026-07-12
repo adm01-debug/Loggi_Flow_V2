@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
@@ -65,7 +66,7 @@ Deno.serve(async (req) => {
         fetchBody = JSON.stringify(params);
 
         const response = await meBreaker.execute(async () => {
-          const res = await fetch(url, { method, headers, body: fetchBody });
+          const res = await safeFetch(url, { method, headers, body: fetchBody });
           if (!res.ok && res.status >= 500) throw new Error(`ME API Server Error: ${res.status}`);
           return res;
         });
@@ -275,7 +276,7 @@ Deno.serve(async (req) => {
     if (action === "calcularFrete") return new Response(null); // Should not reach here
 
     const response = await meBreaker.execute(async () => {
-      const res = await fetch(url, {
+      const res = await safeFetch(url, {
         method,
         headers,
         body: fetchBody,

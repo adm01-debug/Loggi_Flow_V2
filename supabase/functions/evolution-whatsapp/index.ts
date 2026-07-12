@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { log } from "../_shared/logger.ts";
@@ -48,7 +49,7 @@ serve(async (req) => {
         }
 
         const result = await withCircuitBreaker("whatsapp-api", async () => {
-          const response = await fetch(
+          const response = await safeFetch(
             `${EVOLUTION_API_URL}/message/sendText/${instance}`,
             {
               method: "POST",
@@ -119,7 +120,7 @@ serve(async (req) => {
           .filter(Boolean)
           .join("\n");
 
-        const response = await fetch(
+        const response = await safeFetch(
           `${EVOLUTION_API_URL}/message/sendText/${instance}`,
           {
             method: "POST",
@@ -156,7 +157,7 @@ serve(async (req) => {
 
       case "check_status": {
         const { instance } = data;
-        const response = await fetch(
+        const response = await safeFetch(
           `${EVOLUTION_API_URL}/instance/connectionState/${instance}`,
           {
             headers: { apikey: EVOLUTION_API_KEY },
