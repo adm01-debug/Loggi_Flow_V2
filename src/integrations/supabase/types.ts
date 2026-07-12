@@ -5553,6 +5553,20 @@ export type Database = {
           sample_count: number
         }[]
       }
+      get_maintenance_windows: {
+        Args: { p_days?: number; p_limit?: number; p_window_hours?: number }
+        Returns: {
+          avg_load: number
+          day_name: string
+          day_of_week: number
+          end_hour: number
+          peak_load: number
+          rank: number
+          recommendation: string
+          start_hour: number
+          vs_daily_peak_pct: number
+        }[]
+      }
       get_monthly_analytics: {
         Args: { end_date: string; start_date: string }
         Returns: {
