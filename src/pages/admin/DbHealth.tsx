@@ -13,6 +13,7 @@ import {
   ExportHealthReportButton,
   RemediationHistoryCard,
   MttrMetricsCard,
+  GlobalHealthScoreCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -36,6 +37,8 @@ export default function DbHealthPage() {
           </div>
           <ExportHealthReportButton />
         </header>
+
+        <GlobalHealthScoreCard />
 
         <div className="grid gap-6 md:grid-cols-2">
           <RegressionsCard />
