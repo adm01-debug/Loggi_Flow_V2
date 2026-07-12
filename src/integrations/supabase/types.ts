@@ -5779,6 +5779,20 @@ export type Database = {
           total_time_ms: number
         }[]
       }
+      get_temp_file_stats: {
+        Args: { p_limit?: number }
+        Returns: {
+          calls: number
+          identifier: string
+          mean_exec_ms: number
+          query_text: string
+          recommendation: string
+          scope: string
+          severity: string
+          temp_bytes: number
+          temp_files: number
+        }[]
+      }
       get_top_queries_fast: {
         Args: { p_limit?: number }
         Returns: {
