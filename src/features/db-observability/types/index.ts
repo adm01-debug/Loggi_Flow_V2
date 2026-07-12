@@ -77,3 +77,13 @@ export interface CapacityForecast {
   hours_until_threshold: number | null;
   severity: "critical" | "warning" | "ok";
 }
+
+export interface RemediationSuggestion {
+  id: string;
+  category: "query" | "hotpath" | "contention" | "capacity" | string;
+  severity: "critical" | "warning" | "ok";
+  title: string;
+  detail: string;
+  recommended_action: string;
+  evidence: Record<string, unknown>;
+}
