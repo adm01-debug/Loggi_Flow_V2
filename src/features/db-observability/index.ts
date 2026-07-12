@@ -29,6 +29,8 @@ export { CacheHitRatioCard } from "./components/CacheHitRatioCard";
 export { ReplicationStatusCard } from "./components/ReplicationStatusCard";
 export { TempFileStatsCard } from "./components/TempFileStatsCard";
 export { DuplicateIndexesCard } from "./components/DuplicateIndexesCard";
+export { AutovacuumHealthCard } from "./components/AutovacuumHealthCard";
+export { useAutovacuumHealth } from "./hooks/useAutovacuumHealth";
 export { useLongRunningQueries, useCancelQuery } from "./hooks/useLongRunningQueries";
 export { useLockConflicts } from "./hooks/useLockConflicts";
 export { useCacheHitRatios } from "./hooks/useCacheHitRatios";

@@ -31,6 +31,7 @@ import {
   ReplicationStatusCard,
   TempFileStatsCard,
   DuplicateIndexesCard,
+  AutovacuumHealthCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -93,6 +94,7 @@ export default function DbHealthPage() {
         <ReplicationStatusCard />
         <TempFileStatsCard />
         <DuplicateIndexesCard />
+        <AutovacuumHealthCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
