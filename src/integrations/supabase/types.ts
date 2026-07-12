@@ -5562,6 +5562,19 @@ export type Database = {
           table_name: string
         }[]
       }
+      get_extensions_audit: {
+        Args: never
+        Returns: {
+          default_version: string
+          extension_name: string
+          installed_version: string
+          is_relocatable: boolean
+          recommendation: string
+          schema_name: string
+          severity: string
+          update_available: boolean
+        }[]
+      }
       get_global_health_score_fast: {
         Args: never
         Returns: {
