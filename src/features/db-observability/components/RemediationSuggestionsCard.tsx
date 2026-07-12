@@ -1,13 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wrench } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Wrench, PlayCircle } from "lucide-react";
 import { useRemediationSuggestions } from "../hooks/useRemediationSuggestions";
+import { useApplyRemediation } from "../hooks/useRemediationActions";
 
 const variant = (s: string): "destructive" | "secondary" | "default" =>
   s === "critical" ? "destructive" : s === "warning" ? "secondary" : "default";
 
 export function RemediationSuggestionsCard() {
   const { data, isLoading, error } = useRemediationSuggestions();
+  const apply = useApplyRemediation();
 
   return (
     <Card>
@@ -29,7 +32,7 @@ export function RemediationSuggestionsCard() {
           </p>
         )}
         {data?.map((s) => (
-          <div key={s.id} className="rounded-md border border-border p-3 space-y-1">
+          <div key={s.id} className="rounded-md border border-border p-3 space-y-2">
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm font-medium">{s.title}</p>
               <Badge variant={variant(s.severity)}>{s.severity}</Badge>
@@ -39,6 +42,18 @@ export function RemediationSuggestionsCard() {
               <span className="font-medium text-foreground">Ação:</span>{" "}
               <span className="text-muted-foreground">{s.recommended_action}</span>
             </p>
+            <div className="pt-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => apply.mutate(s)}
+                disabled={apply.isPending}
+                className="gap-1"
+              >
+                <PlayCircle className="h-3.5 w-3.5" />
+                Aplicar
+              </Button>
+            </div>
           </div>
         ))}
       </CardContent>
