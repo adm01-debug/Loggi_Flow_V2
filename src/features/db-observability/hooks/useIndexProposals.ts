@@ -19,6 +19,8 @@ export interface IndexProposal {
   post_apply_mean_ms: number | null;
   improvement_pct: number | null;
   measured_at: string | null;
+  reverted_at: string | null;
+  revert_reason: string | null;
 }
 
 export function useIndexProposals() {
