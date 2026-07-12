@@ -5416,6 +5416,23 @@ export type Database = {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
       }
+      get_bloat_hotspots: {
+        Args: { p_limit?: number; p_min_dead_tuples?: number }
+        Returns: {
+          dead_pct: number
+          dead_tuples: number
+          estimated_bloat_bytes: number
+          last_analyze: string
+          last_autovacuum: string
+          last_vacuum: string
+          live_tuples: number
+          schema_name: string
+          severity: string
+          table_name: string
+          table_size_bytes: number
+          vacuum_ddl: string
+        }[]
+      }
       get_capacity_forecast_fast: {
         Args: { p_hours_ahead?: number }
         Returns: {
