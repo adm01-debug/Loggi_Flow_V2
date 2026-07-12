@@ -2546,6 +2546,8 @@ export type Database = {
           proposed_by: string | null
           queryid: number | null
           rationale: string | null
+          revert_reason: string | null
+          reverted_at: string | null
           status: string
           target_columns: string[] | null
           target_table: string | null
@@ -2566,6 +2568,8 @@ export type Database = {
           proposed_by?: string | null
           queryid?: number | null
           rationale?: string | null
+          revert_reason?: string | null
+          reverted_at?: string | null
           status?: string
           target_columns?: string[] | null
           target_table?: string | null
@@ -2586,6 +2590,8 @@ export type Database = {
           proposed_by?: string | null
           queryid?: number | null
           rationale?: string | null
+          revert_reason?: string | null
+          reverted_at?: string | null
           status?: string
           target_columns?: string[] | null
           target_table?: string | null
@@ -5346,6 +5352,10 @@ export type Database = {
       }
       alert_slow_queries: { Args: { threshold_ms?: number }; Returns: number }
       apply_index_proposal: { Args: { p_id: string }; Returns: Json }
+      auto_revert_ineffective_indexes: {
+        Args: { p_min_hours?: number; p_min_improvement?: number }
+        Returns: Json
+      }
       calculate_level: { Args: { xp: number }; Returns: number }
       check_and_alert_health_regression: { Args: never; Returns: Json }
       cleanup_old_health_snapshots: {
