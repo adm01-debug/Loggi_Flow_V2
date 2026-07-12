@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Copy, Check, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryDetail, useQueryIndexSuggestion } from "../hooks/useQueryDetail";
+import { useProposeIndex } from "../hooks/useIndexProposals";
 
 interface Props {
   queryid: number | null;
@@ -22,6 +23,7 @@ const confidenceColor: Record<string, string> = {
 export function QueryDetailDialog({ queryid, open, onOpenChange }: Props) {
   const { data: detail, isLoading } = useQueryDetail(open ? queryid : null);
   const { data: suggestions } = useQueryIndexSuggestion(open ? queryid : null);
+  const propose = useProposeIndex();
   const [copied, setCopied] = useState<string | null>(null);
 
   const copy = (text: string, key: string) => {
@@ -88,9 +90,30 @@ export function QueryDetailDialog({ queryid, open, onOpenChange }: Props) {
                     <p className="text-sm">{s.rationale}</p>
                     <div className="flex items-center justify-between gap-2 rounded bg-muted/50 p-2">
                       <code className="text-xs font-mono break-all">{s.recommended_ddl}</code>
-                      <Button size="sm" variant="ghost" onClick={() => copy(s.recommended_ddl, `s-${i}`)}>
-                        {copied === `s-${i}` ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                      </Button>
+                      <div className="flex gap-1 shrink-0">
+                        <Button size="sm" variant="ghost" onClick={() => copy(s.recommended_ddl, `s-${i}`)}>
+                          {copied === `s-${i}` ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        </Button>
+                        {s.suggestion_type !== "manual_review" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={propose.isPending}
+                            onClick={() =>
+                              propose.mutate({
+                                queryid,
+                                target_table: s.target_table,
+                                target_columns: s.target_columns,
+                                ddl: s.recommended_ddl,
+                                rationale: s.rationale,
+                                confidence: s.confidence,
+                              })
+                            }
+                          >
+                            Propor
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
