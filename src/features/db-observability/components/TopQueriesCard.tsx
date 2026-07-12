@@ -1,10 +1,20 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Activity } from "lucide-react";
+import { Activity, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useTopQueries } from "../hooks/useTopQueries";
+import { QueryDetailDialog } from "./QueryDetailDialog";
 
 export function TopQueriesCard() {
   const { data, isLoading, error } = useTopQueries(10);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const openDetail = (id: number) => {
+    setSelectedId(id);
+    setDialogOpen(true);
+  };
 
   return (
     <Card>
@@ -14,7 +24,7 @@ export function TopQueriesCard() {
           Top 10 Queries por Tempo Total
         </CardTitle>
         <CardDescription>
-          Fonte: <code>pg_stat_statements</code>. Ordenado por tempo total acumulado.
+          Fonte: <code>pg_stat_statements</code>. Clique em uma linha para ver detalhes e sugestões.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -34,11 +44,16 @@ export function TopQueriesCard() {
                 <TableHead className="text-right">Média (ms)</TableHead>
                 <TableHead className="text-right">Total (ms)</TableHead>
                 <TableHead className="text-right">Máx (ms)</TableHead>
+                <TableHead className="w-10"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.map((q) => (
-                <TableRow key={q.queryid}>
+                <TableRow
+                  key={q.queryid}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => openDetail(Number(q.queryid))}
+                >
                   <TableCell className="max-w-md truncate font-mono text-xs">
                     {q.query_text}
                   </TableCell>
@@ -52,12 +67,18 @@ export function TopQueriesCard() {
                   <TableCell className="text-right tabular-nums">
                     {Number(q.max_exec_ms).toFixed(2)}
                   </TableCell>
+                  <TableCell>
+                    <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); openDetail(Number(q.queryid)); }}>
+                      <Search className="h-3 w-3" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
       </CardContent>
+      <QueryDetailDialog queryid={selectedId} open={dialogOpen} onOpenChange={setDialogOpen} />
     </Card>
   );
 }
