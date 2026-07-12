@@ -4,6 +4,39 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Data-driven vendor chunk mapping keeps `manualChunks` cognitive complexity low.
+// Order matters: first match wins.
+const VENDOR_CHUNKS: ReadonlyArray<readonly [string, readonly string[]]> = [
+  ['vendor-router', ['react-router']],
+  ['vendor-react', ['react-dom', '/react/']],
+  ['vendor-query', ['@tanstack/react-query']],
+  ['vendor-supabase', ['@supabase']],
+  ['vendor-ui', ['@radix-ui']],
+  ['vendor-charts', ['recharts', 'd3-']],
+  ['vendor-motion', ['framer-motion']],
+  ['vendor-mapbox', ['mapbox-gl']],
+  ['vendor-pdf', ['jspdf', 'jspdf-autotable']],
+  ['vendor-html2canvas', ['html2canvas']],
+  ['vendor-xlsx', ['xlsx']],
+  ['vendor-purify', ['dompurify', 'purify']],
+  ['vendor-dates', ['date-fns']],
+  ['vendor-carousel', ['embla-carousel']],
+  ['vendor-dnd', ['@dnd-kit']],
+  ['vendor-markdown', ['react-markdown', 'remark', 'rehype', 'unified', 'mdast', 'hast', 'micromark']],
+  ['vendor-cmdk', ['cmdk']],
+  ['vendor-forms', ['zod', 'react-hook-form', '@hookform']],
+];
+
+function resolveVendorChunk(id: string): string | undefined {
+  for (const [chunk, needles] of VENDOR_CHUNKS) {
+    for (const needle of needles) {
+      if (id.includes(needle)) return chunk;
+    }
+  }
+  return undefined;
+}
+
+
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
