@@ -66,3 +66,14 @@ export interface SloDaily {
   overall_slo_pct: number;
   computed_at: string;
 }
+
+export interface CapacityForecast {
+  metric: string;
+  current_value: number;
+  slope_per_hour: number;
+  forecast_value: number;
+  hours_ahead: number;
+  threshold: number;
+  hours_until_threshold: number | null;
+  severity: "critical" | "warning" | "ok";
+}
