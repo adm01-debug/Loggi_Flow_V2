@@ -15,16 +15,19 @@ export { HealthScoreHistoryChart } from "./components/HealthScoreHistoryChart";
 export { HealthRegressionAlert } from "./components/HealthRegressionAlert";
 export { QueryDetailDialog } from "./components/QueryDetailDialog";
 export { IndexProposalsCard } from "./components/IndexProposalsCard";
+export { IndexRoiCard } from "./components/IndexRoiCard";
 export { useRemediationMttr } from "./hooks/useRemediationMttr";
 export { useGlobalHealthScore } from "./hooks/useGlobalHealthScore";
 export { useHealthScoreHistory } from "./hooks/useHealthScoreHistory";
 export { useHealthScoreRegression } from "./hooks/useHealthScoreRegression";
 export { useQueryDetail, useQueryIndexSuggestion } from "./hooks/useQueryDetail";
+export { useIndexRoi } from "./hooks/useIndexRoi";
 export {
   useIndexProposals,
   useProposeIndex,
   useApplyIndexProposal,
   useRejectIndexProposal,
+  useMeasureIndexImpact,
 } from "./hooks/useIndexProposals";
 export {
   useRemediationActions,

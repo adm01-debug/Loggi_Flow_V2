@@ -5511,6 +5511,22 @@ export type Database = {
           slo_score: number
         }[]
       }
+      get_index_roi_summary: {
+        Args: never
+        Returns: {
+          avg_improvement_pct: number
+          best_improvement_pct: number
+          effective_indexes: number
+          ineffective_indexes: number
+          measured_count: number
+          total_applied: number
+          total_ms_saved_per_call: number
+          total_proposed: number
+          total_rejected: number
+          total_reverted: number
+          worst_improvement_pct: number
+        }[]
+      }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
         Returns: {
