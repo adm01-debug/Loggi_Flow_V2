@@ -180,6 +180,7 @@ function AppRoutes() {
           <Route path="/bitrix24" element={<ProtectedRoute requiredRole="admin"><IntegracaoBitrix /></ProtectedRoute>} />
           <Route path="/admin/adr" element={<ProtectedRoute requiredRole="admin"><AdminADR /></ProtectedRoute>} />
           <Route path="/admin/db-health" element={<ProtectedRoute requiredRole="admin"><AdminDbHealth /></ProtectedRoute>} />
+          <Route path="/admin/quality-gate" element={<ProtectedRoute requiredRole="admin"><AdminQualityGate /></ProtectedRoute>} />
           <Route path="/config-frete" element={<ProtectedRoute><ConfiguracoesFrete /></ProtectedRoute>} />
           <Route path="/rastrear" element={<RastreamentoPublico />} />
           <Route path="/reset-password" element={<ResetPassword />} />
