@@ -5237,6 +5237,19 @@ export type Database = {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
       }
+      get_capacity_forecast_fast: {
+        Args: { p_hours_ahead?: number }
+        Returns: {
+          current_value: number
+          forecast_value: number
+          hours_ahead: number
+          hours_until_threshold: number
+          metric: string
+          severity: string
+          slope_per_hour: number
+          threshold: number
+        }[]
+      }
       get_carrier_performance_fast: {
         Args: never
         Returns: unknown[]
