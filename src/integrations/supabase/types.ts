@@ -5717,6 +5717,18 @@ export type Database = {
           total_exec_ms: number
         }[]
       }
+      get_unindexed_foreign_keys: {
+        Args: never
+        Returns: {
+          constraint_name: string
+          fk_columns: string[]
+          referenced_table: string
+          severity: string
+          suggested_ddl: string
+          table_name: string
+          table_size_bytes: number
+        }[]
+      }
       get_unused_indexes: {
         Args: { p_limit?: number; p_min_size_bytes?: number }
         Returns: {
