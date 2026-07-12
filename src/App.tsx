@@ -71,6 +71,7 @@ const LogisticaReversa = lazy(() => import("./pages/LogisticaReversa"));
 const AdminADR = lazy(() => import("./pages/AdminADR"));
 const ConfiguracoesFrete = lazy(() => import("./pages/ConfiguracoesFrete"));
 const AdminDbHealth = lazy(() => import("./pages/admin/DbHealth"));
+const AdminQualityGate = lazy(() => import("./pages/admin/QualityGate"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load non-critical providers
