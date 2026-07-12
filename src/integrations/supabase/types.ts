@@ -194,6 +194,13 @@ export type Database = {
             foreignKeyName: "alertas_custo_transportadora_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
+          {
+            foreignKeyName: "alertas_custo_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
             referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
@@ -906,6 +913,13 @@ export type Database = {
             foreignKeyName: "carrier_rankings_transportadora_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
+          {
+            foreignKeyName: "carrier_rankings_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
             referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
@@ -1108,6 +1122,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fornecedores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_coletas_transportadora"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
           },
           {
             foreignKeyName: "fk_coletas_transportadora"
@@ -1346,6 +1367,13 @@ export type Database = {
             foreignKeyName: "cotacoes_frete_transportadora_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
+          {
+            foreignKeyName: "cotacoes_frete_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
             referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
@@ -1428,6 +1456,13 @@ export type Database = {
           workflow_logs?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "cotacoes_multicanal_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
           {
             foreignKeyName: "cotacoes_multicanal_transportadora_id_fkey"
             columns: ["transportadora_id"]
@@ -1659,6 +1694,13 @@ export type Database = {
             foreignKeyName: "entregas_transportadora_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
+          {
+            foreignKeyName: "entregas_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
             referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
@@ -1817,6 +1859,13 @@ export type Database = {
             foreignKeyName: "freight_decisions_selected_carrier_id_fkey"
             columns: ["selected_carrier_id"]
             isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
+          {
+            foreignKeyName: "freight_decisions_selected_carrier_id_fkey"
+            columns: ["selected_carrier_id"]
+            isOneToOne: false
             referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
@@ -1848,6 +1897,13 @@ export type Database = {
           transportadora_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "freight_integration_mappings_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
           {
             foreignKeyName: "freight_integration_mappings_transportadora_id_fkey"
             columns: ["transportadora_id"]
@@ -1931,6 +1987,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "freight_webhooks_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
           {
             foreignKeyName: "freight_webhooks_transportadora_id_fkey"
             columns: ["transportadora_id"]
@@ -4244,6 +4307,13 @@ export type Database = {
             foreignKeyName: "tabelas_frete_transportadora_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
+          {
+            foreignKeyName: "tabelas_frete_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
             referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
@@ -4347,6 +4417,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transportadora_rotas_transportadora_id_fkey"
+            columns: ["transportadora_id"]
+            isOneToOne: false
+            referencedRelation: "mv_carrier_performance"
+            referencedColumns: ["transportadora_id"]
+          },
           {
             foreignKeyName: "transportadora_rotas_transportadora_id_fkey"
             columns: ["transportadora_id"]
@@ -4820,7 +4897,38 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      mv_carrier_performance: {
+        Row: {
+          entregas_no_prazo: number | null
+          last_refresh: string | null
+          nome_fantasia: string | null
+          otif_percent: number | null
+          total_entregas: number | null
+          transportadora_id: string | null
+          valor_total_frete: number | null
+        }
+        Relationships: []
+      }
+      mv_dashboard_metrics: {
+        Row: {
+          coletas_com_divergencia: number | null
+          coletas_em_transito: number | null
+          coletas_finalizadas: number | null
+          coletas_pendentes: number | null
+          entregas_com_ocorrencia: number | null
+          entregas_em_transito: number | null
+          entregas_finalizadas: number | null
+          entregas_pendentes: number | null
+          last_refresh: string | null
+          otif_rate: number | null
+          singleton: number | null
+          total_coletas: number | null
+          total_entregas: number | null
+          total_volume: number | null
+          valor_total_frete: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_xp: {
@@ -4939,6 +5047,7 @@ export type Database = {
       }
       reconcile_pending_freights: { Args: never; Returns: Json }
       record_heartbeat: { Args: never; Returns: undefined }
+      refresh_dashboard_views: { Args: never; Returns: Json }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       validate_payload_schema: {
