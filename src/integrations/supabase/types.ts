@@ -5414,6 +5414,21 @@ export type Database = {
           regression_pct: number
         }[]
       }
+      get_remediation_mttr_fast: {
+        Args: never
+        Returns: {
+          category: string
+          last_resolved_at: string
+          mttr_hours: number
+          mttr_p50_hours: number
+          mttr_p95_hours: number
+          resolution_rate_pct: number
+          total_applied: number
+          total_ignored: number
+          total_pending: number
+          total_resolved: number
+        }[]
+      }
       get_remediation_suggestions_fast: {
         Args: never
         Returns: {

@@ -12,6 +12,7 @@ import {
   RemediationSuggestionsCard,
   ExportHealthReportButton,
   RemediationHistoryCard,
+  MttrMetricsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -48,6 +49,8 @@ export default function DbHealthPage() {
 
         <RemediationSuggestionsCard />
         <RemediationHistoryCard />
+        <MttrMetricsCard />
+
 
 
         <CronJobsCard />
