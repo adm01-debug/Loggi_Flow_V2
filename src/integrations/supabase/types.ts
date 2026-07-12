@@ -5700,6 +5700,21 @@ export type Database = {
           total_exec_ms: number
         }[]
       }
+      get_unused_indexes: {
+        Args: { p_limit?: number; p_min_size_bytes?: number }
+        Returns: {
+          drop_ddl: string
+          index_name: string
+          index_scans: number
+          index_size_bytes: number
+          is_primary: boolean
+          is_unique: boolean
+          schema_name: string
+          severity: string
+          table_name: string
+          table_size_bytes: number
+        }[]
+      }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
