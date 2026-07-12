@@ -2530,6 +2530,57 @@ export type Database = {
         }
         Relationships: []
       }
+      index_proposals: {
+        Row: {
+          applied_at: string | null
+          applied_by: string | null
+          confidence: string
+          created_at: string
+          ddl: string
+          error_message: string | null
+          id: string
+          proposed_by: string | null
+          queryid: number | null
+          rationale: string | null
+          status: string
+          target_columns: string[] | null
+          target_table: string | null
+          updated_at: string
+        }
+        Insert: {
+          applied_at?: string | null
+          applied_by?: string | null
+          confidence?: string
+          created_at?: string
+          ddl: string
+          error_message?: string | null
+          id?: string
+          proposed_by?: string | null
+          queryid?: number | null
+          rationale?: string | null
+          status?: string
+          target_columns?: string[] | null
+          target_table?: string | null
+          updated_at?: string
+        }
+        Update: {
+          applied_at?: string | null
+          applied_by?: string | null
+          confidence?: string
+          created_at?: string
+          ddl?: string
+          error_message?: string | null
+          id?: string
+          proposed_by?: string | null
+          queryid?: number | null
+          rationale?: string | null
+          status?: string
+          target_columns?: string[] | null
+          target_table?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ip_access_rules: {
         Row: {
           created_at: string
@@ -5282,6 +5333,7 @@ export type Database = {
         Returns: undefined
       }
       alert_slow_queries: { Args: { threshold_ms?: number }; Returns: number }
+      apply_index_proposal: { Args: { p_id: string }; Returns: Json }
       calculate_level: { Args: { xp: number }; Returns: number }
       check_and_alert_health_regression: { Args: never; Returns: Json }
       cleanup_old_health_snapshots: {
@@ -5586,6 +5638,10 @@ export type Database = {
       reconcile_pending_freights: { Args: never; Returns: Json }
       record_heartbeat: { Args: never; Returns: undefined }
       refresh_dashboard_views: { Args: never; Returns: Json }
+      reject_index_proposal: {
+        Args: { p_id: string; p_reason?: string }
+        Returns: undefined
+      }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       validate_payload_schema: {
