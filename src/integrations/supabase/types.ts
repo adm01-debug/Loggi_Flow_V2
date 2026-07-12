@@ -4933,6 +4933,16 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_query_regressions_fast: {
+        Args: never
+        Returns: {
+          baseline_mean_ms: number
+          current_mean_ms: number
+          query_text: string
+          queryid: number
+          regression_pct: number
+        }[]
+      }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
