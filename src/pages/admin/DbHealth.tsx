@@ -30,6 +30,7 @@ import {
   CacheHitRatioCard,
   ReplicationStatusCard,
   TempFileStatsCard,
+  DuplicateIndexesCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -91,6 +92,7 @@ export default function DbHealthPage() {
         <CacheHitRatioCard />
         <ReplicationStatusCard />
         <TempFileStatsCard />
+        <DuplicateIndexesCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
