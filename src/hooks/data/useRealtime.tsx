@@ -185,10 +185,7 @@ export function useRealtime<T = Record<string, unknown>>({
 }
 
 // Hook para múltiplas tabelas
-interface RealtimeTableConfig<T> extends Omit<
-  UseRealtimeOptions<T>,
-  "enabled"
-> {}
+type RealtimeTableConfig<T> = Omit<UseRealtimeOptions<T>, "enabled">;
 
 export function useMultiTableRealtime<T = Record<string, unknown>>(
   tables: RealtimeTableConfig<T>[],
