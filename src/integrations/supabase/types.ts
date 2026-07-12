@@ -4857,6 +4857,16 @@ export type Database = {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
       }
+      get_carrier_performance_fast: {
+        Args: never
+        Returns: unknown[]
+        SetofOptions: {
+          from: "*"
+          to: "mv_carrier_performance"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_carrier_performance_stats: {
         Args: never
         Returns: {
@@ -4870,6 +4880,16 @@ export type Database = {
       }
       get_current_organization_id: { Args: never; Returns: string }
       get_dashboard_metrics: { Args: never; Returns: Json }
+      get_dashboard_metrics_fast: {
+        Args: never
+        Returns: unknown
+        SetofOptions: {
+          from: "*"
+          to: "mv_dashboard_metrics"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
         Returns: {
@@ -4939,6 +4959,7 @@ export type Database = {
       }
       reconcile_pending_freights: { Args: never; Returns: Json }
       record_heartbeat: { Args: never; Returns: undefined }
+      refresh_dashboard_views: { Args: never; Returns: Json }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       validate_payload_schema: {
