@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { log } from "../_shared/logger.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,7 +44,10 @@ serve(async (req) => {
 
     log.info(`Geocoding address: ${address}`);
 
-    const response = await fetch(geocodeUrl);
+    const response = await safeFetch(geocodeUrl, {
+      timeout: 8000,
+      allowedHosts: ["api.mapbox.com"],
+    });
 
     if (!response.ok) {
       log.error(
