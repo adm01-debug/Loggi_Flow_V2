@@ -105,6 +105,9 @@ export function IndexProposalsCard() {
                     {p.error_message && (
                       <p className="text-xs text-destructive mt-1">{p.error_message}</p>
                     )}
+                    {p.revert_reason && (
+                      <p className="text-xs text-orange-600 mt-1">↩ {p.revert_reason}</p>
+                    )}
                   </TableCell>
                   <TableCell className="text-xs">{p.target_table ?? "—"}</TableCell>
                   <TableCell>
