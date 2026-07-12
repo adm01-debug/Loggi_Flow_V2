@@ -61,6 +61,9 @@ interface SelectionRule {
   id?: string;
   name?: string;
   priority?: number;
+  price_weight?: number;
+  time_weight?: number;
+  performance_weight?: number;
   conditions?: JsonRecord;
   action?: string;
   active?: boolean;
@@ -70,6 +73,8 @@ interface SelectionRule {
 interface FreightMapping {
   id: string;
   source_type: string;
+  nome_fantasia?: string;
+  active?: boolean;
   [key: string]: unknown;
 }
 
