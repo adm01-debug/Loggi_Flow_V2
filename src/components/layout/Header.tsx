@@ -65,7 +65,7 @@ export const Header = memo(function Header() {
       });
       await signOut();
       navigate("/auth");
-    } catch (err) {
+    } catch {
       await signOut();
       navigate("/auth");
     }

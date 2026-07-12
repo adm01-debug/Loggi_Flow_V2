@@ -45,7 +45,7 @@ export function RealtimeStatus() {
       
       await runSystemSanityChecks();
       toast.success(data.message || "Auditoria Nexus concluída com sucesso!");
-    } catch (err) {
+    } catch {
       toast.error("Protocolo de auto-reparo falhou. Verifique logs.");
     } finally {
       toast.dismiss(loader);

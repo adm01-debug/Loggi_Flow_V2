@@ -58,7 +58,7 @@ export default function Configuracoes() {
       // If additional page-level settings are added, persist them here.
       setIsDirty(false);
       toast.success("Configurações salvas!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao salvar configurações");
     } finally {
       setSaving(false);

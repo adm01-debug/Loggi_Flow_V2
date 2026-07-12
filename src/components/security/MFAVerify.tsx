@@ -37,7 +37,7 @@ export function MFAVerify({
     try {
       await verifyCode(factorId, code);
       onSuccess?.();
-    } catch (err) {
+    } catch {
       setAttempts((prev) => prev + 1);
       setError("Código inválido. Tente novamente.");
       setCode("");

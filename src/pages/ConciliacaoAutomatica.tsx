@@ -173,7 +173,7 @@ export default function ConciliacaoAutomatica() {
       toast.success(
         `Conciliação concluída: ${conciliados} OK, ${divergencias} divergências, ${semMatch} sem match`,
       );
-    } catch (err) {
+    } catch {
       toast.error("Erro na conciliação automática");
     } finally {
       setIsProcessing(false);

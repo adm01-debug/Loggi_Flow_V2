@@ -51,7 +51,7 @@ export class WidgetErrorBoundary extends Component<Props, State> {
       });
       
       this.setState({ reported: true });
-    } catch (reportErr) {
+    } catch {
       // Fail silently
     }
   }
