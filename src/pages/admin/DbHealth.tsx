@@ -38,6 +38,7 @@ import {
   RlsAuditCard,
   ExtensionsAuditCard,
   TransactionHealthCard,
+  WalHealthCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -107,6 +108,7 @@ export default function DbHealthPage() {
         <RlsAuditCard />
         <ExtensionsAuditCard />
         <TransactionHealthCard />
+        <WalHealthCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
