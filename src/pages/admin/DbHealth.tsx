@@ -38,6 +38,7 @@ import {
   RlsAuditCard,
   ExtensionsAuditCard,
   TransactionHealthCard,
+  WalHealthCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
