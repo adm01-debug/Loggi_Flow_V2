@@ -20,6 +20,7 @@ export { LoadHeatmapCard } from "./components/LoadHeatmapCard";
 export { MaintenanceWindowsCard } from "./components/MaintenanceWindowsCard";
 export { TableCoaccessCard } from "./components/TableCoaccessCard";
 export { useTableCoaccess } from "./hooks/useTableCoaccess";
+export { useLoadHeatmap } from "./hooks/useLoadHeatmap";
 export { useMaintenanceWindows } from "./hooks/useMaintenanceWindows";
 export { useRemediationMttr } from "./hooks/useRemediationMttr";
 export { useGlobalHealthScore } from "./hooks/useGlobalHealthScore";
