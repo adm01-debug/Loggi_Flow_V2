@@ -15,6 +15,10 @@ export interface IndexProposal {
   applied_at: string | null;
   error_message: string | null;
   created_at: string;
+  baseline_mean_ms: number | null;
+  post_apply_mean_ms: number | null;
+  improvement_pct: number | null;
+  measured_at: string | null;
 }
 
 export function useIndexProposals() {
@@ -95,5 +99,29 @@ export function useRejectIndexProposal() {
       qc.invalidateQueries({ queryKey: ["index-proposals"] });
     },
     onError: (e: Error) => toast.error(`Erro: ${e.message}`),
+  });
+}
+
+export function useMeasureIndexImpact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const rpc = supabase.rpc as unknown as (
+        fn: string,
+        args?: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: unknown }>;
+      const { data, error } = await rpc("measure_index_proposal_impact", { p_id: id });
+      if (error) throw error as Error;
+      return data as { status: string; improvement_pct?: number };
+    },
+    onSuccess: (res) => {
+      if (res?.status === "measured" && typeof res.improvement_pct === "number") {
+        toast.success(`Ganho medido: ${res.improvement_pct}%`);
+      } else {
+        toast.info("Sem dados suficientes ainda — aguarde execuções da query.");
+      }
+      qc.invalidateQueries({ queryKey: ["index-proposals"] });
+    },
+    onError: (e: Error) => toast.error(`Falha ao medir: ${e.message}`),
   });
 }

@@ -3,8 +3,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle2, XCircle, Database, Play } from "lucide-react";
-import { useIndexProposals, useApplyIndexProposal, useRejectIndexProposal } from "../hooks/useIndexProposals";
+import { CheckCircle2, XCircle, Database, Play, Activity, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  useIndexProposals,
+  useApplyIndexProposal,
+  useRejectIndexProposal,
+  useMeasureIndexImpact,
+} from "../hooks/useIndexProposals";
 
 const statusColor: Record<string, string> = {
   proposed: "bg-amber-500/15 text-amber-600 border-amber-500/30",
@@ -22,10 +27,43 @@ const statusLabel: Record<string, string> = {
   failed: "Falhou",
 };
 
+function ImpactCell({
+  baseline,
+  current,
+  pct,
+}: {
+  baseline: number | null;
+  current: number | null;
+  pct: number | null;
+}) {
+  if (baseline == null && current == null) {
+    return <span className="text-xs text-muted-foreground">—</span>;
+  }
+  const positive = (pct ?? 0) > 0;
+  const Icon = positive ? TrendingDown : TrendingUp;
+  const color = positive ? "text-emerald-600" : "text-destructive";
+  return (
+    <div className="text-xs space-y-0.5">
+      <div className="text-muted-foreground">
+        {baseline != null ? `${baseline.toFixed(1)}ms` : "—"}
+        {" → "}
+        {current != null ? `${current.toFixed(1)}ms` : "—"}
+      </div>
+      {pct != null && (
+        <div className={`flex items-center gap-1 font-medium ${color}`}>
+          <Icon className="h-3 w-3" />
+          {pct > 0 ? `-${pct}%` : `+${Math.abs(pct)}%`}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function IndexProposalsCard() {
   const { data, isLoading, error } = useIndexProposals();
   const apply = useApplyIndexProposal();
   const reject = useRejectIndexProposal();
+  const measure = useMeasureIndexImpact();
 
   return (
     <Card className="card-raised">
@@ -35,7 +73,7 @@ export function IndexProposalsCard() {
           Propostas de Índice
         </CardTitle>
         <CardDescription>
-          Sugestões automáticas com aprovação humana. Apenas <code>CREATE INDEX IF NOT EXISTS</code> passa na whitelist.
+          Sugestões com aprovação humana e medição de impacto (baseline vs. pós-aplicação).
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -53,6 +91,7 @@ export function IndexProposalsCard() {
                 <TableHead>DDL</TableHead>
                 <TableHead>Tabela</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Impacto</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -70,6 +109,13 @@ export function IndexProposalsCard() {
                     <Badge variant="outline" className={statusColor[p.status]}>
                       {statusLabel[p.status]}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <ImpactCell
+                      baseline={p.baseline_mean_ms}
+                      current={p.post_apply_mean_ms}
+                      pct={p.improvement_pct}
+                    />
                   </TableCell>
                   <TableCell className="text-right">
                     {(p.status === "proposed" || p.status === "approved") && (
@@ -94,7 +140,20 @@ export function IndexProposalsCard() {
                       </div>
                     )}
                     {p.status === "applied" && (
-                      <CheckCircle2 className="h-4 w-4 text-emerald-600 inline" />
+                      <div className="flex justify-end items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                        {p.queryid != null && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => measure.mutate(p.id)}
+                            disabled={measure.isPending}
+                          >
+                            <Activity className="h-3 w-3 mr-1" />
+                            Medir
+                          </Button>
+                        )}
+                      </div>
                     )}
                   </TableCell>
                 </TableRow>
