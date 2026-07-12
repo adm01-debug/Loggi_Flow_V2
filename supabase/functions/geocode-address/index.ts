@@ -44,7 +44,10 @@ serve(async (req) => {
 
     log.info(`Geocoding address: ${address}`);
 
-    const response = await fetch(geocodeUrl);
+    const response = await safeFetch(geocodeUrl, {
+      timeout: 8000,
+      allowedHosts: ["api.mapbox.com"],
+    });
 
     if (!response.ok) {
       log.error(
