@@ -18,6 +18,8 @@ export { IndexProposalsCard } from "./components/IndexProposalsCard";
 export { IndexRoiCard } from "./components/IndexRoiCard";
 export { LoadHeatmapCard } from "./components/LoadHeatmapCard";
 export { MaintenanceWindowsCard } from "./components/MaintenanceWindowsCard";
+export { TableCoaccessCard } from "./components/TableCoaccessCard";
+export { useTableCoaccess } from "./hooks/useTableCoaccess";
 export { useLoadHeatmap } from "./hooks/useLoadHeatmap";
 export { useMaintenanceWindows } from "./hooks/useMaintenanceWindows";
 export { useRemediationMttr } from "./hooks/useRemediationMttr";

@@ -5661,6 +5661,17 @@ export type Database = {
           title: string
         }[]
       }
+      get_table_coaccess_graph: {
+        Args: { p_limit?: number }
+        Returns: {
+          avg_mean_ms: number
+          co_occurrences: number
+          table_a: string
+          table_b: string
+          total_calls: number
+          total_time_ms: number
+        }[]
+      }
       get_top_queries_fast: {
         Args: { p_limit?: number }
         Returns: {
