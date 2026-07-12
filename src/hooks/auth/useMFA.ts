@@ -131,8 +131,6 @@ export function useMFA() {
       }
 
       return data;
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
