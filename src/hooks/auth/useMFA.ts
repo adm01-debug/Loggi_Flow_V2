@@ -105,8 +105,6 @@ export function useMFA() {
       await logSecurityEvent("mfa_enabled", "2FA foi ativado para a conta");
       
       return data;
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
