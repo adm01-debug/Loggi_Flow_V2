@@ -4,6 +4,7 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
@@ -73,6 +74,13 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
+    }
+
+    // Idempotency guard
+    const eventId = String(body.data?.key?.id ?? body.event_id ?? body.id ?? `${body.event ?? body.source}:${Date.now()}`);
+    const idem = await claimIdempotencyKey(`nexus:${body.event ?? body.source ?? "unknown"}`, eventId);
+    if (idem.duplicate) {
+      return new Response(JSON.stringify({ success: true, duplicate: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // 1. Identify source (WhatsApp Evolution API usually sends 'messages-upsert')

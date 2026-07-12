@@ -4,6 +4,7 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
@@ -67,6 +68,16 @@ serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 400,
         },
+      );
+    }
+
+    // Idempotency guard: dedupe by (carrier_id + event_id|timestamp)
+    const eventId = String(payload.event_id ?? payload.id ?? `${payload.carrier_id}:${payload.event_type}:${payload.timestamp ?? ""}`);
+    const idem = await claimIdempotencyKey(`carrier:${payload.carrier_id}`, eventId);
+    if (idem.duplicate) {
+      return new Response(
+        JSON.stringify({ success: true, duplicate: true, message: "already processed" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
