@@ -59,7 +59,7 @@ export function SecurityOverviewPanel() {
       const sessions = (sessionsResult.data ?? []) as Array<{ is_current?: boolean }>;
       const devices = (devicesResult.data ?? []) as Array<{ is_trusted?: boolean }>;
       const loginAttempts = (loginAttemptsResult.data ?? []) as Array<{ success?: boolean }>;
-      const securityEvents = (securityEventsResult.data ?? []) as Array<{ severity?: string }>;
+      const securityEvents = (securityEventsResult.data ?? []) as Array<{ severity?: string; created_at?: string }>;
       const activeSessions = sessions.filter(s => s.is_current).length;
       const trustedDevices = devices.filter(d => d.is_trusted).length;
       const failedLogins = loginAttempts.filter(l => !l.success).length;
