@@ -4121,6 +4121,60 @@ export type Database = {
         }
         Relationships: []
       }
+      remediation_actions: {
+        Row: {
+          admin_notes: string | null
+          applied_at: string | null
+          applied_by: string | null
+          category: string
+          created_at: string
+          detail: string | null
+          evidence: Json
+          id: string
+          recommended_action: string
+          resolved_at: string | null
+          severity: string
+          status: string
+          suggestion_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          applied_at?: string | null
+          applied_by?: string | null
+          category: string
+          created_at?: string
+          detail?: string | null
+          evidence?: Json
+          id?: string
+          recommended_action: string
+          resolved_at?: string | null
+          severity: string
+          status?: string
+          suggestion_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          applied_at?: string | null
+          applied_by?: string | null
+          category?: string
+          created_at?: string
+          detail?: string | null
+          evidence?: Json
+          id?: string
+          recommended_action?: string
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          suggestion_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reward_items: {
         Row: {
           available: boolean

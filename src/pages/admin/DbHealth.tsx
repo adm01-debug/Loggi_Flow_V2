@@ -11,6 +11,7 @@ import {
   CapacityForecastCard,
   RemediationSuggestionsCard,
   ExportHealthReportButton,
+  RemediationHistoryCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -46,6 +47,8 @@ export default function DbHealthPage() {
         </div>
 
         <RemediationSuggestionsCard />
+        <RemediationHistoryCard />
+
 
         <CronJobsCard />
 

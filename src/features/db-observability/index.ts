@@ -8,6 +8,12 @@ export { SloTrendCard } from "./components/SloTrendCard";
 export { CapacityForecastCard } from "./components/CapacityForecastCard";
 export { RemediationSuggestionsCard } from "./components/RemediationSuggestionsCard";
 export { ExportHealthReportButton } from "./components/ExportHealthReportButton";
+export { RemediationHistoryCard } from "./components/RemediationHistoryCard";
+export {
+  useRemediationActions,
+  useApplyRemediation,
+  useUpdateRemediationStatus,
+} from "./hooks/useRemediationActions";
 export { useDbRegressions } from "./hooks/useDbRegressions";
 export { useTopQueries } from "./hooks/useTopQueries";
 export { useCronJobs } from "./hooks/useCronJobs";
