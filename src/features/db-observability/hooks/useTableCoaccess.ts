@@ -15,12 +15,11 @@ export function useTableCoaccess(limit = 30) {
     queryKey: ["db-observability", "table-coaccess", limit],
     queryFn: async (): Promise<TableCoaccessEdge[]> => {
       const { data, error } = await supabase.rpc(
-        // @ts-expect-error - função nova, tipos regerados após aprovação
         "get_table_coaccess_graph",
         { p_limit: limit },
       );
       if (error) throw error;
-      return (data ?? []) as TableCoaccessEdge[];
+      return (data ?? []) as unknown as TableCoaccessEdge[];
     },
     staleTime: 5 * 60 * 1000,
   });
