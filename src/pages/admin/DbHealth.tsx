@@ -24,6 +24,7 @@ import {
   SeqScanHotspotsCard,
   UnusedIndexesCard,
   BloatHotspotsCard,
+  UnindexedFksCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
