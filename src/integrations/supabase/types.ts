@@ -2534,11 +2534,15 @@ export type Database = {
         Row: {
           applied_at: string | null
           applied_by: string | null
+          baseline_mean_ms: number | null
           confidence: string
           created_at: string
           ddl: string
           error_message: string | null
           id: string
+          improvement_pct: number | null
+          measured_at: string | null
+          post_apply_mean_ms: number | null
           proposed_by: string | null
           queryid: number | null
           rationale: string | null
@@ -2550,11 +2554,15 @@ export type Database = {
         Insert: {
           applied_at?: string | null
           applied_by?: string | null
+          baseline_mean_ms?: number | null
           confidence?: string
           created_at?: string
           ddl: string
           error_message?: string | null
           id?: string
+          improvement_pct?: number | null
+          measured_at?: string | null
+          post_apply_mean_ms?: number | null
           proposed_by?: string | null
           queryid?: number | null
           rationale?: string | null
@@ -2566,11 +2574,15 @@ export type Database = {
         Update: {
           applied_at?: string | null
           applied_by?: string | null
+          baseline_mean_ms?: number | null
           confidence?: string
           created_at?: string
           ddl?: string
           error_message?: string | null
           id?: string
+          improvement_pct?: number | null
+          measured_at?: string | null
+          post_apply_mean_ms?: number | null
           proposed_by?: string | null
           queryid?: number | null
           rationale?: string | null
@@ -5629,6 +5641,7 @@ export type Database = {
         Returns: boolean
       }
       jsonb_recursive_merge: { Args: { a: Json; b: Json }; Returns: Json }
+      measure_index_proposal_impact: { Args: { p_id: string }; Returns: Json }
       persist_db_health_snapshot: { Args: never; Returns: string }
       persist_global_health_score: { Args: never; Returns: string }
       purchase_reward: {
