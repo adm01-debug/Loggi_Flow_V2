@@ -5480,6 +5480,34 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_query_detail_fast: {
+        Args: { p_queryid: number }
+        Returns: {
+          cache_hit_pct: number
+          calls: number
+          max_exec_ms: number
+          mean_exec_ms: number
+          min_exec_ms: number
+          query_text: string
+          queryid: number
+          rows_returned: number
+          shared_blks_hit: number
+          shared_blks_read: number
+          stddev_exec_ms: number
+          total_exec_ms: number
+        }[]
+      }
+      get_query_index_suggestion: {
+        Args: { p_queryid: number }
+        Returns: {
+          confidence: string
+          rationale: string
+          recommended_ddl: string
+          suggestion_type: string
+          target_columns: string[]
+          target_table: string
+        }[]
+      }
       get_query_regressions_fast: {
         Args: never
         Returns: {
