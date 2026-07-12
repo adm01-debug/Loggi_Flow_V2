@@ -21,6 +21,7 @@ import {
   LoadHeatmapCard,
   MaintenanceWindowsCard,
   TableCoaccessCard,
+  SeqScanHotspotsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
