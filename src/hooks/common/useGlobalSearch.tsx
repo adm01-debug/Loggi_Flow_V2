@@ -304,7 +304,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         id: c.id,
         type: "cliente",
         title: c.nome_fantasia || c.razao_social,
-        subtitle: `${c.cidade || ""}${c.estado ? `, ${c.estado}` : ""}`,
+        subtitle: [c.cidade, c.estado].filter(Boolean).join(", "),
         url: "/clientes",
         icon: Users,
       });
@@ -316,7 +316,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         id: f.id,
         type: "fornecedor",
         title: f.nome_fantasia || f.razao_social,
-        subtitle: `${f.cidade || ""}${f.estado ? `, ${f.estado}` : ""}`,
+        subtitle: [f.cidade, f.estado].filter(Boolean).join(", "),
         url: "/fornecedores",
         icon: Building2,
       });

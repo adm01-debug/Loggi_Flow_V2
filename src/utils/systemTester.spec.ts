@@ -30,9 +30,9 @@ describe('System Integrity Tests', () => {
   });
 
   it('should pass all checks when system is healthy', async () => {
-    (supabase.auth.getSession as any).mockResolvedValue({ data: { session: {} } });
+    (supabase.auth.getSession as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({ data: { session: {} } });
     
-    (supabase.from as any).mockImplementation((table: string) => {
+    (supabase.from as unknown as { mockImplementation: (fn: (t: string) => unknown) => void }).mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: vi.fn().mockReturnThis(),
@@ -49,9 +49,9 @@ describe('System Integrity Tests', () => {
       return { select: vi.fn().mockReturnThis(), limit: vi.fn().mockResolvedValue({ data: [], error: null }) };
     });
 
-    (supabase.functions.invoke as any).mockResolvedValue({ data: { status: 'healthy', checks: { database: true } }, error: null });
-    (supabase.auth.mfa.listFactors as any).mockResolvedValue({ data: [], error: null });
-    (supabase.storage.listBuckets as any).mockResolvedValue({ data: [], error: null });
+    (supabase.functions.invoke as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({ data: { status: 'healthy', checks: { database: true } }, error: null });
+    (supabase.auth.mfa.listFactors as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({ data: [], error: null });
+    (supabase.storage.listBuckets as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({ data: [], error: null });
 
     const results = await runSystemSanityChecks();
     const failures = results.filter(r => r.status !== 'PASS');
@@ -60,8 +60,8 @@ describe('System Integrity Tests', () => {
   });
 
   it('should detect database connectivity failure', async () => {
-    (supabase.auth.getSession as any).mockResolvedValue({ data: { session: {} } });
-    (supabase.from as any).mockImplementation((table: string) => {
+    (supabase.auth.getSession as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({ data: { session: {} } });
+    (supabase.from as unknown as { mockImplementation: (fn: (t: string) => unknown) => void }).mockImplementation((table: string) => {
       if (table === 'profiles') {
         return {
           select: vi.fn().mockReturnThis(),

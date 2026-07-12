@@ -81,7 +81,10 @@ export default function RastreamentoPublico() {
 
   const shareWhatsApp = () => {
     const statusLabel = statusConfig[tracking?.status || ""]?.label || tracking?.status;
-    const msg = `📦 *Rastreamento da sua entrega*\n\nStatus: *${statusLabel}*\nCódigo: \`${tracking?.codigo_rastreamento || tracking?.nf_remessa}\`\n${tracking?.previsao_entrega ? `Previsão: ${format(new Date(tracking.previsao_entrega), "dd/MM/yyyy")}` : ""}\n\nAcompanhe em tempo real: ${trackingUrl}`;
+    const previsaoLine = tracking?.previsao_entrega
+      ? `Previsão: ${format(new Date(tracking.previsao_entrega), "dd/MM/yyyy")}`
+      : "";
+    const msg = `📦 *Rastreamento da sua entrega*\n\nStatus: *${statusLabel}*\nCódigo: \`${tracking?.codigo_rastreamento || tracking?.nf_remessa}\`\n${previsaoLine}\n\nAcompanhe em tempo real: ${trackingUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
