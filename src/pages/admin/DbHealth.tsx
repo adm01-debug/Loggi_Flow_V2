@@ -17,6 +17,7 @@ import {
   HealthScoreHistoryChart,
   HealthRegressionAlert,
   IndexProposalsCard,
+  IndexRoiCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
