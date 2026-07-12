@@ -94,10 +94,10 @@ export default function FreightConfig() {
     },
   });
 
-  const [editingRule, setEditRule] = useState<SelectionRule | null>(null);
+  const [editingRule, setEditRule] = useState<any>(null);
 
   const saveRule = useMutation({
-    mutationFn: async (rule: SelectionRule) => {
+    mutationFn: async (rule: any) => {
       const { data, error } = await supabase
         .from("freight_selection_rules")
         .upsert(rule);
@@ -150,12 +150,12 @@ export default function FreightConfig() {
         .order("nome_fantasia")
         .limit(200);
       if (error) throw error;
-      return (data || []) as CarrierConfig[];
+      return (data || []) as any;
     },
   });
 
   const updateCarrier = useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string } & Partial<CarrierConfig>) => {
+    mutationFn: async ({ id, ...updates }: any) => {
       const { error } = await supabase
         .from("transportadoras")
         .update(updates)
@@ -300,12 +300,12 @@ export default function FreightConfig() {
                               <Input
                                 type="password"
                                 value={
-                                  (selectedCarrier.credentials as JsonRecord)
+                                  (selectedCarrier.credentials as any)
                                     ?.api_key || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as JsonRecord),
+                                    ...(selectedCarrier.credentials as any),
                                     api_key: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -320,12 +320,12 @@ export default function FreightConfig() {
                               <Input
                                 placeholder="https://api..."
                                 value={
-                                  (selectedCarrier.credentials as JsonRecord)
+                                  (selectedCarrier.credentials as any)
                                     ?.endpoint || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as JsonRecord),
+                                    ...(selectedCarrier.credentials as any),
                                     endpoint: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -341,12 +341,12 @@ export default function FreightConfig() {
                               <Label>Usuário Portal</Label>
                               <Input
                                 value={
-                                  (selectedCarrier.credentials as JsonRecord)
+                                  (selectedCarrier.credentials as any)
                                     ?.username || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as JsonRecord),
+                                    ...(selectedCarrier.credentials as any),
                                     username: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -361,12 +361,12 @@ export default function FreightConfig() {
                               <Input
                                 type="password"
                                 value={
-                                  (selectedCarrier.credentials as JsonRecord)
+                                  (selectedCarrier.credentials as any)
                                     ?.password || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as JsonRecord),
+                                    ...(selectedCarrier.credentials as any),
                                     password: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -473,12 +473,12 @@ export default function FreightConfig() {
                                   className="font-mono text-xs h-32"
                                   placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
                                   value={
-                                    (selectedCarrier.non_api_config as JsonRecord)
+                                    (selectedCarrier.non_api_config as any)
                                       ?.whatsapp_template || ""
                                   }
                                   onChange={(e) => {
                                     const cfg = {
-                                      ...(selectedCarrier.non_api_config as JsonRecord),
+                                      ...(selectedCarrier.non_api_config as any),
                                       whatsapp_template: e.target.value,
                                     };
                                     updateCarrier.mutate({
@@ -498,12 +498,12 @@ export default function FreightConfig() {
                               <NormalizationMapping
                                 carrierId={selectedCarrier.id}
                                 initialConfig={
-                                  (selectedCarrier.non_api_config as JsonRecord)
+                                  (selectedCarrier.non_api_config as any)
                                     ?.normalization
                                 }
                                 onSave={(normConfig) => {
                                   const cfg = {
-                                    ...(selectedCarrier.non_api_config as JsonRecord),
+                                    ...(selectedCarrier.non_api_config as any),
                                     normalization: normConfig,
                                   };
                                   updateCarrier.mutate({
@@ -735,7 +735,7 @@ export default function FreightConfig() {
                   )}
 
                   <div className="grid gap-4">
-                    {rules.map((rule: SelectionRule) => (
+                    {rules.map((rule: any) => (
                       <div
                         key={rule.id}
                         className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors"
@@ -834,8 +834,8 @@ export default function FreightConfig() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {mappings
-                    .filter((m: FreightMapping) => m.source_type === "webhook")
-                    .map((m: FreightMapping) => (
+                    .filter((m: any) => m.source_type === "webhook")
+                    .map((m: any) => (
                       <div
                         key={m.id}
                         className="p-4 border-2 border-primary/20 rounded-xl bg-primary/5 space-y-3"
