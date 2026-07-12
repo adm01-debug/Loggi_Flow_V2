@@ -304,7 +304,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         id: c.id,
         type: "cliente",
         title: c.nome_fantasia || c.razao_social,
-        subtitle: `${c.cidade || ""}${c.estado ? `, ${c.estado}` : ""}`,
+        subtitle: [c.cidade, c.estado].filter(Boolean).join(", "),
         url: "/clientes",
         icon: Users,
       });
