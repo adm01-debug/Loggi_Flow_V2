@@ -27,6 +27,7 @@ import {
   UnindexedFksCard,
   LongRunningQueriesCard,
   LockConflictsCard,
+  CacheHitRatioCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -85,6 +86,7 @@ export default function DbHealthPage() {
         <UnindexedFksCard />
         <LongRunningQueriesCard />
         <LockConflictsCard />
+        <CacheHitRatioCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
