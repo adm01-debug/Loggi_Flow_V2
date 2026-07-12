@@ -50,18 +50,16 @@ export function SecurityOverviewPanel() {
       const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const currentUserId = user.id;
 
-      const [sessionsResult, devicesResult, loginAttemptsResult, securityEventsResult, blockedIPsResult] = await Promise.all([
-        supabase.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId),
-        supabase.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId),
-        supabase.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString()),
-        supabase.from('security_events').select('*').eq('user_id', currentUserId).gte('created_at', today.toISOString()),
-        supabase.from('rate_limit_logs').select('*', { count: 'exact' }).eq('user_id', currentUserId).eq('blocked', true).gte('created_at', last24h.toISOString()),
-      ]);
+      const sessionsResult = await supabase.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId);
+      const devicesResult = await supabase.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId);
+      const loginAttemptsResult = await supabase.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString());
+      const securityEventsResult = await supabase.from('security_events').select('*').eq('user_id', currentUserId).gte('created_at', today.toISOString());
+      const blockedIPsResult = await supabase.from('rate_limit_logs').select('*', { count: 'exact' }).eq('user_id', currentUserId).eq('blocked', true).gte('created_at', last24h.toISOString());
 
-      const sessions = sessionsResult.data || [];
-      const devices = devicesResult.data || [];
-      const loginAttempts = loginAttemptsResult.data || [];
-      const securityEvents = securityEventsResult.data || [];
+      const sessions = (sessionsResult.data ?? []) as Array<{ is_current?: boolean }>;
+      const devices = (devicesResult.data ?? []) as Array<{ is_trusted?: boolean }>;
+      const loginAttempts = (loginAttemptsResult.data ?? []) as Array<{ success?: boolean }>;
+      const securityEvents = (securityEventsResult.data ?? []) as Array<{ severity?: string }>;
       const activeSessions = sessions.filter(s => s.is_current).length;
       const trustedDevices = devices.filter(d => d.is_trusted).length;
       const failedLogins = loginAttempts.filter(l => !l.success).length;
