@@ -22,6 +22,7 @@ import {
   MaintenanceWindowsCard,
   TableCoaccessCard,
   SeqScanHotspotsCard,
+  UnusedIndexesCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -75,6 +76,7 @@ export default function DbHealthPage() {
         <MaintenanceWindowsCard />
         <TableCoaccessCard />
         <SeqScanHotspotsCard />
+        <UnusedIndexesCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
