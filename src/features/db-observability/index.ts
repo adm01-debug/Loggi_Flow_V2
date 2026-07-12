@@ -11,8 +11,10 @@ export { ExportHealthReportButton } from "./components/ExportHealthReportButton"
 export { RemediationHistoryCard } from "./components/RemediationHistoryCard";
 export { MttrMetricsCard } from "./components/MttrMetricsCard";
 export { GlobalHealthScoreCard } from "./components/GlobalHealthScoreCard";
+export { HealthScoreHistoryChart } from "./components/HealthScoreHistoryChart";
 export { useRemediationMttr } from "./hooks/useRemediationMttr";
 export { useGlobalHealthScore } from "./hooks/useGlobalHealthScore";
+export { useHealthScoreHistory } from "./hooks/useHealthScoreHistory";
 export {
   useRemediationActions,
   useApplyRemediation,
