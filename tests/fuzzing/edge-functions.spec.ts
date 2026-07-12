@@ -1,11 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 describe('Edge Function Fuzzing Suite', () => {
-  const edgeFunctions = [
-    'carrier-webhook-receiver',
-    'nexus-webhook-receiver',
-    'normalize-freight-response'
-  ];
+
 
   it('should reject invalid UUIDs in payloads', () => {
     const invalidUUIDs = ['123', 'abc-123', '', 'null', 'undefined', '00000000-0000-0000-0000-000000000000'];
