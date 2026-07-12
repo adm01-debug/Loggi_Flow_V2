@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-export const simulateWebhookPayload = (type: string, data: any) => {
+export const simulateWebhookPayload = (type: string, data: Record<string, unknown>) => {
   return {
     type,
     payload: data,

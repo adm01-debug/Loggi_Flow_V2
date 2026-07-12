@@ -4,6 +4,39 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Data-driven vendor chunk mapping keeps `manualChunks` cognitive complexity low.
+// Order matters: first match wins.
+const VENDOR_CHUNKS: ReadonlyArray<readonly [string, readonly string[]]> = [
+  ['vendor-router', ['react-router']],
+  ['vendor-react', ['react-dom', '/react/']],
+  ['vendor-query', ['@tanstack/react-query']],
+  ['vendor-supabase', ['@supabase']],
+  ['vendor-ui', ['@radix-ui']],
+  ['vendor-charts', ['recharts', 'd3-']],
+  ['vendor-motion', ['framer-motion']],
+  ['vendor-mapbox', ['mapbox-gl']],
+  ['vendor-pdf', ['jspdf', 'jspdf-autotable']],
+  ['vendor-html2canvas', ['html2canvas']],
+  ['vendor-xlsx', ['xlsx']],
+  ['vendor-purify', ['dompurify', 'purify']],
+  ['vendor-dates', ['date-fns']],
+  ['vendor-carousel', ['embla-carousel']],
+  ['vendor-dnd', ['@dnd-kit']],
+  ['vendor-markdown', ['react-markdown', 'remark', 'rehype', 'unified', 'mdast', 'hast', 'micromark']],
+  ['vendor-cmdk', ['cmdk']],
+  ['vendor-forms', ['zod', 'react-hook-form', '@hookform']],
+];
+
+function resolveVendorChunk(id: string): string | undefined {
+  for (const [chunk, needles] of VENDOR_CHUNKS) {
+    for (const needle of needles) {
+      if (id.includes(needle)) return chunk;
+    }
+  }
+  return undefined;
+}
+
+
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -50,70 +83,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Core React runtime
-          if (id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-router'))) {
-            return 'vendor-react';
-          }
-          if (id.includes('react-router')) {
-            return 'vendor-router';
-          }
-          // Query layer
-          if (id.includes('@tanstack/react-query')) {
-            return 'vendor-query';
-          }
-          // Supabase
-          if (id.includes('@supabase')) {
-            return 'vendor-supabase';
-          }
-          // Radix UI components
-          if (id.includes('@radix-ui')) {
-            return 'vendor-ui';
-          }
-          // Heavy libs - lazy loaded
-          if (id.includes('recharts') || id.includes('d3-')) {
-            return 'vendor-charts';
-          }
-          if (id.includes('framer-motion')) {
-            return 'vendor-motion';
-          }
-          if (id.includes('mapbox-gl')) {
-            return 'vendor-mapbox';
-          }
-          if (id.includes('jspdf') || id.includes('jspdf-autotable')) {
-            return 'vendor-pdf';
-          }
-          if (id.includes('html2canvas')) {
-            return 'vendor-html2canvas';
-          }
-          if (id.includes('xlsx')) {
-            return 'vendor-xlsx';
-          }
-          if (id.includes('dompurify') || id.includes('purify')) {
-            return 'vendor-purify';
-          }
-          if (id.includes('date-fns')) {
-            return 'vendor-dates';
-          }
-          // Embla carousel - used by few pages
-          if (id.includes('embla-carousel')) {
-            return 'vendor-carousel';
-          }
-          // DnD kit - used by dashboard
-          if (id.includes('@dnd-kit')) {
-            return 'vendor-dnd';
-          }
-          // React markdown - used by AI assistant
-          if (id.includes('react-markdown') || id.includes('remark') || id.includes('rehype') || id.includes('unified') || id.includes('mdast') || id.includes('hast') || id.includes('micromark')) {
-            return 'vendor-markdown';
-          }
-          // cmdk - command palette
-          if (id.includes('cmdk')) {
-            return 'vendor-cmdk';
-          }
-          // Zod + react-hook-form
-          if (id.includes('zod') || id.includes('react-hook-form') || id.includes('@hookform')) {
-            return 'vendor-forms';
-          }
+          return resolveVendorChunk(id);
         },
       },
     },
@@ -124,6 +94,7 @@ export default defineConfig(({ mode }) => ({
     // Vendor chunks like mapbox are large but lazy-loaded; suppress warnings
     chunkSizeWarningLimit: 700,
   },
+
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
   },
