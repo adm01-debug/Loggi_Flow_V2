@@ -46,36 +46,13 @@ import { Switch } from "@/components/ui/switch";
 import { NormalizationMapping } from "@/components/transportadoras/NormalizationMapping";
 import { Slider } from "@/components/ui/slider";
 
-type JsonRecord = Record<string, unknown>;
-
 interface CarrierConfig {
   id: string;
   nome_fantasia: string;
-  credentials: JsonRecord;
+  credentials: any;
   regioes_atendidas: string[];
-  non_api_config: JsonRecord;
-  coverage_details?: JsonRecord;
-}
-
-interface SelectionRule {
-  id?: string;
-  name?: string;
-  priority?: number;
-  price_weight?: number;
-  time_weight?: number;
-  performance_weight?: number;
-  conditions?: JsonRecord;
-  action?: string;
-  active?: boolean;
-  [key: string]: unknown;
-}
-
-interface FreightMapping {
-  id: string;
-  source_type: string;
-  nome_fantasia?: string;
-  active?: boolean;
-  [key: string]: unknown;
+  non_api_config: any;
+  coverage_details?: any;
 }
 
 export default function FreightConfig() {
