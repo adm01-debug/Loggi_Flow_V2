@@ -19,6 +19,7 @@ import {
   IndexProposalsCard,
   IndexRoiCard,
   LoadHeatmapCard,
+  MaintenanceWindowsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
