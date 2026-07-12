@@ -1,7 +1,8 @@
 // Verifies an HMAC-SHA256 (hex) signature of the raw request payload.
 // FAIL-CLOSED: if the secret env var is not configured, verification returns
 // false so no unauthenticated write is ever accepted in production.
-// To bypass in local/sandbox, set header `x-test-mode: true` upstream.
+// Test-mode bypass requires the SERVER-SIDE env var ALLOW_TEST_MODE=true
+// combined with the header `x-test-mode: true`. Header alone is NOT enough.
 import { log } from "./logger.ts";
 
 export async function verifyWebhookHmac(

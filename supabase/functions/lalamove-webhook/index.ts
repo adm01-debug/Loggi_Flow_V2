@@ -86,7 +86,8 @@ serve(async (req) => {
 
     const payload = await req.text();
     const signature = req.headers.get('x-lalamove-signature') || '';
-    const isTestMode = req.headers.get('x-test-mode') === 'true';
+    const testModeAllowed = Deno.env.get('ALLOW_TEST_MODE') === 'true';
+    const isTestMode = testModeAllowed && req.headers.get('x-test-mode') === 'true';
 
     log.info('Received Lalamove webhook');
 
