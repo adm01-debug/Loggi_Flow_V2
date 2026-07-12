@@ -71,6 +71,16 @@ serve(async (req) => {
       );
     }
 
+    // Idempotency guard: dedupe by (carrier_id + event_id|timestamp)
+    const eventId = String(payload.event_id ?? payload.id ?? `${payload.carrier_id}:${payload.event_type}:${payload.timestamp ?? ""}`);
+    const idem = await claimIdempotencyKey(`carrier:${payload.carrier_id}`, eventId);
+    if (idem.duplicate) {
+      return new Response(
+        JSON.stringify({ success: true, duplicate: true, message: "already processed" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     // 1. Audit log
     await supabaseClient.from("automation_audit_logs").insert({
       action_taken: "carrier_webhook_validated",
