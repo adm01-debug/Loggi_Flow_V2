@@ -15,6 +15,7 @@ import {
   MttrMetricsCard,
   GlobalHealthScoreCard,
   HealthScoreHistoryChart,
+  HealthRegressionAlert,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -39,6 +40,7 @@ export default function DbHealthPage() {
           <ExportHealthReportButton />
         </header>
 
+        <HealthRegressionAlert />
         <GlobalHealthScoreCard />
         <HealthScoreHistoryChart />
 
