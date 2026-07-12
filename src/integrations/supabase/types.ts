@@ -5420,6 +5420,19 @@ export type Database = {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
       }
+      get_active_sessions_summary: {
+        Args: never
+        Returns: {
+          longest_query_seconds: number
+          longest_xact_seconds: number
+          oldest_session_seconds: number
+          sample_query: string
+          session_count: number
+          severity: string
+          state: string
+          wait_event_type: string
+        }[]
+      }
       get_autovacuum_health: {
         Args: { p_limit?: number }
         Returns: {
