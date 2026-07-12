@@ -78,6 +78,7 @@ export default function DbHealthPage() {
         <TableCoaccessCard />
         <SeqScanHotspotsCard />
         <UnusedIndexesCard />
+        <BloatHotspotsCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
