@@ -5437,6 +5437,23 @@ export type Database = {
           vacuum_ddl: string
         }[]
       }
+      get_cache_hit_ratios: {
+        Args: { p_limit?: number; p_max_ratio?: number; p_min_reads?: number }
+        Returns: {
+          combined_hit_ratio: number
+          heap_blks_hit: number
+          heap_blks_read: number
+          heap_hit_ratio: number
+          idx_blks_hit: number
+          idx_blks_read: number
+          idx_hit_ratio: number
+          recommendation: string
+          schema_name: string
+          severity: string
+          table_name: string
+          table_size_bytes: number
+        }[]
+      }
       get_capacity_forecast_fast: {
         Args: { p_hours_ahead?: number }
         Returns: {
