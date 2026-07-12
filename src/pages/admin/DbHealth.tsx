@@ -11,6 +11,7 @@ import {
   CapacityForecastCard,
   RemediationSuggestionsCard,
   ExportHealthReportButton,
+  RemediationHistoryCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
