@@ -106,6 +106,7 @@ export default function DbHealthPage() {
         <TopTablesBySizeCard />
         <RlsAuditCard />
         <ExtensionsAuditCard />
+        <TransactionHealthCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
