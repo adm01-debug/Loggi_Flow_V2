@@ -9,6 +9,7 @@ import {
   AnomaliesCard,
   SloTrendCard,
   CapacityForecastCard,
+  RemediationSuggestionsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
