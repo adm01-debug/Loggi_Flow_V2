@@ -10,7 +10,9 @@ export { RemediationSuggestionsCard } from "./components/RemediationSuggestionsC
 export { ExportHealthReportButton } from "./components/ExportHealthReportButton";
 export { RemediationHistoryCard } from "./components/RemediationHistoryCard";
 export { MttrMetricsCard } from "./components/MttrMetricsCard";
+export { GlobalHealthScoreCard } from "./components/GlobalHealthScoreCard";
 export { useRemediationMttr } from "./hooks/useRemediationMttr";
+export { useGlobalHealthScore } from "./hooks/useGlobalHealthScore";
 export {
   useRemediationActions,
   useApplyRemediation,
