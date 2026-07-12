@@ -316,7 +316,7 @@ export function useGlobalSearch(options: UseGlobalSearchOptions = {}) {
         id: f.id,
         type: "fornecedor",
         title: f.nome_fantasia || f.razao_social,
-        subtitle: `${f.cidade || ""}${f.estado ? `, ${f.estado}` : ""}`,
+        subtitle: [f.cidade, f.estado].filter(Boolean).join(", "),
         url: "/fornecedores",
         icon: Building2,
       });
