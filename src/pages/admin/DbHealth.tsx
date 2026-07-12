@@ -49,6 +49,8 @@ export default function DbHealthPage() {
 
         <RemediationSuggestionsCard />
         <RemediationHistoryCard />
+        <MttrMetricsCard />
+
 
 
         <CronJobsCard />
