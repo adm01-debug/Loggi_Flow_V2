@@ -84,7 +84,7 @@ export function SecurityOverviewPanel() {
         totalSessions: sessions.length, activeSessions, knownDevices: devices.length, trustedDevices,
         recentLoginAttempts: loginAttempts.length, failedLoginAttempts: failedLogins,
         securityEventsToday: securityEvents.length, criticalEvents, blockedIPs: blockedIPsResult.count || 0,
-        mfaEnabled, lastSecurityEvent: securityEvents.length > 0 ? securityEvents[0].created_at : null, securityScore: score,
+        mfaEnabled, lastSecurityEvent: securityEvents.length > 0 ? (securityEvents[0].created_at ?? null) : null, securityScore: score,
       });
       setAlerts(newAlerts);
     } catch {} finally { setIsLoading(false); }
