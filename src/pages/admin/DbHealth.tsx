@@ -28,6 +28,7 @@ import {
   LongRunningQueriesCard,
   LockConflictsCard,
   CacheHitRatioCard,
+  ReplicationStatusCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -87,6 +88,7 @@ export default function DbHealthPage() {
         <LongRunningQueriesCard />
         <LockConflictsCard />
         <CacheHitRatioCard />
+        <ReplicationStatusCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
