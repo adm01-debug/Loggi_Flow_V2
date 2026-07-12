@@ -58,8 +58,11 @@ serve(async (req: Request) => {
     const raw = await req.text();
 
 
-    // Verify webhook signature (skipped if RODONAVES_WEBHOOK_SECRET unset)
-    const isTestMode = req.headers.get("x-test-mode") === "true";
+    // HMAC signature verification (fail-closed).
+    // Test-mode bypass ONLY when ALLOW_TEST_MODE=true is set server-side —
+    // clients cannot bypass by sending a header alone.
+    const testModeAllowed = Deno.env.get("ALLOW_TEST_MODE") === "true";
+    const isTestMode = testModeAllowed && req.headers.get("x-test-mode") === "true";
     if (!isTestMode) {
       const signature = req.headers.get("x-rodonaves-signature") || "";
       if (
