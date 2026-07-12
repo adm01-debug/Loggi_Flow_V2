@@ -25,6 +25,9 @@ Estado de **Perfeição Técnica Absoluta (10/10)** atingido, **sustentado** e *
 | 34 | Painel DB Admin | `/admin/db-health` + RPCs `get_top_queries_fast` / `get_cron_jobs_status` |
 | 35 | Alertas de Regressão | Edge `db-regression-monitor` a cada 15min + hook realtime + feature flags |
 | 36 | Runbook Interativo + Histórico | `db_health_snapshots` (BRIN, 30d), cron horário, `<HealthTrendChart />`, ADR 0012 |
+| 37 | Coleta Real de Métricas | `internal.collect_db_health()` + `persist_db_health_snapshot()` |
+| 38 | Detecção de Anomalia | `get_health_anomalies_fast()` (z-score 7d) + `<AnomaliesCard />` |
+| 39 | SLO Diário | `db_slo_daily` + `compute_db_slo_for()` + cron 03:15 UTC + `<SloTrendCard />` + ADR 0013 |
 
 ## Resultado
 - **Dashboards**: <5ms (era ~800ms)
