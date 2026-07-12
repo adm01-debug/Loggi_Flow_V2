@@ -39,7 +39,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       setIsProcessing(true);
-      const { error } = await supabase.from(table).delete().in('id', ids);
+      const { error } = await (supabase.from(table) as any).delete().in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { 
