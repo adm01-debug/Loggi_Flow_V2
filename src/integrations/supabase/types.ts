@@ -5877,6 +5877,20 @@ export type Database = {
           permission_name: string
         }[]
       }
+      get_wraparound_status: {
+        Args: { p_limit?: number }
+        Returns: {
+          freeze_max_age: number
+          last_autovacuum: string
+          pct_towards_wraparound: number
+          recommendation: string
+          schema_name: string
+          severity: string
+          table_name: string
+          table_size_bytes: number
+          xid_age: number
+        }[]
+      }
       has_permission: {
         Args: { _permission_code: string; _user_id: string }
         Returns: boolean
