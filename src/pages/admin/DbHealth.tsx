@@ -37,6 +37,7 @@ import {
   TopTablesBySizeCard,
   RlsAuditCard,
   ExtensionsAuditCard,
+  TransactionHealthCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
