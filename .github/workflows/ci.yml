@@ -87,7 +87,7 @@ jobs:
   build:
     name: Build Artifact
     runs-on: ubuntu-latest
-    needs: [security, lint, typecheck, test]
+    needs: [security, lint, typecheck, warning-budget, test]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
