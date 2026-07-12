@@ -46,7 +46,7 @@ export function BloatHotspotsCard() {
       <CardHeader>
         <CardTitle className="flex items-center justify-between gap-2 text-lg">
           <div className="flex items-center gap-2">
-            <Broom className="h-5 w-5 text-primary" />
+            <Sparkles className="h-5 w-5 text-primary" />
             Bloat & Necessidade de VACUUM
           </div>
           {totalBloat > 0 && (
