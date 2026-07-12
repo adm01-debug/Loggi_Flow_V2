@@ -16,6 +16,7 @@ import {
   GlobalHealthScoreCard,
   HealthScoreHistoryChart,
   HealthRegressionAlert,
+  IndexProposalsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -63,6 +64,7 @@ export default function DbHealthPage() {
         <CronJobsCard />
 
         <TopQueriesCard />
+        <IndexProposalsCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
