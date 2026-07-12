@@ -10,6 +10,7 @@ import {
   SloTrendCard,
   CapacityForecastCard,
   RemediationSuggestionsCard,
+  ExportHealthReportButton,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -19,16 +20,19 @@ export default function DbHealthPage() {
   return (
     <MainLayout>
       <div className="space-y-6 p-4 md:p-6">
-        <header className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Database className="h-6 w-6 text-primary" />
+        <header className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Database className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Saúde do Banco</h1>
+              <p className="text-sm text-muted-foreground">
+                Observabilidade de queries, cron jobs, anomalias e SLOs.
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Saúde do Banco</h1>
-            <p className="text-sm text-muted-foreground">
-              Observabilidade de queries, cron jobs, anomalias e SLOs.
-            </p>
-          </div>
+          <ExportHealthReportButton />
         </header>
 
         <div className="grid gap-6 md:grid-cols-2">
