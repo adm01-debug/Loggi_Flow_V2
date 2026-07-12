@@ -15,6 +15,10 @@ export interface IndexProposal {
   applied_at: string | null;
   error_message: string | null;
   created_at: string;
+  baseline_mean_ms: number | null;
+  post_apply_mean_ms: number | null;
+  improvement_pct: number | null;
+  measured_at: string | null;
 }
 
 export function useIndexProposals() {
