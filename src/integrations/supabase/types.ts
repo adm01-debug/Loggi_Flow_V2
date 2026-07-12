@@ -5512,6 +5512,24 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_duplicate_indexes: {
+        Args: { p_limit?: number }
+        Returns: {
+          drop_columns: string
+          drop_ddl: string
+          drop_index: string
+          drop_scans: number
+          drop_size_bytes: number
+          keep_columns: string
+          keep_index: string
+          keep_scans: number
+          keep_size_bytes: number
+          relationship: string
+          schema_name: string
+          severity: string
+          table_name: string
+        }[]
+      }
       get_global_health_score_fast: {
         Args: never
         Returns: {
