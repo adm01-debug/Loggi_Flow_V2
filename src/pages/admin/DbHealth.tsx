@@ -18,6 +18,7 @@ import {
   HealthRegressionAlert,
   IndexProposalsCard,
   IndexRoiCard,
+  LoadHeatmapCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
