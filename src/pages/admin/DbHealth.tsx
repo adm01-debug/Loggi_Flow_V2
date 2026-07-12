@@ -47,6 +47,8 @@ export default function DbHealthPage() {
         </div>
 
         <RemediationSuggestionsCard />
+        <RemediationHistoryCard />
+
 
         <CronJobsCard />
 
