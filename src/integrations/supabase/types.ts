@@ -5357,6 +5357,10 @@ export type Database = {
         Returns: Json
       }
       calculate_level: { Args: { xp: number }; Returns: number }
+      cancel_long_running_query: {
+        Args: { p_pid: number; p_terminate?: boolean }
+        Returns: boolean
+      }
       check_and_alert_health_regression: { Args: never; Returns: Json }
       cleanup_old_health_snapshots: {
         Args: { days_to_keep?: number }
@@ -5568,6 +5572,22 @@ export type Database = {
           intensity: number
           max_active_connections: number
           sample_count: number
+        }[]
+      }
+      get_long_running_queries: {
+        Args: { p_limit?: number; p_min_seconds?: number }
+        Returns: {
+          application_name: string
+          client_addr: string
+          duration_seconds: number
+          pid: number
+          query: string
+          query_start: string
+          severity: string
+          state: string
+          usename: string
+          wait_event: string
+          wait_event_type: string
         }[]
       }
       get_maintenance_windows: {
