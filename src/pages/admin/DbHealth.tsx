@@ -34,6 +34,7 @@ import {
   AutovacuumHealthCard,
   WraparoundStatusCard,
   ActiveSessionsCard,
+  TopTablesBySizeCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -99,6 +100,7 @@ export default function DbHealthPage() {
         <AutovacuumHealthCard />
         <WraparoundStatusCard />
         <ActiveSessionsCard />
+        <TopTablesBySizeCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
