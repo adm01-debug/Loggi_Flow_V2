@@ -13,10 +13,12 @@ export { MttrMetricsCard } from "./components/MttrMetricsCard";
 export { GlobalHealthScoreCard } from "./components/GlobalHealthScoreCard";
 export { HealthScoreHistoryChart } from "./components/HealthScoreHistoryChart";
 export { HealthRegressionAlert } from "./components/HealthRegressionAlert";
+export { QueryDetailDialog } from "./components/QueryDetailDialog";
 export { useRemediationMttr } from "./hooks/useRemediationMttr";
 export { useGlobalHealthScore } from "./hooks/useGlobalHealthScore";
 export { useHealthScoreHistory } from "./hooks/useHealthScoreHistory";
 export { useHealthScoreRegression } from "./hooks/useHealthScoreRegression";
+export { useQueryDetail, useQueryIndexSuggestion } from "./hooks/useQueryDetail";
 export {
   useRemediationActions,
   useApplyRemediation,
