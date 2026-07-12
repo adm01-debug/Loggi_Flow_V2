@@ -108,6 +108,7 @@ export default function DbHealthPage() {
         <RlsAuditCard />
         <ExtensionsAuditCard />
         <TransactionHealthCard />
+        <WalHealthCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
