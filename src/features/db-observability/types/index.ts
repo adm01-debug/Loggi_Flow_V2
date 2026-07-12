@@ -75,13 +75,13 @@ export interface CapacityForecast {
   hours_ahead: number;
   threshold: number;
   hours_until_threshold: number | null;
-  severity: "critical" | "warning" | "ok";
+  severity: RegressionSeverity;
 }
 
 export interface RemediationSuggestion {
   id: string;
   category: "query" | "hotpath" | "contention" | "capacity" | string;
-  severity: "critical" | "warning" | "ok";
+  severity: RegressionSeverity;
   title: string;
   detail: string;
   recommended_action: string;
