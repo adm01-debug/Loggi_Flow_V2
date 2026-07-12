@@ -6,11 +6,12 @@ import {
   CronJobsCard,
   HealthTrendChart,
   PerformanceRunbook,
+  AnomaliesCard,
+  SloTrendCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
 export default function DbHealthPage() {
-  // Ativa alertas realtime enquanto admin está na página
   useDbRegressionAlerts();
 
   return (
@@ -23,20 +24,23 @@ export default function DbHealthPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Saúde do Banco</h1>
             <p className="text-sm text-muted-foreground">
-              Observabilidade de queries, cron jobs e tendências de performance.
+              Observabilidade de queries, cron jobs, anomalias e SLOs.
             </p>
           </div>
         </header>
 
         <div className="grid gap-6 md:grid-cols-2">
           <RegressionsCard />
+          <AnomaliesCard />
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <SloTrendCard />
           <CronJobsCard />
         </div>
 
         <TopQueriesCard />
-
         <HealthTrendChart />
-
         <PerformanceRunbook />
       </div>
     </MainLayout>

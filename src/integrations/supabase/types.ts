@@ -1761,6 +1761,39 @@ export type Database = {
         }
         Relationships: []
       }
+      db_slo_daily: {
+        Row: {
+          cache_slo_pct: number
+          computed_at: string
+          connection_slo_pct: number
+          day: string
+          deadlock_free_pct: number
+          id: string
+          overall_slo_pct: number
+          samples: number
+        }
+        Insert: {
+          cache_slo_pct: number
+          computed_at?: string
+          connection_slo_pct: number
+          day: string
+          deadlock_free_pct: number
+          id?: string
+          overall_slo_pct: number
+          samples: number
+        }
+        Update: {
+          cache_slo_pct?: number
+          computed_at?: string
+          connection_slo_pct?: number
+          day?: string
+          deadlock_free_pct?: number
+          id?: string
+          overall_slo_pct?: number
+          samples?: number
+        }
+        Relationships: []
+      }
       delivery_receipt_audit: {
         Row: {
           created_at: string
@@ -5168,6 +5201,25 @@ export type Database = {
       cleanup_old_telemetry_logs:
         | { Args: never; Returns: undefined }
         | { Args: { days_to_keep?: number }; Returns: number }
+      compute_db_slo_for: {
+        Args: { p_day: string }
+        Returns: {
+          cache_slo_pct: number
+          computed_at: string
+          connection_slo_pct: number
+          day: string
+          deadlock_free_pct: number
+          id: string
+          overall_slo_pct: number
+          samples: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "db_slo_daily"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       drop_old_partitions: {
         Args: {
           p_months_to_keep: number
@@ -5229,6 +5281,18 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      get_health_anomalies_fast: {
+        Args: never
+        Returns: {
+          current_value: number
+          detected_at: string
+          mean_value: number
+          metric: string
+          severity: string
+          stddev_value: number
+          z_score: number
+        }[]
       }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
@@ -5315,6 +5379,7 @@ export type Database = {
         Returns: boolean
       }
       jsonb_recursive_merge: { Args: { a: Json; b: Json }; Returns: Json }
+      persist_db_health_snapshot: { Args: never; Returns: string }
       purchase_reward: {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json

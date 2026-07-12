@@ -45,3 +45,24 @@ export const severityOf = (pct: number): RegressionSeverity => {
   if (pct >= 50) return "warning";
   return "ok";
 };
+
+export interface HealthAnomaly {
+  metric: string;
+  current_value: number;
+  mean_value: number;
+  stddev_value: number;
+  z_score: number;
+  severity: "critical" | "warning" | "ok";
+  detected_at: string;
+}
+
+export interface SloDaily {
+  id: string;
+  day: string;
+  samples: number;
+  connection_slo_pct: number;
+  cache_slo_pct: number;
+  deadlock_free_pct: number;
+  overall_slo_pct: number;
+  computed_at: string;
+}

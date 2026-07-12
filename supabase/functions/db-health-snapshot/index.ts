@@ -1,8 +1,8 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-// Coleta métricas de saúde do banco e (opcionalmente) persiste em db_health_snapshots.
-// Chamado sob demanda pelo painel admin OU pelo cron job horário.
+// Coleta métricas REAIS via RPC internal.collect_db_health() e opcionalmente persiste.
+// Persiste quando ?persist=true (cron horário) OU retorna somente snapshot atual (painel admin).
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -16,43 +16,31 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    // Queries curtas e baratas (todas leves).
-    const [conns, size, cache, deadlocks] = await Promise.all([
-      admin.rpc('exec_health_conns' as never).then(() => null).catch(() => null),
-      Promise.resolve(null),
-      Promise.resolve(null),
-      Promise.resolve(null),
-    ]);
-
-    // Fallback: usa consultas SQL brutas via PostgREST não é possível, então
-    // usamos uma RPC dedicada quando disponível OU retornamos apenas o timestamp.
-    // Nesta implementação inicial coletamos via queries diretas ao pg_catalog usando o service role.
-    const { data: metricsRow, error: metricsErr } = await admin
-      .from('pg_stat_database' as never)
-      .select('*')
-      .limit(0);
-
-    // Como PostgREST não expõe pg_catalog, delegamos a coleta ao Postgres via RPC pública `system_health_check`
-    const { data: health } = await admin.rpc('system_health_check');
-
-    const snapshot = {
-      active_connections: null as number | null,
-      total_connections: null as number | null,
-      db_size_bytes: null as number | null,
-      cache_hit_ratio: null as number | null,
-      deadlocks: null as number | null,
-      wal_size_bytes: null as number | null,
-      metadata: { health, collected_at: new Date().toISOString() },
-    };
-
     if (persist) {
-      const { error: insErr } = await admin
+      const { data: id, error } = await admin.rpc('persist_db_health_snapshot');
+      if (error) throw error;
+
+      const { data: snap } = await admin
         .from('db_health_snapshots')
-        .insert(snapshot);
-      if (insErr) throw insErr;
+        .select('*')
+        .eq('id', id as unknown as string)
+        .maybeSingle();
+
+      return new Response(JSON.stringify({ ok: true, id, snapshot: snap }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    return new Response(JSON.stringify({ ok: true, snapshot }), {
+    // Modo leitura: retorna último snapshot (rápido, sem escrita)
+    const { data: latest, error: rErr } = await admin
+      .from('db_health_snapshots')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (rErr) throw rErr;
+
+    return new Response(JSON.stringify({ ok: true, snapshot: latest }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
