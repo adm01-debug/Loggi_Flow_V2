@@ -20,6 +20,7 @@ import {
   IndexRoiCard,
   LoadHeatmapCard,
   MaintenanceWindowsCard,
+  TableCoaccessCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
