@@ -1725,6 +1725,45 @@ export type Database = {
           },
         ]
       }
+      db_health_score_history: {
+        Row: {
+          anomaly_score: number
+          capacity_score: number
+          captured_at: string
+          created_at: string
+          details: Json
+          grade: string
+          id: string
+          mttr_score: number
+          overall_score: number
+          slo_score: number
+        }
+        Insert: {
+          anomaly_score: number
+          capacity_score: number
+          captured_at?: string
+          created_at?: string
+          details?: Json
+          grade: string
+          id?: string
+          mttr_score: number
+          overall_score: number
+          slo_score: number
+        }
+        Update: {
+          anomaly_score?: number
+          capacity_score?: number
+          captured_at?: string
+          created_at?: string
+          details?: Json
+          grade?: string
+          id?: string
+          mttr_score?: number
+          overall_score?: number
+          slo_score?: number
+        }
+        Relationships: []
+      }
       db_health_snapshots: {
         Row: {
           active_connections: number | null
@@ -5374,6 +5413,18 @@ export type Database = {
           z_score: number
         }[]
       }
+      get_health_score_history_fast: {
+        Args: { p_days?: number }
+        Returns: {
+          anomaly_score: number
+          capacity_score: number
+          captured_at: string
+          grade: string
+          mttr_score: number
+          overall_score: number
+          slo_score: number
+        }[]
+      }
       get_leaderboard: {
         Args: { limit_count?: number; period_filter?: string }
         Returns: {
@@ -5487,6 +5538,7 @@ export type Database = {
       }
       jsonb_recursive_merge: { Args: { a: Json; b: Json }; Returns: Json }
       persist_db_health_snapshot: { Args: never; Returns: string }
+      persist_global_health_score: { Args: never; Returns: string }
       purchase_reward: {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json
