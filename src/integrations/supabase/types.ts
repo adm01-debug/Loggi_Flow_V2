@@ -5360,6 +5360,18 @@ export type Database = {
           regression_pct: number
         }[]
       }
+      get_remediation_suggestions_fast: {
+        Args: never
+        Returns: {
+          category: string
+          detail: string
+          evidence: Json
+          id: string
+          recommended_action: string
+          severity: string
+          title: string
+        }[]
+      }
       get_top_queries_fast: {
         Args: { p_limit?: number }
         Returns: {

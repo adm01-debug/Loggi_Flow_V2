@@ -9,6 +9,7 @@ import {
   AnomaliesCard,
   SloTrendCard,
   CapacityForecastCard,
+  RemediationSuggestionsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -39,6 +40,8 @@ export default function DbHealthPage() {
           <SloTrendCard />
           <CapacityForecastCard />
         </div>
+
+        <RemediationSuggestionsCard />
 
         <CronJobsCard />
 
