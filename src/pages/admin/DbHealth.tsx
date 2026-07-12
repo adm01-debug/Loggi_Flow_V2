@@ -10,7 +10,6 @@ import {
   SloTrendCard,
   CapacityForecastCard,
   RemediationSuggestionsCard,
-  RemediationSuggestionsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
