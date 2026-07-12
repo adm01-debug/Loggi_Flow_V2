@@ -22,6 +22,9 @@ Estado de **Perfeição Técnica Absoluta (10/10)** atingido, **sustentado** e *
 | 31 | Query Baseline | `internal.query_baseline` + RPC de regressões + cron diário |
 | 32 | Timeouts Defensivos | Statement/lock/idle timeouts por role |
 | 33 | Governance Final | ADR 0011 + Runbook `RUNBOOK_DB_PERFORMANCE.md` |
+| 34 | Painel DB Admin | `/admin/db-health` + RPCs `get_top_queries_fast` / `get_cron_jobs_status` |
+| 35 | Alertas de Regressão | Edge `db-regression-monitor` a cada 15min + hook realtime + feature flags |
+| 36 | Runbook Interativo + Histórico | `db_health_snapshots` (BRIN, 30d), cron horário, `<HealthTrendChart />`, ADR 0012 |
 
 ## Resultado
 - **Dashboards**: <5ms (era ~800ms)
