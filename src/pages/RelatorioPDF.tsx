@@ -149,7 +149,7 @@ export default function RelatorioPDF() {
         `relatorio_${reportType}_${format(new Date(), "yyyyMMdd_HHmm")}.pdf`,
       );
       toast.success("PDF gerado com sucesso!");
-    } catch (err) {
+    } catch {
       toast.error("Erro ao gerar PDF");
     } finally {
       setGenerating(false);

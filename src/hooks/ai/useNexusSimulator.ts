@@ -24,7 +24,7 @@ export function useNexusSimulator() {
         id: toastId,
         description: '100% de consistência de dados validada em todas as camadas.'
       });
-    } catch (error) {
+    } catch {
       toast.error('Falha na Simulação de Carga', { id: toastId });
     } finally {
       setIsSimulating(false);

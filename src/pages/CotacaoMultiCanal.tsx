@@ -218,7 +218,7 @@ export default function CotacaoMultiCanal() {
         toast.success(
           `${enriched.length} transportadora(s) local(is) encontrada(s)`,
         );
-    } catch (error) {
+    } catch {
       // Silent error handler
       toast.error("Erro ao buscar transportadoras");
     } finally {

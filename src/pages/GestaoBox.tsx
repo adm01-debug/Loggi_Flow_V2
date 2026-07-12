@@ -174,7 +174,7 @@ export default function GestaoBox() {
       }
       toast.success("Boxes liberados com sucesso", { id: loadingToast });
       clearSelection();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao liberar boxes", { id: loadingToast });
     }
   };
@@ -226,7 +226,7 @@ export default function GestaoBox() {
         );
       }
       toast.success("Alocação inteligente concluída", { id: loadingToast });
-    } catch (error) {
+    } catch {
       toast.error("Erro na alocação inteligente", { id: loadingToast });
     }
   };

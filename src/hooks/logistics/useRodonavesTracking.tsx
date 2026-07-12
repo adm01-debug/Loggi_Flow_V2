@@ -258,7 +258,7 @@ export function useRodonavesTracking() {
     try {
       await syncMutation.mutateAsync(cnpjRemetente);
       toast.dismiss(loader);
-    } catch (e) {
+    } catch {
       toast.dismiss(loader);
     }
   };

@@ -69,8 +69,6 @@ export function useMFA() {
 
       setEnrollmentData(data as EnrollmentData);
       return data;
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -107,8 +105,6 @@ export function useMFA() {
       await logSecurityEvent("mfa_enabled", "2FA foi ativado para a conta");
       
       return data;
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -135,8 +131,6 @@ export function useMFA() {
       }
 
       return data;
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -160,8 +154,6 @@ export function useMFA() {
       // Log security event
       await logSecurityEvent("mfa_disabled", "2FA foi desativado para a conta");
       
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }

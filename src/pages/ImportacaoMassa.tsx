@@ -186,7 +186,7 @@ export default function ImportacaoMassa() {
 
       // Reset step after some time
       setTimeout(() => setCurrentStep(0), 5000);
-    } catch (err) {
+    } catch {
       toast.error("Erro inesperado durante a importação");
       setCurrentStep(0);
     } finally {

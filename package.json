@@ -14,6 +14,7 @@
     "test:security": "vitest run tests/security/",
     "lint": "eslint .",
     "lint:budget": "node scripts/check-warning-budget.mjs",
+    "lint:budget:ratchet": "node scripts/ratchet-warning-budget.mjs",
     "quality:report": "node scripts/generate-quality-report.mjs",
     "preview": "vite preview",
     "test": "vitest",

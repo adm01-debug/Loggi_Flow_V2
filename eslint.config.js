@@ -51,7 +51,9 @@ export default tseslint.config(
       "sonarjs/no-nested-functions": "warn",
       "sonarjs/no-nested-template-literals": "warn",
       "sonarjs/no-identical-functions": "warn",
-      "sonarjs/pseudo-random": "warn",
+      // Disabled: project uses Math.random exclusively for non-cryptographic purposes
+      // (UI keys, animation seeds, sample data, test fixtures). Real crypto uses crypto.randomUUID.
+      "sonarjs/pseudo-random": "off",
       "sonarjs/constructor-for-side-effects": "warn",
       "sonarjs/prefer-single-boolean-return": "warn",
       "sonarjs/slow-regex": "warn",

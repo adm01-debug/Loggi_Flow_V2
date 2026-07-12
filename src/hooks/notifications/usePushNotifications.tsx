@@ -144,7 +144,7 @@ export const usePushNotifications = () => {
       setIsSubscribed(true);
       toast.success('Inscrito para notificações push!');
       return true;
-    } catch (err) {
+    } catch {
       // Silent fail
       toast.error('Erro ao ativar notificações push');
       return false;
