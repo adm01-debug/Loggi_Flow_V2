@@ -22,6 +22,7 @@ import {
   MaintenanceWindowsCard,
   TableCoaccessCard,
   SeqScanHotspotsCard,
+  UnusedIndexesCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
