@@ -17,6 +17,7 @@ const statusColor: Record<string, string> = {
   applied: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
   rejected: "bg-muted text-muted-foreground",
   failed: "bg-destructive/15 text-destructive border-destructive/30",
+  reverted: "bg-orange-500/15 text-orange-600 border-orange-500/30",
 };
 
 const statusLabel: Record<string, string> = {
@@ -25,6 +26,7 @@ const statusLabel: Record<string, string> = {
   applied: "Aplicado",
   rejected: "Rejeitado",
   failed: "Falhou",
+  reverted: "Revertido",
 };
 
 function ImpactCell({
@@ -102,6 +104,9 @@ export function IndexProposalsCard() {
                     <code className="text-xs font-mono block truncate">{p.ddl}</code>
                     {p.error_message && (
                       <p className="text-xs text-destructive mt-1">{p.error_message}</p>
+                    )}
+                    {p.revert_reason && (
+                      <p className="text-xs text-orange-600 mt-1">↩ {p.revert_reason}</p>
                     )}
                   </TableCell>
                   <TableCell className="text-xs">{p.target_table ?? "—"}</TableCell>

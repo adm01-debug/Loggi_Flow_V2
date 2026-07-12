@@ -10,7 +10,7 @@ export interface IndexProposal {
   ddl: string;
   rationale: string | null;
   confidence: string;
-  status: "proposed" | "approved" | "applied" | "rejected" | "failed";
+  status: "proposed" | "approved" | "applied" | "rejected" | "failed" | "reverted";
   applied_by: string | null;
   applied_at: string | null;
   error_message: string | null;
@@ -19,6 +19,8 @@ export interface IndexProposal {
   post_apply_mean_ms: number | null;
   improvement_pct: number | null;
   measured_at: string | null;
+  reverted_at: string | null;
+  revert_reason: string | null;
 }
 
 export function useIndexProposals() {
