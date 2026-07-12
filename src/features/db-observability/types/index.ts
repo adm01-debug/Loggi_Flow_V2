@@ -52,7 +52,7 @@ export interface HealthAnomaly {
   mean_value: number;
   stddev_value: number;
   z_score: number;
-  severity: "critical" | "warning" | "ok";
+  severity: RegressionSeverity;
   detected_at: string;
 }
 
