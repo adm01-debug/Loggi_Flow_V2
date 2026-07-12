@@ -5802,6 +5802,21 @@ export type Database = {
           write_lag_seconds: number
         }[]
       }
+      get_rls_audit: {
+        Args: never
+        Returns: {
+          has_delete_policy: boolean
+          has_insert_policy: boolean
+          has_select_policy: boolean
+          has_update_policy: boolean
+          policy_count: number
+          recommendation: string
+          rls_enabled: boolean
+          schema_name: string
+          severity: string
+          table_name: string
+        }[]
+      }
       get_seq_scan_hotspots: {
         Args: { p_limit?: number; p_min_live_tuples?: number }
         Returns: {
