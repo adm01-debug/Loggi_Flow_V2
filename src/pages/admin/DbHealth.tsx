@@ -80,6 +80,7 @@ export default function DbHealthPage() {
         <SeqScanHotspotsCard />
         <UnusedIndexesCard />
         <BloatHotspotsCard />
+        <UnindexedFksCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>
