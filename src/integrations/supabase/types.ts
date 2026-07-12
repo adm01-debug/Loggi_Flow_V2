@@ -5283,6 +5283,7 @@ export type Database = {
       }
       alert_slow_queries: { Args: { threshold_ms?: number }; Returns: number }
       calculate_level: { Args: { xp: number }; Returns: number }
+      check_and_alert_health_regression: { Args: never; Returns: Json }
       cleanup_old_health_snapshots: {
         Args: { days_to_keep?: number }
         Returns: number
@@ -5312,6 +5313,17 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      detect_health_score_regression: {
+        Args: { p_threshold?: number }
+        Returns: {
+          current_at: string
+          current_score: number
+          delta: number
+          previous_at: string
+          previous_score: number
+          regression_detected: boolean
+        }[]
       }
       drop_old_partitions: {
         Args: {
