@@ -5732,6 +5732,26 @@ export type Database = {
           title: string
         }[]
       }
+      get_replication_status: {
+        Args: never
+        Returns: {
+          application_name: string
+          backend_start: string
+          client_addr: string
+          flush_lag_bytes: number
+          flush_lag_seconds: number
+          pid: number
+          replay_lag_bytes: number
+          replay_lag_seconds: number
+          severity: string
+          state: string
+          sync_state: string
+          total_lag_bytes: number
+          usename: string
+          write_lag_bytes: number
+          write_lag_seconds: number
+        }[]
+      }
       get_seq_scan_hotspots: {
         Args: { p_limit?: number; p_min_live_tuples?: number }
         Returns: {
