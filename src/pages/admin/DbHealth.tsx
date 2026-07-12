@@ -18,6 +18,7 @@ import {
   HealthRegressionAlert,
   IndexProposalsCard,
   IndexRoiCard,
+  LoadHeatmapCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -67,6 +68,7 @@ export default function DbHealthPage() {
         <TopQueriesCard />
         <IndexRoiCard />
         <IndexProposalsCard />
+        <LoadHeatmapCard />
         <HealthTrendChart />
         <PerformanceRunbook />
       </div>

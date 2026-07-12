@@ -16,6 +16,8 @@ export { HealthRegressionAlert } from "./components/HealthRegressionAlert";
 export { QueryDetailDialog } from "./components/QueryDetailDialog";
 export { IndexProposalsCard } from "./components/IndexProposalsCard";
 export { IndexRoiCard } from "./components/IndexRoiCard";
+export { LoadHeatmapCard } from "./components/LoadHeatmapCard";
+export { useLoadHeatmap } from "./hooks/useLoadHeatmap";
 export { useRemediationMttr } from "./hooks/useRemediationMttr";
 export { useGlobalHealthScore } from "./hooks/useGlobalHealthScore";
 export { useHealthScoreHistory } from "./hooks/useHealthScoreHistory";

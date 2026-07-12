@@ -5541,6 +5541,18 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_load_heatmap: {
+        Args: { p_days?: number }
+        Returns: {
+          avg_active_connections: number
+          avg_cache_hit_ratio: number
+          day_of_week: number
+          hour_of_day: number
+          intensity: number
+          max_active_connections: number
+          sample_count: number
+        }[]
+      }
       get_monthly_analytics: {
         Args: { end_date: string; start_date: string }
         Returns: {
