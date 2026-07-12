@@ -23,6 +23,7 @@ import {
   TableCoaccessCard,
   SeqScanHotspotsCard,
   UnusedIndexesCard,
+  BloatHotspotsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
