@@ -140,7 +140,7 @@ export function DeliveryReceiptUpload({
       if (error) throw error;
       setPreview(null);
       toast.success("Comprovante removido");
-    } catch (error: any) {
+    } catch {
       toast.error("Erro ao remover comprovante");
     }
   };

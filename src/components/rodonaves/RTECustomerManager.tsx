@@ -32,7 +32,7 @@ export function RTECustomerManager() {
       });
       if (error) throw error;
       setCustomers(data?.Result || []);
-    } catch (err: any) {
+    } catch {
       toast.error('Erro ao buscar clientes');
     }
   };
@@ -47,7 +47,7 @@ export function RTECustomerManager() {
       });
       if (error) throw error;
       setCustomers(data?.Result ? [data.Result] : []);
-    } catch (err: any) {
+    } catch {
       toast.error('Erro na busca completa');
     }
   };
@@ -63,7 +63,7 @@ export function RTECustomerManager() {
       });
       if (error) throw error;
       setCustomers(data?.Result || []);
-    } catch (err: any) {
+    } catch {
       toast.error('Erro ao listar clientes');
     }
   };
@@ -78,7 +78,7 @@ export function RTECustomerManager() {
       });
       if (error) throw error;
       setAddresses(data?.Result || []);
-    } catch (err: any) {
+    } catch {
       toast.error('Erro ao buscar endereços');
     }
   };
