@@ -93,7 +93,7 @@ export function PerformanceRunbook() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => void step.action?.()}
+                onClick={() => { step.action?.(); }}
                 className="gap-2 shrink-0"
               >
                 <PlayCircle className="h-4 w-4" />

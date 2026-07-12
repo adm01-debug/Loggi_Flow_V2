@@ -50,18 +50,17 @@ export function SecurityOverviewPanel() {
       const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const currentUserId = user.id;
 
-      const [sessionsResult, devicesResult, loginAttemptsResult, securityEventsResult, blockedIPsResult] = await Promise.all([
-        supabase.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId),
-        supabase.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId),
-        supabase.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString()),
-        supabase.from('security_events').select('*').eq('user_id', currentUserId).gte('created_at', today.toISOString()),
-        supabase.from('rate_limit_logs').select('*', { count: 'exact' }).eq('user_id', currentUserId).eq('blocked', true).gte('created_at', last24h.toISOString()),
-      ]);
+      const sb = supabase as any;
+      const sessionsResult = await sb.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId);
+      const devicesResult = await sb.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId);
+      const loginAttemptsResult = await sb.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString());
+      const securityEventsResult = await sb.from('security_events').select('*').eq('user_id', currentUserId).gte('created_at', today.toISOString());
+      const blockedIPsResult = await sb.from('rate_limit_logs').select('*', { count: 'exact' }).eq('user_id', currentUserId).eq('blocked', true).gte('created_at', last24h.toISOString());
 
-      const sessions = sessionsResult.data || [];
-      const devices = devicesResult.data || [];
-      const loginAttempts = loginAttemptsResult.data || [];
-      const securityEvents = securityEventsResult.data || [];
+      const sessions = (sessionsResult.data ?? []) as Array<{ is_current?: boolean }>;
+      const devices = (devicesResult.data ?? []) as Array<{ is_trusted?: boolean }>;
+      const loginAttempts = (loginAttemptsResult.data ?? []) as Array<{ success?: boolean }>;
+      const securityEvents = (securityEventsResult.data ?? []) as Array<{ severity?: string; created_at?: string }>;
       const activeSessions = sessions.filter(s => s.is_current).length;
       const trustedDevices = devices.filter(d => d.is_trusted).length;
       const failedLogins = loginAttempts.filter(l => !l.success).length;
@@ -86,7 +85,7 @@ export function SecurityOverviewPanel() {
         totalSessions: sessions.length, activeSessions, knownDevices: devices.length, trustedDevices,
         recentLoginAttempts: loginAttempts.length, failedLoginAttempts: failedLogins,
         securityEventsToday: securityEvents.length, criticalEvents, blockedIPs: blockedIPsResult.count || 0,
-        mfaEnabled, lastSecurityEvent: securityEvents.length > 0 ? securityEvents[0].created_at : null, securityScore: score,
+        mfaEnabled, lastSecurityEvent: securityEvents.length > 0 ? (securityEvents[0].created_at ?? null) : null, securityScore: score,
       });
       setAlerts(newAlerts);
     } catch {} finally { setIsLoading(false); }
