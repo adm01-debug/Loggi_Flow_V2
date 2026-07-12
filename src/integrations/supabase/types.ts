@@ -5661,6 +5661,22 @@ export type Database = {
           title: string
         }[]
       }
+      get_seq_scan_hotspots: {
+        Args: { p_limit?: number; p_min_live_tuples?: number }
+        Returns: {
+          avg_tuples_per_scan: number
+          idx_scan: number
+          idx_tup_fetch: number
+          live_tuples: number
+          schema_name: string
+          seq_ratio: number
+          seq_scan: number
+          seq_tup_read: number
+          severity: string
+          table_name: string
+          table_size_bytes: number
+        }[]
+      }
       get_table_coaccess_graph: {
         Args: { p_limit?: number }
         Returns: {
