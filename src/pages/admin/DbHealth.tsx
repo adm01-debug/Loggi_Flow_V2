@@ -8,6 +8,7 @@ import {
   PerformanceRunbook,
   AnomaliesCard,
   SloTrendCard,
+  CapacityForecastCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
@@ -36,8 +37,10 @@ export default function DbHealthPage() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <SloTrendCard />
-          <CronJobsCard />
+          <CapacityForecastCard />
         </div>
+
+        <CronJobsCard />
 
         <TopQueriesCard />
         <HealthTrendChart />
