@@ -65,6 +65,7 @@ export default function DbHealthPage() {
         <CronJobsCard />
 
         <TopQueriesCard />
+        <IndexRoiCard />
         <IndexProposalsCard />
         <HealthTrendChart />
         <PerformanceRunbook />
