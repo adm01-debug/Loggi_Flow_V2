@@ -5349,6 +5349,19 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_global_health_score_fast: {
+        Args: never
+        Returns: {
+          anomaly_score: number
+          capacity_score: number
+          computed_at: string
+          details: Json
+          grade: string
+          mttr_score: number
+          overall_score: number
+          slo_score: number
+        }[]
+      }
       get_health_anomalies_fast: {
         Args: never
         Returns: {
