@@ -5855,6 +5855,21 @@ export type Database = {
           total_exec_ms: number
         }[]
       }
+      get_top_tables_by_size: {
+        Args: { p_limit?: number }
+        Returns: {
+          bytes_per_row: number
+          estimated_rows: number
+          indexes_bytes: number
+          recommendation: string
+          schema_name: string
+          severity: string
+          table_bytes: number
+          table_name: string
+          toast_bytes: number
+          total_bytes: number
+        }[]
+      }
       get_unindexed_foreign_keys: {
         Args: never
         Returns: {
