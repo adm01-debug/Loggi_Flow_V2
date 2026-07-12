@@ -32,7 +32,6 @@ export function TacticalTerminal() {
         id: log.id,
         timestamp: new Date(log.created_at).toLocaleTimeString([], {
           hour12: false,
-          fractionalSecondDigits: 3,
         }),
         module: log.type, // Map 'type' to 'module'
         message: log.message,
