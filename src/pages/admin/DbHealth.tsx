@@ -12,6 +12,7 @@ import {
   RemediationSuggestionsCard,
   ExportHealthReportButton,
   RemediationHistoryCard,
+  MttrMetricsCard,
   useDbRegressionAlerts,
 } from "@/features/db-observability";
 
