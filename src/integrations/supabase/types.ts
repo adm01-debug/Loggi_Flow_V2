@@ -4878,6 +4878,18 @@ export type Database = {
           transportadora_id: string
         }[]
       }
+      get_cron_jobs_status: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobid: number
+          jobname: string
+          last_duration_ms: number
+          last_start: string
+          last_status: string
+          schedule: string
+        }[]
+      }
       get_current_organization_id: { Args: never; Returns: string }
       get_dashboard_metrics: { Args: never; Returns: Json }
       get_dashboard_metrics_fast: {
@@ -4941,6 +4953,18 @@ export type Database = {
           query_text: string
           queryid: number
           regression_pct: number
+        }[]
+      }
+      get_top_queries_fast: {
+        Args: { p_limit?: number }
+        Returns: {
+          calls: number
+          max_exec_ms: number
+          mean_exec_ms: number
+          query_text: string
+          queryid: number
+          rows_returned: number
+          total_exec_ms: number
         }[]
       }
       get_user_permissions: {
