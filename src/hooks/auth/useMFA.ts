@@ -154,8 +154,6 @@ export function useMFA() {
       // Log security event
       await logSecurityEvent("mfa_disabled", "2FA foi desativado para a conta");
       
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
