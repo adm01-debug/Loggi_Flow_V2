@@ -50,11 +50,12 @@ export function SecurityOverviewPanel() {
       const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const currentUserId = user.id;
 
-      const sessionsResult = await supabase.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId);
-      const devicesResult = await supabase.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId);
-      const loginAttemptsResult = await supabase.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString());
-      const securityEventsResult = await supabase.from('security_events').select('*').eq('user_id', currentUserId).gte('created_at', today.toISOString());
-      const blockedIPsResult = await supabase.from('rate_limit_logs').select('*', { count: 'exact' }).eq('user_id', currentUserId).eq('blocked', true).gte('created_at', last24h.toISOString());
+      const sb = supabase as any;
+      const sessionsResult = await sb.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId);
+      const devicesResult = await sb.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId);
+      const loginAttemptsResult = await sb.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString());
+      const securityEventsResult = await sb.from('security_events').select('*').eq('user_id', currentUserId).gte('created_at', today.toISOString());
+      const blockedIPsResult = await sb.from('rate_limit_logs').select('*', { count: 'exact' }).eq('user_id', currentUserId).eq('blocked', true).gte('created_at', last24h.toISOString());
 
       const sessions = (sessionsResult.data ?? []) as Array<{ is_current?: boolean }>;
       const devices = (devicesResult.data ?? []) as Array<{ is_trusted?: boolean }>;
