@@ -69,8 +69,6 @@ export function useMFA() {
 
       setEnrollmentData(data as EnrollmentData);
       return data;
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
