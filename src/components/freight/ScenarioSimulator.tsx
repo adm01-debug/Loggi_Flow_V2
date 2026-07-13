@@ -9,11 +9,10 @@ import { formatCurrency } from '@/lib/formatters';
 
 interface SimulationResult {
   volumes: number;
-  results: {
+  results: Array<{
     transportadora_nome: string;
     valor_total: number;
-    [key: string]: unknown;
-  }[];
+  }>;
 }
 
 interface ScenarioSimulatorProps<TCargo = unknown> {
