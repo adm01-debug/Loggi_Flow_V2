@@ -16,6 +16,14 @@ interface ConciliacaoStats {
   diferenca: number;
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  pendente: "Pendente",
+  conciliado: "Conciliado",
+  divergencia: "Divergência",
+};
+const statusLabel = (s: string | null | undefined) => STATUS_LABELS[s ?? ""] ?? "Ignorado";
+
+
 export function exportToPDF(
   conciliacao: Conciliacao,
   itens: ItemImportado[],
@@ -51,10 +59,10 @@ export function exportToPDF(
     item.transportadora_nome || "-",
     formatCurrency(item.valor),
     item.diferenca_valor !== null ? formatCurrency(item.diferenca_valor) : "-",
-    item.status === "pendente" ? "Pendente" :
-      item.status === "conciliado" ? "Conciliado" :
-      item.status === "divergencia" ? "Divergência" : "Ignorado"
+    statusLabel(item.status),
   ]);
+
+
 
   autoTable(doc, {
     head: [["Linha", "Referência", "Descrição", "Data", "Transportadora", "Valor", "Diferença", "Status"]],
@@ -123,9 +131,8 @@ export function exportToExcel(
       item.transportadora_nome || "",
       item.valor,
       item.diferenca_valor ?? "",
-      item.status === "pendente" ? "Pendente" :
-        item.status === "conciliado" ? "Conciliado" :
-        item.status === "divergencia" ? "Divergência" : "Ignorado",
+      statusLabel(item.status),
+
       item.observacoes || ""
     ])
   ];

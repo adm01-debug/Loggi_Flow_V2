@@ -76,51 +76,57 @@ export function useBusinessRuleEngine() {
     return result;
   }, [evaluateCondition]);
 
-  const executeActions = useCallback(async (rule: BusinessRule, entityId: string, entityData: Record<string, unknown>) => {
+  const resolveActionUrl = useCallback((entityType: string) => {
+    if (entityType === "coleta") return "/coletas";
+    if (entityType === "entrega") return "/envios";
+    return "/ocorrencias";
+  }, []);
+
+  const resolveEntityTable = useCallback((entityType: string) => {
+    if (entityType === "coleta") return "coletas" as const;
+    if (entityType === "entrega") return "entregas" as const;
+    return "ocorrencias" as const;
+  }, []);
+
+  const runAction = useCallback(async (
+    action: BusinessRule["actions"][number],
+    rule: BusinessRule,
+    entityId: string,
+  ) => {
+    if (action.type === "send_notification" || action.type === "create_alert") {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) return;
+      const isAlert = action.type === "create_alert";
+      await supabase.from("notifications").insert({
+        user_id: userData.user.id,
+        title: isAlert ? `⚠️ Alerta: ${rule.name}` : `Regra: ${rule.name}`,
+        message:
+          (isAlert ? action.config.alert_message : action.config.message) ||
+          (isAlert
+            ? `Alerta disparado pela regra "${rule.name}"`
+            : `Regra "${rule.name}" acionada`),
+        type: isAlert ? ("warning" as const) : ("info" as const),
+        ...(isAlert ? {} : { action_url: resolveActionUrl(rule.entity_type) }),
+      });
+      return;
+    }
+    if (action.type === "change_status" && action.config.new_status) {
+      const table = resolveEntityTable(rule.entity_type);
+      await supabase.from(table).update({ status: action.config.new_status }).eq("id", entityId);
+    }
+  }, [resolveActionUrl, resolveEntityTable]);
+
+  const executeActions = useCallback(async (rule: BusinessRule, entityId: string, _entityData: Record<string, unknown>) => {
     const startTime = Date.now();
 
     for (const action of rule.actions) {
       try {
-        switch (action.type) {
-          case "send_notification": {
-            const { data: userData } = await supabase.auth.getUser();
-            if (userData?.user) {
-              await supabase.from("notifications").insert({
-                user_id: userData.user.id,
-                title: `Regra: ${rule.name}`,
-                message: action.config.message || `Regra "${rule.name}" acionada`,
-                type: "info" as const,
-                action_url: `/${rule.entity_type === "coleta" ? "coletas" : rule.entity_type === "entrega" ? "envios" : "ocorrencias"}`,
-              });
-            }
-            break;
-          }
-          case "create_alert": {
-            const { data: userData } = await supabase.auth.getUser();
-            if (userData?.user) {
-              await supabase.from("notifications").insert({
-                user_id: userData.user.id,
-                title: `⚠️ Alerta: ${rule.name}`,
-                message: action.config.alert_message || `Alerta disparado pela regra "${rule.name}"`,
-                type: "warning" as const,
-              });
-            }
-            break;
-          }
-          case "change_status": {
-            const table = rule.entity_type === "coleta" ? "coletas" : rule.entity_type === "entrega" ? "entregas" : "ocorrencias";
-            if (action.config.new_status) {
-              await supabase.from(table).update({ status: action.config.new_status }).eq("id", entityId);
-            }
-            break;
-          }
-        }
+        await runAction(action, rule, entityId);
       } catch {
         // Rule action failed — silent fail for background processing
       }
     }
 
-    // Log execution using batching system
     const executionTime = Date.now() - startTime;
     addToBatch({
       rule_id: rule.id,
@@ -140,7 +146,8 @@ export function useBusinessRuleEngine() {
         metadata: { rule_id: rule.id, entity_type: rule.entity_type }
       });
     }
-  }, []);
+  }, [runAction, addToBatch, logTelemetry]);
+
 
   const evaluateRules = useCallback(async (
     entityType: string,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,9 +39,8 @@ export function SecurityOverviewPanel() {
   const [alerts, setAlerts] = useState<SecurityAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => { if (user?.id) fetchSecurityStats(); }, [user?.id]);
+  const fetchSecurityStats = useCallback(async () => {
 
-  const fetchSecurityStats = async () => {
     setIsLoading(true);
     try {
       if (!user?.id) return;
@@ -50,7 +49,11 @@ export function SecurityOverviewPanel() {
       const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const currentUserId = user.id;
 
+      // Tabelas security ainda não geradas nos tipos; usa cast único para a fluent API do supabase.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sb = supabase as any;
+
+
       const sessionsResult = await sb.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId);
       const devicesResult = await sb.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId);
       const loginAttemptsResult = await sb.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString());
@@ -88,8 +91,18 @@ export function SecurityOverviewPanel() {
         mfaEnabled, lastSecurityEvent: securityEvents.length > 0 ? (securityEvents[0].created_at ?? null) : null, securityScore: score,
       });
       setAlerts(newAlerts);
-    } catch {} finally { setIsLoading(false); }
-  };
+    } catch {
+      // silencia falha de leitura de estatísticas de segurança
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) fetchSecurityStats();
+  }, [user?.id, fetchSecurityStats]);
+
+
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -118,12 +131,18 @@ export function SecurityOverviewPanel() {
           <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-lg"><AlertTriangle className="h-5 w-5 text-warning" />Alertas de Segurança</CardTitle></CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {alerts.map((alert) => (
-                <div key={alert.id} className={`flex items-center gap-3 p-3 rounded-lg border ${getSeverityColor(alert.severity)}`}>
-                  {alert.severity === 'critical' ? <XCircle className="h-5 w-5 flex-shrink-0" /> : alert.severity === 'warning' ? <AlertTriangle className="h-5 w-5 flex-shrink-0" /> : <Activity className="h-5 w-5 flex-shrink-0" />}
-                  <span className="text-sm flex-1">{alert.message}</span>
-                </div>
-              ))}
+              {alerts.map((alert) => {
+                let AlertIcon = <Activity className="h-5 w-5 flex-shrink-0" />;
+                if (alert.severity === 'critical') AlertIcon = <XCircle className="h-5 w-5 flex-shrink-0" />;
+                else if (alert.severity === 'warning') AlertIcon = <AlertTriangle className="h-5 w-5 flex-shrink-0" />;
+                return (
+                  <div key={alert.id} className={`flex items-center gap-3 p-3 rounded-lg border ${getSeverityColor(alert.severity)}`}>
+                    {AlertIcon}
+                    <span className="text-sm flex-1">{alert.message}</span>
+                  </div>
+                );
+              })}
+
             </div>
           </CardContent>
         </Card>

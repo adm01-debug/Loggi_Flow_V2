@@ -48,7 +48,7 @@ const filterConfig: FilterConfig<DeliveryPoint> = {
 
 export default function MapaRotas() {
   const deliveryRoutes = useDeliveryRoutes();
-  const routes = deliveryRoutes?.data || [];
+  const routes = useMemo(() => deliveryRoutes?.data || [], [deliveryRoutes?.data]);
 
   const [showRouteLines] = useState(true);
   const [mapStyle] = useState<"dark" | "satellite">("dark");
@@ -116,7 +116,7 @@ export default function MapaRotas() {
           }),
           event_time: l.event_time,
           msg: l.message,
-          type: l.type as any,
+          type: l.type as "info" | "warn" | "crit",
           vehicle: l.target_vehicle,
         })),
       );
@@ -434,11 +434,10 @@ export default function MapaRotas() {
                         <div
                           className={cn(
                             "w-1 h-full absolute left-0 top-0",
-                            log.type === "crit"
-                              ? "bg-rose-500"
-                              : log.type === "warn"
-                                ? "bg-amber-500"
-                                : "bg-cyan-500/20",
+                            (log.type === "crit" && "bg-rose-500") ||
+                              (log.type === "warn" && "bg-amber-500") ||
+                              "bg-cyan-500/20",
+
                           )}
                         />
                         <div className="flex-1 space-y-2">

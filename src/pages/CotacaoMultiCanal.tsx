@@ -101,7 +101,7 @@ export default function CotacaoMultiCanal() {
         destinoCidade || undefined,
       );
       const enriched: TransportadoraComCanal[] = localResults.map((rota) => {
-        const t = rota.transportadora as any;
+        const t = rota.transportadora as { api_disponivel?: boolean; whatsapp_operacional?: string; email_comercial?: string } | undefined;
         const hasApi = t?.api_disponivel === true;
         const hasWhatsapp = !!t?.whatsapp_operacional;
         let canal: "api" | "whatsapp" | "email" = "email";
@@ -160,18 +160,27 @@ export default function CotacaoMultiCanal() {
             to: { postal_code: cleanedDestinoCep },
             volumes: [{ width: 20, height: 20, length: 20, weight: weight }], // Default volume if not provided
           })
-          .then((res: any) => {
+          .then((res: unknown) => {
             if (Array.isArray(res)) {
-              res.forEach((option: any) => {
+              type MEOption = {
+                id?: string | number;
+                name?: string;
+                price?: string | number;
+                delivery_range?: { max?: number };
+                delivery_time?: number;
+                error?: unknown;
+              };
+              (res as MEOption[]).forEach((option) => {
                 if (!option.error) {
                   addCotacao({
                     id: crypto.randomUUID(),
                     transportadora_id: `me-${option.id}`,
                     transportadora_nome: `Melhor Envio - ${option.name}`,
                     canal: "api",
-                    valor: parseFloat(option.price),
+                    valor: parseFloat(String(option.price ?? "0")),
                     prazo_dias:
-                      option.delivery_range?.max || option.delivery_time,
+                      option.delivery_range?.max ?? option.delivery_time ?? null,
+
                     status: "respondido",
                     observacoes: `Serviço: ${option.name}`,
                     created_at: new Date().toISOString(),
@@ -180,6 +189,7 @@ export default function CotacaoMultiCanal() {
               });
             }
           })
+
           .catch((e) => {
             // Silent catch
           });
