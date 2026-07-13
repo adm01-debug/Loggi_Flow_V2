@@ -191,6 +191,7 @@ export function MapboxMap({
       map.current?.remove();
       map.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, center, zoom, riskZones]); // Re-init if core props change significantly
 
   // Handle Style, Pitch and Traffic changes
