@@ -140,7 +140,24 @@ export function MEEtiquetasPanel() {
     rastreio: o.tracking || '-',
   }));
 
+  let stateElement: React.ReactNode = null;
+  if (listarEtiquetas.isLoading) {
+    stateElement = <TableSkeleton rows={5} columns={8} />;
+  } else if (listarEtiquetas.isError) {
+    stateElement = <MEErrorState message="Erro ao carregar etiquetas." onRetry={() => listarEtiquetas.refetch()} />;
+  } else if (filteredOrders.length === 0) {
+    stateElement = (
+      <EmptyState
+        variant="inbox"
+        title="Nenhuma etiqueta encontrada"
+        description={statusFilter !== 'all' ? 'Nenhuma etiqueta com este status. Tente outro filtro.' : 'Compre fretes no carrinho para gerar etiquetas.'}
+        size="sm"
+      />
+    );
+  }
+
   return (
+
     <div className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
