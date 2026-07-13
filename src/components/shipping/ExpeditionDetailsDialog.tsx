@@ -51,21 +51,8 @@ interface TimelineEvent {
 interface ExpeditionDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  delivery: {
-    id: string;
-    status: string;
-    numero_entrega?: string;
-    codigo_rastreamento?: string | null;
-    endereco_entrega?: string;
-    previsao_entrega?: string | null;
-    data_entrega_efetiva?: string | null;
-    data_despacho?: string | null;
-    nf_remessa?: string | null;
-    valor_frete?: number | null;
-    transportadora?: { nome_fantasia: string } | null;
-    cliente?: { razao_social: string } | null;
-    [key: string]: unknown;
-  } | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  delivery: any | null;
   statusConfig: Record<
     string,
     {
