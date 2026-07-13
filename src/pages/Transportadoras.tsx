@@ -85,8 +85,9 @@ interface CarrierCredentials {
   api_password: string;
   endpoint: string;
 }
+type NonApiChannel = "whatsapp" | "email" | "portal";
 interface NonApiConfig {
-  type: "whatsapp" | "email" | "portal";
+  type: NonApiChannel;
   template: string;
   recipient: string;
   portal_url: string;
