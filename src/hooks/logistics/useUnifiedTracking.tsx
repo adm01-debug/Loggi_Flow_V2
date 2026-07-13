@@ -208,7 +208,23 @@ export function useUnifiedTracking() {
     const result: UnifiedShipment[] = [];
 
     // Normalize entregas
-    (entregas || []).forEach((e: Record<string, unknown> & { id: string; transportadora?: unknown; cliente?: unknown }) => {
+    interface EntregaRow {
+      id: string;
+      numero_entrega: string;
+      status: string;
+      endereco_entrega: string;
+      transportadora_id: string | null;
+      previsao_entrega: string | null;
+      data_entrega_efetiva: string | null;
+      codigo_rastreamento: string | null;
+      nf_remessa: string | null;
+      valor_frete: number | null;
+      latitude: number | null;
+      longitude: number | null;
+      transportadora?: { nome_fantasia: string } | null;
+      cliente?: { razao_social: string } | null;
+    }
+    (entregas as EntregaRow[] | undefined || []).forEach((e) => {
       const t = e.transportadora as { nome_fantasia: string } | null;
       const c = e.cliente as { razao_social: string } | null;
       const atrasado = isAtrasado(
