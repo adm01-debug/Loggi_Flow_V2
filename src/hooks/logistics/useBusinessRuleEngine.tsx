@@ -28,7 +28,7 @@ export function useBusinessRuleEngine() {
     }
   }, []);
 
-  const addToBatch = useCallback((log: any) => {
+  const addToBatch = useCallback((log: { conditions_met: boolean; entity_id: string; entity_type: string; trigger_event: string; rule_id?: string | null; actions_executed?: Json; error_message?: string | null; execution_time_ms?: number | null }) => {
     executionBatchRef.current.push(log);
     if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
     batchTimerRef.current = setTimeout(flushLogs, 2000);
