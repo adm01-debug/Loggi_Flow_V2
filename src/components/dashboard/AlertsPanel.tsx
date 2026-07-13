@@ -58,7 +58,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
         // Mocking delta calculation for demonstration if not present
         // In a real scenario, this would come from the backend/hook
         const delta =
-          (alert as any).delta || Number(alert.id.charCodeAt(0)) % 20;
+          alert.delta || Number(alert.id.charCodeAt(0)) % 20;
         return delta >= threshold;
       });
     }, [initialAlerts, threshold]);
@@ -277,7 +277,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                     const Icon = getAlertIcon(alert.type);
                     const styles = getSeverityStyles(alert.severity);
                     const delta =
-                      (alert as any).delta ||
+                      alert.delta ||
                       (Number(alert.id.charCodeAt(0)) % 20) + 5;
 
                     return (
