@@ -351,10 +351,10 @@ export function ExpeditionDetailsDialog({
                                   { locale: ptBR },
                                 )}
                               </span>
-                              {(event as any).action_by_user?.display_name && (
+                              {event.action_by_user?.display_name && (
                                 <span className="flex items-center gap-1.5 text-primary">
                                   <User className="w-3 h-3" />{" "}
-                                  {(event as any).action_by_user.display_name}
+                                  {event.action_by_user.display_name}
                                 </span>
                               )}
                             </div>
