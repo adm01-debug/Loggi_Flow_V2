@@ -7,7 +7,7 @@ import {
 } from "@supabase/supabase-js";
 
 // Simple internal debounce function to avoid external dependencies
-function debounce<T extends (...args: any[]) => void>(
+function debounce<T extends (...args: unknown[]) => void>(
   func: T,
   wait: number,
 ): (...args: Parameters<T>) => void {
