@@ -811,7 +811,21 @@ export function LogisticsMapWidget() {
                 </Source>
               )}
 
-              {filteredShipments.map((s) => (
+              {filteredShipments.map((s) => {
+                const inTransit = ["em_transito", "despachado", "saiu_entrega"].includes(s.status);
+                const delivered = ["entregue", "finalizado", "recebido"].includes(s.status);
+                let statusRingColor = "bg-destructive";
+                if (inTransit) statusRingColor = "bg-primary";
+                else if (delivered) statusRingColor = "bg-success";
+                let markerColorClass = "bg-black border-destructive text-destructive";
+                if (inTransit) markerColorClass = "bg-black border-primary text-primary";
+                else if (delivered) markerColorClass = "bg-black border-success text-success";
+                let MarkerIcon = <Package className="w-5 h-5" />;
+                if (s.atrasado) MarkerIcon = <AlertTriangle className="w-5 h-5 animate-bounce" />;
+                else if (s.valorFrete && s.valorFrete > 500)
+                  MarkerIcon = <Star className="w-5 h-5 animate-pulse text-primary fill-primary" />;
+                else if (s.tipo === "entrega") MarkerIcon = <Truck className="w-5 h-5" />;
+                return (
                 <Marker
                   key={s.id}
                   latitude={s.coordinates!.lat}
@@ -835,15 +849,7 @@ export function LogisticsMapWidget() {
                     <div
                       className={cn(
                         "absolute -inset-4 rounded-full animate-ping opacity-20",
-                        ["em_transito", "despachado", "saiu_entrega"].includes(
-                          s.status,
-                        )
-                          ? "bg-primary"
-                          : ["entregue", "finalizado", "recebido"].includes(
-                                s.status,
-                              )
-                            ? "bg-success"
-                            : "bg-destructive",
+                        statusRingColor,
                       )}
                     />
 
@@ -853,27 +859,12 @@ export function LogisticsMapWidget() {
                         selectedShipment?.id === s.id
                           ? "scale-125 -translate-y-2 border-white ring-4 ring-primary/30"
                           : "border-primary/50",
-                        ["em_transito", "despachado", "saiu_entrega"].includes(
-                          s.status,
-                        )
-                          ? "bg-black border-primary text-primary"
-                          : ["entregue", "finalizado", "recebido"].includes(
-                                s.status,
-                              )
-                            ? "bg-black border-success text-success"
-                            : "bg-black border-destructive text-destructive",
+                        markerColorClass,
                       )}
                     >
-                      {s.atrasado ? (
-                        <AlertTriangle className="w-5 h-5 animate-bounce" />
-                      ) : s.valorFrete && s.valorFrete > 500 ? (
-                        <Star className="w-5 h-5 animate-pulse text-primary fill-primary" />
-                      ) : s.tipo === "entrega" ? (
-                        <Truck className="w-5 h-5" />
-                      ) : (
-                        <Package className="w-5 h-5" />
-                      )}
+                      {MarkerIcon}
                     </div>
+
 
                     {/* Simple Tooltip on Hover */}
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 group-hover/marker:opacity-100 transition-opacity pointer-events-none z-50">
