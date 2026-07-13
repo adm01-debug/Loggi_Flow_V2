@@ -208,7 +208,7 @@ export function useUnifiedTracking() {
     const result: UnifiedShipment[] = [];
 
     // Normalize entregas
-    (entregas || []).forEach((e: any) => {
+    (entregas || []).forEach((e: Record<string, unknown> & { id: string; transportadora?: unknown; cliente?: unknown }) => {
       const t = e.transportadora as { nome_fantasia: string } | null;
       const c = e.cliente as { razao_social: string } | null;
       const atrasado = isAtrasado(
