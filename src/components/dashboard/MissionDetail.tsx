@@ -32,8 +32,8 @@ function formatDate(date: string | null): string {
 }
 
 export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
-  const [bitrixData, setBitrixData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setBitrixData] = useState<any>(null);
+  const [, setIsLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;

@@ -50,7 +50,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
       "nexus-alert-threshold",
       5,
     );
-    const [deltaVisibility, setDeltaVisibility] = React.useState(false);
+    
 
     // Delta Filter Logic
     const alerts = React.useMemo(() => {

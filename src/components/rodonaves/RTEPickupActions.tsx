@@ -17,7 +17,7 @@ interface RTEPickupActionsProps {
 export function RTEPickupActions({ coletaId, protocolNumber, onActionComplete }: RTEPickupActionsProps) {
   const rte = useRodonavesTracking();
   const [showReschedule, setShowReschedule] = useState(false);
-  const [showCreate, setShowCreate] = useState(false);
+  
   const [showDates, setShowDates] = useState(false);
   const [newDate, setNewDate] = useState('');
   const [protocol, setProtocol] = useState(protocolNumber?.toString() || '');

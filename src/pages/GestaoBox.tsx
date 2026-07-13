@@ -116,7 +116,7 @@ export default function GestaoBox() {
     removeFromBox,
     toggleCrossDocking,
   } = useBoxManagement();
-  const { playSuccess, playError, playAction } = useAudioFeedback();
+  const { playAction } = useAudioFeedback();
 
   const [selectedBox, setSelectedBox] = useState<BoxData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

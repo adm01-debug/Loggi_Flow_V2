@@ -33,9 +33,6 @@ import {
   PackageCheck,
   Coins,
   LucideIcon,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   GraduationCap,
   User,
   Bell,
@@ -280,7 +277,7 @@ export default function Conquistas() {
     totalFiltered,
     totalOriginal,
   } = useFilters(tabFiltered, filterConfig);
-  const { sortedData, toggleSort, getSortDirection } = useSorting(
+  const { sortedData } = useSorting(
     filteredData,
     { defaultKey: "unlocked", defaultDirection: "desc" },
   );
@@ -297,15 +294,6 @@ export default function Conquistas() {
     [mappedAchievements],
   );
 
-  const SortIcon = ({ field }: { field: string }) => {
-    const dir = getSortDirection(field as any);
-    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   return (
     <MainLayout>

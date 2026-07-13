@@ -78,7 +78,7 @@ RefreshTimer.displayName = "RefreshTimer";
 export default function Index() {
   const [performanceMode, setPerformanceMode] = useState(false);
   usePerformanceMonitor();
-  const { data: metrics, refetch: refetchMetrics } = useDashboardMetrics();
+  const { refetch: refetchMetrics } = useDashboardMetrics();
   const {
     data: alerts = [],
     isLoading: alertsLoading,
@@ -135,7 +135,6 @@ export default function Index() {
   const {
     chartData,
     statusStats,
-    isLoading: combinedLoading,
     refetch: combinedRefetch,
   } = useDashboardData(dateRange);
 
