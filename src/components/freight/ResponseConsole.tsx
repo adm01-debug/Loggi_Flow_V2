@@ -21,7 +21,7 @@ interface RawResponse {
   carrier_name: string;
   raw_text: string;
   processed: boolean;
-  extracted_data?: any;
+  extracted_data?: Record<string, unknown>;
   created_at: string;
 }
 
@@ -34,7 +34,7 @@ export function ResponseConsole() {
     const channel = supabase
       .channel("raw_responses")
       .on(
-        "postgres_changes" as any,
+        "postgres_changes",
         { event: "*", schema: "public", table: "cotacoes_multicanal" },
         () => {
           fetchIncoming();
@@ -57,7 +57,7 @@ export function ResponseConsole() {
     if (data) {
       const formatted = data.map((c) => ({
         id: c.id,
-        source: c.canal as any,
+        source: c.canal as RawResponse["source"],
         carrier_id: c.transportadora_id,
         carrier_name: c.transportadora?.nome_fantasia || "N/A",
         raw_text: c.observacoes || "Sem texto original",
@@ -86,8 +86,8 @@ export function ResponseConsole() {
       if (error) throw error;
       toast.success("Normalização concluída com sucesso!");
       fetchIncoming();
-    } catch (error: any) {
-      toast.error(`Erro ao normalizar: ${error.message}`);
+    } catch (error) {
+      toast.error(`Erro ao normalizar: ${(error as Error).message}`);
     } finally {
       setIsProcessing(null);
     }

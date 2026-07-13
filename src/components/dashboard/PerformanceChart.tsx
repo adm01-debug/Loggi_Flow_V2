@@ -67,7 +67,7 @@ const PerformanceChart = React.forwardRef<
     },
     ref,
   ) => {
-    const CustomTooltip = ({ active, payload, label }: any) => {
+    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color?: string; dataKey: string }>; label?: string }) => {
       if (active && payload && payload.length) {
         return (
           <div className="relative group/tooltip">
@@ -89,7 +89,7 @@ const PerformanceChart = React.forwardRef<
                 </div>
               </div>
               <div className="space-y-5">
-                {payload.map((entry: any, index: number) => (
+                {payload.map((entry, index: number) => (
                   <div
                     key={index}
                     className="flex items-center justify-between gap-8 group/item"
@@ -245,7 +245,7 @@ const PerformanceChart = React.forwardRef<
                     className="fill-white font-black text-5xl italic tracking-tighter drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]"
                   >
                     {data.reduce(
-                      (acc: any, curr: any) =>
+                      (acc: number, curr: Record<string, unknown>) =>
                         acc + (Number(curr[dataKey]) || 0),
                       0,
                     )}

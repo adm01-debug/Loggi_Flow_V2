@@ -18,8 +18,8 @@ export function RTECustomerManager() {
   const [addressTaxId, setAddressTaxId] = useState('');
   const [, setShowNewAddress] = useState(false);
 
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [addresses, setAddresses] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Array<Record<string, unknown>>>([]);
+  const [addresses, setAddresses] = useState<Array<Record<string, unknown>>>([]);
 
   const handleSearch = async () => {
     try {
@@ -123,7 +123,7 @@ export function RTECustomerManager() {
             </div>
             {customers.length > 0 && (
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {customers.map((c: any, i: number) => (
+                {customers.map((c, i: number) => (
                   <div key={i} className="p-3 rounded-lg border bg-card text-sm space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{String(c.Name || c.name || 'N/A')}</span>
@@ -162,7 +162,7 @@ export function RTECustomerManager() {
             </div>
             {addresses.length > 0 && (
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {addresses.map((addr: any, i: number) => (
+                {addresses.map((addr, i: number) => (
                   <div key={i} className="p-3 rounded-lg border bg-card text-sm flex justify-between items-center">
                     <div>
                       <p className="font-medium">{String(addr.Street || 'Logradouro N/D')}, {String(addr.Number || 'S/N')}</p>
