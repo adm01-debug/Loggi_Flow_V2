@@ -105,7 +105,7 @@ export function useBusinessRuleEngine() {
           (isAlert
             ? `Alerta disparado pela regra "${rule.name}"`
             : `Regra "${rule.name}" acionada`),
-        type: (isAlert ? "warning" : "info") as const,
+        type: isAlert ? ("warning" as const) : ("info" as const),
         ...(isAlert ? {} : { action_url: resolveActionUrl(rule.entity_type) }),
       });
       return;
