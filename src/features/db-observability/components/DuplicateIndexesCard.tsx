@@ -6,9 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Copy, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { useDuplicateIndexes } from "../hooks/useDuplicateIndexes";
-
-const sevVariant = (s: string): "destructive" | "default" | "secondary" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+import { severityVariantDefault as sevVariant } from "./_severityHelpers";
 
 const fmtBytes = (b: number) => {
   if (b >= 1024 ** 3) return `${(b / 1024 ** 3).toFixed(2)} GB`;
