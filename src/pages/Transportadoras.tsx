@@ -584,7 +584,7 @@ export default function Transportadoras() {
             onValueChange={(v: string) =>
               setForm({
                 ...form,
-                non_api_config: { ...form.non_api_config, type: v as "whatsapp" | "email" | "portal" },
+                non_api_config: { ...form.non_api_config, type: v as NonApiChannel },
               })
             }
           >
