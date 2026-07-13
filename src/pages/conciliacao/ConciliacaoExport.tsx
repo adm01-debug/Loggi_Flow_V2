@@ -16,6 +16,14 @@ interface ConciliacaoStats {
   diferenca: number;
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  pendente: "Pendente",
+  conciliado: "Conciliado",
+  divergencia: "Divergência",
+};
+const statusLabel = (s: string | null | undefined) => STATUS_LABELS[s ?? ""] ?? "Ignorado";
+
+
 export function exportToPDF(
   conciliacao: Conciliacao,
   itens: ItemImportado[],
