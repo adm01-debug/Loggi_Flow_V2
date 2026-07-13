@@ -183,6 +183,7 @@ function AppRoutes() {
           <Route path="/admin/db-health" element={<ProtectedRoute requiredRole="admin"><AdminDbHealth /></ProtectedRoute>} />
           <Route path="/admin/quality-gate" element={<ProtectedRoute requiredRole="admin"><AdminQualityGate /></ProtectedRoute>} />
           <Route path="/config-frete" element={<ProtectedRoute><ConfiguracoesFrete /></ProtectedRoute>} />
+          <Route path="/exportacao" element={<ProtectedRoute><ExportacaoDados /></ProtectedRoute>} />
           <Route path="/rastrear" element={<RastreamentoPublico />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
