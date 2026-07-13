@@ -101,7 +101,7 @@ export default function CotacaoMultiCanal() {
         destinoCidade || undefined,
       );
       const enriched: TransportadoraComCanal[] = localResults.map((rota) => {
-        const t = rota.transportadora as any;
+        const t = rota.transportadora as { api_disponivel?: boolean; whatsapp_operacional?: string; email_comercial?: string } | undefined;
         const hasApi = t?.api_disponivel === true;
         const hasWhatsapp = !!t?.whatsapp_operacional;
         let canal: "api" | "whatsapp" | "email" = "email";
