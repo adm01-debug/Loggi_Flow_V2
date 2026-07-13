@@ -65,6 +65,7 @@ const routeLabels: Record<string, string> = {
   "/inteligencia-frete": "Inteligência de Frete",
   "/central-rastreamento": "Central de Rastreamento",
   "/painel-otif": "Painel OTIF",
+  "/painel-sla": "Painel SLA",
   "/kanban-entregas": "Kanban Entregas",
   "/importacao-massa": "Importação em Massa",
   "/automacao-regras": "Automação de Regras",

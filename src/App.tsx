@@ -57,6 +57,7 @@ const InteligenciaFrete = lazy(() => import("./pages/InteligenciaFrete"));
 const CotacaoMultiCanal = lazy(() => import("./pages/CotacaoMultiCanal"));
 const DashboardCotacoes = lazy(() => import("./pages/DashboardCotacoes"));
 const PainelOTIF = lazy(() => import("./pages/PainelOTIF"));
+const PainelSLA = lazy(() => import("./pages/PainelSLA"));
 const KanbanEntregas = lazy(() => import("./pages/KanbanEntregas"));
 const RelatorioPDF = lazy(() => import("./pages/RelatorioPDF"));
 const ConciliacaoAutomatica = lazy(() => import("./pages/ConciliacaoAutomatica"));
@@ -160,6 +161,7 @@ function AppRoutes() {
           <Route path="/cotacao-multicanal" element={<ProtectedRoute><CotacaoMultiCanal /></ProtectedRoute>} />
           <Route path="/dashboard-cotacoes" element={<ProtectedRoute><DashboardCotacoes /></ProtectedRoute>} />
           <Route path="/painel-otif" element={<ProtectedRoute><PainelOTIF /></ProtectedRoute>} />
+          <Route path="/painel-sla" element={<ProtectedRoute><PainelSLA /></ProtectedRoute>} />
           <Route path="/kanban-entregas" element={<ProtectedRoute><KanbanEntregas /></ProtectedRoute>} />
           <Route path="/relatorio-pdf" element={<ProtectedRoute><RelatorioPDF /></ProtectedRoute>} />
           <Route path="/conciliacao-automatica" element={<ProtectedRoute><ConciliacaoAutomatica /></ProtectedRoute>} />
