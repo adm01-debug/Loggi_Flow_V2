@@ -9,19 +9,18 @@ import { formatCurrency } from '@/lib/formatters';
 
 interface SimulationResult {
   volumes: number;
-  results: {
+  results: Array<{
     transportadora_nome: string;
     valor_total: number;
-    [key: string]: any;
-  }[];
+  }>;
 }
 
-interface ScenarioSimulatorProps {
-  cargoData: any;
-  simulateScenario: (data: any, splitVolumes: number) => Promise<SimulationResult[]>;
+interface ScenarioSimulatorProps<TCargo = unknown> {
+  cargoData: TCargo | null;
+  simulateScenario: (data: TCargo, splitVolumes: number) => Promise<SimulationResult[]>;
 }
 
-export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimulatorProps) {
+export function ScenarioSimulator<TCargo>({ cargoData, simulateScenario }: ScenarioSimulatorProps<TCargo>) {
   const [volumes, setVolumes] = useState(2);
   const [results, setResults] = useState<SimulationResult[]>([]);
 

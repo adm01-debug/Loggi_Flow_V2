@@ -51,6 +51,7 @@ interface TimelineEvent {
 interface ExpeditionDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   delivery: any | null;
   statusConfig: Record<
     string,

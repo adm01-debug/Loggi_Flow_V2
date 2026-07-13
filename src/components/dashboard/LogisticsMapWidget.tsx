@@ -376,7 +376,7 @@ export function LogisticsMapWidget() {
               <div className="px-2">
                 <Slider
                   value={timeTravelRange}
-                  onValueChange={(val: any) => setTimeTravelRange(val)}
+                  onValueChange={(val: number[]) => setTimeTravelRange(val as [number, number])}
                   max={24}
                   step={1}
                   minStepsBetweenThumbs={1}
@@ -509,7 +509,7 @@ export function LogisticsMapWidget() {
                       {["all", "entrega", "coleta"].map((type) => (
                         <button
                           key={type}
-                          onClick={() => setTypeFilter(type as any)}
+                          onClick={() => setTypeFilter(type as "all" | "entrega" | "coleta")}
                           className={cn(
                             "h-8 rounded-xl border text-[8px] font-black uppercase transition-all",
                             typeFilter === type

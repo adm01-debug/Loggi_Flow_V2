@@ -174,7 +174,7 @@ export function MapboxMap({
           },
         };
 
-        map.current.addImage("pulsing-dot", pulsingDot as any, {
+        map.current.addImage("pulsing-dot", pulsingDot as unknown as ImageData, {
           pixelRatio: 2,
         });
 
@@ -203,7 +203,7 @@ export function MapboxMap({
         : "mapbox://styles/mapbox/dark-v11";
 
     // Smooth transition between styles
-    map.current.setStyle(newStyle, { diff: true } as any);
+    map.current.setStyle(newStyle, { diff: true } as Parameters<typeof map.current.setStyle>[1]);
 
     // Continual animation for pitch/bearing
     map.current.easeTo({

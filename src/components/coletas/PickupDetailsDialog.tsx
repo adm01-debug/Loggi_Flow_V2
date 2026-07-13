@@ -139,9 +139,9 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
     });
     
     doc.setFontSize(14);
-    doc.text("NOTAS E OBSERVAÇÕES", 20, (doc as any).lastAutoTable.finalY + 20);
+    doc.text("NOTAS E OBSERVAÇÕES", 20, (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 20);
     doc.setFontSize(10);
-    doc.text(pickup.observacoes || "Nenhuma observação registrada.", 20, (doc as any).lastAutoTable.finalY + 30, { maxWidth: 170 });
+    doc.text(pickup.observacoes || "Nenhuma observação registrada.", 20, (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 30, { maxWidth: 170 });
     
     // Footer
     doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 20, 280);
