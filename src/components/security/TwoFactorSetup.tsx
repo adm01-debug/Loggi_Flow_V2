@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useAuth } from "@/hooks/auth/useAuth";
 import { 
   Shield, 
   ShieldCheck, 
