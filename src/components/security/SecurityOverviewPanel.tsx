@@ -39,9 +39,8 @@ export function SecurityOverviewPanel() {
   const [alerts, setAlerts] = useState<SecurityAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => { if (user?.id) fetchSecurityStats(); }, [user?.id]);
+  const fetchSecurityStats = useCallback(async () => {
 
-  const fetchSecurityStats = async () => {
     setIsLoading(true);
     try {
       if (!user?.id) return;
