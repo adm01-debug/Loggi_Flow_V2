@@ -55,9 +55,36 @@ export default function SLADashboard() {
   };
   const slaRate = stats.taxaOTIF ? Math.round(stats.taxaOTIF) : 0;
 
+  const slaBadgeVariant = (rate: number): "default" | "secondary" | "destructive" => {
+    if (rate >= 95) return "default";
+    if (rate >= 80) return "secondary";
+    return "destructive";
+  };
+  const slaLabel = (rate: number) => {
+    if (rate >= 95) return "Excelente";
+    if (rate >= 80) return "Bom";
+    return "Crítico";
+  };
+  const slaProgressClass = (rate: number) => {
+    if (rate >= 95) return "[&>div]:bg-success";
+    if (rate >= 80) return "[&>div]:bg-warning";
+    return "[&>div]:bg-destructive";
+  };
+  const slaBgClass = (rate: number) => {
+    if (rate >= 95) return "bg-success/15 text-success";
+    if (rate >= 80) return "bg-warning/15 text-warning";
+    return "bg-destructive/15 text-destructive";
+  };
+  const slaTextClass = (rate: number) => {
+    if (rate >= 95) return "text-success";
+    if (rate >= 80) return "text-warning";
+    return "text-destructive";
+  };
+
   const handleDateChange = (range: DateRange | undefined) => {
     if (range) setDateRange(range);
   };
+
 
   return (
     <MainLayout>
