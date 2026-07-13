@@ -110,7 +110,8 @@ export function LongRunningQueriesCard() {
               </TableBody>
             </Table>
           </div>
-        )}
+          );
+        })()}
       </CardContent>
     </Card>
   );
