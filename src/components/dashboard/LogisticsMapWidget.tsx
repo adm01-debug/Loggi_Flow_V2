@@ -376,7 +376,7 @@ export function LogisticsMapWidget() {
               <div className="px-2">
                 <Slider
                   value={timeTravelRange}
-                  onValueChange={(val: number[]) => setTimeTravelRange(val)}
+                  onValueChange={(val: number[]) => setTimeTravelRange(val as [number, number])}
                   max={24}
                   step={1}
                   minStepsBetweenThumbs={1}
