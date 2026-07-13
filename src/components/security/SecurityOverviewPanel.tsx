@@ -87,8 +87,18 @@ export function SecurityOverviewPanel() {
         mfaEnabled, lastSecurityEvent: securityEvents.length > 0 ? (securityEvents[0].created_at ?? null) : null, securityScore: score,
       });
       setAlerts(newAlerts);
-    } catch {} finally { setIsLoading(false); }
-  };
+    } catch {
+      // silencia falha de leitura de estatísticas de segurança
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) fetchSecurityStats();
+  }, [user?.id, fetchSecurityStats]);
+
+
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
