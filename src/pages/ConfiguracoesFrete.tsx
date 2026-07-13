@@ -85,7 +85,7 @@ export default function FreightConfig() {
         .from("freight_selection_rules")
         .select("*");
       if (error) throw error;
-      return data;
+      return (data ?? []) as unknown as FreightRule[];
     },
   });
 
