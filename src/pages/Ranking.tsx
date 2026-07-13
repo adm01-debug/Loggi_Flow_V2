@@ -51,7 +51,7 @@ const filterConfig: FilterConfig<RankUser> = { search: { fields: ["name"] } };
 
 export default function Ranking() {
   const { user } = useAuth();
-  const { userLevel, isLoading: gamificationLoading } = useGamification();
+  useGamification();
   const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("all");
   const [levelFilter, setLevelFilter] = useState("");
 

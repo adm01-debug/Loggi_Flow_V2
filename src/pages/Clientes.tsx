@@ -268,8 +268,6 @@ export default function Clientes() {
     selectAll,
     clearSelection,
     isSelected,
-    isAllSelected,
-    isPartialSelected,
   } = useSelection(pagination.paginatedData);
 
   const createMut = useMutation({

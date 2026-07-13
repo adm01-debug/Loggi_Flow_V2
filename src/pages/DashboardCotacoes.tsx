@@ -177,8 +177,6 @@ export default function DashboardCotacoes() {
     pendentes,
     respondidas,
     expiradas,
-    selecionadas,
-    isLoading,
     refetch,
     updateCotacao,
     selectCotacao,

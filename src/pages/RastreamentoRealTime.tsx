@@ -62,9 +62,8 @@ export default function RastreamentoRealTime() {
     allShipments,
     isLoading: isLoadingTracking,
     refetch,
-    getStatusColor,
   } = useUnifiedTracking();
-  const { geocodeAddress, isGeocoding } = useGeocoding();
+  const { geocodeAddress } = useGeocoding();
   const {
     analyzeDelays,
     predictions,
