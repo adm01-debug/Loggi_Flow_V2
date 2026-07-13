@@ -34,9 +34,11 @@ export function MELojasPanel() {
   const [newPhone, setNewPhone] = useState({ phone: '', type: 'mobile' });
 
   const rawData = listarLojas.data;
-  const stores: MEStore[] = Array.isArray((rawData as Record<string, unknown>)?.data)
-    ? (rawData as Record<string, unknown>).data as MEStore[]
-    : Array.isArray(rawData) ? rawData as MEStore[] : [];
+  const rawDataObj = rawData as Record<string, unknown> | undefined;
+  let stores: MEStore[] = [];
+  if (Array.isArray(rawDataObj?.data)) stores = rawDataObj!.data as MEStore[];
+  else if (Array.isArray(rawData)) stores = rawData as MEStore[];
+
 
   const handleCreate = () => {
     cadastrarLoja.mutate({
@@ -51,9 +53,12 @@ export function MELojasPanel() {
   };
 
   const parseArrayResponse = <T,>(data: unknown): T[] => {
-    const d = data as Record<string, unknown>;
-    return Array.isArray(d?.data) ? d.data as T[] : Array.isArray(data) ? data as T[] : [];
+    const d = data as Record<string, unknown> | undefined;
+    if (Array.isArray(d?.data)) return d!.data as T[];
+    if (Array.isArray(data)) return data as T[];
+    return [];
   };
+
 
   const viewStore = (id: string) => {
     setSelectedStoreId(id);
@@ -98,45 +103,51 @@ export function MELojasPanel() {
           </Button>
         </CardHeader>
         <CardContent>
-          {listarLojas.isLoading ? (
-            <TableSkeleton rows={3} columns={4} />
-          ) : listarLojas.isError ? (
-            <MEErrorState message="Erro ao carregar lojas." onRetry={() => listarLojas.refetch()} />
-          ) : stores.length === 0 ? (
-            <EmptyState
-              variant="default"
-              title="Nenhuma loja cadastrada"
-              description="Crie uma loja para gerenciar endereços e telefones."
-              size="sm"
-              action={{ label: 'Nova Loja', onClick: () => setShowNewStore(true) }}
-            />
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Documento</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead className="w-10" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {stores.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-medium">{s.name}</TableCell>
-                    <TableCell className="font-mono text-xs">{s.document || s.company_document || '-'}</TableCell>
-                    <TableCell>{s.email || '-'}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="icon" onClick={() => viewStore(s.id)}>
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
+          {(() => {
+            if (listarLojas.isLoading) return <TableSkeleton rows={3} columns={4} />;
+            if (listarLojas.isError) {
+              return <MEErrorState message="Erro ao carregar lojas." onRetry={() => listarLojas.refetch()} />;
+            }
+            if (stores.length === 0) {
+              return (
+                <EmptyState
+                  variant="default"
+                  title="Nenhuma loja cadastrada"
+                  description="Crie uma loja para gerenciar endereços e telefones."
+                  size="sm"
+                  action={{ label: 'Nova Loja', onClick: () => setShowNewStore(true) }}
+                />
+              );
+            }
+            return (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Documento</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead className="w-10" />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+                </TableHeader>
+                <TableBody>
+                  {stores.map((s) => (
+                    <TableRow key={s.id}>
+                      <TableCell className="font-medium">{s.name}</TableCell>
+                      <TableCell className="font-mono text-xs">{s.document || s.company_document || '-'}</TableCell>
+                      <TableCell>{s.email || '-'}</TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="icon" onClick={() => viewStore(s.id)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            );
+          })()}
         </CardContent>
+
       </Card>
 
       <Dialog open={showNewStore} onOpenChange={setShowNewStore}>

@@ -40,9 +40,11 @@ export function MEEtiquetasPanel() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const rawData = listarEtiquetas.data;
-  const orders: MEOrder[] = Array.isArray((rawData as Record<string, unknown>)?.data)
-    ? (rawData as Record<string, unknown>).data as MEOrder[]
-    : Array.isArray(rawData) ? rawData as MEOrder[] : [];
+  const rawDataObj = rawData as Record<string, unknown> | undefined;
+  let orders: MEOrder[] = [];
+  if (Array.isArray(rawDataObj?.data)) orders = rawDataObj!.data as MEOrder[];
+  else if (Array.isArray(rawData)) orders = rawData as MEOrder[];
+
 
   const baseOrders = searchResults.length > 0 ? searchResults : orders;
   const filteredOrders = statusFilter === 'all'
@@ -138,7 +140,24 @@ export function MEEtiquetasPanel() {
     rastreio: o.tracking || '-',
   }));
 
+  let stateElement: React.ReactNode = null;
+  if (listarEtiquetas.isLoading) {
+    stateElement = <TableSkeleton rows={5} columns={8} />;
+  } else if (listarEtiquetas.isError) {
+    stateElement = <MEErrorState message="Erro ao carregar etiquetas." onRetry={() => listarEtiquetas.refetch()} />;
+  } else if (filteredOrders.length === 0) {
+    stateElement = (
+      <EmptyState
+        variant="inbox"
+        title="Nenhuma etiqueta encontrada"
+        description={statusFilter !== 'all' ? 'Nenhuma etiqueta com este status. Tente outro filtro.' : 'Compre fretes no carrinho para gerar etiquetas.'}
+        size="sm"
+      />
+    );
+  }
+
   return (
+
     <div className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
@@ -195,19 +214,9 @@ export function MEEtiquetasPanel() {
             </div>
           )}
 
-          {listarEtiquetas.isLoading ? (
-            <TableSkeleton rows={5} columns={8} />
-          ) : listarEtiquetas.isError ? (
-            <MEErrorState message="Erro ao carregar etiquetas." onRetry={() => listarEtiquetas.refetch()} />
-          ) : filteredOrders.length === 0 ? (
-            <EmptyState
-              variant="inbox"
-              title="Nenhuma etiqueta encontrada"
-              description={statusFilter !== 'all' ? 'Nenhuma etiqueta com este status. Tente outro filtro.' : 'Compre fretes no carrinho para gerar etiquetas.'}
-              size="sm"
-            />
-          ) : (
+          {stateElement ?? (
             <>
+
               <ScrollArea className="w-full">
                 <Table>
                   <TableHeader>
