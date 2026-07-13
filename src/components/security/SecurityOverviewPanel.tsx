@@ -131,12 +131,18 @@ export function SecurityOverviewPanel() {
           <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-lg"><AlertTriangle className="h-5 w-5 text-warning" />Alertas de Segurança</CardTitle></CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {alerts.map((alert) => (
-                <div key={alert.id} className={`flex items-center gap-3 p-3 rounded-lg border ${getSeverityColor(alert.severity)}`}>
-                  {alert.severity === 'critical' ? <XCircle className="h-5 w-5 flex-shrink-0" /> : alert.severity === 'warning' ? <AlertTriangle className="h-5 w-5 flex-shrink-0" /> : <Activity className="h-5 w-5 flex-shrink-0" />}
-                  <span className="text-sm flex-1">{alert.message}</span>
-                </div>
-              ))}
+              {alerts.map((alert) => {
+                let AlertIcon = <Activity className="h-5 w-5 flex-shrink-0" />;
+                if (alert.severity === 'critical') AlertIcon = <XCircle className="h-5 w-5 flex-shrink-0" />;
+                else if (alert.severity === 'warning') AlertIcon = <AlertTriangle className="h-5 w-5 flex-shrink-0" />;
+                return (
+                  <div key={alert.id} className={`flex items-center gap-3 p-3 rounded-lg border ${getSeverityColor(alert.severity)}`}>
+                    {AlertIcon}
+                    <span className="text-sm flex-1">{alert.message}</span>
+                  </div>
+                );
+              })}
+
             </div>
           </CardContent>
         </Card>
