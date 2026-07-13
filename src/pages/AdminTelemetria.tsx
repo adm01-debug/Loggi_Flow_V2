@@ -144,7 +144,7 @@ export default function AdminTelemetriaPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="database" className="space-y-4" onValueChange={setActiveTab}>
+        <Tabs defaultValue="database" className="space-y-4">
           <TabsList className="bg-background border">
             <TabsTrigger value="database" className="gap-2">
               <Activity className="h-4 w-4" />
