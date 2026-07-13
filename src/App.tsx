@@ -74,6 +74,7 @@ const ConfiguracoesFrete = lazy(() => import("./pages/ConfiguracoesFrete"));
 const AdminDbHealth = lazy(() => import("./pages/admin/DbHealth"));
 const AdminQualityGate = lazy(() => import("./pages/admin/QualityGate"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ExportacaoDados = lazy(() => import("./pages/ExportacaoDados"));
 
 // Lazy load non-critical providers
 const LazyProviders = lazy(() => import("./components/LazyProviders"));
@@ -182,6 +183,7 @@ function AppRoutes() {
           <Route path="/admin/db-health" element={<ProtectedRoute requiredRole="admin"><AdminDbHealth /></ProtectedRoute>} />
           <Route path="/admin/quality-gate" element={<ProtectedRoute requiredRole="admin"><AdminQualityGate /></ProtectedRoute>} />
           <Route path="/config-frete" element={<ProtectedRoute><ConfiguracoesFrete /></ProtectedRoute>} />
+          <Route path="/exportacao" element={<ProtectedRoute><ExportacaoDados /></ProtectedRoute>} />
           <Route path="/rastrear" element={<RastreamentoPublico />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
