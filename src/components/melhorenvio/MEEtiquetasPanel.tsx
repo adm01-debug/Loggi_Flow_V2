@@ -40,9 +40,11 @@ export function MEEtiquetasPanel() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const rawData = listarEtiquetas.data;
-  const orders: MEOrder[] = Array.isArray((rawData as Record<string, unknown>)?.data)
-    ? (rawData as Record<string, unknown>).data as MEOrder[]
-    : Array.isArray(rawData) ? rawData as MEOrder[] : [];
+  const rawDataObj = rawData as Record<string, unknown> | undefined;
+  let orders: MEOrder[] = [];
+  if (Array.isArray(rawDataObj?.data)) orders = rawDataObj!.data as MEOrder[];
+  else if (Array.isArray(rawData)) orders = rawData as MEOrder[];
+
 
   const baseOrders = searchResults.length > 0 ? searchResults : orders;
   const filteredOrders = statusFilter === 'all'
