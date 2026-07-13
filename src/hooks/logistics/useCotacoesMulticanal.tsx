@@ -29,9 +29,9 @@ export interface CotacaoMulticanal {
     razao_social: string;
     score_performance: number | null;
   };
-  workflow_logs?: any[];
+  workflow_logs?: Array<Record<string, unknown>>;
   retry_count?: number;
-  normalization_data?: any;
+  normalization_data?: Record<string, unknown> | null;
 }
 
 export const useCotacoesMulticanal = () => {

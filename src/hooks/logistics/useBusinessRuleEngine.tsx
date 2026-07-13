@@ -11,7 +11,7 @@ import { useTelemetry } from "@/hooks/analytics/useTelemetry";
 export function useBusinessRuleEngine() {
   const { rules } = useBusinessRules();
   const { logTelemetry } = useTelemetry();
-  const executionBatchRef = useRef<any[]>([]);
+  const executionBatchRef = useRef<Array<{ conditions_met: boolean; entity_id: string; entity_type: string; trigger_event: string; rule_id?: string | null; actions_executed?: Json; error_message?: string | null; execution_time_ms?: number | null }>>([]);
   const batchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Debounced Batch Logging for high-frequency rule execution
@@ -28,7 +28,7 @@ export function useBusinessRuleEngine() {
     }
   }, []);
 
-  const addToBatch = useCallback((log: any) => {
+  const addToBatch = useCallback((log: { conditions_met: boolean; entity_id: string; entity_type: string; trigger_event: string; rule_id?: string | null; actions_executed?: Json; error_message?: string | null; execution_time_ms?: number | null }) => {
     executionBatchRef.current.push(log);
     if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
     batchTimerRef.current = setTimeout(flushLogs, 2000);

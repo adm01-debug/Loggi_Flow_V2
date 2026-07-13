@@ -208,7 +208,23 @@ export function useUnifiedTracking() {
     const result: UnifiedShipment[] = [];
 
     // Normalize entregas
-    (entregas || []).forEach((e: any) => {
+    interface EntregaRow {
+      id: string;
+      numero_entrega: string;
+      status: string;
+      endereco_entrega: string;
+      transportadora_id: string | null;
+      previsao_entrega: string | null;
+      data_entrega_efetiva: string | null;
+      codigo_rastreamento: string | null;
+      nf_remessa: string | null;
+      valor_frete: number | null;
+      latitude: number | null;
+      longitude: number | null;
+      transportadora?: { nome_fantasia: string } | null;
+      cliente?: { razao_social: string } | null;
+    }
+    (entregas as EntregaRow[] | undefined || []).forEach((e) => {
       const t = e.transportadora as { nome_fantasia: string } | null;
       const c = e.cliente as { razao_social: string } | null;
       const atrasado = isAtrasado(
@@ -245,7 +261,20 @@ export function useUnifiedTracking() {
     });
 
     // Normalize coletas
-    (coletas || []).forEach((c: any) => {
+    interface ColetaRow {
+      id: string;
+      numero_coleta: string;
+      status: string;
+      endereco_coleta: string;
+      transportadora_id: string | null;
+      data_prevista_coleta: string | null;
+      data_efetiva_coleta: string | null;
+      codigo_rastreamento: string | null;
+      tipo_coleta?: string;
+      transportadora?: { nome_fantasia: string } | null;
+      fornecedor?: { razao_social: string } | null;
+    }
+    (coletas as ColetaRow[] | undefined || []).forEach((c) => {
       const t = c.transportadora as { nome_fantasia: string } | null;
       const f = c.fornecedor as { razao_social: string } | null;
       const atrasado = isAtrasado(
