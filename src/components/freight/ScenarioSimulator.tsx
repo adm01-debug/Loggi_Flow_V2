@@ -12,13 +12,13 @@ interface SimulationResult {
   results: {
     transportadora_nome: string;
     valor_total: number;
-    [key: string]: any;
+    [key: string]: unknown;
   }[];
 }
 
 interface ScenarioSimulatorProps {
-  cargoData: any;
-  simulateScenario: (data: any, splitVolumes: number) => Promise<SimulationResult[]>;
+  cargoData: Record<string, unknown> | null;
+  simulateScenario: (data: Record<string, unknown>, splitVolumes: number) => Promise<SimulationResult[]>;
 }
 
 export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimulatorProps) {
