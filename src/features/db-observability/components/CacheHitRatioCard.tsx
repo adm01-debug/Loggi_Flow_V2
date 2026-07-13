@@ -5,8 +5,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Gauge } from "lucide-react";
 import { useCacheHitRatios } from "../hooks/useCacheHitRatios";
 
-const sevVariant = (s: string): "destructive" | "default" | "secondary" | "outline" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : s === "info" ? "secondary" : "outline";
+const sevVariant = (s: string): "destructive" | "default" | "secondary" | "outline" => {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "default";
+  if (s === "info") return "secondary";
+  return "outline";
+};
+
 
 const fmtBytes = (b: number) => {
   if (b >= 1024 ** 3) return `${(b / 1024 ** 3).toFixed(1)} GB`;
