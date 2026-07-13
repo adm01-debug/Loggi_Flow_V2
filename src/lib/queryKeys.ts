@@ -18,16 +18,16 @@ export const QUERY_KEYS = {
   },
   logistics: {
     entregas: {
-      list: (filters: any) => ['logistics', 'entregas', 'list', filters] as const,
+      list: (filters: Record<string, unknown>) => ['logistics', 'entregas', 'list', filters] as const,
       detail: (id: string) => ['logistics', 'entregas', 'detail', id] as const,
       history: (id: string) => ['logistics', 'entregas', 'history', id] as const,
     },
     coletas: {
-      list: (filters: any) => ['logistics', 'coletas', 'list', filters] as const,
+      list: (filters: Record<string, unknown>) => ['logistics', 'coletas', 'list', filters] as const,
       detail: (id: string) => ['logistics', 'coletas', 'detail', id] as const,
     },
     transportadoras: {
-      list: (filters: any) => ['logistics', 'transportadoras', 'list', filters] as const,
+      list: (filters: Record<string, unknown>) => ['logistics', 'transportadoras', 'list', filters] as const,
       detail: (id: string) => ['logistics', 'transportadoras', 'detail', id] as const,
       rotas: (id: string) => ['logistics', 'transportadoras', 'rotas', id] as const,
     },
@@ -59,7 +59,7 @@ export const QUERY_KEYS = {
   system: {
     settings: ['system', 'settings'] as const,
     webhooks: ['system', 'webhooks'] as const,
-    audit: (filters: any) => ['system', 'audit', filters] as const,
+    audit: (filters: Record<string, unknown>) => ['system', 'audit', filters] as const,
     notifications: (userId: string) => ['system', 'notifications', userId] as const,
   },
 } as const;

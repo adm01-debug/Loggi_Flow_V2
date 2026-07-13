@@ -35,7 +35,7 @@ export default function RastreamentoMotorista() {
     isLoading,
     isTracking,
     startTracking,
-    stopTracking,
+    
     refetchDriverLocation,
   } = useLalamoveTracking(selectedOrder || null);
   const [isLive, setIsLive] = useState(false);

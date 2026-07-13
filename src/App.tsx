@@ -107,7 +107,7 @@ PageLoader.displayName = "PageLoader";
 
 function AppRoutes() {
   const location = useLocation();
-  const { direction } = useNavigationHistory();
+  useNavigationHistory();
   useGlobalShortcuts();
   
   
