@@ -162,15 +162,22 @@ export default function CotacaoMultiCanal() {
           })
           .then((res: unknown) => {
             if (Array.isArray(res)) {
-              (res as Array<Record<string, unknown>>).forEach((option) => {
-
+              type MEOption = {
+                id?: string | number;
+                name?: string;
+                price?: string | number;
+                delivery_range?: { max?: number };
+                delivery_time?: number;
+                error?: unknown;
+              };
+              (res as MEOption[]).forEach((option) => {
                 if (!option.error) {
                   addCotacao({
                     id: crypto.randomUUID(),
                     transportadora_id: `me-${option.id}`,
                     transportadora_nome: `Melhor Envio - ${option.name}`,
                     canal: "api",
-                    valor: parseFloat(option.price),
+                    valor: parseFloat(String(option.price ?? "0")),
                     prazo_dias:
                       option.delivery_range?.max || option.delivery_time,
                     status: "respondido",
@@ -181,6 +188,7 @@ export default function CotacaoMultiCanal() {
               });
             }
           })
+
           .catch((e) => {
             // Silent catch
           });
