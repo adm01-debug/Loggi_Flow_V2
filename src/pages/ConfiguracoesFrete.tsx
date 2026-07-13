@@ -55,6 +55,26 @@ interface CarrierConfig {
   coverage_details?: Record<string, unknown> | null;
 }
 
+interface FreightRule {
+  id: string;
+  event_type: string;
+  max_sla_days: number;
+  price_weight: number;
+  time_weight: number;
+  performance_weight: number;
+  is_active: boolean;
+  is_default: boolean;
+  [k: string]: unknown;
+}
+
+interface FreightMapping {
+  id: string;
+  source_type: string;
+  is_active: boolean;
+  transportadora?: { nome_fantasia?: string } | null;
+  [k: string]: unknown;
+}
+
 export default function FreightConfig() {
   const queryClient = useQueryClient();
   const [selectedCarrierId, setSelectedCarrierId] = useState<string>("");
