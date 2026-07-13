@@ -1,6 +1,6 @@
 {
   "$comment": "CI gate — see scripts/check-warning-budget.mjs. Lower these numbers as debt is paid; increases require reviewer approval.",
-  "lintWarnings": 350,
+  "lintWarnings": 330,
   "lintErrors": 0,
   "tsErrors": 0
 }
