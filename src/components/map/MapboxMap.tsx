@@ -312,7 +312,6 @@ export function MapboxMap({
           // Pulse effect for weather
           let opacity = 0.15;
           let direction = 1;
-          let weatherRafId: number;
           const animateWeather = () => {
             if (!map.current?.getLayer("weather-layer")) return;
             opacity += 0.005 * direction;
@@ -322,9 +321,9 @@ export function MapboxMap({
               "fill-opacity",
               opacity,
             );
-            weatherRafId = requestAnimationFrame(animateWeather);
+            requestAnimationFrame(animateWeather);
           };
-          weatherRafId = requestAnimationFrame(animateWeather);
+          requestAnimationFrame(animateWeather);
         }
       } else {
         if (map.current.getLayer("weather-layer")) {
