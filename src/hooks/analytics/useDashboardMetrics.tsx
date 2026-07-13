@@ -221,7 +221,7 @@ export function useRecentAlerts() {
       });
 
       predictionsRes.data?.forEach((pred) => {
-        const p = pred.prediction_data as any;
+        const p = pred.prediction_data as unknown as PredictionData;
         alerts.push({
           id: `ia-pred-${pred.id}`,
           type: "ia_previsao",
@@ -231,15 +231,15 @@ export function useRecentAlerts() {
           entityId: pred.entity_id,
           entityType: pred.entity_type as "coleta" | "entrega",
           delta: p.probabilidade_atraso,
-        } as any);
+        });
       });
 
       slaAlertsRes.data?.forEach((alert) => {
         alerts.push({
           id: `sla-${alert.id}`,
-          type: alert.alert_type as any,
+          type: alert.alert_type as RecentAlert["type"],
           message: alert.message || `Violação de SLA detectada`,
-          severity: alert.severity as any,
+          severity: alert.severity as RecentAlert["severity"],
           createdAt: alert.created_at || now.toISOString(),
           entityId: alert.freight_id,
           entityType: "entrega",
@@ -269,7 +269,7 @@ export function useRecentAlerts() {
             createdAt: c.created_at,
             entityId: c.id,
             delta: delta,
-          } as any);
+          });
         }
 
         // Monitoring failures
@@ -281,7 +281,7 @@ export function useRecentAlerts() {
             severity: "error",
             createdAt: c.created_at,
             entityId: c.id,
-          } as any);
+          });
         }
       });
 
@@ -325,7 +325,7 @@ export function useTransportadoraPerformance() {
 
       if (error) throw error;
 
-      return (data || []) as any[];
+      return (data || []);
     },
     staleTime: QUERY_STALE_TIME.STATIC,
     enabled: !!user?.id,
