@@ -1076,7 +1076,7 @@ export default function Transportadoras() {
                             <MapPin className="w-3.5 h-3.5 text-primary" />
                           </div>
                           <span className="uppercase text-[11px] tracking-tight">
-                            {(t.coverage_details?.states || t.regioes_atendidas)
+                            {(t.coverage_details?.states || t.regioes_atendidas || [])
                               .slice(0, 3)
                               .join(", ")}
                             {(t.coverage_details?.states?.length ||
