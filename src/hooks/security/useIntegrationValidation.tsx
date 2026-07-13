@@ -63,7 +63,7 @@ export function useIntegrationValidation() {
 
   const validateBitrix24 = useCallback(async (): Promise<IntegrationStatus> => {
     try {
-      const { data, error } = await supabase.functions.invoke('bitrix24-integration', {
+      const { error } = await supabase.functions.invoke('bitrix24-integration', {
         body: { action: 'test-connection' },
       });
       if (error) return { name: 'Bitrix24', status: 'error', message: error.message };
@@ -75,7 +75,7 @@ export function useIntegrationValidation() {
 
   const validateRodonaves = useCallback(async (): Promise<IntegrationStatus> => {
     try {
-      const { data, error } = await supabase.functions.invoke('rodonaves-api', {
+      const { error } = await supabase.functions.invoke('rodonaves-api', {
         body: { action: 'cubage-factor', cnpjRemetente: 'test' }, // cubage is a safe test call
       });
       if (error) return { name: 'Rodonaves', status: 'error', message: error.message };
@@ -87,7 +87,7 @@ export function useIntegrationValidation() {
 
   const validateMelhorEnvio = useCallback(async (): Promise<IntegrationStatus> => {
     try {
-      const { data, error } = await supabase.functions.invoke('melhor-envio-api', {
+      const { error } = await supabase.functions.invoke('melhor-envio-api', {
         body: { action: 'infoUsuario', useSandbox: true },
       });
       if (error) return { name: 'Melhor Envio', status: 'error', message: error.message };

@@ -180,16 +180,15 @@ export function MaterialLabelPrinter() {
         }
 
         // QR code as data URL
-        const { QRCodeCanvas } = await import("qrcode.react");
+        await import("qrcode.react");
         // Generate QR as canvas
-        const canvas = document.createElement("canvas");
-        const { createRoot } = await import("react-dom/client");
+        document.createElement("canvas");
+        await import("react-dom/client");
         const qrDiv = document.createElement("div");
         document.body.appendChild(qrDiv);
-        const root = createRoot(qrDiv);
 
         await new Promise<void>((resolve) => {
-          const img = new Image();
+          new Image();
           // Use a simple QR code generation approach
           const tempCanvas = document.createElement("canvas");
           tempCanvas.width = 200;

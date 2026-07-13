@@ -67,8 +67,8 @@ import { MapIntelligenceOverlay } from "../map/MapIntelligenceOverlay";
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "";
 
 export function LogisticsMapWidget() {
-  const { allShipments: shipments, summary, isLoading } = useUnifiedTracking();
-  const { riskZones } = useMapWeatherSync();
+  const { allShipments: shipments, isLoading } = useUnifiedTracking();
+  useMapWeatherSync();
   const { data: anomalies = [] } = useBiometricAnomalies();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
@@ -79,7 +79,7 @@ export function LogisticsMapWidget() {
     "all" | "entrega" | "coleta"
   >("all");
   const [showMission, setShowMission] = React.useState(false);
-  const [showHeatmap, setShowHeatmap] = React.useState(false);
+  const [showHeatmap] = React.useState(false);
   const [isOptimizing, setIsOptimizing] = React.useState(false);
   const [showPerformance, setShowPerformance] = React.useState(false);
   const [isExporting, setIsExporting] = React.useState(false);
@@ -1022,7 +1022,7 @@ export function LogisticsMapWidget() {
             onAction={async (id) => {
               const anomaly = anomalies.find((a) => a.id === id);
               if (anomaly?.vehicle_id) {
-                const { data, error } = await supabase.functions.invoke(
+                const { error } = await supabase.functions.invoke(
                   "execute-protocol",
                   {
                     body: {
