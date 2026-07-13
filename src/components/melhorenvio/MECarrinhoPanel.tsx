@@ -266,22 +266,9 @@ export function MECarrinhoPanel() {
           </div>
         </CardHeader>
         <CardContent>
-          {listarCarrinho.isLoading ? (
-            <TableSkeleton rows={3} columns={7} />
-          ) : listarCarrinho.isError ? (
-            <MEErrorState
-              message="Erro ao carregar o carrinho."
-              onRetry={() => listarCarrinho.refetch()}
-            />
-          ) : items.length === 0 ? (
-            <EmptyState
-              variant="inbox"
-              title="Carrinho vazio"
-              description="Faça uma cotação e adicione fretes ao carrinho para começar."
-              size="sm"
-            />
-          ) : (
+          {stateElement ?? (
             <>
+
               <ScrollArea className="w-full">
                 <Table>
                   <TableHeader>
