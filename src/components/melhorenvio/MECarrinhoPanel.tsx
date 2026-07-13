@@ -89,13 +89,14 @@ export function MECarrinhoPanel() {
   });
 
   const rawData = listarCarrinho.data;
-  const items: MECartItem[] = Array.isArray(
-    (rawData as Record<string, unknown>)?.data,
-  )
-    ? ((rawData as Record<string, unknown>).data as MECartItem[])
-    : Array.isArray(rawData)
-      ? (rawData as MECartItem[])
-      : [];
+  const rawDataObj = rawData as Record<string, unknown> | undefined;
+  let items: MECartItem[] = [];
+  if (Array.isArray(rawDataObj?.data)) {
+    items = rawDataObj!.data as MECartItem[];
+  } else if (Array.isArray(rawData)) {
+    items = rawData as MECartItem[];
+  }
+
 
   const pagination = usePagination(items, { initialPageSize: 10 });
 
