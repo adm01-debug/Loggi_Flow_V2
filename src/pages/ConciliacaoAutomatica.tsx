@@ -25,7 +25,7 @@ import {
   Eye,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
@@ -51,7 +51,7 @@ interface MatchResult {
 
 export default function ConciliacaoAutomatica() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  
   const [showResults, setShowResults] = useState(false);
   const [matchResults, setMatchResults] = useState<MatchResult[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);

@@ -24,7 +24,7 @@ type SeverityFilter = "all" | "slow" | "very_slow" | "error";
 type TimeFilter = "1h" | "6h" | "24h" | "7d" | "custom";
 
 export default function AdminTelemetriaPage() {
-  const [activeTab, setActiveTab] = useState("database");
+  
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("all");
 
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("24h");
@@ -144,7 +144,7 @@ export default function AdminTelemetriaPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="database" className="space-y-4" onValueChange={setActiveTab}>
+        <Tabs defaultValue="database" className="space-y-4">
           <TabsList className="bg-background border">
             <TabsTrigger value="database" className="gap-2">
               <Activity className="h-4 w-4" />

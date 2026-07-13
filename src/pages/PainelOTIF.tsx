@@ -55,7 +55,7 @@ interface TransportadoraOTIF {
 export default function PainelOTIF() {
   const { user } = useAuth();
 
-  const { data: entregas, isLoading } = useQuery({
+  const { data: entregas } = useQuery({
     queryKey: ["otif-entregas"],
     queryFn: async () => {
       const { data, error } = await supabase

@@ -8,8 +8,8 @@ export function useDensity() {
 
   useEffect(() => {
     const root = document.documentElement;
-    let padding = '1rem';
-    let fontSize = '0.875rem';
+    let padding: string;
+    let fontSize: string;
     
     switch (density) {
       case 'compact':

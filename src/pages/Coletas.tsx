@@ -36,7 +36,7 @@ import {
   Cell,
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/ui/use-toast";
+
 import { useExport } from "@/hooks/common/useExport";
 import { cn } from "@/lib/utils";
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
@@ -99,7 +99,7 @@ const statusConfig: Record<
 
 export default function Coletas() {
   const { exportToCSV } = useExport();
-  const { toast } = useToast();
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState<Coleta | null>(null);

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ export interface SLAAlertItem {
 
 export const useSLAAlerts = () => {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  
 
   const { data: entregas, isLoading } = useQuery({
     queryKey: ["sla-alerts-entregas"],

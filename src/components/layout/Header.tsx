@@ -39,7 +39,7 @@ export const Header = memo(function Header() {
   
   const prevPage = recentPages.length > 1 ? recentPages[1] : null;
 
-  const isHomePage = location.pathname === "/";
+  
 
   // Handle keyboard shortcuts
   useEffect(() => {

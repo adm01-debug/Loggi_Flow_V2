@@ -110,8 +110,6 @@ function AppRoutes() {
   const { direction } = useNavigationHistory();
   useGlobalShortcuts();
   
-  // Animation direction logic
-  const isBack = direction === "back";
   
   return (
     <AnimatePresence mode="wait">

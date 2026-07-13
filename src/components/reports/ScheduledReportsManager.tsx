@@ -35,7 +35,7 @@ const DAYS_OF_WEEK = [
 ];
 
 export function ScheduledReportsManager() {
-  const { reports, isLoading, createReport, deleteReport, generateReport, updateReport } = useScheduledReports();
+  const { reports, isLoading, createReport, deleteReport, generateReport } = useScheduledReports();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<ScheduledReportFormData>({
     name: '',

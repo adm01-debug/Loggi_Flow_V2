@@ -468,18 +468,6 @@ export default function CotacaoMultiCanal() {
     }
     return 0;
   }, [cotacoes, hasSearched, carriers]);
-  const exportData = useMemo(
-    () =>
-      cotacoes.map((c) => ({
-        transportadora: c.transportadora_nome,
-        canal: c.canal,
-        valor: c.valor ? `R$ ${c.valor.toFixed(2)}` : "-",
-        prazo: c.prazo_dias ? `${c.prazo_dias} dias` : "-",
-        status: c.status,
-        observacoes: c.observacoes,
-      })),
-    [cotacoes],
-  );
 
   return (
     <MainLayout>

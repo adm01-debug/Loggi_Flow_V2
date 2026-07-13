@@ -31,7 +31,7 @@ import { useToast } from "@/hooks/ui/use-toast";
 
 export function GlobalSearch() {
   const navigate = useNavigate();
-  const { user, signOut, isAdmin } = useAuth();
+  const { signOut, isAdmin } = useAuth();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
 

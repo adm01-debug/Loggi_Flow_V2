@@ -16,7 +16,7 @@ export function RTECustomerManager() {
   const [listDate, setListDate] = useState('');
   const [listPage, setListPage] = useState(1);
   const [addressTaxId, setAddressTaxId] = useState('');
-  const [showNewAddress, setShowNewAddress] = useState(false);
+  const [, setShowNewAddress] = useState(false);
 
   const [customers, setCustomers] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);

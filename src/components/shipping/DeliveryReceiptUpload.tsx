@@ -106,7 +106,7 @@ export function DeliveryReceiptUpload({
       setIsProcessingOCR(true);
       toast.info("Processando OCR para extração de dados...");
 
-      const { data: ocrResult, error: ocrError } =
+      const { error: ocrError } =
         await supabase.functions.invoke("ocr-receipt-processor", {
           body: { storage_path: filePath, delivery_id: entregaId },
         });

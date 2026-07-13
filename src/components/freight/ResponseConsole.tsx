@@ -72,7 +72,7 @@ export function ResponseConsole() {
   const handleNormalize = async (res: RawResponse) => {
     setIsProcessing(res.id);
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { error } = await supabase.functions.invoke(
         "normalize-freight-response",
         {
           body: {
