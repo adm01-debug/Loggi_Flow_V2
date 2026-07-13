@@ -130,7 +130,7 @@ export default function FreightConfig() {
         .from("freight_integration_mappings")
         .select("*, transportadora:transportadoras(nome_fantasia)");
       if (error) throw error;
-      return data;
+      return (data ?? []) as unknown as FreightMapping[];
     },
   });
 
