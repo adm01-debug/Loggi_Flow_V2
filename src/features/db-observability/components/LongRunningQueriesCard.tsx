@@ -7,8 +7,12 @@ import { Activity, Ban, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useCancelQuery, useLongRunningQueries } from "../hooks/useLongRunningQueries";
 
-const severityVariant = (s: string): "destructive" | "default" | "secondary" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+const severityVariant = (s: string): "destructive" | "default" | "secondary" => {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "default";
+  return "secondary";
+};
+
 
 export function LongRunningQueriesCard() {
   const { data, isLoading, error } = useLongRunningQueries(30, 50);
