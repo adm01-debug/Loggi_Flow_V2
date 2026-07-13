@@ -89,13 +89,14 @@ export function MECarrinhoPanel() {
   });
 
   const rawData = listarCarrinho.data;
-  const items: MECartItem[] = Array.isArray(
-    (rawData as Record<string, unknown>)?.data,
-  )
-    ? ((rawData as Record<string, unknown>).data as MECartItem[])
-    : Array.isArray(rawData)
-      ? (rawData as MECartItem[])
-      : [];
+  const rawDataObj = rawData as Record<string, unknown> | undefined;
+  let items: MECartItem[] = [];
+  if (Array.isArray(rawDataObj?.data)) {
+    items = rawDataObj!.data as MECartItem[];
+  } else if (Array.isArray(rawData)) {
+    items = rawData as MECartItem[];
+  }
+
 
   const pagination = usePagination(items, { initialPageSize: 10 });
 
@@ -200,7 +201,29 @@ export function MECarrinhoPanel() {
     );
   };
 
+  let stateElement: React.ReactNode = null;
+  if (listarCarrinho.isLoading) {
+    stateElement = <TableSkeleton rows={3} columns={7} />;
+  } else if (listarCarrinho.isError) {
+    stateElement = (
+      <MEErrorState
+        message="Erro ao carregar o carrinho."
+        onRetry={() => listarCarrinho.refetch()}
+      />
+    );
+  } else if (items.length === 0) {
+    stateElement = (
+      <EmptyState
+        variant="inbox"
+        title="Carrinho vazio"
+        description="Faça uma cotação e adicione fretes ao carrinho para começar."
+        size="sm"
+      />
+    );
+  }
+
   return (
+
     <div className="space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -243,22 +266,9 @@ export function MECarrinhoPanel() {
           </div>
         </CardHeader>
         <CardContent>
-          {listarCarrinho.isLoading ? (
-            <TableSkeleton rows={3} columns={7} />
-          ) : listarCarrinho.isError ? (
-            <MEErrorState
-              message="Erro ao carregar o carrinho."
-              onRetry={() => listarCarrinho.refetch()}
-            />
-          ) : items.length === 0 ? (
-            <EmptyState
-              variant="inbox"
-              title="Carrinho vazio"
-              description="Faça uma cotação e adicione fretes ao carrinho para começar."
-              size="sm"
-            />
-          ) : (
+          {stateElement ?? (
             <>
+
               <ScrollArea className="w-full">
                 <Table>
                   <TableHeader>
