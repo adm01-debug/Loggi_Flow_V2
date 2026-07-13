@@ -4,9 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GitBranch } from "lucide-react";
 import { useReplicationStatus } from "../hooks/useReplicationStatus";
-
-const sevVariant = (s: string): "destructive" | "default" | "secondary" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+import { severityVariantDefault as sevVariant } from "./_severityHelpers";
 
 const fmtBytes = (b: number) => {
   const abs = Math.abs(b);
