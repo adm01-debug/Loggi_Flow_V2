@@ -43,7 +43,7 @@ import {
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { NormalizationMapping } from "@/components/transportadoras/NormalizationMapping";
+import { NormalizationMapping, type NormalizationConfig } from "@/components/transportadoras/NormalizationMapping";
 import { Slider } from "@/components/ui/slider";
 
 interface CarrierConfig {
@@ -767,7 +767,7 @@ export default function FreightConfig() {
                               size="icon"
                               variant="ghost"
                               className="text-destructive"
-                              onClick={() => deleteRule.mutate(rule.id)}
+                              onClick={() => rule.id && deleteRule.mutate(rule.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
