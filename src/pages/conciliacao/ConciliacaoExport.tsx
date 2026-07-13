@@ -59,11 +59,10 @@ export function exportToPDF(
     item.transportadora_nome || "-",
     formatCurrency(item.valor),
     item.diferenca_valor !== null ? formatCurrency(item.diferenca_valor) : "-",
-    item.diferenca_valor !== null ? formatCurrency(item.diferenca_valor) : "-",
     statusLabel(item.status),
   ]);
 
-  ]);
+
 
   autoTable(doc, {
     head: [["Linha", "Referência", "Descrição", "Data", "Transportadora", "Valor", "Diferença", "Status"]],
