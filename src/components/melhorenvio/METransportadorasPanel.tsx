@@ -46,9 +46,12 @@ export function METransportadorasPanel() {
   const showDetail = (id: string, type: 'transportadora' | 'servico' | 'agencia') => {
     const titleMap = { transportadora: 'Transportadora', servico: 'Serviço', agencia: 'Agência' };
     setDetailTitle(`Detalhes - ${titleMap[type]}`);
-    const fn = type === 'transportadora' ? infoTransportadora : type === 'servico' ? infoServico : infoAgencia;
+    let fn = infoAgencia;
+    if (type === 'transportadora') fn = infoTransportadora;
+    else if (type === 'servico') fn = infoServico;
     fn.mutate(id, { onSuccess: (data) => setDetail(data as Record<string, unknown>) });
   };
+
 
   const UF_LIST = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
 
