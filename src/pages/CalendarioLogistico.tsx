@@ -37,7 +37,7 @@ export default function CalendarioLogistico() {
 
   const events = calendarResult.data || [];
   const isLoading = calendarResult.isLoading;
-  const refetch = calendarResult.refetch;
+  
 
   const days = useMemo(() => {
     const start = startOfMonth(currentMonth);

@@ -41,7 +41,7 @@ interface TwoFactorSetupProps {
 
 export function TwoFactorSetup({ onStatusChange }: TwoFactorSetupProps) {
   const [isEnabling, setIsEnabling] = useState(false);
-  const [, setIsDisabling] = useState(false);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);

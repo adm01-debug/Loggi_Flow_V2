@@ -23,7 +23,7 @@ const AVAILABLE_EVENTS = [
 
 export function WebhookManager() {
   const {
-    webhooks, deliveries, isLoading, isLoadingDeliveries,
+    webhooks, deliveries, isLoading,
     createWebhook, toggleWebhook, deleteWebhook,
   } = useClientWebhooks();
 

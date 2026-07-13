@@ -51,7 +51,7 @@ interface MatchResult {
 
 export default function ConciliacaoAutomatica() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  
   const [showResults, setShowResults] = useState(false);
   const [matchResults, setMatchResults] = useState<MatchResult[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);

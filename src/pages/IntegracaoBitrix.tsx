@@ -50,7 +50,7 @@ export default function IntegracaoBitrix() {
     },
   });
 
-  const { data: logs = [], isLoading: isLoadingLogs } = useQuery({
+  const { data: logs = [] } = useQuery({
     queryKey: ["bitrix-logs"],
     queryFn: async () => {
       const { data, error } = await supabase

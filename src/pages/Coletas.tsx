@@ -99,7 +99,7 @@ const statusConfig: Record<
 
 export default function Coletas() {
   const { exportToCSV } = useExport();
-  const { toast } = useToast();
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState<Coleta | null>(null);

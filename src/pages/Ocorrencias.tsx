@@ -294,12 +294,6 @@ export default function Ocorrencias() {
     setDlgEdit(true);
   };
 
-  const handlePhotoUpload = async (files: File[]) => {
-    for (const f of files) {
-      const result = await uploadImage(f);
-      if (result) setUploadedPhotos((p) => [...p, result.url]);
-    }
-  };
 
   const handleClearFilters = () => {
     clearFilters();

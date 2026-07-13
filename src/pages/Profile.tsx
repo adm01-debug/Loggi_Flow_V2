@@ -23,7 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function Profile() {
-  const { user, profile, isLoading } = useAuth();
+  const { user, profile } = useAuth();
   const { userLevel, achievements } = useGamification();
   const { uploadImage, uploading } = useImageUpload("avatars");
   const [saving, setSaving] = useState(false);

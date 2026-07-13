@@ -20,7 +20,7 @@ export function OnboardingChecklist() {
     completedSteps,
     progressPercentage,
     isCompleted,
-    completeStep,
+    
     isStepCompleted,
     isLoading
   } = useOnboarding();

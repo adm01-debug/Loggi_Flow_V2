@@ -16,7 +16,7 @@ export function useSelfHealing() {
       // Em um cenário real, isso poderia chamar uma RPC que reconcilia fretes pendentes
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const { error: rpcError } = await supabase.rpc('reconcile_pending_freights');
+      await supabase.rpc('reconcile_pending_freights');
       
       // Mesmo se a RPC falhar (pode não existir ainda), continuamos o protocolo de UI
       

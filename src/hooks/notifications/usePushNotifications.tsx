@@ -66,7 +66,7 @@ export const usePushNotifications = () => {
     const p256dh = arrayBufferToBase64(sub.getKey('p256dh'));
     const auth = arrayBufferToBase64(sub.getKey('auth'));
 
-    const { error } = await supabase.from('push_subscriptions').upsert({
+    await supabase.from('push_subscriptions').upsert({
       user_id: userId,
       endpoint: sub.endpoint,
       p256dh,

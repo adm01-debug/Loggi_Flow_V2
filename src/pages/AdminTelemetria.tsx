@@ -24,7 +24,7 @@ type SeverityFilter = "all" | "slow" | "very_slow" | "error";
 type TimeFilter = "1h" | "6h" | "24h" | "7d" | "custom";
 
 export default function AdminTelemetriaPage() {
-  const [activeTab, setActiveTab] = useState("database");
+  
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("all");
 
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("24h");

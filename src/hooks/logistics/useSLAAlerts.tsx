@@ -19,7 +19,7 @@ export interface SLAAlertItem {
 
 export const useSLAAlerts = () => {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  
 
   const { data: entregas, isLoading } = useQuery({
     queryKey: ["sla-alerts-entregas"],

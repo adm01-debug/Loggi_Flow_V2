@@ -9,7 +9,7 @@ import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 
 export function LevelUpModal() {
-  const { userLevel, levelProgress } = useGamification();
+  const { userLevel } = useGamification();
   const [show, setShow] = useState(false);
   const prevLevelRef = useRef<number | null>(null);
   const { width, height } = useWindowSize();
