@@ -186,28 +186,13 @@ export default function SLADashboard() {
         <div className="card-base p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Taxa de Cumprimento SLA</h3>
-            <Badge
-              variant={
-                slaRate >= 95
-                  ? "default"
-                  : slaRate >= 80
-                    ? "secondary"
-                    : "destructive"
-              }
-            >
-              {slaRate >= 95 ? "Excelente" : slaRate >= 80 ? "Bom" : "Crítico"}
+            <Badge variant={slaBadgeVariant(slaRate)}>
+              {slaLabel(slaRate)}
             </Badge>
           </div>
           <Progress
             value={slaRate}
-            className={cn(
-              "h-4",
-              slaRate >= 95
-                ? "[&>div]:bg-success"
-                : slaRate >= 80
-                  ? "[&>div]:bg-warning"
-                  : "[&>div]:bg-destructive",
-            )}
+            className={cn("h-4", slaProgressClass(slaRate))}
           />
           <div className="flex justify-between mt-2 text-sm text-muted-foreground">
             <span>Meta: 95%</span>
