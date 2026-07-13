@@ -6,9 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Shield, ShieldAlert, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useRlsAudit } from "../hooks/useRlsAudit";
-
-const severityVariant = (s: string) =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+import { severityVariantDefault as severityVariant } from "./_severityHelpers";
 
 export function RlsAuditCard() {
   const { data, isLoading, error } = useRlsAudit();
