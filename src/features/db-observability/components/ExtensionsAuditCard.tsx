@@ -113,7 +113,6 @@ export function ExtensionsAuditCard() {
           );
         })()}
       </CardContent>
-      </CardContent>
     </Card>
   );
 }
