@@ -516,18 +516,25 @@ export default function RastreamentoRealTime() {
               <TabsContent value="historico" className="mt-0">
                 <Card className="bg-black/40 border-white/5 backdrop-blur-xl rounded-[2rem] p-8">
                   <AnimatePresence mode="wait">
-                    {loadingHistory ? (
-                      <div className="flex justify-center py-20">
-                        <RefreshCw className="w-10 h-10 animate-spin text-primary" />
-                      </div>
-                    ) : !history || history.length === 0 ? (
-                      <div className="text-center py-20 opacity-30">
-                        <History className="w-16 h-16 mx-auto mb-4" />
-                        <p className="font-black uppercase tracking-widest text-[10px]">
-                          Nenhum log de micro-evento encontrado_NODE
-                        </p>
-                      </div>
-                    ) : (
+                    {(() => {
+                      if (loadingHistory) {
+                        return (
+                          <div className="flex justify-center py-20">
+                            <RefreshCw className="w-10 h-10 animate-spin text-primary" />
+                          </div>
+                        );
+                      }
+                      if (!history || history.length === 0) {
+                        return (
+                          <div className="text-center py-20 opacity-30">
+                            <History className="w-16 h-16 mx-auto mb-4" />
+                            <p className="font-black uppercase tracking-widest text-[10px]">
+                              Nenhum log de micro-evento encontrado_NODE
+                            </p>
+                          </div>
+                        );
+                      }
+                      return (
                       <div className="space-y-8 relative pl-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-1 before:bg-gradient-to-b before:from-primary/40 before:to-transparent">
                         {history.map((log, idx) => (
                           <motion.div
