@@ -700,6 +700,7 @@ export function MapboxMap({
     } else {
       map.current.on("style.load", addRouteLayer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markers, originMarker, showRoute, loading, riskZones]);
 
   if (error) {
