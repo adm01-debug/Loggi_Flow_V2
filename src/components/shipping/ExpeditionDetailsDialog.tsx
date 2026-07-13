@@ -101,7 +101,7 @@ export function ExpeditionDetailsDialog({
       setActiveTab("detalhes");
       fetchTimeline();
     }
-  }, [open, delivery?.id, fetchTimeline]);
+  }, [open, delivery, fetchTimeline]);
 
   if (!delivery) return null;
 
