@@ -212,7 +212,7 @@ export default function Transportadoras() {
 
       // Enriched data with stats from RPC
       return transportadoras.map((t) => {
-        const tStats = (stats as any[]).find(
+        const tStats = (stats as Array<{ transportadora_id: string; total_entregas?: number; entregas_sucesso?: number; score_performance?: number | null }>).find(
           (s) => s.transportadora_id === t.id,
         );
         return {
