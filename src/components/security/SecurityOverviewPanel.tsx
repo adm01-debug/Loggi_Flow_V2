@@ -49,18 +49,10 @@ export function SecurityOverviewPanel() {
       const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const currentUserId = user.id;
 
-      const sb = supabase as unknown as {
-        from: (table: string) => {
-          select: (cols: string, opts?: { count: 'exact' }) => {
-            eq: (col: string, val: unknown) => {
-              gte?: (col: string, val: string) => Promise<{ data: unknown[] | null; count: number | null }>;
-              eq?: (col: string, val: unknown) => {
-                gte: (col: string, val: string) => Promise<{ data: unknown[] | null; count: number | null }>;
-              };
-            } & Promise<{ data: unknown[] | null; count: number | null }>;
-          };
-        };
-      };
+      // Tabelas security ainda não geradas nos tipos; usa cast único para a fluent API do supabase.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sb = supabase as any;
+
 
       const sessionsResult = await sb.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId);
       const devicesResult = await sb.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId);
