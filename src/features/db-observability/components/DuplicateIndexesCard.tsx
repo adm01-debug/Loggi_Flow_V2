@@ -6,9 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Copy, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { useDuplicateIndexes } from "../hooks/useDuplicateIndexes";
-
-const sevVariant = (s: string): "destructive" | "default" | "secondary" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+import { severityVariantDefault as sevVariant } from "./_severityHelpers";
 
 const fmtBytes = (b: number) => {
   if (b >= 1024 ** 3) return `${(b / 1024 ** 3).toFixed(2)} GB`;
@@ -41,59 +39,66 @@ export function DuplicateIndexesCard() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-          </div>
-        ) : error ? (
-          <p className="text-sm text-destructive">Erro: {(error as Error).message}</p>
-        ) : !data || data.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum índice duplicado ou redundante detectado.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tabela</TableHead>
-                  <TableHead>Manter</TableHead>
-                  <TableHead>Remover</TableHead>
-                  <TableHead>Relação</TableHead>
-                  <TableHead>Recuperar</TableHead>
-                  <TableHead className="text-right">DDL</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((r, i) => (
-                  <TableRow key={`${r.keep_index}-${r.drop_index}-${i}`}>
-                    <TableCell className="font-mono text-xs">{r.table_name}</TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {r.keep_index}
-                      <div className="text-muted-foreground">({r.keep_columns}) · {r.keep_scans} scans</div>
-                    </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {r.drop_index}
-                      <div className="text-muted-foreground">({r.drop_columns}) · {r.drop_scans} scans</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">
-                        {r.relationship === "exact_duplicate" ? "duplicado" : "prefixo"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={sevVariant(r.severity)}>{fmtBytes(r.drop_size_bytes)}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button size="sm" variant="outline" onClick={() => copy(r.drop_ddl)}>
-                        <Copy className="h-3 w-3 mr-1" /> DROP
-                      </Button>
-                    </TableCell>
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            );
+          }
+          if (error) {
+            return <p className="text-sm text-destructive">Erro: {(error as Error).message}</p>;
+          }
+          if (!data || data.length === 0) {
+            return <p className="text-sm text-muted-foreground">Nenhum índice duplicado ou redundante detectado.</p>;
+          }
+          return (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tabela</TableHead>
+                    <TableHead>Manter</TableHead>
+                    <TableHead>Remover</TableHead>
+                    <TableHead>Relação</TableHead>
+                    <TableHead>Recuperar</TableHead>
+                    <TableHead className="text-right">DDL</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+                </TableHeader>
+                <TableBody>
+                  {data.map((r, i) => (
+                    <TableRow key={`${r.keep_index}-${r.drop_index}-${i}`}>
+                      <TableCell className="font-mono text-xs">{r.table_name}</TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {r.keep_index}
+                        <div className="text-muted-foreground">({r.keep_columns}) · {r.keep_scans} scans</div>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {r.drop_index}
+                        <div className="text-muted-foreground">({r.drop_columns}) · {r.drop_scans} scans</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">
+                          {r.relationship === "exact_duplicate" ? "duplicado" : "prefixo"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={sevVariant(r.severity)}>{fmtBytes(r.drop_size_bytes)}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button size="sm" variant="outline" onClick={() => copy(r.drop_ddl)}>
+                          <Copy className="h-3 w-3 mr-1" /> DROP
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          );
+        })()}
       </CardContent>
     </Card>
   );

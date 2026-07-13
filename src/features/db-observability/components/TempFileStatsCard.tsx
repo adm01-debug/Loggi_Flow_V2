@@ -4,9 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { HardDrive } from "lucide-react";
 import { useTempFileStats } from "../hooks/useTempFileStats";
-
-const sevVariant = (s: string): "destructive" | "default" | "secondary" | "outline" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : s === "info" ? "secondary" : "outline";
+import { severityVariantExtended as sevVariant } from "./_severityHelpers";
 
 const fmtBytes = (b: number) => {
   if (b >= 1024 ** 3) return `${(b / 1024 ** 3).toFixed(2)} GB`;
@@ -35,59 +33,65 @@ export function TempFileStatsCard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-          </div>
-        ) : error ? (
-          <p className="text-sm text-destructive">Erro: {(error as Error).message}</p>
-        ) : (
-          <>
-            {dbRow && (
-              <div className="text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{dbRow.temp_files.toLocaleString()}</span> arquivos temporários acumulados desde o último reset. {dbRow.recommendation}
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
               </div>
-            )}
+            );
+          }
+          if (error) {
+            return <p className="text-sm text-destructive">Erro: {(error as Error).message}</p>;
+          }
+          return (
+            <>
+              {dbRow && (
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">{dbRow.temp_files.toLocaleString()}</span> arquivos temporários acumulados desde o último reset. {dbRow.recommendation}
+                </div>
+              )}
 
-            {queries.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma query com spill significativo detectada.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Query ID</TableHead>
-                      <TableHead>Spill</TableHead>
-                      <TableHead>Chamadas</TableHead>
-                      <TableHead>Média</TableHead>
-                      <TableHead>Query</TableHead>
-                      <TableHead>Severidade</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {queries.map((q) => (
-                      <TableRow key={q.identifier}>
-                        <TableCell className="font-mono text-xs">{q.identifier}</TableCell>
-                        <TableCell className="text-xs font-mono">{fmtBytes(q.temp_bytes)}</TableCell>
-                        <TableCell className="text-xs">{q.calls?.toLocaleString() ?? "—"}</TableCell>
-                        <TableCell className="text-xs">
-                          {q.mean_exec_ms != null ? `${q.mean_exec_ms.toFixed(1)}ms` : "—"}
-                        </TableCell>
-                        <TableCell className="max-w-md truncate font-mono text-xs" title={q.query_text ?? ""}>
-                          {q.query_text}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={sevVariant(q.severity)}>{q.severity}</Badge>
-                        </TableCell>
+              {queries.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nenhuma query com spill significativo detectada.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Query ID</TableHead>
+                        <TableHead>Spill</TableHead>
+                        <TableHead>Chamadas</TableHead>
+                        <TableHead>Média</TableHead>
+                        <TableHead>Query</TableHead>
+                        <TableHead>Severidade</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </>
-        )}
+                    </TableHeader>
+                    <TableBody>
+                      {queries.map((q) => (
+                        <TableRow key={q.identifier}>
+                          <TableCell className="font-mono text-xs">{q.identifier}</TableCell>
+                          <TableCell className="text-xs font-mono">{fmtBytes(q.temp_bytes)}</TableCell>
+                          <TableCell className="text-xs">{q.calls?.toLocaleString() ?? "—"}</TableCell>
+                          <TableCell className="text-xs">
+                            {q.mean_exec_ms != null ? `${q.mean_exec_ms.toFixed(1)}ms` : "—"}
+                          </TableCell>
+                          <TableCell className="max-w-md truncate font-mono text-xs" title={q.query_text ?? ""}>
+                            {q.query_text}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={sevVariant(q.severity)}>{q.severity}</Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </CardContent>
     </Card>
   );

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, AlertTriangle } from "lucide-react";
 import { useActiveSessions } from "../hooks/useActiveSessions";
+import { severityVariantDefault as severityVariant } from "./_severityHelpers";
 
 const stateLabel: Record<string, string> = {
   active: "Ativo",
@@ -13,9 +14,6 @@ const stateLabel: Record<string, string> = {
   disabled: "Desabilitado",
   unknown: "Desconhecido",
 };
-
-const severityVariant = (s: string) =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
 
 const fmtSec = (n: number | null) => {
   if (n == null) return "-";
@@ -54,62 +52,61 @@ export function ActiveSessionsCard() {
         </p>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div className="space-y-2">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
-        ) : error ? (
-          <p className="text-sm text-destructive">
-            Erro: {(error as Error).message}
-          </p>
-        ) : !data?.length ? (
-          <p className="text-sm text-muted-foreground">
-            Sem sessões ativas no momento.
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-xs text-muted-foreground">
-                  <th className="p-2">Estado</th>
-                  <th className="p-2">Evento</th>
-                  <th className="p-2">Conexões</th>
-                  <th className="p-2">Query mais antiga</th>
-                  <th className="p-2">Transação mais antiga</th>
-                  <th className="p-2">Severidade</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((row, i) => (
-                  <tr key={`${row.state}-${row.wait_event_type}-${i}`} className="border-b">
-                    <td className="p-2">
-                      {stateLabel[row.state] ?? row.state}
-                    </td>
-                    <td className="p-2 text-xs text-muted-foreground">
-                      {row.wait_event_type}
-                    </td>
-                    <td className="p-2 tabular-nums font-medium">
-                      {row.session_count}
-                    </td>
-                    <td className="p-2 tabular-nums">
-                      {fmtSec(row.longest_query_seconds)}
-                    </td>
-                    <td className="p-2 tabular-nums">
-                      {fmtSec(row.longest_xact_seconds)}
-                    </td>
-                    <td className="p-2">
-                      <Badge variant={severityVariant(row.severity)}>
-                        {row.severity}
-                      </Badge>
-                    </td>
-                  </tr>
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="space-y-2">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+              </div>
+            );
+          }
+          if (error) {
+            return (
+              <p className="text-sm text-destructive">
+                Erro: {(error as Error).message}
+              </p>
+            );
+          }
+          if (!data?.length) {
+            return (
+              <p className="text-sm text-muted-foreground">
+                Sem sessões ativas no momento.
+              </p>
+            );
+          }
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs text-muted-foreground">
+                    <th className="p-2">Estado</th>
+                    <th className="p-2">Evento</th>
+                    <th className="p-2">Conexões</th>
+                    <th className="p-2">Query mais antiga</th>
+                    <th className="p-2">Transação mais antiga</th>
+                    <th className="p-2">Severidade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((row, i) => (
+                    <tr key={`${row.state}-${row.wait_event_type}-${i}`} className="border-b">
+                      <td className="p-2">{stateLabel[row.state] ?? row.state}</td>
+                      <td className="p-2 text-xs text-muted-foreground">{row.wait_event_type}</td>
+                      <td className="p-2 tabular-nums font-medium">{row.session_count}</td>
+                      <td className="p-2 tabular-nums">{fmtSec(row.longest_query_seconds)}</td>
+                      <td className="p-2 tabular-nums">{fmtSec(row.longest_xact_seconds)}</td>
+                      <td className="p-2">
+                        <Badge variant={severityVariant(row.severity)}>{row.severity}</Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
       </CardContent>
     </Card>
   );
