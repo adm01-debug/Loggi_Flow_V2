@@ -135,7 +135,7 @@ export function RTETrackingPanel() {
                   {String(ev.HoraOcorrencia || ev.time || "")}
                 </span>
               </div>
-              {(ev.Cidade || ev.city) && (
+              {Boolean(ev.Cidade || ev.city) && (
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <MapPin className="w-3 h-3" />
                   {String(ev.Cidade || ev.city)}/
