@@ -59,9 +59,10 @@ export function exportToPDF(
     item.transportadora_nome || "-",
     formatCurrency(item.valor),
     item.diferenca_valor !== null ? formatCurrency(item.diferenca_valor) : "-",
-    item.status === "pendente" ? "Pendente" :
-      item.status === "conciliado" ? "Conciliado" :
-      item.status === "divergencia" ? "Divergência" : "Ignorado"
+    item.diferenca_valor !== null ? formatCurrency(item.diferenca_valor) : "-",
+    statusLabel(item.status),
+  ]);
+
   ]);
 
   autoTable(doc, {
