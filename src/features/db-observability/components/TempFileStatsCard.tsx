@@ -4,9 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { HardDrive } from "lucide-react";
 import { useTempFileStats } from "../hooks/useTempFileStats";
-
-const sevVariant = (s: string): "destructive" | "default" | "secondary" | "outline" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : s === "info" ? "secondary" : "outline";
+import { severityVariantExtended as sevVariant } from "./_severityHelpers";
 
 const fmtBytes = (b: number) => {
   if (b >= 1024 ** 3) return `${(b / 1024 ** 3).toFixed(2)} GB`;
