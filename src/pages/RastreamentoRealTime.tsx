@@ -582,7 +582,8 @@ export default function RastreamentoRealTime() {
                           </motion.div>
                         ))}
                       </div>
-                    )}
+                      );
+                    })()}
                   </AnimatePresence>
                 </Card>
               </TabsContent>
