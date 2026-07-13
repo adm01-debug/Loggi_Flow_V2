@@ -214,19 +214,9 @@ export function MEEtiquetasPanel() {
             </div>
           )}
 
-          {listarEtiquetas.isLoading ? (
-            <TableSkeleton rows={5} columns={8} />
-          ) : listarEtiquetas.isError ? (
-            <MEErrorState message="Erro ao carregar etiquetas." onRetry={() => listarEtiquetas.refetch()} />
-          ) : filteredOrders.length === 0 ? (
-            <EmptyState
-              variant="inbox"
-              title="Nenhuma etiqueta encontrada"
-              description={statusFilter !== 'all' ? 'Nenhuma etiqueta com este status. Tente outro filtro.' : 'Compre fretes no carrinho para gerar etiquetas.'}
-              size="sm"
-            />
-          ) : (
+          {stateElement ?? (
             <>
+
               <ScrollArea className="w-full">
                 <Table>
                   <TableHeader>
