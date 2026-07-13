@@ -37,72 +37,82 @@ export function ExtensionsAuditCard() {
         </p>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div className="space-y-2">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
-        ) : error ? (
-          <p className="text-sm text-destructive">
-            Erro: {(error as Error).message}
-          </p>
-        ) : !data?.length ? (
-          <p className="text-sm text-muted-foreground">Sem extensões.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-xs text-muted-foreground">
-                  <th className="p-2">Extensão</th>
-                  <th className="p-2">Schema</th>
-                  <th className="p-2">Instalada</th>
-                  <th className="p-2">Disponível</th>
-                  <th className="p-2">Status</th>
-                  <th className="p-2">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((row) => (
-                  <tr key={row.extension_name} className="border-b">
-                    <td className="p-2 font-mono text-xs font-medium">
-                      {row.extension_name}
-                    </td>
-                    <td className="p-2 text-xs text-muted-foreground">
-                      {row.schema_name}
-                    </td>
-                    <td className="p-2 tabular-nums">{row.installed_version}</td>
-                    <td className="p-2 tabular-nums">
-                      {row.default_version ?? "-"}
-                    </td>
-                    <td className="p-2">
-                      {row.update_available ? (
-                        <Badge>update</Badge>
-                      ) : (
-                        <Badge variant="secondary">ok</Badge>
-                      )}
-                    </td>
-                    <td className="p-2">
-                      {row.update_available ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 gap-1"
-                          onClick={() => copy(row.recommendation)}
-                        >
-                          <Copy className="h-3 w-3" />
-                          Copiar
-                        </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </td>
-                  </tr>
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="space-y-2">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+              </div>
+            );
+          }
+          if (error) {
+            return (
+              <p className="text-sm text-destructive">
+                Erro: {(error as Error).message}
+              </p>
+            );
+          }
+          if (!data?.length) {
+            return <p className="text-sm text-muted-foreground">Sem extensões.</p>;
+          }
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs text-muted-foreground">
+                    <th className="p-2">Extensão</th>
+                    <th className="p-2">Schema</th>
+                    <th className="p-2">Instalada</th>
+                    <th className="p-2">Disponível</th>
+                    <th className="p-2">Status</th>
+                    <th className="p-2">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((row) => (
+                    <tr key={row.extension_name} className="border-b">
+                      <td className="p-2 font-mono text-xs font-medium">
+                        {row.extension_name}
+                      </td>
+                      <td className="p-2 text-xs text-muted-foreground">
+                        {row.schema_name}
+                      </td>
+                      <td className="p-2 tabular-nums">{row.installed_version}</td>
+                      <td className="p-2 tabular-nums">
+                        {row.default_version ?? "-"}
+                      </td>
+                      <td className="p-2">
+                        {row.update_available ? (
+                          <Badge>update</Badge>
+                        ) : (
+                          <Badge variant="secondary">ok</Badge>
+                        )}
+                      </td>
+                      <td className="p-2">
+                        {row.update_available ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 gap-1"
+                            onClick={() => copy(row.recommendation)}
+                          >
+                            <Copy className="h-3 w-3" />
+                            Copiar
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
+      </CardContent>
       </CardContent>
     </Card>
   );
