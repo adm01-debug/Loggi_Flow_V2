@@ -21,7 +21,7 @@ interface ScenarioSimulatorProps<TCargo = unknown> {
   simulateScenario: (data: TCargo, splitVolumes: number) => Promise<SimulationResult[]>;
 }
 
-export function ScenarioSimulator({ cargoData, simulateScenario }: ScenarioSimulatorProps) {
+export function ScenarioSimulator<TCargo>({ cargoData, simulateScenario }: ScenarioSimulatorProps<TCargo>) {
   const [volumes, setVolumes] = useState(2);
   const [results, setResults] = useState<SimulationResult[]>([]);
 
