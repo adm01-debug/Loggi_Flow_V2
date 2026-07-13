@@ -107,40 +107,39 @@ export function METransportadorasPanel() {
         <Card>
           <CardHeader><CardTitle>Serviços de Envio</CardTitle></CardHeader>
           <CardContent>
-            {listarServicos.isLoading ? (
-              <TableSkeleton rows={5} columns={5} />
-            ) : listarServicos.isError ? (
-              <MEErrorState onRetry={() => listarServicos.refetch()} />
-            ) : services.length === 0 ? (
-              <EmptyState variant="default" title="Nenhum serviço" size="sm" />
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Transportadora</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead className="w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {services.map((s) => (
-                    <TableRow key={s.id}>
-                      <TableCell>{s.id}</TableCell>
-                      <TableCell className="font-medium">{s.name}</TableCell>
-                      <TableCell>{s.company?.name || '-'}</TableCell>
-                      <TableCell><Badge variant="outline">{s.type || '-'}</Badge></TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => showDetail(String(s.id), 'servico')}>
-                          <Info className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
+            {(() => {
+              if (listarServicos.isLoading) return <TableSkeleton rows={5} columns={5} />;
+              if (listarServicos.isError) return <MEErrorState onRetry={() => listarServicos.refetch()} />;
+              if (services.length === 0) return <EmptyState variant="default" title="Nenhum serviço" size="sm" />;
+              return (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Transportadora</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead className="w-10" />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
+                  </TableHeader>
+                  <TableBody>
+                    {services.map((s) => (
+                      <TableRow key={s.id}>
+                        <TableCell>{s.id}</TableCell>
+                        <TableCell className="font-medium">{s.name}</TableCell>
+                        <TableCell>{s.company?.name || '-'}</TableCell>
+                        <TableCell><Badge variant="outline">{s.type || '-'}</Badge></TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="icon" onClick={() => showDetail(String(s.id), 'servico')}>
+                            <Info className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              );
+            })()}
           </CardContent>
         </Card>
       </TabsContent>
