@@ -53,9 +53,12 @@ export function MELojasPanel() {
   };
 
   const parseArrayResponse = <T,>(data: unknown): T[] => {
-    const d = data as Record<string, unknown>;
-    return Array.isArray(d?.data) ? d.data as T[] : Array.isArray(data) ? data as T[] : [];
+    const d = data as Record<string, unknown> | undefined;
+    if (Array.isArray(d?.data)) return d!.data as T[];
+    if (Array.isArray(data)) return data as T[];
+    return [];
   };
+
 
   const viewStore = (id: string) => {
     setSelectedStoreId(id);
