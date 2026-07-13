@@ -160,9 +160,10 @@ export default function CotacaoMultiCanal() {
             to: { postal_code: cleanedDestinoCep },
             volumes: [{ width: 20, height: 20, length: 20, weight: weight }], // Default volume if not provided
           })
-          .then((res: any) => {
+          .then((res: unknown) => {
             if (Array.isArray(res)) {
-              res.forEach((option: any) => {
+              (res as Array<Record<string, unknown>>).forEach((option) => {
+
                 if (!option.error) {
                   addCotacao({
                     id: crypto.randomUUID(),
