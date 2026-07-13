@@ -219,7 +219,7 @@ export default function SLADashboard() {
               <Loader2 className="w-6 h-6 animate-spin mx-auto" />
             ) : (
               (stats.performancePorTransportadora || []).map(
-                (c: { nome: string; totalEntregas: number; taxaOTIF: number }, i: number) => (
+                (c: { nome: string; totalEntregas: number | null; taxaOTIF: number }, i: number) => (
                   <div
                     key={i}
                     className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between"
