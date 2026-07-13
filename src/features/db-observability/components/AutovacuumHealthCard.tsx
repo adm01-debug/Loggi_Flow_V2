@@ -4,9 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sparkles, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useAutovacuumHealth } from "../hooks/useAutovacuumHealth";
-
-const severityVariant = (s: string) =>
-  s === "critical" ? "destructive" : s === "warning" ? "secondary" : "outline";
+import { severityVariantMuted as severityVariant } from "./_severityHelpers";
 
 const fmtDate = (d: string | null) =>
   d ? new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : "—";
