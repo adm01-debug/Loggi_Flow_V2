@@ -79,6 +79,25 @@ import { useSorting } from "@/hooks/common/useSorting";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { cn } from "@/lib/utils";
 
+interface CarrierCredentials {
+  api_key: string;
+  api_user: string;
+  api_password: string;
+  endpoint: string;
+}
+interface NonApiConfig {
+  type: "whatsapp" | "email" | "portal";
+  template: string;
+  recipient: string;
+  portal_url: string;
+  portal_user: string;
+  normalization: NormalizationConfig;
+}
+interface CoverageDetails {
+  states: string[];
+  cities: string[];
+}
+
 interface Transportadora {
   id: string;
   razao_social: string;
@@ -95,9 +114,9 @@ interface Transportadora {
   total_entregas?: number;
   entregas_sucesso?: number;
   score_performance?: number | null;
-  credentials?: Record<string, unknown> | null;
-  non_api_config?: Record<string, unknown> | null;
-  coverage_details?: Record<string, unknown> | null;
+  credentials?: CarrierCredentials | null;
+  non_api_config?: NonApiConfig | null;
+  coverage_details?: CoverageDetails | null;
 }
 
 const UFS = [
