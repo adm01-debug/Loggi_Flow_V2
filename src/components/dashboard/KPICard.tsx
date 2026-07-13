@@ -232,21 +232,29 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                   <TacticalSparkline data={sparklineData} color={config.sparkColor} />
                 </div>
               )}
-              {(trendValue || changePercent !== null) && (
-                <motion.div 
-                  initial={{ x: 20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  className={cn(
-                    "flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-full border-2 shadow-2xl tracking-[0.2em] uppercase",
-                    trend === 'up' ? "bg-success/20 text-success border-success/40" : 
-                    trend === 'down' ? "bg-destructive/20 text-destructive border-destructive/40" : 
-                    "bg-white/10 text-white/60 border-white/20"
-                  )}
-                >
-                  {trend === 'up' ? <Activity className="w-3 h-3" /> : trend === 'down' ? <Activity className="w-3 h-3 rotate-180" /> : <Zap className="w-3 h-3" />}
-                  <span>{trendValue || `${changePercent}%`} Delta</span>
-                </motion.div>
-              )}
+              {(trendValue || changePercent !== null) && (() => {
+                const trendClass =
+                  trend === 'up' ? "bg-success/20 text-success border-success/40" :
+                  trend === 'down' ? "bg-destructive/20 text-destructive border-destructive/40" :
+                  "bg-white/10 text-white/60 border-white/20";
+                let TrendIcon: JSX.Element;
+                if (trend === 'up') TrendIcon = <Activity className="w-3 h-3" />;
+                else if (trend === 'down') TrendIcon = <Activity className="w-3 h-3 rotate-180" />;
+                else TrendIcon = <Zap className="w-3 h-3" />;
+                return (
+                  <motion.div
+                    initial={{ x: 20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className={cn(
+                      "flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-full border-2 shadow-2xl tracking-[0.2em] uppercase",
+                      trendClass
+                    )}
+                  >
+                    {TrendIcon}
+                    <span>{trendValue || `${changePercent}%`} Delta</span>
+                  </motion.div>
+                );
+              })()}
             </div>
           </div>
 
@@ -262,12 +270,15 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
               >
                 {typeof value === 'string' && (value.includes('R$') || value.includes('%')) ? value : animatedValue}
               </motion.span>
-              {status !== 'neutral' && (
-                <div className={cn("w-3 h-3 rounded-full mb-4 animate-ping shadow-[0_0_15px_currentColor]", 
-                  status === 'success' ? 'text-success bg-success' : 
-                  status === 'warning' ? 'text-warning bg-warning' : 'text-destructive bg-destructive'
-                )} />
-              )}
+              {status !== 'neutral' && (() => {
+                const statusPulseClass =
+                  status === 'success' ? 'text-success bg-success' :
+                  status === 'warning' ? 'text-warning bg-warning' :
+                  'text-destructive bg-destructive';
+                return (
+                  <div className={cn("w-3 h-3 rounded-full mb-4 animate-ping shadow-[0_0_15px_currentColor]", statusPulseClass)} />
+                );
+              })()}
             </div>
             
             {subtitle && (

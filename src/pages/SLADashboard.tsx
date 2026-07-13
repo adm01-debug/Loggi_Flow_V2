@@ -55,9 +55,36 @@ export default function SLADashboard() {
   };
   const slaRate = stats.taxaOTIF ? Math.round(stats.taxaOTIF) : 0;
 
+  const slaBadgeVariant = (rate: number): "default" | "secondary" | "destructive" => {
+    if (rate >= 95) return "default";
+    if (rate >= 80) return "secondary";
+    return "destructive";
+  };
+  const slaLabel = (rate: number) => {
+    if (rate >= 95) return "Excelente";
+    if (rate >= 80) return "Bom";
+    return "Crítico";
+  };
+  const slaProgressClass = (rate: number) => {
+    if (rate >= 95) return "[&>div]:bg-success";
+    if (rate >= 80) return "[&>div]:bg-warning";
+    return "[&>div]:bg-destructive";
+  };
+  const slaBgClass = (rate: number) => {
+    if (rate >= 95) return "bg-success/15 text-success";
+    if (rate >= 80) return "bg-warning/15 text-warning";
+    return "bg-destructive/15 text-destructive";
+  };
+  const slaTextClass = (rate: number) => {
+    if (rate >= 95) return "text-success";
+    if (rate >= 80) return "text-warning";
+    return "text-destructive";
+  };
+
   const handleDateChange = (range: DateRange | undefined) => {
     if (range) setDateRange(range);
   };
+
 
   return (
     <MainLayout>
@@ -159,28 +186,13 @@ export default function SLADashboard() {
         <div className="card-base p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Taxa de Cumprimento SLA</h3>
-            <Badge
-              variant={
-                slaRate >= 95
-                  ? "default"
-                  : slaRate >= 80
-                    ? "secondary"
-                    : "destructive"
-              }
-            >
-              {slaRate >= 95 ? "Excelente" : slaRate >= 80 ? "Bom" : "Crítico"}
+            <Badge variant={slaBadgeVariant(slaRate)}>
+              {slaLabel(slaRate)}
             </Badge>
           </div>
           <Progress
             value={slaRate}
-            className={cn(
-              "h-4",
-              slaRate >= 95
-                ? "[&>div]:bg-success"
-                : slaRate >= 80
-                  ? "[&>div]:bg-warning"
-                  : "[&>div]:bg-destructive",
-            )}
+            className={cn("h-4", slaProgressClass(slaRate))}
           />
           <div className="flex justify-between mt-2 text-sm text-muted-foreground">
             <span>Meta: 95%</span>
@@ -207,7 +219,7 @@ export default function SLADashboard() {
               <Loader2 className="w-6 h-6 animate-spin mx-auto" />
             ) : (
               (stats.performancePorTransportadora || []).map(
-                (c: any, i: number) => (
+                (c: { nome: string; totalEntregas: number | null; taxaOTIF: number }, i: number) => (
                   <div
                     key={i}
                     className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between"
@@ -216,11 +228,7 @@ export default function SLADashboard() {
                       <div
                         className={cn(
                           "p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500",
-                          c.taxaOTIF >= 95
-                            ? "bg-success/15 text-success"
-                            : c.taxaOTIF >= 80
-                              ? "bg-warning/15 text-warning"
-                              : "bg-destructive/15 text-destructive",
+                          slaBgClass(c.taxaOTIF),
                         )}
                       >
                         <Truck className="w-6 h-6" />
@@ -235,16 +243,7 @@ export default function SLADashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p
-                        className={cn(
-                          "text-xl font-bold",
-                          c.taxaOTIF >= 95
-                            ? "text-success"
-                            : c.taxaOTIF >= 80
-                              ? "text-warning"
-                              : "text-destructive",
-                        )}
-                      >
+                      <p className={cn("text-xl font-bold", slaTextClass(c.taxaOTIF))}>
                         {c.taxaOTIF.toFixed(0)}%
                       </p>
                       <Progress value={c.taxaOTIF} className="w-24 h-2" />

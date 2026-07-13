@@ -7,8 +7,12 @@ import { Activity, Ban, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useCancelQuery, useLongRunningQueries } from "../hooks/useLongRunningQueries";
 
-const severityVariant = (s: string): "destructive" | "default" | "secondary" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+const severityVariant = (s: string): "destructive" | "default" | "secondary" => {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "default";
+  return "secondary";
+};
+
 
 export function LongRunningQueriesCard() {
   const { data, isLoading, error } = useLongRunningQueries(30, 50);
@@ -37,20 +41,27 @@ export function LongRunningQueriesCard() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-          </div>
-        ) : error ? (
-          <p className="text-sm text-destructive">Erro: {(error as Error).message}</p>
-        ) : !data || data.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhuma query longa em execução (≥ 30s).</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            );
+          }
+          if (error) {
+            return <p className="text-sm text-destructive">Erro: {(error as Error).message}</p>;
+          }
+          if (!data || data.length === 0) {
+            return <p className="text-sm text-muted-foreground">Nenhuma query longa em execução (≥ 30s).</p>;
+          }
+          return (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+
                   <TableHead>PID</TableHead>
                   <TableHead>Usuário</TableHead>
                   <TableHead>Duração</TableHead>
@@ -99,7 +110,8 @@ export function LongRunningQueriesCard() {
               </TableBody>
             </Table>
           </div>
-        )}
+          );
+        })()}
       </CardContent>
     </Card>
   );
