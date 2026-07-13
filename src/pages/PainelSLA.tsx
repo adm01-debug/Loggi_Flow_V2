@@ -214,13 +214,11 @@ export default function PainelSLA() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <Helmet>
-        <title>Painel de SLAs — Metas e Alertas | LogiFlow</title>
-        <meta
-          name="description"
-          content="Painel de SLAs de expedições e coletas com metas configuráveis e alertas por vencimento."
-        />
-      </Helmet>
+      <SEOHead
+        title="Painel de SLAs — Metas e Alertas | LogiFlow"
+        description="Painel de SLAs de expedições e coletas com metas configuráveis e alertas por vencimento."
+      />
+
 
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
