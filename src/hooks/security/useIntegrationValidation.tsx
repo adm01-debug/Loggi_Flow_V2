@@ -2,9 +2,9 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-interface IntegrationStatus {
+export interface IntegrationStatus {
   name: string;
-  status: 'connected' | 'configured' | 'not_configured' | 'error';
+  status: 'connected' | 'configured' | 'not_configured' | 'error' | 'unknown';
   lastCheck?: Date;
   message?: string;
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useConfirmExit } from "@/hooks/common/useConfirmExit";
-import { useIntegrationValidation } from "@/hooks/security/useIntegrationValidation";
+import { useIntegrationValidation, type IntegrationStatus } from "@/hooks/security/useIntegrationValidation";
 import { useNotificationPreferences } from "@/hooks/notifications/useNotificationPreferences";
 import { type NotificationPreferences } from "@/hooks";
 import { format } from "date-fns";
@@ -65,48 +65,16 @@ export default function Configuracoes() {
     }
   };
 
+  const findStatus = (name: string, fallback: IntegrationStatus["status"] = "not_configured") =>
+    (integrations.find((i) => i.name === name)?.status || fallback) as IntegrationStatus["status"];
+
   const integrationsList = [
-    {
-      id: "supabase",
-      name: "Supabase",
-      icon: Database,
-      status: "connected" as const,
-    },
-    {
-      id: "bitrix24",
-      name: "Bitrix24",
-      icon: Link,
-      status: (integrations.find((i) => i.name === "Bitrix24")?.status ||
-        "not_configured") as any,
-    },
-    {
-      id: "lalamove",
-      name: "Lalamove",
-      icon: Globe,
-      status: (integrations.find((i) => i.name === "Lalamove")?.status ||
-        "not_configured") as any,
-    },
-    {
-      id: "n8n",
-      name: "n8n",
-      icon: Settings,
-      status: (integrations.find((i) => i.name === "n8n")?.status ||
-        "unknown") as any,
-    },
-    {
-      id: "rodonaves",
-      name: "Rodonaves RTE",
-      icon: Truck,
-      status: (integrations.find((i) => i.name === "Rodonaves")?.status ||
-        "not_configured") as any,
-    },
-    {
-      id: "melhorenvio",
-      name: "Melhor Envio",
-      icon: Package,
-      status: (integrations.find((i) => i.name === "Melhor Envio")?.status ||
-        "not_configured") as any,
-    },
+    { id: "supabase", name: "Supabase", icon: Database, status: "connected" as IntegrationStatus["status"] },
+    { id: "bitrix24", name: "Bitrix24", icon: Link, status: findStatus("Bitrix24") },
+    { id: "lalamove", name: "Lalamove", icon: Globe, status: findStatus("Lalamove") },
+    { id: "n8n", name: "n8n", icon: Settings, status: findStatus("n8n", "unknown") },
+    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: findStatus("Rodonaves") },
+    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: findStatus("Melhor Envio") },
   ];
 
   const handleValidateIntegration = (id: string) => {
@@ -269,6 +237,16 @@ export default function Configuracoes() {
                   const isConnected = status === "connected";
                   const isError = status === "error";
 
+                  let badgeVariant: "default" | "destructive" | "secondary" = "secondary";
+                  if (isConnected) badgeVariant = "default";
+                  else if (isError) badgeVariant = "destructive";
+                  let badgeContent: React.ReactNode = "Pendente";
+                  if (isConnected) {
+                    badgeContent = (<><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</>);
+                  } else if (isError) {
+                    badgeContent = (<><XCircle className="w-3 h-3 mr-1" />Erro</>);
+                  }
+
                   return (
                     <div
                       key={int.id}
@@ -296,29 +274,8 @@ export default function Configuracoes() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-right hidden sm:block">
-                          <Badge
-                            variant={
-                              isConnected
-                                ? "default"
-                                : isError
-                                  ? "destructive"
-                                  : "secondary"
-                            }
-                            className="mb-1"
-                          >
-                            {isConnected ? (
-                              <>
-                                <CheckCircle2 className="w-3 h-3 mr-1" />
-                                Conectado
-                              </>
-                            ) : isError ? (
-                              <>
-                                <XCircle className="w-3 h-3 mr-1" />
-                                Erro
-                              </>
-                            ) : (
-                              "Pendente"
-                            )}
+                          <Badge variant={badgeVariant} className="mb-1">
+                            {badgeContent}
                           </Badge>
                           {integrationData?.lastCheck && (
                             <p className="text-[10px] text-muted-foreground">
@@ -373,7 +330,7 @@ export default function Configuracoes() {
                       </p>
                     </div>
                     <Switch
-                      checked={(preferences as any)?.[pref.key] ?? false}
+                      checked={(preferences as Partial<NotificationPreferences> & Record<string, boolean | undefined>)?.[`notifications_${pref.key}`] ?? false}
                       onCheckedChange={(v) =>
                         handleUpdatePreference(pref.key, v)
                       }

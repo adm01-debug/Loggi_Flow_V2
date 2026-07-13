@@ -24,7 +24,10 @@ import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
+
+type EntregaStatus = Database["public"]["Enums"]["entrega_status"];
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetailsDialog";
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
@@ -196,7 +199,7 @@ export default function Despachos() {
 
       const { error } = await supabase
         .from("entregas")
-        .update({ status: nextStatus as any })
+        .update({ status: nextStatus as EntregaStatus })
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
@@ -222,7 +225,7 @@ export default function Despachos() {
       );
       refetch();
     },
-    onError: (error: any) => toast.error(error.message),
+    onError: (error: Error) => toast.error(error.message),
   });
 
   const moveToNext = (item: Despacho) => {
@@ -249,7 +252,7 @@ export default function Despachos() {
       const { error } = await supabase
         .from("entregas")
         .update({
-          status: "despachado" as any,
+          status: "despachado" as EntregaStatus,
           data_despacho: new Date().toISOString(),
         })
         .eq("id", item.id)
@@ -273,7 +276,7 @@ export default function Despachos() {
       setConfirmItem(null);
       refetch();
     },
-    onError: (error: any) => toast.error(error.message),
+    onError: (error: Error) => toast.error(error.message),
   });
 
   const confirmDispatch = () => {
@@ -326,16 +329,13 @@ export default function Despachos() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-2">
           {columns.map((col) => {
             const config = statusConfig[col];
-            const count =
-              stats[
-                col === "pronto_despacho"
-                  ? "prontos"
-                  : col === "cotacao_frete"
-                    ? "cotacao"
-                    : col === "nf_emitida"
-                      ? "nfEmitida"
-                      : "despachados"
-              ];
+            const statsKeyMap: Record<string, keyof typeof stats> = {
+              pronto_despacho: "prontos",
+              cotacao_frete: "cotacao",
+              nf_emitida: "nfEmitida",
+              despachado: "despachados",
+            };
+            const count = stats[statsKeyMap[col] ?? "despachados"];
             return (
               <div
                 key={col}
@@ -530,7 +530,7 @@ export default function Despachos() {
           open={detailsOpen}
           onOpenChange={setDetailsOpen}
           delivery={selectedItem}
-          statusConfig={statusConfig as any}
+          statusConfig={statusConfig as unknown as Record<string, { color: string; label: string; icon: LucideIcon }>}
           onStatusUpdate={() => {
             refetch();
           }}
