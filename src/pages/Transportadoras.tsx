@@ -95,9 +95,9 @@ interface Transportadora {
   total_entregas?: number;
   entregas_sucesso?: number;
   score_performance?: number | null;
-  credentials?: any;
-  non_api_config?: any;
-  coverage_details?: any;
+  credentials?: Record<string, unknown> | null;
+  non_api_config?: Record<string, unknown> | null;
+  coverage_details?: Record<string, unknown> | null;
 }
 
 const UFS = [
