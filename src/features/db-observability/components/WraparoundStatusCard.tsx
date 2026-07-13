@@ -5,9 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, Copy, Snowflake } from "lucide-react";
 import { toast } from "sonner";
 import { useWraparoundStatus } from "../hooks/useWraparoundStatus";
-
-const severityVariant = (s: string) =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+import { severityVariantDefault as severityVariant } from "./_severityHelpers";
 
 function formatBytes(n: number) {
   if (!n) return "-";
