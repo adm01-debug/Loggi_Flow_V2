@@ -7,6 +7,12 @@ import type { Database } from '@/integrations/supabase/types';
 
 type TableNames = keyof Database['public']['Tables'];
 
+type DynamicTable = {
+  delete: () => { in: (c: string, v: string[]) => Promise<{ error: Error | null }> };
+  update: (v: Record<string, unknown>) => { in: (c: string, v: string[]) => Promise<{ error: Error | null }> };
+};
+
+
 export interface BulkAction<T> {
   id: string;
   label: string;
@@ -39,7 +45,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       setIsProcessing(true);
-      const { error } = await (supabase.from(table) as any).delete().in('id', ids);
+      const { error } = await (supabase.from(table) as unknown as DynamicTable).delete().in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { 
@@ -59,7 +65,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkUpdateMutation = useMutation({
     mutationFn: async ({ ids, data }: { ids: string[]; data: Partial<T> }) => {
       setIsProcessing(true);
-      const { error } = await (supabase.from(table) as any).update(data).in('id', ids);
+      const { error } = await (supabase.from(table) as unknown as DynamicTable).update(data).in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { 
@@ -79,7 +85,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkSoftDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       setIsProcessing(true);
-      const { error } = await (supabase.from(table) as any).update({ deleted_at: new Date().toISOString() }).in('id', ids);
+      const { error } = await (supabase.from(table) as unknown as DynamicTable).update({ deleted_at: new Date().toISOString() }).in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { 
@@ -99,7 +105,7 @@ export function useBulkActions<T extends { id: string }>(options: BulkActionOpti
   const bulkRestoreMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       setIsProcessing(true);
-      const { error } = await (supabase.from(table) as any).update({ deleted_at: null }).in('id', ids);
+      const { error } = await (supabase.from(table) as unknown as DynamicTable).update({ deleted_at: null }).in('id', ids);
       if (error) throw error;
     },
     onSuccess: () => { 
