@@ -919,7 +919,9 @@ export function LogisticsMapWidget() {
                     </div>
                   </div>
                 </Marker>
-              ))}
+                );
+              })}
+
 
               {/* Rota Visualization if selected */}
               {selectedShipment?.coordinates && (
