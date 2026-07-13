@@ -13,7 +13,7 @@ export interface ScheduledReport {
   day_of_month?: number;
   time_of_day: string;
   recipients: string[];
-  filters: Record<string, any>;
+  filters: Record<string, unknown>;
   is_active: boolean;
   last_sent_at?: string;
   next_send_at?: string;
@@ -29,7 +29,7 @@ export interface ScheduledReportFormData {
   day_of_month?: number;
   time_of_day: string;
   recipients: string[];
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   is_active?: boolean;
 }
 
@@ -126,7 +126,7 @@ export const useScheduledReports = () => {
   const generateReport = useMutation({
     mutationFn: async (reportData: {
       report_type: string;
-      filters?: Record<string, any>;
+      filters?: Record<string, unknown>;
     }) => {
       const { data, error } = await supabase.functions.invoke(
         "scheduled-reports",
