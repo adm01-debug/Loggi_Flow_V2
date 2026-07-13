@@ -1,6 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet-async";
 import { differenceInHours, parseISO, isPast, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AlertTriangle, Clock, Package, Truck, Target, Settings2, CheckCircle2 } from "lucide-react";
