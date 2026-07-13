@@ -74,6 +74,7 @@ const ConfiguracoesFrete = lazy(() => import("./pages/ConfiguracoesFrete"));
 const AdminDbHealth = lazy(() => import("./pages/admin/DbHealth"));
 const AdminQualityGate = lazy(() => import("./pages/admin/QualityGate"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ExportacaoDados = lazy(() => import("./pages/ExportacaoDados"));
 
 // Lazy load non-critical providers
 const LazyProviders = lazy(() => import("./components/LazyProviders"));
