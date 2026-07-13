@@ -8,7 +8,7 @@ export interface AnimatedNumberProps {
   prefix?: string;
   suffix?: string;
   duration?: number;
-  formatValue?: (v: any) => any;
+  formatValue?: (v: number) => string;
 }
 
 export const AnimatedNumber = React.memo(
