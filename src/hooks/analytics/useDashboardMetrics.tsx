@@ -41,6 +41,14 @@ export interface RecentAlert {
   createdAt: string;
   entityId?: string;
   entityType?: "coleta" | "entrega";
+  delta?: number;
+}
+
+interface PredictionData {
+  probabilidade_atraso: number;
+  numero: string;
+  tipo: string;
+  risco: "critico" | "alto" | "medio" | "baixo";
 }
 
 export function useDashboardMetrics() {
