@@ -7,9 +7,7 @@ import { Lock, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useLockConflicts } from "../hooks/useLockConflicts";
 import { useCancelQuery } from "../hooks/useLongRunningQueries";
-
-const sevVariant = (s: string): "destructive" | "default" | "secondary" =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
+import { severityVariantDefault as sevVariant } from "./_severityHelpers";
 
 export function LockConflictsCard() {
   const { data, isLoading, error } = useLockConflicts(50);
