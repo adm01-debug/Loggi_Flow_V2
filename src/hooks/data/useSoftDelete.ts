@@ -10,9 +10,10 @@ export function useSoftDelete(tableName: TableName, queryKeysToInvalidate: strin
 
   const softDeleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from(tableName as any)
-        .update({ deleted_at: new Date().toISOString() } as any)
+      const { error } = await (supabase.from(tableName) as unknown as {
+        update: (v: Record<string, unknown>) => { eq: (c: string, v: string) => Promise<{ error: Error | null }> };
+      })
+        .update({ deleted_at: new Date().toISOString() })
         .eq("id", id);
 
       if (error) throw error;
@@ -38,9 +39,10 @@ export function useSoftDelete(tableName: TableName, queryKeysToInvalidate: strin
 
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from(tableName as any)
-        .update({ deleted_at: null } as any)
+      const { error } = await (supabase.from(tableName) as unknown as {
+        update: (v: Record<string, unknown>) => { eq: (c: string, v: string) => Promise<{ error: Error | null }> };
+      })
+        .update({ deleted_at: null })
         .eq("id", id);
 
       if (error) throw error;

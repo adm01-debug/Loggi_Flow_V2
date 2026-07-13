@@ -21,7 +21,7 @@ export function usePerformanceMonitor() {
         metadata: {
           metric: "LCP",
           value: lastEntry.startTime,
-          element: (lastEntry as any).element?.tagName,
+          element: (lastEntry as PerformanceEntry & { element?: Element }).element?.tagName,
         },
       });
     });
@@ -29,7 +29,7 @@ export function usePerformanceMonitor() {
     // Observe First Input Delay (FID)
     const fidObserver = new PerformanceObserver((entryList) => {
       entryList.getEntries().forEach((entry) => {
-        const delay = (entry as any).processingStart - entry.startTime;
+        const delay = (entry as PerformanceEntry & { processingStart: number }).processingStart - entry.startTime;
         logRef.current({
           severity: "info",
           category: "performance_fid",
@@ -46,9 +46,9 @@ export function usePerformanceMonitor() {
     // Observe Cumulative Layout Shift (CLS)
     const clsObserver = new PerformanceObserver((entryList) => {
       let clsValue = 0;
-      entryList.getEntries().forEach((entry: any) => {
+      entryList.getEntries().forEach((entry: PerformanceEntry & { hadRecentInput?: boolean; value?: number }) => {
         if (!entry.hadRecentInput) {
-          clsValue += entry.value;
+          clsValue += entry.value ?? 0;
         }
       });
 
