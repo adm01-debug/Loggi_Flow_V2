@@ -277,7 +277,7 @@ export default function Transportadoras() {
       setForm(emptyForm);
       invalidate();
     },
-    onError: (error: any) =>
+    onError: (error: Error) =>
       toast({
         title: "Erro",
         description: error.message,
@@ -312,7 +312,7 @@ export default function Transportadoras() {
       setEditDialog(false);
       invalidate();
     },
-    onError: (error: any) =>
+    onError: (error: Error) =>
       toast({
         title: "Erro",
         description: error.message,
@@ -333,7 +333,7 @@ export default function Transportadoras() {
       setDeleteTarget(null);
       invalidate();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Erro",
         description: error.message,
@@ -366,7 +366,7 @@ export default function Transportadoras() {
       clearSelection();
       invalidate();
     },
-    onError: (error: any) =>
+    onError: (error: Error) =>
       toast({
         title: "Erro",
         description: error.message,
@@ -580,7 +580,7 @@ export default function Transportadoras() {
           <Label>Canal de Cotação</Label>
           <Select
             value={form.non_api_config.type}
-            onValueChange={(v: any) =>
+            onValueChange={(v: string) =>
               setForm({
                 ...form,
                 non_api_config: { ...form.non_api_config, type: v },
