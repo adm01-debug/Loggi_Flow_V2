@@ -468,8 +468,8 @@ export default function FreightConfig() {
                                   className="font-mono text-xs h-32"
                                   placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
                                   value={
-                                    (selectedCarrier.non_api_config as Record<string, unknown>)
-                                      ?.whatsapp_template || ""
+                                    ((selectedCarrier.non_api_config as Record<string, unknown> | null)
+                                      ?.whatsapp_template as string) || ""
                                   }
                                   onChange={(e) => {
                                     const cfg = {
