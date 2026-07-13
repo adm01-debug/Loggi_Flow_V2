@@ -246,7 +246,7 @@ export default function Coletas() {
               variant="outline"
               size="lg"
               onClick={() =>
-                exportToCSV(coletas as any, { filename: "coletas" })
+                exportToCSV(coletas as unknown as Record<string, unknown>[], { filename: "coletas" })
               }
               className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 hover:bg-primary/5 transition-all"
             >
@@ -479,17 +479,17 @@ export default function Coletas() {
                             type: "Inbound",
                             val:
                               stats.total -
-                              coletas.filter((c) => (c as any).is_reverse)
+                              coletas.filter((c) => c.is_reverse)
                                 .length,
                           },
                           {
                             type: "Reversa",
-                            val: coletas.filter((c) => (c as any).is_reverse)
+                            val: coletas.filter((c) => c.is_reverse)
                               .length,
                           },
                           {
                             type: "Urgente",
-                            val: coletas.filter((c) => (c as any).is_urgent)
+                            val: coletas.filter((c) => c.is_urgent)
                               .length,
                           },
                         ]}
@@ -516,17 +516,8 @@ export default function Coletas() {
                           }}
                         />
                         <Bar dataKey="val" radius={[8, 8, 0, 0]}>
-                          {[0, 1, 2].map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={
-                                index === 0
-                                  ? "var(--primary)"
-                                  : index === 1
-                                    ? "#a855f7"
-                                    : "#f97316"
-                              }
-                            />
+                          {(["var(--primary)", "#a855f7", "#f97316"]).map((fill, index) => (
+                            <Cell key={`cell-${index}`} fill={fill} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -698,8 +689,8 @@ export default function Coletas() {
                                 )}
                               </div>
                               <p className="text-sm text-muted-foreground font-bold uppercase tracking-tight mt-0.5">
-                                {(c.fornecedores as any)?.nome_fantasia ||
-                                  (c.fornecedores as any)?.razao_social}
+                                {c.fornecedores?.nome_fantasia ||
+                                  c.fornecedores?.razao_social}
                               </p>
                             </div>
                           </div>

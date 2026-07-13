@@ -26,6 +26,16 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { hapticFeedback } from "@/utils/haptics";
+import type {
+  ThemeMode,
+  UIDensity,
+  AccessibilitySettings,
+  UserPreferences,
+} from "../types";
+
+type AnimationSpeed = UserPreferences["gamification"]["animationSpeed"];
+type VibrationIntensity = UserPreferences["gamification"]["vibrationIntensity"];
+type FontSize = AccessibilitySettings["fontSize"];
 
 export function PreferencePanel() {
   const {
@@ -53,9 +63,9 @@ export function PreferencePanel() {
             </Label>
             <Tabs
               value={preferences.theme}
-              onValueChange={(v: any) => {
+              onValueChange={(v) => {
                 hapticFeedback("light");
-                updatePreference("theme", v);
+                updatePreference("theme", v as ThemeMode);
               }}
               className="w-full"
             >
@@ -92,7 +102,7 @@ export function PreferencePanel() {
                   className="flex-col h-20 gap-2 text-[10px] font-bold uppercase"
                   onClick={() => {
                     hapticFeedback("medium");
-                    updatePreference("density", d.id as any);
+                    updatePreference("density", d.id as UIDensity);
                   }}
                 >
                   <d.icon className="w-5 h-5" />
@@ -159,7 +169,7 @@ export function PreferencePanel() {
                 <p className="text-sm font-bold">Escala de Fonte</p>
                 <Select
                   value={preferences.accessibility.fontSize}
-                  onValueChange={(v: any) => updateAccessibility("fontSize", v)}
+                  onValueChange={(v) => updateAccessibility("fontSize", v as FontSize)}
                 >
                   <SelectTrigger className="h-8 text-xs font-bold bg-background/50">
                     <SelectValue />
@@ -236,11 +246,9 @@ export function PreferencePanel() {
             </div>
             <div className="w-32">
               <Select
-                value={
-                  (preferences.gamification as any).animationSpeed || "normal"
-                }
+                value={preferences.gamification.animationSpeed || "normal"}
                 onValueChange={(v) =>
-                  updateGamification("animationSpeed" as any, v)
+                  updateGamification("animationSpeed", v as AnimationSpeed)
                 }
               >
                 <SelectTrigger className="h-8 text-[10px] font-black uppercase bg-background/50 border-white/10">
@@ -284,11 +292,9 @@ export function PreferencePanel() {
             </div>
             <div className="w-32">
               <Select
-                value={
-                  (preferences.gamification as any).vibrationIntensity || "low"
-                }
+                value={preferences.gamification.vibrationIntensity || "low"}
                 onValueChange={(v) =>
-                  updateGamification("vibrationIntensity" as any, v)
+                  updateGamification("vibrationIntensity", v as VibrationIntensity)
                 }
               >
                 <SelectTrigger className="h-8 text-[10px] font-black uppercase bg-background/50 border-white/10">
