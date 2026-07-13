@@ -48,7 +48,7 @@ const filterConfig: FilterConfig<DeliveryPoint> = {
 
 export default function MapaRotas() {
   const deliveryRoutes = useDeliveryRoutes();
-  const routes = deliveryRoutes?.data || [];
+  const routes = useMemo(() => deliveryRoutes?.data || [], [deliveryRoutes?.data]);
 
   const [showRouteLines] = useState(true);
   const [mapStyle] = useState<"dark" | "satellite">("dark");
