@@ -214,10 +214,8 @@ export default function PainelSLA() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <SEOHead
-        title="Painel de SLAs — Metas e Alertas | LogiFlow"
-        description="Painel de SLAs de expedições e coletas com metas configuráveis e alertas por vencimento."
-      />
+      {/* SEO handled via useEffect below */}
+
 
 
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
