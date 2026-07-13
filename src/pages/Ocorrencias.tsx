@@ -192,7 +192,7 @@ export default function Ocorrencias() {
     deleteComment,
     isLoading: commentsLoading,
   } = useComments({ entityType: "ocorrencia", entityId: sel?.id || "" });
-  const { uploadImage, uploading } = useImageUpload("ocorrencias-fotos");
+  const { uploading } = useImageUpload("ocorrencias-fotos");
   const { history } = useEntityHistory({
     entityType: "ocorrencia",
     entityId: sel?.id || "",

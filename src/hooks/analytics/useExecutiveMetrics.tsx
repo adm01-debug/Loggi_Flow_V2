@@ -36,7 +36,6 @@ export function useExecutiveMetrics() {
     queryKey: ["exec-trends", user?.id],
     queryFn: async (): Promise<MonthlyTrend[]> => {
       const now = new Date();
-      const months: MonthlyTrend[] = [];
 
       const monthsPromises = Array.from({ length: 6 }).map(async (_, i) => {
         const monthDate = subMonths(now, 5 - i); // Reversed order to build chronologically

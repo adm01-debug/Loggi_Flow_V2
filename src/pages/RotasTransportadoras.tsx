@@ -24,7 +24,7 @@ export default function RotasTransportadoras() {
     TransportadoraRota[] | null
   >(null);
 
-  const { rotas, isLoading, addRota, deleteRota } =
+  const { rotas, isLoading, addRota } =
     useTransportadoraRotas(activeFilters);
 
   // Fetch transportadoras for the form

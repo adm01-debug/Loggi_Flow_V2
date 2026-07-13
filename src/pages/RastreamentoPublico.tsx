@@ -54,7 +54,7 @@ export default function RastreamentoPublico() {
   const [code, setCode] = useState(trackingCode || searchParams.get("code") || "");
   const [searchCode, setSearchCode] = useState(code);
 
-  const { data: tracking, isLoading, error } = useQuery({
+  const { data: tracking, isLoading } = useQuery({
     queryKey: ["tracking-public", searchCode],
     queryFn: async () => {
       if (!searchCode) return null;
