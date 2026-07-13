@@ -219,7 +219,7 @@ export default function SLADashboard() {
               <Loader2 className="w-6 h-6 animate-spin mx-auto" />
             ) : (
               (stats.performancePorTransportadora || []).map(
-                (c: any, i: number) => (
+                (c: { nome: string; totalEntregas: number; taxaOTIF: number }, i: number) => (
                   <div
                     key={i}
                     className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between"
@@ -228,11 +228,7 @@ export default function SLADashboard() {
                       <div
                         className={cn(
                           "p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500",
-                          c.taxaOTIF >= 95
-                            ? "bg-success/15 text-success"
-                            : c.taxaOTIF >= 80
-                              ? "bg-warning/15 text-warning"
-                              : "bg-destructive/15 text-destructive",
+                          slaBgClass(c.taxaOTIF),
                         )}
                       >
                         <Truck className="w-6 h-6" />
@@ -247,16 +243,7 @@ export default function SLADashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p
-                        className={cn(
-                          "text-xl font-bold",
-                          c.taxaOTIF >= 95
-                            ? "text-success"
-                            : c.taxaOTIF >= 80
-                              ? "text-warning"
-                              : "text-destructive",
-                        )}
-                      >
+                      <p className={cn("text-xl font-bold", slaTextClass(c.taxaOTIF))}>
                         {c.taxaOTIF.toFixed(0)}%
                       </p>
                       <Progress value={c.taxaOTIF} className="w-24 h-2" />
