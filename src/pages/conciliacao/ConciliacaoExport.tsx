@@ -131,9 +131,8 @@ export function exportToExcel(
       item.transportadora_nome || "",
       item.valor,
       item.diferenca_valor ?? "",
-      item.status === "pendente" ? "Pendente" :
-        item.status === "conciliado" ? "Conciliado" :
-        item.status === "divergencia" ? "Divergência" : "Ignorado",
+      statusLabel(item.status),
+
       item.observacoes || ""
     ])
   ];
