@@ -10,8 +10,11 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const variant = (s: string): "destructive" | "secondary" | "default" =>
-  s === "critical" ? "destructive" : s === "warning" ? "secondary" : "default";
+function variant(s: string): "destructive" | "secondary" | "default" {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "secondary";
+  return "default";
+}
 
 const statusLabel: Record<RemediationAction["status"], string> = {
   pending: "Pendente",
@@ -20,8 +23,11 @@ const statusLabel: Record<RemediationAction["status"], string> = {
   ignored: "Ignorada",
 };
 
-const statusVariant = (s: RemediationAction["status"]): "default" | "secondary" | "outline" =>
-  s === "resolved" ? "default" : s === "ignored" ? "outline" : "secondary";
+function statusVariant(s: RemediationAction["status"]): "default" | "secondary" | "outline" {
+  if (s === "resolved") return "default";
+  if (s === "ignored") return "outline";
+  return "secondary";
+}
 
 export function RemediationHistoryCard() {
   const { data, isLoading, error } = useRemediationActions();

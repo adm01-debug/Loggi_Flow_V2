@@ -3,8 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { AlertTriangle } from "lucide-react";
 import { useHealthAnomalies } from "../hooks/useHealthAnomalies";
 
-const severityVariant = (s: string): "destructive" | "secondary" | "default" =>
-  s === "critical" ? "destructive" : s === "warning" ? "secondary" : "default";
+function severityVariant(s: string): "destructive" | "secondary" | "default" {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "secondary";
+  return "default";
+}
 
 export function AnomaliesCard() {
   const { data, isLoading, error } = useHealthAnomalies();

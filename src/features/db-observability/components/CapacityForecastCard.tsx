@@ -3,8 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from "lucide-react";
 import { useCapacityForecast } from "../hooks/useCapacityForecast";
 
-const variant = (s: string): "destructive" | "secondary" | "default" =>
-  s === "critical" ? "destructive" : s === "warning" ? "secondary" : "default";
+function variant(s: string): "destructive" | "secondary" | "default" {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "secondary";
+  return "default";
+}
 
 const formatEta = (h: number | null): string => {
   if (h === null || h === undefined) return "estável / decrescente";

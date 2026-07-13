@@ -52,21 +52,13 @@ export function CronJobsCard() {
                       : "—"}
                   </TableCell>
                   <TableCell>
-                    {j.last_status ? (
-                      <Badge
-                        variant={
-                          j.last_status === "succeeded"
-                            ? "default"
-                            : j.last_status === "failed"
-                              ? "destructive"
-                              : "secondary"
-                        }
-                      >
-                        {j.last_status}
-                      </Badge>
-                    ) : (
-                      "—"
-                    )}
+                    {(() => {
+                      if (!j.last_status) return "—";
+                      let statusVariant: "default" | "destructive" | "secondary" = "secondary";
+                      if (j.last_status === "succeeded") statusVariant = "default";
+                      else if (j.last_status === "failed") statusVariant = "destructive";
+                      return <Badge variant={statusVariant}>{j.last_status}</Badge>;
+                    })()}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-xs">
                     {j.last_duration_ms != null

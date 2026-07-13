@@ -43,6 +43,9 @@ export function RegressionsCard() {
             <TableBody>
               {data.map((r) => {
                 const sev = severityOf(Number(r.regression_pct));
+                let badgeVariant: "destructive" | "secondary" | "outline" = "outline";
+                if (sev === "critical") badgeVariant = "destructive";
+                else if (sev === "warning") badgeVariant = "secondary";
                 return (
                   <TableRow key={r.queryid}>
                     <TableCell className="font-mono text-xs">{r.queryid}</TableCell>
@@ -56,16 +59,7 @@ export function RegressionsCard() {
                       {Number(r.current_mean_ms).toFixed(1)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Badge
-                        variant={
-                          sev === "critical"
-                            ? "destructive"
-                            : sev === "warning"
-                              ? "secondary"
-                              : "outline"
-                        }
-                        className="gap-1"
-                      >
+                      <Badge variant={badgeVariant} className="gap-1">
                         {sev === "critical" && <AlertTriangle className="h-3 w-3" />}
                         +{Number(r.regression_pct).toFixed(0)}%
                       </Badge>

@@ -5,8 +5,11 @@ import { Wrench, PlayCircle } from "lucide-react";
 import { useRemediationSuggestions } from "../hooks/useRemediationSuggestions";
 import { useApplyRemediation } from "../hooks/useRemediationActions";
 
-const variant = (s: string): "destructive" | "secondary" | "default" =>
-  s === "critical" ? "destructive" : s === "warning" ? "secondary" : "default";
+function variant(s: string): "destructive" | "secondary" | "default" {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "secondary";
+  return "default";
+}
 
 export function RemediationSuggestionsCard() {
   const { data, isLoading, error } = useRemediationSuggestions();
