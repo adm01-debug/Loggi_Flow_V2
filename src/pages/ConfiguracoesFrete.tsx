@@ -56,23 +56,21 @@ interface CarrierConfig {
 }
 
 interface FreightRule {
-  id: string;
+  id?: string;
   event_type: string;
-  max_sla_days: number;
-  price_weight: number;
-  time_weight: number;
-  performance_weight: number;
-  is_active: boolean;
-  is_default: boolean;
-  [k: string]: unknown;
+  max_sla_days: number | null;
+  price_weight: number | null;
+  time_weight: number | null;
+  performance_weight: number | null;
+  is_active: boolean | null;
+  is_default: boolean | null;
 }
 
 interface FreightMapping {
   id: string;
   source_type: string;
-  is_active: boolean;
+  is_active: boolean | null;
   transportadora?: { nome_fantasia?: string } | null;
-  [k: string]: unknown;
 }
 
 export default function FreightConfig() {
