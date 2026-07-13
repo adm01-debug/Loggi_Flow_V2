@@ -19,11 +19,15 @@ export function LongRunningQueriesCard() {
   const cancelMutation = useCancelQuery();
 
   const handleCancel = async (pid: number, terminate: boolean) => {
+    const action = terminate ? "terminar" : "cancelar";
+    const actionPast = terminate ? "terminada" : "cancelada";
     try {
       const ok = await cancelMutation.mutateAsync({ pid, terminate });
-      toast[ok ? "success" : "error"](
-        ok ? `Query ${terminate ? "terminada" : "cancelada"} (PID ${pid})` : `Falha ao ${terminate ? "terminar" : "cancelar"} PID ${pid}`
-      );
+      if (ok) {
+        toast.success(`Query ${actionPast} (PID ${pid})`);
+      } else {
+        toast.error(`Falha ao ${action} PID ${pid}`);
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao cancelar query");
     }
