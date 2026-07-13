@@ -365,16 +365,16 @@ export function MapboxMap({
 
       if (riskZones.length === 0) return;
 
+      const severityColor = (s: string) => {
+        if (s === "high") return "#ef4444";
+        if (s === "medium") return "#f59e0b";
+        return "#3b82f6";
+      };
       const features = riskZones.map((zone) => ({
         type: "Feature" as const,
         properties: {
           severity: zone.severity,
-          color:
-            zone.severity === "high"
-              ? "#ef4444"
-              : zone.severity === "medium"
-                ? "#f59e0b"
-                : "#3b82f6",
+          color: severityColor(zone.severity),
           label: zone.severity.toUpperCase() + " RISK ZONE",
         },
         geometry: {
