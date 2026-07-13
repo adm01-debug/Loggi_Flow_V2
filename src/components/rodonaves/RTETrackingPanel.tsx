@@ -98,7 +98,7 @@ export function RTETrackingPanel() {
 
   const renderEvents = (data: unknown) => {
     if (!data) return null;
-    const d = data as { data?: { Tracking?: Array<any> } };
+    const d = data as { data?: { Tracking?: Array<Record<string, unknown>> } };
     const events = d?.data?.Tracking || (Array.isArray(d?.data) ? d.data : []);
     if (!Array.isArray(events) || events.length === 0)
       return (
@@ -109,9 +109,9 @@ export function RTETrackingPanel() {
 
     return (
       <div className="space-y-2 max-h-96 overflow-y-auto">
-        {events.map((ev: any, i: number) => {
+        {events.map((ev: Record<string, unknown>, i: number) => {
           const code = Number(ev.CodigoOcorrencia || ev.occurrenceCode || 0);
-          const status = (RODONAVES_STATUS_MAP as any)[code];
+          const status = (RODONAVES_STATUS_MAP as Record<number, { label: string; severity: string } | undefined>)[code];
           const severityColors: Record<string, string> = {
             info: "bg-primary/10 text-primary",
             success: "bg-success/10 text-success",
@@ -152,13 +152,13 @@ export function RTETrackingPanel() {
 
   const renderBatchResults = (data: unknown) => {
     if (!data) return null;
-    const d = data as { data?: any[] | any };
+    const d = data as { data?: unknown[] | unknown };
     const items = Array.isArray(d?.data) ? d.data : d?.data ? [d.data] : [];
     if (items.length === 0)
       return <p className="text-sm text-muted-foreground">Nenhum resultado</p>;
     return (
       <div className="space-y-2 max-h-96 overflow-y-auto">
-        {items.map((item: any, i: number) => (
+        {items.map((item: unknown, i: number) => (
           <div key={i} className="p-3 rounded-lg border bg-card text-sm">
             <pre className="whitespace-pre-wrap text-xs overflow-x-auto">
               {JSON.stringify(item, null, 2)}
