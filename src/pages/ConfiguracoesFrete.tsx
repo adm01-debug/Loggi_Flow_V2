@@ -493,8 +493,8 @@ export default function FreightConfig() {
                               <NormalizationMapping
                                 carrierId={selectedCarrier.id}
                                 initialConfig={
-                                  (selectedCarrier.non_api_config as Record<string, unknown>)
-                                    ?.normalization
+                                  (selectedCarrier.non_api_config as Record<string, unknown> | null)
+                                    ?.normalization as NormalizationConfig | undefined
                                 }
                                 onSave={(normConfig) => {
                                   const cfg = {
