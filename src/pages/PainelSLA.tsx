@@ -101,6 +101,26 @@ export default function PainelSLA() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [aba, setAba] = useState<"todos" | "entregas" | "coletas">("todos");
 
+  useEffect(() => {
+    const prev = document.title;
+    document.title = "Painel de SLAs — Metas e Alertas | LogiFlow";
+    let meta = document.querySelector('meta[name="description"]');
+    const prevDesc = meta?.getAttribute("content") ?? "";
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "description");
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute(
+      "content",
+      "Painel de SLAs de expedições e coletas com metas configuráveis e alertas por vencimento.",
+    );
+    return () => {
+      document.title = prev;
+      if (meta && prevDesc) meta.setAttribute("content", prevDesc);
+    };
+  }, []);
+
   const { data: entregas, isLoading: loadingEntregas } = useQuery({
     queryKey: ["painel-sla-entregas"],
     queryFn: async () => {
