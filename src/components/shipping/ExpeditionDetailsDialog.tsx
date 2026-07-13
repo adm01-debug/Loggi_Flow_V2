@@ -51,7 +51,7 @@ interface TimelineEvent {
 interface ExpeditionDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  delivery: any | null;
+  delivery: Record<string, unknown> | null;
   statusConfig: Record<
     string,
     {
