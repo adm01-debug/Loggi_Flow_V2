@@ -16,14 +16,13 @@ function formatBytes(n: number) {
   return `${v.toFixed(1)} ${units[i]}`;
 }
 
-const severityVariant = (s: string) =>
-  s === "critical"
-    ? "destructive"
-    : s === "warning"
-      ? "default"
-      : s === "info"
-        ? "outline"
-        : "secondary";
+const severityVariant = (s: string): "destructive" | "default" | "outline" | "secondary" => {
+  if (s === "critical") return "destructive";
+  if (s === "warning") return "default";
+  if (s === "info") return "outline";
+  return "secondary";
+};
+
 
 export function TopTablesBySizeCard() {
   const { data, isLoading, error } = useTopTablesBySize(30);
