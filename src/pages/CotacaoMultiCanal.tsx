@@ -179,7 +179,8 @@ export default function CotacaoMultiCanal() {
                     canal: "api",
                     valor: parseFloat(String(option.price ?? "0")),
                     prazo_dias:
-                      option.delivery_range?.max || option.delivery_time,
+                      option.delivery_range?.max ?? option.delivery_time ?? null,
+
                     status: "respondido",
                     observacoes: `Serviço: ${option.name}`,
                     created_at: new Date().toISOString(),
