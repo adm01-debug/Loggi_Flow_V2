@@ -1,9 +1,7 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { RealtimeChannel } from "@supabase/supabase-js";
-import { useNotificationPreferences } from "@/hooks/notifications/useNotificationPreferences";
 import { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "@/lib/queryConfig";
 
 export interface Notification {
@@ -22,9 +20,6 @@ export interface Notification {
 export function useNotifications() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
-  const { shouldShowNotification, shouldShowBrowserNotification, preferences } =
-    useNotificationPreferences();
 
   // Fetch notifications
   const { data: notifications = [], isLoading } = useQuery({

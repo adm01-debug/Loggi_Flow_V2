@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useAuth } from "@/hooks/auth/useAuth";
 import { 
   Shield, 
   ShieldCheck, 
@@ -42,7 +41,7 @@ interface TwoFactorSetupProps {
 
 export function TwoFactorSetup({ onStatusChange }: TwoFactorSetupProps) {
   const [isEnabling, setIsEnabling] = useState(false);
-  const [isDisabling, setIsDisabling] = useState(false);
+  const [, setIsDisabling] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
@@ -53,7 +52,6 @@ export function TwoFactorSetup({ onStatusChange }: TwoFactorSetupProps) {
   const [copied, setCopied] = useState(false);
 
   const { toast } = useToast();
-  const { user } = useAuth();
 
   // Check MFA status on mount
   useState(() => {
@@ -107,7 +105,7 @@ export function TwoFactorSetup({ onStatusChange }: TwoFactorSetupProps) {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+      const { error } = await supabase.auth.mfa.challengeAndVerify({
         factorId,
         code: verificationCode,
       });

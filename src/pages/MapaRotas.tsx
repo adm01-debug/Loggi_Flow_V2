@@ -49,22 +49,12 @@ const filterConfig: FilterConfig<DeliveryPoint> = {
 export default function MapaRotas() {
   const deliveryRoutes = useDeliveryRoutes();
   const routes = deliveryRoutes?.data || [];
-  const isLoading = deliveryRoutes?.isLoading || false;
 
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [showRouteLines, setShowRouteLines] = useState(true);
-  const [mapStyle, setMapStyle] = useState<"dark" | "satellite">("dark");
-  const [mapPitch, setMapPitch] = useState(0);
+  const [showRouteLines] = useState(true);
+  const [mapStyle] = useState<"dark" | "satellite">("dark");
+  const [mapPitch] = useState(0);
   const [timeTravelValue, setTimeTravelValue] = useState(100);
-  const [activeLayers, setActiveLayers] = useState({
-    fleet: true,
-    deliveries: true,
-    nexus: false,
-    risks: true,
-    weather: false,
-    bio: false,
-  });
-  const [riskZones, setRiskZones] = useState<
+  const [riskZones] = useState<
     {
       id: string;
       center: [number, number];
@@ -77,6 +67,10 @@ export default function MapaRotas() {
   ]);
   const [lastSync, setLastSync] = useState(new Date());
   const [isLiveData, setIsLiveData] = useState(true);
+  const [, setBioData] = useState<{
+    heart_rate: number;
+    fatigue_index: string;
+  } | null>(null);
   const [logs, setLogs] = useState<
     {
       id: string;
@@ -87,10 +81,6 @@ export default function MapaRotas() {
       event_time: string;
     }[]
   >([]);
-  const [bioData, setBioData] = useState<{
-    heart_rate: number;
-    fatigue_index: string;
-  } | null>(null);
   const [vehicleFilter, setVehicleFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedLogTime, setSelectedLogTime] = useState<string | null>(null);

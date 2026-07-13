@@ -328,7 +328,6 @@ export default function Envios() {
   const qc = useQueryClient();
   const [dlgCreate, setDlgCreate] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
-  const [dlgEdit, setDlgEdit] = useState(false);
   const [dlgView, setDlgView] = useState(false);
   const [dlgDel, setDlgDel] = useState(false);
   const [sel, setSel] = useState<Entrega | null>(null);
@@ -337,7 +336,7 @@ export default function Envios() {
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
   const [form, setForm] = useState(emptyForm);
-  const { playSuccess, playAction, playError, playWhoosh } = useAudioFeedback();
+  const { playSuccess, playError, playWhoosh } = useAudioFeedback();
 
   const {
     data: list = [],

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -73,19 +72,13 @@ export default function CentralRastreamento() {
     searchTerm,
     setSearchTerm,
     refetch,
-    getStatusLabel,
   } = useUnifiedTracking();
 
   const {
     isLoading: isPredicting,
     analyzeDelays,
-    predictions,
     summary: predSummary,
   } = useDelayPrediction();
-
-  const [selectedShipment, setSelectedShipment] =
-    useState<UnifiedShipment | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
 
   const pagination = usePagination(shipments, { initialPageSize: 20 });
 

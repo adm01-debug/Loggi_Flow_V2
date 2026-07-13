@@ -93,16 +93,14 @@ export default function AlertasCusto() {
   const {
     alertas = [],
     notificacoes,
-    costCheckResults,
     isLoadingAlertas,
     checkCosts,
     createAlerta,
     deleteAlerta,
     updateAlerta,
-    markAllAsRead,
   } = useCostAlerts();
 
-  const { alerts: smartAlertsList } = useSmartAlerts();
+  useSmartAlerts();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [tipoFilter, setTipoFilter] = useState("all");
