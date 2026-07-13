@@ -244,109 +244,28 @@ export function MECarrinhoPanel() {
           </div>
         </CardHeader>
         <CardContent>
-          {listarCarrinho.isLoading ? (
-            <TableSkeleton rows={3} columns={7} />
-          ) : listarCarrinho.isError ? (
-            <MEErrorState
-              message="Erro ao carregar o carrinho."
-              onRetry={() => listarCarrinho.refetch()}
-            />
-          ) : items.length === 0 ? (
-            <EmptyState
-              variant="inbox"
-              title="Carrinho vazio"
-              description="Faça uma cotação e adicione fretes ao carrinho para começar."
-              size="sm"
-            />
-          ) : (
-            <>
-              <ScrollArea className="w-full">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-10">
-                        <Checkbox
-                          checked={
-                            selectedIds.length === items.length &&
-                            items.length > 0
-                          }
-                          onCheckedChange={selectAll}
-                        />
-                      </TableHead>
-                      <TableHead>Serviço</TableHead>
-                      <TableHead>Transportadora</TableHead>
-                      <TableHead>Destino</TableHead>
-                      <TableHead>Valor</TableHead>
-                      <TableHead>Prazo</TableHead>
-                      <TableHead className="w-20" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pagination.paginatedData.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedIds.includes(item.id)}
-                            onCheckedChange={() => toggleSelect(item.id)}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {item.service || "-"}
-                        </TableCell>
-                        <TableCell>{item.company?.name || "-"}</TableCell>
-                        <TableCell className="text-xs">
-                          {item.to?.postal_code || "-"}
-                        </TableCell>
-                        <TableCell className="font-semibold text-primary">
-                          R$ {item.price || "-"}
-                        </TableCell>
-                        <TableCell>{item.delivery_time || "-"} dias</TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleViewItem(item.id)}
-                              disabled={exibirItemCarrinho.isPending}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => setConfirmRemoveId(item.id)}
-                              disabled={removerItemCarrinho.isPending}
-                            >
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                totalItems={pagination.totalItems}
-                pageSize={pagination.pageSize}
-                startIndex={pagination.startIndex}
-                endIndex={pagination.endIndex}
-                hasNextPage={pagination.hasNextPage}
-                hasPrevPage={pagination.hasPrevPage}
-                pageSizeOptions={pagination.pageSizeOptions}
-                onPageChange={pagination.setPage}
-                onPageSizeChange={pagination.setPageSize}
-                onNextPage={pagination.nextPage}
-                onPrevPage={pagination.prevPage}
-                onFirstPage={pagination.firstPage}
-                onLastPage={pagination.lastPage}
-              />
-            </>
-          )}
-        </CardContent>
+          {(() => {
+            if (listarCarrinho.isLoading) return <TableSkeleton rows={3} columns={7} />;
+            if (listarCarrinho.isError) {
+              return (
+                <MEErrorState
+                  message="Erro ao carregar o carrinho."
+                  onRetry={() => listarCarrinho.refetch()}
+                />
+              );
+            }
+            if (items.length === 0) {
+              return (
+                <EmptyState
+                  variant="inbox"
+                  title="Carrinho vazio"
+                  description="Faça uma cotação e adicione fretes ao carrinho para começar."
+                  size="sm"
+                />
+              );
+            }
+            return (
+
       </Card>
 
       <ConfirmDialog
