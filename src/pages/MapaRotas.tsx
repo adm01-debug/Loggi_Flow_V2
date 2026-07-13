@@ -116,7 +116,7 @@ export default function MapaRotas() {
           }),
           event_time: l.event_time,
           msg: l.message,
-          type: l.type as any,
+          type: l.type as "info" | "warn" | "crit",
           vehicle: l.target_vehicle,
         })),
       );
