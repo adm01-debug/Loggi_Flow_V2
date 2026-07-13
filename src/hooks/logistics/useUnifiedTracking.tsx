@@ -261,7 +261,20 @@ export function useUnifiedTracking() {
     });
 
     // Normalize coletas
-    (coletas || []).forEach((c: any) => {
+    interface ColetaRow {
+      id: string;
+      numero_coleta: string;
+      status: string;
+      endereco_coleta: string;
+      transportadora_id: string | null;
+      data_prevista_coleta: string | null;
+      data_efetiva_coleta: string | null;
+      codigo_rastreamento: string | null;
+      tipo_coleta?: string;
+      transportadora?: { nome_fantasia: string } | null;
+      fornecedor?: { razao_social: string } | null;
+    }
+    (coletas as ColetaRow[] | undefined || []).forEach((c) => {
       const t = c.transportadora as { nome_fantasia: string } | null;
       const f = c.fornecedor as { razao_social: string } | null;
       const atrasado = isAtrasado(
