@@ -23,7 +23,7 @@ function debounce<T extends (...args: never[]) => void>(
 const payloadCache = new Map<string, string>();
 const MAX_CACHE_SIZE = 50;
 
-function isDuplicatePayload(table: string, payload: any): boolean {
+function isDuplicatePayload(table: string, payload: unknown): boolean {
   const hash = JSON.stringify(payload);
   if (payloadCache.get(table) === hash) return true;
 
