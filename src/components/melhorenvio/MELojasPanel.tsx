@@ -34,9 +34,11 @@ export function MELojasPanel() {
   const [newPhone, setNewPhone] = useState({ phone: '', type: 'mobile' });
 
   const rawData = listarLojas.data;
-  const stores: MEStore[] = Array.isArray((rawData as Record<string, unknown>)?.data)
-    ? (rawData as Record<string, unknown>).data as MEStore[]
-    : Array.isArray(rawData) ? rawData as MEStore[] : [];
+  const rawDataObj = rawData as Record<string, unknown> | undefined;
+  let stores: MEStore[] = [];
+  if (Array.isArray(rawDataObj?.data)) stores = rawDataObj!.data as MEStore[];
+  else if (Array.isArray(rawData)) stores = rawData as MEStore[];
+
 
   const handleCreate = () => {
     cadastrarLoja.mutate({
