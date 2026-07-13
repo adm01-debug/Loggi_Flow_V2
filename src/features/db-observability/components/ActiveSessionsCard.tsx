@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, AlertTriangle } from "lucide-react";
 import { useActiveSessions } from "../hooks/useActiveSessions";
+import { severityVariantDefault as severityVariant } from "./_severityHelpers";
 
 const stateLabel: Record<string, string> = {
   active: "Ativo",
@@ -13,9 +14,6 @@ const stateLabel: Record<string, string> = {
   disabled: "Desabilitado",
   unknown: "Desconhecido",
 };
-
-const severityVariant = (s: string) =>
-  s === "critical" ? "destructive" : s === "warning" ? "default" : "secondary";
 
 const fmtSec = (n: number | null) => {
   if (n == null) return "-";
