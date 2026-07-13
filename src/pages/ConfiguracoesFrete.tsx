@@ -91,10 +91,10 @@ export default function FreightConfig() {
     },
   });
 
-  const [editingRule, setEditRule] = useState<Record<string, unknown> | null>(null);
+  const [editingRule, setEditRule] = useState<FreightRule | null>(null);
 
   const saveRule = useMutation({
-    mutationFn: async (rule: Record<string, unknown>) => {
+    mutationFn: async (rule: FreightRule) => {
       const { data, error } = await supabase
         .from("freight_selection_rules")
         .upsert(rule);
@@ -732,7 +732,7 @@ export default function FreightConfig() {
                   )}
 
                   <div className="grid gap-4">
-                    {rules.map((rule: Record<string, unknown>) => (
+                    {rules.map((rule: FreightRule) => (
                       <div
                         key={rule.id}
                         className="p-4 border rounded-xl space-y-4 bg-muted/20 hover:border-primary/30 transition-colors"
@@ -831,8 +831,8 @@ export default function FreightConfig() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {mappings
-                    .filter((m: Record<string, unknown>) => m.source_type === "webhook")
-                    .map((m: Record<string, unknown>) => (
+                    .filter((m: FreightMapping) => m.source_type === "webhook")
+                    .map((m: FreightMapping) => (
                       <div
                         key={m.id}
                         className="p-4 border-2 border-primary/20 rounded-xl bg-primary/5 space-y-3"
