@@ -39,6 +39,7 @@ const menuSections: MenuSection[] = [
       { title: "Executivo", url: "/dashboard-executivo", icon: TrendingUp },
       { title: "Dashboard SLA", url: "/sla-dashboard", icon: Target },
       { title: "Painel OTIF", url: "/painel-otif", icon: Award },
+      { title: "Painel SLA", url: "/painel-sla", icon: Target },
       { title: "Calendário", url: "/calendario", icon: CalendarDays },
     ],
   },
