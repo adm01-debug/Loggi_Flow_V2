@@ -11,7 +11,7 @@ import { useTelemetry } from "@/hooks/analytics/useTelemetry";
 export function useBusinessRuleEngine() {
   const { rules } = useBusinessRules();
   const { logTelemetry } = useTelemetry();
-  const executionBatchRef = useRef<Array<Record<string, unknown>>>([]);
+  const executionBatchRef = useRef<Array<{ conditions_met: boolean; entity_id: string; entity_type: string; trigger_event: string; rule_id?: string | null; actions_executed?: Json; error_message?: string | null; execution_time_ms?: number | null }>>([]);
   const batchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Debounced Batch Logging for high-frequency rule execution
