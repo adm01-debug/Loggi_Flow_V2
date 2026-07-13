@@ -18,8 +18,8 @@ export function RTECustomerManager() {
   const [addressTaxId, setAddressTaxId] = useState('');
   const [, setShowNewAddress] = useState(false);
 
-  const [customers, setCustomers] = useState<Array<Record<string, unknown>>>([]);
-  const [addresses, setAddresses] = useState<Array<Record<string, unknown>>>([]);
+  const [customers, setCustomers] = useState<Array<Record<string, string | number | undefined>>>([]);
+  const [addresses, setAddresses] = useState<Array<Record<string, string | number | undefined>>>([]);
 
   const handleSearch = async () => {
     try {

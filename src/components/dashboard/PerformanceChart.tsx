@@ -67,7 +67,7 @@ const PerformanceChart = React.forwardRef<
     },
     ref,
   ) => {
-    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color?: string; dataKey: string }>; label?: string }) => {
+    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color?: string; dataKey: string; payload?: Record<string, unknown> }>; label?: string }) => {
       if (active && payload && payload.length) {
         return (
           <div className="relative group/tooltip">
@@ -99,14 +99,14 @@ const PerformanceChart = React.forwardRef<
                         <div
                           className="absolute inset-0 rounded-full animate-ping opacity-50"
                           style={{
-                            backgroundColor: entry.color || entry.payload.fill,
+                            backgroundColor: entry.color || (entry.payload?.fill as string | undefined),
                           }}
                         />
                         <div
                           className="relative w-2.5 h-2.5 rounded-full shadow-[0_0_15px_currentColor]"
                           style={{
-                            backgroundColor: entry.color || entry.payload.fill,
-                            color: entry.color || entry.payload.fill,
+                            backgroundColor: entry.color || (entry.payload?.fill as string | undefined),
+                            color: entry.color || (entry.payload?.fill as string | undefined),
                           }}
                         />
                       </div>

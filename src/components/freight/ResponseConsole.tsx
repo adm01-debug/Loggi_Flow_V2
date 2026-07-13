@@ -21,7 +21,7 @@ interface RawResponse {
   carrier_name: string;
   raw_text: string;
   processed: boolean;
-  extracted_data?: Record<string, unknown>;
+  extracted_data?: { price?: number; days?: number };
   created_at: string;
 }
 
