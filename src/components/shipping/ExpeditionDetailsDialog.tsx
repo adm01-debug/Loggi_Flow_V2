@@ -108,7 +108,7 @@ export function ExpeditionDetailsDialog({
   const updateStatus = async (newStatus: EntregaStatus) => {
     if (!delivery) return;
 
-    const updates: any = {
+    const updates: { status: EntregaStatus; updated_at: string; data_despacho?: string } = {
       status: newStatus,
       updated_at: new Date().toISOString(),
     };
