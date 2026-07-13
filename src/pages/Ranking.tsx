@@ -314,18 +314,19 @@ export default function Ranking() {
                 onClick={() => toggleSort(field)}
                 className="gap-1 shrink-0"
               >
-                {field === "achievements" ? (
-                  <>
-                    <span className="hidden sm:inline">Conquistas</span>
-                    <span className="sm:hidden">Conq.</span>
-                  </>
-                ) : field === "xp" ? (
-                  "XP"
-                ) : field === "level" ? (
-                  "Nível"
-                ) : (
-                  "Streak"
-                )}
+                {(() => {
+                  if (field === "achievements") {
+                    return (
+                      <>
+                        <span className="hidden sm:inline">Conquistas</span>
+                        <span className="sm:hidden">Conq.</span>
+                      </>
+                    );
+                  }
+                  if (field === "xp") return "XP";
+                  if (field === "level") return "Nível";
+                  return "Streak";
+                })()}
                 <SortIcon field={field} />
               </Button>
             ),
