@@ -238,14 +238,12 @@ export default function RastreamentoRealTime() {
     );
   }
 
-  const progressPercent =
-    shipment.status === "entregue"
-      ? 100
-      : shipment.status === "saiu_entrega"
-        ? 85
-        : shipment.status === "em_transito"
-          ? 50
-          : 15;
+  const statusProgressMap: Record<string, number> = {
+    entregue: 100,
+    saiu_entrega: 85,
+    em_transito: 50,
+  };
+  const progressPercent = statusProgressMap[shipment.status ?? ""] ?? 15;
 
   return (
     <MainLayout>
