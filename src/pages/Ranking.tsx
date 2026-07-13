@@ -350,15 +350,15 @@ export default function Ranking() {
                 <div
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm",
-                    rankUser.rank === 1
-                      ? "bg-gradient-to-br from-warning to-warning/80 text-warning-foreground"
-                      : rankUser.rank === 2
-                        ? "bg-gradient-to-br from-muted-foreground/60 to-muted-foreground text-white"
-                        : rankUser.rank === 3
-                          ? "bg-gradient-to-br from-warning/80 to-warning/60 text-warning-foreground"
-                          : "bg-muted",
+                    (() => {
+                      if (rankUser.rank === 1) return "bg-gradient-to-br from-warning to-warning/80 text-warning-foreground";
+                      if (rankUser.rank === 2) return "bg-gradient-to-br from-muted-foreground/60 to-muted-foreground text-white";
+                      if (rankUser.rank === 3) return "bg-gradient-to-br from-warning/80 to-warning/60 text-warning-foreground";
+                      return "bg-muted";
+                    })(),
                   )}
                 >
+
                   {rankUser.rank}
                 </div>
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
