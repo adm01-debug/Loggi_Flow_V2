@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useMemo,
   ReactNode,
 } from "react";
 import { formatInTimeZone } from "date-fns-tz";
@@ -15,14 +16,38 @@ interface TimezoneContextType {
   formatDateTime: (date: Date | string, formatStr?: string) => string;
 }
 
-const TimezoneContext = createContext<TimezoneContextType | undefined>(
+// eslint-disable-next-line react-refresh/only-export-components
+export const TimezoneContext = createContext<TimezoneContextType | undefined>(
   undefined,
 );
 
 const TIMEZONE_KEY = "logiflow_timezone";
 
-const defaultTimezone =
+// eslint-disable-next-line react-refresh/only-export-components
+export const defaultTimezone =
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function createTimezoneFormatters(timezone: string) {
+  const format = (
+    date: Date | string,
+    formatStr: string,
+  ): string => {
+    try {
+      const dateObj = typeof date === "string" ? new Date(date) : date;
+      if (isNaN(dateObj.getTime())) return "-";
+      return formatInTimeZone(dateObj, timezone, formatStr, { locale: ptBR });
+    } catch {
+      return "-";
+    }
+  };
+  return {
+    formatDate: (date: Date | string, formatStr = "dd/MM/yyyy") =>
+      format(date, formatStr),
+    formatDateTime: (date: Date | string, formatStr = "dd/MM/yyyy HH:mm") =>
+      format(date, formatStr),
+  };
+}
 
 export function TimezoneProvider({ children }: { children: ReactNode }) {
   const [timezone, setTimezoneState] = useState<string>(() => {
@@ -36,42 +61,24 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TIMEZONE_KEY, timezone);
   }, [timezone]);
 
-  const setTimezone = (tz: string) => {
-    setTimezoneState(tz);
-  };
-
-  const formatDate = (date: Date | string, formatStr = "dd/MM/yyyy") => {
-    try {
-      const dateObj = typeof date === "string" ? new Date(date) : date;
-      if (isNaN(dateObj.getTime())) return "-";
-      return formatInTimeZone(dateObj, timezone, formatStr, { locale: ptBR });
-    } catch {
-      return "-";
-    }
-  };
-
-  const formatDateTime = (
-    date: Date | string,
-    formatStr = "dd/MM/yyyy HH:mm",
-  ) => {
-    try {
-      const dateObj = typeof date === "string" ? new Date(date) : date;
-      if (isNaN(dateObj.getTime())) return "-";
-      return formatInTimeZone(dateObj, timezone, formatStr, { locale: ptBR });
-    } catch {
-      return "-";
-    }
-  };
+  const value = useMemo(() => {
+    const { formatDate, formatDateTime } = createTimezoneFormatters(timezone);
+    return {
+      timezone,
+      setTimezone: setTimezoneState,
+      formatDate,
+      formatDateTime,
+    };
+  }, [timezone]);
 
   return (
-    <TimezoneContext.Provider
-      value={{ timezone, setTimezone, formatDate, formatDateTime }}
-    >
+    <TimezoneContext.Provider value={value}>
       {children}
     </TimezoneContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTimezone() {
   const context = useContext(TimezoneContext);
   if (context === undefined) {
@@ -81,38 +88,16 @@ export function useTimezone() {
 }
 
 // Helper hook for components that may not have the provider
+// eslint-disable-next-line react-refresh/only-export-components
 export function useDateFormatter() {
   const context = useContext(TimezoneContext);
-
   const timezone = context?.timezone || defaultTimezone;
-
-  const formatDate = (date: Date | string, formatStr = "dd/MM/yyyy") => {
-    try {
-      const dateObj = typeof date === "string" ? new Date(date) : date;
-      if (isNaN(dateObj.getTime())) return "-";
-      return formatInTimeZone(dateObj, timezone, formatStr, { locale: ptBR });
-    } catch {
-      return "-";
-    }
-  };
-
-  const formatDateTime = (
-    date: Date | string,
-    formatStr = "dd/MM/yyyy HH:mm",
-  ) => {
-    try {
-      const dateObj = typeof date === "string" ? new Date(date) : date;
-      if (isNaN(dateObj.getTime())) return "-";
-      return formatInTimeZone(dateObj, timezone, formatStr, { locale: ptBR });
-    } catch {
-      return "-";
-    }
-  };
-
+  const { formatDate, formatDateTime } = createTimezoneFormatters(timezone);
   return { formatDate, formatDateTime, timezone };
 }
 
 // Common timezones for Brazil
+// eslint-disable-next-line react-refresh/only-export-components
 export const brazilianTimezones = [
   { value: "America/Sao_Paulo", label: "Brasília (BRT/BRST)" },
   { value: "America/Manaus", label: "Manaus (AMT)" },

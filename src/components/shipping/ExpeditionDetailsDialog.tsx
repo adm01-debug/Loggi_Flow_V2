@@ -1,28 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Truck,
-  Package,
-  MapPin,
-  Clock,
-  History,
-  Info,
-  Zap,
-  FileText,
-  Loader2,
-  User,
-  Camera,
-} from "lucide-react";
+import { Truck, Package, MapPin, Clock, History, Info, Zap, FileText, Loader2, User, Camera } from "lucide-react";
 import { DeliveryReceiptUpload } from "./DeliveryReceiptUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -101,14 +84,14 @@ export function ExpeditionDetailsDialog({
       setActiveTab("detalhes");
       fetchTimeline();
     }
-  }, [open, delivery?.id, fetchTimeline]);
+  }, [open, delivery, fetchTimeline]);
 
   if (!delivery) return null;
 
   const updateStatus = async (newStatus: EntregaStatus) => {
     if (!delivery) return;
 
-    const updates: any = {
+    const updates: { status: EntregaStatus; updated_at: string; data_despacho?: string } = {
       status: newStatus,
       updated_at: new Date().toISOString(),
     };
@@ -351,10 +334,10 @@ export function ExpeditionDetailsDialog({
                                   { locale: ptBR },
                                 )}
                               </span>
-                              {(event as any).action_by_user?.display_name && (
+                              {event.action_by_user?.display_name && (
                                 <span className="flex items-center gap-1.5 text-primary">
                                   <User className="w-3 h-3" />{" "}
-                                  {(event as any).action_by_user.display_name}
+                                  {event.action_by_user.display_name}
                                 </span>
                               )}
                             </div>
