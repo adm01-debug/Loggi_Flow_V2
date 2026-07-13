@@ -79,6 +79,26 @@ import { useSorting } from "@/hooks/common/useSorting";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { cn } from "@/lib/utils";
 
+interface CarrierCredentials {
+  api_key: string;
+  api_user: string;
+  api_password: string;
+  endpoint: string;
+}
+type NonApiChannel = "whatsapp" | "email" | "portal";
+interface NonApiConfig {
+  type: NonApiChannel;
+  template: string;
+  recipient: string;
+  portal_url: string;
+  portal_user: string;
+  normalization: NormalizationConfig;
+}
+interface CoverageDetails {
+  states: string[];
+  cities: string[];
+}
+
 interface Transportadora {
   id: string;
   razao_social: string;
@@ -95,9 +115,9 @@ interface Transportadora {
   total_entregas?: number;
   entregas_sucesso?: number;
   score_performance?: number | null;
-  credentials?: any;
-  non_api_config?: any;
-  coverage_details?: any;
+  credentials?: CarrierCredentials | null;
+  non_api_config?: NonApiConfig | null;
+  coverage_details?: CoverageDetails | null;
 }
 
 const UFS = [
@@ -193,7 +213,7 @@ export default function Transportadoras() {
 
       // Enriched data with stats from RPC
       return transportadoras.map((t) => {
-        const tStats = (stats as any[]).find(
+        const tStats = (stats as Array<{ transportadora_id: string; total_entregas?: number; entregas_no_prazo?: number; score_performance?: number | null }>).find(
           (s) => s.transportadora_id === t.id,
         );
         return {
@@ -258,7 +278,7 @@ export default function Transportadoras() {
       setForm(emptyForm);
       invalidate();
     },
-    onError: (error: any) =>
+    onError: (error: Error) =>
       toast({
         title: "Erro",
         description: error.message,
@@ -293,7 +313,7 @@ export default function Transportadoras() {
       setEditDialog(false);
       invalidate();
     },
-    onError: (error: any) =>
+    onError: (error: Error) =>
       toast({
         title: "Erro",
         description: error.message,
@@ -314,7 +334,7 @@ export default function Transportadoras() {
       setDeleteTarget(null);
       invalidate();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Erro",
         description: error.message,
@@ -347,7 +367,7 @@ export default function Transportadoras() {
       clearSelection();
       invalidate();
     },
-    onError: (error: any) =>
+    onError: (error: Error) =>
       toast({
         title: "Erro",
         description: error.message,
@@ -561,10 +581,10 @@ export default function Transportadoras() {
           <Label>Canal de Cotação</Label>
           <Select
             value={form.non_api_config.type}
-            onValueChange={(v: any) =>
+            onValueChange={(v: string) =>
               setForm({
                 ...form,
-                non_api_config: { ...form.non_api_config, type: v },
+                non_api_config: { ...form.non_api_config, type: v as NonApiChannel },
               })
             }
           >
@@ -1057,7 +1077,7 @@ export default function Transportadoras() {
                             <MapPin className="w-3.5 h-3.5 text-primary" />
                           </div>
                           <span className="uppercase text-[11px] tracking-tight">
-                            {(t.coverage_details?.states || t.regioes_atendidas)
+                            {(t.coverage_details?.states || t.regioes_atendidas || [])
                               .slice(0, 3)
                               .join(", ")}
                             {(t.coverage_details?.states?.length ||
