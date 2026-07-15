@@ -122,8 +122,8 @@ export function DeliveryReceiptUpload({
 
       onUploadSuccess?.(publicUrl);
       toast.success("Comprovante vinculado com sucesso!");
-    } catch (error: any) {
-      toast.error("Falha no protocolo de upload: " + error.message);
+    } catch (error: unknown) {
+      toast.error("Falha no protocolo de upload: " + (error instanceof Error ? error.message : String(error)));
     } finally {
       setIsUploading(false);
       setIsProcessingOCR(false);
