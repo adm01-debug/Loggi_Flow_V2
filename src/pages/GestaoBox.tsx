@@ -40,7 +40,7 @@ const filterConfig: FilterConfig<BoxData> = {
     placeholder: "Buscar box...",
   },
   status: {
-    field: "isOccupied" as any,
+    field: "isOccupied" as keyof BoxData,
     options: [
       { value: "ocupado", label: "Ocupados" },
       { value: "livre", label: "Livres" },
