@@ -4,6 +4,7 @@ import { toast } from "sonner";
 /**
  * Hook para detectar status de conexão online/offline
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(
     typeof navigator !== "undefined" ? navigator.onLine : true
@@ -45,6 +46,7 @@ export function useOnlineStatus() {
 /**
  * Hook para verificar status de conexão com API específica
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useApiStatus(healthCheckUrl?: string) {
   const [isApiOnline, setIsApiOnline] = useState(true);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
