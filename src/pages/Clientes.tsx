@@ -1072,7 +1072,7 @@ export default function Clientes() {
             columns={clienteCSVColumns}
             templateName="clientes_template"
             onImport={async (data) => {
-              const rows = (data as any[]).map((d: any) => ({
+              const rows = (data as Array<Record<string, string | null | undefined>>).map((d) => ({
                 razao_social: d.razao_social,
                 nome_fantasia: d.nome_fantasia || null,
                 cnpj: d.cnpj || null,
