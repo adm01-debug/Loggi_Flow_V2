@@ -145,4 +145,4 @@ export function TacticalTerminal() {
   );
 }
 
-const cn = (...classes: any[]) => classes.filter(Boolean).join(" ");
+const cn = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
