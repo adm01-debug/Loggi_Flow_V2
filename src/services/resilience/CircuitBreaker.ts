@@ -68,7 +68,7 @@ class CircuitBreaker {
         metadata: {
           failures: this.failures,
           state: newState,
-          config: this.config,
+          config: { ...this.config },
           timestamp: new Date().toISOString()
         }
       }]);
