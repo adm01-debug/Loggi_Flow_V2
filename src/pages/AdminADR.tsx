@@ -120,7 +120,7 @@ export default function AdminADR() {
                   <select 
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={newAdr.status}
-                    onChange={e => setNewAdr({...newAdr, status: e.target.value as any})}
+                    onChange={e => setNewAdr({...newAdr, status: e.target.value as ADR['status']})}
                   >
                     <option value="proposed">Proposto</option>
                     <option value="accepted">Aceito</option>
