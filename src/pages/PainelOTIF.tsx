@@ -374,18 +374,12 @@ export default function PainelOTIF() {
                     <YAxis domain={[0, 100]} unit="%" />
                     <Tooltip formatter={(val: number) => `${val}%`} />
                     <Bar dataKey="otif" name="OTIF %" radius={[4, 4, 0, 0]}>
-                      {chartData.map((entry, index) => (
-                        <Cell
-                          key={index}
-                          fill={
-                            entry.otif >= 95
-                              ? "hsl(142 76% 36%)"
-                              : entry.otif >= 85
-                                ? "hsl(45 93% 47%)"
-                                : "hsl(0 84% 60%)"
-                          }
-                        />
-                      ))}
+                      {chartData.map((entry, index) => {
+                        let fill = "hsl(0 84% 60%)";
+                        if (entry.otif >= 95) fill = "hsl(142 76% 36%)";
+                        else if (entry.otif >= 85) fill = "hsl(45 93% 47%)";
+                        return <Cell key={index} fill={fill} />;
+                      })}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>

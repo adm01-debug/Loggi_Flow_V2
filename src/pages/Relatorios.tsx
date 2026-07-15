@@ -652,18 +652,14 @@ export default function Relatorios() {
                 <CardContent>
                   {driverPerformance.length > 0 ? (
                     <div className="space-y-4">
-                      {driverPerformance.map((user, idx) => (
+                      {driverPerformance.map((user, idx) => {
+                        const rankBg = ["bg-warning", "bg-muted-foreground", "bg-destructive/80"][idx] ?? "bg-muted";
+                        return (
                         <div key={idx} className="flex items-center gap-4">
                           <div
                             className={cn(
                               "w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold",
-                              idx === 0
-                                ? "bg-warning"
-                                : idx === 1
-                                  ? "bg-muted-foreground"
-                                  : idx === 2
-                                    ? "bg-destructive/80"
-                                    : "bg-muted",
+                              rankBg,
                             )}
                           >
                             {idx + 1}
@@ -683,7 +679,8 @@ export default function Relatorios() {
                             </p>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-[250px] text-muted-foreground">

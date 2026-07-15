@@ -352,11 +352,10 @@ export default function RelatorioPDF() {
           e.data_entrega_efetiva
             ? format(new Date(e.data_entrega_efetiva), "dd/MM/yy")
             : "—",
-          e.previsao_entrega && e.data_entrega_efetiva
-            ? new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega)
-              ? "✅ Sim"
-              : "❌ Não"
-            : "—",
+          (() => {
+            if (!e.previsao_entrega || !e.data_entrega_efetiva) return "—";
+            return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega) ? "✅ Sim" : "❌ Não";
+          })(),
         ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [34, 197, 94] },
@@ -411,11 +410,11 @@ export default function RelatorioPDF() {
         .map((e) => [
           e.numero_entrega,
           e.status.toUpperCase(),
-          isAtrasado(e)
-            ? "ATRASO DETECTADO"
-            : e.status === "ocorrencia"
-              ? "OCORRÊNCIA ATIVA"
-              : "SEM TRANSP. VÍNCULADA",
+          (() => {
+            if (isAtrasado(e)) return "ATRASO DETECTADO";
+            if (e.status === "ocorrencia") return "OCORRÊNCIA ATIVA";
+            return "SEM TRANSP. VÍNCULADA";
+          })(),
           e.transportadora?.nome_fantasia || "N/A",
           e.valor_frete ? `R$ ${e.valor_frete.toFixed(2)}` : "R$ 0,00",
           format(new Date(e.created_at), "dd/MM/yy HH:mm"),
