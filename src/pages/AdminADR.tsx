@@ -51,8 +51,9 @@ export default function AdminADR() {
     mutationFn: async (adr: Partial<ADR>) => {
       const { error } = await supabase
         .from("architecture_decisions")
-        .insert(adr as unknown as Parameters<typeof supabase.from>[0] extends never ? never : Record<string, unknown>);
+        .insert(adr as Record<string, unknown>);
       if (error) throw error;
+
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["architecture-decisions"] });
