@@ -61,7 +61,7 @@ export function useAnalytics(dateRange?: DateRange) {
 
       if (error) throw error;
 
-      return data.map((d: any) => ({
+      return data.map((d: { month_label: string; entregas_count: number | string; coletas_count: number | string; custo_total: number | string; sla_atingido: number | string; ocorrencias_count: number | string }) => ({
         month: d.month_label,
         entregas: Number(d.entregas_count),
         coletas: Number(d.coletas_count),
