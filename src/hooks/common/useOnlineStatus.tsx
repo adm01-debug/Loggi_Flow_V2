@@ -93,6 +93,7 @@ interface PendingOperation {
   timestamp: number;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useOfflineSync() {
   const { isOnline } = useOnlineStatus();
   const [pendingOperations, setPendingOperations] = useState<PendingOperation[]>([]);
