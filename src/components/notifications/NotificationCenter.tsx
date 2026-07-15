@@ -37,6 +37,19 @@ export function NotificationCenter() {
     clearAllAlerts,
   } = useSmartAlerts();
 
+  const ENTITY_LABELS: Record<string, string> = {
+    coleta: "Coleta",
+    entrega: "Entrega",
+  };
+  const getEntityLabel = (t?: SystemAlert["entityType"]) =>
+    (t && ENTITY_LABELS[t]) || "Ocorrência";
+
+  const SEVERITY_BORDERS: Record<string, string> = {
+    error: "border-l-destructive",
+    warning: "border-l-warning",
+  };
+  const getSeverityBorder = (s: string) => SEVERITY_BORDERS[s] || "border-l-primary";
+
   const getAlertIcon = (type: SystemAlert['type']) => {
     switch (type) {
       case 'coleta_atrasada':
@@ -52,6 +65,7 @@ export function NotificationCenter() {
         return Info;
     }
   };
+
 
   const getEntityIcon = (entityType?: SystemAlert['entityType']) => {
     switch (entityType) {
@@ -204,7 +218,7 @@ export function NotificationCenter() {
                         "group relative p-4 transition-all duration-300",
                         !alert.read ? cn("bg-muted/10", styles.glow) : "hover:bg-muted/30",
                         "cursor-pointer overflow-hidden border-l-4",
-                        !alert.read ? (alert.severity === 'error' ? 'border-l-destructive' : alert.severity === 'warning' ? 'border-l-warning' : 'border-l-primary') : 'border-l-transparent'
+                        !alert.read ? getSeverityBorder(alert.severity) : 'border-l-transparent'
                       )}
                       onClick={() => {
                         if (!alert.read) markAsRead(alert.id);
@@ -250,8 +264,8 @@ export function NotificationCenter() {
                               {alert.entityType && (
                                 <span className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-muted/50 px-2 py-0.5 rounded-md">
                                   <EntityIcon className="w-3 h-3" />
-                                  {alert.entityType === 'coleta' ? 'Coleta' : 
-                                   alert.entityType === 'entrega' ? 'Entrega' : 'Ocorrência'}
+                                  {getEntityLabel(alert.entityType)}
+
                                 </span>
                               )}
                               <span className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground opacity-60">
