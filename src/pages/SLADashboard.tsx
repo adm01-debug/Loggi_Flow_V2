@@ -270,18 +270,16 @@ export default function SLADashboard() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p
-                        className={cn(
-                          "text-xl font-bold",
-                          t.taxaOTIF >= 95
-                            ? "text-success"
-                            : t.taxaOTIF >= 80
-                              ? "text-warning"
-                              : "text-destructive",
-                        )}
-                      >
-                        {t.taxaOTIF.toFixed(0)}%
-                      </p>
+                      {(() => {
+                        let cls = "text-destructive";
+                        if (t.taxaOTIF >= 95) cls = "text-success";
+                        else if (t.taxaOTIF >= 80) cls = "text-warning";
+                        return (
+                          <p className={cn("text-xl font-bold", cls)}>
+                            {t.taxaOTIF.toFixed(0)}%
+                          </p>
+                        );
+                      })()}
                     </div>
                   </div>
                 ),
