@@ -131,7 +131,7 @@ export default function AlertasCusto() {
 
   const alertasList = useMemo(
     () =>
-      ((alertas as any[]) || []).map((a: AlertaRaw) => ({
+      ((alertas as AlertaRaw[]) || []).map((a: AlertaRaw) => ({
         id: a.id,
         nome: a.nome || a.name || "Alerta",
         tipo: a.tipo || a.type || "valor_maximo",
