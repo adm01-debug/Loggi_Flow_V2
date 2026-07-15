@@ -49,7 +49,7 @@ const filterConfig: FilterConfig<BoxData> = {
   },
   select: {
     zone: {
-      field: "zone" as any,
+      field: "zone" as keyof BoxData,
       options: [
         { value: "norte", label: "Zona Norte" },
         { value: "sul", label: "Zona Sul" },
