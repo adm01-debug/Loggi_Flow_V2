@@ -92,7 +92,17 @@ export const useFreightQuotation = () => {
     if (!tabelasFrete || tabelasFrete.length === 0) return [];
 
     // Fetch selection rules for specific event type if provided
-    const { data: selectionRules } = await (supabase as any)
+    const { data: selectionRules } = await (supabase as unknown as {
+      from: (t: string) => {
+        select: (c: string) => {
+          eq: (k: string, v: string) => {
+            eq: (k: string, v: boolean) => {
+              maybeSingle: () => Promise<{ data: { price_weight?: string; time_weight?: string; max_sla_days?: number } | null }>;
+            };
+          };
+        };
+      };
+    })
       .from('freight_selection_rules')
       .select('*')
       .eq('event_type', request.event_type || 'Normal')
