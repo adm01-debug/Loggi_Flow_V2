@@ -89,20 +89,24 @@ export function ResetRequestsTable({ requests, searchTerm, onSearchChange, isLoa
                       <TableCell>{format(new Date(request.requested_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</TableCell>
                       <TableCell>{request.reviewed_at ? format(new Date(request.reviewed_at), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "-"}</TableCell>
                       <TableCell className="text-right">
-                        {request.status === "pending" ? (
-                          <div className="flex justify-end gap-2">
-                            <Button variant="outline" size="sm" className="text-success hover:text-success hover:bg-success/10" onClick={() => onApprove(request)}>
-                              <CheckCircle className="h-4 w-4 mr-1" />Aprovar
-                            </Button>
-                            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onReject(request)}>
-                              <XCircle className="h-4 w-4 mr-1" />Rejeitar
-                            </Button>
-                          </div>
-                        ) : request.status === "rejected" && request.rejection_reason ? (
-                          <span className="text-sm text-muted-foreground">{request.rejection_reason}</span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
-                        )}
+                        {(() => {
+                          if (request.status === "pending") {
+                            return (
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" size="sm" className="text-success hover:text-success hover:bg-success/10" onClick={() => onApprove(request)}>
+                                  <CheckCircle className="h-4 w-4 mr-1" />Aprovar
+                                </Button>
+                                <Button variant="outline" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onReject(request)}>
+                                  <XCircle className="h-4 w-4 mr-1" />Rejeitar
+                                </Button>
+                              </div>
+                            );
+                          }
+                          if (request.status === "rejected" && request.rejection_reason) {
+                            return <span className="text-sm text-muted-foreground">{request.rejection_reason}</span>;
+                          }
+                          return <span className="text-sm text-muted-foreground">-</span>;
+                        })()}
                       </TableCell>
                     </TableRow>
                   ))

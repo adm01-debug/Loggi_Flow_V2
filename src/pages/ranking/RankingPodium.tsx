@@ -42,7 +42,7 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
               className={cn("text-center", pos === 0 && "order-2", pos === 1 && "order-1", pos === 2 && "order-3")}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: pos === 0 ? 0 : pos === 1 ? 0.1 : 0.2 }}
+              transition={{ delay: [0, 0.1, 0.2][pos] ?? 0 }}
             >
               <div className="relative">
                 <div className={cn("w-20 h-20 rounded-full bg-gradient-to-br flex items-center justify-center mx-auto mb-2 shadow-lg ring-4 ring-background", podiumColors[pos])}>

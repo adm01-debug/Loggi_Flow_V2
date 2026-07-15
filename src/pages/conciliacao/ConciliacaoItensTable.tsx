@@ -47,15 +47,22 @@ export function ConciliacaoItensTable({
         </Select>
       </div>
 
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
-      ) : itens.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          {allItens.length === 0 ? "Importe um arquivo para começar" : "Nenhum item com este status"}
-        </div>
-      ) : (
+      {(() => {
+        if (isLoading) {
+          return (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          );
+        }
+        if (itens.length === 0) {
+          return (
+            <div className="text-center py-8 text-muted-foreground">
+              {allItens.length === 0 ? "Importe um arquivo para começar" : "Nenhum item com este status"}
+            </div>
+          );
+        }
+        return (
         <ScrollArea className="h-[400px]">
           <Table>
             <TableHeader>
@@ -124,7 +131,8 @@ export function ConciliacaoItensTable({
             </TableBody>
           </Table>
         </ScrollArea>
-      )}
+        );
+      })()}
     </div>
   );
 }

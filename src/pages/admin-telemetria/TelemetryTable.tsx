@@ -49,19 +49,26 @@ export function TelemetryTable({ rows, isLoading }: TelemetryTableProps) {
   return (
     <Card>
       <CardContent className="p-0">
-        {isLoading ? (
-          <div className="p-4 space-y-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
-        ) : rows.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">
-            <Activity className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">Nenhuma query lenta registrada</p>
-            <p className="text-sm mt-1">Isso é bom! O sistema está performando bem.</p>
-          </div>
-        ) : (
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="p-4 space-y-3">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
+              </div>
+            );
+          }
+          if (rows.length === 0) {
+            return (
+              <div className="text-center py-16 text-muted-foreground">
+                <Activity className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p className="font-medium">Nenhuma query lenta registrada</p>
+                <p className="text-sm mt-1">Isso é bom! O sistema está performando bem.</p>
+              </div>
+            );
+          }
+          return (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -84,9 +91,12 @@ export function TelemetryTable({ rows, isLoading }: TelemetryTableProps) {
                     <td className="p-3"><Badge variant="outline" className="text-[10px] font-mono">{row.operation}</Badge></td>
                     <td className="p-3 font-mono text-xs font-medium">{row.rpc_name || row.table_name || "-"}</td>
                     <td className="p-3 text-right font-mono font-bold tabular-nums">
-                      <span className={row.duration_ms >= 8000 ? "text-destructive" : row.duration_ms >= 3000 ? "text-warning" : ""}>
-                        {formatDuration(row.duration_ms)}
-                      </span>
+                      {(() => {
+                        let cls = "";
+                        if (row.duration_ms >= 8000) cls = "text-destructive";
+                        else if (row.duration_ms >= 3000) cls = "text-warning";
+                        return <span className={cls}>{formatDuration(row.duration_ms)}</span>;
+                      })()}
                     </td>
                     <td className="p-3 text-right font-mono text-xs tabular-nums">{row.record_count ?? "-"}</td>
                     <td className="p-3 text-right font-mono text-xs tabular-nums text-muted-foreground">{row.query_limit ?? "-"}</td>
@@ -98,7 +108,8 @@ export function TelemetryTable({ rows, isLoading }: TelemetryTableProps) {
               </tbody>
             </table>
           </div>
-        )}
+          );
+        })()}
       </CardContent>
     </Card>
   );
