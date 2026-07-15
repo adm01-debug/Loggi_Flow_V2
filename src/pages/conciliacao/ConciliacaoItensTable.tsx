@@ -131,7 +131,8 @@ export function ConciliacaoItensTable({
             </TableBody>
           </Table>
         </ScrollArea>
-      )}
+        );
+      })()}
     </div>
   );
 }
