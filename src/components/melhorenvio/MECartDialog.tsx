@@ -119,7 +119,7 @@ export function MECartDialog({
         city: senderForm.city,
         state_abbr: senderForm.state_abbr,
         postal_code: cepOrigem.replace(/\D/g, ""),
-        note: senderForm.note ?? "",
+        note: senderForm.note,
       },
       to: {
         name: cartForm.name,
@@ -133,7 +133,7 @@ export function MECartDialog({
         city: cartForm.city,
         state_abbr: cartForm.state_abbr,
         postal_code: (cartForm.postal_code ?? "").replace(/\D/g, ""),
-        note: cartForm.note ?? "",
+        note: cartForm.note,
       },
       products: volumes.map((v) => ({
         width: v.width,

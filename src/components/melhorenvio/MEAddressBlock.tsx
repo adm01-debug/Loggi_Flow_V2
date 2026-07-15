@@ -159,7 +159,7 @@ export function MEAddressBlock({
         {showNote && (
           <MEFormField label="Observações" className="col-span-2">
             <Input
-              value={form.note ?? ""}
+              value={form.note}
               onChange={(e) => set("note", e.target.value)}
             />
           </MEFormField>

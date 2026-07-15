@@ -12,7 +12,7 @@ export interface AddressFormValues {
   city: string;
   state_abbr: string;
   postal_code?: string;
-  note?: string;
+  note: string;
 }
 
 interface FieldRule {
