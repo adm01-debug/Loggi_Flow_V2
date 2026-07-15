@@ -84,9 +84,12 @@ export function TelemetryTable({ rows, isLoading }: TelemetryTableProps) {
                     <td className="p-3"><Badge variant="outline" className="text-[10px] font-mono">{row.operation}</Badge></td>
                     <td className="p-3 font-mono text-xs font-medium">{row.rpc_name || row.table_name || "-"}</td>
                     <td className="p-3 text-right font-mono font-bold tabular-nums">
-                      <span className={row.duration_ms >= 8000 ? "text-destructive" : row.duration_ms >= 3000 ? "text-warning" : ""}>
-                        {formatDuration(row.duration_ms)}
-                      </span>
+                      {(() => {
+                        let cls = "";
+                        if (row.duration_ms >= 8000) cls = "text-destructive";
+                        else if (row.duration_ms >= 3000) cls = "text-warning";
+                        return <span className={cls}>{formatDuration(row.duration_ms)}</span>;
+                      })()}
                     </td>
                     <td className="p-3 text-right font-mono text-xs tabular-nums">{row.record_count ?? "-"}</td>
                     <td className="p-3 text-right font-mono text-xs tabular-nums text-muted-foreground">{row.query_limit ?? "-"}</td>
