@@ -1,3 +1,4 @@
+import type React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -16,7 +17,7 @@ interface DORAIndicatorProps {
   value: string;
   trend: string;
   status: 'elite' | 'high' | 'medium' | 'low';
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 const DORAIndicator = ({ label, value, trend, status, icon: Icon }: DORAIndicatorProps) => {
