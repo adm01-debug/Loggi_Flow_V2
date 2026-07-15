@@ -169,11 +169,16 @@ export default function RastreamentoMotorista() {
         {selectedOrder ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 card-base p-0 min-h-[500px] overflow-hidden relative border-none bg-black">
-              {isLoading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-muted/20 backdrop-blur-sm z-10">
-                  <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                </div>
-              ) : location.lat !== 0 ? (
+              {(() => {
+                if (isLoading) {
+                  return (
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted/20 backdrop-blur-sm z-10">
+                      <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                    </div>
+                  );
+                }
+                if (location.lat !== 0) {
+                  return (
                 <Map
                   initialViewState={{
                     latitude: location.lat,
@@ -224,7 +229,9 @@ export default function RastreamentoMotorista() {
                     )}
                   </div>
                 </Map>
-              ) : (
+                  );
+                }
+                return (
                 <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-4">
                   <Navigation className="w-16 h-16 opacity-20" />
                   <div className="text-center">
@@ -236,7 +243,8 @@ export default function RastreamentoMotorista() {
                     </p>
                   </div>
                 </div>
-              )}
+                );
+              })()}
             </div>
             <div className="space-y-4">
               <div className="card-base p-4">
