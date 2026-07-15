@@ -337,14 +337,19 @@ export default function PainelSLA() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              {isLoading ? (
-                <div className="p-8 text-center text-muted-foreground">Carregando…</div>
-              ) : filtered.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
-                  Nenhum item em monitoramento no momento.
-                </div>
-              ) : (
-                <ul className="divide-y">
+              {(() => {
+                if (isLoading) {
+                  return <div className="p-8 text-center text-muted-foreground">Carregando…</div>;
+                }
+                if (filtered.length === 0) {
+                  return (
+                    <div className="p-8 text-center text-muted-foreground">
+                      Nenhum item em monitoramento no momento.
+                    </div>
+                  );
+                }
+                return (
+                  <ul className="divide-y">
                   {filtered.map((item) => {
                     const style = RISCO_STYLES[item.risco];
                     const Icon = style.icon;
