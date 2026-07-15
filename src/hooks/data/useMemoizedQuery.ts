@@ -7,7 +7,7 @@ import { QUERY_STALE_TIME } from "@/lib/queryConfig";
  * for data that changes infrequently.
  */
 export function useMemoizedQuery<TData, TError = Error>(
-  queryKey: any[],
+  queryKey: readonly unknown[],
   queryFn: () => Promise<TData>,
   options?: Omit<UseQueryOptions<TData, TError>, 'queryKey' | 'queryFn'>
 ) {
