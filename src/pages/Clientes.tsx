@@ -1073,7 +1073,8 @@ export default function Clientes() {
             templateName="clientes_template"
             onImport={async (data) => {
               const rows = (data as Array<Record<string, string | null | undefined>>).map((d) => ({
-                razao_social: d.razao_social,
+                razao_social: d.razao_social ?? "",
+
                 nome_fantasia: d.nome_fantasia || null,
                 cnpj: d.cnpj || null,
                 endereco_completo: d.endereco_completo,
