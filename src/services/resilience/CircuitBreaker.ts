@@ -61,7 +61,7 @@ class CircuitBreaker {
 
   private async logCircuitEvent(newState: CircuitState) {
     try {
-      await supabase.from('security_events').insert({
+      await supabase.from('security_events').insert([{
         event_type: 'resilience_event',
         description: `Circuit Breaker alterado para: ${newState}`,
         severity: newState === 'OPEN' ? 'critical' : 'warning',
@@ -71,7 +71,7 @@ class CircuitBreaker {
           config: this.config,
           timestamp: new Date().toISOString()
         }
-      });
+      }]);
     } catch (e) {
       console.error('CB logging failure:', e);
     }
