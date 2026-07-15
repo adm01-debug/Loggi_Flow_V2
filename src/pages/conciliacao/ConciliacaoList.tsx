@@ -21,13 +21,18 @@ export function ConciliacaoList({ conciliacoes, isLoading, selectedId, onSelect 
   return (
     <div className="card-base">
       <h3 className="font-semibold mb-4">Conciliações</h3>
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
-      ) : conciliacoes.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-8">Nenhuma conciliação</p>
-      ) : (
+      {(() => {
+        if (isLoading) {
+          return (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          );
+        }
+        if (conciliacoes.length === 0) {
+          return <p className="text-sm text-muted-foreground text-center py-8">Nenhuma conciliação</p>;
+        }
+        return ("EXPR_START")
         <ScrollArea className="h-[400px]">
           <div className="space-y-2 pr-4">
             {conciliacoes.map((c) => (
