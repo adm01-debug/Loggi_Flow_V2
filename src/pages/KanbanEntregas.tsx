@@ -314,7 +314,7 @@ export default function KanbanEntregas() {
       toast.success("Status do fluxo logístico atualizado com sucesso!");
       playSuccess();
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error("Erro crítico na transição de status", {
         description: err.message,
       });

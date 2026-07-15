@@ -112,8 +112,8 @@ export function BulkRouteImport() {
       toast.success(`${inserted} rotas importadas com sucesso!`);
       queryClient.invalidateQueries({ queryKey: ["transportadora-rotas"] });
       setFile(null);
-    } catch (error: any) {
-      toast.error(`Erro na importação: ${error.message}`);
+    } catch (error: unknown) {
+      toast.error(`Erro na importação: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsUploading(false);
     }

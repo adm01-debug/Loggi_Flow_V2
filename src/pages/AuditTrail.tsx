@@ -35,8 +35,8 @@ export default function AuditTrail() {
       exportToCSV(data as unknown as Record<string, unknown>[], {
         filename: "audit-logs-completo",
       });
-    } catch (err: any) {
-      toast.error(`Erro ao exportar: ${err.message}`);
+    } catch (err: unknown) {
+      toast.error(`Erro ao exportar: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsExporting(false);
     }

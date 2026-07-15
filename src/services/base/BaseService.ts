@@ -2,7 +2,7 @@ import { logisticsBreaker } from "../resilience/CircuitBreaker";
 
 export class BaseService {
   protected static async call<T>(
-    operation: () => Promise<{ data: T | null; error: any }>,
+    operation: () => Promise<{ data: T | null; error: unknown }>,
     metadata: { category: string; message: string },
   ): Promise<T> {
     return await logisticsBreaker.execute(async () => {
