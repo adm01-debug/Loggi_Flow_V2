@@ -108,7 +108,8 @@ export function TelemetryTable({ rows, isLoading }: TelemetryTableProps) {
               </tbody>
             </table>
           </div>
-        )}
+          );
+        })()}
       </CardContent>
     </Card>
   );
