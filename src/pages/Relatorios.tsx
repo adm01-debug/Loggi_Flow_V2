@@ -679,7 +679,8 @@ export default function Relatorios() {
                             </p>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-[250px] text-muted-foreground">
