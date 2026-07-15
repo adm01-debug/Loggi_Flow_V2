@@ -316,18 +316,26 @@ export function MaterialLabelPrinter() {
             </div>
           )}
 
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              variant="inbox"
-              title="Nenhuma entrega encontrada"
-              description="Cadastre entregas para gerar etiquetas QR Code."
-              size="sm"
-            />
-          ) : (
+          {(() => {
+            if (isLoading) {
+              return (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              );
+            }
+            if (filtered.length === 0) {
+              return (
+                <EmptyState
+                  variant="inbox"
+                  title="Nenhuma entrega encontrada"
+                  description="Cadastre entregas para gerar etiquetas QR Code."
+                  size="sm"
+                />
+              );
+            }
+            return (
+
             <ScrollArea className="max-h-[500px]">
               <Table>
                 <TableHeader>
