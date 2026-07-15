@@ -75,7 +75,9 @@ export function FreightAudit() {
       peso_kg: weight,
     });
 
-    const expectedQuotation = (quotations || []).find((q: any) => q.transportadora_id === form.transportadora_id);
+    const expectedQuotation = (quotations || []).find(
+      (q: { transportadora_id: string; valor_total: number | string }) => q.transportadora_id === form.transportadora_id
+    );
 
     if (!expectedQuotation) {
       setAuditResult({
