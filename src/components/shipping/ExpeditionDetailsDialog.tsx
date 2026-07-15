@@ -31,11 +31,23 @@ interface TimelineEvent {
   };
 }
 
+export interface ExpeditionDelivery {
+  id: string;
+  numero_entrega: string;
+  status: string;
+  cliente?: string | null;
+  destino?: string | null;
+  transportadora?: string | null;
+  box_alocado?: string | null;
+  nf_remessa?: string | null;
+  created_at: string;
+  comprovante_entrega_url?: string | null;
+}
+
 interface ExpeditionDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  delivery: any | null;
+  delivery: ExpeditionDelivery | null;
   statusConfig: Record<
     string,
     {

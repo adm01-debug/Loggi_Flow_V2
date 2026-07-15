@@ -29,7 +29,7 @@ export function useMapWeatherSync() {
           id: z.id,
           center: [z.center_lng, z.center_lat] as [number, number],
           radius: z.radius,
-          severity: z.severity as any,
+          severity: (z.severity ?? 'low') as 'low' | 'medium' | 'high' | 'critical',
           cause: z.cause || undefined,
           action: z.suggested_action || undefined
         })));

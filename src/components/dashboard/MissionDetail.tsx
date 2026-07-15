@@ -32,7 +32,7 @@ function formatDate(date: string | null): string {
 }
 
 export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
-  const [, setBitrixData] = useState<any>(null);
+  const [, setBitrixData] = useState<Record<string, unknown> | null>(null);
   const [, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
         if (error) {
           console.warn("Bitrix fetch:", error.message);
         } else if (data) {
-          setBitrixData(data);
+          setBitrixData(data as Record<string, unknown>);
         }
       } catch (err) {
         if (!cancelled) console.error("Error fetching bitrix data:", err);
