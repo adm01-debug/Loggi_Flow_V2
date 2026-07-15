@@ -23,15 +23,29 @@ export interface IndexProposal {
   revert_reason: string | null;
 }
 
+type SupabaseTableFn = (table: string) => {
+  select: (cols: string) => {
+    order: (col: string, opts: { ascending: boolean }) => {
+      limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
+    };
+  };
+  insert: (row: Record<string, unknown>) => {
+    select: () => { single: () => Promise<{ data: unknown; error: unknown }> };
+  };
+};
+
+const fromIndexProposals = () =>
+  (supabase.from as unknown as SupabaseTableFn)("index_proposals");
+
 export function useIndexProposals() {
   return useQuery({
     queryKey: ["index-proposals"],
     queryFn: async (): Promise<IndexProposal[]> => {
-      const { data, error } = await (supabase.from("index_proposals" as never) as any)
+      const { data, error } = await fromIndexProposals()
         .select("*")
         .order("created_at", { ascending: false })
         .limit(50);
-      if (error) throw error;
+      if (error) throw error as Error;
       return (data ?? []) as IndexProposal[];
     },
     staleTime: 30_000,
@@ -50,11 +64,11 @@ export function useProposeIndex() {
       confidence: string;
     }) => {
       const user = (await supabase.auth.getUser()).data.user;
-      const { data, error } = await (supabase.from("index_proposals" as never) as any)
+      const { data, error } = await fromIndexProposals()
         .insert({ ...input, proposed_by: user?.id })
         .select()
         .single();
-      if (error) throw error;
+      if (error) throw error as Error;
       return data;
     },
     onSuccess: () => {
@@ -64,6 +78,7 @@ export function useProposeIndex() {
     onError: (e: Error) => toast.error(`Erro: ${e.message}`),
   });
 }
+
 
 export function useApplyIndexProposal() {
   const qc = useQueryClient();

@@ -287,7 +287,7 @@ export default function DashboardCotacoes() {
                       observacoes:
                         "Olá! O valor para esse frete SP-RJ é de R$ 145,00 com entrega em 3 dias úteis.",
                       expires_at: new Date(Date.now() + 86400000).toISOString(),
-                    } as any,
+                    } as never,
                   ]);
                 if (!error)
                   toast.success("Resposta simulada recebida via WhatsApp!");
@@ -575,7 +575,7 @@ export default function DashboardCotacoes() {
                 <div className="border rounded-lg divide-y bg-black/5">
                   {selectedCotacao?.workflow_logs &&
                   selectedCotacao.workflow_logs.length > 0 ? (
-                    selectedCotacao.workflow_logs.map((log: any, i: number) => (
+                    selectedCotacao.workflow_logs.map((log: { action?: string; timestamp?: string; details?: string }, i: number) => (
                       <div
                         key={i}
                         className="p-3 text-xs flex items-start gap-3"

@@ -40,7 +40,7 @@ const filterConfig: FilterConfig<BoxData> = {
     placeholder: "Buscar box...",
   },
   status: {
-    field: "isOccupied" as any,
+    field: "isOccupied" as keyof BoxData,
     options: [
       { value: "ocupado", label: "Ocupados" },
       { value: "livre", label: "Livres" },
@@ -49,7 +49,7 @@ const filterConfig: FilterConfig<BoxData> = {
   },
   select: {
     zone: {
-      field: "zone" as any,
+      field: "zone" as keyof BoxData,
       options: [
         { value: "norte", label: "Zona Norte" },
         { value: "sul", label: "Zona Sul" },

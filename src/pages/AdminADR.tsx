@@ -49,19 +49,28 @@ export default function AdminADR() {
 
   const createMutation = useMutation({
     mutationFn: async (adr: Partial<ADR>) => {
-      const { error } = await supabase.from("architecture_decisions").insert(adr as any);
+      if (!adr.title) throw new Error("Título obrigatório");
+      const { error } = await supabase.from("architecture_decisions").insert({
+        title: adr.title,
+        status: adr.status,
+        context: adr.context,
+        decision: adr.decision,
+        consequences: adr.consequences,
+      });
       if (error) throw error;
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["architecture-decisions"] });
       setIsAdding(false);
       setNewAdr({ status: 'proposed' });
       toast({ title: "Sucesso", description: "ADR registrada com sucesso." });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     },
   });
+
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -111,7 +120,7 @@ export default function AdminADR() {
                   <select 
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={newAdr.status}
-                    onChange={e => setNewAdr({...newAdr, status: e.target.value as any})}
+                    onChange={e => setNewAdr({...newAdr, status: e.target.value as ADR['status']})}
                   >
                     <option value="proposed">Proposto</option>
                     <option value="accepted">Aceito</option>
