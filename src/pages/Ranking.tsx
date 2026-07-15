@@ -99,7 +99,7 @@ export default function Ranking() {
 
   const users: RankUser[] = useMemo(
     () =>
-      (leaderboard || []).map((u: any, index: number) => ({
+      (leaderboard || []).map((u: Record<string, unknown> & { profiles?: { full_name?: string; avatar_url?: string } }, index: number) => ({
         id: u.user_id,
         name: u.profiles?.full_name || "Usuário",
         avatar: u.profiles?.avatar_url,
