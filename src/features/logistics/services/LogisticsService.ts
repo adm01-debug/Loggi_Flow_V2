@@ -12,7 +12,20 @@ export class LogisticsService extends BaseService {
     );
   }
 
-  static async updateStatus(id: string, status: string) {
+  static async updateStatus(
+    id: string,
+    status:
+      | "aguardando_producao"
+      | "cotacao_frete"
+      | "despachado"
+      | "em_transito"
+      | "entregue"
+      | "finalizado"
+      | "nf_emitida"
+      | "ocorrencia"
+      | "pronto_despacho"
+      | "saiu_entrega",
+  ) {
     return this.call(
       async () => {
         const result = await supabase.from('entregas').update({ status }).eq('id', id);
