@@ -49,7 +49,9 @@ export default function AdminADR() {
 
   const createMutation = useMutation({
     mutationFn: async (adr: Partial<ADR>) => {
-      const { error } = await supabase.from("architecture_decisions").insert(adr as any);
+      const { error } = await supabase
+        .from("architecture_decisions")
+        .insert(adr as unknown as Parameters<typeof supabase.from>[0] extends never ? never : Record<string, unknown>);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -58,10 +60,11 @@ export default function AdminADR() {
       setNewAdr({ status: 'proposed' });
       toast({ title: "Sucesso", description: "ADR registrada com sucesso." });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     },
   });
+
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
