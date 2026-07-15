@@ -49,13 +49,17 @@ export default function AdminADR() {
 
   const createMutation = useMutation({
     mutationFn: async (adr: Partial<ADR>) => {
-      const { error } = await supabase
-        .from("architecture_decisions")
-        .insert(adr as Parameters<ReturnType<typeof supabase.from<"architecture_decisions">>["insert"]>[0]);
+      if (!adr.title) throw new Error("Título obrigatório");
+      const { error } = await supabase.from("architecture_decisions").insert({
+        title: adr.title,
+        status: adr.status,
+        context: adr.context,
+        decision: adr.decision,
+        consequences: adr.consequences,
+      });
       if (error) throw error;
-
-
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["architecture-decisions"] });
       setIsAdding(false);
