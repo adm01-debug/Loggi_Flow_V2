@@ -575,7 +575,7 @@ export default function DashboardCotacoes() {
                 <div className="border rounded-lg divide-y bg-black/5">
                   {selectedCotacao?.workflow_logs &&
                   selectedCotacao.workflow_logs.length > 0 ? (
-                    selectedCotacao.workflow_logs.map((log: Record<string, unknown>, i: number) => (
+                    selectedCotacao.workflow_logs.map((log: { action?: string; timestamp?: string; details?: string }, i: number) => (
                       <div
                         key={i}
                         className="p-3 text-xs flex items-start gap-3"
