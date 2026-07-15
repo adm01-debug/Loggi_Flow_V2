@@ -49,19 +49,26 @@ export function TelemetryTable({ rows, isLoading }: TelemetryTableProps) {
   return (
     <Card>
       <CardContent className="p-0">
-        {isLoading ? (
-          <div className="p-4 space-y-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
-        ) : rows.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">
-            <Activity className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">Nenhuma query lenta registrada</p>
-            <p className="text-sm mt-1">Isso é bom! O sistema está performando bem.</p>
-          </div>
-        ) : (
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="p-4 space-y-3">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
+              </div>
+            );
+          }
+          if (rows.length === 0) {
+            return (
+              <div className="text-center py-16 text-muted-foreground">
+                <Activity className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p className="font-medium">Nenhuma query lenta registrada</p>
+                <p className="text-sm mt-1">Isso é bom! O sistema está performando bem.</p>
+              </div>
+            );
+          }
+          return (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
