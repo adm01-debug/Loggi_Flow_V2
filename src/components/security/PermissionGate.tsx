@@ -96,6 +96,7 @@ function AccessDenied({ permission, permissions }: AccessDeniedProps) {
 }
 
 // Higher-order component version
+// eslint-disable-next-line react-refresh/only-export-components
 export function withPermission<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   permission: string,
@@ -111,6 +112,7 @@ export function withPermission<P extends object>(
 }
 
 // Hook-like usage for conditional rendering
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCanAccess(permission: string): boolean {
   const { hasPermission } = usePermissions();
   return hasPermission(permission);

@@ -2,9 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { statusConfigs, type StatusType } from "./statusHelpers";
 
-export { getStatusLabel, getStatusColor, statusOptions } from "./statusHelpers";
-export type { StatusType } from "./statusHelpers";
-
 interface StatusBadgeProps {
   status: string;
   showIcon?: boolean;
