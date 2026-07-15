@@ -32,7 +32,7 @@ export function ConciliacaoList({ conciliacoes, isLoading, selectedId, onSelect 
         if (conciliacoes.length === 0) {
           return <p className="text-sm text-muted-foreground text-center py-8">Nenhuma conciliação</p>;
         }
-        return ("EXPR_START")
+        return (
         <ScrollArea className="h-[400px]">
           <div className="space-y-2 pr-4">
             {conciliacoes.map((c) => (
@@ -76,7 +76,8 @@ export function ConciliacaoList({ conciliacoes, isLoading, selectedId, onSelect 
             ))}
           </div>
         </ScrollArea>
-      )}
+        );
+      })()}
     </div>
   );
 }
