@@ -264,8 +264,8 @@ export function NotificationCenter() {
                               {alert.entityType && (
                                 <span className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-muted/50 px-2 py-0.5 rounded-md">
                                   <EntityIcon className="w-3 h-3" />
-                                  {alert.entityType === 'coleta' ? 'Coleta' : 
-                                   alert.entityType === 'entrega' ? 'Entrega' : 'Ocorrência'}
+                                  {getEntityLabel(alert.entityType)}
+
                                 </span>
                               )}
                               <span className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground opacity-60">
