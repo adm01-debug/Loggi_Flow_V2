@@ -399,7 +399,9 @@ export function MaterialLabelPrinter() {
                 </TableBody>
               </Table>
             </ScrollArea>
-          )}
+            );
+          })()}
+
         </CardContent>
       </Card>
 
