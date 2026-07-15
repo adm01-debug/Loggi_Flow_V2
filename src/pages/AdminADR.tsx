@@ -51,8 +51,9 @@ export default function AdminADR() {
     mutationFn: async (adr: Partial<ADR>) => {
       const { error } = await supabase
         .from("architecture_decisions")
-        .insert(adr as Record<string, unknown>);
+        .insert(adr as Parameters<ReturnType<typeof supabase.from<"architecture_decisions">>["insert"]>[0]);
       if (error) throw error;
+
 
     },
     onSuccess: () => {
