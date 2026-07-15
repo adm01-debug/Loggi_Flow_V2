@@ -37,6 +37,19 @@ export function NotificationCenter() {
     clearAllAlerts,
   } = useSmartAlerts();
 
+  const ENTITY_LABELS: Record<string, string> = {
+    coleta: "Coleta",
+    entrega: "Entrega",
+  };
+  const getEntityLabel = (t?: SystemAlert["entityType"]) =>
+    (t && ENTITY_LABELS[t]) || "Ocorrência";
+
+  const SEVERITY_BORDERS: Record<string, string> = {
+    error: "border-l-destructive",
+    warning: "border-l-warning",
+  };
+  const getSeverityBorder = (s: string) => SEVERITY_BORDERS[s] || "border-l-primary";
+
   const getAlertIcon = (type: SystemAlert['type']) => {
     switch (type) {
       case 'coleta_atrasada':
@@ -52,6 +65,7 @@ export function NotificationCenter() {
         return Info;
     }
   };
+
 
   const getEntityIcon = (entityType?: SystemAlert['entityType']) => {
     switch (entityType) {
