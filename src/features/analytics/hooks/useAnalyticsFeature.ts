@@ -14,7 +14,7 @@ export function useAnalyticsFeature(dateRange?: { from: Date; to: Date }) {
       if (error) throw error;
       if (!data || data.length === 0) return null;
 
-      const results = data as any[];
+      const results = data as Array<{ entregas_count: number | string; custo_total: number | string; sla_atingido: number | string }>;
       const currentMonth = results[results.length - 1];
       const previousMonth = results[results.length - 2];
       
