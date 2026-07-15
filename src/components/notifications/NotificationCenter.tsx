@@ -218,7 +218,7 @@ export function NotificationCenter() {
                         "group relative p-4 transition-all duration-300",
                         !alert.read ? cn("bg-muted/10", styles.glow) : "hover:bg-muted/30",
                         "cursor-pointer overflow-hidden border-l-4",
-                        !alert.read ? (alert.severity === 'error' ? 'border-l-destructive' : alert.severity === 'warning' ? 'border-l-warning' : 'border-l-primary') : 'border-l-transparent'
+                        !alert.read ? getSeverityBorder(alert.severity) : 'border-l-transparent'
                       )}
                       onClick={() => {
                         if (!alert.read) markAsRead(alert.id);
