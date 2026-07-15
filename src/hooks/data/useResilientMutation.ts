@@ -14,8 +14,8 @@ export function useResilientMutation<TData, TError, TVariables, TContext>(
     mutationFn: async (variables: TVariables) => {
       try {
         return await logisticsBreaker.execute(() => mutationFn(variables));
-      } catch (error: any) {
-        const message = error?.message || "Ocorreu um erro inesperado";
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Ocorreu um erro inesperado";
         
         logTelemetry({
           severity: 'critical',
