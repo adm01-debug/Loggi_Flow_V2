@@ -173,7 +173,12 @@ export function useSmartAlerts() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "nexus_tactical_logs" },
         (payload) => {
-          const newLog = payload.new as any;
+          const newLog = payload.new as {
+            id: string;
+            type: string;
+            message: string;
+            target_vehicle: string | null;
+          };
           addAlert({
             type: "nexus_tactical",
             title: `TÁTICO: ${newLog.type === "crit" ? "CRÍTICO" : "AVISO"}`,

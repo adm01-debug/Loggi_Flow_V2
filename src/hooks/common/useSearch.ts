@@ -48,7 +48,7 @@ export function useSearch<T extends Record<string, unknown>>(
       if (!shouldSearch) return [];
       const orConditions = columns.map((col) => `${col}.ilike.%${debouncedTerm}%`).join(',');
       
-      let queryBuilder = supabase.from(tableName as any).select('*');
+      let queryBuilder = (supabase.from as unknown as (t: string) => ReturnType<typeof supabase.from>)(tableName).select('*');
       
       if (orConditions) {
         queryBuilder = queryBuilder.or(orConditions);

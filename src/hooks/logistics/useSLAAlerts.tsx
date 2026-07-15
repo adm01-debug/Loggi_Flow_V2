@@ -49,7 +49,14 @@ export const useSLAAlerts = () => {
   const alerts = useMemo((): SLAAlertItem[] => {
     if (!entregas) return [];
 
-    return (entregas as any[])
+    return (entregas as unknown as Array<{
+      id: string;
+      numero_entrega: string;
+      status: string;
+      previsao_entrega: string | null;
+      transportadora: { nome_fantasia: string } | null;
+      cliente: { razao_social: string } | null;
+    }>)
       .map((e) => {
         const transportadora = e.transportadora as {
           nome_fantasia: string;
