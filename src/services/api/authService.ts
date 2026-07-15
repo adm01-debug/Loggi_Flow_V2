@@ -33,7 +33,7 @@ export const authService = {
       console.error("Error fetching roles:", error);
       return [];
     }
-    return data.map((r: any) => r.role);
+    return data.map((r: { role: string }) => r.role);
   },
 
   async updateStreak(userId: string): Promise<void> {
