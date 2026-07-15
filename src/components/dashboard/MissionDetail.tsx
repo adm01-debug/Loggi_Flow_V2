@@ -32,7 +32,7 @@ function formatDate(date: string | null): string {
 }
 
 export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
-  const [, setBitrixData] = useState<any>(null);
+  const [, setBitrixData] = useState<Record<string, unknown> | null>(null);
   const [, setIsLoading] = useState(false);
 
   useEffect(() => {
