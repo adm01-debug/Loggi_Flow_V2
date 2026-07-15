@@ -12,7 +12,7 @@ export class LogisticsService extends BaseService {
     );
   }
 
-  static async updateStatus(id: string, status: any) {
+  static async updateStatus(id: string, status: string) {
     return this.call(
       async () => {
         const result = await supabase.from('entregas').update({ status }).eq('id', id);
