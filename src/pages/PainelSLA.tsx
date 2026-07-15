@@ -410,7 +410,8 @@ export default function PainelSLA() {
                     );
                   })}
                 </ul>
-              )}
+                );
+              })()}
             </CardContent>
           </Card>
         </TabsContent>
