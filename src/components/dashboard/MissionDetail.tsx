@@ -52,7 +52,7 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
         if (error) {
           console.warn("Bitrix fetch:", error.message);
         } else if (data) {
-          setBitrixData(data);
+          setBitrixData(data as Record<string, unknown>);
         }
       } catch (err) {
         if (!cancelled) console.error("Error fetching bitrix data:", err);
