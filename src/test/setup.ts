@@ -31,7 +31,7 @@ class MockIntersectionObserver implements IntersectionObserver {
   takeRecords = vi.fn();
 }
 
-global.IntersectionObserver = MockIntersectionObserver as any;
+global.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
 
 class MockResizeObserver implements ResizeObserver {
   observe = vi.fn();
@@ -39,7 +39,7 @@ class MockResizeObserver implements ResizeObserver {
   disconnect = vi.fn();
 }
 
-global.ResizeObserver = MockResizeObserver as any;
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
