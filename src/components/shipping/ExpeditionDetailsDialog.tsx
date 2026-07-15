@@ -42,7 +42,6 @@ export interface ExpeditionDelivery {
   nf_remessa?: string | null;
   created_at: string;
   comprovante_entrega_url?: string | null;
-  [key: string]: unknown;
 }
 
 interface ExpeditionDetailsDialogProps {
