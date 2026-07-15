@@ -1077,7 +1077,8 @@ export default function Clientes() {
 
                 nome_fantasia: d.nome_fantasia || null,
                 cnpj: d.cnpj || null,
-                endereco_completo: d.endereco_completo,
+                endereco_completo: d.endereco_completo ?? "",
+
                 cidade: d.cidade || null,
                 estado: d.estado || null,
                 cep: d.cep || null,
