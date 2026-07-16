@@ -8,7 +8,8 @@ export interface TelemetryLog {
   category: string;
   message: string;
   stack_trace?: string;
-  metadata?: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- metadata bridges to Supabase Json column
+  metadata?: Record<string, any>;
   url?: string;
 }
 
