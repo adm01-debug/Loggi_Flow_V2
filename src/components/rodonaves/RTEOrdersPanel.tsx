@@ -26,7 +26,7 @@ export function RTEOrdersPanel() {
     });
   };
 
-  const orders = rte.ordersResult as { data?: Array<Record<string, any>> } | undefined;
+  const orders = rte.ordersResult as { data?: Array<Record<string, unknown>> } | undefined;
   const items = Array.isArray(orders?.data) ? orders.data : [];
 
   return (

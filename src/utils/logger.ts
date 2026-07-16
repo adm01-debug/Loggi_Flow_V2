@@ -5,7 +5,7 @@ type LogSeverity = 'info' | 'warning' | 'error' | 'critical';
 interface LogOptions {
   severity?: LogSeverity;
   category?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   userId?: string;
   stackTrace?: string;
 }

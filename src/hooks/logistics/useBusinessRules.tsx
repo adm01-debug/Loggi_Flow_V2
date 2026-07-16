@@ -41,7 +41,7 @@ export interface RuleCondition {
 export interface RuleAction {
   id: string;
   type: ActionType;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 export interface BusinessRule {

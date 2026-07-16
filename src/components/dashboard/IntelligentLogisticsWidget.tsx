@@ -20,7 +20,7 @@ import { useGamification } from "@/hooks/gamification/useGamification";
 import { cn } from "@/lib/utils";
 import { BiometricConsentModal } from "./BiometricConsentModal";
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   truck: Truck,
   package: Package,
   "trending-up": TrendingUp,

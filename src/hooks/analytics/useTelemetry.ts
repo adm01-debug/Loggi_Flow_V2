@@ -8,7 +8,7 @@ export interface TelemetryLog {
   category: string;
   message: string;
   stack_trace?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   url?: string;
 }
 

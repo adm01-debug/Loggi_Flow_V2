@@ -21,7 +21,7 @@ export interface UseSortingReturn<T> {
   getSortDirection: (key: keyof T) => SortDirection;
 }
 
-export function useSorting<T extends Record<string, any>>(
+export function useSorting<T extends Record<string, unknown>>(
   data: T[],
   options: UseSortingOptions<T> = {}
 ): UseSortingReturn<T> {
