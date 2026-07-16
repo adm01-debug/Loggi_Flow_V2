@@ -41,7 +41,8 @@ export interface RuleCondition {
 export interface RuleAction {
   id: string;
   type: ActionType;
-  config: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- action config is dynamic; validated at execution time
+  config: Record<string, any>;
 }
 
 export interface BusinessRule {
