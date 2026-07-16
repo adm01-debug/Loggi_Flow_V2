@@ -21,6 +21,7 @@ export interface UseSortingReturn<T> {
   getSortDirection: (key: keyof T) => SortDirection;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic constraint intentionally accepts any record shape
 export function useSorting<T extends Record<string, any>>(
   data: T[],
   options: UseSortingOptions<T> = {}

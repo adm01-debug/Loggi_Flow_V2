@@ -26,6 +26,7 @@ export function RTEOrdersPanel() {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- RTE order rows are dynamic key/value payloads from the carrier API
   const orders = rte.ordersResult as { data?: Array<Record<string, any>> } | undefined;
   const items = Array.isArray(orders?.data) ? orders.data : [];
 

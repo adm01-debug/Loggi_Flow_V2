@@ -5,6 +5,7 @@ type LogSeverity = 'info' | 'warning' | 'error' | 'critical';
 interface LogOptions {
   severity?: LogSeverity;
   category?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- metadata bridges to Supabase Json column
   metadata?: Record<string, any>;
   userId?: string;
   stackTrace?: string;
