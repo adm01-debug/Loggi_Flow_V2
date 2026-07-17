@@ -69,11 +69,11 @@ function StepCard({
         <div
           className={cn(
             "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-inner",
-            isCompleted
-              ? "bg-success text-success-foreground"
-              : isCurrent
-                ? "bg-primary text-primary-foreground scale-110 rotate-3 shadow-lg shadow-primary/30"
-                : "bg-muted text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary",
+            (() => {
+              if (isCompleted) return "bg-success text-success-foreground";
+              if (isCurrent) return "bg-primary text-primary-foreground scale-110 rotate-3 shadow-lg shadow-primary/30";
+              return "bg-muted text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary";
+            })(),
           )}
         >
           {isCompleted ? (
