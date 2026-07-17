@@ -99,11 +99,7 @@ export function AIFreightForecasting({ currentTotal }: AIFreightForecastingProps
         {insights.map((insight, i) => (
           <div key={i} className="p-3 rounded-xl border bg-card/50 space-y-2 hover:border-primary/50 transition-colors">
             <div className="flex items-center gap-2">
-              <div className={`p-1.5 rounded-lg ${
-                insight.type === 'warning' ? 'bg-warning/10 text-warning' : 
-                insight.type === 'success' ? 'bg-success/10 text-success' : 
-                'bg-info/10 text-info'
-              }`}>
+              <div className={`p-1.5 rounded-lg ${({ warning: 'bg-warning/10 text-warning', success: 'bg-success/10 text-success', info: 'bg-info/10 text-info' } as Record<string,string>)[insight.type] ?? 'bg-info/10 text-info'}`}>
                 <insight.icon className="w-4 h-4" />
               </div>
               <h4 className="text-xs font-bold">{insight.title}</h4>
