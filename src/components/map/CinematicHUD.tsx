@@ -25,12 +25,12 @@ export function CinematicHUD({ isLiveData, lastSync }: { isLiveData?: boolean; l
       >
         <div className="flex items-center gap-2">
           <Satellite className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-cyan-500 animate-pulse" />
-          <span className="text-[8px] sm:text-[9px] font-black text-white uppercase tracking-[0.1em] sm:tracking-[0.2em]">{isLiveData ? (isMobile ? "SAT_LOCK" : "SAT_LOCK: 14_FIXED") : "RESTORED"}</span>
+          <span className="text-[8px] sm:text-[9px] font-black text-white uppercase tracking-[0.1em] sm:tracking-[0.2em]">{(() => { if (!isLiveData) { return "RESTORED"; } return isMobile ? "SAT_LOCK" : "SAT_LOCK: 14_FIXED"; })()}</span>
         </div>
         <div className="w-px h-3 sm:h-4 bg-white/10" />
         <div className="flex items-center gap-2">
           <Navigation className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-amber-500" />
-          <span className="text-[8px] sm:text-[9px] font-black text-white uppercase tracking-[0.1em] sm:tracking-[0.2em]">{isLiveData ? (isMobile ? "HDOP_OK" : "HDOP: 0.82") : lastSync?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <span className="text-[8px] sm:text-[9px] font-black text-white uppercase tracking-[0.1em] sm:tracking-[0.2em]">{(() => { if (!isLiveData) { return lastSync?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } return isMobile ? "HDOP_OK" : "HDOP: 0.82"; })()}</span>
         </div>
         {!isMobile && (
           <>

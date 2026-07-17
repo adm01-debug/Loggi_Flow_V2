@@ -94,15 +94,10 @@ export function useUserPreferences() {
     }
 
     // Apply Accessibility: Font Size
+    const fontScaleMap: Record<string, string> = { sm: "0.9", md: "1.0", lg: "1.15", xl: "1.3" };
     root.style.setProperty(
       "--font-scale",
-      preferences.accessibility.fontSize === "sm"
-        ? "0.9"
-        : preferences.accessibility.fontSize === "md"
-          ? "1.0"
-          : preferences.accessibility.fontSize === "lg"
-            ? "1.15"
-            : "1.3",
+      fontScaleMap[preferences.accessibility.fontSize] ?? "1.3",
     );
 
     // Apply Dyslexic Font

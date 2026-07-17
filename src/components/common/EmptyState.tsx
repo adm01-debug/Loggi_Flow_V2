@@ -75,13 +75,13 @@ export function EmptyState({
         "flex items-center justify-center rounded-full bg-primary/10 mb-4",
         ringSizes[size],
         "ring-primary/5",
-        size === "sm" ? "w-12 h-12" : size === "md" ? "w-16 h-16" : "w-24 h-24"
+        { sm: "w-12 h-12", md: "w-16 h-16", lg: "w-24 h-24" }[size]
       )}>
         <Icon className={cn(iconSizes[size], config.color)} />
       </div>
       <h3 className={cn(
         "font-display font-semibold text-foreground mb-2",
-        size === "sm" ? "text-base" : size === "md" ? "text-xl" : "text-2xl"
+        { sm: "text-base", md: "text-xl", lg: "text-2xl" }[size]
       )}>
         {title}
       </h3>

@@ -139,22 +139,22 @@ export function OnboardingChecklist() {
                       transition={{ delay: index * 0.05 }}
                       className={cn(
                         "flex items-center gap-3 p-2 rounded-lg transition-colors cursor-pointer group",
-                        completed 
-                          ? "bg-primary/5" 
-                          : isCurrent
-                            ? "bg-primary/10 border border-primary/30"
-                            : "hover:bg-muted/50"
+                        (() => {
+                          if (completed) return "bg-primary/5";
+                          if (isCurrent) return "bg-primary/10 border border-primary/30";
+                          return "hover:bg-muted/50";
+                        })()
                       )}
                       onClick={() => handleStepClick(step.id, step.route)}
                     >
                       {/* Icon */}
                       <div className={cn(
                         "w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                        completed
-                          ? "bg-primary text-primary-foreground"
-                          : isCurrent
-                            ? "bg-primary/20 text-primary"
-                            : "bg-muted text-muted-foreground"
+                        (() => {
+                          if (completed) return "bg-primary text-primary-foreground";
+                          if (isCurrent) return "bg-primary/20 text-primary";
+                          return "bg-muted text-muted-foreground";
+                        })()
                       )}>
                         {completed ? (
                           <CheckCircle2 className="w-4 h-4" />

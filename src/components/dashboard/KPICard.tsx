@@ -233,10 +233,11 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                 </div>
               )}
               {(trendValue || changePercent !== null) && (() => {
-                const trendClass =
-                  trend === 'up' ? "bg-success/20 text-success border-success/40" :
-                  trend === 'down' ? "bg-destructive/20 text-destructive border-destructive/40" :
-                  "bg-white/10 text-white/60 border-white/20";
+                const trendClass = {
+                  up: "bg-success/20 text-success border-success/40",
+                  down: "bg-destructive/20 text-destructive border-destructive/40",
+                  neutral: "bg-white/10 text-white/60 border-white/20",
+                }[trend ?? 'neutral'] ?? "bg-white/10 text-white/60 border-white/20";
                 let TrendIcon: JSX.Element;
                 if (trend === 'up') TrendIcon = <Activity className="w-3 h-3" />;
                 else if (trend === 'down') TrendIcon = <Activity className="w-3 h-3 rotate-180" />;
@@ -271,10 +272,11 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                 {typeof value === 'string' && (value.includes('R$') || value.includes('%')) ? value : animatedValue}
               </motion.span>
               {status !== 'neutral' && (() => {
-                const statusPulseClass =
-                  status === 'success' ? 'text-success bg-success' :
-                  status === 'warning' ? 'text-warning bg-warning' :
-                  'text-destructive bg-destructive';
+                const statusPulseClass = {
+                  success: 'text-success bg-success',
+                  warning: 'text-warning bg-warning',
+                  danger: 'text-destructive bg-destructive',
+                }[status as 'success' | 'warning' | 'danger'] ?? 'text-destructive bg-destructive';
                 return (
                   <div className={cn("w-3 h-3 rounded-full mb-4 animate-ping shadow-[0_0_15px_currentColor]", statusPulseClass)} />
                 );
