@@ -57,11 +57,11 @@ function StepCard({
       layout
       className={cn(
         "relative p-5 rounded-2xl border-2 transition-all duration-500 cursor-pointer group overflow-hidden",
-        isCompleted
-          ? "border-success/20 bg-success/5 opacity-70"
-          : isCurrent
-            ? "border-primary bg-primary/5 shadow-2xl shadow-primary/10"
-            : "border-border/50 hover:border-primary/30 hover:bg-muted/50",
+        (() => {
+          if (isCompleted) return "border-success/20 bg-success/5 opacity-70";
+          if (isCurrent) return "border-primary bg-primary/5 shadow-2xl shadow-primary/10";
+          return "border-border/50 hover:border-primary/30 hover:bg-muted/50";
+        })(),
       )}
       onClick={onNavigate}
     >
