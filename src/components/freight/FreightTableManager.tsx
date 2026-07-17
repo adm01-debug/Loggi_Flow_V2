@@ -194,11 +194,10 @@ export function FreightTableManager({ tabelasList, transportadoras, isLoading, o
         />
       )}
 
-      {isLoading ? (
-        <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-      ) : sortedData.length === 0 ? (
-        <EmptyState icon={MapPin} title="Nenhuma tabela cadastrada" description="Adicione tabelas de frete para começar a cotar" />
-      ) : (
+      {(() => {
+        if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
+        if (sortedData.length === 0) return <EmptyState icon={MapPin} title="Nenhuma tabela cadastrada" description="Adicione tabelas de frete para começar a cotar" />;
+        return (
         <div className="space-y-2">
           {pagination.paginatedData.map(t => (
             <div key={t.id} className={cn('card-interactive flex items-center gap-3', isSelected(t.id) && 'ring-2 ring-primary')}>
