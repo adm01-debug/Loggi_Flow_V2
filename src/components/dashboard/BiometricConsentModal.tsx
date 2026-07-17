@@ -123,7 +123,7 @@ export function BiometricConsentModal({ isOpen, onClose, onConfirm }: BiometricC
             disabled={step !== 'idle'}
             className="bg-primary hover:bg-primary/80 text-white font-black uppercase text-[10px] tracking-[0.2em] h-12 px-10 shadow-[0_0_20px_rgba(234,56,76,0.4)] transition-all active:scale-95 min-w-[200px]"
           >
-            {step === 'idle' ? "INICIAR SINCRONIZAÇÃO" : step === 'scanning' ? "PROCESSANDO..." : "SUCESSO!"}
+            {({ idle: "INICIAR SINCRONIZAÇÃO", scanning: "PROCESSANDO...", success: "SUCESSO!" } as Record<string, string>)[step] ?? "SUCESSO!"}
           </Button>
         </DialogFooter>
       </DialogContent>
