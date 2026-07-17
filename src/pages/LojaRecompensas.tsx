@@ -340,11 +340,11 @@ export default function LojaRecompensas() {
                         }
                         onClick={() => handleRedeem(r)}
                       >
-                        {!canAfford
-                          ? "Sem moedas"
-                          : !r.available
-                            ? "Indisponível"
-                            : "Resgatar"}
+                        {(() => {
+                          if (!canAfford) return "Sem moedas";
+                          if (!r.available) return "Indisponível";
+                          return "Resgatar";
+                        })()}
                       </Button>
                     </div>
                   </div>
