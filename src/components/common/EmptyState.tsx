@@ -81,7 +81,7 @@ export function EmptyState({
       </div>
       <h3 className={cn(
         "font-display font-semibold text-foreground mb-2",
-        size === "sm" ? "text-base" : size === "md" ? "text-xl" : "text-2xl"
+        { sm: "text-base", md: "text-xl", lg: "text-2xl" }[size]
       )}>
         {title}
       </h3>
