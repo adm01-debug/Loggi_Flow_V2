@@ -52,12 +52,11 @@ const addAlert = (alert: Omit<SystemAlert, "id" | "createdAt" | "read">) => {
     notifyListeners();
 
     // Show toast notification
-    const toastFn =
-      alert.severity === "error"
-        ? toast.error
-        : alert.severity === "warning"
-          ? toast.warning
-          : toast.info;
+    const toastFn = (() => {
+      if (alert.severity === "error") return toast.error;
+      if (alert.severity === "warning") return toast.warning;
+      return toast.info;
+    })();
 
     toastFn(alert.title, {
       description: alert.message,
