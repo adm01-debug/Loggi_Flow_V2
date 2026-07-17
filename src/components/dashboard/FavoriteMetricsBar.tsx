@@ -474,14 +474,11 @@ export function FavoriteMetricsBar() {
                                     "text-muted-foreground",
                                 )}
                               >
-                                {data.changeType === ("positive" as string) ? (
-                                  <TrendingUp className="h-2.5 w-2.5 mr-1" />
-                                ) : data.changeType ===
-                                  ("negative" as string) ? (
-                                  <TrendingDown className="h-2.5 w-2.5 mr-1" />
-                                ) : (
-                                  <Minus className="h-2.5 w-2.5 mr-1" />
-                                )}
+                                {(() => {
+                                  if (data.changeType === ("positive" as string)) return <TrendingUp className="h-2.5 w-2.5 mr-1" />;
+                                  if (data.changeType === ("negative" as string)) return <TrendingDown className="h-2.5 w-2.5 mr-1" />;
+                                  return <Minus className="h-2.5 w-2.5 mr-1" />;
+                                })()}
                                 {typeof data.change === "number" &&
                                   Math.abs(data.change)}
                               </div>
