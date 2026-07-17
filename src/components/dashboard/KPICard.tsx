@@ -233,10 +233,11 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                 </div>
               )}
               {(trendValue || changePercent !== null) && (() => {
-                const trendClass =
-                  trend === 'up' ? "bg-success/20 text-success border-success/40" :
-                  trend === 'down' ? "bg-destructive/20 text-destructive border-destructive/40" :
-                  "bg-white/10 text-white/60 border-white/20";
+                const trendClass = {
+                  up: "bg-success/20 text-success border-success/40",
+                  down: "bg-destructive/20 text-destructive border-destructive/40",
+                  neutral: "bg-white/10 text-white/60 border-white/20",
+                }[trend ?? 'neutral'] ?? "bg-white/10 text-white/60 border-white/20";
                 let TrendIcon: JSX.Element;
                 if (trend === 'up') TrendIcon = <Activity className="w-3 h-3" />;
                 else if (trend === 'down') TrendIcon = <Activity className="w-3 h-3 rotate-180" />;
