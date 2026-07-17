@@ -153,7 +153,11 @@ export function RTETrackingPanel() {
   const renderBatchResults = (data: unknown) => {
     if (!data) return null;
     const d = data as { data?: unknown[] | unknown };
-    const items = Array.isArray(d?.data) ? d.data : d?.data ? [d.data] : [];
+    const items: unknown[] = (() => {
+      if (Array.isArray(d?.data)) return d.data;
+      if (d?.data) return [d.data];
+      return [];
+    })();
     if (items.length === 0)
       return <p className="text-sm text-muted-foreground">Nenhum resultado</p>;
     return (
