@@ -139,11 +139,11 @@ export function OnboardingChecklist() {
                       transition={{ delay: index * 0.05 }}
                       className={cn(
                         "flex items-center gap-3 p-2 rounded-lg transition-colors cursor-pointer group",
-                        completed 
-                          ? "bg-primary/5" 
-                          : isCurrent
-                            ? "bg-primary/10 border border-primary/30"
-                            : "hover:bg-muted/50"
+                        (() => {
+                          if (completed) return "bg-primary/5";
+                          if (isCurrent) return "bg-primary/10 border border-primary/30";
+                          return "hover:bg-muted/50";
+                        })()
                       )}
                       onClick={() => handleStepClick(step.id, step.route)}
                     >
