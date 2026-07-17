@@ -35,10 +35,12 @@ export function METransportadorasPanel() {
     listarAgencias.mutate(params, {
       onSuccess: (data) => {
         const d = data as Record<string, unknown>;
-        setAgencies(
-          Array.isArray(d?.data) ? d.data as MEAgency[] :
-          Array.isArray(data) ? data as MEAgency[] : []
-        );
+        const list: MEAgency[] = (() => {
+          if (Array.isArray(d?.data)) return d.data as MEAgency[];
+          if (Array.isArray(data)) return data as MEAgency[];
+          return [];
+        })();
+        setAgencies(list);
       },
     });
   };
