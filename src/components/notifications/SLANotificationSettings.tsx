@@ -57,20 +57,18 @@ export function SLANotificationSettings() {
               <Settings2 className="w-4 h-4 text-muted-foreground" />
               <h4 className="font-semibold">Notificações SLA</h4>
             </div>
-            {permission === "granted" ? (
-              <Badge variant="secondary" className="text-xs bg-success/10 text-success">
-                <CheckCircle2 className="w-3 h-3 mr-1" />
-                Ativo
-              </Badge>
-            ) : permission === "denied" ? (
-              <Badge variant="destructive" className="text-xs">
-                Bloqueado
-              </Badge>
-            ) : (
-              <Badge variant="secondary" className="text-xs">
-                Pendente
-              </Badge>
-            )}
+            {(() => {
+              if (permission === "granted") return (
+                <Badge variant="secondary" className="text-xs bg-success/10 text-success">
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                  Ativo
+                </Badge>
+              );
+              if (permission === "denied") return (
+                <Badge variant="destructive" className="text-xs">Bloqueado</Badge>
+              );
+              return <Badge variant="secondary" className="text-xs">Pendente</Badge>;
+            })()}
           </div>
 
           {permission !== "granted" && (
