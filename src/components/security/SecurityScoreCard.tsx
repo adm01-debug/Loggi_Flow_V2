@@ -49,7 +49,11 @@ export function SecurityScoreCard({ securityScore, mfaEnabled, knownDevices, act
                 <span className="font-medium">{getScoreLabel(securityScore)}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                {securityScore >= 80 ? 'Sua conta está bem protegida.' : securityScore >= 60 ? 'Algumas melhorias são recomendadas.' : 'Ação necessária para melhorar a segurança.'}
+                {(() => {
+                  if (securityScore >= 80) return 'Sua conta está bem protegida.';
+                  if (securityScore >= 60) return 'Algumas melhorias são recomendadas.';
+                  return 'Ação necessária para melhorar a segurança.';
+                })()}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
