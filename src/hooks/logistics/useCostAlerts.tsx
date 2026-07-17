@@ -303,11 +303,11 @@ export const useCostAlerts = () => {
       let tipoNotificacao: 'warning' | 'critical' | 'exceeded' = 'warning';
       let mensagem = '';
 
-      const nome = result.alerta.tipo === 'transportadora' 
-        ? result.alerta.transportadora?.nome_fantasia 
-        : result.alerta.tipo === 'rota' 
-          ? `Rota ${result.alerta.estado_destino}` 
-          : 'Total Geral';
+      const nome = (() => {
+        if (result.alerta.tipo === 'transportadora') return result.alerta.transportadora?.nome_fantasia;
+        if (result.alerta.tipo === 'rota') return `Rota ${result.alerta.estado_destino}`;
+        return 'Total Geral';
+      })();
 
       if (result.status === 'exceeded') {
         tipoNotificacao = 'exceeded';
