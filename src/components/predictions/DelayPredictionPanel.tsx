@@ -192,13 +192,7 @@ function PredictionCard({
 
   return (
     <div
-      className={`border rounded-lg p-3 transition-all ${
-        prediction.risco === "critico"
-          ? "border-destructive/30 bg-destructive/5"
-          : prediction.risco === "alto"
-            ? "border-warning/30 bg-warning/5"
-            : "border-border"
-      }`}
+      className={`border rounded-lg p-3 transition-all ${({ critico: 'border-destructive/30 bg-destructive/5', alto: 'border-warning/30 bg-warning/5' } as Record<string,string>)[prediction.risco] ?? 'border-border'}`}
     >
       <div
         className="flex items-center justify-between cursor-pointer"

@@ -28,7 +28,7 @@ export function useBiometricAnomalies() {
         const heartRate = Number(entry.heart_rate) || 0;
         return {
           id: entry.id,
-          level: entry.severity === 'critical' ? 'crit' : entry.severity === 'warning' ? 'warn' : 'info',
+          level: (() => { if (entry.severity === 'critical') { return 'crit'; } if (entry.severity === 'warning') { return 'warn'; } return 'info'; })(),
           cause: entry.cause || (heartRate > 100 ? 'Frequência Cardíaca Elevada' : 'Fadiga Detectada'),
           action: entry.suggested_action || (heartRate > 100 ? 'Solicitar Parada Imediata' : 'Monitoramento Reforçado'),
           unit: entry.vehicle_id || 'UNKNOWN',

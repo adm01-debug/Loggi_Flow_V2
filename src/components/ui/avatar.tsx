@@ -280,7 +280,11 @@ const AvatarBadge = ({
       )}
       {...props}
     >
-      {children || (count !== undefined ? (count > 99 ? "99+" : count) : null)}
+      {(() => {
+        if (children) return children;
+        if (count === undefined) return null;
+        return count > 99 ? "99+" : count;
+      })()}
     </span>
   );
 };

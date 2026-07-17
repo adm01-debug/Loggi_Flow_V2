@@ -93,13 +93,12 @@ export function useUpdateRemediationStatus() {
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {
-      toast.success(
-        vars.status === "resolved"
-          ? "Marcada como resolvida ✅"
-          : vars.status === "ignored"
-          ? "Marcada como ignorada"
-          : "Status atualizado",
-      );
+      const msg = (() => {
+        if (vars.status === "resolved") return "Marcada como resolvida ✅";
+        if (vars.status === "ignored") return "Marcada como ignorada";
+        return "Status atualizado";
+      })();
+      toast.success(msg);
       qc.invalidateQueries({ queryKey: QK });
     },
     onError: (e: Error) => toast.error(`Falha: ${e.message}`),

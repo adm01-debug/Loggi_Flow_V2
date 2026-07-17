@@ -265,85 +265,89 @@ export function ScheduledReportsManager() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          {[1, 2].map(i => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-6 bg-muted rounded w-1/2 mb-4" />
-                <div className="h-4 bg-muted rounded w-3/4" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : reports.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Mail className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-            <h3 className="text-lg font-medium mb-1">Nenhum relatório agendado</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Crie agendamentos para receber relatórios automáticos por email
-            </p>
-            <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Criar Primeiro Agendamento
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {reports.map(report => {
-            const Icon = getReportIcon(report.report_type);
-            return (
-              <Card key={report.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-5 w-5 text-primary" />
-                      <CardTitle className="text-base">{report.name}</CardTitle>
-                    </div>
-                    <Badge variant={report.is_active ? 'default' : 'secondary'}>
-                      {report.is_active ? 'Ativo' : 'Inativo'}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      <span>{getFrequencyLabel(report.frequency)}</span>
-                      <Clock className="h-4 w-4 ml-2" />
-                      <span>{report.time_of_day}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Mail className="h-4 w-4" />
-                      <span>{report.recipients.join(', ')}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleGenerateNow(report.report_type)}
-                      disabled={generateReport.isPending}
-                    >
-                      <Play className="h-4 w-4 mr-1" />
-                      Gerar Agora
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteReport.mutate(report.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+      {(() => {
+        if (isLoading) return (
+          <div className="grid gap-4 md:grid-cols-2">
+            {[1, 2].map(i => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="p-6">
+                  <div className="h-6 bg-muted rounded w-1/2 mb-4" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
-      )}
+            ))}
+          </div>
+        );
+        if (reports.length === 0) return (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Mail className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+              <h3 className="text-lg font-medium mb-1">Nenhum relatório agendado</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Crie agendamentos para receber relatórios automáticos por email
+              </p>
+              <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Criar Primeiro Agendamento
+              </Button>
+            </CardContent>
+          </Card>
+        );
+        return (
+          <div className="grid gap-4 md:grid-cols-2">
+            {reports.map(report => {
+              const Icon = getReportIcon(report.report_type);
+              return (
+                <Card key={report.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-base">{report.name}</CardTitle>
+                      </div>
+                      <Badge variant={report.is_active ? 'default' : 'secondary'}>
+                        {report.is_active ? 'Ativo' : 'Inativo'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        <span>{getFrequencyLabel(report.frequency)}</span>
+                        <Clock className="h-4 w-4 ml-2" />
+                        <span>{report.time_of_day}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Mail className="h-4 w-4" />
+                        <span>{report.recipients.join(', ')}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleGenerateNow(report.report_type)}
+                        disabled={generateReport.isPending}
+                      >
+                        <Play className="h-4 w-4 mr-1" />
+                        Gerar Agora
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteReport.mutate(report.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        );
+      })()}
     </div>
   );
 }

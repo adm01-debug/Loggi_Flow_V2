@@ -188,14 +188,11 @@ export default function CalendarioLogistico() {
                         </p>
                       </div>
                       <Badge
-                        variant={
-                          e.status === "pendente"
-                            ? "secondary"
-                            : e.status === "finalizada" ||
-                                e.status === "entregue"
-                              ? "default"
-                              : "destructive"
-                        }
+                        variant={((): "secondary" | "default" | "destructive" => {
+                          if (e.status === "pendente") return "secondary";
+                          if (e.status === "finalizada" || e.status === "entregue") return "default";
+                          return "destructive";
+                        })()}
                       >
                         {e.status}
                       </Badge>

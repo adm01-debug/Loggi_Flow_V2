@@ -46,7 +46,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [showPassword, setShowPassword] = React.useState(false);
     const [isFocused, setIsFocused] = React.useState(false);
     const isPassword = type === "password";
-    const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+    const inputType = ((): typeof type => {
+      if (!isPassword) return type;
+      return showPassword ? "text" : "password";
+    })();
 
     const hasValue = props.value !== undefined && props.value !== "";
 

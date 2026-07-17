@@ -230,36 +230,38 @@ export function GeoBlockingPanel() {
           </div>
         </CardHeader>
         <CardContent>
-          {rulesLoading ? (
-            <p className="text-center text-muted-foreground py-4">Carregando...</p>
-          ) : rules.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Globe className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhum país na whitelist</p>
-              <p className="text-sm">Adicione países para habilitar o bloqueio geográfico</p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>País</TableHead><TableHead>Código</TableHead><TableHead>Status</TableHead><TableHead>Adicionado em</TableHead><TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rules.map((rule) => (
-                  <TableRow key={rule.id}>
-                    <TableCell className="font-medium"><div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-muted-foreground" />{rule.country_name}</div></TableCell>
-                    <TableCell><Badge variant="outline">{rule.country_code}</Badge></TableCell>
-                    <TableCell><Switch checked={rule.is_active} onCheckedChange={(checked) => toggleCountryMutation.mutate({ id: rule.id, isActive: checked })} /></TableCell>
-                    <TableCell className="text-muted-foreground">{format(new Date(rule.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setDeleteConfirmId(rule.id)}><Trash2 className="h-4 w-4" /></Button>
-                    </TableCell>
+          {(() => {
+            if (rulesLoading) return <p className="text-center text-muted-foreground py-4">Carregando...</p>;
+            if (rules.length === 0) return (
+              <div className="text-center py-8 text-muted-foreground">
+                <Globe className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Nenhum país na whitelist</p>
+                <p className="text-sm">Adicione países para habilitar o bloqueio geográfico</p>
+              </div>
+            );
+            return (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>País</TableHead><TableHead>Código</TableHead><TableHead>Status</TableHead><TableHead>Adicionado em</TableHead><TableHead className="text-right">Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+                </TableHeader>
+                <TableBody>
+                  {rules.map((rule) => (
+                    <TableRow key={rule.id}>
+                      <TableCell className="font-medium"><div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-muted-foreground" />{rule.country_name}</div></TableCell>
+                      <TableCell><Badge variant="outline">{rule.country_code}</Badge></TableCell>
+                      <TableCell><Switch checked={rule.is_active} onCheckedChange={(checked) => toggleCountryMutation.mutate({ id: rule.id, isActive: checked })} /></TableCell>
+                      <TableCell className="text-muted-foreground">{format(new Date(rule.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setDeleteConfirmId(rule.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            );
+          })()}
         </CardContent>
       </Card>
 

@@ -135,12 +135,11 @@ const TableHead = React.forwardRef<
     onSort?: () => void;
   }
 >(({ className, sortable, sortDirection, onSort, children, ...props }, ref) => {
-  const SortIcon =
-    sortDirection === "asc"
-      ? ArrowUp
-      : sortDirection === "desc"
-        ? ArrowDown
-        : ArrowUpDown;
+  const SortIcon = (() => {
+    if (sortDirection === "asc") return ArrowUp;
+    if (sortDirection === "desc") return ArrowDown;
+    return ArrowUpDown;
+  })();
   return (
     <th
       ref={ref}

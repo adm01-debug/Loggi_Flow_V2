@@ -218,133 +218,65 @@ export default function LogisticaReversa() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {list.isLoading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
+                  {(() => {
+                    if (list.isLoading) return Array.from({ length: 5 }).map((_, i) => (
                       <TableRow key={i}>
                         {Array.from({ length: 7 }).map((_, j) => (
-                          <TableCell key={j}>
-                            <Skeleton className="h-4 w-full" />
-                          </TableCell>
+                          <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                         ))}
                       </TableRow>
-                    ))
-                  ) : filteredData?.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-center py-12 text-muted-foreground"
-                      >
-                        <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                        Nenhuma solicitação de logística reversa encontrada.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredData?.map((item) => (
-                      <TableRow
-                        key={item.id}
-                        className="hover:bg-muted/30 transition-colors"
-                      >
-                        <TableCell className="font-mono text-xs text-muted-foreground">
-                          #{item.id.substring(0, 8)}
+                    ));
+                    if (filteredData?.length === 0) return (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                          <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                          Nenhuma solicitação de logística reversa encontrada.
                         </TableCell>
+                      </TableRow>
+                    );
+                    return filteredData?.map((item) => (
+                      <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
+                        <TableCell className="font-mono text-xs text-muted-foreground">#{item.id.substring(0, 8)}</TableCell>
                         <TableCell>
                           <div className="flex flex-col">
-                            <span className="font-medium">
-                              {item.clientes?.razao_social ||
-                                "Cliente não identificado"}
-                            </span>
-                            <span className="text-xs text-muted-foreground truncate max-w-[200px]">
-                              {item.motivo}
-                            </span>
+                            <span className="font-medium">{item.clientes?.razao_social || "Cliente não identificado"}</span>
+                            <span className="text-xs text-muted-foreground truncate max-w-[200px]">{item.motivo}</span>
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(item.status)}</TableCell>
                         <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={
-                              item.prioridade === "alta"
-                                ? "border-red-500 text-red-500"
-                                : ""
-                            }
-                          >
-                            {item.prioridade}
-                          </Badge>
+                          <Badge variant="outline" className={item.prioridade === "alta" ? "border-red-500 text-red-500" : ""}>{item.prioridade}</Badge>
                         </TableCell>
-                        <TableCell className="text-sm">
-                          {format(
-                            new Date(item.created_at),
-                            "dd/MM/yyyy HH:mm",
-                            { locale: ptBR },
-                          )}
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {item.codigo_rastreio_reverso || "-"}
-                        </TableCell>
+                        <TableCell className="text-sm">{format(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</TableCell>
+                        <TableCell className="font-mono text-xs">{item.codigo_rastreio_reverso || "-"}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
+                              <Button variant="ghost" size="icon"><MoreHorizontal className="w-4 h-4" /></Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
                               <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                              <DropdownMenuItem className="gap-2">
-                                <Search className="w-4 h-4" /> Detalhes
-                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2"><Search className="w-4 h-4" /> Detalhes</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="gap-2 text-blue-500"
-                                onClick={() =>
-                                  updateStatus.mutate({
-                                    id: item.id,
-                                    status: "aprovado",
-                                  })
-                                }
-                              >
+                              <DropdownMenuItem className="gap-2 text-blue-500" onClick={() => updateStatus.mutate({ id: item.id, status: "aprovado" })}>
                                 <CheckCircle2 className="w-4 h-4" /> Aprovar
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="gap-2 text-purple-500"
-                                onClick={() =>
-                                  updateStatus.mutate({
-                                    id: item.id,
-                                    status: "em_transito",
-                                  })
-                                }
-                              >
+                              <DropdownMenuItem className="gap-2 text-purple-500" onClick={() => updateStatus.mutate({ id: item.id, status: "em_transito" })}>
                                 <Truck className="w-4 h-4" /> Em Trânsito
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="gap-2 text-green-500"
-                                onClick={() =>
-                                  updateStatus.mutate({
-                                    id: item.id,
-                                    status: "recebido",
-                                  })
-                                }
-                              >
+                              <DropdownMenuItem className="gap-2 text-green-500" onClick={() => updateStatus.mutate({ id: item.id, status: "recebido" })}>
                                 <Package className="w-4 h-4" /> Recebido
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="gap-2 text-red-500"
-                                onClick={() =>
-                                  updateStatus.mutate({
-                                    id: item.id,
-                                    status: "cancelado",
-                                  })
-                                }
-                              >
+                              <DropdownMenuItem className="gap-2 text-red-500" onClick={() => updateStatus.mutate({ id: item.id, status: "cancelado" })}>
                                 <XCircle className="w-4 h-4" /> Cancelar
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
+                    ));
+                  })()}
                 </TableBody>
               </Table>
             </div>
