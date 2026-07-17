@@ -355,51 +355,47 @@ export default function ExportacaoDados() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-8 text-center text-muted-foreground">Carregando…</div>
-          ) : !rows || rows.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              Nenhum registro encontrado para o filtro atual.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Número</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Transportadora</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Origem → Destino</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rows.slice(0, 100).map((r) => (
-                    <TableRow key={r.id}>
-                      <TableCell className="font-mono text-xs">{r.numero}</TableCell>
-                      <TableCell>
-                        {r.data ? format(parseISO(r.data), "dd/MM/yyyy") : "—"}
-                      </TableCell>
-                      <TableCell>{r.transportadora}</TableCell>
-                      <TableCell className="capitalize">{r.status.replace(/_/g, " ")}</TableCell>
-                      <TableCell className="max-w-[300px] truncate" title={r.origem_destino}>
-                        {r.origem_destino}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {r.valor !== null ? `R$ ${r.valor.toFixed(2)}` : "—"}
-                      </TableCell>
+          {(() => {
+            if (isLoading) return <div className="p-8 text-center text-muted-foreground">Carregando…</div>;
+            if (!rows || rows.length === 0) return (
+              <div className="p-8 text-center text-muted-foreground">
+                Nenhum registro encontrado para o filtro atual.
+              </div>
+            );
+            return (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Número</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Transportadora</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Origem → Destino</TableHead>
+                      <TableHead className="text-right">Valor</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              {rows.length > 100 && (
-                <p className="text-xs text-muted-foreground text-center py-3">
-                  Exibindo 100 de {rows.length} registros. A exportação inclui todos.
-                </p>
-              )}
-            </div>
-          )}
+                  </TableHeader>
+                  <TableBody>
+                    {rows.slice(0, 100).map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="font-mono text-xs">{r.numero}</TableCell>
+                        <TableCell>{r.data ? format(parseISO(r.data), "dd/MM/yyyy") : "—"}</TableCell>
+                        <TableCell>{r.transportadora}</TableCell>
+                        <TableCell className="capitalize">{r.status.replace(/_/g, " ")}</TableCell>
+                        <TableCell className="max-w-[300px] truncate" title={r.origem_destino}>{r.origem_destino}</TableCell>
+                        <TableCell className="text-right">{r.valor !== null ? `R$ ${r.valor.toFixed(2)}` : "—"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {rows.length > 100 && (
+                  <p className="text-xs text-muted-foreground text-center py-3">
+                    Exibindo 100 de {rows.length} registros. A exportação inclui todos.
+                  </p>
+                )}
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>
