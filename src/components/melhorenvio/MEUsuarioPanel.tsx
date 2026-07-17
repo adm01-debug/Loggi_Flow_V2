@@ -19,9 +19,12 @@ export function MEUsuarioPanel() {
 
   const usuario = infoUsuario.data as MEUserInfo | undefined;
   const rawEnderecos = enderecosUsuario.data;
-  const enderecos: MEAddress[] = Array.isArray((rawEnderecos as Record<string, unknown>)?.data)
-    ? (rawEnderecos as Record<string, unknown>).data as MEAddress[]
-    : Array.isArray(rawEnderecos) ? rawEnderecos as MEAddress[] : [];
+  const enderecos: MEAddress[] = (() => {
+    const inner = (rawEnderecos as Record<string, unknown>)?.data;
+    if (Array.isArray(inner)) return inner as MEAddress[];
+    if (Array.isArray(rawEnderecos)) return rawEnderecos as MEAddress[];
+    return [];
+  })();
   const saldo = saldoUsuario.data as MEBalance | undefined;
 
   const isLoading = infoUsuario.isLoading || enderecosUsuario.isLoading || saldoUsuario.isLoading;

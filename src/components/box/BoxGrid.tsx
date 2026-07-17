@@ -102,13 +102,11 @@ export function BoxGrid({ boxes, onBoxClick, onDrop, isLoading }: BoxGridProps) 
             {box.isOccupied ? (
               <>
                 <div className="relative">
-                  {box.isUrgent ? (
-                    <AlertTriangle className="w-6 h-6 text-destructive" />
-                  ) : box.isCrossDocking ? (
-                    <ArrowRightLeft className="w-6 h-6 text-info" />
-                  ) : (
-                    <Package className="w-6 h-6 text-warning" />
-                  )}
+                  {(() => {
+                    if (box.isUrgent) return <AlertTriangle className="w-6 h-6 text-destructive" />;
+                    if (box.isCrossDocking) return <ArrowRightLeft className="w-6 h-6 text-info" />;
+                    return <Package className="w-6 h-6 text-warning" />;
+                  })()}
                   {box.isUrgent && (
                     <motion.div
                       animate={{ scale: [1, 1.2, 1] }}
