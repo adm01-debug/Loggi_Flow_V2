@@ -216,7 +216,8 @@ export function FreightTableManager({ tabelasList, transportadoras, isLoading, o
             </div>
           ))}
         </div>
-      )}
+        );
+      })()}
 
       {sortedData.length > 0 && (
         <Pagination
