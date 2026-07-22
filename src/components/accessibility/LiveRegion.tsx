@@ -49,6 +49,7 @@ export function LiveRegionProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLiveRegion() {
   const context = useContext(LiveRegionContext);
   if (!context) {
@@ -58,6 +59,7 @@ export function useLiveRegion() {
 }
 
 // Hook for announcing route changes
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRouteAnnouncer() {
   const { announce } = useLiveRegion();
 

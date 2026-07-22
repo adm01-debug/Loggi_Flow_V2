@@ -134,6 +134,7 @@ export function InstallPrompt() {
 }
 
 // Hook for checking PWA install state
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePWAInstall() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [canInstall, setCanInstall] = useState(false);

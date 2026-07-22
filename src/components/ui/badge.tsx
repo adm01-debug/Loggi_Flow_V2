@@ -155,4 +155,5 @@ function StatusDot({ status, pulse = true, className, ...props }: StatusDotProps
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Badge, BadgeGroup, StatusDot, badgeVariants };

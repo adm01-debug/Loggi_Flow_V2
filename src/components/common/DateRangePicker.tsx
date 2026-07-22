@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { motion } from "framer-motion";
 
 // Presets de períodos
+// eslint-disable-next-line react-refresh/only-export-components
 export const dateRangePresets = {
   today: () => {
     const today = new Date();

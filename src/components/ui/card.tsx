@@ -312,5 +312,6 @@ export {
   StatCard, 
   MagneticCard,
   GlassCard,
+  // eslint-disable-next-line react-refresh/only-export-components
   cardVariants 
 };

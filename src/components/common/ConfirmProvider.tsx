@@ -28,6 +28,7 @@ interface ConfirmContextType {
 
 const ConfirmContext = createContext<ConfirmContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const typeConfig = {
   danger: { icon: Trash2, iconClass: "text-destructive", buttonClass: "bg-destructive hover:bg-destructive/90", bgClass: "bg-destructive/10", borderClass: "border-destructive/20", pulseClass: "animate-pulse-destructive" },
   warning: { icon: AlertTriangle, iconClass: "text-warning", buttonClass: "bg-warning hover:bg-warning/90 text-warning-foreground", bgClass: "bg-warning/10", borderClass: "border-warning/20", pulseClass: "" },
@@ -181,6 +182,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useConfirm() {
   const context = useContext(ConfirmContext);
   if (!context) throw new Error("useConfirm must be used within a ConfirmProvider");

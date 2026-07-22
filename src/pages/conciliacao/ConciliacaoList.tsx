@@ -82,4 +82,5 @@ export function ConciliacaoList({ conciliacoes, isLoading, selectedId, onSelect 
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { TIPOS_CONCILIACAO };

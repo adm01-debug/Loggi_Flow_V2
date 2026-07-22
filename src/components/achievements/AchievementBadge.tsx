@@ -18,6 +18,7 @@ export interface AchievementBadgeData {
   maxProgress?: number;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const rarityConfig = {
   common: {
     border: "border-muted-foreground/30",
