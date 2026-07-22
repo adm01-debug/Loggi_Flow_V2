@@ -102,6 +102,7 @@ export function ConfirmDialog({
 }
 
 // Re-export sub-components for backward compatibility
+// eslint-disable-next-line react-refresh/only-export-components
 export { ConfirmProvider, useConfirm } from "./ConfirmProvider";
 export { DeleteButton } from "./DeleteButton";
 export { InlineConfirm } from "./InlineConfirm";

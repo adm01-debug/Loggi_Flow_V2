@@ -145,6 +145,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
 
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useErrorHandler() {
   const [error, setError] = useState<Error | null>(null);
 

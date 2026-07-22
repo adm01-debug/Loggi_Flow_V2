@@ -56,11 +56,13 @@ export function ReducedMotionProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useReducedMotion() {
   return useContext(ReducedMotionContext);
 }
 
 // Hook for conditional animations
+// eslint-disable-next-line react-refresh/only-export-components
 export function useMotionVariants<T extends Record<string, unknown>>(
   animatedVariants: T,
   reducedVariants?: T

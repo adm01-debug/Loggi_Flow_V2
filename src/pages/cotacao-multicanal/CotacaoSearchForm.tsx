@@ -115,4 +115,5 @@ export function CotacaoSearchForm(props: CotacaoSearchFormProps) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { ESTADOS_BRASIL };

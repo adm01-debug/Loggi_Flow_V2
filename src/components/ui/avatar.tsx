@@ -295,5 +295,6 @@ export {
   AvatarFallback, 
   AvatarGroup,
   AvatarBadge,
+  // eslint-disable-next-line react-refresh/only-export-components
   avatarVariants,
 };

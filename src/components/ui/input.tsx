@@ -173,4 +173,5 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 );
 SearchInput.displayName = "SearchInput";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Input, SearchInput, inputVariants };
