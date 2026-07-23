@@ -24,10 +24,10 @@ const FACTOR_META: Record<string, { icon: LucideIcon; label: string; hint: strin
   tempo_transito: { icon: Timer, label: "Tempo em Trânsito", hint: "Dias desde o despacho" },
 };
 
-const impactoClass = (impacto: PredictionFactor["impacto"]) => {
-  if (impacto === "negativo") return "bg-destructive";
-  if (impacto === "positivo") return "bg-success";
-  return "bg-muted-foreground";
+const impactoColor = (impacto: PredictionFactor["impacto"]): "danger" | "success" | "default" => {
+  if (impacto === "negativo") return "danger";
+  if (impacto === "positivo") return "success";
+  return "default";
 };
 
 export function PredictionExplainability({ fatores }: PredictionExplainabilityProps) {
