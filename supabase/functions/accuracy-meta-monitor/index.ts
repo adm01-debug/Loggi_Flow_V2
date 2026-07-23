@@ -41,7 +41,7 @@ export const handler = async (req: Request): Promise<Response> => {
 
     const { data: settings, error: sErr } = await supabase
       .from("prediction_accuracy_settings")
-      .select("user_id, transportadora, target_pct, consecutive_days_alert");
+      .select("user_id, transportadora, target_pct, consecutive_days_alert, notify_email, notify_whatsapp, email, whatsapp_phone");
 
     if (sErr) throw sErr;
 
