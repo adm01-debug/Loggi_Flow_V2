@@ -200,15 +200,37 @@ interface MitigationListProps {
   currentOtif?: number | null;
 }
 function MitigationList({ report, currentOtif }: MitigationListProps) {
-  const { create } = useMitigationActions();
+  const { create, list } = useMitigationActions();
   const suggestions = buildMitigations(report);
-  if (!suggestions.length) return null;
-  const sorted = [...suggestions].sort((a, b) => b.impactScore - a.impactScore);
+
+  const roiReport = useMemo(() => {
+    const rows = list.data ?? [];
+    const records: MitigationRecord[] = rows.map((r) => ({
+      category: r.category,
+      priority: r.priority,
+      status: r.status,
+      impact_score: r.impact_score,
+      otif_before: r.otif_before,
+      otif_after: r.otif_after,
+      otif_delta: r.otif_delta,
+    }));
+    return computeROI(records);
+  }, [list.data]);
+
+  const sorted: RankedMitigation[] = useMemo(
+    () => rerankByROI(suggestions, roiReport),
+    [suggestions, roiReport],
+  );
+
+  if (!sorted.length) return null;
   return (
     <div className="space-y-3 border-t pt-4">
       <div className="flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-primary" />
         <h3 className="text-sm font-semibold">Ações recomendadas</h3>
+        <Badge variant="outline" className="ml-auto text-[10px]">
+          Reordenado por ROI histórico ({roiReport.totalMeasured} medidas)
+        </Badge>
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {sorted.map((s) => (
@@ -221,9 +243,14 @@ function MitigationList({ report, currentOtif }: MitigationListProps) {
                 <p className="font-medium">{s.headline}</p>
               </div>
               <Badge variant={PRIORITY_BADGE[s.priority]} className="shrink-0">
-                {PRIORITY_LABELS[s.priority]} · {s.impactScore}
+                {PRIORITY_LABELS[s.priority]} · {s.effectiveScore}
               </Badge>
             </div>
+            {s.roiMeasured > 0 && s.roiAdjustment !== 0 ? (
+              <p className={`mt-1 text-[11px] font-medium ${s.roiAdjustment > 0 ? "text-success" : "text-destructive"}`}>
+                {s.roiAdjustment > 0 ? "▲" : "▼"} ROI histórico: Δ {s.roiAvgDelta?.toFixed(1)}% ({s.roiAdjustment > 0 ? "+" : ""}{s.roiAdjustment} pts)
+              </p>
+            ) : null}
             <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
               {s.actions.map((a) => (
                 <li key={a} className="flex gap-2">
