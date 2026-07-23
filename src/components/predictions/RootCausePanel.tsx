@@ -11,6 +11,7 @@ import { ROOT_CAUSE_LABELS, type RootCauseCategory } from "@/lib/predictions/roo
 import { buildMitigations, rerankByROI, PRIORITY_LABELS, type MitigationPriority, type RankedMitigation } from "@/lib/predictions/mitigationRecommender";
 import { computeROI, type MitigationRecord } from "@/lib/predictions/mitigationROI";
 import { useMitigationActions } from "@/hooks/predictions/useMitigationActions";
+import { WhatIfPanel } from "./WhatIfPanel";
 
 const WINDOW_OPTIONS = [
   { value: "7", label: "Últimos 7 dias" },
@@ -288,6 +289,7 @@ function MitigationList({ report, currentOtif }: MitigationListProps) {
           </div>
         ))}
       </div>
+      <WhatIfPanel ranked={sorted} baselineOtif={currentOtif ?? null} />
     </div>
   );
 }
