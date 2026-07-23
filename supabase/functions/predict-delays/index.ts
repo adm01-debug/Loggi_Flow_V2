@@ -185,7 +185,7 @@ export const handler = async (req: Request) => {
       coletas: coletasForAnalysis,
       stats: { delayRate: delayRate.toFixed(1), occurrences: occurrenceStats },
     })}
-    Retorne um JSON array (max 10 itens críticos):
+    Retorne um JSON array (max 10 itens críticos). Para "fatores", use APENAS estes nomes: "clima", "historico_transportadora", "distancia", "horario", "sazonalidade", "ocorrencias_recentes", "tempo_transito". Peso 0-100, impacto "positivo"|"negativo"|"neutro":
     [{
       "id": "uuid",
       "numero": "string",
@@ -194,7 +194,8 @@ export const handler = async (req: Request) => {
       "probabilidade_atraso": 0-100,
       "motivos": ["string"],
       "recomendacoes": ["string"],
-      "horas_estimadas_atraso": number
+      "horas_estimadas_atraso": number,
+      "fatores": [{"nome": "string", "peso": 0-100, "impacto": "positivo"|"negativo"|"neutro", "descricao": "string"}]
     }]`;
 
     const aiResponse = await withCircuitBreaker("ai-gateway", async () => {
