@@ -2,16 +2,25 @@
  * WhatIfPanel — Simulador de impacto combinado de mitigações selecionadas.
  * Determinístico (via simulateWhatIf), sem I/O.
  */
-import { useMemo, useState } from "react";
-import { FlaskConical, Sparkles, TrendingUp } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FlaskConical, Sparkles, Star, Trash2, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/common/EmptyState";
 import { simulateWhatIf } from "@/lib/predictions/whatIfSimulator";
 import { ROOT_CAUSE_LABELS, type RootCauseCategory } from "@/lib/predictions/rootCauseAnalyzer";
 import type { RankedMitigation } from "@/lib/predictions/mitigationRecommender";
+import {
+  deleteScenario,
+  listScenarios,
+  saveScenario,
+  type SavedScenario,
+} from "@/lib/predictions/whatIfScenarios";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface WhatIfPanelProps {
@@ -19,8 +28,20 @@ interface WhatIfPanelProps {
   baselineOtif: number | null | undefined;
 }
 
+const getStore = (): Storage | null => {
+  if (typeof window === "undefined") return null;
+  try { return window.localStorage; } catch { return null; }
+};
+
 export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
   const [selected, setSelected] = useState<Set<RootCauseCategory>>(new Set());
+  const [scenarios, setScenarios] = useState<SavedScenario[]>([]);
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const store = getStore();
+    if (store) setScenarios(listScenarios(store));
+  }, []);
 
   const projection = useMemo(
     () => simulateWhatIf(ranked, selected, baselineOtif ?? 0),
