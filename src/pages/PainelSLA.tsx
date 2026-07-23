@@ -417,7 +417,10 @@ export default function PainelSLA() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <CarrierAccuracyPanel />
     </div>
+
   );
 }
 
