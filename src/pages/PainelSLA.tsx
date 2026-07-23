@@ -28,6 +28,7 @@ import { AccuracyMetaCycleWidget } from "@/components/predictions/AccuracyMetaCy
 import { AccuracyMetaAuditPanel } from "@/components/predictions/AccuracyMetaAuditPanel";
 import { ChannelHealthPanel } from "@/components/predictions/ChannelHealthPanel";
 import { DigestPreviewPanel } from "@/components/predictions/DigestPreviewPanel";
+import { RootCausePanel } from "@/components/predictions/RootCausePanel";
 
 type Risco = "critico" | "alto" | "medio" | "ok";
 
@@ -430,6 +431,7 @@ export default function PainelSLA() {
       <DigestPreviewPanel />
       <AccuracyMetaAuditPanel />
       <CarrierAccuracyPanel />
+      <RootCausePanel />
     </div>
 
 
