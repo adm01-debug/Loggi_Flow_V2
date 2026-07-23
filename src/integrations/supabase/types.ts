@@ -3215,6 +3215,36 @@ export type Database = {
         }
         Relationships: []
       }
+      prediction_accuracy_settings: {
+        Row: {
+          consecutive_days_alert: number
+          created_at: string
+          id: string
+          target_pct: number
+          transportadora: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consecutive_days_alert?: number
+          created_at?: string
+          id?: string
+          target_pct?: number
+          transportadora?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consecutive_days_alert?: number
+          created_at?: string
+          id?: string
+          target_pct?: number
+          transportadora?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -5491,6 +5521,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      count_prediction_breach_days: {
+        Args: { _carrier?: string; _target: number }
+        Returns: number
       }
       detect_health_score_regression: {
         Args: { p_threshold?: number }
