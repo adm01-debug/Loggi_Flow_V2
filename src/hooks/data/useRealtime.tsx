@@ -125,6 +125,7 @@ export function useRealtime<T = Record<string, unknown>>({
           break;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [queryKey, queryClient, onInsert, onUpdate, onDelete, table],
   );
 

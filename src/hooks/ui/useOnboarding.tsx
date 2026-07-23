@@ -213,8 +213,10 @@ export function useOnboarding() {
     if (user?.id && !isLoading && progress === null) {
       initializeMutation.mutate();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, isLoading, progress]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const completedSteps = progress?.completed_steps || [];
   const currentStepIndex = progress?.current_step || 0;
   const isCompleted = progress?.completed_at !== null;

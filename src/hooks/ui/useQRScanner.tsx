@@ -139,6 +139,7 @@ export function useQRScanner(options: UseQRScannerOptions = {}) {
     }
 
     animationRef.current = requestAnimationFrame(scanFrame);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isScanning, continuous, detectBarcode, onScan]);
 
   // Start scanning
@@ -234,6 +235,7 @@ export function useQRScanner(options: UseQRScannerOptions = {}) {
     return () => {
       stopScanning();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Check if BarcodeDetector is supported

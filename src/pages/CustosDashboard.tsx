@@ -58,6 +58,7 @@ export default function CustosDashboard() {
     to: new Date(),
   });
   const startDate = dateRange?.from || subDays(new Date(), 90);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const endDate = dateRange?.to || new Date();
   const { costsByCarrier, costsByRoute, summary, isLoading, entregas } =
     useLogisticsCosts(startDate, endDate);

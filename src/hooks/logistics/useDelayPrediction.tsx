@@ -133,6 +133,7 @@ export function useDelayPrediction() {
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getRiskColor = useCallback((risco: DelayPrediction['risco']) => {

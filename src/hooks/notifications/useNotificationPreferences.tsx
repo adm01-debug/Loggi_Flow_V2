@@ -93,6 +93,7 @@ export function useNotificationPreferences() {
     staleTime: QUERY_STALE_TIME.USER,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const preferences: NotificationPreferences = dbPreferences
     ? {
         notifications_email: dbPreferences.notifications_email,

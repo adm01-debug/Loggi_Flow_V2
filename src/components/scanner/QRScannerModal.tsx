@@ -74,6 +74,7 @@ export function QRScannerModal({
     return () => {
       stopScanning();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, hasPermission]);
 
   const handleClose = () => {

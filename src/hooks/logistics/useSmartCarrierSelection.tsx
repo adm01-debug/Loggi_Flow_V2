@@ -100,6 +100,7 @@ export const useSmartCarrierSelection = () => {
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logTelemetry]);
 
   const clearResult = () => {

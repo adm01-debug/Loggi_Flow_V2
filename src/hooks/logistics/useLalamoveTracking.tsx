@@ -403,6 +403,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
         setError(errorMessage);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, orderDetails, useSandbox, coletaId]);
 
   // Start tracking
