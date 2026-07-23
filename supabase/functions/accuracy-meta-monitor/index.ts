@@ -5,6 +5,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
+import { decideEscalation, DEFAULT_ESCALATION, HistoricalNotification } from "./escalation.ts";
 
 interface SettingsRow {
   user_id: string;
@@ -163,8 +164,31 @@ export const handler = async (req: Request): Promise<Response> => {
       }
       created++;
 
-      // ─── Sprint P #10: dispatch canais externos (fire-and-forget) ───
+      // ─── Sprint P #10 + #13: dispatch canais externos + escalonamento WhatsApp ───
       const channels = resolveChannels(s);
+
+      // Sprint P #13: escalonamento — busca 72h de histórico para decidir escalar WA
+      const escalationWindowStart = new Date(
+        Date.now() - DEFAULT_ESCALATION.windowHours * 60 * 60 * 1000,
+      ).toISOString();
+      const { data: escalationHistory } = await supabase
+        .from("notifications")
+        .select("id, created_at, read, metadata")
+        .eq("user_id", s.user_id)
+        .gte("created_at", escalationWindowStart)
+        .contains("metadata", { source: "accuracy-meta-monitor" });
+
+      const decision = decideEscalation(
+        (escalationHistory ?? []) as HistoricalNotification[],
+        carrierTag,
+        new Date(),
+      );
+
+      const phoneDigits = (s.whatsapp_phone ?? "").replace(/\D/g, "");
+      const phoneOk = phoneDigits.length >= 10 && phoneDigits.length <= 15;
+      const shouldEscalateWhatsapp =
+        decision.escalate && phoneOk && !channels.whatsapp;
+
       const dispatched: Record<string, string> = {};
 
       if (channels.email) {
@@ -182,15 +206,19 @@ export const handler = async (req: Request): Promise<Response> => {
         }
       }
 
-      if (channels.whatsapp) {
+      const whatsappTarget = channels.whatsapp ?? (shouldEscalateWhatsapp ? phoneDigits : null);
+      if (whatsappTarget) {
         try {
+          const escalationSuffix = shouldEscalateWhatsapp
+            ? ` [ESCALONADO: ${decision.ignoredCount} email(s) não lido(s) em ${DEFAULT_ESCALATION.windowHours}h]`
+            : "";
           const { error: wErr } = await supabase.functions.invoke("whatsapp-notification", {
             body: {
               action: "send_custom",
-              phone: channels.whatsapp,
+              phone: whatsappTarget,
               template: "accuracy_meta_alert",
               variables: {
-                title: payload.title,
+                title: payload.title + escalationSuffix,
                 message: payload.message,
                 carrier: carrierLabel,
                 target: String(s.target_pct),
@@ -198,22 +226,38 @@ export const handler = async (req: Request): Promise<Response> => {
               },
             },
           });
-          dispatched.whatsapp = wErr ? `error:${wErr.message}` : "ok";
+          dispatched.whatsapp = wErr
+            ? `error:${wErr.message}`
+            : shouldEscalateWhatsapp ? "ok:escalated" : "ok";
         } catch (e) {
           dispatched.whatsapp = `throw:${e instanceof Error ? e.message : String(e)}`;
         }
       }
 
-      if (Object.keys(dispatched).length > 0) {
+      if (Object.keys(dispatched).length > 0 || shouldEscalateWhatsapp) {
         await supabase
           .from("notifications")
           .update({
-            metadata: { ...payload.metadata, channels: dispatched },
+            metadata: {
+              ...payload.metadata,
+              channels: dispatched,
+              escalation: {
+                escalated: shouldEscalateWhatsapp,
+                ignored_count: decision.ignoredCount,
+                reason: decision.reason,
+                window_hours: DEFAULT_ESCALATION.windowHours,
+              },
+            },
           })
           .eq("user_id", s.user_id)
           .eq("title", payload.title)
           .gte("created_at", new Date(Date.now() - 60_000).toISOString());
-        log.info("external channels dispatched", { user: s.user_id, dispatched });
+        log.info("external channels dispatched", {
+          user: s.user_id,
+          dispatched,
+          escalated: shouldEscalateWhatsapp,
+          ignored: decision.ignoredCount,
+        });
       }
     }
 
