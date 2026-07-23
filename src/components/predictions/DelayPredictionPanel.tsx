@@ -21,11 +21,14 @@ import {
   ChevronUp,
   Lightbulb,
   Zap,
+  Target,
 } from "lucide-react";
 import {
   useDelayPrediction,
   DelayPrediction,
 } from "@/hooks/logistics/useDelayPrediction";
+import { usePredictionAccuracy } from "@/hooks/logistics/usePredictionAccuracy";
+import { PredictionExplainability } from "./PredictionExplainability";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
