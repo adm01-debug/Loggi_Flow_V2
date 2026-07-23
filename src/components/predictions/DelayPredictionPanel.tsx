@@ -44,10 +44,11 @@ export function DelayPredictionPanel() {
     isCached,
   } = useDelayPrediction();
 
+  const { last7Days, last30Days, isLoading: accLoading } = usePredictionAccuracy();
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Tenta carregar predições em cache ao montar o componente
     if (predictions.length === 0) {
       analyzeDelays(false);
     }
