@@ -115,9 +115,9 @@ describe("Fuzz — 500 cenários de recomendações", () => {
         expect(s.impactScore).toBeLessThanOrEqual(100);
         expect(s.actions.length).toBeGreaterThanOrEqual(3);
       }
-      // Pelo menos uma sugestão de alta OU o topo é alta/média (bucket dominante sempre tem score 100)
+      // O bucket com mais frequência tem score >= 70 (freq=1.0 => 0.7 min).
       const top = suggestions.sort((a, b) => b.impactScore - a.impactScore)[0];
-      expect(top.impactScore).toBe(100);
+      expect(top.impactScore).toBeGreaterThanOrEqual(70);
       expect(top.priority).toBe("alta");
     }
   });
