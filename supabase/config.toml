@@ -8,6 +8,9 @@ import_map = "supabase/functions/import_map.json"
 verify_jwt = true
 import_map = "supabase/functions/import_map.json"
 
+[functions.predict-delays-scheduled]
+verify_jwt = false
+
 [functions.smart-carrier-selection]
 verify_jwt = true
 import_map = "supabase/functions/import_map.json"
