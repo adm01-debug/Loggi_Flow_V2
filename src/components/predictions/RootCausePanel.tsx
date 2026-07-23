@@ -7,6 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useRootCauseAnalysis } from "@/hooks/logistics/useRootCauseAnalysis";
 import { ROOT_CAUSE_LABELS, type RootCauseCategory } from "@/lib/predictions/rootCauseAnalyzer";
+import { buildMitigations, PRIORITY_LABELS, type MitigationPriority } from "@/lib/predictions/mitigationRecommender";
+import { Lightbulb } from "lucide-react";
 
 const WINDOW_OPTIONS = [
   { value: "7", label: "Últimos 7 dias" },
@@ -111,6 +113,7 @@ export function RootCausePanel({ transportadora, availableCarriers = [] }: RootC
                 />
               ))}
             </div>
+            <MitigationList report={data} />
           </>
         )}
       </CardContent>
