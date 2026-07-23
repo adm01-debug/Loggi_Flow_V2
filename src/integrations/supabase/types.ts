@@ -1849,6 +1849,7 @@ export type Database = {
           probabilidade_atraso: number
           recomendacoes: Json
           risco: string
+          transportadora: string | null
           was_accurate: boolean | null
         }
         Insert: {
@@ -1866,6 +1867,7 @@ export type Database = {
           probabilidade_atraso: number
           recomendacoes?: Json
           risco: string
+          transportadora?: string | null
           was_accurate?: boolean | null
         }
         Update: {
@@ -1883,6 +1885,7 @@ export type Database = {
           probabilidade_atraso?: number
           recomendacoes?: Json
           risco?: string
+          transportadora?: string | null
           was_accurate?: boolean | null
         }
         Relationships: []
@@ -5404,6 +5407,19 @@ export type Database = {
         }
         Relationships: []
       }
+      v_prediction_accuracy_by_carrier: {
+        Row: {
+          acuracia_percentual: number | null
+          desvio_medio_horas: number | null
+          risco: string | null
+          total_acertos: number | null
+          total_confirmadas: number | null
+          total_predicoes: number | null
+          transportadora: string | null
+          ultima_predicao: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_xp: {
@@ -5550,6 +5566,10 @@ export type Database = {
           table_name: string
           table_size_bytes: number
         }[]
+      }
+      get_calibrated_tolerance: {
+        Args: { _transportadora: string }
+        Returns: number
       }
       get_capacity_forecast_fast: {
         Args: { p_hours_ahead?: number }

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { CarrierAccuracyPanel } from "@/components/predictions/CarrierAccuracyPanel";
 
 type Risco = "critico" | "alto" | "medio" | "ok";
 
@@ -417,7 +418,10 @@ export default function PainelSLA() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <CarrierAccuracyPanel />
     </div>
+
   );
 }
 
