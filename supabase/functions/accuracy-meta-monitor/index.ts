@@ -62,7 +62,7 @@ export const handler = async (req: Request): Promise<Response> => {
         { _target: s.target_pct, _carrier: s.transportadora },
       );
       if (bErr) {
-        log.error(, "breach RPC failed", { user: s.user_id, err: bErr.message });
+        log.error("breach RPC failed", { user: s.user_id, err: bErr.message });
         continue;
       }
       const days = Number(breach ?? 0);
@@ -134,7 +134,7 @@ export const handler = async (req: Request): Promise<Response> => {
           })
           .eq("id", target.id);
         if (uErr) {
-          log.error(, "notification update failed", { user: s.user_id, err: uErr.message });
+          log.error("notification update failed", { user: s.user_id, err: uErr.message });
           continue;
         }
         updated++;
@@ -143,13 +143,13 @@ export const handler = async (req: Request): Promise<Response> => {
 
       const { error: nErr } = await supabase.from("notifications").insert(payload);
       if (nErr) {
-        log.error(, "notification insert failed", { user: s.user_id, err: nErr.message });
+        log.error("notification insert failed", { user: s.user_id, err: nErr.message });
         continue;
       }
       created++;
     }
 
-    log.info(, "accuracy-meta-monitor complete", {
+    log.info("accuracy-meta-monitor complete", {
       evaluated: rows.length,
       groups: seen.size,
       notifications_created: created,
@@ -170,7 +170,7 @@ export const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    log.error(, "accuracy-meta-monitor failure", { error: message });
+    log.error("accuracy-meta-monitor failure", { error: message });
     return new Response(
       JSON.stringify({ success: false, message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
