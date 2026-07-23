@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { CarrierAccuracyPanel } from "@/components/predictions/CarrierAccuracyPanel";
+import { PredictionAccuracyTimeline } from "@/components/predictions/PredictionAccuracyTimeline";
 
 type Risco = "critico" | "alto" | "medio" | "ok";
 
