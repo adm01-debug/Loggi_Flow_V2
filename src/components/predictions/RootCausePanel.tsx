@@ -289,6 +289,7 @@ function MitigationList({ report, currentOtif }: MitigationListProps) {
           </div>
         ))}
       </div>
+      <WhatIfPanel ranked={sorted} baselineOtif={currentOtif ?? null} />
     </div>
   );
 }
