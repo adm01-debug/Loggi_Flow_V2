@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { CarrierAccuracyPanel } from "@/components/predictions/CarrierAccuracyPanel";
 import { PredictionAccuracyTimeline } from "@/components/predictions/PredictionAccuracyTimeline";
+import { AccuracyMetaCycleWidget } from "@/components/predictions/AccuracyMetaCycleWidget";
 
 type Risco = "critico" | "alto" | "medio" | "ok";
 
