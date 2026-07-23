@@ -7,6 +7,33 @@ export interface SettingRow {
   transportadora: string | null;
   target_pct: number;
   consecutive_days_alert: number;
+  notify_email?: boolean;
+  notify_whatsapp?: boolean;
+  email?: string | null;
+  whatsapp_phone?: string | null;
+}
+
+/** Canais externos habilitados para um alerta recém-inserido. */
+export interface ExternalChannels {
+  email: string | null;
+  whatsapp: string | null;
+}
+
+/**
+ * Resolve canais externos válidos para uma configuração.
+ * - Retorna null quando o toggle está desligado, credencial ausente ou inválida.
+ * - Email exige formato mínimo `x@y.z`.
+ * - WhatsApp exige 10+ dígitos após remover não-numéricos.
+ */
+export function resolveChannels(s: SettingRow): ExternalChannels {
+  const emailRaw = (s.email ?? "").trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw);
+  const phoneDigits = (s.whatsapp_phone ?? "").replace(/\D/g, "");
+  const phoneOk = phoneDigits.length >= 10 && phoneDigits.length <= 15;
+  return {
+    email: s.notify_email && emailOk ? emailRaw : null,
+    whatsapp: s.notify_whatsapp && phoneOk ? phoneDigits : null,
+  };
 }
 
 export interface NotificationRow {
