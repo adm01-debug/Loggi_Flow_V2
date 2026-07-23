@@ -20,6 +20,7 @@ import {
   saveScenario,
   type SavedScenario,
 } from "@/lib/predictions/whatIfScenarios";
+import { compareScenarios, toScenarioLike, type ScenarioLike } from "@/lib/predictions/whatIfCompare";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,8 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
   const [selected, setSelected] = useState<Set<RootCauseCategory>>(new Set());
   const [scenarios, setScenarios] = useState<SavedScenario[]>([]);
   const [name, setName] = useState("");
+  const [pickA, setPickA] = useState<string>("");
+  const [pickB, setPickB] = useState<string>("__current__");
 
   useEffect(() => {
     const store = getStore();
@@ -83,6 +86,30 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
   }, []);
 
   const canSave = projection.selectedCount > 0 && name.trim().length > 0;
+
+  const currentAsScenario: ScenarioLike = useMemo(() => ({
+    id: "__current__",
+    name: "Seleção atual",
+    baselineOtif: projection.baselineOtif,
+    projectedOtif: projection.projectedOtif,
+    totalGain: projection.totalGain,
+    confidence: projection.confidence,
+    categories: projection.contributions.map((c) => c.category),
+  }), [projection]);
+
+  const resolveScenario = useCallback((id: string): ScenarioLike | null => {
+    if (!id) return null;
+    if (id === "__current__") return currentAsScenario;
+    const s = scenarios.find((x) => x.id === id);
+    return s ? toScenarioLike(s) : null;
+  }, [scenarios, currentAsScenario]);
+
+  const diff = useMemo(() => {
+    const A = resolveScenario(pickA);
+    const B = resolveScenario(pickB);
+    if (!A || !B || A.id === B.id) return null;
+    return compareScenarios(A, B);
+  }, [pickA, pickB, resolveScenario]);
 
   return (
     <Card className="card-raised">
@@ -221,9 +248,107 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
                 </ul>
               )}
             </div>
+
+            {scenarios.length > 0 && (
+              <div className="rounded-lg border bg-muted/10 p-3 space-y-3">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Sparkles className="h-4 w-4 text-primary" /> Comparar cenários
+                </div>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <select
+                    className="rounded-md border bg-background px-2 py-1 text-sm"
+                    value={pickA}
+                    onChange={(e) => setPickA(e.target.value)}
+                    aria-label="Cenário A"
+                  >
+                    <option value="">— Cenário A —</option>
+                    {scenarios.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                  <select
+                    className="rounded-md border bg-background px-2 py-1 text-sm"
+                    value={pickB}
+                    onChange={(e) => setPickB(e.target.value)}
+                    aria-label="Cenário B"
+                  >
+                    <option value="__current__">Seleção atual</option>
+                    {scenarios.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+                {diff ? (
+                  <div className="space-y-2 rounded-md border bg-background p-3 text-sm">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-medium">
+                        {diff.a.name} <span className="text-muted-foreground">vs</span> {diff.b.name}
+                      </span>
+                      <Badge variant={diff.winner === "tie" ? "outline" : "default"}>
+                        Vencedor: {diff.winner === "tie" ? "empate" : (diff.winner === "a" ? diff.a.name : diff.b.name)}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                      <Metric label="Δ OTIF proj." value={diff.projectedDelta} suffix="pts" />
+                      <Metric label="Δ Ganho" value={diff.gainDelta} suffix="pts" />
+                      <Metric label="Δ Confiança" value={diff.confidenceDelta * 100} suffix="%" digits={0} />
+                      <Metric label="Similaridade" value={diff.jaccard * 100} suffix="%" digits={0} neutral />
+                    </div>
+                    {Math.abs(diff.baselineDrift) > 0.01 && (
+                      <p className="text-xs text-warning">
+                        ⚠ Baseline diferente entre cenários (drift {diff.baselineDrift > 0 ? "+" : ""}{diff.baselineDrift} pts) — comparação pode ser enviesada.
+                      </p>
+                    )}
+                    <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-3">
+                      <CatList title="Compartilhadas" items={diff.sharedCategories} />
+                      <CatList title={`Só em ${diff.a.name}`} items={diff.onlyInA} />
+                      <CatList title={`Só em ${diff.b.name}`} items={diff.onlyInB} />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Selecione dois cenários distintos para ver o diff.
+                  </p>
+                )}
+              </div>
+            )}
           </>
         )}
       </CardContent>
     </Card>
+  );
+}
+
+interface MetricProps { label: string; value: number; suffix?: string; digits?: number; neutral?: boolean }
+function Metric({ label, value, suffix = "", digits = 2, neutral = false }: MetricProps) {
+  const positive = value > 0.005;
+  const negative = value < -0.005;
+  const color = neutral ? "text-foreground" : positive ? "text-success" : negative ? "text-destructive" : "text-muted-foreground";
+  return (
+    <div className="rounded border bg-muted/20 p-2">
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className={cn("font-semibold tabular-nums", color)}>
+        {positive ? "+" : ""}{value.toFixed(digits)}{suffix}
+      </p>
+    </div>
+  );
+}
+
+function CatList({ title, items }: { title: string; items: readonly RootCauseCategory[] }) {
+  return (
+    <div className="rounded border bg-muted/10 p-2">
+      <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">{title}</p>
+      {items.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">—</p>
+      ) : (
+        <div className="flex flex-wrap gap-1">
+          {items.map((c) => (
+            <Badge key={c} variant="outline" className="text-[10px]">
+              {ROOT_CAUSE_LABELS[c]}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
