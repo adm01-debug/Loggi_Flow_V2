@@ -30,6 +30,7 @@ import { ChannelHealthPanel } from "@/components/predictions/ChannelHealthPanel"
 import { DigestPreviewPanel } from "@/components/predictions/DigestPreviewPanel";
 import { RootCausePanel } from "@/components/predictions/RootCausePanel";
 import { MitigationHistoryPanel } from "@/components/predictions/MitigationHistoryPanel";
+import { MitigationROIPanel } from "@/components/predictions/MitigationROIPanel";
 
 type Risco = "critico" | "alto" | "medio" | "ok";
 
@@ -434,6 +435,7 @@ export default function PainelSLA() {
       <CarrierAccuracyPanel />
       <RootCausePanel currentOtif={stats.onTimePct} />
       <MitigationHistoryPanel currentOtif={stats.onTimePct} />
+      <MitigationROIPanel />
     </div>
 
 
