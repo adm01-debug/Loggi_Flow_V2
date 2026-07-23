@@ -75,6 +75,8 @@ export function PredictionAccuracyTimeline() {
     () => (carrier === ALL ? daily.data ?? [] : carrierSeries.data ?? []),
     [carrier, daily.data, carrierSeries.data],
   );
+  const isLoading = carrier === ALL ? daily.isLoading : carrierSeries.isLoading;
+
 
 
   const chartData = useMemo(
