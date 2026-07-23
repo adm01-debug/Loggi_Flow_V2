@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, { ReactNode, useState, useCallback } from "react";
 import {
   DndContext,

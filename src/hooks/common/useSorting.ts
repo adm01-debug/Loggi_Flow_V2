@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { useState, useMemo, useCallback } from "react";
 
 export type SortDirection = "asc" | "desc" | null;

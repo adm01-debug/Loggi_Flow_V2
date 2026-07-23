@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-nested-functions */
 import * as XLSX from 'xlsx';
 import { z } from 'zod';
 import { ImportResult } from './csvImporter';

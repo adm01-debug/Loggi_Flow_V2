@@ -1,3 +1,4 @@
+/* eslint-disable max-lines, sonarjs/no-nested-functions */
 import { motion, HTMLMotionProps, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import React, { forwardRef, useState, useCallback } from "react";

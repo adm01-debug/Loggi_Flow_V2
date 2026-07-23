@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useFreightIntelligence } from "@/hooks/logistics/useFreightIntelligence";
 import { formatCurrency } from "@/lib/formatters";

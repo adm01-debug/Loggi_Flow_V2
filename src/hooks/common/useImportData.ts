@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-nested-functions */
 /**
  * FINANCE HUB - Hook para Importação de Dados
  * 

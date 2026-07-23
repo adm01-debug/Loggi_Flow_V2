@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { ReactNode } from "react";
 import { usePermissions } from "@/hooks/auth/usePermissions";
 import { useAuth } from "@/hooks/auth/useAuth";

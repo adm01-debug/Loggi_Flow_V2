@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";

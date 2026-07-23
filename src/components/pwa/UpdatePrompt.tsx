@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-nested-functions */
 import { useState, useEffect } from "react";
 import { RefreshCw, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";

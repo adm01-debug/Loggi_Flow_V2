@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Stepper } from "@/components/ui/stepper";

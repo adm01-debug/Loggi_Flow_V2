@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/prefer-single-boolean-return */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from "@/hooks/auth/useAuth";

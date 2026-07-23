@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";

@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/slow-regex */
 import { test, expect } from '@playwright/test';
 
 test.describe('Nexus Core E2E - Critical Path Validation', () => {

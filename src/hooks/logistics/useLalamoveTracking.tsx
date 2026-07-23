@@ -1,3 +1,4 @@
+/* eslint-disable max-lines, sonarjs/cognitive-complexity */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';

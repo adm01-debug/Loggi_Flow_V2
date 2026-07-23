@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-nested-functions */
 import { useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";

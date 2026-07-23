@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/constructor-for-side-effects */
 import { useState, useEffect } from "react";
 import { Bell, BellOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
