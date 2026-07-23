@@ -5429,6 +5429,16 @@ export type Database = {
         }
         Relationships: []
       }
+      v_prediction_accuracy_daily_carrier: {
+        Row: {
+          acertos: number | null
+          acuracia_pct: number | null
+          dia: string | null
+          total_confirmadas: number | null
+          transportadora: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_xp: {
