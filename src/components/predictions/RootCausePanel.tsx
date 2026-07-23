@@ -1,14 +1,15 @@
 import { useMemo, useState } from "react";
-import { AlertOctagon, Filter } from "lucide-react";
+import { AlertOctagon, Filter, Lightbulb, PlusCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useRootCauseAnalysis } from "@/hooks/logistics/useRootCauseAnalysis";
 import { ROOT_CAUSE_LABELS, type RootCauseCategory } from "@/lib/predictions/rootCauseAnalyzer";
 import { buildMitigations, PRIORITY_LABELS, type MitigationPriority } from "@/lib/predictions/mitigationRecommender";
-import { Lightbulb } from "lucide-react";
+import { useMitigationActions } from "@/hooks/predictions/useMitigationActions";
 
 const WINDOW_OPTIONS = [
   { value: "7", label: "Últimos 7 dias" },
@@ -19,9 +20,10 @@ const WINDOW_OPTIONS = [
 interface RootCausePanelProps {
   transportadora?: string | null;
   availableCarriers?: string[];
+  currentOtif?: number | null;
 }
 
-export function RootCausePanel({ transportadora, availableCarriers = [] }: RootCausePanelProps) {
+export function RootCausePanel({ transportadora, availableCarriers = [], currentOtif }: RootCausePanelProps) {
   const [carrier, setCarrier] = useState<string>(transportadora ?? "all");
   const [windowDays, setWindowDays] = useState<string>("30");
 
@@ -113,7 +115,7 @@ export function RootCausePanel({ transportadora, availableCarriers = [] }: RootC
                 />
               ))}
             </div>
-            <MitigationList report={data} />
+            <MitigationList report={data} currentOtif={currentOtif} />
           </>
         )}
       </CardContent>
@@ -194,8 +196,10 @@ const PRIORITY_BADGE: Record<MitigationPriority, "destructive" | "secondary" | "
 
 interface MitigationListProps {
   report: import("@/lib/predictions/rootCauseAnalyzer").RootCauseReport;
+  currentOtif?: number | null;
 }
-function MitigationList({ report }: MitigationListProps) {
+function MitigationList({ report, currentOtif }: MitigationListProps) {
+  const { create } = useMitigationActions();
   const suggestions = buildMitigations(report);
   if (!suggestions.length) return null;
   const sorted = [...suggestions].sort((a, b) => b.impactScore - a.impactScore);
@@ -232,6 +236,27 @@ function MitigationList({ report }: MitigationListProps) {
                 Foco: <span className="font-medium">{s.focusCarrier}</span>
               </p>
             ) : null}
+            <div className="mt-3">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="gap-1"
+                disabled={create.isPending}
+                onClick={() =>
+                  create.mutate({
+                    category: s.category,
+                    headline: s.headline,
+                    priority: s.priority,
+                    focus_carrier: s.focusCarrier,
+                    impact_score: s.impactScore,
+                    actions: s.actions,
+                    otif_before: currentOtif ?? null,
+                  })
+                }
+              >
+                <PlusCircle className="h-4 w-4" /> Registrar mitigação
+              </Button>
+            </div>
           </div>
         ))}
       </div>
