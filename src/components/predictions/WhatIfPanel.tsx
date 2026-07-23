@@ -38,6 +38,8 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
   const [selected, setSelected] = useState<Set<RootCauseCategory>>(new Set());
   const [scenarios, setScenarios] = useState<SavedScenario[]>([]);
   const [name, setName] = useState("");
+  const [pickA, setPickA] = useState<string>("");
+  const [pickB, setPickB] = useState<string>("__current__");
 
   useEffect(() => {
     const store = getStore();
