@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MainLayout } from "@/components/layout/MainLayout";

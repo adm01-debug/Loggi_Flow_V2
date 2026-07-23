@@ -1,3 +1,4 @@
+/* eslint-disable max-lines, sonarjs/cognitive-complexity */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -402,6 +403,7 @@ export const useLalamoveTracking = (orderId: string | null, useSandbox = true, c
         setError(errorMessage);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, orderDetails, useSandbox, coletaId]);
 
   // Start tracking

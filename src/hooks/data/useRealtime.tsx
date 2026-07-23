@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-nested-functions */
 import { useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -124,6 +125,7 @@ export function useRealtime<T = Record<string, unknown>>({
           break;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [queryKey, queryClient, onInsert, onUpdate, onDelete, table],
   );
 

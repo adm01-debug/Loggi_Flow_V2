@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

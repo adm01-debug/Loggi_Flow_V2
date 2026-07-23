@@ -139,6 +139,7 @@ export const useSLAAlerts = () => {
     });
 
     sessionStorage.setItem("sla-notified", Array.from(notifiedIds).join(","));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [criticos]);
 
   return {

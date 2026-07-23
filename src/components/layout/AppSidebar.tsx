@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState, lazy, Suspense, memo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {

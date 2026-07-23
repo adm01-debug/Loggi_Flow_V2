@@ -7,7 +7,7 @@ import sonarjs from "eslint-plugin-sonarjs";
 import unusedImports from "eslint-plugin-unused-imports";
 
 export default tseslint.config(
-  { ignores: ["dist", "supabase"] },
+  { ignores: ["dist", "supabase", "src/integrations/supabase/types.ts"] },
   {
     extends: [
       js.configs.recommended,

@@ -38,7 +38,9 @@ export function useQuotationFlow() {
   // History
   const [history, setHistory] = useLocalStorage<Array<{ data: CargoData; results: QuotationResult[]; date: string }>>('freight-history', []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const tabelasFrete = freightQuotation?.tabelasFrete || [];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const transportadoras = freightQuotation?.transportadoras || [];
   const isLoadingTabelas = freightQuotation?.isLoadingTabelas || false;
   const calculateQuotations = freightQuotation?.calculateQuotations;

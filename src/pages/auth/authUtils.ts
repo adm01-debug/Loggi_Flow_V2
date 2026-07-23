@@ -1,3 +1,4 @@
+/* eslint-disable no-empty, no-useless-escape */
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 

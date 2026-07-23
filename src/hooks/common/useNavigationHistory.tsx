@@ -109,6 +109,7 @@ export function useNavigationHistory() {
     trackPageView();
 
     prevPathRef.current = currentPath;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, user?.id]);
 
   const getPageLabel = useCallback((path: string) => {

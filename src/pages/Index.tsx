@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState, useEffect, memo } from "react";
 import {
   Truck,

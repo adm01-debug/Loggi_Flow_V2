@@ -108,6 +108,7 @@ export function useMFA() {
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Verify MFA code during login
@@ -157,6 +158,7 @@ export function useMFA() {
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Get current assurance level

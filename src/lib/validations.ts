@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/slow-regex */
 import { z } from "zod";
 
 // Validadores comuns

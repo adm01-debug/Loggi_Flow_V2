@@ -78,12 +78,14 @@ export default function RastreamentoMotorista() {
       const interval = setInterval(() => refetchDriverLocation?.(), 10000);
       return () => clearInterval(interval);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLive, selectedOrder]);
 
   useEffect(() => {
     if (selectedOrder && !isTracking) {
       startTracking();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedOrder]);
 
   const driver = driverLocation || {

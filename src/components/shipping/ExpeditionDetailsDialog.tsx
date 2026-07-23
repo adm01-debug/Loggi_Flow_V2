@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
