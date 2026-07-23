@@ -6,3 +6,4 @@ export { PredictionAccuracyTimeline } from './PredictionAccuracyTimeline';
 export { CarrierAccuracyPanel } from './CarrierAccuracyPanel';
 export { PredictionExplainability } from './PredictionExplainability';
 export { DigestPreviewPanel } from './DigestPreviewPanel';
+export { RootCausePanel } from './RootCausePanel';
