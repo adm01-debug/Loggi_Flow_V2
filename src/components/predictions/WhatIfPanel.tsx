@@ -318,3 +318,37 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
     </Card>
   );
 }
+
+interface MetricProps { label: string; value: number; suffix?: string; digits?: number; neutral?: boolean }
+function Metric({ label, value, suffix = "", digits = 2, neutral = false }: MetricProps) {
+  const positive = value > 0.005;
+  const negative = value < -0.005;
+  const color = neutral ? "text-foreground" : positive ? "text-success" : negative ? "text-destructive" : "text-muted-foreground";
+  return (
+    <div className="rounded border bg-muted/20 p-2">
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className={cn("font-semibold tabular-nums", color)}>
+        {positive ? "+" : ""}{value.toFixed(digits)}{suffix}
+      </p>
+    </div>
+  );
+}
+
+function CatList({ title, items }: { title: string; items: readonly RootCauseCategory[] }) {
+  return (
+    <div className="rounded border bg-muted/10 p-2">
+      <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">{title}</p>
+      {items.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">—</p>
+      ) : (
+        <div className="flex flex-wrap gap-1">
+          {items.map((c) => (
+            <Badge key={c} variant="outline" className="text-[10px]">
+              {ROOT_CAUSE_LABELS[c]}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
