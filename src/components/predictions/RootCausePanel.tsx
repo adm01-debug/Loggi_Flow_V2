@@ -179,3 +179,62 @@ function BucketRow({ category, count, totalDelayHours, maxCount, sampleMotivos, 
     </div>
   );
 }
+
+const PRIORITY_STYLES: Record<MitigationPriority, string> = {
+  alta: "border-destructive/40 bg-destructive/5",
+  media: "border-warning/40 bg-warning/5",
+  baixa: "border-border bg-muted/30",
+};
+
+const PRIORITY_BADGE: Record<MitigationPriority, "destructive" | "secondary" | "outline"> = {
+  alta: "destructive",
+  media: "secondary",
+  baixa: "outline",
+};
+
+interface MitigationListProps {
+  report: import("@/lib/predictions/rootCauseAnalyzer").RootCauseReport;
+}
+function MitigationList({ report }: MitigationListProps) {
+  const suggestions = buildMitigations(report);
+  if (!suggestions.length) return null;
+  const sorted = [...suggestions].sort((a, b) => b.impactScore - a.impactScore);
+  return (
+    <div className="space-y-3 border-t pt-4">
+      <div className="flex items-center gap-2">
+        <Lightbulb className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-semibold">Ações recomendadas</h3>
+      </div>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {sorted.map((s) => (
+          <div key={s.category} className={`rounded-lg border p-3 ${PRIORITY_STYLES[s.priority]}`}>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {ROOT_CAUSE_LABELS[s.category]}
+                </p>
+                <p className="font-medium">{s.headline}</p>
+              </div>
+              <Badge variant={PRIORITY_BADGE[s.priority]} className="shrink-0">
+                {PRIORITY_LABELS[s.priority]} · {s.impactScore}
+              </Badge>
+            </div>
+            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+              {s.actions.map((a) => (
+                <li key={a} className="flex gap-2">
+                  <span className="text-primary">•</span>
+                  <span>{a}</span>
+                </li>
+              ))}
+            </ul>
+            {s.focusCarrier ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Foco: <span className="font-medium">{s.focusCarrier}</span>
+              </p>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
