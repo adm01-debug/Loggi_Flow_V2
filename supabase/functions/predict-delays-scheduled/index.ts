@@ -95,7 +95,8 @@ export const handler = async (req: Request): Promise<Response> => {
         title: `Risco ${p.risco} de atraso detectado`,
         message: `${p.tipo === "entrega" ? "Entrega" : "Coleta"} ${p.numero} — ${p.probabilidade_atraso}% de probabilidade (+${p.horas_estimadas_atraso}h)`,
         type: p.risco === "critico" ? "error" : "warning",
-        link: `/central-rastreamento?${p.tipo}=${p.id}`,
+        action_url: `/central-rastreamento?${p.tipo}=${p.id}`,
+        metadata: { source: "predict-delays-scheduled", entity_id: p.id, entity_type: p.tipo, risco: p.risco },
       })),
     );
 
