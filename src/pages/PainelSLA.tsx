@@ -26,6 +26,7 @@ import { CarrierAccuracyPanel } from "@/components/predictions/CarrierAccuracyPa
 import { PredictionAccuracyTimeline } from "@/components/predictions/PredictionAccuracyTimeline";
 import { AccuracyMetaCycleWidget } from "@/components/predictions/AccuracyMetaCycleWidget";
 import { AccuracyMetaAuditPanel } from "@/components/predictions/AccuracyMetaAuditPanel";
+import { ChannelHealthPanel } from "@/components/predictions/ChannelHealthPanel";
 
 type Risco = "critico" | "alto" | "medio" | "ok";
 
@@ -424,6 +425,7 @@ export default function PainelSLA() {
 
       <PredictionAccuracyTimeline />
       <AccuracyMetaCycleWidget />
+      <ChannelHealthPanel />
       <AccuracyMetaAuditPanel />
       <CarrierAccuracyPanel />
     </div>
