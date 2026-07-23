@@ -67,7 +67,7 @@ export function PredictionExplainability({ fatores }: PredictionExplainabilityPr
                 </div>
                 <span className="tabular-nums font-semibold text-muted-foreground">{peso}%</span>
               </div>
-              <Progress value={peso} className="h-1.5" indicatorClassName={impactoClass(f.impacto)} />
+              <Progress value={peso} size="sm" color={impactoColor(f.impacto)} />
             </div>
           );
         })}
