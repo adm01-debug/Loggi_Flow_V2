@@ -145,6 +145,12 @@ export function DelayPredictionPanel() {
           </div>
         )}
 
+        {/* Sprint P #2: Acurácia do modelo */}
+        <div className="grid grid-cols-2 gap-2">
+          <AccuracyCard label="Acurácia (7d)" summary={last7Days} loading={accLoading} />
+          <AccuracyCard label="Acurácia (30d)" summary={last30Days} loading={accLoading} />
+        </div>
+
         <Separator />
 
         {/* Predictions List */}
