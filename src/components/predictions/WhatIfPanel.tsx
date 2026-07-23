@@ -20,6 +20,8 @@ import {
   saveScenario,
   type SavedScenario,
 } from "@/lib/predictions/whatIfScenarios";
+import { compareScenarios, toScenarioLike, type ScenarioLike } from "@/lib/predictions/whatIfCompare";
+import { ROOT_CAUSE_LABELS as RCL } from "@/lib/predictions/rootCauseAnalyzer";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
