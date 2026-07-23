@@ -4,6 +4,7 @@
  * dominante. Puro/determinístico para permitir simulação de centenas de cenários.
  */
 import type { CategoryBucket, RootCauseCategory, RootCauseReport } from "./rootCauseAnalyzer";
+import type { ROIReport } from "./mitigationROI";
 
 export type MitigationPriority = "alta" | "media" | "baixa";
 
@@ -14,6 +15,13 @@ export interface MitigationSuggestion {
   actions: string[];
   focusCarrier: string | null;
   impactScore: number; // 0-100
+}
+
+export interface RankedMitigation extends MitigationSuggestion {
+  effectiveScore: number; // impact ajustado pelo ROI histórico (0-100)
+  roiAdjustment: number;  // delta aplicado (-30..+30)
+  roiAvgDelta: number | null;
+  roiMeasured: number;
 }
 
 const PLAYBOOK: Record<RootCauseCategory, { headline: string; actions: string[] }> = {
