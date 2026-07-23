@@ -57,6 +57,33 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
     });
   };
 
+  const handleSave = useCallback(() => {
+    const store = getStore();
+    if (!store) { toast.error("Armazenamento local indisponível"); return; }
+    try {
+      const next = saveScenario(store, { name, projection });
+      setScenarios(next);
+      setName("");
+      toast.success("Cenário salvo");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao salvar");
+    }
+  }, [name, projection]);
+
+  const handleDelete = useCallback((id: string) => {
+    const store = getStore();
+    if (!store) return;
+    setScenarios(deleteScenario(store, id));
+    toast.success("Cenário removido");
+  }, []);
+
+  const handleRestore = useCallback((s: SavedScenario) => {
+    setSelected(new Set(s.categories));
+    toast.info(`Cenário "${s.name}" carregado`);
+  }, []);
+
+  const canSave = projection.selectedCount > 0 && name.trim().length > 0;
+
   return (
     <Card className="card-raised">
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
