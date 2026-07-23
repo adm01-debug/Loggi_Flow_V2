@@ -87,6 +87,30 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
 
   const canSave = projection.selectedCount > 0 && name.trim().length > 0;
 
+  const currentAsScenario: ScenarioLike = useMemo(() => ({
+    id: "__current__",
+    name: "Seleção atual",
+    baselineOtif: projection.baselineOtif,
+    projectedOtif: projection.projectedOtif,
+    totalGain: projection.totalGain,
+    confidence: projection.confidence,
+    categories: projection.contributions.map((c) => c.category),
+  }), [projection]);
+
+  const resolveScenario = useCallback((id: string): ScenarioLike | null => {
+    if (!id) return null;
+    if (id === "__current__") return currentAsScenario;
+    const s = scenarios.find((x) => x.id === id);
+    return s ? toScenarioLike(s) : null;
+  }, [scenarios, currentAsScenario]);
+
+  const diff = useMemo(() => {
+    const A = resolveScenario(pickA);
+    const B = resolveScenario(pickB);
+    if (!A || !B || A.id === B.id) return null;
+    return compareScenarios(A, B);
+  }, [pickA, pickB, resolveScenario]);
+
   return (
     <Card className="card-raised">
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
