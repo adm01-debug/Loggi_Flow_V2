@@ -5,9 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 export interface AccuracySettings {
   target_pct: number;
   consecutive_days_alert: number;
+  notify_email: boolean;
+  notify_whatsapp: boolean;
+  email: string | null;
+  whatsapp_phone: string | null;
 }
 
-const DEFAULT: AccuracySettings = { target_pct: 80, consecutive_days_alert: 3 };
+const DEFAULT: AccuracySettings = {
+  target_pct: 80,
+  consecutive_days_alert: 3,
+  notify_email: false,
+  notify_whatsapp: false,
+  email: null,
+  whatsapp_phone: null,
+};
 const LEGACY_TARGET_KEY = "prediction_accuracy_target";
 
 function keyFor(carrier: string | null) {
