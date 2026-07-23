@@ -11,6 +11,21 @@ interface SettingsRow {
   transportadora: string | null;
   target_pct: number;
   consecutive_days_alert: number;
+  notify_email: boolean | null;
+  notify_whatsapp: boolean | null;
+  email: string | null;
+  whatsapp_phone: string | null;
+}
+
+function resolveChannels(s: SettingsRow) {
+  const emailRaw = (s.email ?? "").trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw);
+  const phoneDigits = (s.whatsapp_phone ?? "").replace(/\D/g, "");
+  const phoneOk = phoneDigits.length >= 10 && phoneDigits.length <= 15;
+  return {
+    email: s.notify_email && emailOk ? emailRaw : null,
+    whatsapp: s.notify_whatsapp && phoneOk ? phoneDigits : null,
+  };
 }
 
 export const handler = async (req: Request): Promise<Response> => {
