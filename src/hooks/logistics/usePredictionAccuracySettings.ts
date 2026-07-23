@@ -5,9 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 export interface AccuracySettings {
   target_pct: number;
   consecutive_days_alert: number;
+  notify_email: boolean;
+  notify_whatsapp: boolean;
+  email: string | null;
+  whatsapp_phone: string | null;
 }
 
-const DEFAULT: AccuracySettings = { target_pct: 80, consecutive_days_alert: 3 };
+const DEFAULT: AccuracySettings = {
+  target_pct: 80,
+  consecutive_days_alert: 3,
+  notify_email: false,
+  notify_whatsapp: false,
+  email: null,
+  whatsapp_phone: null,
+};
 const LEGACY_TARGET_KEY = "prediction_accuracy_target";
 
 function keyFor(carrier: string | null) {
@@ -26,17 +37,21 @@ export function usePredictionAccuracySettings(carrier: string | null) {
 
       let q = supabase
         .from("prediction_accuracy_settings" as never)
-        .select("target_pct, consecutive_days_alert, transportadora")
+        .select("target_pct, consecutive_days_alert, transportadora, notify_email, notify_whatsapp, email, whatsapp_phone")
         .eq("user_id", uid);
       q = carrier ? q.eq("transportadora", carrier) : q.is("transportadora", null);
 
       const { data, error } = await q.maybeSingle();
       if (error) throw error;
       if (data) {
-        const row = data as unknown as AccuracySettings;
+        const row = data as unknown as Partial<AccuracySettings>;
         return {
           target_pct: Number(row.target_pct) || DEFAULT.target_pct,
           consecutive_days_alert: Number(row.consecutive_days_alert) || DEFAULT.consecutive_days_alert,
+          notify_email: Boolean(row.notify_email),
+          notify_whatsapp: Boolean(row.notify_whatsapp),
+          email: row.email ?? null,
+          whatsapp_phone: row.whatsapp_phone ?? null,
         };
       }
       // Migração leve do localStorage (uma única vez)
@@ -66,6 +81,10 @@ export function usePredictionAccuracySettings(carrier: string | null) {
             transportadora: carrier,
             target_pct: next.target_pct,
             consecutive_days_alert: next.consecutive_days_alert,
+            notify_email: next.notify_email,
+            notify_whatsapp: next.notify_whatsapp,
+            email: next.email,
+            whatsapp_phone: next.whatsapp_phone,
           } as never,
           { onConflict: "user_id,transportadora" },
         );

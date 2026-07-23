@@ -342,3 +342,80 @@ Deno.test("idempotência: rodar 2x com mesmas existing produz apenas skip_signat
   assertEquals(run2.updated, 0);
   assertEquals(run2.skipped, 3);
 });
+
+// ---------------------------------------------------------------------------
+// Sprint P #10 — resolveChannels (email / WhatsApp)
+// ---------------------------------------------------------------------------
+import { resolveChannels } from "./simulator.ts";
+
+const baseSetting = (over: Partial<SettingRow> = {}): SettingRow => ({
+  user_id: "u1",
+  transportadora: null,
+  target_pct: 80,
+  consecutive_days_alert: 3,
+  notify_email: false,
+  notify_whatsapp: false,
+  email: null,
+  whatsapp_phone: null,
+  ...over,
+});
+
+Deno.test("resolveChannels: toggles desligados retornam null mesmo com credenciais", () => {
+  const r = resolveChannels(baseSetting({ email: "a@b.co", whatsapp_phone: "11999998888" }));
+  assertEquals(r, { email: null, whatsapp: null });
+});
+
+Deno.test("resolveChannels: email inválido é rejeitado", () => {
+  const r = resolveChannels(baseSetting({ notify_email: true, email: "sem-arroba" }));
+  assertEquals(r.email, null);
+});
+
+Deno.test("resolveChannels: email válido é normalizado (trim)", () => {
+  const r = resolveChannels(baseSetting({ notify_email: true, email: "  ops@corp.io " }));
+  assertEquals(r.email, "ops@corp.io");
+});
+
+Deno.test("resolveChannels: telefone curto demais é rejeitado", () => {
+  const r = resolveChannels(baseSetting({ notify_whatsapp: true, whatsapp_phone: "1199" }));
+  assertEquals(r.whatsapp, null);
+});
+
+Deno.test("resolveChannels: telefone com máscara é normalizado para dígitos", () => {
+  const r = resolveChannels(baseSetting({ notify_whatsapp: true, whatsapp_phone: "(11) 99999-8888" }));
+  assertEquals(r.whatsapp, "11999998888");
+});
+
+Deno.test("resolveChannels: telefone > 15 dígitos é rejeitado", () => {
+  const r = resolveChannels(baseSetting({ notify_whatsapp: true, whatsapp_phone: "1".repeat(16) }));
+  assertEquals(r.whatsapp, null);
+});
+
+Deno.test("resolveChannels: ambos canais habilitados retornam ambos", () => {
+  const r = resolveChannels(baseSetting({
+    notify_email: true,
+    notify_whatsapp: true,
+    email: "a@b.co",
+    whatsapp_phone: "+55 11 99999-8888",
+  }));
+  assert(r.email !== null);
+  assert(r.whatsapp !== null);
+});
+
+Deno.test("resolveChannels: fuzz 500 combinações — nunca lança e sempre respeita toggle", () => {
+  const rand = mulberry32(0xC4A11E1);
+  for (let i = 0; i < 500; i++) {
+    const s = baseSetting({
+      notify_email: rand() > 0.5,
+      notify_whatsapp: rand() > 0.5,
+      email: rand() > 0.3 ? pick(rand, ["a@b.co", "x", "", "  y@z.io ", null]) : null,
+      whatsapp_phone: rand() > 0.3
+        ? pick(rand, ["11999998888", "abc", "(11) 9 9999-8888", "1", "9".repeat(20), null])
+        : null,
+    });
+    const r = resolveChannels(s);
+    if (!s.notify_email) assertEquals(r.email, null);
+    if (!s.notify_whatsapp) assertEquals(r.whatsapp, null);
+    if (r.whatsapp) assert(/^\d{10,15}$/.test(r.whatsapp));
+    if (r.email) assert(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email));
+  }
+});

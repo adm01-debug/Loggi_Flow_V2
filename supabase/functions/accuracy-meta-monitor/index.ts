@@ -11,6 +11,21 @@ interface SettingsRow {
   transportadora: string | null;
   target_pct: number;
   consecutive_days_alert: number;
+  notify_email: boolean | null;
+  notify_whatsapp: boolean | null;
+  email: string | null;
+  whatsapp_phone: string | null;
+}
+
+function resolveChannels(s: SettingsRow) {
+  const emailRaw = (s.email ?? "").trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw);
+  const phoneDigits = (s.whatsapp_phone ?? "").replace(/\D/g, "");
+  const phoneOk = phoneDigits.length >= 10 && phoneDigits.length <= 15;
+  return {
+    email: s.notify_email && emailOk ? emailRaw : null,
+    whatsapp: s.notify_whatsapp && phoneOk ? phoneDigits : null,
+  };
 }
 
 export const handler = async (req: Request): Promise<Response> => {
@@ -26,7 +41,7 @@ export const handler = async (req: Request): Promise<Response> => {
 
     const { data: settings, error: sErr } = await supabase
       .from("prediction_accuracy_settings")
-      .select("user_id, transportadora, target_pct, consecutive_days_alert");
+      .select("user_id, transportadora, target_pct, consecutive_days_alert, notify_email, notify_whatsapp, email, whatsapp_phone");
 
     if (sErr) throw sErr;
 
@@ -147,6 +162,59 @@ export const handler = async (req: Request): Promise<Response> => {
         continue;
       }
       created++;
+
+      // ─── Sprint P #10: dispatch canais externos (fire-and-forget) ───
+      const channels = resolveChannels(s);
+      const dispatched: Record<string, string> = {};
+
+      if (channels.email) {
+        try {
+          const { error: eErr } = await supabase.functions.invoke("resend-email", {
+            body: {
+              to: channels.email,
+              subject: payload.title,
+              html: `<p>${payload.message}</p><p><a href="${Deno.env.get("APP_URL") ?? ""}/painel-sla">Abrir Painel SLA</a></p>`,
+            },
+          });
+          dispatched.email = eErr ? `error:${eErr.message}` : "ok";
+        } catch (e) {
+          dispatched.email = `throw:${e instanceof Error ? e.message : String(e)}`;
+        }
+      }
+
+      if (channels.whatsapp) {
+        try {
+          const { error: wErr } = await supabase.functions.invoke("whatsapp-notification", {
+            body: {
+              action: "send_custom",
+              phone: channels.whatsapp,
+              template: "accuracy_meta_alert",
+              variables: {
+                title: payload.title,
+                message: payload.message,
+                carrier: carrierLabel,
+                target: String(s.target_pct),
+                days: String(days),
+              },
+            },
+          });
+          dispatched.whatsapp = wErr ? `error:${wErr.message}` : "ok";
+        } catch (e) {
+          dispatched.whatsapp = `throw:${e instanceof Error ? e.message : String(e)}`;
+        }
+      }
+
+      if (Object.keys(dispatched).length > 0) {
+        await supabase
+          .from("notifications")
+          .update({
+            metadata: { ...payload.metadata, channels: dispatched },
+          })
+          .eq("user_id", s.user_id)
+          .eq("title", payload.title)
+          .gte("created_at", new Date(Date.now() - 60_000).toISOString());
+        log.info("external channels dispatched", { user: s.user_id, dispatched });
+      }
     }
 
     log.info("accuracy-meta-monitor complete", {
