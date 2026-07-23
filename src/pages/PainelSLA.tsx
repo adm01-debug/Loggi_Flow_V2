@@ -422,6 +422,7 @@ export default function PainelSLA() {
       </Tabs>
 
       <PredictionAccuracyTimeline />
+      <AccuracyMetaCycleWidget />
       <CarrierAccuracyPanel />
     </div>
 
