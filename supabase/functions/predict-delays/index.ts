@@ -264,18 +264,25 @@ export const handler = async (req: Request) => {
       if (cacheError) log("ERROR", "Failed to cache predictions", cacheError);
 
       // Sprint P #1: Persist full history for auditability + Sprint P #2 feedback loop
-      const historyRows = predictions.map((p: any) => ({
-        entity_id: p.id,
-        entity_type: p.tipo,
-        entity_numero: p.numero,
-        risco: p.risco,
-        probabilidade_atraso: Math.max(0, Math.min(100, Number(p.probabilidade_atraso) || 0)),
-        horas_estimadas_atraso: Number(p.horas_estimadas_atraso) || 0,
-        motivos: Array.isArray(p.motivos) ? p.motivos : [],
-        recomendacoes: Array.isArray(p.recomendacoes) ? p.recomendacoes : [],
-        fatores: Array.isArray(p.fatores) ? p.fatores : [],
-        predicted_at: now.toISOString(),
-      }));
+      const historyRows = predictions.map((p: any) => {
+        const original =
+          p.tipo === "entrega"
+            ? entregasForAnalysis.find((e: any) => e.id === p.id)
+            : coletasForAnalysis.find((c: any) => c.id === p.id);
+        return {
+          entity_id: p.id,
+          entity_type: p.tipo,
+          entity_numero: p.numero,
+          transportadora: original?.transportadora ?? null,
+          risco: p.risco,
+          probabilidade_atraso: Math.max(0, Math.min(100, Number(p.probabilidade_atraso) || 0)),
+          horas_estimadas_atraso: Number(p.horas_estimadas_atraso) || 0,
+          motivos: Array.isArray(p.motivos) ? p.motivos : [],
+          recomendacoes: Array.isArray(p.recomendacoes) ? p.recomendacoes : [],
+          fatores: Array.isArray(p.fatores) ? p.fatores : [],
+          predicted_at: now.toISOString(),
+        };
+      });
       const { error: histError } = await supabase
         .from("delay_predictions_history")
         .insert(historyRows);
