@@ -46,7 +46,7 @@ const KEYWORD_MAP: ReadonlyArray<readonly [RegExp, RootCauseCategory]> = [
   [/\b(chuva|clima|tempo|temporal|neblina|alagament|enchente)/i, "clima"],
   [/\b(feriad|recess|ponto\s*facultat)/i, "feriado"],
   [/\b(endere[cç]o|cep|localiza[cç][aã]o|acesso)/i, "endereco"],
-  [/\b(document|nota|fiscal|nf-?e|cte)/i, "documentacao"],
+  [/(document|nota\s*fiscal|nf-?e|ct-?e)/i, "documentacao"],
   [/\b(dist[aâ]ncia|rota|km|percurso|longe)/i, "distancia"],
   [/\b(demanda|volume|pico|black|natal|sazon)/i, "demanda"],
   [/\b(transportadora|carrier|frota|motorista|ve[ií]culo|greve|opera[cç][aã]o)/i, "transportadora"],
