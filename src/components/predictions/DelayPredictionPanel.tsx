@@ -310,15 +310,19 @@ function AccuracyCard({ label, loading, summary }: AccuracyCardProps) {
         <Target className="h-3 w-3" />
         {label}
       </div>
-      {loading ? (
-        <div className="h-6 w-16 rounded bg-muted animate-pulse" />
-      ) : summary.acuraciaPercentual === null ? (
-        <div className="text-lg font-semibold text-muted-foreground">—</div>
-      ) : (
-        <div className="text-lg font-bold text-foreground tabular-nums">
-          {summary.acuraciaPercentual}%
-        </div>
-      )}
+      {(() => {
+        if (loading) {
+          return <div className="h-6 w-16 rounded bg-muted animate-pulse" />;
+        }
+        if (summary.acuraciaPercentual === null) {
+          return <div className="text-lg font-semibold text-muted-foreground">—</div>;
+        }
+        return (
+          <div className="text-lg font-bold text-foreground tabular-nums">
+            {summary.acuraciaPercentual}%
+          </div>
+        );
+      })()}
       <div className="text-[10px] text-muted-foreground mt-0.5">
         {summary.totalConfirmadas} de {summary.totalPredicoes} confirmadas
       </div>
