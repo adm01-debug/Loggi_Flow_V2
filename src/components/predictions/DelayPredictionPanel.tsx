@@ -276,8 +276,52 @@ function PredictionCard({
               ))}
             </ul>
           </div>
+
+          {/* Sprint P #4: Explainability */}
+          {prediction.fatores && prediction.fatores.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                <Target className="h-4 w-4 text-primary" />
+                Fatores da predição:
+              </div>
+              <PredictionExplainability fatores={prediction.fatores} />
+            </div>
+          )}
         </div>
       )}
+    </div>
+  );
+}
+
+interface AccuracyCardProps {
+  label: string;
+  loading: boolean;
+  summary: {
+    acuraciaPercentual: number | null;
+    totalConfirmadas: number;
+    totalPredicoes: number;
+  };
+}
+
+function AccuracyCard({ label, loading, summary }: AccuracyCardProps) {
+  return (
+    <div className="rounded-lg border bg-card p-3">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+        <Target className="h-3 w-3" />
+        {label}
+      </div>
+      {loading ? (
+        <div className="h-6 w-16 rounded bg-muted animate-pulse" />
+      ) : summary.acuraciaPercentual === null ? (
+        <div className="text-lg font-semibold text-muted-foreground">—</div>
+      ) : (
+        <div className="text-lg font-bold text-foreground tabular-nums">
+          {summary.acuraciaPercentual}%
+        </div>
+      )}
+      <div className="text-[10px] text-muted-foreground mt-0.5">
+        {summary.totalConfirmadas} de {summary.totalPredicoes} confirmadas
+      </div>
     </div>
   );
 }
