@@ -1,7 +1,10 @@
 // Edge Function: digest semanal de metas de acurácia.
-// Para cada usuário com notify_email + email configurado, agrega as
-// notificações da última semana e envia um único email consolidado via
-// resend-email, evitando spam de alertas diários.
+// Modos:
+//   - Padrão (POST sem body ou body.preview !== true): itera destinatários,
+//     agrega semana e envia via resend-email + audita.
+//   - Preview (body.preview === true): usa o Bearer do usuário chamador,
+//     retorna { subject, html, report } SEM enviar email nem gravar auditoria.
+//     Usado pelo PainelSLA para permitir revisão antes do disparo real.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -23,8 +26,74 @@ interface DispatchResult {
   detail?: string;
 }
 
+async function handlePreview(req: Request): Promise<Response> {
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+  if (!token) {
+    return new Response(
+      JSON.stringify({ ok: false, error: "Missing Authorization header" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  const service = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  const { data: userRes, error: uErr } = await service.auth.getUser(token);
+  if (uErr || !userRes?.user) {
+    return new Response(
+      JSON.stringify({ ok: false, error: "Invalid session" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  const now = new Date();
+  const windowStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: notifs, error: nErr } = await service
+    .from("notifications")
+    .select("id, created_at, metadata")
+    .eq("user_id", userRes.user.id)
+    .contains("metadata", { source: "accuracy-meta-monitor" })
+    .gte("created_at", windowStart)
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  if (nErr) {
+    return new Response(
+      JSON.stringify({ ok: false, error: nErr.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  const report = buildDigest((notifs ?? []) as DigestNotification[], now);
+  const email = renderDigestEmail(report);
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      preview: true,
+      empty: !email,
+      subject: email?.subject ?? null,
+      html: email?.html ?? null,
+      report,
+    }),
+    { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+  );
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  // Modo preview — não envia email, retorna HTML pro usuário chamador.
+  if (req.method === "POST") {
+    try {
+      const cloned = req.clone();
+      const body = await cloned.json().catch(() => null);
+      if (body && typeof body === "object" && (body as { preview?: unknown }).preview === true) {
+        return await handlePreview(req);
+      }
+    } catch { /* ignora e cai no fluxo padrão */ }
+  }
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -83,7 +152,6 @@ serve(async (req) => {
           results.push({ user_id: r.user_id, status: "error", detail: eErr.message });
         } else {
           results.push({ user_id: r.user_id, status: "sent" });
-          // Registra na tabela de notificações para auditoria/histórico
           await supabase.from("notifications").insert({
             user_id: r.user_id,
             title: email.subject,
