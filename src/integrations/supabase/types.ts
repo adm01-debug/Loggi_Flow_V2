@@ -5420,6 +5420,15 @@ export type Database = {
         }
         Relationships: []
       }
+      v_prediction_accuracy_daily: {
+        Row: {
+          acertos: number | null
+          acuracia_pct: number | null
+          dia: string | null
+          total_confirmadas: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_xp: {
