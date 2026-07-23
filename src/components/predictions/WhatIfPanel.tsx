@@ -2,16 +2,25 @@
  * WhatIfPanel — Simulador de impacto combinado de mitigações selecionadas.
  * Determinístico (via simulateWhatIf), sem I/O.
  */
-import { useMemo, useState } from "react";
-import { FlaskConical, Sparkles, TrendingUp } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FlaskConical, Sparkles, Star, Trash2, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/common/EmptyState";
 import { simulateWhatIf } from "@/lib/predictions/whatIfSimulator";
 import { ROOT_CAUSE_LABELS, type RootCauseCategory } from "@/lib/predictions/rootCauseAnalyzer";
 import type { RankedMitigation } from "@/lib/predictions/mitigationRecommender";
+import {
+  deleteScenario,
+  listScenarios,
+  saveScenario,
+  type SavedScenario,
+} from "@/lib/predictions/whatIfScenarios";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface WhatIfPanelProps {
@@ -19,8 +28,20 @@ interface WhatIfPanelProps {
   baselineOtif: number | null | undefined;
 }
 
+const getStore = (): Storage | null => {
+  if (typeof window === "undefined") return null;
+  try { return window.localStorage; } catch { return null; }
+};
+
 export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
   const [selected, setSelected] = useState<Set<RootCauseCategory>>(new Set());
+  const [scenarios, setScenarios] = useState<SavedScenario[]>([]);
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const store = getStore();
+    if (store) setScenarios(listScenarios(store));
+  }, []);
 
   const projection = useMemo(
     () => simulateWhatIf(ranked, selected, baselineOtif ?? 0),
@@ -35,6 +56,33 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
       return next;
     });
   };
+
+  const handleSave = useCallback(() => {
+    const store = getStore();
+    if (!store) { toast.error("Armazenamento local indisponível"); return; }
+    try {
+      const next = saveScenario(store, { name, projection });
+      setScenarios(next);
+      setName("");
+      toast.success("Cenário salvo");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao salvar");
+    }
+  }, [name, projection]);
+
+  const handleDelete = useCallback((id: string) => {
+    const store = getStore();
+    if (!store) return;
+    setScenarios(deleteScenario(store, id));
+    toast.success("Cenário removido");
+  }, []);
+
+  const handleRestore = useCallback((s: SavedScenario) => {
+    setSelected(new Set(s.categories));
+    toast.info(`Cenário "${s.name}" carregado`);
+  }, []);
+
+  const canSave = projection.selectedCount > 0 && name.trim().length > 0;
 
   return (
     <Card className="card-raised">
@@ -116,6 +164,63 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
                 );
               })}
             </ul>
+
+            <div className="rounded-lg border bg-muted/10 p-3 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Star className="h-4 w-4 text-primary" /> Cenários favoritos
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nome do cenário (ex: Blitz clima Sudeste)"
+                  maxLength={80}
+                />
+                <Button onClick={handleSave} disabled={!canSave} size="sm">
+                  Salvar seleção
+                </Button>
+              </div>
+              {scenarios.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Nenhum cenário salvo. Selecione mitigações e salve para comparar projeções depois.
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {scenarios.map((s) => {
+                    const gain = s.totalGain;
+                    return (
+                      <li key={s.id} className="flex items-start justify-between gap-2 rounded-md border bg-background p-2">
+                        <button
+                          type="button"
+                          onClick={() => handleRestore(s)}
+                          className="min-w-0 flex-1 text-left"
+                        >
+                          <p className="truncate text-sm font-medium">{s.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(s.createdAt).toLocaleString("pt-BR")} · {s.categories.length} mitigação(ões)
+                          </p>
+                          <div className="mt-1 flex flex-wrap gap-1 text-[11px]">
+                            <Badge variant="outline">Base {s.baselineOtif.toFixed(1)}%</Badge>
+                            <Badge variant={gain >= 0 ? "default" : "destructive"}>
+                              Proj {s.projectedOtif.toFixed(1)}% ({gain >= 0 ? "+" : ""}{gain.toFixed(1)})
+                            </Badge>
+                            <Badge variant="secondary">Conf {Math.round(s.confidence * 100)}%</Badge>
+                          </div>
+                        </button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(s.id)}
+                          aria-label={`Remover cenário ${s.name}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
           </>
         )}
       </CardContent>
