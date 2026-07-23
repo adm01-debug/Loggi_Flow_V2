@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { CarrierAccuracyPanel } from "@/components/predictions/CarrierAccuracyPanel";
 import { PredictionAccuracyTimeline } from "@/components/predictions/PredictionAccuracyTimeline";
 import { AccuracyMetaCycleWidget } from "@/components/predictions/AccuracyMetaCycleWidget";
+import { AccuracyMetaAuditPanel } from "@/components/predictions/AccuracyMetaAuditPanel";
 
 type Risco = "critico" | "alto" | "medio" | "ok";
 
@@ -423,6 +424,7 @@ export default function PainelSLA() {
 
       <PredictionAccuracyTimeline />
       <AccuracyMetaCycleWidget />
+      <AccuracyMetaAuditPanel />
       <CarrierAccuracyPanel />
     </div>
 
