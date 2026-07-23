@@ -2865,6 +2865,66 @@ export type Database = {
           },
         ]
       }
+      mitigation_actions: {
+        Row: {
+          actions: Json
+          category: string
+          created_at: string
+          executed_at: string | null
+          focus_carrier: string | null
+          headline: string
+          id: string
+          impact_score: number
+          measured_at: string | null
+          notes: string | null
+          otif_after: number | null
+          otif_before: number | null
+          otif_delta: number | null
+          priority: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actions?: Json
+          category: string
+          created_at?: string
+          executed_at?: string | null
+          focus_carrier?: string | null
+          headline: string
+          id?: string
+          impact_score?: number
+          measured_at?: string | null
+          notes?: string | null
+          otif_after?: number | null
+          otif_before?: number | null
+          otif_delta?: number | null
+          priority: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actions?: Json
+          category?: string
+          created_at?: string
+          executed_at?: string | null
+          focus_carrier?: string | null
+          headline?: string
+          id?: string
+          impact_score?: number
+          measured_at?: string | null
+          notes?: string | null
+          otif_after?: number | null
+          otif_before?: number | null
+          otif_delta?: number | null
+          priority?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       nexus_tactical_logs: {
         Row: {
           alert_metadata: Json | null
