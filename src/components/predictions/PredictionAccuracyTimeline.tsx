@@ -171,6 +171,52 @@ export function PredictionAccuracyTimeline() {
             </div>
           </div>
         </div>
+        <div className="mt-3 flex flex-wrap items-end gap-3 rounded-md border bg-muted/30 p-2">
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-muted-foreground" />
+            <Switch
+              id="notify-email"
+              checked={settings.data?.notify_email ?? false}
+              onCheckedChange={(v) => settings.save({ notify_email: v }).catch(() => undefined)}
+            />
+            <Label htmlFor="notify-email" className="text-xs">Email</Label>
+            <Input
+              type="email"
+              placeholder="voce@empresa.com"
+              defaultValue={settings.data?.email ?? ""}
+              onBlur={(e) => {
+                const v = e.target.value.trim() || null;
+                if (v !== (settings.data?.email ?? null)) {
+                  settings.save({ email: v }).catch(() => undefined);
+                }
+              }}
+              className="h-8 w-56"
+              disabled={!(settings.data?.notify_email ?? false)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            <Switch
+              id="notify-wa"
+              checked={settings.data?.notify_whatsapp ?? false}
+              onCheckedChange={(v) => settings.save({ notify_whatsapp: v }).catch(() => undefined)}
+            />
+            <Label htmlFor="notify-wa" className="text-xs">WhatsApp</Label>
+            <Input
+              type="tel"
+              placeholder="11999998888"
+              defaultValue={settings.data?.whatsapp_phone ?? ""}
+              onBlur={(e) => {
+                const v = e.target.value.trim() || null;
+                if (v !== (settings.data?.whatsapp_phone ?? null)) {
+                  settings.save({ whatsapp_phone: v }).catch(() => undefined);
+                }
+              }}
+              className="h-8 w-48"
+              disabled={!(settings.data?.notify_whatsapp ?? false)}
+            />
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         {criticalStreak && (
