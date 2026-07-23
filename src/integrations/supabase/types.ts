@@ -3219,29 +3219,41 @@ export type Database = {
         Row: {
           consecutive_days_alert: number
           created_at: string
+          email: string | null
           id: string
+          notify_email: boolean
+          notify_whatsapp: boolean
           target_pct: number
           transportadora: string | null
           updated_at: string
           user_id: string
+          whatsapp_phone: string | null
         }
         Insert: {
           consecutive_days_alert?: number
           created_at?: string
+          email?: string | null
           id?: string
+          notify_email?: boolean
+          notify_whatsapp?: boolean
           target_pct?: number
           transportadora?: string | null
           updated_at?: string
           user_id: string
+          whatsapp_phone?: string | null
         }
         Update: {
           consecutive_days_alert?: number
           created_at?: string
+          email?: string | null
           id?: string
+          notify_email?: boolean
+          notify_whatsapp?: boolean
           target_pct?: number
           transportadora?: string | null
           updated_at?: string
           user_id?: string
+          whatsapp_phone?: string | null
         }
         Relationships: []
       }
