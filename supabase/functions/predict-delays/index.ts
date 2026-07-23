@@ -185,7 +185,7 @@ export const handler = async (req: Request) => {
       coletas: coletasForAnalysis,
       stats: { delayRate: delayRate.toFixed(1), occurrences: occurrenceStats },
     })}
-    Retorne um JSON array (max 10 itens críticos):
+    Retorne um JSON array (max 10 itens críticos). Para "fatores", use APENAS estes nomes: "clima", "historico_transportadora", "distancia", "horario", "sazonalidade", "ocorrencias_recentes", "tempo_transito". Peso 0-100, impacto "positivo"|"negativo"|"neutro":
     [{
       "id": "uuid",
       "numero": "string",
@@ -194,7 +194,8 @@ export const handler = async (req: Request) => {
       "probabilidade_atraso": 0-100,
       "motivos": ["string"],
       "recomendacoes": ["string"],
-      "horas_estimadas_atraso": number
+      "horas_estimadas_atraso": number,
+      "fatores": [{"nome": "string", "peso": 0-100, "impacto": "positivo"|"negativo"|"neutro", "descricao": "string"}]
     }]`;
 
     const aiResponse = await withCircuitBreaker("ai-gateway", async () => {
@@ -261,6 +262,24 @@ export const handler = async (req: Request) => {
         .from("ai_delay_predictions")
         .insert(cacheData);
       if (cacheError) log("ERROR", "Failed to cache predictions", cacheError);
+
+      // Sprint P #1: Persist full history for auditability + Sprint P #2 feedback loop
+      const historyRows = predictions.map((p: any) => ({
+        entity_id: p.id,
+        entity_type: p.tipo,
+        entity_numero: p.numero,
+        risco: p.risco,
+        probabilidade_atraso: Math.max(0, Math.min(100, Number(p.probabilidade_atraso) || 0)),
+        horas_estimadas_atraso: Number(p.horas_estimadas_atraso) || 0,
+        motivos: Array.isArray(p.motivos) ? p.motivos : [],
+        recomendacoes: Array.isArray(p.recomendacoes) ? p.recomendacoes : [],
+        fatores: Array.isArray(p.fatores) ? p.fatores : [],
+        predicted_at: now.toISOString(),
+      }));
+      const { error: histError } = await supabase
+        .from("delay_predictions_history")
+        .insert(historyRows);
+      if (histError) log("ERROR", "Failed to persist prediction history", histError);
     }
 
     const summary = {

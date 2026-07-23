@@ -21,11 +21,14 @@ import {
   ChevronUp,
   Lightbulb,
   Zap,
+  Target,
 } from "lucide-react";
 import {
   useDelayPrediction,
   DelayPrediction,
 } from "@/hooks/logistics/useDelayPrediction";
+import { usePredictionAccuracy } from "@/hooks/logistics/usePredictionAccuracy";
+import { PredictionExplainability } from "./PredictionExplainability";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -41,10 +44,11 @@ export function DelayPredictionPanel() {
     isCached,
   } = useDelayPrediction();
 
+  const { last7Days, last30Days, isLoading: accLoading } = usePredictionAccuracy();
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Tenta carregar predições em cache ao montar o componente
     if (predictions.length === 0) {
       analyzeDelays(false);
     }
@@ -140,6 +144,12 @@ export function DelayPredictionPanel() {
             )}
           </div>
         )}
+
+        {/* Sprint P #2: Acurácia do modelo */}
+        <div className="grid grid-cols-2 gap-2">
+          <AccuracyCard label="Acurácia (7d)" summary={last7Days} loading={accLoading} />
+          <AccuracyCard label="Acurácia (30d)" summary={last30Days} loading={accLoading} />
+        </div>
 
         <Separator />
 
@@ -266,8 +276,56 @@ function PredictionCard({
               ))}
             </ul>
           </div>
+
+          {/* Sprint P #4: Explainability */}
+          {prediction.fatores && prediction.fatores.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                <Target className="h-4 w-4 text-primary" />
+                Fatores da predição:
+              </div>
+              <PredictionExplainability fatores={prediction.fatores} />
+            </div>
+          )}
         </div>
       )}
+    </div>
+  );
+}
+
+interface AccuracyCardProps {
+  label: string;
+  loading: boolean;
+  summary: {
+    acuraciaPercentual: number | null;
+    totalConfirmadas: number;
+    totalPredicoes: number;
+  };
+}
+
+function AccuracyCard({ label, loading, summary }: AccuracyCardProps) {
+  return (
+    <div className="rounded-lg border bg-card p-3">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+        <Target className="h-3 w-3" />
+        {label}
+      </div>
+      {(() => {
+        if (loading) {
+          return <div className="h-6 w-16 rounded bg-muted animate-pulse" />;
+        }
+        if (summary.acuraciaPercentual === null) {
+          return <div className="text-lg font-semibold text-muted-foreground">—</div>;
+        }
+        return (
+          <div className="text-lg font-bold text-foreground tabular-nums">
+            {summary.acuraciaPercentual}%
+          </div>
+        );
+      })()}
+      <div className="text-[10px] text-muted-foreground mt-0.5">
+        {summary.totalConfirmadas} de {summary.totalPredicoes} confirmadas
+      </div>
     </div>
   );
 }

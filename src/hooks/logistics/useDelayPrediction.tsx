@@ -4,6 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useTelemetry } from '@/hooks/analytics/useTelemetry';
 
+export interface PredictionFactor {
+  nome: string;
+  peso: number;
+  impacto: 'positivo' | 'negativo' | 'neutro';
+  descricao?: string;
+}
+
 export interface DelayPrediction {
   id: string;
   numero: string;
@@ -13,6 +20,7 @@ export interface DelayPrediction {
   motivos: string[];
   recomendacoes: string[];
   horas_estimadas_atraso: number;
+  fatores?: PredictionFactor[];
 }
 
 export interface PredictionSummary {
