@@ -1833,6 +1833,60 @@ export type Database = {
         }
         Relationships: []
       }
+      delay_predictions_history: {
+        Row: {
+          actual_delay_hours: number | null
+          confirmed_at: string | null
+          created_at: string
+          entity_id: string
+          entity_numero: string | null
+          entity_type: string
+          fatores: Json
+          horas_estimadas_atraso: number
+          id: string
+          motivos: Json
+          predicted_at: string
+          probabilidade_atraso: number
+          recomendacoes: Json
+          risco: string
+          was_accurate: boolean | null
+        }
+        Insert: {
+          actual_delay_hours?: number | null
+          confirmed_at?: string | null
+          created_at?: string
+          entity_id: string
+          entity_numero?: string | null
+          entity_type: string
+          fatores?: Json
+          horas_estimadas_atraso?: number
+          id?: string
+          motivos?: Json
+          predicted_at?: string
+          probabilidade_atraso: number
+          recomendacoes?: Json
+          risco: string
+          was_accurate?: boolean | null
+        }
+        Update: {
+          actual_delay_hours?: number | null
+          confirmed_at?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_numero?: string | null
+          entity_type?: string
+          fatores?: Json
+          horas_estimadas_atraso?: number
+          id?: string
+          motivos?: Json
+          predicted_at?: string
+          probabilidade_atraso?: number
+          recomendacoes?: Json
+          risco?: string
+          was_accurate?: boolean | null
+        }
+        Relationships: []
+      }
       delivery_receipt_audit: {
         Row: {
           created_at: string
@@ -5339,7 +5393,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_prediction_accuracy: {
+        Row: {
+          acuracia_percentual: number | null
+          dia: string | null
+          risco: string | null
+          total_acertos: number | null
+          total_confirmadas: number | null
+          total_predicoes: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_xp: {
@@ -5362,6 +5426,7 @@ export type Database = {
         Returns: boolean
       }
       check_and_alert_health_regression: { Args: never; Returns: Json }
+      cleanup_old_delay_predictions: { Args: never; Returns: undefined }
       cleanup_old_health_snapshots: {
         Args: { days_to_keep?: number }
         Returns: number
