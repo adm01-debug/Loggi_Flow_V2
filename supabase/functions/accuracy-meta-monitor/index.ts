@@ -38,10 +38,25 @@ export const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const WINDOW_MS = 24 * 60 * 60 * 1000;
+    const windowStart = new Date(Date.now() - WINDOW_MS).toISOString();
     let created = 0;
+    let updated = 0;
+    let skipped = 0;
+
+    // Agrupa por (user_id, carrier) para evitar reprocessamento duplicado quando
+    // o mesmo par aparece mais de uma vez em prediction_accuracy_settings.
+    const seen = new Set<string>();
 
     for (const s of rows) {
+      const carrierTag = s.transportadora ?? "__all__";
+      const groupKey = `${s.user_id}::${carrierTag}`;
+      if (seen.has(groupKey)) {
+        skipped++;
+        continue;
+      }
+      seen.add(groupKey);
+
       const { data: breach, error: bErr } = await supabase.rpc(
         "count_prediction_breach_days",
         { _target: s.target_pct, _carrier: s.transportadora },
@@ -53,23 +68,42 @@ export const handler = async (req: Request): Promise<Response> => {
       const days = Number(breach ?? 0);
       if (days < s.consecutive_days_alert) continue;
 
-      // Dedup: já notificamos esse usuário/carrier nas últimas 24h?
-      const carrierTag = s.transportadora ?? "__all__";
-      const { data: existing } = await supabase
-        .from("notifications")
-        .select("id")
-        .eq("user_id", s.user_id)
-        .gte("created_at", dayAgo)
-        .contains("metadata", {
-          source: "accuracy-meta-monitor",
-          carrier: carrierTag,
-        })
-        .limit(1);
+      // Dedup janela 24h por (user, carrier). Busca todas as variações de
+      // carrier já persistidas (null literal ou "__all__") para o caso "todas".
+      const carrierVariants =
+        s.transportadora === null ? ["__all__", null] : [carrierTag];
 
-      if (existing && existing.length > 0) continue;
+      const { data: existingList } = await supabase
+        .from("notifications")
+        .select("id, created_at, metadata")
+        .eq("user_id", s.user_id)
+        .gte("created_at", windowStart)
+        .contains("metadata", { source: "accuracy-meta-monitor" })
+        .order("created_at", { ascending: false });
+
+      type ExistingMeta = {
+        source?: string;
+        carrier?: string | null;
+        breach_days?: number;
+        target_pct?: number;
+      };
+      const matchingInWindow = (existingList ?? []).filter((n) => {
+        const meta = (n.metadata ?? {}) as ExistingMeta;
+        return carrierVariants.includes(meta.carrier ?? null);
+      });
+
+      const signatureHit = matchingInWindow.find((n) => {
+        const meta = (n.metadata ?? {}) as ExistingMeta;
+        return meta.breach_days === days && meta.target_pct === s.target_pct;
+      });
+
+      if (signatureHit) {
+        skipped++;
+        continue;
+      }
 
       const carrierLabel = s.transportadora ?? "todas as transportadoras";
-      const { error: nErr } = await supabase.from("notifications").insert({
+      const payload = {
         user_id: s.user_id,
         title: `Meta de acurácia preditiva violada (${carrierLabel})`,
         message: `Acurácia ficou abaixo de ${s.target_pct}% por ${days} dia(s) consecutivo(s).`,
@@ -80,8 +114,34 @@ export const handler = async (req: Request): Promise<Response> => {
           carrier: carrierTag,
           target_pct: s.target_pct,
           breach_days: days,
+          window_hours: 24,
+          last_evaluated_at: new Date().toISOString(),
         },
-      });
+      };
+
+      // Se já existe alerta no mesmo grupo (24h) mas com breach_days diferente,
+      // atualiza o registro em vez de criar duplicata.
+      if (matchingInWindow.length > 0) {
+        const target = matchingInWindow[0];
+        const { error: uErr } = await supabase
+          .from("notifications")
+          .update({
+            title: payload.title,
+            message: payload.message,
+            metadata: payload.metadata,
+            read: false,
+            read_at: null,
+          })
+          .eq("id", target.id);
+        if (uErr) {
+          log("ERROR", "notification update failed", { user: s.user_id, err: uErr.message });
+          continue;
+        }
+        updated++;
+        continue;
+      }
+
+      const { error: nErr } = await supabase.from("notifications").insert(payload);
       if (nErr) {
         log("ERROR", "notification insert failed", { user: s.user_id, err: nErr.message });
         continue;
@@ -91,14 +151,20 @@ export const handler = async (req: Request): Promise<Response> => {
 
     log("INFO", "accuracy-meta-monitor complete", {
       evaluated: rows.length,
+      groups: seen.size,
       notifications_created: created,
+      notifications_updated: updated,
+      skipped,
     });
 
     return new Response(
       JSON.stringify({
         success: true,
         evaluated: rows.length,
+        groups: seen.size,
         notifications_created: created,
+        notifications_updated: updated,
+        skipped,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
