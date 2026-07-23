@@ -164,6 +164,63 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
                 );
               })}
             </ul>
+
+            <div className="rounded-lg border bg-muted/10 p-3 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Star className="h-4 w-4 text-primary" /> Cenários favoritos
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nome do cenário (ex: Blitz clima Sudeste)"
+                  maxLength={80}
+                />
+                <Button onClick={handleSave} disabled={!canSave} size="sm">
+                  Salvar seleção
+                </Button>
+              </div>
+              {scenarios.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Nenhum cenário salvo. Selecione mitigações e salve para comparar projeções depois.
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {scenarios.map((s) => {
+                    const gain = s.totalGain;
+                    return (
+                      <li key={s.id} className="flex items-start justify-between gap-2 rounded-md border bg-background p-2">
+                        <button
+                          type="button"
+                          onClick={() => handleRestore(s)}
+                          className="min-w-0 flex-1 text-left"
+                        >
+                          <p className="truncate text-sm font-medium">{s.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(s.createdAt).toLocaleString("pt-BR")} · {s.categories.length} mitigação(ões)
+                          </p>
+                          <div className="mt-1 flex flex-wrap gap-1 text-[11px]">
+                            <Badge variant="outline">Base {s.baselineOtif.toFixed(1)}%</Badge>
+                            <Badge variant={gain >= 0 ? "default" : "destructive"}>
+                              Proj {s.projectedOtif.toFixed(1)}% ({gain >= 0 ? "+" : ""}{gain.toFixed(1)})
+                            </Badge>
+                            <Badge variant="secondary">Conf {Math.round(s.confidence * 100)}%</Badge>
+                          </div>
+                        </button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(s.id)}
+                          aria-label={`Remover cenário ${s.name}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
           </>
         )}
       </CardContent>
