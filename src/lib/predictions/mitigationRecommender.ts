@@ -4,6 +4,7 @@
  * dominante. Puro/determinístico para permitir simulação de centenas de cenários.
  */
 import type { CategoryBucket, RootCauseCategory, RootCauseReport } from "./rootCauseAnalyzer";
+import type { ROIReport } from "./mitigationROI";
 
 export type MitigationPriority = "alta" | "media" | "baixa";
 
@@ -14,6 +15,13 @@ export interface MitigationSuggestion {
   actions: string[];
   focusCarrier: string | null;
   impactScore: number; // 0-100
+}
+
+export interface RankedMitigation extends MitigationSuggestion {
+  effectiveScore: number; // impact ajustado pelo ROI histórico (0-100)
+  roiAdjustment: number;  // delta aplicado (-30..+30)
+  roiAvgDelta: number | null;
+  roiMeasured: number;
 }
 
 const PLAYBOOK: Record<RootCauseCategory, { headline: string; actions: string[] }> = {
@@ -130,3 +138,47 @@ export const PRIORITY_LABELS: Record<MitigationPriority, string> = {
   media: "Prioridade Média",
   baixa: "Prioridade Baixa",
 };
+
+/**
+ * Reordena sugestões aplicando ajuste baseado no ROI histórico por categoria.
+ * - Categorias com Δ OTIF histórico positivo recebem boost proporcional (até +30).
+ * - Categorias com Δ negativo recebem penalidade (até -30), reduzindo prioridade
+ *   quando intervenções passadas não trouxeram retorno mensurável.
+ * - Sem histórico medido → ajuste 0 (mantém score original).
+ */
+export function rerankByROI(
+  suggestions: readonly MitigationSuggestion[],
+  roi: ROIReport | null | undefined,
+): RankedMitigation[] {
+  const roiByCategory = new Map<RootCauseCategory, { avgDelta: number; measured: number }>();
+  if (roi) {
+    for (const c of roi.byCategory) {
+      roiByCategory.set(c.category, { avgDelta: c.avgDelta, measured: c.measuredActions });
+    }
+  }
+
+  const ranked: RankedMitigation[] = suggestions.map((s) => {
+    const hist = roiByCategory.get(s.category);
+    let adjustment = 0;
+    if (hist && hist.measured > 0 && Number.isFinite(hist.avgDelta)) {
+      // Clamp delta em [-10, +10] pts OTIF → escala p/ [-30, +30]
+      const clamped = Math.max(-10, Math.min(10, hist.avgDelta));
+      adjustment = Math.round(clamped * 3);
+    }
+    const effective = Math.max(0, Math.min(100, s.impactScore + adjustment));
+    return {
+      ...s,
+      effectiveScore: effective,
+      roiAdjustment: adjustment,
+      roiAvgDelta: hist ? hist.avgDelta : null,
+      roiMeasured: hist ? hist.measured : 0,
+      priority: priorityFromScore(effective),
+    };
+  });
+
+  ranked.sort((a, b) => {
+    if (b.effectiveScore !== a.effectiveScore) return b.effectiveScore - a.effectiveScore;
+    return a.category.localeCompare(b.category);
+  });
+  return ranked;
+}
