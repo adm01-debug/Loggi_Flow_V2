@@ -420,8 +420,10 @@ export default function PainelSLA() {
         </TabsContent>
       </Tabs>
 
+      <PredictionAccuracyTimeline />
       <CarrierAccuracyPanel />
     </div>
+
 
   );
 }
