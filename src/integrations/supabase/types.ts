@@ -6237,12 +6237,25 @@ export type Database = {
         Args: { p_reward_item_id: string; p_user_id: string }
         Returns: Json
       }
+      purge_rte_gateway_health: {
+        Args: { retention_days?: number }
+        Returns: number
+      }
       reconcile_pending_freights: { Args: never; Returns: Json }
       record_heartbeat: { Args: never; Returns: undefined }
       refresh_dashboard_views: { Args: never; Returns: Json }
       reject_index_proposal: {
         Args: { p_id: string; p_reason?: string }
         Returns: undefined
+      }
+      rte_gateway_sustained_downtime: {
+        Args: { window_hours?: number }
+        Returns: {
+          checks: number
+          gateway: string
+          last_checked_at: string
+          last_error: string
+        }[]
       }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
