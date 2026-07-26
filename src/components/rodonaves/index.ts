@@ -10,3 +10,5 @@ export { RTESelfAttendance } from './RTESelfAttendance';
 export { RTEAdvancedQuotation } from './RTEAdvancedQuotation';
 export { RTEGatewayHealthPanel } from './RTEGatewayHealthPanel';
 export { RTELatencyTrendChart } from './RTELatencyTrendChart';
+export { RTEGatewaySLOPanel } from './RTEGatewaySLOPanel';
+export { RTESLOAlertsPanel } from './RTESLOAlertsPanel';
