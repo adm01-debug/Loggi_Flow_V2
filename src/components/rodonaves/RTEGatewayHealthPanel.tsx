@@ -7,6 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useGatewayHealth, type GatewayUptime } from "@/hooks/rodonaves/useGatewayHealth";
+import { RTELatencyTrendChart } from "./RTELatencyTrendChart";
+
 
 const GATEWAY_LABEL: Record<string, string> = {
   tracking: "Rastreio",
