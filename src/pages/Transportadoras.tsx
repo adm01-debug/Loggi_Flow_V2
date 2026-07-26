@@ -222,7 +222,7 @@ export default function Transportadoras() {
           total_entregas: Number(tStats?.total_entregas || 0),
           entregas_sucesso: Number(tStats?.entregas_no_prazo || 0),
         };
-      }) as Transportadora[];
+      }) as unknown as Transportadora[];
     },
     staleTime: QUERY_STALE_TIME.STATIC,
   });

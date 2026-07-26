@@ -15,6 +15,77 @@ const DEADLINE_GATEWAY = "https://01wapi.rte.com.br";
 const PICKUP_GATEWAY = "https://pickup-apigateway.rte.com.br";
 const CUSTOMER_GATEWAY = "https://customer-apigateway.rte.com.br";
 const SELFATTENDANCE_GATEWAY = "https://01wapi.rte.com.br";
+const UNITTOCITY_GATEWAY = "https://unittocity-apigateway.rte.com.br";
+const PAYMENTS_GATEWAY = "https://payments-apigateway.rte.com.br";
+const DNE_GATEWAY = "https://dne-apigateway.rte.com.br";
+
+/**
+ * Perfis de timeout por gateway (ms), derivados do SLA implícito medido:
+ * tracking P95 5s, quotation/customer P95 10s, selfattendance 12s, pickup 15s.
+ * Usar um timeout único faz a coleta abortar cedo e o rastreio esperar demais.
+ */
+const GATEWAY_TIMEOUT: Record<string, number> = {
+  [TRACKING_GATEWAY]: 8_000,
+  [QUOTATION_GATEWAY]: 14_000,
+  [PICKUP_GATEWAY]: 20_000,
+  [CUSTOMER_GATEWAY]: 14_000,
+  [SELFATTENDANCE_GATEWAY]: 16_000,
+  [UNITTOCITY_GATEWAY]: 14_000,
+  [PAYMENTS_GATEWAY]: 16_000,
+  [DNE_GATEWAY]: 8_000,
+};
+const DEFAULT_TIMEOUT = 15_000;
+
+function timeoutFor(gateway: string): number {
+  return GATEWAY_TIMEOUT[gateway] ?? DEFAULT_TIMEOUT;
+}
+
+/** Erro tipado da integração RTE, com classificação de causa. */
+class RTEError extends Error {
+  constructor(
+    message: string,
+    readonly code: "RTE_SCOPE_BLOCKED" | "RTE_UPSTREAM_ERROR" | "RTE_TIMEOUT" | "RTE_AUTH_FAILED" | "RTE_BAD_REQUEST",
+    readonly httpStatus: number,
+    readonly gateway: string,
+  ) {
+    super(message);
+    this.name = "RTEError";
+  }
+}
+
+function classifyStatus(status: number): RTEError["code"] {
+  if (status === 401) return "RTE_AUTH_FAILED";
+  if (status === 403) return "RTE_SCOPE_BLOCKED";
+  if (status >= 500) return "RTE_UPSTREAM_ERROR";
+  return "RTE_BAD_REQUEST";
+}
+
+/** Executa um fetch com AbortController respeitando o perfil do gateway. */
+async function fetchWithTimeout(
+  gateway: string,
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutFor(gateway));
+  try {
+    return await safeFetch(url, { ...init, signal: controller.signal });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (controller.signal.aborted) {
+      throw new RTEError(
+        `Timeout de ${timeoutFor(gateway)}ms no gateway ${gateway}`,
+        "RTE_TIMEOUT",
+        504,
+        gateway,
+      );
+    }
+    throw new RTEError(message, "RTE_UPSTREAM_ERROR", 502, gateway);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 
 const rodonavesBreaker = getCircuitBreaker('rodonaves', {
   failureThreshold: 10,
@@ -33,7 +104,7 @@ async function getToken(gateway: string): Promise<string> {
   const password = Deno.env.get("RODONAVES_PASSWORD");
   if (!username || !password) throw new Error("RODONAVES credentials not configured");
 
-  const response = await safeFetch(`${gateway}/token`, {
+  const response = await fetchWithTimeout(gateway, `${gateway}/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ auth_type: "DEV", grant_type: "password", username, password }).toString(),
@@ -41,9 +112,10 @@ async function getToken(gateway: string): Promise<string> {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Auth failed [${response.status}]: ${text}`);
+    throw new RTEError(`Auth failed [${response.status}]: ${text}`, "RTE_AUTH_FAILED", 502, gateway);
   }
   const data = await response.json();
+  // Cache por gateway: cada gateway emite seu próprio token OAuth.
   tokenCache[gateway] = { token: data.access_token, expiresAt: Date.now() + 25 * 60_000 };
   return data.access_token;
 }
@@ -79,8 +151,15 @@ async function apiGet(gateway: string, path: string, params: Record<string, stri
     const token = await getToken(gateway);
     const qs = buildQS(params);
     const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-    const res = await safeFetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
+    const res = await fetchWithTimeout(gateway, url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) {
+      throw new RTEError(
+        `GET ${path} failed [${res.status}]: ${await res.text()}`,
+        classifyStatus(res.status),
+        res.status,
+        gateway,
+      );
+    }
     return res.json();
   });
 }
@@ -97,11 +176,198 @@ async function apiMutate(gateway: string, method: string, path: string, body?: u
       headers["Content-Type"] = "application/json";
       opts.body = JSON.stringify(body);
     }
-    const res = await safeFetch(url, opts);
-    if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
+    const res = await fetchWithTimeout(gateway, url, opts);
+    if (!res.ok) {
+      throw new RTEError(
+        `${method} ${path} failed [${res.status}]: ${await res.text()}`,
+        classifyStatus(res.status),
+        res.status,
+        gateway,
+      );
+    }
     const text = await res.text();
     try { return JSON.parse(text); } catch { return { raw: text }; }
   });
+}
+
+// ==========================================
+// R5 — FALLBACK DE ENDEREÇO (gateway DNE offline)
+// ==========================================
+
+interface ResolvedAddress {
+  zipCode: string;
+  street: string;
+  district: string;
+  city: string;
+  state: string;
+  source: "rte_selfattendance" | "viacep" | "brasilapi";
+}
+
+async function fetchJson(url: string, timeoutMs: number): Promise<Record<string, unknown>> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await safeFetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function str(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+/**
+ * Resolve endereço por CEP com cadeia de fallback:
+ * SelfAttendance (RTE) → ViaCEP → BrasilAPI. A fonte usada é sempre marcada
+ * na resposta, pois o gateway DNE da RTE está offline.
+ */
+async function resolveAddressByZip(rawZip: string): Promise<ResolvedAddress> {
+  const zip = rawZip.replace(/\D/g, "");
+  if (zip.length !== 8) {
+    throw new RTEError("CEP inválido: informe 8 dígitos", "RTE_BAD_REQUEST", 422, SELFATTENDANCE_GATEWAY);
+  }
+
+  const attempts: Array<() => Promise<ResolvedAddress>> = [
+    async () => {
+      const data = await apiGet(SELFATTENDANCE_GATEWAY, "/webapi/address/zipcode", { zipCode: zip });
+      const record = (data ?? {}) as Record<string, unknown>;
+      const city = str(record.CityName) || str(record.City);
+      if (!city) throw new Error("Resposta RTE sem cidade");
+      return {
+        zipCode: zip,
+        street: str(record.Street) || str(record.Address),
+        district: str(record.District) || str(record.Neighborhood),
+        city,
+        state: str(record.StateAbbreviation) || str(record.State),
+        source: "rte_selfattendance",
+      };
+    },
+    async () => {
+      const data = await fetchJson(`https://viacep.com.br/ws/${zip}/json/`, 6_000);
+      if (data.erro) throw new Error("CEP não encontrado no ViaCEP");
+      return {
+        zipCode: zip,
+        street: str(data.logradouro),
+        district: str(data.bairro),
+        city: str(data.localidade),
+        state: str(data.uf),
+        source: "viacep",
+      };
+    },
+    async () => {
+      const data = await fetchJson(`https://brasilapi.com.br/api/cep/v2/${zip}`, 6_000);
+      return {
+        zipCode: zip,
+        street: str(data.street),
+        district: str(data.neighborhood),
+        city: str(data.city),
+        state: str(data.state),
+        source: "brasilapi",
+      };
+    },
+  ];
+
+  const errors: string[] = [];
+  for (const attempt of attempts) {
+    try {
+      const resolved = await attempt();
+      if (resolved.city) return resolved;
+      errors.push("resposta sem cidade");
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  throw new RTEError(
+    `Não foi possível resolver o CEP ${zip}. Tentativas: ${errors.join(" | ")}`,
+    "RTE_UPSTREAM_ERROR",
+    502,
+    DNE_GATEWAY,
+  );
+}
+
+// ==========================================
+// R6 — MALHA DE ATENDIMENTO (unittocity)
+// ==========================================
+
+async function unitToCity(p: Record<string, unknown>) {
+  return apiGet(UNITTOCITY_GATEWAY, "/api/v1/unittocity", {
+    ZipCode: String(p.zipCode ?? "").replace(/\D/g, ""),
+    CityId: p.cityId as number,
+  });
+}
+
+/** Verifica se um CEP está na malha atendida antes de disparar uma cotação. */
+async function checkCoverage(rawZip: string) {
+  const zip = String(rawZip ?? "").replace(/\D/g, "");
+  if (zip.length !== 8) {
+    throw new RTEError("CEP inválido: informe 8 dígitos", "RTE_BAD_REQUEST", 422, UNITTOCITY_GATEWAY);
+  }
+  try {
+    const data = await unitToCity({ zipCode: zip });
+    const record = (data ?? {}) as Record<string, unknown>;
+    const covered = Boolean(record.UnitId ?? record.unitId ?? record.Unit);
+    return { zipCode: zip, covered, unit: data, source: "unittocity" as const };
+  } catch (error) {
+    // Malha indisponível não deve impedir a cotação — retorna indeterminado.
+    const message = error instanceof Error ? error.message : String(error);
+    return { zipCode: zip, covered: null, unit: null, source: "indisponivel" as const, reason: message };
+  }
+}
+
+// ==========================================
+// R7 — HEALTH CHECK DOS GATEWAYS
+// ==========================================
+
+const HEALTH_TARGETS: Array<{ name: string; base: string; path: string }> = [
+  { name: "tracking", base: TRACKING_GATEWAY, path: "/api/healthcheck" },
+  { name: "quotation", base: QUOTATION_GATEWAY, path: "/api/healthcheck" },
+  { name: "pickup", base: PICKUP_GATEWAY, path: "/api/healthcheck" },
+  { name: "customer", base: CUSTOMER_GATEWAY, path: "/api/healthcheck" },
+  { name: "selfattendance", base: SELFATTENDANCE_GATEWAY, path: "/webapi/healthcheck" },
+  { name: "unittocity", base: UNITTOCITY_GATEWAY, path: "/api/healthcheck" },
+  { name: "payments", base: PAYMENTS_GATEWAY, path: "/api/healthcheck" },
+  { name: "dne", base: DNE_GATEWAY, path: "/api/healthcheck" },
+];
+
+async function healthAll() {
+  const checks = await Promise.all(
+    HEALTH_TARGETS.map(async (target) => {
+      const startedAt = Date.now();
+      try {
+        const res = await fetchWithTimeout(target.base, `${target.base}${target.path}`, { method: "GET" });
+        await res.text();
+        return {
+          gateway: target.name,
+          // Qualquer resposta HTTP (inclusive 401/404) prova que o gateway está
+          // no ar; só falha de conexão/DNS/timeout caracteriza indisponibilidade.
+          online: res.status > 0,
+          httpStatus: res.status,
+          latencyMs: Date.now() - startedAt,
+        };
+      } catch (error) {
+        return {
+          gateway: target.name,
+          online: false,
+          httpStatus: 0,
+          latencyMs: Date.now() - startedAt,
+          error: error instanceof Error ? error.message : String(error),
+        };
+      }
+    }),
+  );
+
+  const online = checks.filter((c) => c.online).length;
+  return {
+    checkedAt: new Date().toISOString(),
+    online,
+    offline: checks.length - online,
+    total: checks.length,
+    gateways: checks,
+  };
 }
 
 
@@ -996,6 +1262,28 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ===== R5: ENDEREÇO COM FALLBACK (DNE offline) =====
+      case "resolve-address": {
+        result = await resolveAddressByZip(String(params.cep ?? params.zipCode ?? ""));
+        break;
+      }
+
+      // ===== R6: MALHA DE ATENDIMENTO =====
+      case "unit-to-city": {
+        result = await unitToCity({ zipCode: params.cep ?? params.zipCode, cityId: params.cityId });
+        break;
+      }
+      case "check-coverage": {
+        result = await checkCoverage(String(params.cep ?? params.zipCode ?? ""));
+        break;
+      }
+
+      // ===== R7: HEALTH DOS 8 GATEWAYS =====
+      case "health-all": {
+        result = await healthAll();
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: `Unknown action: ${action}` }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -1006,6 +1294,17 @@ Deno.serve(async (req) => {
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return validationErrorResponse(error, corsHeaders);
+    }
+    if (error instanceof RTEError) {
+      log.error(`[rodonaves-api] ${error.code} @ ${error.gateway}:`, error.message);
+      const status = error.code === "RTE_SCOPE_BLOCKED" ? 403
+        : error.code === "RTE_TIMEOUT" ? 504
+        : error.code === "RTE_BAD_REQUEST" ? 422
+        : 502;
+      return new Response(
+        JSON.stringify({ success: false, code: error.code, gateway: error.gateway, error: error.message }),
+        { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
     log.error("[rodonaves-api] Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
