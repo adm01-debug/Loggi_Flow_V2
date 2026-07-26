@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useGatewayHealth, type GatewayUptime } from "@/hooks/rodonaves/useGatewayHealth";
 import { RTELatencyTrendChart } from "./RTELatencyTrendChart";
 import { RTEGatewaySLOPanel } from "./RTEGatewaySLOPanel";
+import { RTESLOHistoryPanel } from "./RTESLOHistoryPanel";
 
 
 const GATEWAY_LABEL: Record<string, string> = {
