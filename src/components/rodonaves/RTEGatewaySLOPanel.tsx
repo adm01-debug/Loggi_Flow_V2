@@ -72,9 +72,10 @@ export interface RTEGatewaySLOPanelProps {
 }
 
 /**
- * SLO por gateway com metas configuráveis (persistidas localmente)
- * e consumo de error budget por gateway.
+ * SLO por gateway com metas compartilhadas (persistidas no banco, editáveis
+ * apenas por administradores) e consumo de error budget por gateway.
  */
+
 export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatewaySLOPanelProps) {
   const { globalTarget, canEdit, saveTarget } = useSLOTargets();
   const target = globalTarget;
