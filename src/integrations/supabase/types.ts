@@ -4584,6 +4584,39 @@ export type Database = {
           },
         ]
       }
+      rte_gateway_health: {
+        Row: {
+          checked_at: string
+          created_at: string
+          error_message: string | null
+          gateway: string
+          http_status: number
+          id: string
+          latency_ms: number
+          online: boolean
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          error_message?: string | null
+          gateway: string
+          http_status?: number
+          id?: string
+          latency_ms?: number
+          online: boolean
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          error_message?: string | null
+          gateway?: string
+          http_status?: number
+          id?: string
+          latency_ms?: number
+          online?: boolean
+        }
+        Relationships: []
+      }
       rule_execution_logs: {
         Row: {
           actions_executed: Json | null
