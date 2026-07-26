@@ -137,15 +137,18 @@ export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatew
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {results.map((result) => (
-              <SLORow
-                key={result.gateway}
-                result={result}
-                label={labels[result.gateway] ?? result.gateway}
-              />
-            ))}
-          </div>
+          <>
+            <div className="space-y-2">
+              {results.map((result) => (
+                <SLORow
+                  key={result.gateway}
+                  result={result}
+                  label={labels[result.gateway] ?? result.gateway}
+                />
+              ))}
+            </div>
+            <RTESLOAlertsPanel results={results} labels={labels} />
+          </>
         )}
       </CardContent>
     </Card>
