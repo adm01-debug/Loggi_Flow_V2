@@ -76,14 +76,17 @@ export interface RTEGatewaySLOPanelProps {
  * e consumo de error budget por gateway.
  */
 export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatewaySLOPanelProps) {
-  const [target, setTarget] = useState(() => loadSLOTarget());
+  const { globalTarget, canEdit, saveTarget } = useSLOTargets();
+  const target = globalTarget;
 
   const results = useMemo(() => evaluateAllSLO(metrics, target), [metrics, target]);
   const summary = useMemo(() => summarizeSLO(results), [results]);
 
   const update = (patch: Partial<typeof target>) => {
-    setTarget(saveSLOTarget({ ...target, ...patch }));
+    if (!canEdit) return;
+    saveTarget.mutate({ target: { ...target, ...patch } });
   };
+
 
   return (
     <Card className={cn("card-raised", className)}>
