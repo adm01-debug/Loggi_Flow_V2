@@ -7,6 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useGatewayHealth, type GatewayUptime } from "@/hooks/rodonaves/useGatewayHealth";
+import { RTELatencyTrendChart } from "./RTELatencyTrendChart";
+
 
 const GATEWAY_LABEL: Record<string, string> = {
   tracking: "Rastreio",
@@ -80,7 +82,7 @@ export interface RTEGatewayHealthPanelProps {
  * latência média/P95 e execução manual de verificação.
  */
 export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealthPanelProps) {
-  const { uptime, downtime, isLoading, error, runCheck } = useGatewayHealth(hours);
+  const { history, uptime, downtime, isLoading, error, runCheck } = useGatewayHealth(hours);
 
   const summary = useMemo(() => {
     if (uptime.length === 0) return { online: 0, total: 0, avgUptime: 0 };
@@ -161,9 +163,14 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
           </div>
         )}
 
+        {!isLoading && !error && history.length > 0 && (
+          <RTELatencyTrendChart samples={history} labels={GATEWAY_LABEL} />
+        )}
+
         {!isLoading &&
           !error &&
           uptime.map((item) => <GatewayRow key={item.gateway} item={item} />)}
+
 
         {runCheck.isError && (
           <p className="text-sm text-destructive">
