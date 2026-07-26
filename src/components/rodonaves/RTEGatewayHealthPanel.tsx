@@ -163,9 +163,14 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
           </div>
         )}
 
+        {!isLoading && !error && history.length > 0 && (
+          <RTELatencyTrendChart samples={history} labels={GATEWAY_LABEL} />
+        )}
+
         {!isLoading &&
           !error &&
           uptime.map((item) => <GatewayRow key={item.gateway} item={item} />)}
+
 
         {runCheck.isError && (
           <p className="text-sm text-destructive">
