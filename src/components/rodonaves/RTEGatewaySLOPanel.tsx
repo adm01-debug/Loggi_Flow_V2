@@ -15,6 +15,7 @@ import {
   type GatewaySLOResult,
   type SLOStatus,
 } from "@/lib/rodonaves/gatewaySLO";
+import { RTESLOAlertsPanel } from "./RTESLOAlertsPanel";
 
 const STATUS_TONE: Record<SLOStatus, { label: string; className: string }> = {
   ok: { label: "Dentro da meta", className: "bg-primary/10 text-primary border-primary/20" },
