@@ -39,8 +39,8 @@ export function getCorsHeaders(req?: Request): Record<string, string> {
       ...BASE_HEADERS,
       "Access-Control-Allow-Origin": origin,
       "Vary": "Origin",
-ようこそ: "",
     };
+
   }
   return { ...BASE_HEADERS, "Access-Control-Allow-Origin": list[0] || "*", "Vary": "Origin" };
 }
