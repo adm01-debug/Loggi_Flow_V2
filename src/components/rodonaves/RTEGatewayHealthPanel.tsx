@@ -186,7 +186,12 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
           uptime.map((item) => <GatewayRow key={item.gateway} item={item} />)}
 
         {!isLoading && !error && uptime.length > 0 && (
-          <RTEGatewaySLOPanel metrics={sloMetrics} labels={GATEWAY_LABEL} className="mt-2" />
+          <RTEGatewaySLOPanel
+            metrics={sloMetrics}
+            samples={history}
+            labels={GATEWAY_LABEL}
+            className="mt-2"
+          />
         )}
 
 
