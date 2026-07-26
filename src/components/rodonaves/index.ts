@@ -13,3 +13,4 @@ export { RTELatencyTrendChart } from './RTELatencyTrendChart';
 export { RTEGatewaySLOPanel } from './RTEGatewaySLOPanel';
 export { RTESLOAlertsPanel } from './RTESLOAlertsPanel';
 export { RTESLOReportPanel } from './RTESLOReportPanel';
+export { RTESLOHistoryPanel } from './RTESLOHistoryPanel';
