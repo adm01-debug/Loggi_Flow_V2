@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Gauge, ShieldAlert, ShieldCheck, TriangleAlert } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,14 +8,14 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import {
   evaluateAllSLO,
-  loadSLOTarget,
-  saveSLOTarget,
   summarizeSLO,
   type GatewaySLOInput,
   type GatewaySLOResult,
   type SLOStatus,
 } from "@/lib/rodonaves/gatewaySLO";
+import { useSLOTargets } from "@/hooks/rodonaves/useSLOTargets";
 import { RTESLOAlertsPanel } from "./RTESLOAlertsPanel";
+
 
 const STATUS_TONE: Record<SLOStatus, { label: string; className: string }> = {
   ok: { label: "Dentro da meta", className: "bg-primary/10 text-primary border-primary/20" },
@@ -72,18 +72,22 @@ export interface RTEGatewaySLOPanelProps {
 }
 
 /**
- * SLO por gateway com metas configuráveis (persistidas localmente)
- * e consumo de error budget por gateway.
+ * SLO por gateway com metas compartilhadas (persistidas no banco, editáveis
+ * apenas por administradores) e consumo de error budget por gateway.
  */
+
 export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatewaySLOPanelProps) {
-  const [target, setTarget] = useState(() => loadSLOTarget());
+  const { globalTarget, canEdit, saveTarget } = useSLOTargets();
+  const target = globalTarget;
 
   const results = useMemo(() => evaluateAllSLO(metrics, target), [metrics, target]);
   const summary = useMemo(() => summarizeSLO(results), [results]);
 
   const update = (patch: Partial<typeof target>) => {
-    setTarget(saveSLOTarget({ ...target, ...patch }));
+    if (!canEdit) return;
+    saveTarget.mutate({ target: { ...target, ...patch } });
   };
+
 
   return (
     <Card className={cn("card-raised", className)}>
@@ -111,6 +115,7 @@ export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatew
               min={50}
               max={100}
               step={0.1}
+              disabled={!canEdit || saveTarget.isPending}
               value={target.uptimeTargetPct}
               onChange={(event) => update({ uptimeTargetPct: Number(event.target.value) })}
             />
@@ -125,11 +130,25 @@ export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatew
               min={50}
               max={120000}
               step={50}
+              disabled={!canEdit || saveTarget.isPending}
               value={target.latencyP95BudgetMs}
               onChange={(event) => update({ latencyP95BudgetMs: Number(event.target.value) })}
             />
           </div>
         </div>
+
+        <p className="text-xs text-muted-foreground">
+          {canEdit
+            ? "Metas compartilhadas com toda a equipe (salvas no banco)."
+            : "Metas definidas pela administração — somente leitura."}
+        </p>
+
+        {saveTarget.isError && (
+          <p role="alert" className="text-xs text-destructive">
+            Não foi possível salvar a meta: {(saveTarget.error as Error).message}
+          </p>
+        )}
+
 
         {results.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border p-6 text-center">

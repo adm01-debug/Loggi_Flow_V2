@@ -4617,6 +4617,36 @@ export type Database = {
         }
         Relationships: []
       }
+      rte_slo_targets: {
+        Row: {
+          created_at: string
+          gateway: string
+          id: string
+          latency_p95_budget_ms: number
+          updated_at: string
+          updated_by: string | null
+          uptime_target_pct: number
+        }
+        Insert: {
+          created_at?: string
+          gateway: string
+          id?: string
+          latency_p95_budget_ms?: number
+          updated_at?: string
+          updated_by?: string | null
+          uptime_target_pct?: number
+        }
+        Update: {
+          created_at?: string
+          gateway?: string
+          id?: string
+          latency_p95_budget_ms?: number
+          updated_at?: string
+          updated_by?: string | null
+          uptime_target_pct?: number
+        }
+        Relationships: []
+      }
       rule_execution_logs: {
         Row: {
           actions_executed: Json | null
