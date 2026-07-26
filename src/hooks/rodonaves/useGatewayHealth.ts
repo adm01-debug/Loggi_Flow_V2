@@ -82,12 +82,33 @@ export function aggregateUptime(rows: GatewayHealthRow[]): GatewayUptime[] {
     .sort((a, b) => a.uptimePct - b.uptimePct);
 }
 
+/** Gateway com queda sustentada (todas as verificações da janela offline). */
+export interface GatewayDowntime {
+  gateway: string;
+  checks: number;
+  last_checked_at: string;
+  last_error: string | null;
+}
+
 /**
  * Histórico + execução manual do health-check dos gateways da Rodonaves.
  * O histórico é somente leitura no cliente; a gravação ocorre no backend.
  */
 export function useGatewayHealth(hours = 24) {
   const queryClient = useQueryClient();
+
+  const downtime = useQuery({
+    queryKey: [...HISTORY_KEY, "downtime"],
+    queryFn: async (): Promise<GatewayDowntime[]> => {
+      const { data, error } = await supabase.rpc("rte_gateway_sustained_downtime", {
+        window_hours: 2,
+      });
+      if (error) throw error;
+      return (data ?? []) as GatewayDowntime[];
+    },
+    staleTime: 60_000,
+    gcTime: 300_000,
+  });
 
   const history = useQuery({
     queryKey: [...HISTORY_KEY, hours],
