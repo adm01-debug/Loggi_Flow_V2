@@ -195,6 +195,9 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
           />
         )}
 
+        <RTESLOHistoryPanel labels={GATEWAY_LABEL} className="mt-2" />
+
+
 
 
 
