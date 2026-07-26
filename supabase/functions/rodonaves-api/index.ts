@@ -342,7 +342,9 @@ async function healthAll() {
         await res.text();
         return {
           gateway: target.name,
-          online: res.ok,
+          // Qualquer resposta HTTP (inclusive 401/404) prova que o gateway está
+          // no ar; só falha de conexão/DNS/timeout caracteriza indisponibilidade.
+          online: res.status > 0,
           httpStatus: res.status,
           latencyMs: Date.now() - startedAt,
         };
