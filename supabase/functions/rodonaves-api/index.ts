@@ -104,7 +104,7 @@ async function getToken(gateway: string): Promise<string> {
   const password = Deno.env.get("RODONAVES_PASSWORD");
   if (!username || !password) throw new Error("RODONAVES credentials not configured");
 
-  const response = await safeFetch(`${gateway}/token`, {
+  const response = await fetchWithTimeout(gateway, `${gateway}/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ auth_type: "DEV", grant_type: "password", username, password }).toString(),
@@ -112,9 +112,10 @@ async function getToken(gateway: string): Promise<string> {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Auth failed [${response.status}]: ${text}`);
+    throw new RTEError(`Auth failed [${response.status}]: ${text}`, "RTE_AUTH_FAILED", 502, gateway);
   }
   const data = await response.json();
+  // Cache por gateway: cada gateway emite seu próprio token OAuth.
   tokenCache[gateway] = { token: data.access_token, expiresAt: Date.now() + 25 * 60_000 };
   return data.access_token;
 }
