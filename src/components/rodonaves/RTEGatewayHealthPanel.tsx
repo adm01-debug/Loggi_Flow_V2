@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useGatewayHealth, type GatewayUptime } from "@/hooks/rodonaves/useGatewayHealth";
 import { RTELatencyTrendChart } from "./RTELatencyTrendChart";
 import { RTEGatewaySLOPanel } from "./RTEGatewaySLOPanel";
+import { RTESLOHistoryPanel } from "./RTESLOHistoryPanel";
 
 
 const GATEWAY_LABEL: Record<string, string> = {
@@ -193,6 +194,9 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
             className="mt-2"
           />
         )}
+
+        <RTESLOHistoryPanel labels={GATEWAY_LABEL} className="mt-2" />
+
 
 
 
