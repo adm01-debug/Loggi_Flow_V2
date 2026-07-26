@@ -396,11 +396,15 @@ async function healthAll(persist = false) {
   );
 
   const online = checks.filter((c) => c.online).length;
+  const checkedAt = new Date().toISOString();
+  const persisted = persist ? await persistHealth(checks, checkedAt) : false;
+
   return {
-    checkedAt: new Date().toISOString(),
+    checkedAt,
     online,
     offline: checks.length - online,
     total: checks.length,
+    persisted,
     gateways: checks,
   };
 }
