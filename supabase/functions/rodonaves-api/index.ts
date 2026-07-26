@@ -1319,7 +1319,7 @@ Deno.serve(async (req) => {
 
       // ===== R7: HEALTH DOS 8 GATEWAYS =====
       case "health-all": {
-        result = await healthAll();
+        result = await healthAll(params.persist !== false);
         break;
       }
 
