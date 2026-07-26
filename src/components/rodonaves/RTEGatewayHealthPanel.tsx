@@ -80,7 +80,7 @@ export interface RTEGatewayHealthPanelProps {
  * latência média/P95 e execução manual de verificação.
  */
 export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealthPanelProps) {
-  const { uptime, isLoading, error, runCheck } = useGatewayHealth(hours);
+  const { uptime, downtime, isLoading, error, runCheck } = useGatewayHealth(hours);
 
   const summary = useMemo(() => {
     if (uptime.length === 0) return { online: 0, total: 0, avgUptime: 0 };
