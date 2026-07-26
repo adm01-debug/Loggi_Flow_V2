@@ -15,6 +15,77 @@ const DEADLINE_GATEWAY = "https://01wapi.rte.com.br";
 const PICKUP_GATEWAY = "https://pickup-apigateway.rte.com.br";
 const CUSTOMER_GATEWAY = "https://customer-apigateway.rte.com.br";
 const SELFATTENDANCE_GATEWAY = "https://01wapi.rte.com.br";
+const UNITTOCITY_GATEWAY = "https://unittocity-apigateway.rte.com.br";
+const PAYMENTS_GATEWAY = "https://payments-apigateway.rte.com.br";
+const DNE_GATEWAY = "https://dne-apigateway.rte.com.br";
+
+/**
+ * Perfis de timeout por gateway (ms), derivados do SLA implícito medido:
+ * tracking P95 5s, quotation/customer P95 10s, selfattendance 12s, pickup 15s.
+ * Usar um timeout único faz a coleta abortar cedo e o rastreio esperar demais.
+ */
+const GATEWAY_TIMEOUT: Record<string, number> = {
+  [TRACKING_GATEWAY]: 8_000,
+  [QUOTATION_GATEWAY]: 14_000,
+  [PICKUP_GATEWAY]: 20_000,
+  [CUSTOMER_GATEWAY]: 14_000,
+  [SELFATTENDANCE_GATEWAY]: 16_000,
+  [UNITTOCITY_GATEWAY]: 14_000,
+  [PAYMENTS_GATEWAY]: 16_000,
+  [DNE_GATEWAY]: 8_000,
+};
+const DEFAULT_TIMEOUT = 15_000;
+
+function timeoutFor(gateway: string): number {
+  return GATEWAY_TIMEOUT[gateway] ?? DEFAULT_TIMEOUT;
+}
+
+/** Erro tipado da integração RTE, com classificação de causa. */
+class RTEError extends Error {
+  constructor(
+    message: string,
+    readonly code: "RTE_SCOPE_BLOCKED" | "RTE_UPSTREAM_ERROR" | "RTE_TIMEOUT" | "RTE_AUTH_FAILED" | "RTE_BAD_REQUEST",
+    readonly httpStatus: number,
+    readonly gateway: string,
+  ) {
+    super(message);
+    this.name = "RTEError";
+  }
+}
+
+function classifyStatus(status: number): RTEError["code"] {
+  if (status === 401) return "RTE_AUTH_FAILED";
+  if (status === 403) return "RTE_SCOPE_BLOCKED";
+  if (status >= 500) return "RTE_UPSTREAM_ERROR";
+  return "RTE_BAD_REQUEST";
+}
+
+/** Executa um fetch com AbortController respeitando o perfil do gateway. */
+async function fetchWithTimeout(
+  gateway: string,
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutFor(gateway));
+  try {
+    return await safeFetch(url, { ...init, signal: controller.signal });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (controller.signal.aborted) {
+      throw new RTEError(
+        `Timeout de ${timeoutFor(gateway)}ms no gateway ${gateway}`,
+        "RTE_TIMEOUT",
+        504,
+        gateway,
+      );
+    }
+    throw new RTEError(message, "RTE_UPSTREAM_ERROR", 502, gateway);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 
 const rodonavesBreaker = getCircuitBreaker('rodonaves', {
   failureThreshold: 10,
