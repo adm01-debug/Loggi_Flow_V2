@@ -80,7 +80,7 @@ export interface RTEGatewayHealthPanelProps {
  * latência média/P95 e execução manual de verificação.
  */
 export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealthPanelProps) {
-  const { uptime, isLoading, error, runCheck } = useGatewayHealth(hours);
+  const { uptime, downtime, isLoading, error, runCheck } = useGatewayHealth(hours);
 
   const summary = useMemo(() => {
     if (uptime.length === 0) return { online: 0, total: 0, avgUptime: 0 };
@@ -115,6 +115,27 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
       </CardHeader>
 
       <CardContent className="space-y-3">
+        {downtime.length > 0 && (
+          <div
+            role="alert"
+            className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive"
+          >
+            <p className="font-medium">
+              Queda sustentada detectada em {downtime.length} gateway
+              {downtime.length === 1 ? "" : "s"} (últimas 2h)
+            </p>
+            <ul className="mt-1 list-disc pl-5 text-xs">
+              {downtime.map((item) => (
+                <li key={item.gateway}>
+                  {GATEWAY_LABEL[item.gateway] ?? item.gateway}
+                  {item.last_error ? ` — ${item.last_error}` : ""}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+
         {isLoading && (
           <div className="space-y-3" aria-busy="true">
             {Array.from({ length: 4 }).map((_, index) => (
