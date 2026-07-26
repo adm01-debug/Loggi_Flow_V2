@@ -10,7 +10,9 @@ import { RTECustomerManager } from "@/components/rodonaves/RTECustomerManager";
 import { RTEAdvancedPickup } from "@/components/rodonaves/RTEAdvancedPickup";
 import { RTESelfAttendance } from "@/components/rodonaves/RTESelfAttendance";
 import { RTEAdvancedQuotation } from "@/components/rodonaves/RTEAdvancedQuotation";
+import { RTEGatewayHealthPanel } from "@/components/rodonaves/RTEGatewayHealthPanel";
 import {
+  Activity,
   Truck,
   RefreshCw,
   Loader2,
