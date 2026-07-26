@@ -92,6 +92,19 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
     return { online, total: uptime.length, avgUptime };
   }, [uptime]);
 
+  const sloMetrics = useMemo(
+    () =>
+      uptime.map((item) => ({
+        gateway: item.gateway,
+        checks: item.checks,
+        uptimePct: item.uptimePct,
+        p95LatencyMs: item.p95LatencyMs,
+      })),
+    [uptime],
+  );
+
+
+
   return (
     <Card className={cn("card-raised", className)}>
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
@@ -171,6 +184,12 @@ export function RTEGatewayHealthPanel({ hours = 24, className }: RTEGatewayHealt
         {!isLoading &&
           !error &&
           uptime.map((item) => <GatewayRow key={item.gateway} item={item} />)}
+
+        {!isLoading && !error && uptime.length > 0 && (
+          <RTEGatewaySLOPanel metrics={sloMetrics} labels={GATEWAY_LABEL} className="mt-2" />
+        )}
+
+
 
 
         {runCheck.isError && (
