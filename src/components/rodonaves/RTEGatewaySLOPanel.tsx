@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Gauge, ShieldAlert, ShieldCheck, TriangleAlert } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,14 +8,14 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import {
   evaluateAllSLO,
-  loadSLOTarget,
-  saveSLOTarget,
   summarizeSLO,
   type GatewaySLOInput,
   type GatewaySLOResult,
   type SLOStatus,
 } from "@/lib/rodonaves/gatewaySLO";
+import { useSLOTargets } from "@/hooks/rodonaves/useSLOTargets";
 import { RTESLOAlertsPanel } from "./RTESLOAlertsPanel";
+
 
 const STATUS_TONE: Record<SLOStatus, { label: string; className: string }> = {
   ok: { label: "Dentro da meta", className: "bg-primary/10 text-primary border-primary/20" },
