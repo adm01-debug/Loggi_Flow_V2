@@ -9,3 +9,4 @@ export { RTEAdvancedPickup } from './RTEAdvancedPickup';
 export { RTESelfAttendance } from './RTESelfAttendance';
 export { RTEAdvancedQuotation } from './RTEAdvancedQuotation';
 export { RTEGatewayHealthPanel } from './RTEGatewayHealthPanel';
+export { RTELatencyTrendChart } from './RTELatencyTrendChart';
