@@ -322,15 +322,15 @@ async function checkCoverage(rawZip: string) {
 // R7 — HEALTH CHECK DOS GATEWAYS
 // ==========================================
 
-const HEALTH_TARGETS: Array<{ name: string; url: string }> = [
-  { name: "tracking", url: `${TRACKING_GATEWAY}/api/healthcheck` },
-  { name: "quotation", url: `${QUOTATION_GATEWAY}/api/healthcheck` },
-  { name: "pickup", url: `${PICKUP_GATEWAY}/api/healthcheck` },
-  { name: "customer", url: `${CUSTOMER_GATEWAY}/api/healthcheck` },
-  { name: "selfattendance", url: `${SELFATTENDANCE_GATEWAY}/webapi/healthcheck` },
-  { name: "unittocity", url: `${UNITTOCITY_GATEWAY}/api/healthcheck` },
-  { name: "payments", url: `${PAYMENTS_GATEWAY}/api/healthcheck` },
-  { name: "dne", url: `${DNE_GATEWAY}/api/healthcheck` },
+const HEALTH_TARGETS: Array<{ name: string; base: string; path: string }> = [
+  { name: "tracking", base: TRACKING_GATEWAY, path: "/api/healthcheck" },
+  { name: "quotation", base: QUOTATION_GATEWAY, path: "/api/healthcheck" },
+  { name: "pickup", base: PICKUP_GATEWAY, path: "/api/healthcheck" },
+  { name: "customer", base: CUSTOMER_GATEWAY, path: "/api/healthcheck" },
+  { name: "selfattendance", base: SELFATTENDANCE_GATEWAY, path: "/webapi/healthcheck" },
+  { name: "unittocity", base: UNITTOCITY_GATEWAY, path: "/api/healthcheck" },
+  { name: "payments", base: PAYMENTS_GATEWAY, path: "/api/healthcheck" },
+  { name: "dne", base: DNE_GATEWAY, path: "/api/healthcheck" },
 ];
 
 async function healthAll() {
@@ -338,7 +338,7 @@ async function healthAll() {
     HEALTH_TARGETS.map(async (target) => {
       const startedAt = Date.now();
       try {
-        const res = await fetchWithTimeout(target.url, target.url, { method: "GET" });
+        const res = await fetchWithTimeout(target.base, `${target.base}${target.path}`, { method: "GET" });
         await res.text();
         return {
           gateway: target.name,
