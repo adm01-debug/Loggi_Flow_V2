@@ -148,6 +148,7 @@ export function useGatewayHealth(hours = 24) {
   return {
     history: history.data ?? [],
     uptime: aggregateUptime(history.data ?? []),
+    downtime: downtime.data ?? [],
     isLoading: history.isLoading,
     error: history.error as Error | null,
     refetch: history.refetch,
