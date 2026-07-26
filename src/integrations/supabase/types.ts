@@ -4617,6 +4617,57 @@ export type Database = {
         }
         Relationships: []
       }
+      rte_slo_daily_snapshots: {
+        Row: {
+          avg_latency_ms: number
+          checks: number
+          created_at: string
+          day: string
+          error_budget_used_pct: number
+          failures: number
+          gateway: string
+          id: string
+          latency_p95_budget_ms: number
+          p95_latency_ms: number
+          status: string
+          updated_at: string
+          uptime_pct: number
+          uptime_target_pct: number
+        }
+        Insert: {
+          avg_latency_ms?: number
+          checks?: number
+          created_at?: string
+          day: string
+          error_budget_used_pct?: number
+          failures?: number
+          gateway: string
+          id?: string
+          latency_p95_budget_ms?: number
+          p95_latency_ms?: number
+          status?: string
+          updated_at?: string
+          uptime_pct?: number
+          uptime_target_pct?: number
+        }
+        Update: {
+          avg_latency_ms?: number
+          checks?: number
+          created_at?: string
+          day?: string
+          error_budget_used_pct?: number
+          failures?: number
+          gateway?: string
+          id?: string
+          latency_p95_budget_ms?: number
+          p95_latency_ms?: number
+          status?: string
+          updated_at?: string
+          uptime_pct?: number
+          uptime_target_pct?: number
+        }
+        Relationships: []
+      }
       rte_slo_targets: {
         Row: {
           created_at: string
@@ -6287,6 +6338,7 @@ export type Database = {
           last_error: string
         }[]
       }
+      rte_rollup_slo_daily: { Args: { target_day?: string }; Returns: number }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
       validate_payload_schema: {
