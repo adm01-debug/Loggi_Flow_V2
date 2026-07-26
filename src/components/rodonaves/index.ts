@@ -8,3 +8,4 @@ export { RTECustomerManager } from './RTECustomerManager';
 export { RTEAdvancedPickup } from './RTEAdvancedPickup';
 export { RTESelfAttendance } from './RTESelfAttendance';
 export { RTEAdvancedQuotation } from './RTEAdvancedQuotation';
+export { RTEGatewayHealthPanel } from './RTEGatewayHealthPanel';
