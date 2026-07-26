@@ -12,3 +12,4 @@ export { RTEGatewayHealthPanel } from './RTEGatewayHealthPanel';
 export { RTELatencyTrendChart } from './RTELatencyTrendChart';
 export { RTEGatewaySLOPanel } from './RTEGatewaySLOPanel';
 export { RTESLOAlertsPanel } from './RTESLOAlertsPanel';
+export { RTESLOReportPanel } from './RTESLOReportPanel';

@@ -15,6 +15,8 @@ import {
 } from "@/lib/rodonaves/gatewaySLO";
 import { useSLOTargets } from "@/hooks/rodonaves/useSLOTargets";
 import { RTESLOAlertsPanel } from "./RTESLOAlertsPanel";
+import { RTESLOReportPanel } from "./RTESLOReportPanel";
+import type { SLOReportSample } from "@/lib/rodonaves/sloReport";
 
 
 const STATUS_TONE: Record<SLOStatus, { label: string; className: string }> = {
@@ -68,6 +70,8 @@ export interface RTEGatewaySLOPanelProps {
   metrics: GatewaySLOInput[];
   /** Rótulos amigáveis por chave de gateway. */
   labels?: Record<string, string>;
+  /** Histórico bruto de verificações, usado no relatório diário de conformidade. */
+  samples?: SLOReportSample[];
   className?: string;
 }
 
@@ -76,7 +80,7 @@ export interface RTEGatewaySLOPanelProps {
  * apenas por administradores) e consumo de error budget por gateway.
  */
 
-export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatewaySLOPanelProps) {
+export function RTEGatewaySLOPanel({ metrics, labels = {}, samples = [], className }: RTEGatewaySLOPanelProps) {
   const { globalTarget, canEdit, saveTarget } = useSLOTargets();
   const target = globalTarget;
 
@@ -168,6 +172,9 @@ export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatew
               ))}
             </div>
             <RTESLOAlertsPanel results={results} labels={labels} />
+            {samples.length > 0 && (
+              <RTESLOReportPanel samples={samples} target={target} labels={labels} />
+            )}
           </>
         )}
       </CardContent>
