@@ -1260,6 +1260,28 @@ Deno.serve(async (req) => {
         break;
       }
 
+      // ===== R5: ENDEREÇO COM FALLBACK (DNE offline) =====
+      case "resolve-address": {
+        result = await resolveAddressByZip(String(params.cep ?? params.zipCode ?? ""));
+        break;
+      }
+
+      // ===== R6: MALHA DE ATENDIMENTO =====
+      case "unit-to-city": {
+        result = await unitToCity({ zipCode: params.cep ?? params.zipCode, cityId: params.cityId });
+        break;
+      }
+      case "check-coverage": {
+        result = await checkCoverage(String(params.cep ?? params.zipCode ?? ""));
+        break;
+      }
+
+      // ===== R7: HEALTH DOS 8 GATEWAYS =====
+      case "health-all": {
+        result = await healthAll();
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: `Unknown action: ${action}` }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -1270,6 +1292,17 @@ Deno.serve(async (req) => {
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return validationErrorResponse(error, corsHeaders);
+    }
+    if (error instanceof RTEError) {
+      log.error(`[rodonaves-api] ${error.code} @ ${error.gateway}:`, error.message);
+      const status = error.code === "RTE_SCOPE_BLOCKED" ? 403
+        : error.code === "RTE_TIMEOUT" ? 504
+        : error.code === "RTE_BAD_REQUEST" ? 422
+        : 502;
+      return new Response(
+        JSON.stringify({ success: false, code: error.code, gateway: error.gateway, error: error.message }),
+        { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
     log.error("[rodonaves-api] Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
