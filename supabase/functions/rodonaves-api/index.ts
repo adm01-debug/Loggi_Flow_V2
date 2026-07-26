@@ -333,7 +333,42 @@ const HEALTH_TARGETS: Array<{ name: string; base: string; path: string }> = [
   { name: "dne", base: DNE_GATEWAY, path: "/api/healthcheck" },
 ];
 
-async function healthAll() {
+/**
+ * Persiste o resultado do health-check. Falhas de persistência jamais devem
+ * derrubar o health-check em si — são apenas logadas.
+ */
+async function persistHealth(
+  checks: Array<{ gateway: string; online: boolean; httpStatus: number; latencyMs: number; error?: string }>,
+  checkedAt: string,
+): Promise<boolean> {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !serviceKey) return false;
+
+    const supabase = createClient(supabaseUrl, serviceKey);
+    const { error } = await supabase.from("rte_gateway_health").insert(
+      checks.map((c) => ({
+        gateway: c.gateway,
+        online: c.online,
+        http_status: c.httpStatus,
+        latency_ms: c.latencyMs,
+        error_message: c.error ?? null,
+        checked_at: checkedAt,
+      })),
+    );
+    if (error) {
+      log.error("[rodonaves-api] persistHealth failed:", error.message);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    log.error("[rodonaves-api] persistHealth exception:", error);
+    return false;
+  }
+}
+
+async function healthAll(persist = false) {
   const checks = await Promise.all(
     HEALTH_TARGETS.map(async (target) => {
       const startedAt = Date.now();
