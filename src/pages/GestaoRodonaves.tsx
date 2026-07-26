@@ -10,7 +10,9 @@ import { RTECustomerManager } from "@/components/rodonaves/RTECustomerManager";
 import { RTEAdvancedPickup } from "@/components/rodonaves/RTEAdvancedPickup";
 import { RTESelfAttendance } from "@/components/rodonaves/RTESelfAttendance";
 import { RTEAdvancedQuotation } from "@/components/rodonaves/RTEAdvancedQuotation";
+import { RTEGatewayHealthPanel } from "@/components/rodonaves/RTEGatewayHealthPanel";
 import {
+  Activity,
   Truck,
   RefreshCw,
   Loader2,
@@ -161,6 +163,10 @@ export default function GestaoRodonaves() {
               <Building className="w-3 h-3" />
               Autoatendimento
             </TabsTrigger>
+            <TabsTrigger value="health" className="gap-1">
+              <Activity className="w-3 h-3" />
+              Saúde
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-4 p-4 border rounded-lg bg-card/50">
@@ -184,6 +190,9 @@ export default function GestaoRodonaves() {
             </TabsContent>
             <TabsContent value="selfservice">
               <RTESelfAttendance />
+            </TabsContent>
+            <TabsContent value="health">
+              <RTEGatewayHealthPanel />
             </TabsContent>
           </div>
         </Tabs>
