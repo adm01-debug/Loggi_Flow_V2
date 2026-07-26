@@ -115,6 +115,7 @@ export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatew
               min={50}
               max={100}
               step={0.1}
+              disabled={!canEdit || saveTarget.isPending}
               value={target.uptimeTargetPct}
               onChange={(event) => update({ uptimeTargetPct: Number(event.target.value) })}
             />
@@ -129,11 +130,25 @@ export function RTEGatewaySLOPanel({ metrics, labels = {}, className }: RTEGatew
               min={50}
               max={120000}
               step={50}
+              disabled={!canEdit || saveTarget.isPending}
               value={target.latencyP95BudgetMs}
               onChange={(event) => update({ latencyP95BudgetMs: Number(event.target.value) })}
             />
           </div>
         </div>
+
+        <p className="text-xs text-muted-foreground">
+          {canEdit
+            ? "Metas compartilhadas com toda a equipe (salvas no banco)."
+            : "Metas definidas pela administração — somente leitura."}
+        </p>
+
+        {saveTarget.isError && (
+          <p role="alert" className="text-xs text-destructive">
+            Não foi possível salvar a meta: {(saveTarget.error as Error).message}
+          </p>
+        )}
+
 
         {results.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border p-6 text-center">
