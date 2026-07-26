@@ -151,8 +151,15 @@ async function apiGet(gateway: string, path: string, params: Record<string, stri
     const token = await getToken(gateway);
     const qs = buildQS(params);
     const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-    const res = await safeFetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!res.ok) throw new Error(`GET ${path} failed [${res.status}]: ${await res.text()}`);
+    const res = await fetchWithTimeout(gateway, url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) {
+      throw new RTEError(
+        `GET ${path} failed [${res.status}]: ${await res.text()}`,
+        classifyStatus(res.status),
+        res.status,
+        gateway,
+      );
+    }
     return res.json();
   });
 }
@@ -169,11 +176,196 @@ async function apiMutate(gateway: string, method: string, path: string, body?: u
       headers["Content-Type"] = "application/json";
       opts.body = JSON.stringify(body);
     }
-    const res = await safeFetch(url, opts);
-    if (!res.ok) throw new Error(`${method} ${path} failed [${res.status}]: ${await res.text()}`);
+    const res = await fetchWithTimeout(gateway, url, opts);
+    if (!res.ok) {
+      throw new RTEError(
+        `${method} ${path} failed [${res.status}]: ${await res.text()}`,
+        classifyStatus(res.status),
+        res.status,
+        gateway,
+      );
+    }
     const text = await res.text();
     try { return JSON.parse(text); } catch { return { raw: text }; }
   });
+}
+
+// ==========================================
+// R5 — FALLBACK DE ENDEREÇO (gateway DNE offline)
+// ==========================================
+
+interface ResolvedAddress {
+  zipCode: string;
+  street: string;
+  district: string;
+  city: string;
+  state: string;
+  source: "rte_selfattendance" | "viacep" | "brasilapi";
+}
+
+async function fetchJson(url: string, timeoutMs: number): Promise<Record<string, unknown>> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await safeFetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function str(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+/**
+ * Resolve endereço por CEP com cadeia de fallback:
+ * SelfAttendance (RTE) → ViaCEP → BrasilAPI. A fonte usada é sempre marcada
+ * na resposta, pois o gateway DNE da RTE está offline.
+ */
+async function resolveAddressByZip(rawZip: string): Promise<ResolvedAddress> {
+  const zip = rawZip.replace(/\D/g, "");
+  if (zip.length !== 8) {
+    throw new RTEError("CEP inválido: informe 8 dígitos", "RTE_BAD_REQUEST", 422, SELFATTENDANCE_GATEWAY);
+  }
+
+  const attempts: Array<() => Promise<ResolvedAddress>> = [
+    async () => {
+      const data = await apiGet(SELFATTENDANCE_GATEWAY, "/webapi/address/zipcode", { zipCode: zip });
+      const record = (data ?? {}) as Record<string, unknown>;
+      const city = str(record.CityName) || str(record.City);
+      if (!city) throw new Error("Resposta RTE sem cidade");
+      return {
+        zipCode: zip,
+        street: str(record.Street) || str(record.Address),
+        district: str(record.District) || str(record.Neighborhood),
+        city,
+        state: str(record.StateAbbreviation) || str(record.State),
+        source: "rte_selfattendance",
+      };
+    },
+    async () => {
+      const data = await fetchJson(`https://viacep.com.br/ws/${zip}/json/`, 6_000);
+      if (data.erro) throw new Error("CEP não encontrado no ViaCEP");
+      return {
+        zipCode: zip,
+        street: str(data.logradouro),
+        district: str(data.bairro),
+        city: str(data.localidade),
+        state: str(data.uf),
+        source: "viacep",
+      };
+    },
+    async () => {
+      const data = await fetchJson(`https://brasilapi.com.br/api/cep/v2/${zip}`, 6_000);
+      return {
+        zipCode: zip,
+        street: str(data.street),
+        district: str(data.neighborhood),
+        city: str(data.city),
+        state: str(data.state),
+        source: "brasilapi",
+      };
+    },
+  ];
+
+  const errors: string[] = [];
+  for (const attempt of attempts) {
+    try {
+      const resolved = await attempt();
+      if (resolved.city) return resolved;
+      errors.push("resposta sem cidade");
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  throw new RTEError(
+    `Não foi possível resolver o CEP ${zip}. Tentativas: ${errors.join(" | ")}`,
+    "RTE_UPSTREAM_ERROR",
+    502,
+    DNE_GATEWAY,
+  );
+}
+
+// ==========================================
+// R6 — MALHA DE ATENDIMENTO (unittocity)
+// ==========================================
+
+async function unitToCity(p: Record<string, unknown>) {
+  return apiGet(UNITTOCITY_GATEWAY, "/api/v1/unittocity", {
+    ZipCode: String(p.zipCode ?? "").replace(/\D/g, ""),
+    CityId: p.cityId as number,
+  });
+}
+
+/** Verifica se um CEP está na malha atendida antes de disparar uma cotação. */
+async function checkCoverage(rawZip: string) {
+  const zip = String(rawZip ?? "").replace(/\D/g, "");
+  if (zip.length !== 8) {
+    throw new RTEError("CEP inválido: informe 8 dígitos", "RTE_BAD_REQUEST", 422, UNITTOCITY_GATEWAY);
+  }
+  try {
+    const data = await unitToCity({ zipCode: zip });
+    const record = (data ?? {}) as Record<string, unknown>;
+    const covered = Boolean(record.UnitId ?? record.unitId ?? record.Unit);
+    return { zipCode: zip, covered, unit: data, source: "unittocity" as const };
+  } catch (error) {
+    // Malha indisponível não deve impedir a cotação — retorna indeterminado.
+    const message = error instanceof Error ? error.message : String(error);
+    return { zipCode: zip, covered: null, unit: null, source: "indisponivel" as const, reason: message };
+  }
+}
+
+// ==========================================
+// R7 — HEALTH CHECK DOS GATEWAYS
+// ==========================================
+
+const HEALTH_TARGETS: Array<{ name: string; url: string }> = [
+  { name: "tracking", url: `${TRACKING_GATEWAY}/api/healthcheck` },
+  { name: "quotation", url: `${QUOTATION_GATEWAY}/api/healthcheck` },
+  { name: "pickup", url: `${PICKUP_GATEWAY}/api/healthcheck` },
+  { name: "customer", url: `${CUSTOMER_GATEWAY}/api/healthcheck` },
+  { name: "selfattendance", url: `${SELFATTENDANCE_GATEWAY}/webapi/healthcheck` },
+  { name: "unittocity", url: `${UNITTOCITY_GATEWAY}/api/healthcheck` },
+  { name: "payments", url: `${PAYMENTS_GATEWAY}/api/healthcheck` },
+  { name: "dne", url: `${DNE_GATEWAY}/api/healthcheck` },
+];
+
+async function healthAll() {
+  const checks = await Promise.all(
+    HEALTH_TARGETS.map(async (target) => {
+      const startedAt = Date.now();
+      try {
+        const res = await fetchWithTimeout(target.url, target.url, { method: "GET" });
+        await res.text();
+        return {
+          gateway: target.name,
+          online: res.ok,
+          httpStatus: res.status,
+          latencyMs: Date.now() - startedAt,
+        };
+      } catch (error) {
+        return {
+          gateway: target.name,
+          online: false,
+          httpStatus: 0,
+          latencyMs: Date.now() - startedAt,
+          error: error instanceof Error ? error.message : String(error),
+        };
+      }
+    }),
+  );
+
+  const online = checks.filter((c) => c.online).length;
+  return {
+    checkedAt: new Date().toISOString(),
+    online,
+    offline: checks.length - online,
+    total: checks.length,
+    gateways: checks,
+  };
 }
 
 
