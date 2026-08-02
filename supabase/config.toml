@@ -54,3 +54,6 @@ verify_jwt = true
 
 
 
+
+[functions.migrate-helper]
+verify_jwt = false
