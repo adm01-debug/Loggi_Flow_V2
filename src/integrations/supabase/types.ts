@@ -5260,6 +5260,7 @@ export type Database = {
           id: string
           last_activity_date: string | null
           level: number
+          nexus_score: number | null
           rank_id: string | null
           streak_days: number
           total_xp: number
@@ -5273,6 +5274,7 @@ export type Database = {
           id?: string
           last_activity_date?: string | null
           level?: number
+          nexus_score?: number | null
           rank_id?: string | null
           streak_days?: number
           total_xp?: number
@@ -5286,6 +5288,7 @@ export type Database = {
           id?: string
           last_activity_date?: string | null
           level?: number
+          nexus_score?: number | null
           rank_id?: string | null
           streak_days?: number
           total_xp?: number
