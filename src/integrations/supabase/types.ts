@@ -5736,6 +5736,7 @@ export type Database = {
         Args: { p_month: number; p_parent: string; p_year: number }
         Returns: string
       }
+      exec_sql: { Args: { query: string }; Returns: Json }
       execute_nexus_protocol: {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
