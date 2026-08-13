@@ -69,13 +69,14 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url)
-    const pathParts = url.pathname.split('/').filter(Boolean)
-    
+    // Read the body once at the top — the client always sends a JSON body
+    // containing `path` and `method` plus the route-specific fields.
+    const body = await req.json().catch(() => ({} as Record<string, any>))
+    const routePath: string = body.path || ''
+    const pathParts = routePath.split('/').filter(Boolean)
+
     // POST /quotations - Criar cotação
     if (req.method === 'POST' && pathParts.includes('quotations')) {
-      const body = await req.json()
-      
       // Try cache first
       const redis = getRedisClient();
       const cacheKey = `lalamove_quote_${JSON.stringify(body.stops)}`;
@@ -100,7 +101,7 @@ serve(async (req) => {
           address: stop.address,
         })),
       })
-      
+
       if (result.error) {
         return new Response(JSON.stringify(result), {
           status: result.status || 400,
@@ -120,38 +121,38 @@ serve(async (req) => {
       });
     }
 
-    
+
     // POST /orders - Criar pedido
     if (req.method === 'POST' && pathParts.includes('orders') && !pathParts.includes('cancel')) {
-      const body = await req.json()
-      const result = await lalamoveRequest('POST', '/v3/orders', body)
-      
+      const { path: _path, method: _method, ...orderPayload } = body
+      const result = await lalamoveRequest('POST', '/v3/orders', orderPayload)
+
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-    
+
     // GET /orders/:id - Buscar pedido
     if (req.method === 'GET' && pathParts.includes('orders')) {
       const orderId = pathParts[pathParts.indexOf('orders') + 1]
       const result = await lalamoveRequest('GET', `/v3/orders/${orderId}`)
-      
+
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-    
+
     // PUT /orders/:id/cancel - Cancelar pedido
     if (req.method === 'PUT' && pathParts.includes('cancel')) {
       const orderId = pathParts[pathParts.indexOf('orders') + 1]
       const result = await lalamoveRequest('PUT', `/v3/orders/${orderId}/cancel`)
-      
+
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-    
-    return new Response(JSON.stringify({ error: 'Route not found' }), {
+
+    return new Response(JSON.stringify({ error: 'Route not found', path: routePath }), {
       status: 404,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
