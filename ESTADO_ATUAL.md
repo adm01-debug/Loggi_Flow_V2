@@ -15,17 +15,17 @@ O **código do produto está substancialmente construído e implantado**. O que 
 **cadeia de qualidade e o plano de manutenção** — e isso já produziu pelo menos um bug que atinge
 o usuário final em produção.
 
-| Camada              | Situação medida                                                                             |
-| ------------------- | ------------------------------------------------------------------------------------------- |
-| Frontend / rotas    | 61 rotas registradas, 0 páginas órfãs — íntegro                                             |
-| Edge Functions      | **43 de 43 implantadas e respondendo** — zero drift de deploy                               |
-| Banco (estrutura)   | 100 tabelas base + 30 partições, 4 views e 79 RPCs — **sem drift**                          |
-| **Pipeline de CI**  | **🔴 0 execuções verdes em 120 amostradas (20/05 → 16/08/2026)**                            |
-| **Typecheck**       | **🔴 21 erros — o orçamento exige 0**                                                       |
-| **Lint**            | **🔴 não executa: crash de configuração**                                                   |
-| **`npm ci`**        | **🔴 falha (ERESOLVE) — instalação limpa impossível**                                       |
-| Testes              | 257 passam localmente, mas **7 de 30 arquivos testam a si mesmos**                          |
-| Cron / agendamentos | **🔴 heartbeat parado há ~3 meses**; cron horário de saúde roda mas **não está versionado** |
+| Camada              | Situação medida                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------- |
+| Frontend / rotas    | 61 rotas registradas, 0 páginas órfãs — íntegro                                                   |
+| Edge Functions      | **43 de 43 do repo implantadas**; porém `migrate-helper` roda em produção **sem existir no repo** |
+| Banco (estrutura)   | 100 tabelas base + 30 partições, 4 views e 79 RPCs — **sem drift**                                |
+| **Pipeline de CI**  | **🔴 0 execuções verdes em 120 amostradas (20/05 → 16/08/2026)**                                  |
+| **Typecheck**       | **🔴 21 erros — o orçamento exige 0**                                                             |
+| **Lint**            | **🔴 não executa: crash de configuração**                                                         |
+| **`npm ci`**        | **🔴 falha (ERESOLVE) — instalação limpa impossível**                                             |
+| Testes              | 257 passam localmente, mas **7 de 32 arquivos testam a si mesmos**                                |
+| Cron / agendamentos | **🔴 heartbeat parado há ~3 meses**; cron horário de saúde roda mas **não está versionado**       |
 
 **O bloco vermelho tem duas idades, e confundi-las leva a corrigir a coisa errada.** As falhas de
 CI são contínuas desde pelo menos 20/05/2026, mas o que falhava mudou: até 16/08 o `npm ci`
@@ -127,9 +127,37 @@ reportados**. O portão existe no YAML, mas morre antes de rodar.
 
 Um cron horário persiste snapshots de saúde do banco — verificado: o registro mais recente é
 `2026-08-16T18:00:02Z` (retornado por `/functions/v1/db-health-snapshot`). **Esse agendamento não
-existe em nenhuma migration.** As migrations versionadas declaram 8 chamadas `cron.schedule`, e
-nenhuma delas invoca Edge Functions.
+existe em nenhuma migration.** As migrations versionadas declaram **15** chamadas `cron.schedule`, e
+nenhuma delas invoca Edge Functions nem `persist_db_health_snapshot` (parse exaustivo em
+`ESTADO_ATUAL_EVIDENCIAS.md` §7.1).
 **Consequência:** reconstruir o projeto a partir do repositório produz um ambiente sem essa rotina.
+
+**Segunda prova, mais forte — código vivo sem fonte no repositório.** A Edge Function
+`migrate-helper` está **implantada e executando** em produção: responde `{"error":"unauthorized"}`,
+que é a checagem de autenticação da própria função (uma função ausente responderia
+`{"code":"NOT_FOUND"}`). **Não existe `supabase/functions/migrate-helper/` no repositório.**
+
+Ou seja, roda em produção um código que ninguém pode revisar, versionar ou reconstruir — e o nome
+sugere que ele executa migrations, operação privilegiada. O drift de implantação é **assimétrico**:
+repo → ambiente está 43/43 em dia; ambiente → repo tem pelo menos 1 função órfã.
+
+### R3-b — 🟡 MÉDIO · Duas gerações de cron convivendo, agendando o mesmo trabalho
+
+Das 15 chamadas `cron.schedule` versionadas, **3 pares executam a função idêntica** em horários
+diferentes — resultado de uma renomeação (`nexus_*` em 11/07 → kebab-case em 12/07) em que a
+geração antiga nunca foi removida:
+
+| Ação                             | Job antigo (11/07)                      | Job novo (12/07)                             |
+| -------------------------------- | --------------------------------------- | -------------------------------------------- |
+| `record_heartbeat()`             | `nexus_heartbeat` — `*/5 * * * *`       | `system-heartbeat-1m` — `* * * * *`          |
+| `cleanup_old_telemetry_logs(30)` | `nexus_telemetry_cleanup` — `0 4 * * *` | `cleanup-telemetry-daily` — `0 3 * * *`      |
+| `cleanup_old_notifications(90)`  | `nexus_notifications_ttl` — `0 5 * * 0` | `cleanup-notifications-weekly` — `0 4 * * 0` |
+
+É o padrão "refactor abandonado": o módulo novo foi criado, o antigo continua agendado. Duplica
+trabalho de limpeza e torna o diagnóstico do heartbeat (R4) mais confuso do que precisa ser.
+
+_Ressalva:_ isto é o que o **repositório declara**. Sem acesso a `cron.job` não é possível dizer
+quais desses 15 estão de fato registrados no banco — marcado `NAO_VERIFICADO`.
 
 ### R4 — 🟠 ALTO · Heartbeat morto e função incompatível com o schema
 
@@ -152,14 +180,15 @@ está atualizando**. Ambos apontam na mesma direção, mas a confirmação final
 
 ### R5 — 🟠 ALTO · Parte da suíte de testes não protege nada
 
-7 dos 30 arquivos de teste (23%) não importam nenhum código do projeto — reimplementam a lógica
+7 dos 32 arquivos de teste (21,9%) não importam nenhum código do projeto — reimplementam a lógica
 dentro do próprio teste e afirmam sobre si mesmos. Ficam verdes para sempre, inclusive se o produto
 quebrar. Detalhe e citações em [`ESTADO_ATUAL_EVIDENCIAS.md`](./ESTADO_ATUAL_EVIDENCIAS.md) §4.
 
 Destaques:
 
-- `tests/fuzzing/edge-functions.spec.ts` e `tests/integration/fuzzing.spec.ts` são **byte a byte
-  duplicatas** e testam um literal de regex — nenhuma Edge Function é tocada.
+- `tests/fuzzing/edge-functions.spec.ts` e `tests/integration/fuzzing.spec.ts` são **funcionalmente
+  idênticos** (mesmos 2 testes e mesmas asserções; diferem só em 2 linhas em branco e 1 comentário)
+  e testam um literal de regex — nenhuma Edge Function é tocada.
 - `tests/integration/massive-simulation.spec.ts` anuncia "10.000 cenários" e apenas monta objetos
   locais em laço.
 - `tests/contracts/nexus-contracts.spec.ts` define os schemas Zod **dentro do teste** em vez de
@@ -198,7 +227,7 @@ Distorcer para baixo seria tão desonesto quanto o inverso. O que foi **medido c
 - **Saúde real do banco.** `/functions/v1/health` responde `healthy` com latência de banco medida;
   snapshot real reporta `cache_hit_ratio: 99.91`, `deadlocks: 0`, `db_size_bytes: 80.727.187`.
   O banco tem ~80 MB — **não é um ambiente vazio**.
-- **23 testes com valor real.** 20 dos 30 arquivos importam o alvo de verdade. `eventCodes.test.ts`
+- **Testes com valor real.** 20 dos 32 arquivos importam o alvo de verdade. `eventCodes.test.ts`
   (266 linhas) é exemplar: PRNG determinístico, 500 cenários de fuzz e verificação de invariantes.
 - **Segurança em profundidade presente e cabeada:** WebAuthn/Passkeys, MFA, geo-blocking, trilha de
   auditoria particionada (18 partições mensais), soft delete, rate limiting.
@@ -227,6 +256,28 @@ concluiu com **sucesso** em 31 s e o job `Type Check` **passou**. O `ERESOLVE` s
 Se o segundo achado tivesse sido publicado, provocaria um redeploy inútil sobre um serviço saudável.
 O terceiro é o mais instrutivo: a **conclusão** dos workflows (`failure`) estava certa, mas a
 **causa** que lhe atribuí estava errada — e só a leitura por passo, não por conclusão, revelou isso.
+
+### 5.1-b Segunda rodada de validação — o que ela derrubou
+
+Uma revisão dedicada a caçar falhas neste próprio relatório encontrou mais quatro defeitos e um
+achado que faltava. Ficam registrados pelo mesmo motivo dos anteriores:
+
+| Defeito                                                   | Correção                                                                                                                                                                                                             |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **"8 chamadas `cron.schedule`"**                          | São **15**, em 8 migrations. O `grep` só casava a forma de linha única. Cinco jobs ficaram fora do relatório. Corrigido em §3/R3 e no anexo §7.1.                                                                    |
+| **"duplicatas byte a byte"** (testes de fuzzing)          | Falso. Os MD5 diferem (`5cad21b2…` / `2cf93ae1…`): são **funcionalmente** idênticos, mas separados por 2 linhas em branco e 1 comentário. Precisão que eu não havia medido.                                          |
+| **"zero drift de deploy"**                                | Verdadeiro só no sentido repo → ambiente. A sondagem, por construção, não podia achar código vivo sem fonte. O teste inverso revelou **`migrate-helper` em produção sem existir no repositório**. Virou parte de R3. |
+| **Critério de pronto: "100% dos arquivos inventariados"** | Overclaim. Recontar 1.005 arquivos e mapeá-los por diretório **não é** inventariá-los: o conteúdo de ~35 foi lido. Rebaixado para ⚠️ PARCIAL em §8.                                                                  |
+| **Denominadores inconsistentes nos testes**               | "7 de 30" e "12 de 32" conviviam. São **32** arquivos no total: 30 executados pelo vitest e 2 (`tests/e2e`) pelo Playwright, que o vitest exclui via `vitest.config.ts:12`. Padronizado em 32.                       |
+| **Achado que faltava**                                    | Três pares de jobs de cron duplicados — nova seção §3/R3-b.                                                                                                                                                          |
+
+**O que a segunda rodada confirmou como correto** (medido de novo, não reafirmado): os 10 pontos de
+`.errors` e sua distribuição por arquivo; 43 funções no repo; 61 rotas com 0 páginas órfãs — desta
+vez por _parse dos `lazy(() => import("./pages/…"))`_, já que o detector original usava `@/pages/` e
+não casava os imports relativos; 130 tabelas = 100 base + 30 partições; 4 views; 79 RPCs; 33
+segredos; os 2 hooks órfãos com 0 referências; os 8 casos de "0 chamadores em `src/`"; e os 4 pontos
+de `Math.random()` visíveis ao usuário — sendo que o de `KPICard.tsx:343` é rotulado na tela como
+**"Completion Rate"**, o que é pior do que a primeira redação sugeria.
 
 ### 5.2 Limites de acesso — `NAO_VERIFICADO`
 
@@ -319,7 +370,7 @@ Legenda de runtime: **V** = verificado em execução · **NV** = `NAO_VERIFICADO
 | ------------------------------- | ------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Assistente logístico (IA)       | ✅     | V       | Edge `ai-logistics-assistant` implantada, **401 sem JWT** = `verify_jwt` ativo (`supabase/config.toml`); `src/components/ai/` (2 arq.)              |
 | Predição de atrasos             | ✅     | V       | Edge `predict-delays` implantada (401); `src/lib/predictions/` (13 arq., 1.628 linhas); tabelas `ai_delay_predictions`, `delay_predictions_history` |
-| Predição agendada               | 🟦     | NV      | Edge `predict-delays-scheduled` implantada, **mas nenhum `cron.schedule` do repositório a invoca** — as 8 chamadas versionadas são todas SQL puro   |
+| Predição agendada               | 🟦     | NV      | Edge `predict-delays-scheduled` implantada, **mas nenhum `cron.schedule` do repositório a invoca** — as 15 chamadas versionadas são todas SQL puro  |
 | Acurácia de predição            | 🟨     | NV      | 4 views `v_prediction_accuracy*`; Edge `accuracy-meta-monitor` implantada; tabela `prediction_accuracy_settings`                                    |
 | Digest semanal de acurácia      | 🟦     | NV      | Edge `accuracy-weekly-digest` implantada; **sem agendador versionado**                                                                              |
 | Análise de causa raiz           | 🟨     | NV      | `src/hooks/logistics/useRootCauseAnalysis.ts`; `src/lib/predictions/rootCauseAnalyzer.test.ts` importa o alvo real                                  |
@@ -426,7 +477,7 @@ Legenda de runtime: **V** = verificado em execução · **NV** = `NAO_VERIFICADO
    `TS7006` (parâmetro `any` implícito) e 1 assinatura em `tests/contracts/nexus-contracts.spec.ts`.
 4. **Criar `audit_report.md`** ou remover o job `generate-audit-pdf` (R6).
 5. **Substituir os 7 testes-espelho** por testes que importem os alvos reais, e **remover a
-   duplicata byte a byte** entre `tests/fuzzing/edge-functions.spec.ts` e
+   duplicata funcional** entre `tests/fuzzing/edge-functions.spec.ts` e
    `tests/integration/fuzzing.spec.ts` (R5).
 6. **Remover ou cabear os 2 hooks órfãos** (`useNexusSimulator.ts`, `useSelfHealing.ts`).
 
@@ -452,15 +503,15 @@ Legenda de runtime: **V** = verificado em execução · **NV** = `NAO_VERIFICADO
 
 ## 8. CRITÉRIO DE PRONTO — AUTOAVALIAÇÃO
 
-| Critério                                                         | Estado                                                                                     |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 100% dos arquivos inventariados, verificado por recontagem       | ✅ 1.005 arquivos rastreáveis recontados (§ recontagem em `ESTADO_ATUAL_EVIDENCIAS.md` §1) |
-| Toda funcionalidade com uma das 4 classificações e evidência     | ✅ 68 funcionalidades, todas com `arquivo:linha`, objeto de banco ou resposta HTTP         |
-| Todo achado grave verificado de forma independente               | ✅ 7 achados graves; **2 conclusões próprias foram refutadas e corrigidas** (§5.1)         |
-| Runtime marcado `VERIFICADO` ou `NAO_VERIFICADO`, sem meio-termo | ✅ coluna Runtime em todas as tabelas                                                      |
-| Documento executivo legível em 10 minutos                        | ✅ §1 a §4                                                                                 |
-| Lacunas declaradas no próprio documento                          | ✅ §5                                                                                      |
-| Nada alterado em produção                                        | ✅ zero DDL/DML/deploy/migration                                                           |
+| Critério                                                         | Estado                                                                                                                                                                     |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 100% dos arquivos inventariados, verificado por recontagem       | ⚠️ **PARCIAL** — os 1.005 arquivos foram recontados e mapeados por diretório, mas o **conteúdo** de ~35 deles foi efetivamente lido. Recontagem não é inventário; ver §5.3 |
+| Toda funcionalidade com uma das 4 classificações e evidência     | ✅ 68 funcionalidades, todas com `arquivo:linha`, objeto de banco ou resposta HTTP                                                                                         |
+| Todo achado grave verificado de forma independente               | ✅ 7 achados graves; **2 conclusões próprias foram refutadas e corrigidas** (§5.1)                                                                                         |
+| Runtime marcado `VERIFICADO` ou `NAO_VERIFICADO`, sem meio-termo | ✅ coluna Runtime em todas as tabelas                                                                                                                                      |
+| Documento executivo legível em 10 minutos                        | ✅ §1 a §4                                                                                                                                                                 |
+| Lacunas declaradas no próprio documento                          | ✅ §5                                                                                                                                                                      |
+| Nada alterado em produção                                        | ✅ zero DDL/DML/deploy/migration                                                                                                                                           |
 
 **Esta auditoria não se declara completa.** Ela se declara **honesta sobre seus próprios limites**:
 a estrutura do sistema foi medida com rigor; o _uso real_ das funcionalidades de negócio permanece

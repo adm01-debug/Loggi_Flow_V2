@@ -43,8 +43,11 @@ Contagem feita sobre a árvore real, não sobre autodeclaração.
 
 ### Detecção de órfãos
 
-Varredura cruzando 646 arquivos contra todos os demais (import por caminho **ou** uso de
-identificador, para evitar o falso-negativo de import multi-linha).
+Método revisado na segunda rodada. O detector original casava `@/pages/…`, mas o `App.tsx` usa
+imports **relativos** (`./pages/…`) — falso-negativo do mesmo tipo que este relatório alerta. A
+verificação definitiva faz o parse dos 61 `lazy(() => import("./pages/…"))` e cruza com a árvore:
+**0 imports apontando para arquivo inexistente** e **0 componentes lazy sem `<Route>`**. Os 17
+arquivos sob `src/pages/*/` são subcomponentes, todos importados por suas páginas-mãe.
 
 | Categoria                | Sem nenhum referenciador                                                                   |
 | ------------------------ | ------------------------------------------------------------------------------------------ |
@@ -85,7 +88,17 @@ NAO deployadas: 0
 Deployadas: 43
 ```
 
-**Zero drift de implantação.**
+**Zero drift no sentido repo → ambiente.**
+
+**Mas o drift inverso existe.** A sondagem só cobria funções que estão no repositório, o que por
+construção não detecta código vivo sem fonte versionada. Testando a direção contrária:
+
+| Função           | No repo? | Viva?   | Resposta                                                            |
+| ---------------- | -------- | ------- | ------------------------------------------------------------------- |
+| `migrate-helper` | **não**  | **sim** | `{"error":"unauthorized"}` — checagem de auth da própria função     |
+| `mcp-query`      | não      | não     | `{"code":"NOT_FOUND","message":"Requested function was not found"}` |
+
+`migrate-helper` executa em produção sem fonte no repositório. Ver `ESTADO_ATUAL.md` §3/R3.
 
 ### 2.3 A ferramenta MCP estava desatualizada
 
@@ -252,7 +265,7 @@ negativo em `eventCodes.test.ts`, que importa 11 símbolos em bloco):
 | `tests/unit/modules-integrity.spec.ts`         | Faz `vi.mock` de `useMelhorEnvio` e `useRodonaves` e então testa `new Date(base + 5*86400000)` e `Math.round(125.5555*100)/100`. Nenhum código do projeto é exercitado.                                     |
 | `tests/integration/webhooks.spec.ts`           | Define `simulateWebhookPayload` no próprio arquivo e afirma sobre a saída dela. Comentário no código: `// Simula a validação que seria feita na Edge Function`.                                             |
 | `tests/integration/fuzzing.spec.ts`            | Testa um literal de regex de UUID e `JSON.parse` de strings inválidas.                                                                                                                                      |
-| `tests/fuzzing/edge-functions.spec.ts`         | **Duplicata byte a byte** do anterior.                                                                                                                                                                      |
+| `tests/fuzzing/edge-functions.spec.ts`         | **Funcionalmente idêntico** ao anterior — mesmos 2 testes, mesmas asserções; difere apenas em 2 linhas em branco e 1 comentário (MD5 distintos: `5cad21b2…` vs `2cf93ae1…`).                                |
 | `tests/integration/massive-simulation.spec.ts` | Anuncia "10.000 cenários"; monta objetos locais em laço com `Math.random()`. Redefine `simulateWebhookPayload` (terceira cópia).                                                                            |
 | `tests/contracts/nexus-contracts.spec.ts`      | Declara `CarrierWebhookSchema` e `FreightCalculationSchema` **dentro do teste**, em vez de importar os schemas do projeto → divergência de contrato é indetectável. Também é o arquivo com o erro `TS2554`. |
 | `tests/load/backend-stress.spec.ts`            | 100 `setTimeout(Math.random()*50)`. Saída real: `Simulated 100 requests. Avg time: 0.49ms`.                                                                                                                 |
@@ -417,20 +430,41 @@ O `security.yml` também roda semanalmente (`cron: '0 0 * * 0'`) e falha toda se
 
 ### 7.1 Jobs versionados no repositório
 
-Oito chamadas `cron.schedule` em 6 migrations — **todas SQL puro, nenhuma invoca Edge Function**:
+**Correção.** A primeira versão deste anexo afirmava "oito chamadas `cron.schedule` em 6 migrations".
+Estava errado: o `grep` usado só casava a forma de **linha única**, e a maioria das chamadas é
+multi-linha. O parse exaustivo (casando o nome, o cron e o corpo entre `$…$`) encontra **15 chamadas
+em 8 migrations**. Cinco jobs tinham ficado de fora do relatório: `auto-revert-ineffective-indexes-daily`,
+`check-health-score-regression-hourly`, `nexus_notifications_ttl`, `nexus_partition_retention` e
+`nexus_telemetry_cleanup`.
 
-| Job                                 | Frequência    | Ação                                                                       |
-| ----------------------------------- | ------------- | -------------------------------------------------------------------------- |
-| `system-heartbeat-1m`               | `* * * * *`   | `record_heartbeat()` — **não está surtindo efeito** (§3)                   |
-| `nexus_heartbeat`                   | `*/5 * * * *` | `record_heartbeat()`                                                       |
-| `refresh-dashboard-views-5m`        | `*/5 * * * *` | `refresh_dashboard_views()`                                                |
-| `cleanup-telemetry-daily`           | `0 3 * * *`   | `cleanup_old_telemetry_logs(30)`                                           |
-| `cleanup-notifications-weekly`      | `0 4 * * 0`   | `cleanup_old_notifications(90)`                                            |
-| `ensure-future-partitions-monthly`  | `0 2 1 * *`   | `ensure_future_partitions()`                                               |
-| `persist-global-health-score-daily` | `0 6 * * *`   | `persist_global_health_score()`                                            |
-| `snapshot-query-baseline-daily`     | `30 4 * * *`  | `internal.snapshot_query_baseline()`                                       |
-| `reindex-hot-indexes-weekly`        | `0 5 * * 0`   | `internal.reindex_hot_indexes()`                                           |
-| `nexus_slow_queries`                | `0 6 * * *`   | `alert_slow_queries(500)` — **desagendado** logo depois na mesma migration |
+Lista completa — **todas SQL puro; nenhuma invoca Edge Function**:
+
+| Job                                     | Cron          | Ação                                                                    |
+| --------------------------------------- | ------------- | ----------------------------------------------------------------------- |
+| `system-heartbeat-1m`                   | `* * * * *`   | `record_heartbeat()`                                                    |
+| `nexus_heartbeat`                       | `*/5 * * * *` | `record_heartbeat()`                                                    |
+| `refresh-dashboard-views-5m`            | `*/5 * * * *` | `refresh_dashboard_views()`                                             |
+| `check-health-score-regression-hourly`  | `15 * * * *`  | `check_and_alert_health_regression()`                                   |
+| `ensure-future-partitions-monthly`      | `0 2 1 * *`   | `ensure_future_partitions()`                                            |
+| `nexus_partition_retention`             | `0 3 1 * *`   | `drop_old_partitions('audit_logs','audit_logs_',18)`                    |
+| `cleanup-telemetry-daily`               | `0 3 * * *`   | `cleanup_old_telemetry_logs(30)`                                        |
+| `nexus_telemetry_cleanup`               | `0 4 * * *`   | `cleanup_old_telemetry_logs(30)`                                        |
+| `cleanup-notifications-weekly`          | `0 4 * * 0`   | `cleanup_old_notifications(90)`                                         |
+| `nexus_notifications_ttl`               | `0 5 * * 0`   | `cleanup_old_notifications(90)`                                         |
+| `snapshot-query-baseline-daily`         | `30 4 * * *`  | `internal.snapshot_query_baseline()`                                    |
+| `auto-revert-ineffective-indexes-daily` | `30 4 * * *`  | `auto_revert_ineffective_indexes(24, 5)`                                |
+| `reindex-hot-indexes-weekly`            | `0 5 * * 0`   | `internal.reindex_hot_indexes()`                                        |
+| `persist-global-health-score-daily`     | `0 6 * * *`   | `persist_global_health_score()`                                         |
+| `nexus_slow_queries`                    | `0 6 * * *`   | `alert_slow_queries(500)` — desagendado logo abaixo, na mesma migration |
+
+**Nenhum dos 15 chama `persist_db_health_snapshot()` nem `net.http_post`** — é o que sustenta §7.2.
+Note que `persist-global-health-score-daily` chama `persist_global_health_score()`, função distinta.
+
+**Três pares duplicados** (mesma ação, dois jobs): `record_heartbeat`, `cleanup_old_telemetry_logs`
+e `cleanup_old_notifications`. Ver `ESTADO_ATUAL.md` §3/R3-b.
+
+_Ressalva:_ isto é o que o repositório **declara**. Sem acesso a `cron.job` não é possível
+confirmar quais estão registrados no banco — `NAO_VERIFICADO`.
 
 ### 7.2 Agendamento que existe no ambiente mas **não** no repositório
 
