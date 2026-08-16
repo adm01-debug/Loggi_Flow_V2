@@ -358,6 +358,45 @@ Dependabot, **não** um job de build, lint, typecheck ou teste.
 Os três workflows (`CI/CD Pipeline`, `CI Quality Gate Nexus`, `Security Scan`) falham em conjunto a
 cada push, desde pelo menos 20/05/2026.
 
+### 6.1-b Três regimes de falha — leitura passo a passo
+
+A conclusão `failure` é a mesma o tempo todo, mas **a causa não é**. Esta distinção só aparece
+inspecionando os `steps` de cada job; ler apenas a conclusão do run leva a um diagnóstico errado.
+
+**Regime A — até 16/08 15:2x.** Run `30025705603` (23/07/2026, commit `ad50655`):
+
+| Job                      | Passo                            | Conclusão         |
+| ------------------------ | -------------------------------- | ----------------- |
+| Type Check               | `Run npm ci`                     | ✅ sucesso (31 s) |
+| Type Check               | `Run npm run typecheck`          | ✅ **sucesso**    |
+| Lint                     | `Run npm ci`                     | ✅ sucesso (28 s) |
+| Lint                     | `Run npm run lint`               | 🔴 falha          |
+| Unit & Integration Tests | `Run npm ci`                     | ✅ sucesso (32 s) |
+| Unit & Integration Tests | `Run npm run test:coverage`      | 🔴 falha          |
+| Warning Budget Gate      | `Enforce lint/TS warning budget` | 🔴 falha          |
+| Security Scan            | `Audit Dependencies`             | 🔴 falha          |
+| Generate Audit PDF       | `Generate PDF from Markdown`     | 🔴 falha          |
+
+**Regime B — a partir de 16/08 15:2x.** Run `31955665339` (commit `513ab5a`, pós-Dependabot):
+
+| Job                      | Passo                   | Conclusão                        |
+| ------------------------ | ----------------------- | -------------------------------- |
+| Type Check               | `Run npm ci`            | 🔴 **falha em 1 s** (`ERESOLVE`) |
+| Type Check               | `Run npm run typecheck` | ⏭️ `skipped`                     |
+| Lint                     | `Run npm ci`            | 🔴 falha em 1 s                  |
+| Lint                     | `Run npm run lint`      | ⏭️ `skipped`                     |
+| Warning Budget Gate      | `Run npm ci`            | 🔴 falha em 1 s                  |
+| Unit & Integration Tests | `Run npm ci`            | 🔴 falha em 1 s                  |
+
+**Regime C — PR #23, 16/08 19:10.** Runs `31966770428` e `31966770434`: os 7 jobs concluem em
+**3–5 segundos** com `runner_id: 0` e `runner_name: ""`, **sem nenhum passo registrado**. Não
+chegaram a receber runner — modo de falha distinto dos regimes A e B, e não atribuível ao conteúdo
+do PR (que altera apenas 2 arquivos `.md`).
+
+> **Correção registrada.** A primeira versão deste relatório atribuiu os ~3 meses de vermelho ao
+> `ERESOLVE`. Está errado: o `ERESOLVE` tem horas de idade, não meses. O que é verdade há meses é
+> que **nenhum portão conclui**; a razão pela qual não conclui mudou pelo menos duas vezes.
+
 ### 6.2 Problemas estruturais nos workflows
 
 | Problema                                                                  | Localização                        |

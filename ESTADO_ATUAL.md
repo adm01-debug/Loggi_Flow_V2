@@ -27,10 +27,13 @@ o usuário final em produção.
 | Testes              | 257 passam localmente, mas **7 de 30 arquivos testam a si mesmos**                          |
 | Cron / agendamentos | **🔴 heartbeat parado há ~3 meses**; cron horário de saúde roda mas **não está versionado** |
 
-**Uma única causa raiz explica quase todo o bloco vermelho:** três PRs de Dependabot mesclados em
-16/08/2026 às 15:2x subiram `@eslint/js` para `10.0.1` (mantendo `eslint@9.32.0`) e `zod` para
-`4.4.3`. Isso quebrou, em cascata, a instalação, o lint, o typecheck e — o mais grave — a
-**exibição de erros de validação em telas de autenticação**.
+**O bloco vermelho tem duas idades, e confundi-las leva a corrigir a coisa errada.** As falhas de
+CI são contínuas desde pelo menos 20/05/2026, mas o que falhava mudou: até 16/08 o `npm ci`
+instalava normalmente e quem quebrava eram as verificações (`lint`, `test:coverage`, `npm audit`,
+`md-to-pdf`). Em 16/08 às 15:2x, três PRs de Dependabot subiram `@eslint/js` para `10.0.1`
+(mantendo `eslint@9.32.0`) e `zod` para `4.4.3` — e a partir daí a própria **instalação** quebra,
+junto com o lint, o typecheck e, o mais grave, a **exibição de erros de validação em telas de
+autenticação**. Detalhamento por regime em §3/R2.
 
 ### O achado que atinge o usuário agora
 
@@ -103,10 +106,22 @@ O único `success` encontrado é o workflow de metadados do próprio Dependabot,
 | CI Quality Gate Nexus | `.github/workflows/ci-nexus.yml` | falha                  |
 | Security Scan         | `.github/workflows/security.yml` | falha                  |
 
-Todos os 6 jobs de `ci.yml` e o `quality-gate` de `ci-nexus.yml` usam `npm ci`, que falha com
-`ERESOLVE` por causa de `@eslint/js@^10.0.1` vs `eslint@^9.32.0` (`package.json`).
-**Consequência:** os 21 erros de typecheck e o crash de lint **nunca foram reportados a ninguém** —
-o portão existe no YAML, mas morre antes de rodar.
+**A causa mudou ao longo do tempo.** Inspeção passo a passo dos jobs revela três regimes distintos —
+tratá-los como um só levaria a corrigir a coisa errada:
+
+| Período                                                           | `npm ci`                     | O que falhava de fato                                                                                                                                     |
+| ----------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| até 16/08 15:2x (ex.: run `30025705603`, 23/07, commit `ad50655`) | ✅ sucesso (28–32 s)         | `npm run lint`, `npm run test:coverage`, `Enforce lint/TS warning budget`, `npm audit` e `md-to-pdf audit_report.md`. **O `Type Check` PASSOU em 23/07.** |
+| a partir de 16/08 15:2x (run `31955665339`, commit `513ab5a`)     | 🔴 falha em 1 s (`ERESOLVE`) | lint, typecheck, testes e budget passam a ser **`skipped`** — os portões morrem antes de rodar                                                            |
+| PR #23, 16/08 19:10 (runs `31966770428`/`31966770434`)            | —                            | jobs terminam em ~3 s com `runner_id: 0` e `runner_name: ""` — **nunca receberam runner**. Modo de falha distinto dos dois anteriores.                    |
+
+Ou seja: o pipeline está vermelho de forma contínua desde pelo menos 20/05/2026, mas o `ERESOLVE`
+de `@eslint/js@^10.0.1` vs `eslint@^9.32.0` só entrou em cena em 16/08. Antes disso o pipeline
+instalava normalmente e falhava nas verificações em si.
+
+**Consequência atual:** desde 16/08 15:2x, lint, typecheck, testes e orçamento de warnings são
+`skipped` — os 21 erros de typecheck introduzidos hoje pelo `zod@4` **nunca chegaram a ser
+reportados**. O portão existe no YAML, mas morre antes de rodar.
 
 ### R3 — 🟠 ALTO · O ambiente não nasce do repositório
 
@@ -202,7 +217,16 @@ Ficam registradas porque quem lê precisa saber que houve revisão:
 | "21 das 44 Edge Functions não estão implantadas" — baseado no `functions_list` do MCP, que retorna 23 | O MCP serve uma **lista estática desatualizada**. Sondagem HTTP direta provou **43/43 implantadas**.                                                                                                                                                                              |
 | "`lalamove-api` não está implantada" — baseado em HTTP 404                                            | O 404 é resposta **interna da própria função** (`{"error":"Route not found"}`, `supabase/functions/lalamove-api/index.ts:155`). Uma função ausente responde `{"code":"NOT_FOUND","message":"Requested function was not found"}`. **`lalamove-api` está implantada e executando.** |
 
+**Terceira correção — atribuição de causa do R2.** Conclusão inicial: _"o `ERESOLVE` explica os ~3
+meses de CI vermelha, e por isso os 21 erros de typecheck nunca foram reportados."_ A inspeção
+**passo a passo** dos jobs desmentiu a generalização: no run `30025705603` (23/07) o `npm ci`
+concluiu com **sucesso** em 31 s e o job `Type Check` **passou**. O `ERESOLVE` só entrou em cena em
+16/08 15:2x, com os merges do Dependabot. Antes disso, quem falhava eram `npm run lint`,
+`npm run test:coverage`, o gate de warnings, `npm audit` e `md-to-pdf`. Correção aplicada em §3/R2.
+
 Se o segundo achado tivesse sido publicado, provocaria um redeploy inútil sobre um serviço saudável.
+O terceiro é o mais instrutivo: a **conclusão** dos workflows (`failure`) estava certa, mas a
+**causa** que lhe atribuí estava errada — e só a leitura por passo, não por conclusão, revelou isso.
 
 ### 5.2 Limites de acesso — `NAO_VERIFICADO`
 
