@@ -201,6 +201,7 @@ export const AppSidebar = memo(function AppSidebar() {
                 </div>
               )}
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nível {levelProgress.currentLevel}</span>
+
             </div>
             {userLevel?.rank && (
               <Badge 
