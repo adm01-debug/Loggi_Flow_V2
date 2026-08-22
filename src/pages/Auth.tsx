@@ -54,7 +54,7 @@ export default function Auth() {
     const validation = loginSchema.safeParse({ email: loginEmail, password: loginPassword });
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
-      validation.error.errors.forEach((err) => { if (err.path[0]) fieldErrors[`login_${err.path[0]}`] = err.message; });
+      validation.error.issues.forEach((err) => { if (err.path[0]) fieldErrors[`login_${err.path[0]}`] = err.message; });
       setErrors(fieldErrors);
       return;
     }
@@ -90,7 +90,7 @@ export default function Auth() {
     const validation = signupSchema.safeParse({ email: signupEmail, password: signupPassword, fullName: signupFullName });
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
-      validation.error.errors.forEach((err) => { if (err.path[0]) fieldErrors[`signup_${err.path[0]}`] = err.message; });
+      validation.error.issues.forEach((err) => { if (err.path[0]) fieldErrors[`signup_${err.path[0]}`] = err.message; });
       setErrors(fieldErrors);
       return;
     }

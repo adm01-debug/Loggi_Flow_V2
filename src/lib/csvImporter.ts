@@ -15,7 +15,7 @@ export interface ImportResult<T> {
 
 function collectRowErrors(error: unknown, rowNumber: number): ImportError[] {
   if (error instanceof z.ZodError) {
-    return error.errors.map((err) => ({
+    return error.issues.map((err) => ({
       row: rowNumber,
       field: err.path.join(".") || "row",
       error: err.message,

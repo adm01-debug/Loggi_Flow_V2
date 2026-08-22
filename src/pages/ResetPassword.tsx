@@ -56,7 +56,7 @@ export default function ResetPassword() {
     const validation = resetSchema.safeParse({ password, confirmPassword });
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
-      validation.error.errors.forEach((err) => {
+      validation.error.issues.forEach((err) => {
         if (err.path[0]) {
           fieldErrors[String(err.path[0])] = err.message;
         }
