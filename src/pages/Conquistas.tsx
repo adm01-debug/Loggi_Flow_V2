@@ -228,17 +228,18 @@ export default function Conquistas() {
 
   const mappedAchievements = useMemo((): AchievementDisplay[] => {
     if (!dbAchievements) return [];
-    return dbAchievements.map((a) => ({
+    return (dbAchievements as any[]).map((a) => ({
       id: a.id,
       name: a.name,
       description: a.description,
-      category: a.category,
-      xpReward: a.xp_reward,
+      category: a.category || "performance",
+      xpReward: a.xp_reward || a.xp_requirement || 0,
       icon: iconMap[a.icon] || Award,
-      unlocked: unlockedAchievementIds.has(a.id),
-      rarity: a.rarity,
+      unlocked: unlockedAchievementIds instanceof Set ? unlockedAchievementIds.has(a.id) : false,
+      rarity: a.rarity || (a.tier === 'diamond' ? 'legendary' : a.tier === 'platinum' ? 'epic' : a.tier === 'gold' ? 'rare' : 'common'),
     }));
   }, [dbAchievements, unlockedAchievementIds]);
+
 
   const onboardingAchievements = useMemo(() => {
     return mappedAchievements.filter((a) => a.category === "onboarding");
