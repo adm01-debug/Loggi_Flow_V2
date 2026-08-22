@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export interface RankBadge {
   id: string;
@@ -35,8 +34,8 @@ export const useGamification = (userId?: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, xp, coins, full_name, avatar_url")
-        .eq("id", userId)
+        .select("*")
+        .eq("id", userId as string)
         .single();
       if (error) throw error;
       return data;
@@ -57,7 +56,8 @@ export const useGamification = (userId?: string) => {
         icon: b.icon_url || 'Award',
         rarity: b.tier === 'diamond' ? 'legendary' : b.tier === 'platinum' ? 'epic' : b.tier === 'gold' ? 'rare' : 'common',
         xp_reward: b.xp_requirement,
-        coins_reward: Math.floor(b.xp_requirement / 10)
+        coins_reward: Math.floor(b.xp_requirement / 10),
+        category: 'performance'
       })) as RankBadge[];
     },
   });
@@ -81,7 +81,7 @@ export const useGamification = (userId?: string) => {
       const { data, error } = await supabase
         .from("user_achievements")
         .select("badge_id")
-        .eq("user_id", userId);
+        .eq("user_id", userId as string);
       if (error) throw error;
       return new Set(data.map((a: any) => a.badge_id));
     },
@@ -102,7 +102,7 @@ export const useGamification = (userId?: string) => {
     },
   });
 
-  const xp = profile?.xp || 0;
+  const xp = (profile as any)?.xp || 0;
   const level = Math.floor(Math.sqrt(xp / 100)) + 1;
   const currentLevelXP = Math.pow(level - 1, 2) * 100;
   const nextLevelXP = Math.pow(level, 2) * 100;
@@ -114,9 +114,9 @@ export const useGamification = (userId?: string) => {
     level,
     xp,
     total_xp: xp,
-    coins: profile?.coins || 0,
+    coins: (profile as any)?.coins || 0,
     progress,
-    rank: { name: "Novato", color: "#94a3b8" }, // Mock rank
+    rank: { name: "Novato", color: "#94a3b8" },
     streak_days: 1,
     current_xp: xp
   };
@@ -136,8 +136,8 @@ export const useGamification = (userId?: string) => {
     isLoading: loadingProfile || loadingBadges || loadingGifts || loadingAchievements,
     awardPoints: async (params: { xp: number; coins: number }) => awardPointsMutation.mutateAsync(params),
     achievements: badges || [],
-    addXP: async (xp: number | { amount: number; reason: string }) => {
-      const amount = typeof xp === 'number' ? xp : xp.amount;
+    addXP: async (xpInput: number | { amount: number; reason: string }) => {
+      const amount = typeof xpInput === 'number' ? xpInput : xpInput.amount;
       return awardPointsMutation.mutateAsync({ xp: amount, coins: 0 });
     },
     unlockAchievement: async (badgeId: string) => {
@@ -145,7 +145,7 @@ export const useGamification = (userId?: string) => {
       const { error } = await supabase
         .from("user_achievements")
         .insert({ user_id: userId, badge_id: badgeId } as any);
-      if (error && error.code !== '23505') throw error;
+      if (error && (error as any).code !== '23505') throw error;
       queryClient.invalidateQueries({ queryKey: ["user_achievements", userId] });
     },
     nexusScore: 85
