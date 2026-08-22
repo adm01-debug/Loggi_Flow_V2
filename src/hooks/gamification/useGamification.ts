@@ -9,6 +9,12 @@ export interface RankBadge {
   tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   icon_url: string;
   xp_requirement: number;
+  code?: string;
+  icon?: string;
+  rarity?: string;
+  xp_reward?: number;
+  coins_reward?: number;
+  category?: string;
 }
 
 export interface TaskGift {
@@ -45,7 +51,14 @@ export const useGamification = (userId?: string) => {
         .select("*")
         .order("xp_requirement", { ascending: true });
       if (error) throw error;
-      return data as RankBadge[];
+      return (data as any[]).map(b => ({
+        ...b,
+        code: b.name.toLowerCase().replace(/\s+/g, '_'),
+        icon: b.icon_url || 'Award',
+        rarity: b.tier === 'diamond' ? 'legendary' : b.tier === 'platinum' ? 'epic' : b.tier === 'gold' ? 'rare' : 'common',
+        xp_reward: b.xp_requirement,
+        coins_reward: Math.floor(b.xp_requirement / 10)
+      })) as RankBadge[];
     },
   });
 
@@ -86,16 +99,26 @@ export const useGamification = (userId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile", userId] });
-      toast.success("Pontos recompensados com sucesso!");
     },
   });
 
-  // Calculate current level based on XP (simple formula: floor(sqrt(xp/100)) + 1)
+  const xp = profile?.xp || 0;
+  const level = Math.floor(Math.sqrt(xp / 100)) + 1;
+  const currentLevelXP = Math.pow(level - 1, 2) * 100;
+  const nextLevelXP = Math.pow(level, 2) * 100;
+  const progress = nextLevelXP > currentLevelXP 
+    ? ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100 
+    : 100;
+
   const userLevel = {
-    level: profile?.xp ? Math.floor(Math.sqrt(profile.xp / 100)) + 1 : 1,
-    xp: profile?.xp || 0,
+    level,
+    xp,
+    total_xp: xp,
     coins: profile?.coins || 0,
-    progress: profile?.xp ? (profile.xp % 100) : 0,
+    progress,
+    rank: { name: "Novato", color: "#94a3b8" }, // Mock rank
+    streak_days: 1,
+    current_xp: xp
   };
 
   return {
@@ -104,20 +127,27 @@ export const useGamification = (userId?: string) => {
     gifts,
     unlockedAchievementIds: unlockedAchievementIds || new Set<string>(),
     userLevel,
+    levelProgress: {
+      currentLevel: level,
+      progress,
+      currentLevelXP,
+      nextLevelXP
+    },
     isLoading: loadingProfile || loadingBadges || loadingGifts || loadingAchievements,
-    awardPoints: awardPointsMutation.mutateAsync,
-    // Add missing properties requested by components
+    awardPoints: async (params: { xp: number; coins: number }) => awardPointsMutation.mutateAsync(params),
     achievements: badges || [],
-    addXP: async (xp: number) => awardPointsMutation.mutateAsync({ xp, coins: 0 }),
+    addXP: async (xp: number | { amount: number; reason: string }) => {
+      const amount = typeof xp === 'number' ? xp : xp.amount;
+      return awardPointsMutation.mutateAsync({ xp: amount, coins: 0 });
+    },
     unlockAchievement: async (badgeId: string) => {
       if (!userId) return;
       const { error } = await supabase
         .from("user_achievements")
-        .insert({ user_id: userId, badge_id: badgeId });
-      if (error && error.code !== '23505') throw error; // Ignore unique constraint violation
+        .insert({ user_id: userId, badge_id: badgeId } as any);
+      if (error && error.code !== '23505') throw error;
       queryClient.invalidateQueries({ queryKey: ["user_achievements", userId] });
     },
-    nexusScore: 85, // Mock value for IntelligentLogisticsWidget
-    levelProgress: userLevel.progress
+    nexusScore: 85
   };
 };
