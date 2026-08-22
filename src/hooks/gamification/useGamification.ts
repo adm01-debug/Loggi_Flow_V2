@@ -8,12 +8,12 @@ export interface RankBadge {
   tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   icon_url: string;
   xp_requirement: number;
-  code?: string;
-  icon?: string;
-  rarity?: string;
-  xp_reward?: number;
-  coins_reward?: number;
-  category?: string;
+  code: string;
+  icon: string;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  xp_reward: number;
+  coins_reward: number;
+  category: string;
 }
 
 export interface TaskGift {
@@ -32,7 +32,7 @@ export const useGamification = (userId?: string) => {
     queryKey: ["profile", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("profiles")
         .select("*")
         .eq("id", userId as string)
@@ -45,19 +45,19 @@ export const useGamification = (userId?: string) => {
   const { data: badges, isLoading: loadingBadges } = useQuery({
     queryKey: ["rank_badges"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("rank_badges")
         .select("*")
         .order("xp_requirement", { ascending: true });
       if (error) throw error;
       return (data as any[]).map(b => ({
         ...b,
-        code: b.name.toLowerCase().replace(/\s+/g, '_'),
-        icon: b.icon_url || 'Award',
-        rarity: b.tier === 'diamond' ? 'legendary' : b.tier === 'platinum' ? 'epic' : b.tier === 'gold' ? 'rare' : 'common',
-        xp_reward: b.xp_requirement,
-        coins_reward: Math.floor(b.xp_requirement / 10),
-        category: 'performance'
+        code: b.code || b.name.toLowerCase().replace(/\s+/g, '_'),
+        icon: b.icon || b.icon_url || 'Award',
+        rarity: (b.rarity as any) || (b.tier === 'diamond' ? 'legendary' : b.tier === 'platinum' ? 'epic' : b.tier === 'gold' ? 'rare' : 'common'),
+        xp_reward: b.xp_reward || b.xp_requirement,
+        coins_reward: b.coins_reward || Math.floor(b.xp_requirement / 10),
+        category: b.category || 'performance'
       })) as RankBadge[];
     },
   });
@@ -65,7 +65,7 @@ export const useGamification = (userId?: string) => {
   const { data: gifts, isLoading: loadingGifts } = useQuery({
     queryKey: ["task_gifts"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("task_gifts")
         .select("*")
         .order("coin_cost", { ascending: true });
@@ -78,19 +78,19 @@ export const useGamification = (userId?: string) => {
     queryKey: ["user_achievements", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_achievements")
         .select("badge_id")
         .eq("user_id", userId as string);
       if (error) throw error;
-      return new Set(data.map((a: any) => a.badge_id));
+      return new Set((data as any[]).map((a: any) => a.badge_id));
     },
   });
 
   const awardPointsMutation = useMutation({
     mutationFn: async ({ xp, coins }: { xp: number; coins: number }) => {
       if (!userId) throw new Error("User not authenticated");
-      const { error } = await supabase.rpc("award_gamification_points", {
+      const { error } = await (supabase as any).rpc("award_gamification_points", {
         _user_id: userId,
         _xp_amount: xp,
         _coins_amount: coins,
@@ -102,23 +102,23 @@ export const useGamification = (userId?: string) => {
     },
   });
 
-  const xp = (profile as any)?.xp || 0;
-  const level = Math.floor(Math.sqrt(xp / 100)) + 1;
-  const currentLevelXP = Math.pow(level - 1, 2) * 100;
-  const nextLevelXP = Math.pow(level, 2) * 100;
-  const progress = nextLevelXP > currentLevelXP 
-    ? ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100 
+  const xpValue = (profile as any)?.xp || 0;
+  const levelValue = Math.floor(Math.sqrt(xpValue / 100)) + 1;
+  const currentLevelXP = Math.pow(levelValue - 1, 2) * 100;
+  const nextLevelXP = Math.pow(levelValue, 2) * 100;
+  const progressPercent = nextLevelXP > currentLevelXP 
+    ? ((xpValue - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100 
     : 100;
 
   const userLevel = {
-    level,
-    xp,
-    total_xp: xp,
+    level: levelValue,
+    xp: xpValue,
+    total_xp: xpValue,
     coins: (profile as any)?.coins || 0,
-    progress,
+    progress: progressPercent,
     rank: { name: "Novato", color: "#94a3b8" },
     streak_days: 1,
-    current_xp: xp
+    current_xp: xpValue
   };
 
   return {
@@ -128,8 +128,8 @@ export const useGamification = (userId?: string) => {
     unlockedAchievementIds: unlockedAchievementIds || new Set<string>(),
     userLevel,
     levelProgress: {
-      currentLevel: level,
-      progress,
+      currentLevel: levelValue,
+      progress: progressPercent,
       currentLevelXP,
       nextLevelXP
     },
@@ -142,9 +142,9 @@ export const useGamification = (userId?: string) => {
     },
     unlockAchievement: async (badgeId: string) => {
       if (!userId) return;
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_achievements")
-        .insert({ user_id: userId, badge_id: badgeId } as any);
+        .insert({ user_id: userId, badge_id: badgeId });
       if (error && (error as any).code !== '23505') throw error;
       queryClient.invalidateQueries({ queryKey: ["user_achievements", userId] });
     },
