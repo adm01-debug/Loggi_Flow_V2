@@ -41,7 +41,7 @@ export function CSVImporter<T>({ schema, onImport, columns, templateName = 'temp
         success.push(validated);
       } catch (err) {
         if (err instanceof z.ZodError) {
-          err.errors.forEach(zErr => {
+          err.issues.forEach(zErr => {
             errors.push({
               row: index + 2,
               field: zErr.path.join('.'),

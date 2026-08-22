@@ -85,7 +85,7 @@ export function IPAccessControl() {
     const validation = ipSchema.safeParse(newRule);
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
-      validation.error.errors.forEach((err) => { if (err.path[0]) fieldErrors[String(err.path[0])] = err.message; });
+      validation.error.issues.forEach((err) => { if (err.path[0]) fieldErrors[String(err.path[0])] = err.message; });
       setErrors(fieldErrors);
       return;
     }
