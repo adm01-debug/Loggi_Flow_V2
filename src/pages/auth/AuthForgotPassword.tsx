@@ -30,7 +30,7 @@ export function AuthForgotPassword({ onBack }: AuthForgotPasswordProps) {
     const validation = forgotPasswordSchema.safeParse({ email: forgotEmail });
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
-      validation.error.issues.forEach((err) => { if (err.path[0]) fieldErrors[`forgot_${err.path[0]}`] = err.message; });
+      validation.error.issues.forEach((err) => { if (err.path[0]) fieldErrors[`forgot_${String(err.path[0])}`] = err.message; });
       setErrors(fieldErrors);
       return;
     }
