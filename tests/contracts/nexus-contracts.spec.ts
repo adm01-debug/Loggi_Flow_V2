@@ -7,7 +7,7 @@ const CarrierWebhookSchema = z.object({
   status: z.enum(['PENDING', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED', 'RETURNED', 'OCCURRENCE']),
   timestamp: z.string().datetime(),
   carrier_id: z.string().uuid(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 // Define the contract for freight calculation responses
