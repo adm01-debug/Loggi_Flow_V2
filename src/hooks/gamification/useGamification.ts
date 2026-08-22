@@ -38,7 +38,7 @@ export const useGamification = (userId?: string) => {
         .eq("id", userId as string)
         .single();
       if (error) throw error;
-      return data;
+      return data as any;
     },
   });
 
@@ -55,8 +55,8 @@ export const useGamification = (userId?: string) => {
         code: b.code || b.name.toLowerCase().replace(/\s+/g, '_'),
         icon: b.icon || b.icon_url || 'Award',
         rarity: (b.rarity as any) || (b.tier === 'diamond' ? 'legendary' : b.tier === 'platinum' ? 'epic' : b.tier === 'gold' ? 'rare' : 'common'),
-        xp_reward: b.xp_reward || b.xp_requirement,
-        coins_reward: b.coins_reward || Math.floor(b.xp_requirement / 10),
+        xp_reward: b.xp_reward || b.xp_requirement || 0,
+        coins_reward: b.coins_reward || Math.floor((b.xp_requirement || 0) / 10),
         category: b.category || 'performance'
       })) as RankBadge[];
     },
@@ -102,7 +102,7 @@ export const useGamification = (userId?: string) => {
     },
   });
 
-  const xpValue = (profile as any)?.xp || 0;
+  const xpValue = profile?.xp || 0;
   const levelValue = Math.floor(Math.sqrt(xpValue / 100)) + 1;
   const currentLevelXP = Math.pow(levelValue - 1, 2) * 100;
   const nextLevelXP = Math.pow(levelValue, 2) * 100;
@@ -114,7 +114,7 @@ export const useGamification = (userId?: string) => {
     level: levelValue,
     xp: xpValue,
     total_xp: xpValue,
-    coins: (profile as any)?.coins || 0,
+    coins: profile?.coins || 0,
     progress: progressPercent,
     rank: { name: "Novato", color: "#94a3b8" },
     streak_days: 1,
@@ -135,7 +135,7 @@ export const useGamification = (userId?: string) => {
     },
     isLoading: loadingProfile || loadingBadges || loadingGifts || loadingAchievements,
     awardPoints: async (params: { xp: number; coins: number }) => awardPointsMutation.mutateAsync(params),
-    achievements: badges || [],
+    achievements: (badges || []) as RankBadge[],
     addXP: async (xpInput: number | { amount: number; reason: string }) => {
       const amount = typeof xpInput === 'number' ? xpInput : xpInput.amount;
       return awardPointsMutation.mutateAsync({ xp: amount, coins: 0 });

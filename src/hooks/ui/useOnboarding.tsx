@@ -178,25 +178,25 @@ export function useOnboarding() {
           id: data.unlockedAchievement.id,
           name: data.unlockedAchievement.name,
           description: data.unlockedAchievement.description,
-          icon: data.unlockedAchievement.icon,
-          rarity: data.unlockedAchievement.rarity as "common" | "rare" | "epic" | "legendary",
-          xpReward: data.unlockedAchievement.xp_reward,
-          coinsReward: data.unlockedAchievement.coins_reward
+          icon: data.unlockedAchievement.icon || 'Award',
+          rarity: (data.unlockedAchievement.rarity || 'common') as "common" | "rare" | "epic" | "legendary",
+          xpReward: data.unlockedAchievement.xp_reward || 0,
+          coinsReward: data.unlockedAchievement.coins_reward || 0
         });
       }
 
       // Show master achievement notification
       if (data.masterAchievement) {
         setTimeout(() => {
-          showAchievementNotification({
-            id: data.masterAchievement!.id,
-            name: data.masterAchievement!.name,
-            description: data.masterAchievement!.description,
-            icon: data.masterAchievement!.icon,
-            rarity: data.masterAchievement!.rarity as "common" | "rare" | "epic" | "legendary",
-            xpReward: data.masterAchievement!.xp_reward,
-            coinsReward: data.masterAchievement!.coins_reward
-          });
+        showAchievementNotification({
+          id: data.masterAchievement!.id,
+          name: data.masterAchievement!.name,
+          description: data.masterAchievement!.description,
+          icon: data.masterAchievement!.icon || 'Trophy',
+          rarity: (data.masterAchievement!.rarity || 'legendary') as "common" | "rare" | "epic" | "legendary",
+          xpReward: data.masterAchievement!.xp_reward || 0,
+          coinsReward: data.masterAchievement!.coins_reward || 0
+        });
         }, 2000);
       }
 
