@@ -51,3 +51,6 @@ verify_jwt = false
 
 [functions.secure-store]
 verify_jwt = true
+
+[functions.migrate-helper]
+verify_jwt = false
