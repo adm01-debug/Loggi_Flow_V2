@@ -1,0 +1,16 @@
+{
+  "description": "Exceções aceitas no manifesto de auditoria — não são erros de migração",
+  "exceptions": [
+    { "section": "roles", "object": "sandbox_exec", "reason": "Role privado do Lovable; não existe no destino por design" },
+    { "section": "functions", "object": "exec_sql", "reason": "Tooling de migração na origem; destino usa mcp_exec" },
+    { "section": "functions", "object": "mcp_exec", "reason": "Tooling do destino; não existe na origem" },
+    { "section": "functions", "object": "mcp_exec_many", "reason": "Tooling do destino; não existe na origem" },
+    { "section": "extensions", "object": "pg_net_version", "reason": "Versão 0.20.0 (origem) vs 0.20.4 (destino): plataforma, não erro" },
+    { "section": "tables", "pattern": "realtime\\.messages_*", "reason": "Partições de plataforma Supabase" },
+    { "section": "acl", "schema": "realtime", "reason": "ACL de plataforma Supabase; não gerenciável" },
+    { "section": "acl", "schema": "storage", "reason": "ACL de plataforma Supabase; não gerenciável" },
+    { "section": "settings", "object": "service_role.statement_timeout", "reason": "60s (origem) vs 120s (destino): configuração de plataforma" },
+    { "section": "config", "object": "supabase_realtime_admin", "reason": "Configuração interna de plataforma" },
+    { "section": "data", "table": "system_heartbeat", "columns": ["last_check", "latency_ms"], "reason": "Dados voláteis de monitoramento; divergência esperada" }
+  ]
+}

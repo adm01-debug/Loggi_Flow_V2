@@ -1,19 +1,20 @@
--- R4 (ESTADO_ATUAL.md): record_heartbeat() usava colunas inexistentes
--- (message, checked_at) e os crons (nexus_heartbeat + system-heartbeat-1m)
--- falhavam toda execução desde 2026-05-19, deixando o heartbeat congelado.
--- Schema real de system_heartbeat: service_name, status, latency_ms,
--- last_check, version, metadata (PK = service_name).
---
--- Fix: atualizar last_check dos 4 serviços registrados (heartbeat por
--- serviço, respeitando a PK), sem inserir linha nova e sem referências
--- a colunas inexistentes.
+-- Migration: 20260822190000_fix_record_heartbeat_columns
+-- Corrige record_heartbeat() que tentava INSERT em colunas inexistentes;
+-- migra para UPDATE SET last_check=now().
+-- Revoga acesso de anon/authenticated (só service_role pode chamar).
+-- Aplicada na origem em 22/08/2026; aplicada no destino via plano de migração (31/08/2026)
 CREATE OR REPLACE FUNCTION public.record_heartbeat()
-RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
 BEGIN
   UPDATE public.system_heartbeat
      SET last_check = now()
    WHERE service_name IN ('database', 'edge_functions', 'storage', 'auth');
-END; $$;
+END;
+$function$;
 
 REVOKE ALL ON FUNCTION public.record_heartbeat() FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.record_heartbeat() TO service_role;
