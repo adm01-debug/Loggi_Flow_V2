@@ -339,10 +339,6 @@ const KPICard = React.forwardRef<HTMLDivElement, KPICardProps>(
                   ))}
                 </div>
               </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-black text-white italic">{(Math.random() * 5 + 92).toFixed(1)}%</span>
-                <span className="text-[8px] font-bold text-white/40 uppercase">Completion Rate</span>
-              </div>
             </motion.div>
           )}
         </div>

@@ -222,11 +222,12 @@ export default function Relatorios() {
   }, [entregas]);
 
   const driverPerformance = useMemo(() => {
+    const maxXp = Math.max(1, ...userLevels.map((u) => u.total_xp || 0));
     return userLevels.slice(0, 5).map((u) => ({
       name: u.name?.split(" ")[0] || "User",
       xp: u.total_xp,
       nivel: u.level,
-      eficiencia: Math.min(100, 80 + Math.floor(Math.random() * 20)),
+      eficiencia: Math.round(((u.total_xp || 0) / maxXp) * 100), // XP relativo ao líder (antes: valor aleatório)
     }));
   }, [userLevels]);
 

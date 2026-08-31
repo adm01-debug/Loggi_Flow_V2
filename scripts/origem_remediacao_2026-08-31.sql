@@ -53,3 +53,6 @@ CREATE POLICY "Anyone can view achievements" ON public.achievements FOR SELECT T
 
 -- 2026-08-31 (auditoria): duplicata de version em cotacoes_multicanal nao coberta pelo cleanup (fica trigger_increment_version_cotacoes)
 DROP TRIGGER IF EXISTS tr_cotacoes_multicanal_version ON public.cotacoes_multicanal;
+
+-- 2026-08-31: auditar rate_limit_logs gerava 1 audit_log por evento de rate limit (96,7% do audit_logs era esse ruido). Removido nos 2 bancos.
+DROP TRIGGER IF EXISTS audit_log_trigger ON public.rate_limit_logs;

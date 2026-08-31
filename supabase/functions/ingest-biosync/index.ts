@@ -40,7 +40,7 @@ serve(async (req) => {
       .insert({
         driver_id,
         vehicle_id,
-        heart_rate: heart_rate || Math.floor(Math.random() * (90 - 60 + 1)) + 60,
+        heart_rate: heart_rate ?? null, // sem leitura = null (antes: valor aleatório 60-90)
         fatigue_index: fatigue_index || "LOW",
         severity,
         timestamp: new Date().toISOString()
