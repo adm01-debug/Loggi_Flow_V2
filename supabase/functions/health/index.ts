@@ -1,0 +1,81 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+/**
+ * Global Health Check Edge Function
+ * Performs deep health inspection of database, auth and external connectivity.
+ */
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  const startTime = Date.now();
+  const checks: Record<string, any> = {};
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''; // Use service role for internal health
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+    // 1. Database Check
+    const { data: dbCheck, error: dbError } = await supabaseClient
+      .from('profiles')
+      .select('id')
+      .limit(1)
+      .maybeSingle();
+      
+    checks.database = {
+      status: dbError ? 'unhealthy' : 'healthy',
+      latency_ms: Date.now() - startTime,
+      error: dbError?.message
+    };
+
+    // 2. Auth Service Check
+    try {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      checks.auth = { status: 'healthy' };
+    } catch (e) {
+      checks.auth = { status: 'unhealthy', error: (e as Error).message };
+    }
+
+    // 3. Storage Check
+    const { data: buckets, error: storageError } = await supabaseClient.storage.listBuckets();
+    checks.storage = { 
+      status: storageError ? 'unhealthy' : 'healthy',
+      buckets_count: buckets?.length || 0
+    };
+
+    // Overall Status
+    const isHealthy = checks.database.status === 'healthy' && checks.auth.status === 'healthy';
+    const statusCode = isHealthy ? 200 : 503;
+
+    return new Response(
+      JSON.stringify({
+        status: isHealthy ? 'healthy' : 'unhealthy',
+        version: '1.0.0-enterprise',
+        timestamp: new Date().toISOString(),
+        total_latency_ms: Date.now() - startTime,
+        services: checks
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: statusCode 
+      }
+    );
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ 
+        status: 'critical_failure', 
+        error: (err as Error).message,
+        timestamp: new Date().toISOString() 
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    );
+  }
+});

@@ -1,0 +1,225 @@
+openapi: 3.1.0
+info:
+  title: LogiFlow Edge Functions API
+  description: |
+    Documentação OpenAPI de todas as 36 Edge Functions do LogiFlow.
+    Base URL: `https://<project-ref>.functions.supabase.co/functions/v1`
+    Todas as rotas requerem header `apikey: <VITE_SUPABASE_PUBLISHABLE_KEY>`.
+    Rotas marcadas com `verify_jwt=true` requerem também `Authorization: Bearer <JWT>`.
+  version: 1.0.0
+  contact:
+    name: LogiFlow Engineering
+
+servers:
+  - url: https://hgicfqjayrjurivtygqf.functions.supabase.co/functions/v1
+    description: Produção
+
+security:
+  - ApiKey: []
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: apikey
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    RateLimited:
+      description: Rate limit excedido
+      content:
+        application/json:
+          schema: { type: object, properties: { error: { type: string } } }
+    Unauthorized:
+      description: Autenticação inválida ou ausente
+    BadRequest:
+      description: Payload inválido (contract validation)
+  schemas:
+    Ok:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { type: object }
+    Err:
+      type: object
+      properties:
+        error: { type: string }
+
+paths:
+  # ============ HEALTH & OBSERVABILITY ============
+  /health:
+    get:
+      summary: Health check público
+      security: [{ ApiKey: [] }]
+      responses:
+        '200': { description: OK }
+  /health-check:
+    get:
+      summary: Deep health check
+      security: [{ ApiKey: [] }]
+      responses: { '200': { description: OK } }
+  /webhook-status:
+    post:
+      summary: Status agregado de webhooks
+      responses: { '200': { description: OK }, '401': { $ref: '#/components/responses/Unauthorized' } }
+
+  # ============ AUTH & SECURITY ============
+  /validate-login:
+    post:
+      summary: Valida credenciais e emite eventos
+      responses: { '200': { description: OK }, '400': { $ref: '#/components/responses/BadRequest' } }
+  /log-login-attempt:
+    post:
+      summary: Registra tentativa de login (sucesso/falha)
+      responses: { '200': { description: OK } }
+  /log-security-event:
+    post:
+      summary: Log de eventos de segurança
+      responses: { '200': { description: OK } }
+  /new-device-alert:
+    post:
+      summary: Alerta de novo dispositivo (email via Resend)
+      responses: { '200': { description: OK } }
+  /send-password-reset:
+    post:
+      summary: Envia email de reset de senha
+      responses: { '200': { description: OK } }
+  /check-password-breach:
+    post:
+      summary: Checa vazamento HIBP k-anonymity
+      responses: { '200': { description: OK } }
+  /check-rate-limit:
+    post:
+      summary: Consulta rate limit (Upstash Redis)
+      responses: { '200': { description: OK }, '429': { $ref: '#/components/responses/RateLimited' } }
+  /lgpd-erase-user:
+    post:
+      summary: LGPD — anonimização/erase de usuário
+      security: [{ ApiKey: [], BearerAuth: [] }]
+      responses: { '200': { description: OK }, '401': { $ref: '#/components/responses/Unauthorized' } }
+
+  # ============ AI / ML ============
+  /ai-logistics-assistant:
+    post:
+      summary: Assistente logístico (Lovable AI)
+      security: [{ ApiKey: [], BearerAuth: [] }]
+      responses: { '200': { description: OK } }
+  /predict-delays:
+    post:
+      summary: Predição de atrasos por entrega
+      security: [{ ApiKey: [], BearerAuth: [] }]
+      responses: { '200': { description: OK } }
+  /smart-carrier-selection:
+    post:
+      summary: Seleção inteligente de transportadora
+      security: [{ ApiKey: [], BearerAuth: [] }]
+      responses: { '200': { description: OK } }
+  /ocr-receipt-processor:
+    post:
+      summary: OCR de comprovantes (Lovable AI vision)
+      responses: { '200': { description: OK } }
+
+  # ============ CARRIERS ============
+  /lalamove-api:
+    post:
+      summary: Proxy autenticado Lalamove
+      responses: { '200': { description: OK } }
+  /lalamove-tracking:
+    post:
+      summary: Rastreamento realtime Lalamove
+      responses: { '200': { description: OK } }
+  /lalamove-webhook:
+    post:
+      summary: Webhook Lalamove (HMAC)
+      security: []
+      responses: { '200': { description: OK }, '401': { $ref: '#/components/responses/Unauthorized' } }
+  /rodonaves-api:
+    post:
+      summary: Proxy Rodonaves (cotação/rastreio)
+      responses: { '200': { description: OK } }
+  /rodonaves-webhook:
+    post:
+      summary: Webhook Rodonaves (HMAC)
+      security: []
+      responses: { '200': { description: OK }, '401': { $ref: '#/components/responses/Unauthorized' } }
+  /melhor-envio-api:
+    post:
+      summary: Proxy Melhor Envio (36 endpoints)
+      security: []
+      responses: { '200': { description: OK } }
+  /carrier-webhook-receiver:
+    post:
+      summary: Webhook genérico multi-transportadora
+      security: []
+      responses: { '200': { description: OK } }
+  /normalize-freight-response:
+    post:
+      summary: Normaliza respostas heterogêneas de fretes
+      responses: { '200': { description: OK } }
+
+  # ============ INTEGRATIONS ============
+  /bitrix24-integration:
+    post:
+      summary: Sync bidirecional com Bitrix24 CRM
+      responses: { '200': { description: OK } }
+  /whatsapp-notification:
+    post:
+      summary: Notificação via A-Ticket
+      responses: { '200': { description: OK } }
+  /evolution-whatsapp:
+    post:
+      summary: Webhook Evolution API WhatsApp
+      security: []
+      responses: { '200': { description: OK } }
+  /resend-email:
+    post:
+      summary: Envio transacional (Resend)
+      security: []
+      responses: { '200': { description: OK } }
+  /external-db-bridge:
+    post:
+      summary: Ponte para Supabase externo (catálogo)
+      responses: { '200': { description: OK } }
+  /geocode-address:
+    post:
+      summary: Geocoding via Mapbox
+      responses: { '200': { description: OK } }
+  /get-mapbox-token:
+    get:
+      summary: Emite token Mapbox público
+      responses: { '200': { description: OK } }
+  /get-weather-data:
+    post:
+      summary: Dados meteorológicos por rota
+      responses: { '200': { description: OK } }
+
+  # ============ NEXUS / TELEMETRY ============
+  /nexus-webhook-receiver:
+    post:
+      summary: Ingestão tática Nexus (HMAC)
+      security: []
+      responses: { '200': { description: OK }, '401': { $ref: '#/components/responses/Unauthorized' } }
+  /nexus-auto-healing:
+    post:
+      summary: Rotinas de auto-cura Nexus
+      responses: { '200': { description: OK } }
+  /ingest-biosync:
+    post:
+      summary: Telemetria biométrica motoristas
+      responses: { '200': { description: OK } }
+  /execute-protocol:
+    post:
+      summary: Executa protocolo tático em veículo
+      security: [{ ApiKey: [], BearerAuth: [] }]
+      responses: { '200': { description: OK } }
+
+  # ============ REPORTS ============
+  /scheduled-reports:
+    post:
+      summary: Geração/agendamento de relatórios
+      security: [{ ApiKey: [], BearerAuth: [] }]
+      responses: { '200': { description: OK } }

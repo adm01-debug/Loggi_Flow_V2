@@ -1,0 +1,2523 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Rodonaves.Tracking",
+    "version": "1.27.3.0"
+  },
+  "paths": {
+    "/token": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": " Obter o token de acesso",
+        "description": "Endpoint de Autenticação",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "auth_type",
+                  "grant_type",
+                  "username",
+                  "password"
+                ],
+                "type": "object",
+                "properties": {
+                  "auth_type": {
+                    "type": "string",
+                    "default": "DEV"
+                  },
+                  "grant_type": {
+                    "type": "string",
+                    "default": "password"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "auth_type": {
+                  "style": "form"
+                },
+                "grant_type": {
+                  "style": "form"
+                },
+                "username": {
+                  "style": "form"
+                },
+                "password": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/deliveryreceipt": {
+      "get": {
+        "tags": [
+          "Comprovante de Entrega"
+        ],
+        "summary": "Pesquisa de comprovante de entrega",
+        "description": "Retorna o comprovante de entrega",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceNumber",
+            "in": "query",
+            "description": "Número da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceKey",
+            "in": "query",
+            "description": "Chave da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ProtocolNumber",
+            "in": "query",
+            "description": "Número do protocolo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/deliveryreceipt/withoutImageCompression": {
+      "get": {
+        "tags": [
+          "Comprovante de Entrega"
+        ],
+        "summary": "Pesquisa de comprovante de entrega sem realizar a compressão de imagem",
+        "description": "Retorna o comprovante de entrega",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceNumber",
+            "in": "query",
+            "description": "Número da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceKey",
+            "in": "query",
+            "description": "Chave da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ProtocolNumber",
+            "in": "query",
+            "description": "Número do protocolo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/deliveryreceipt/deliveryInformation": {
+      "get": {
+        "tags": [
+          "Comprovante de Entrega"
+        ],
+        "summary": "Pesquisa informações do destino da mercadoria",
+        "description": "Retorna informações do destino da mercadoria",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceNumber",
+            "in": "query",
+            "description": "Número da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceKey",
+            "in": "query",
+            "description": "Chave da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ProtocolNumber",
+            "in": "query",
+            "description": "Número do protocolo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryInformationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryInformationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryInformationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/deliveryreceipt/receipt-key-list": {
+      "post": {
+        "tags": [
+          "Comprovante de Entrega"
+        ],
+        "summary": "Pesquisa em lote o comprovante de entrega",
+        "description": "Retorna link do s3 dos comprovante de entrega",
+        "requestBody": {
+          "description": "Parâmetros para pesquisa de comprovante de entrega",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryReceiptGetListRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryReceiptGetListRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryReceiptGetListRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryReceiptGetListRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptKeyListResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptKeyListResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReceiptKeyListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols": {
+      "get": {
+        "tags": [
+          "Comprovante de Entrega"
+        ],
+        "summary": "Retorna em lote os comprovantes de entrega por protocolo",
+        "description": "Retorna em lote os comprovantes de entrega por protocolo",
+        "parameters": [
+          {
+            "name": "requestProtocols",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeliveryReceiptResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/configuration": {
+      "get": {
+        "tags": [
+          "FileConfiguration"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FileConfiguration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfiguration"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfiguration"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfiguration"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileConfiguration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/healthcheck": {
+      "get": {
+        "tags": [
+          "HealthCheck"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/occurrencereceipt/list": {
+      "get": {
+        "tags": [
+          "Comprovante de Ocorrencia"
+        ],
+        "summary": "Retorna lista de comprovantes de ocorrência por id do CT-e",
+        "parameters": [
+          {
+            "name": "BillOfLadingId",
+            "in": "query",
+            "description": "Identificador do CT-e",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "OccurenceCode",
+            "in": "query",
+            "description": "Código / motivo da ocorrência",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "LoadImageContent",
+            "in": "query",
+            "description": "Carrega imagem do comprovante de entrega",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OccurrenceReceiptResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OccurrenceReceiptResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OccurrenceReceiptResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/occurrencereceipt": {
+      "get": {
+        "tags": [
+          "Comprovante de Ocorrencia"
+        ],
+        "summary": "Retorna apenas um comprovante de ocorrência por id do CT-e",
+        "parameters": [
+          {
+            "name": "BillOfLadingId",
+            "in": "query",
+            "description": "Identificador do CT-e",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "OccurenceCode",
+            "in": "query",
+            "description": "Código / motivo da ocorrência",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "LoadImageContent",
+            "in": "query",
+            "description": "Carrega imagem do comprovante de entrega",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OccurrenceReceiptResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OccurrenceReceiptResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OccurrenceReceiptResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/occurrencereceipt/imageurl": {
+      "get": {
+        "tags": [
+          "Comprovante de Ocorrencia"
+        ],
+        "summary": "Retorna URL da imagem do comprovante de ocorrência por id do CT-e",
+        "parameters": [
+          {
+            "name": "BillOfLadingId",
+            "in": "query",
+            "description": "Identificador do CT-e",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "OccurenceCode",
+            "in": "query",
+            "description": "Código / motivo da ocorrência",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "RemoveImageUrlExpire",
+            "in": "query",
+            "description": "Remover expiração da URL da imagem",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageUrlOccurrenceReceiptResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageUrlOccurrenceReceiptResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageUrlOccurrenceReceiptResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/ordersbydaterangepagination": {
+      "get": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Pesquisa de pedidos por cliente com paginação",
+        "description": "Retorna uma lista de pedidos por cliente",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CustomerType",
+            "in": "query",
+            "description": "Papel do Cliente (0 - Todos; 1 - Remetente; 2 - Destinatario; 3 - Tomador; 4 - Expedidor; 5 - Recebedor; 6 - ExpedidorERemetente; 7 - DestinatarioERecebedor)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CustomersTypeEnum"
+            }
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "description": "Data inicial para a pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "description": "Data final para pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "InvoiceNumber",
+            "in": "query",
+            "description": "Número da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AmountByPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrdersResponsePagedBaseResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrdersResponsePagedBaseResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrdersResponsePagedBaseResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/outputcache/{region}": {
+      "delete": {
+        "tags": [
+          "OutputCache"
+        ],
+        "parameters": [
+          {
+            "name": "region",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/tracking": {
+      "get": {
+        "tags": [
+          "Rastreio"
+        ],
+        "summary": "Pesquisa de rastreio de mercadorias",
+        "description": "Retorna o rastreio de mercadorias",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceNumber",
+            "in": "query",
+            "description": "Número da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceKey",
+            "in": "query",
+            "description": "Chave da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ProtocolNumber",
+            "in": "query",
+            "description": "Número do protocolo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "IsCustomerPortal",
+            "in": "query",
+            "description": "Rastreio via Portal do Cliente - Se TRUE Ignorar ocorrencia 80",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/tracking/batch": {
+      "get": {
+        "tags": [
+          "Rastreio"
+        ],
+        "summary": "Pesquisa de rastreio de mercadorias em lotes",
+        "description": "Retorna uma lista de rastreios de mercadorias",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "description": "Data inicial para a pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "description": "Data final para pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "OperationType",
+            "in": "query",
+            "description": "Tipo de operação",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AmountByPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/tracking/batchPagination": {
+      "get": {
+        "tags": [
+          "Rastreio"
+        ],
+        "summary": "Pesquisa de rastreio de mercadorias em lotes com paginação",
+        "description": "Retorna uma lista de rastreios de mercadorias",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "description": "Data inicial para a pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "description": "Data final para pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "OperationType",
+            "in": "query",
+            "description": "Tipo de operação",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AmountByPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponsePagedBaseResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponsePagedBaseResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponsePagedBaseResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/tracking/batchpaginationbyparms": {
+      "get": {
+        "tags": [
+          "Rastreio"
+        ],
+        "summary": "Pesquisa de rastreio de mercadorias em lotes com paginação",
+        "description": "Retorna uma lista de rastreios de mercadorias",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "InvoiceNumber",
+            "in": "query",
+            "description": "Número da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ProtocolNumber",
+            "in": "query",
+            "description": "Número do protocolo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AmountByPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponsePagedBaseResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponsePagedBaseResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingResponsePagedBaseResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/tracking/trackingSteps": {
+      "get": {
+        "tags": [
+          "Rastreio"
+        ],
+        "summary": "Pesquisa de steps do rastreio de mercadorias",
+        "description": "Retorna o steps do rastreio",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceNumber",
+            "in": "query",
+            "description": "Número da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "InvoiceKey",
+            "in": "query",
+            "description": "Chave da Nota Fiscal",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ProtocolNumber",
+            "in": "query",
+            "description": "Número do protocolo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "IsCustomerPortal",
+            "in": "query",
+            "description": "Rastreio via Portal do Cliente - Se TRUE Ignorar ocorrencia 80",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingStepsResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingStepsResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingStepsResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/tracking/batchByOccurrenceDate": {
+      "get": {
+        "tags": [
+          "Rastreio"
+        ],
+        "summary": "Pesquisa de rastreio de mercadorias em lotes por data de ocorrencia",
+        "description": "Retorna uma lista de rastreios de mercadorias",
+        "parameters": [
+          {
+            "name": "TaxIdRegistration",
+            "in": "query",
+            "description": "CPF/CNPJ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CTeNumber",
+            "in": "query",
+            "description": "Número do CT-e",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "description": "Data inicial para a pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "description": "Data final para pesquisa",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "OperationType",
+            "in": "query",
+            "description": "Tipo de operação",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AmountByPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AggregateRouteConfig": {
+        "type": "object",
+        "properties": {
+          "routeKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "parameter": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonPath": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CustomersTypeEnum": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "DeliveryInformationResponse": {
+        "type": "object",
+        "properties": {
+          "destinyUnit": {
+            "type": "integer",
+            "description": "Unidade destino",
+            "format": "int32"
+          },
+          "receiverName": {
+            "type": "string",
+            "description": "Nome recebedor",
+            "nullable": true
+          },
+          "stateDelivery": {
+            "type": "string",
+            "description": "Estado entrega",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Informações do destino"
+      },
+      "DeliveryReceiptGetListRequest": {
+        "type": "object",
+        "properties": {
+          "taxIdRegistration": {
+            "type": "string",
+            "description": "CPF/CNPJ",
+            "nullable": true
+          },
+          "invoiceNumber": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Número da Nota Fiscal",
+            "nullable": true
+          },
+          "invoiceKey": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Chave da Nota Fiscal",
+            "nullable": true
+          },
+          "protocolNumber": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Número do protocolo",
+            "nullable": true
+          },
+          "cTeNumber": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Número do CT-e",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Comprovante de Entrega"
+      },
+      "DeliveryReceiptKeyListResponse": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Link S3 do comprovante de entrega em lote zipado.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Comprovante de Entrega"
+      },
+      "DeliveryReceiptResponse": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Imagem do comprovante de entrega.",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem para retorno caso haja erro",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Comprovante de Entrega"
+      },
+      "FileAggregateRoute": {
+        "type": "object",
+        "properties": {
+          "routeKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "routeKeysConfig": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AggregateRouteConfig"
+            },
+            "nullable": true
+          },
+          "upstreamPathTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "upstreamHost": {
+            "type": "string",
+            "nullable": true
+          },
+          "routeIsCaseSensitive": {
+            "type": "boolean"
+          },
+          "aggregator": {
+            "type": "string",
+            "nullable": true
+          },
+          "upstreamHttpMethod": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileAuthenticationOptions": {
+        "type": "object",
+        "properties": {
+          "allowedScopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "authenticationProviderKey": {
+            "type": "string",
+            "nullable": true,
+            "deprecated": true
+          },
+          "authenticationProviderKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileCacheOptions": {
+        "type": "object",
+        "properties": {
+          "ttlSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "region": {
+            "type": "string",
+            "nullable": true
+          },
+          "header": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileConfiguration": {
+        "type": "object",
+        "properties": {
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileRoute"
+            },
+            "nullable": true
+          },
+          "dynamicRoutes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileDynamicRoute"
+            },
+            "nullable": true
+          },
+          "aggregates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileAggregateRoute"
+            },
+            "nullable": true
+          },
+          "globalConfiguration": {
+            "$ref": "#/components/schemas/FileGlobalConfiguration"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileDynamicRoute": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "rateLimitRule": {
+            "$ref": "#/components/schemas/FileRateLimitRule"
+          },
+          "downstreamHttpVersion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileGlobalConfiguration": {
+        "type": "object",
+        "properties": {
+          "requestIdKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceDiscoveryProvider": {
+            "$ref": "#/components/schemas/FileServiceDiscoveryProvider"
+          },
+          "rateLimitOptions": {
+            "$ref": "#/components/schemas/FileRateLimitOptions"
+          },
+          "qoSOptions": {
+            "$ref": "#/components/schemas/FileQoSOptions"
+          },
+          "baseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "loadBalancerOptions": {
+            "$ref": "#/components/schemas/FileLoadBalancerOptions"
+          },
+          "downstreamScheme": {
+            "type": "string",
+            "nullable": true
+          },
+          "httpHandlerOptions": {
+            "$ref": "#/components/schemas/FileHttpHandlerOptions"
+          },
+          "downstreamHttpVersion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileHostAndPort": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "nullable": true
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileHttpHandlerOptions": {
+        "type": "object",
+        "properties": {
+          "allowAutoRedirect": {
+            "type": "boolean"
+          },
+          "maxConnectionsPerServer": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "useCookieContainer": {
+            "type": "boolean"
+          },
+          "useProxy": {
+            "type": "boolean"
+          },
+          "useTracing": {
+            "type": "boolean"
+          },
+          "pooledConnectionLifetimeSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileLoadBalancerOptions": {
+        "type": "object",
+        "properties": {
+          "expiry": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileQoSOptions": {
+        "type": "object",
+        "properties": {
+          "durationOfBreak": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "exceptionsAllowedBeforeBreaking": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeoutValue": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileRateLimitOptions": {
+        "type": "object",
+        "properties": {
+          "clientIdHeader": {
+            "type": "string",
+            "nullable": true
+          },
+          "quotaExceededMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "rateLimitCounterPrefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "disableRateLimitHeaders": {
+            "type": "boolean"
+          },
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileRateLimitRule": {
+        "type": "object",
+        "properties": {
+          "clientWhitelist": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "enableRateLimiting": {
+            "type": "boolean"
+          },
+          "period": {
+            "type": "string",
+            "nullable": true
+          },
+          "periodTimespan": {
+            "type": "number",
+            "format": "double"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileRoute": {
+        "type": "object",
+        "properties": {
+          "addClaimsToRequest": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "addHeadersToRequest": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "addQueriesToRequest": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "authenticationOptions": {
+            "$ref": "#/components/schemas/FileAuthenticationOptions"
+          },
+          "changeDownstreamPathTemplate": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "dangerousAcceptAnyServerCertificateValidator": {
+            "type": "boolean"
+          },
+          "delegatingHandlers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "downstreamHeaderTransform": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "downstreamHostAndPorts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileHostAndPort"
+            },
+            "nullable": true
+          },
+          "downstreamHttpMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "downstreamHttpVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "downstreamPathTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "downstreamScheme": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileCacheOptions": {
+            "$ref": "#/components/schemas/FileCacheOptions"
+          },
+          "httpHandlerOptions": {
+            "$ref": "#/components/schemas/FileHttpHandlerOptions"
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "loadBalancerOptions": {
+            "$ref": "#/components/schemas/FileLoadBalancerOptions"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "qoSOptions": {
+            "$ref": "#/components/schemas/FileQoSOptions"
+          },
+          "rateLimitOptions": {
+            "$ref": "#/components/schemas/FileRateLimitRule"
+          },
+          "requestIdKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "routeClaimsRequirement": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "routeIsCaseSensitive": {
+            "type": "boolean"
+          },
+          "securityOptions": {
+            "$ref": "#/components/schemas/FileSecurityOptions"
+          },
+          "serviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceNamespace": {
+            "type": "string",
+            "nullable": true
+          },
+          "timeout": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upstreamHeaderTransform": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "upstreamHost": {
+            "type": "string",
+            "nullable": true
+          },
+          "upstreamHttpMethod": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "upstreamPathTemplate": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileSecurityOptions": {
+        "type": "object",
+        "properties": {
+          "ipAllowedList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "ipBlockedList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "excludeAllowedFromBlocked": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileServiceDiscoveryProvider": {
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "type": "string",
+            "nullable": true
+          },
+          "host": {
+            "type": "string",
+            "nullable": true
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "configurationKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "pollingInterval": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "namespace": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImageUrlOccurrenceReceiptResponse": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "description": "Link da imagem do comprovante de entrega.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InvoiceRefusedInfo": {
+        "type": "object",
+        "properties": {
+          "fiscalDocumentNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OccurrenceReceiptResponse": {
+        "type": "object",
+        "properties": {
+          "billOfLadingId": {
+            "type": "integer",
+            "description": "Codigo da CTR",
+            "format": "int32"
+          },
+          "occurrenceCode": {
+            "type": "string",
+            "description": "Número de ocorrência",
+            "nullable": true
+          },
+          "senderTaxIdRegistration": {
+            "type": "string",
+            "description": "CPF / CNPJ do cliente rementente",
+            "nullable": true
+          },
+          "image": {
+            "type": "string",
+            "description": "Link da imagem do comprovante de entrega.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrdersResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Código do CT-e do Novo TMS",
+            "format": "int32"
+          },
+          "billNumber": {
+            "type": "integer",
+            "description": "Número da Fatura",
+            "format": "int32"
+          },
+          "billDigit": {
+            "type": "integer",
+            "description": "Série da Fatura",
+            "format": "int32"
+          },
+          "cTeNumber": {
+            "type": "integer",
+            "description": "Número do CT-e",
+            "format": "int32"
+          },
+          "cTeDigit": {
+            "type": "integer",
+            "description": "Série do CT-e",
+            "format": "int32"
+          },
+          "cTeKey": {
+            "type": "string",
+            "description": "Chave de Acesso CT-e",
+            "nullable": true
+          },
+          "emissionDate": {
+            "type": "string",
+            "description": "Data de Emissão (Data)",
+            "format": "date-time"
+          },
+          "cTeValue": {
+            "type": "number",
+            "description": "Valor do Frete - decimal",
+            "format": "double"
+          },
+          "nfValue": {
+            "type": "number",
+            "description": "Valor do totalNF - decimal",
+            "format": "double"
+          },
+          "payerDescription": {
+            "type": "string",
+            "description": "Razão Social do Tomador de Serviço",
+            "nullable": true
+          },
+          "receiverDescription": {
+            "type": "string",
+            "description": "Razão Social do Recebedor",
+            "nullable": true
+          },
+          "recipientrDescription": {
+            "type": "string",
+            "description": "Razão Social do Destinatário",
+            "nullable": true
+          },
+          "senderDescription": {
+            "type": "string",
+            "description": "Razão Social do Remetente",
+            "nullable": true
+          },
+          "payerTaxIdRegistration": {
+            "type": "string",
+            "description": "Razão Social do Tomador de Serviço",
+            "nullable": true
+          },
+          "recipientTaxIdRegistration": {
+            "type": "string",
+            "description": "CPF/CNPJ Destinatário",
+            "nullable": true
+          },
+          "senderTaxIdRegistration": {
+            "type": "string",
+            "description": "CPF/CNPJ do Rementente",
+            "nullable": true
+          },
+          "receiverProductDescription": {
+            "type": "string",
+            "description": "Descrição do Recebedor da Mercadoria",
+            "nullable": true
+          },
+          "deliveryDate": {
+            "type": "string",
+            "description": "Data de Entrega (Data e Hora)",
+            "format": "date-time"
+          },
+          "maturityDate": {
+            "type": "string",
+            "description": "Data de Vencimento",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "ID Status",
+            "nullable": true
+          },
+          "cityOrigin": {
+            "type": "string",
+            "description": "Cidade de Origem",
+            "nullable": true
+          },
+          "unitOrigin": {
+            "type": "string",
+            "description": "Código Unidade Origem",
+            "nullable": true
+          },
+          "cityDestination": {
+            "type": "string",
+            "description": "Cidade de Destino",
+            "nullable": true
+          },
+          "unitDestination": {
+            "type": "string",
+            "description": "Código Unidade Destino",
+            "nullable": true
+          },
+          "documentsTotalValue": {
+            "type": "number",
+            "description": "Valor Total das Notas Fiscais",
+            "format": "double"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Coleta emitida com sucesso"
+          },
+          "showColumnCTeValue": {
+            "type": "boolean",
+            "description": "Exibir coluna CTeValue"
+          },
+          "messageFail": {
+            "type": "string",
+            "description": "Mensagem informativa caso a coleta não foi emitida",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrdersResponsePagedBaseResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrdersResponse"
+            },
+            "nullable": true
+          },
+          "amountPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalRegisters": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TrackingEventResponse": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Data / Hora - DateTime",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string",
+            "description": "Evento (Texto) - string",
+            "nullable": true
+          },
+          "eventCode": {
+            "type": "string",
+            "description": "Código do Evendo - string",
+            "nullable": true
+          },
+          "procedaCode": {
+            "type": "string",
+            "description": "Código Proceda",
+            "nullable": true
+          },
+          "historicId": {
+            "type": "integer",
+            "description": "Sequencia historico",
+            "format": "int32"
+          },
+          "occurrenceDate": {
+            "type": "string",
+            "description": "Ocorrencia de Rastreio",
+            "format": "date-time"
+          },
+          "newDateSchedule": {
+            "type": "string",
+            "description": "Nova data de Entrega Agendada",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Motivo pelo qual ocorreu o reagendamento",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Eventos"
+      },
+      "TrackingResponse": {
+        "type": "object",
+        "properties": {
+          "protocolNumber": {
+            "type": "string",
+            "description": "Número do protocolo",
+            "nullable": true
+          },
+          "billOfLadingId": {
+            "type": "integer",
+            "description": "Código do CT-e Novo TMS",
+            "format": "int32"
+          },
+          "cTeNumber": {
+            "type": "string",
+            "description": "Número do CT-e",
+            "nullable": true
+          },
+          "senderDescription": {
+            "type": "string",
+            "description": "Nome / Razão Social do Remetente",
+            "nullable": true
+          },
+          "senderTaxIdRegistration": {
+            "type": "string",
+            "description": "CPF / CNPJ do Remetente",
+            "nullable": true
+          },
+          "recipientDescription": {
+            "type": "string",
+            "description": "Nome / Razão Social do Destinatário",
+            "nullable": true
+          },
+          "recipientTaxIdRegistration": {
+            "type": "string",
+            "description": "CPF / CNPJ do Destinatário",
+            "nullable": true
+          },
+          "expectedDeliveryDays": {
+            "type": "integer",
+            "description": "Previsão de entrega.",
+            "format": "int32"
+          },
+          "emissionDate": {
+            "type": "string",
+            "description": "Data emissão",
+            "format": "date-time"
+          },
+          "fiscalDocumentNumber": {
+            "type": "string",
+            "description": "Número documento fiscal",
+            "nullable": true
+          },
+          "listFiscalDocument": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista com número documento fiscal",
+            "nullable": true
+          },
+          "serialCTE": {
+            "type": "string",
+            "description": "Número série CTE",
+            "nullable": true
+          },
+          "unitEmi": {
+            "type": "string",
+            "description": "Unidade emissorora",
+            "nullable": true
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrackingEventResponse"
+            },
+            "description": "Lista de eventos da mercadoria.",
+            "nullable": true
+          },
+          "isDeliveryReceiptBlocked": {
+            "type": "boolean",
+            "description": "Comprovante de entrega bloqueado ou não"
+          },
+          "newDateSchedule": {
+            "type": "string",
+            "description": "Nova previsão de entrega.",
+            "format": "date-time"
+          },
+          "refusedInvoice": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceRefusedInfo"
+            },
+            "description": "Lista de motivos de entrega e sua respectiva nota fiscal.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Rastreio"
+      },
+      "TrackingResponsePagedBaseResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrackingResponse"
+            },
+            "nullable": true
+          },
+          "amountPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalRegisters": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TrackingStepsResponse": {
+        "type": "object",
+        "properties": {
+          "dateStep": {
+            "type": "string",
+            "description": "Data do step",
+            "format": "date-time"
+          },
+          "historicId": {
+            "type": "integer",
+            "description": "Sequencia historico",
+            "format": "int32"
+          },
+          "typeUnity": {
+            "type": "string",
+            "description": "Tipo unidade",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição",
+            "nullable": true
+          },
+          "stepCode": {
+            "type": "integer",
+            "description": "Codigo Step",
+            "format": "int32"
+          },
+          "occurrenceDate": {
+            "type": "string",
+            "description": "Ocorrencia de Rastreio",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Step timeline"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "Autenticação por JWT usando o schema Bearer . Exemplo: \"Bearer {token}\"",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

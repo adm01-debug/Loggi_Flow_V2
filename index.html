@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://*.lovable.app https://api.mapbox.com https://browser.sentry-cdn.com https://cdn.gpteng.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.lovable.app https://*.lovableproject.com https://api.mapbox.com https://events.mapbox.com https://*.sentry.io https://api.ipify.org; img-src 'self' data: blob: https://*.supabase.co https://api.mapbox.com; style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self' blob:;">
+    
+    <!-- Primary Meta Tags -->
+    <title>LogiFlow | Inteligência Logística de Elite</title>
+    <meta name="title" content="LogiFlow | Inteligência Logística de Elite" />
+    <meta name="description" content="Sistema de gestão logística premium para Promo Brindes.">
+    <meta name="author" content="LogiFlow AI" />
+    
+    <!-- PWA -->
+    <meta name="theme-color" content="#f97316" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LogiFlow" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="canonical" href="/" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon-512.svg">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    
+    
+    <meta property="og:image" content="/icons/icon-512.svg">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@LogiFlow" />
+    <meta name="twitter:image" content="/icons/icon-512.svg">
+    
+    <!-- DNS prefetch for backend -->
+    <link rel="dns-prefetch" href="https://uwbpzfcysppwikfpnzok.supabase.co" />
+    <link rel="preconnect" href="https://uwbpzfcysppwikfpnzok.supabase.co" crossorigin />
+    
+    <!-- Fonts - preload for faster rendering -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" /></noscript>
+    <meta property="og:title" content="LogiFlow | Inteligência Logística de Elite">
+  <meta name="twitter:title" content="LogiFlow | Inteligência Logística de Elite">
+  <meta property="og:description" content="Sistema de gestão logística premium para Promo Brindes.">
+  <meta name="twitter:description" content="Sistema de gestão logística premium para Promo Brindes.">
+</head>
+  <body>
+    <div id="root"></div>
+    <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;">
+      Rodar a suíte de testes completa e garantir que não há erros de build após as edições recentes.
+
+      Implementar uma trilha de gamificação com rank badges e task gifts para premiar conquistas operacionais no meu sistema.
+
+      Implemente uma trilha de níveis (level progression) que transforma pontos em tiers e desbloqueia novas recompensas e badges no meu sistema.
+
+      Implemente gatilhos para que pontos e recompensas sejam automaticamente atribuídos quando eu concluir entregas e despachos no meu sistema.
+      Adicione um histórico/auditoria das atribuições de pontos e recompensas para eu acompanhar quem recebeu, quando e por qual entrega ou despacho.
+    </div>
+
+
+    <!-- Branded Splash Screen — outside #root so React mount can't leave it stuck -->
+    <div id="splash-screen" style="
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: hsl(220 20% 7%);
+      color: hsl(210 40% 98%);
+      font-family: 'Outfit', system-ui, sans-serif;
+      gap: 1.5rem;
+      transition: opacity 0.35s ease-out;
+    ">
+      <div style="
+        width: 56px; height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, hsl(25 95% 53%), hsl(38 92% 50%));
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 30px hsl(25 95% 53% / 0.35);
+        animation: splash-pulse 2s ease-in-out infinite;
+      ">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+          <path d="M15 18H9"/>
+          <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
+          <circle cx="17" cy="18" r="2"/>
+          <circle cx="7" cy="18" r="2"/>
+        </svg>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;">LogiFlow</div>
+        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.5; margin-top: 4px;">Logística Gamificada</div>
+      </div>
+      <div style="
+        width: 120px; height: 3px;
+        border-radius: 4px;
+        background: hsl(220 15% 18%);
+        overflow: hidden;
+        margin-top: 0.5rem;
+      ">
+        <div style="
+          width: 40%; height: 100%;
+          border-radius: 4px;
+          background: linear-gradient(90deg, hsl(25 95% 53%), hsl(38 92% 50%));
+          animation: splash-loading 1.2s ease-in-out infinite;
+        "></div>
+      </div>
+    </div>
+    <style>
+      @keyframes splash-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      @keyframes splash-loading {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(350%); }
+      }
+      #splash-screen.splash-hidden { opacity: 0; pointer-events: none; }
+    </style>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator && !location.hostname.includes('lovableproject')) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

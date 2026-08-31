@@ -1,0 +1,232 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateContract } from "../_shared/contract-validator.ts";
+import { requireString } from "../_shared/validate.ts";
+import { log } from "../_shared/logger.ts";
+import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
+
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+// Map Rodonaves status codes to system entrega_status enum
+function mapRodonavesStatus(code: string): string | null {
+  const codeNum = parseInt(code, 10);
+  // Delivered
+  if ([1, 80, 81, 82, 83, 84, 85].includes(codeNum)) return "entregue";
+  // In transit
+  if ([2, 3, 4, 5, 6, 20, 21, 22, 23, 24, 25, 26, 27].includes(codeNum))
+    return "em_transito";
+  // Out for delivery
+  if ([7, 8, 9, 10].includes(codeNum)) return "saiu_entrega";
+  // Issues / occurrences
+  if (
+    [
+      40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 60, 61, 62, 63, 64,
+      65, 70, 71, 72, 73,
+    ].includes(codeNum)
+  )
+    return "ocorrencia";
+  return null;
+}
+
+serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    // P13: rate limit
+    const rl = await checkRateLimit(req, "rodonaves-webhook", { maxRequests: 100 });
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: rl.message ?? "rate limited" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    const raw = await req.text();
+
+
+    // HMAC signature verification (fail-closed).
+    // Test-mode bypass ONLY when ALLOW_TEST_MODE=true is set server-side —
+    // clients cannot bypass by sending a header alone.
+    const testModeAllowed = Deno.env.get("ALLOW_TEST_MODE") === "true";
+    const isTestMode = testModeAllowed && req.headers.get("x-test-mode") === "true";
+    if (!isTestMode) {
+      const signature = req.headers.get("x-rodonaves-signature") || "";
+      if (
+        !(await verifyWebhookHmac(raw, signature, "RODONAVES_WEBHOOK_SECRET"))
+      ) {
+        log.warn("Rodonaves webhook: invalid signature");
+        return new Response(JSON.stringify({ error: "Invalid signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const payload = JSON.parse(raw);
+    log.info("Rodonaves webhook received:", { payload });
+
+    // Contract Validation
+    const { isValid, errors } = await validateContract(
+      supabaseAdmin,
+      "rodonaves-webhook",
+      payload,
+      (p) => {
+        if (!p.nf_numero && !p.codigo_rastreamento) {
+          throw new Error("nf_numero or codigo_rastreamento is required");
+        }
+        requireString(p, "status_code");
+      },
+    );
+
+    if (!isValid) {
+      return new Response(
+        JSON.stringify({
+          error: "Contract Violation",
+          details: errors,
+          nexus_protocol: "RODONAVES_GATE_REJECTION",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        },
+      );
+    }
+
+    const {
+      nf_numero,
+      status_code,
+      status_descricao,
+      data_evento,
+      codigo_rastreamento,
+      recebedor,
+      event_id,
+    } = payload;
+
+    // Idempotency: use event_id or create one from unique fields
+    const finalEventId =
+      event_id ||
+      `rodonaves-${nf_numero || codigo_rastreamento}-${status_code}-${data_evento}`;
+
+    // Idempotency check
+    const { data: existingEvent } = await supabaseAdmin
+      .from("webhook_events_processed")
+      .select("id")
+      .eq("event_id", finalEventId)
+      .eq("provider", "rodonaves")
+      .maybeSingle();
+
+    if (existingEvent) {
+      log.info(
+        `Webhook already processed (eventId: ${finalEventId}), skipping`,
+      );
+      return new Response(
+        JSON.stringify({ success: true, message: "Already processed" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // Find the entrega
+    let query = supabaseAdmin
+      .from("entregas")
+      .select("id, status, numero_entrega")
+      .limit(1);
+    if (codigo_rastreamento) {
+      query = query.eq("codigo_rastreamento", codigo_rastreamento);
+    } else {
+      query = query.eq("nf_remessa", nf_numero);
+    }
+
+    const { data: entregas, error: findError } = await query;
+    if (findError) throw findError;
+
+    if (!entregas || entregas.length === 0) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Entrega não encontrada" }),
+        {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const entrega = entregas[0];
+    const newStatus = mapRodonavesStatus(status_code?.toString() || "");
+
+    if (!newStatus) {
+      log.info(`Unknown Rodonaves status code: ${status_code}`);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Status code não mapeado, ignorado",
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Update entrega
+    const updateData: Record<string, unknown> = { status: newStatus };
+    if (newStatus === "entregue") {
+      updateData.data_entrega_efetiva = data_evento || new Date().toISOString();
+      if (recebedor) updateData.recebedor = recebedor;
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from("entregas")
+      .update(updateData)
+      .eq("id", entrega.id);
+
+    if (updateError) throw updateError;
+
+    // Register ocorrencia if status is ocorrencia
+    if (newStatus === "ocorrencia") {
+      await supabaseAdmin.from("ocorrencias").insert([
+        {
+          entrega_id: entrega.id,
+          tipo_ocorrencia: "atraso",
+          descricao: `Rodonaves: ${status_descricao || `Código ${status_code}`}`,
+        },
+      ]);
+    }
+
+    log.info(`Entrega ${entrega.numero_entrega} updated to ${newStatus}`);
+
+    // Mark as processed
+    await supabaseAdmin.from("webhook_events_processed").insert({
+      event_id: finalEventId,
+      provider: "rodonaves",
+      payload: payload,
+    });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        entrega_id: entrega.id,
+        new_status: newStatus,
+        event_id: finalEventId,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  } catch (error: any) {
+    log.error("Rodonaves webhook error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

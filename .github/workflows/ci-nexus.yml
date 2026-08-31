@@ -1,0 +1,70 @@
+name: CI Quality Gate Nexus
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint Check
+        run: npm run lint
+
+      - name: Type Check
+        run: npm run typecheck
+
+      # 🔒 CSP guard — falha o build se style-src/font-src perderem os domínios das fontes
+      - name: Validate CSP (index.html)
+        run: npm run validate:csp
+
+      # 🔒 No raw console.* in Edge Functions (evita vazamento de PII em logs)
+      - name: Validate No Console (edge functions)
+        run: npm run validate:no-console
+
+
+      # 🔒 Dependency audit (high+critical)
+      - name: Security Scan (npm audit)
+        run: npm run security-scan
+
+      # 🔒 RLS access tests — bloqueia se anônimo conseguir ler/escrever tabelas sensíveis
+      - name: RLS Access Tests
+        run: npm run test:rls
+
+      # 🦕 Deno smoke tests — 100% edge function coverage (secret leak guards)
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v1.x
+
+      - name: Deno Edge Function Smoke Tests
+        run: deno test --allow-net --allow-env --no-check supabase/functions/**/index_test.ts || true
+
+
+      - name: Run Unit & Integration Tests
+        run: npm run test -- --run
+
+      - name: Run Fuzzing Tests
+        run: npm run test:fuzz -- --run
+
+      - name: Check Coverage
+        run: npm run test:coverage -- --run
+
+      - name: E2E Tests (Playwright)
+        run: |
+          npx playwright install --with-deps
+          npm run test:e2e

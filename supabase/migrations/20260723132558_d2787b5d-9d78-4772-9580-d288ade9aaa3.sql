@@ -1,0 +1,1 @@
+ALTER VIEW public.v_prediction_accuracy_daily SET (security_invoker = true);
