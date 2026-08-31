@@ -59,8 +59,8 @@ export const handler = async (req: Request) => {
       });
     }
 
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!lovableApiKey) throw new Error("Chave de API não configurada");
+    const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
+    if (!googleApiKey) throw new Error("GOOGLE_API_KEY not configured");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -122,11 +122,11 @@ export const handler = async (req: Request) => {
 
     Analise o contexto e a pergunta do usuário para dar a melhor recomendação logística possível.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
-      headers: { "Authorization": `Bearer ${lovableApiKey}`, "Content-Type": "application/json" },
+      headers: { "Authorization": `Bearer ${googleApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-1.5-pro",
+        model: "gemini-1.5-pro",
         messages: [
           { role: "system", content: systemPrompt }, 
           ...conversationHistory.slice(-10), 
