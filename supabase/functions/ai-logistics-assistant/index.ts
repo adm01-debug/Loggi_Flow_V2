@@ -126,7 +126,7 @@ export const handler = async (req: Request) => {
       method: "POST",
       headers: { "Authorization": `Bearer ${googleApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gemini-1.5-pro",
+        model: "gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt }, 
           ...conversationHistory.slice(-10), 
