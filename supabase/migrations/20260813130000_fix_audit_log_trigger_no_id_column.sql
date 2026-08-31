@@ -1,8 +1,6 @@
--- Migration: 20260813130000_fix_audit_log_trigger_no_id_column
--- Corrige audit_log_trigger() para extrair record_id de forma defensiva:
--- tenta 'id', depois 'key' (business_rules_config, feature_flags),
--- depois 'version' (schema_migrations), depois '?'
--- Aplicada na origem em 13/08/2026; aplicada no destino via plano de migração (31/08/2026)
+-- Migration 20260813130000_fix_audit_log_trigger_no_id_column
+-- Corpo EXATO da origem (hgicfqjayrjurivtygqf, pg_get_functiondef em 2026-08-31): record_id via id -> key -> version -> '?'
+-- Corrige falha de UPDATE em tabelas sem coluna id (business_rules_config, feature_flags).
 CREATE OR REPLACE FUNCTION public.audit_log_trigger()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -17,13 +15,15 @@ DECLARE
 BEGIN
     current_user_id := auth.uid();
 
+    -- Extrair ID de forma defensiva: tenta 'id', depois 'key', depois uuid da linha
+    -- row_to_json retorna NULL para chaves inexistentes — sem crash
     new_json := CASE WHEN TG_OP IN ('INSERT','UPDATE') THEN row_to_json(NEW)::jsonb ELSE NULL END;
     old_json := CASE WHEN TG_OP IN ('UPDATE','DELETE') THEN row_to_json(OLD)::jsonb ELSE NULL END;
 
     record_id_val := COALESCE(
-        (COALESCE(new_json, old_json) ->> 'id'),
-        (COALESCE(new_json, old_json) ->> 'key'),
-        (COALESCE(new_json, old_json) ->> 'version'),
+        (COALESCE(new_json, old_json) ->> 'id'),    -- coluna id (uuid padrão)
+        (COALESCE(new_json, old_json) ->> 'key'),   -- coluna key (business_rules_config, feature_flags)
+        (COALESCE(new_json, old_json) ->> 'version'), -- coluna version (schema_migrations)
         '?'
     );
 
@@ -45,4 +45,6 @@ BEGIN
 
     RETURN COALESCE(NEW, OLD);
 END;
-$function$;
+$function$
+
+;

@@ -1,0 +1,5 @@
+SELECT 'data'::text AS section, n.nspname||'.'||c.relname AS key,
+  'rows='||(xpath('/row/n/text()', query_to_xml(format('select count(*) as n from %I.%I', n.nspname, c.relname), false, true, '')))[1]::text
+  ||' hash='||coalesce((xpath('/row/h/text()', query_to_xml(format('select md5(string_agg(x, '''' order by x)) as h from (select md5(jsonb_strip_nulls(to_jsonb(t))::text) as x from %I.%I t) s', n.nspname, c.relname), false, true, '')))[1]::text,'') AS def
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname IN ('public','internal') AND c.relkind IN ('r','p') AND NOT c.relispartition

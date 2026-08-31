@@ -50,3 +50,6 @@ GRANT EXECUTE ON FUNCTION public.mark_predictions_accurate() TO service_role;
 -- Etapa 34: achievements.Anyone can view -> TO authenticated (como no destino)
 DROP POLICY IF EXISTS "Anyone can view achievements" ON public.achievements;
 CREATE POLICY "Anyone can view achievements" ON public.achievements FOR SELECT TO authenticated USING (true);
+
+-- 2026-08-31 (auditoria): duplicata de version em cotacoes_multicanal nao coberta pelo cleanup (fica trigger_increment_version_cotacoes)
+DROP TRIGGER IF EXISTS tr_cotacoes_multicanal_version ON public.cotacoes_multicanal;
