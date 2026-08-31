@@ -1,17 +1,76 @@
+import { useSyncExternalStore } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
 import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 
-// Helper to call the edge function
-async function meApi(action: string, params: Record<string, unknown> = {}, useSandbox = true) {
+// --- Singleton: todas as instâncias do hook compartilham um único health check ---
+// Evita N chamadas simultâneas quando N componentes usam useMelhorEnvio().
+
+// Module-level cache (persiste entre instâncias do hook, mesmo em StrictMode)
+const _healthCache = (() => {
+  if (typeof window === 'undefined') return { fetched: false, ok: false };
+  try {
+    const stored = window.sessionStorage.getItem('me-available');
+    return { fetched: true, ok: stored !== 'false' };
+  } catch { return { fetched: false, ok: false }; }
+})();
+
+// Flag reativa que todas as instâncias leem para decidir se disparam queries.
+let _meAvailable = _healthCache.ok;
+
+// Helper to chamar a edge function. Quando recebe "MELHOR_ENVIO_TOKEN not
+// configured", marca indisponibilidade e persiste no sessionStorage.
+async function meApi(
+  action: string,
+  params: Record<string, unknown>,
+  useSandbox: boolean,
+) {
   const { data, error } = await supabase.functions.invoke('melhor-envio-api', {
     body: { action, params, useSandbox },
   });
   if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
+  if (data?.error) {
+    if (
+      typeof data.error === 'string' &&
+      data.error.toLowerCase().includes('melhor_envio_token not configured')
+    ) {
+      _meAvailable = false;
+      if (typeof window !== 'undefined') {
+        try { window.sessionStorage.setItem('me-available', 'false'); } catch { /* ignore */ }
+      }
+      throw new Error('Melhor Envio indisponível: token não configurado no Supabase.');
+    }
+    throw new Error(data.error);
+  }
   return data;
+}
+
+// Singleton: health check executa uma única vez por processo.
+// Injetado dentro do hook para manter acesso ao queryClient do React Query.
+let _healthCheckQueryKey: string[] | null = null;
+
+// Mapeia _meAvailable para subscribers do useSyncExternalStore.
+const _subscribers = new Set<() => void>();
+const _notify = () => _subscribers.forEach((s: () => void) => s());
+
+// Atualiza a flag e notifica todos os subscribers.
+function setMeAvailable(ok: boolean) {
+  _meAvailable = ok;
+  if (typeof window !== 'undefined') {
+    try { window.sessionStorage.setItem('me-available', ok ? 'true' : 'false'); } catch { /* ignore */ }
+  }
+  _notify();
+}
+
+function subscribe(fn: () => void) {
+  _subscribers.add(fn);
+  return () => _subscribers.delete(fn);
+}
+
+function getSnapshot() {
+  return _meAvailable;
 }
 
 export function useMelhorEnvio() {
@@ -19,6 +78,43 @@ export function useMelhorEnvio() {
   const { user } = useAuth();
   const enabled = !!user?.id;
   const [useSandbox] = useLocalStorage('me-sandbox-mode', true);
+
+  // Todas as instâncias observam o mesmo snapshot — não importa quantos
+  // componentes usem o hook na mesma página.
+  const meAvailable = useSyncExternalStore(subscribe, getSnapshot, () => false);
+
+  // Singleton: só o primeiro hook a montar dispara o health check.
+  // Subsequent instances skip because _healthCheckQueryKey is already set.
+  if (!_healthCheckQueryKey) {
+    _healthCheckQueryKey = ['me-health'];
+  }
+
+  useQuery({
+    queryKey: _healthCheckQueryKey,
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('melhor-envio-api', {
+          body: { action: 'infoUsuario', params: {}, useSandbox },
+        });
+        if (error) throw new Error(error.message);
+        if (data?.error) throw new Error(String(data.error));
+        setMeAvailable(true);
+        return { ok: true };
+      } catch {
+        setMeAvailable(false);
+        return { ok: false };
+      }
+    },
+    // Só dispara se:
+    // 1. user está logado
+    // 2. sessionStorage ainda não marcou como indisponível (evita 500 na 1ª vez)
+    // 3. é a instância que vai registrar o singleton (todas executam, só uma
+    //    é a "primeira" — as outras acham que o queryKey já existe e pulam)
+    enabled: enabled && _healthCache.fetched,
+    staleTime: 60 * 60 * 1000,
+    retry: false,
+    meta: { silent: true },
+  });
 
   const api = (action: string, params: Record<string, unknown> = {}) =>
     meApi(action, params, useSandbox);
@@ -57,7 +153,8 @@ export function useMelhorEnvio() {
   const listarCarrinho = useQuery({
     queryKey: ['me-carrinho'],
     queryFn: () => api('listarCarrinho'),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 30 * 1000,
   });
 
@@ -115,7 +212,8 @@ export function useMelhorEnvio() {
   const listarEtiquetas = useQuery({
     queryKey: ['me-etiquetas'],
     queryFn: () => api('listarEtiquetas', { per_page: '50' }),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 60 * 1000,
   });
 
@@ -146,7 +244,8 @@ export function useMelhorEnvio() {
   const listarTransportadoras = useQuery({
     queryKey: ['me-transportadoras'],
     queryFn: () => api('listarTransportadoras'),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 10 * 60 * 1000,
   });
 
@@ -157,7 +256,8 @@ export function useMelhorEnvio() {
   const listarServicos = useQuery({
     queryKey: ['me-servicos'],
     queryFn: () => api('listarServicos'),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 10 * 60 * 1000,
   });
 
@@ -177,21 +277,24 @@ export function useMelhorEnvio() {
   const infoUsuario = useQuery({
     queryKey: ['me-usuario'],
     queryFn: () => api('infoUsuario'),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
   const enderecosUsuario = useQuery({
     queryKey: ['me-enderecos-usuario'],
     queryFn: () => api('enderecosUsuario'),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
   const saldoUsuario = useQuery({
     queryKey: ['me-saldo'],
     queryFn: () => api('saldoUsuario'),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 60 * 1000,
   });
 
@@ -208,7 +311,8 @@ export function useMelhorEnvio() {
   const listarLojas = useQuery({
     queryKey: ['me-lojas'],
     queryFn: () => api('listarLojas'),
-    enabled,
+    enabled: enabled && meAvailable,
+    retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -246,6 +350,8 @@ export function useMelhorEnvio() {
   });
 
   return {
+    // Status
+    meAvailable,
     // Cotação
     calcularFrete,
     // Carrinho

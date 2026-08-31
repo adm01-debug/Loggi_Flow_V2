@@ -82,14 +82,14 @@ export function RotaSearchFilter({ onSearch, onClear, isLoading }: RotaSearchFil
               Origem
             </Label>
             <Select
-              value={filters.origem_estado || ''}
-              onValueChange={(value) => setFilters({ ...filters, origem_estado: value || undefined })}
+              value={filters.origem_estado || 'all'}
+              onValueChange={(value) => setFilters({ ...filters, origem_estado: value === 'all' ? undefined : value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Estado de origem" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os estados</SelectItem>
+                <SelectItem value="all">Todos os estados</SelectItem>
                 {ESTADOS_BRASIL.map((estado) => (
                   <SelectItem key={estado.sigla} value={estado.sigla}>
                     {estado.sigla} - {estado.nome}
@@ -111,14 +111,14 @@ export function RotaSearchFilter({ onSearch, onClear, isLoading }: RotaSearchFil
               Destino
             </Label>
             <Select
-              value={filters.destino_estado || ''}
-              onValueChange={(value) => setFilters({ ...filters, destino_estado: value || undefined })}
+              value={filters.destino_estado || 'all'}
+              onValueChange={(value) => setFilters({ ...filters, destino_estado: value === 'all' ? undefined : value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Estado de destino" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os estados</SelectItem>
+                <SelectItem value="all">Todos os estados</SelectItem>
                 {ESTADOS_BRASIL.map((estado) => (
                   <SelectItem key={estado.sigla} value={estado.sigla}>
                     {estado.sigla} - {estado.nome}

@@ -37,8 +37,17 @@ export const authService = {
   },
 
   async updateStreak(userId: string): Promise<void> {
+    // P18: o RPC update_user_streak estava retornando 403 (permissão negada
+    // para o role anon). Como o debounce de 1x/dia já é feito no
+    // useAuth via localStorage, basta atualizar o last_activity_date em
+    // user_levels (schema em uso pelo useGamification.tsx). Se a linha
+    // não existir para este user, ignora silenciosamente.
     try {
-      await supabase.rpc("update_user_streak", { p_user_id: userId });
+      const today = new Date().toISOString().slice(0, 10);
+      await (supabase as any)
+        .from("user_levels")
+        .update({ last_activity_date: today })
+        .eq("user_id", userId);
     } catch (err) {
       console.error("Error updating streak:", err);
     }

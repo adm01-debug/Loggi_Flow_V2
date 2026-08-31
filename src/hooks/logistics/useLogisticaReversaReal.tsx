@@ -16,7 +16,7 @@ export interface LogisticaReversa {
   updated_at: string;
   created_by: string | null;
   clientes?: { razao_social: string };
-  entregas?: { codigo_rastreio: string };
+  entregas?: { codigo_rastreamento: string };
 }
 
 export const useLogisticaReversaReal = () => {
@@ -30,7 +30,7 @@ export const useLogisticaReversaReal = () => {
         .select(`
           *,
           clientes (razao_social),
-          entregas (codigo_rastreio)
+          entregas (codigo_rastreamento)
         `)
         .order("created_at", { ascending: false });
 

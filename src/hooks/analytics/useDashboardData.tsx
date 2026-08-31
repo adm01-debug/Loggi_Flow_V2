@@ -1,18 +1,20 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { startOfDay, endOfDay, eachDayOfInterval, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 
 export function useDashboardData(dateRange: DateRange) {
+  const { user } = useAuth();
   const {
     data: combinedData,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["dashboard-data-combined", dateRange.from, dateRange.to],
+    queryKey: ["dashboard-data-combined", dateRange.from, dateRange.to, user?.id],
     queryFn: async () => {
       if (!dateRange.from || !dateRange.to)
         return { coletas: [], entregas: [] };
@@ -38,6 +40,11 @@ export function useDashboardData(dateRange: DateRange) {
       return { coletas: coletas || [], entregas: entregas || [] };
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD,
+    // P23: não dispara a query até o user estar carregado. Sem isso,
+    // no F5 o React Query faz a chamada antes do getSession terminar,
+    // recebe 401 (sem token), o data fica vazio, e os cards do
+    // dashboard aparecem zerados até o próximo refetch manual.
+    enabled: !!user?.id,
   });
 
   const chartData = useMemo(() => {

@@ -8,11 +8,11 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-const REQUEST_ID_HEADER = 'x-request-id';
-
-const getGlobalHeaders = () => ({
-  [REQUEST_ID_HEADER]: crypto.randomUUID(),
-});
+// P18: NÃO injetar header customizado global. Supabase Edge Functions / REST
+// só permitem Access-Control-Allow-Headers: authorization, x-client-info,
+// apikey, content-type. Um header extra dispara preflight CORS em todas as
+// chamadas e quebra validate-login, log-login-attempt, RPCs, etc.
+// Para correlação, gere o ID no momento da chamada específica, se precisar.
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
@@ -20,20 +20,4 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: true,
     autoRefreshToken: true,
   },
-  global: {
-    get headers() {
-      return getGlobalHeaders();
-    },
-  },
 });
-
-// Helper para garantir correlation ID único por requisição se necessário
-export const getSupabaseWithContext = (requestId = crypto.randomUUID()) => {
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    global: {
-      headers: {
-        [REQUEST_ID_HEADER]: requestId,
-      },
-    },
-  });
-};

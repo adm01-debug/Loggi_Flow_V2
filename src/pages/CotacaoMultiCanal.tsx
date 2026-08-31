@@ -483,6 +483,38 @@ export default function CotacaoMultiCanal() {
   return (
     <MainLayout>
       <div className="space-y-8 max-w-[1600px] mx-auto pb-12">
+        {!melhorEnvio.meAvailable && (
+          <Alert className="border-warning/40 bg-warning/5">
+            <AlertTitle className="text-warning text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4" />
+              Melhor Envio indisponível
+            </AlertTitle>
+            <AlertDescription className="text-xs text-white/70 space-y-2">
+              <p>
+                O token <code className="text-white/80 bg-white/5 px-1 rounded">MELHOR_ENVIO_TOKEN</code> não está configurado no Supabase.
+                Configure em <strong>Edge Functions → Secrets</strong> para ativar cotações via Melhor Envio.
+                Outras fontes (Rodonaves, Lalamove, transportadoras locais) continuam funcionando.
+              </p>
+              <p className="text-white/50">
+                Já configurou?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      window.sessionStorage.removeItem('me-available');
+                    } catch {
+                      // ignore
+                    }
+                    window.location.reload();
+                  }}
+                  className="text-primary hover:underline font-semibold"
+                >
+                  Re-tentar detecção
+                </button>
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
           <div className="space-y-2">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white flex items-center gap-4 tracking-tighter uppercase italic">

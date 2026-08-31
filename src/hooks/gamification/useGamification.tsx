@@ -257,11 +257,16 @@ export function useGamification() {
   const updateStreakMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not logged in");
-      
-      const { error } = await supabase.rpc("update_user_streak", {
-        p_user_id: user.id,
-      });
-      
+
+      // P18: substituído update_user_streak RPC (403 anon) por update direto
+      // em user_levels.last_activity_date, alinhado com o schema em uso neste
+      // arquivo. Debounce de 1x/dia fica a cargo do caller via localStorage.
+      const today = new Date().toISOString().slice(0, 10);
+      const { error } = await (supabase as any)
+        .from("user_levels")
+        .update({ last_activity_date: today })
+        .eq("user_id", user.id);
+
       if (error) throw error;
     },
     onSuccess: () => {

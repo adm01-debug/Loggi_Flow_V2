@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+// P18: alinhado ao schema em uso por useGamification.tsx.
+// Tabelas usadas no projeto: achievements, rewards, user_levels,
+// user_achievements, user_ranks. RPC: add_user_xp. As antigas
+// rank_badges/task_gifts/update_user_streak não existem (404/403).
+
 export interface RankBadge {
   id: string;
   name: string;
@@ -25,6 +30,14 @@ export interface TaskGift {
   image_url: string;
 }
 
+const tierFromRequirement = (req: number): RankBadge['tier'] => {
+  if (req >= 1000) return 'diamond';
+  if (req >= 500) return 'platinum';
+  if (req >= 100) return 'gold';
+  if (req >= 25) return 'silver';
+  return 'bronze';
+};
+
 export const useGamification = (userId?: string) => {
   const queryClient = useQueryClient();
 
@@ -46,31 +59,51 @@ export const useGamification = (userId?: string) => {
     queryKey: ["rank_badges"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("rank_badges")
+        .from("achievements")
         .select("*")
-        .order("xp_requirement", { ascending: true });
+        .order("requirement_value", { ascending: true });
       if (error) throw error;
-      return (data as any[]).map(b => ({
-        ...b,
-        code: b.code || b.name.toLowerCase().replace(/\s+/g, '_'),
-        icon: b.icon || b.icon_url || 'Award',
-        rarity: (b.rarity as any) || (b.tier === 'diamond' ? 'legendary' : b.tier === 'platinum' ? 'epic' : b.tier === 'gold' ? 'rare' : 'common'),
-        xp_reward: b.xp_reward || b.xp_requirement || 0,
-        coins_reward: b.coins_reward || Math.floor((b.xp_requirement || 0) / 10),
-        category: b.category || 'performance'
-      })) as RankBadge[];
+      return (data as any[]).map((b) => {
+        const req = b.requirement_value || 0;
+        const tier = tierFromRequirement(req);
+        return {
+          ...b,
+          tier,
+          icon_url: b.icon || '',
+          xp_requirement: req,
+          code: b.name.toLowerCase().replace(/\s+/g, '_'),
+          icon: b.icon || 'Award',
+          rarity:
+            tier === 'diamond' ? 'legendary' :
+            tier === 'platinum' ? 'epic' :
+            tier === 'gold' ? 'rare' : 'common',
+          xp_reward: b.xp_reward || 0,
+          coins_reward: b.coins_reward || 0,
+          category: b.requirement_type || 'performance',
+        } as RankBadge;
+      });
     },
   });
 
   const { data: gifts, isLoading: loadingGifts } = useQuery({
     queryKey: ["task_gifts"],
     queryFn: async () => {
+      // P18: tabela real no banco deployado é `reward_items` (ver types.ts).
+      // Colunas: available, coins_cost, category, rarity, stock, etc.
       const { data, error } = await (supabase as any)
-        .from("task_gifts")
+        .from("reward_items")
         .select("*")
-        .order("coin_cost", { ascending: true });
+        .eq("available", true)
+        .order("coins_cost", { ascending: true });
       if (error) throw error;
-      return data as TaskGift[];
+      return (data as any[]).map((r) => ({
+        id: r.id,
+        name: r.name,
+        description: r.description || '',
+        coin_cost: r.coins_cost,
+        stock_quantity: r.stock ?? 0,
+        image_url: r.icon || '',
+      })) as TaskGift[];
     },
   });
 
@@ -78,27 +111,30 @@ export const useGamification = (userId?: string) => {
     queryKey: ["user_achievements", userId],
     enabled: !!userId,
     queryFn: async () => {
+      // P18: tabela user_achievements existe neste schema (linhas com
+      // achievement_id, mesmo formato da versão .tsx).
       const { data, error } = await (supabase as any)
         .from("user_achievements")
-        .select("badge_id")
+        .select("achievement_id")
         .eq("user_id", userId as string);
       if (error) throw error;
-      return new Set((data as any[]).map((a: any) => a.badge_id));
+      return new Set<string>((data as any[]).map((a: any) => a.achievement_id));
     },
   });
 
   const awardPointsMutation = useMutation({
     mutationFn: async ({ xp, coins }: { xp: number; coins: number }) => {
       if (!userId) throw new Error("User not authenticated");
-      const { error } = await (supabase as any).rpc("award_gamification_points", {
-        _user_id: userId,
-        _xp_amount: xp,
-        _coins_amount: coins,
+      // P18: RPC add_user_xp é o RPC real do schema em uso.
+      const { error } = await (supabase as any).rpc("add_user_xp", {
+        p_user_id: userId,
+        p_xp_amount: xp,
+        p_coins_amount: coins,
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+      queryClient.invalidateQueries({ queryKey: ["userLevel", userId] });
     },
   });
 
@@ -142,9 +178,10 @@ export const useGamification = (userId?: string) => {
     },
     unlockAchievement: async (badgeId: string) => {
       if (!userId) return;
+      // P18: insere em user_achievements (idempotente via catch 23505).
       const { error } = await (supabase as any)
         .from("user_achievements")
-        .insert({ user_id: userId, badge_id: badgeId });
+        .insert({ user_id: userId, achievement_id: badgeId });
       if (error && (error as any).code !== '23505') throw error;
       queryClient.invalidateQueries({ queryKey: ["user_achievements", userId] });
     },

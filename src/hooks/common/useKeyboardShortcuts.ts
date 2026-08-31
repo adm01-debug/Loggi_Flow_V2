@@ -36,6 +36,7 @@ export function useKeyboardShortcut(
     if (options.disabled) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!event.key) return;
       const isKeyMatch = event.key.toLowerCase() === key.toLowerCase();
       const isAltMatch = !!options.alt === event.altKey;
       const isCtrlMatch = !!options.ctrl === event.ctrlKey;

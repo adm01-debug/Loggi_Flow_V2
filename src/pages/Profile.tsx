@@ -23,25 +23,46 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function Profile() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const { userLevel, achievements } = useGamification();
   const { uploadImage, uploading } = useImageUpload("avatars");
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    full_name: profile?.full_name || user?.user_metadata?.full_name || "",
-    phone: user?.user_metadata?.phone || "",
-  });
-  const isDirty =
-    form.full_name !==
-    (profile?.full_name || user?.user_metadata?.full_name || "");
+
+  // Inicializa o form com o nome vindo do profile na primeira vez que
+  // o profile chega. Mantemos em refs para não re-inicializar o state
+  // a cada re-render.
+  const [form, setForm] = useState(() => ({
+    full_name:
+      profile?.full_name ||
+      (typeof window !== "undefined" && (user?.user_metadata?.full_name as string)) ||
+      "",
+    phone: (user?.user_metadata?.phone as string) || "",
+  }));
+  const [hydrated, setHydrated] = useState(false);
+
+  // P22: quando o profile finalmente carrega (ele começa como null
+  // durante o fetch), sincronizamos o form com o nome persistido
+  // exatamente uma vez. Sem isso, o form ficava com string vazia
+  // (porque profile era null no momento do useState inicial) e
+  // mostrávamos "Usuário" na tela.
+  useEffect(() => {
+    if (hydrated) return;
+    if (profile?.full_name !== undefined) {
+      setForm((prev) => ({
+        ...prev,
+        full_name: prev.full_name || profile.full_name || "",
+      }));
+      setHydrated(true);
+    }
+  }, [profile?.full_name, hydrated]);
+
+  // Dirty-flag: form divergiu do valor persistido (profile ou user_metadata).
+  // Comparamos contra o último valor "limpo" conhecido.
+  const persistedName =
+    profile?.full_name || user?.user_metadata?.full_name || "";
+  const isDirty = form.full_name !== persistedName;
 
   useConfirmExit(isDirty);
-
-  useEffect(() => {
-    if (profile?.full_name) {
-      setForm((prev) => ({ ...prev, full_name: profile.full_name }));
-    }
-  }, [profile]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -52,6 +73,12 @@ export default function Profile() {
         .update({ full_name: form.full_name })
         .eq("id", user.id);
       if (error) throw error;
+      // P21: atualiza o profile em memória para que o cabeçalho/avatar
+      // reflitam o novo nome sem precisar de refetch. Se o hook não
+      // expuser refreshProfile, ignora — o próximo load já virá correto.
+      if (typeof refreshProfile === "function") {
+        await refreshProfile();
+      }
       toast.success("Perfil atualizado!");
     } catch (e) {
       const message = e instanceof Error ? e.message : "Erro desconhecido";
