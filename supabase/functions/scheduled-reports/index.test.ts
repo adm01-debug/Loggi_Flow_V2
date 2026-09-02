@@ -3,7 +3,7 @@ import { stub } from "https://deno.land/std@0.168.0/testing/mock.ts";
 import { handler } from "./index.ts";
 
 // Mock environment variables
-Deno.env.set("SUPABASE_URL", "https://hgicfqjayrjurivtygqf.supabase.co");
+Deno.env.set("SUPABASE_URL", "https://jvfhclubfpxrtrrazrgr.supabase.co");
 Deno.env.set("SUPABASE_SERVICE_ROLE_KEY", "test-key");
 Deno.env.set("RESEND_API_KEY", "re_test_123");
 

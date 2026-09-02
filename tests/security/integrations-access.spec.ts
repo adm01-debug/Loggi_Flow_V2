@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 
-const SUPABASE_URL = 'https://hgicfqjayrjurivtygqf.supabase.co';
+const SUPABASE_URL = 'https://jvfhclubfpxrtrrazrgr.supabase.co';
 const ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnaWNmcWpheXJqdXJpdnR5Z3FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0ODQzNzksImV4cCI6MjA5NDA2MDM3OX0.TvD6_8T9-wRgXTpXeFnZ17rdL47oYpxBaGbWnjZVeGQ';
 
