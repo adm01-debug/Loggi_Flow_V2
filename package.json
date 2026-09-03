@@ -25,7 +25,7 @@
     "test:fuzz": "vitest tests/integration/fuzzing.spec.ts",
     "typecheck": "tsc --noEmit",
     "check-circular": "madge --circular src",
-    "security-scan": "npm audit --audit-level=high",
+    "security-scan": "node scripts/audit-gate.mjs",
     "seed": "tsx scripts/seed-database.ts",
     "prepare": "husky"
   },
