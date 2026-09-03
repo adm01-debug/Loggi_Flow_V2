@@ -218,6 +218,15 @@ function OnboardingAchievementCard({
   );
 }
 
+function getTierRarity(
+  tier?: string,
+): "legendary" | "epic" | "rare" | "common" {
+  if (tier === "diamond") return "legendary";
+  if (tier === "platinum") return "epic";
+  if (tier === "gold") return "rare";
+  return "common";
+}
+
 export default function Conquistas() {
   const {
     userLevel,
@@ -228,18 +237,30 @@ export default function Conquistas() {
 
   const mappedAchievements = useMemo((): AchievementDisplay[] => {
     if (!dbAchievements) return [];
-    return (dbAchievements as any[]).map((a) => ({
-      id: a.id,
-      name: a.name,
-      description: a.description,
-      category: a.category || "performance",
-      xpReward: a.xp_reward || a.xp_requirement || 0,
-      icon: iconMap[a.icon] || Award,
-      unlocked: unlockedAchievementIds instanceof Set ? unlockedAchievementIds.has(a.id) : false,
-      rarity: a.rarity || (a.tier === 'diamond' ? 'legendary' : a.tier === 'platinum' ? 'epic' : a.tier === 'gold' ? 'rare' : 'common'),
+    return dbAchievements.map((a) => ({
+      id: (a as Record<string, unknown>).id as string,
+      name: (a as Record<string, unknown>).name as string,
+      description: (a as Record<string, unknown>).description as string,
+      category:
+        ((a as Record<string, unknown>).category as string) || "performance",
+      xpReward:
+        ((a as Record<string, unknown>).xp_reward as number) ||
+        ((a as Record<string, unknown>).xp_requirement as number) ||
+        0,
+      icon: iconMap[(a as Record<string, unknown>).icon as string] || Award,
+      unlocked:
+        unlockedAchievementIds instanceof Set
+          ? unlockedAchievementIds.has(
+              (a as Record<string, unknown>).id as string,
+            )
+          : false,
+      rarity:
+        ((a as Record<string, unknown>).rarity as string) ||
+        getTierRarity(
+          (a as Record<string, unknown>).tier as string | undefined,
+        ),
     }));
   }, [dbAchievements, unlockedAchievementIds]);
-
 
   const onboardingAchievements = useMemo(() => {
     return mappedAchievements.filter((a) => a.category === "onboarding");
@@ -279,10 +300,10 @@ export default function Conquistas() {
     totalFiltered,
     totalOriginal,
   } = useFilters(tabFiltered, filterConfig);
-  const { sortedData } = useSorting(
-    filteredData,
-    { defaultKey: "unlocked", defaultDirection: "desc" },
-  );
+  const { sortedData } = useSorting(filteredData, {
+    defaultKey: "unlocked",
+    defaultDirection: "desc",
+  });
   const pagination = usePagination(sortedData, { initialPageSize: 12 });
 
   const stats = useMemo(
@@ -295,7 +316,6 @@ export default function Conquistas() {
     }),
     [mappedAchievements],
   );
-
 
   return (
     <MainLayout>

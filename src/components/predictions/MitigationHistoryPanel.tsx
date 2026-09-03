@@ -4,7 +4,14 @@
 import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { History, TrendingUp, TrendingDown, Minus, Ruler, Trash2 } from "lucide-react";
+import {
+  History,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Ruler,
+  Trash2,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,7 +27,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useMitigationActions, type MitigationActionRow } from "@/hooks/predictions/useMitigationActions";
+import {
+  useMitigationActions,
+  type MitigationActionRow,
+} from "@/hooks/predictions/useMitigationActions";
 import { ROOT_CAUSE_LABELS } from "@/lib/predictions/rootCauseAnalyzer";
 import { PRIORITY_LABELS } from "@/lib/predictions/mitigationRecommender";
 import { cn } from "@/lib/utils";
@@ -29,12 +39,24 @@ interface Props {
   currentOtif?: number | null;
 }
 
+function getDeltaIcon(delta: number | null) {
+  if (delta == null || delta === 0) return Minus;
+  return delta > 0 ? TrendingUp : TrendingDown;
+}
+
+function getDeltaTone(delta: number | null) {
+  if (delta == null || delta === 0) return "text-muted-foreground";
+  return delta > 0 ? "text-success" : "text-destructive";
+}
+
 export function MitigationHistoryPanel({ currentOtif }: Props) {
   const { list, measure, remove } = useMitigationActions();
 
   const stats = useMemo(() => {
     const rows = list.data ?? [];
-    const done = rows.filter((r) => r.status === "concluida" && r.otif_delta !== null);
+    const done = rows.filter(
+      (r) => r.status === "concluida" && r.otif_delta !== null,
+    );
     const totalDelta = done.reduce((a, r) => a + (r.otif_delta ?? 0), 0);
     const avg = done.length ? totalDelta / done.length : 0;
     return { total: rows.length, concluidas: done.length, mediaDelta: avg };
@@ -56,33 +78,45 @@ export function MitigationHistoryPanel({ currentOtif }: Props) {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {list.isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-16 w-full" />
-            ))}
-          </div>
-        ) : !list.data || list.data.length === 0 ? (
-          <EmptyState
-            icon={History}
-            title="Nenhuma mitigação registrada"
-            description="Registre uma ação recomendada no painel de Causa Raiz para começar a medir o impacto no OTIF."
-          />
-        ) : (
-          <ul className="divide-y">
-            {list.data.map((row) => (
-              <MitigationRow
-                key={row.id}
-                row={row}
-                currentOtif={currentOtif}
-                onMeasure={(otif_after, notes) =>
-                  measure.mutate({ id: row.id, otif_after, notes: notes ?? null })
-                }
-                onDelete={() => remove.mutate(row.id)}
+        {(() => {
+          if (list.isLoading) {
+            return (
+              <div className="space-y-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
+              </div>
+            );
+          }
+          if (!list.data || list.data.length === 0) {
+            return (
+              <EmptyState
+                icon={History}
+                title="Nenhuma mitigação registrada"
+                description="Registre uma ação recomendada no painel de Causa Raiz para começar a medir o impacto no OTIF."
               />
-            ))}
-          </ul>
-        )}
+            );
+          }
+          return (
+            <ul className="divide-y">
+              {list.data.map((row) => (
+                <MitigationRow
+                  key={row.id}
+                  row={row}
+                  currentOtif={currentOtif}
+                  onMeasure={(otif_after, notes) =>
+                    measure.mutate({
+                      id: row.id,
+                      otif_after,
+                      notes: notes ?? null,
+                    })
+                  }
+                  onDelete={() => remove.mutate(row.id)}
+                />
+              ))}
+            </ul>
+          );
+        })()}
       </CardContent>
     </Card>
   );
@@ -98,14 +132,15 @@ interface RowProps {
 function MitigationRow({ row, currentOtif, onMeasure, onDelete }: RowProps) {
   const [open, setOpen] = useState(false);
   const [otif, setOtif] = useState<string>(
-    currentOtif != null ? currentOtif.toString() : row.otif_after?.toString() ?? "",
+    currentOtif != null
+      ? currentOtif.toString()
+      : (row.otif_after?.toString() ?? ""),
   );
   const [notes, setNotes] = useState(row.notes ?? "");
 
   const delta = row.otif_delta;
-  const DeltaIcon = delta == null ? Minus : delta > 0 ? TrendingUp : delta < 0 ? TrendingDown : Minus;
-  const deltaTone =
-    delta == null ? "text-muted-foreground" : delta > 0 ? "text-success" : delta < 0 ? "text-destructive" : "text-muted-foreground";
+  const DeltaIcon = getDeltaIcon(delta);
+  const deltaTone = getDeltaTone(delta);
 
   return (
     <li className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -132,7 +167,12 @@ function MitigationRow({ row, currentOtif, onMeasure, onDelete }: RowProps) {
       <div className="flex items-center gap-3">
         <div className="text-right">
           <p className="text-xs text-muted-foreground">Δ OTIF</p>
-          <p className={cn("flex items-center gap-1 text-sm font-semibold", deltaTone)}>
+          <p
+            className={cn(
+              "flex items-center gap-1 text-sm font-semibold",
+              deltaTone,
+            )}
+          >
             <DeltaIcon className="h-4 w-4" />
             {delta == null ? "—" : `${delta.toFixed(2)}%`}
           </p>
@@ -149,7 +189,8 @@ function MitigationRow({ row, currentOtif, onMeasure, onDelete }: RowProps) {
             </DialogHeader>
             <div className="space-y-3 py-2">
               <div className="text-sm text-muted-foreground">
-                OTIF antes: <strong>{row.otif_before?.toFixed(2) ?? "—"}%</strong>
+                OTIF antes:{" "}
+                <strong>{row.otif_before?.toFixed(2) ?? "—"}%</strong>
               </div>
               <div className="space-y-2">
                 <Label>OTIF atual (%)</Label>
@@ -164,7 +205,10 @@ function MitigationRow({ row, currentOtif, onMeasure, onDelete }: RowProps) {
               </div>
               <div className="space-y-2">
                 <Label>Notas (opcional)</Label>
-                <Input value={notes} onChange={(e) => setNotes(e.target.value)} />
+                <Input
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
               </div>
             </div>
             <DialogFooter>
@@ -185,7 +229,12 @@ function MitigationRow({ row, currentOtif, onMeasure, onDelete }: RowProps) {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <Button variant="ghost" size="icon" onClick={onDelete} aria-label="Remover">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onDelete}
+          aria-label="Remover"
+        >
           <Trash2 className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>
