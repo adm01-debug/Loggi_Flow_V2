@@ -8,11 +8,15 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-card border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20",
-        elevated: "bg-card-elevated border border-border shadow-xl hover:shadow-2xl hover:border-primary/30",
+        default:
+          "bg-card border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20",
+        elevated:
+          "bg-card-elevated border border-border shadow-xl hover:shadow-2xl hover:border-primary/30",
         glass: "bg-card/40 backdrop-blur-2xl border border-white/10 shadow-xl",
-        gradient: "bg-gradient-to-br from-card via-card to-card-elevated border border-primary/10 shadow-lg hover:shadow-xl",
-        outline: "bg-transparent border-2 border-border hover:border-primary/50",
+        gradient:
+          "bg-gradient-to-br from-card via-card to-card-elevated border border-primary/10 shadow-lg hover:shadow-xl",
+        outline:
+          "bg-transparent border-2 border-border hover:border-primary/50",
         ghost: "bg-transparent hover:bg-card/50",
         interactive: [
           "bg-card border border-border shadow-sm cursor-pointer",
@@ -27,7 +31,8 @@ const cardVariants = cva(
         ].join(" "),
         success: "bg-success/5 border-2 border-success/30 shadow-success/10",
         warning: "bg-warning/5 border-2 border-warning/30 shadow-warning/10",
-        danger: "bg-destructive/5 border-2 border-destructive/30 shadow-destructive/10",
+        danger:
+          "bg-destructive/5 border-2 border-destructive/30 shadow-destructive/10",
       },
       size: {
         default: "p-4 sm:p-6",
@@ -48,11 +53,12 @@ const cardVariants = cva(
       size: "default",
       hover: "none",
     },
-  }
+  },
 );
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof cardVariants> {}
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
@@ -62,7 +68,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       className={cn(cardVariants({ variant, size, hover, className }))}
       {...props}
     />
-  )
+  ),
 );
 Card.displayName = "Card";
 
@@ -74,8 +80,9 @@ const CardHeader = React.forwardRef<
     ref={ref}
     className={cn(
       "flex flex-col space-y-1.5 p-4 sm:p-6",
-      gradient && "bg-gradient-to-r from-muted/50 to-transparent rounded-t-xl -m-4 sm:-m-6 mb-0 p-4 sm:p-6",
-      className
+      gradient &&
+        "bg-gradient-to-r from-muted/50 to-transparent rounded-t-xl -m-4 sm:-m-6 mb-0 p-4 sm:p-6",
+      className,
     )}
     {...props}
   />
@@ -90,8 +97,9 @@ const CardTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-xl font-display font-bold leading-none tracking-tight",
-      gradient && "bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent",
-      className
+      gradient &&
+        "bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent",
+      className,
     )}
     {...props}
   />
@@ -127,7 +135,7 @@ const CardFooter = React.forwardRef<
     className={cn(
       "flex flex-col sm:flex-row items-center gap-2 p-4 sm:p-6 pt-0",
       separated && "border-t border-border mt-4 pt-4",
-      className
+      className,
     )}
     {...props}
   />
@@ -147,14 +155,17 @@ interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
-  ({ label, value, icon, trend, variant = "default", className, ...props }, ref) => {
+  (
+    { label, value, icon, trend, variant = "default", className, ...props },
+    ref,
+  ) => {
     const variantStyles = {
       default: "border-border bg-card",
       success: "border-success/30 bg-success/5",
       warning: "border-warning/30 bg-warning/5",
       danger: "border-destructive/30 bg-destructive/5",
     };
-    
+
     const trendColors = {
       up: "text-success",
       down: "text-destructive",
@@ -167,16 +178,19 @@ const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         className={cn(
           "rounded-xl border-2 p-4 transition-all duration-200 hover:shadow-md",
           variantStyles[variant],
-          className
+          className,
         )}
         {...props}
       >
         <div className="flex items-center justify-between mb-2">
-          {icon && (
-            <div className="p-2 rounded-lg bg-muted/50">{icon}</div>
-          )}
+          {icon && <div className="p-2 rounded-lg bg-muted/50">{icon}</div>}
           {trend && (
-            <span className={cn("text-sm font-semibold", trendColors[trend.direction])}>
+            <span
+              className={cn(
+                "text-sm font-semibold",
+                trendColors[trend.direction],
+              )}
+            >
               {trend.direction === "up" && "↑"}
               {trend.direction === "down" && "↓"}
               {trend.value}
@@ -189,7 +203,7 @@ const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         </p>
       </div>
     );
-  }
+  },
 );
 StatCard.displayName = "StatCard";
 
@@ -204,21 +218,26 @@ interface MagneticCardProps {
   className?: string;
 }
 
-const MagneticCard = ({ children, className, intensity = 10, glare = true }: MagneticCardProps) => {
+const MagneticCard = ({
+  children,
+  className,
+  intensity = 10,
+  glare = true,
+}: MagneticCardProps) => {
   const cardRef = React.useRef<HTMLDivElement>(null);
-  
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  
+
   const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
   const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
-  
+
   const rotateX = useTransform(mouseY, [-0.5, 0.5], [intensity, -intensity]);
   const rotateY = useTransform(mouseX, [-0.5, 0.5], [-intensity, intensity]);
-  
+
   const glareX = useTransform(mouseX, [-0.5, 0.5], [0, 100]);
   const glareY = useTransform(mouseY, [-0.5, 0.5], [0, 100]);
-  
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -227,7 +246,7 @@ const MagneticCard = ({ children, className, intensity = 10, glare = true }: Mag
     x.set((e.clientX - centerX) / rect.width);
     y.set((e.clientY - centerY) / rect.height);
   };
-  
+
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
@@ -239,7 +258,7 @@ const MagneticCard = ({ children, className, intensity = 10, glare = true }: Mag
       className={cn(
         "relative rounded-xl bg-card border border-border shadow-lg overflow-hidden",
         "transition-shadow duration-300 hover:shadow-xl",
-        className
+        className,
       )}
       style={{
         rotateX,
@@ -250,20 +269,20 @@ const MagneticCard = ({ children, className, intensity = 10, glare = true }: Mag
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-        {/* Glare overlay */}
-        {glare && (
-          <motion.div
-            className="absolute inset-0 pointer-events-none z-10"
-            style={{
-              background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
-            }}
-          />
-        )}
-        
-        {/* Content */}
-        <div style={{ transform: "translateZ(50px)" }} className="relative z-0">
-          {children}
-        </div>
+      {/* Glare overlay */}
+      {glare && (
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
+          }}
+        />
+      )}
+
+      {/* Content */}
+      <div style={{ transform: "translateZ(50px)" }} className="relative z-0">
+        {children}
+      </div>
     </motion.div>
   );
 };
@@ -280,15 +299,20 @@ interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
   ({ className, blur = "lg", opacity = 0.8, children, ...props }, ref) => {
-    const blurMap = { sm: "backdrop-blur-sm", md: "backdrop-blur-md", lg: "backdrop-blur-lg", xl: "backdrop-blur-xl" };
-    
+    const blurMap = {
+      sm: "backdrop-blur-sm",
+      md: "backdrop-blur-md",
+      lg: "backdrop-blur-lg",
+      xl: "backdrop-blur-xl",
+    };
+
     return (
       <div
         ref={ref}
         className={cn(
           "relative rounded-xl border border-white/20 shadow-xl overflow-hidden",
           blurMap[blur],
-          className
+          className,
         )}
         style={{ backgroundColor: `hsl(var(--card) / ${opacity})` }}
         {...props}
@@ -298,20 +322,19 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
         {children}
       </div>
     );
-  }
+  },
 );
 GlassCard.displayName = "GlassCard";
 
-export { 
-  Card, 
-  CardHeader, 
-  CardFooter, 
-  CardTitle, 
-  CardDescription, 
-  CardContent, 
-  StatCard, 
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  StatCard,
   MagneticCard,
   GlassCard,
-  // eslint-disable-next-line react-refresh/only-export-components
-  cardVariants 
+  cardVariants,
 };

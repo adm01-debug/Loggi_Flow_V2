@@ -21,11 +21,7 @@ export type RTEGateway =
   | "unittocity";
 
 export type RTECapabilityStatus =
-  | "liberado"
-  | "bloqueado"
-  | "offline"
-  | "instavel"
-  | "nao_testado";
+  "liberado" | "bloqueado" | "offline" | "instavel" | "nao_testado";
 
 export interface RTECapability {
   readonly action: string;
@@ -66,21 +62,37 @@ const CAPABILITIES: readonly RTECapability[] = [
   { action: "track-batch", gateway: "tracking", status: "liberado" },
   { action: "track-batch-paginated", gateway: "tracking", status: "liberado" },
   { action: "track-batch-by-params", gateway: "tracking", status: "liberado" },
-  { action: "track-batch-by-occurrence", gateway: "tracking", status: "liberado" },
+  {
+    action: "track-batch-by-occurrence",
+    gateway: "tracking",
+    status: "liberado",
+  },
   { action: "tracking-steps", gateway: "tracking", status: "liberado" },
   { action: "delivery-proof", gateway: "tracking", status: "liberado" },
   { action: "delivery-proof-hq", gateway: "tracking", status: "liberado" },
   { action: "delivery-info", gateway: "tracking", status: "liberado" },
   { action: "delivery-receipt-batch", gateway: "tracking", status: "liberado" },
-  { action: "delivery-receipt-by-protocols", gateway: "tracking", status: "liberado" },
+  {
+    action: "delivery-receipt-by-protocols",
+    gateway: "tracking",
+    status: "liberado",
+  },
   {
     action: "occurrence-receipt",
     gateway: "tracking",
     status: "bloqueado",
     note: "Comprovante de ocorrência pertence ao escopo de operação interna.",
   },
-  { action: "occurrence-receipt-list", gateway: "tracking", status: "bloqueado" },
-  { action: "occurrence-receipt-image", gateway: "tracking", status: "bloqueado" },
+  {
+    action: "occurrence-receipt-list",
+    gateway: "tracking",
+    status: "bloqueado",
+  },
+  {
+    action: "occurrence-receipt-image",
+    gateway: "tracking",
+    status: "bloqueado",
+  },
   { action: "orders", gateway: "tracking", status: "nao_testado" },
   { action: "sync-tracking", gateway: "tracking", status: "liberado" },
 
@@ -98,9 +110,21 @@ const CAPABILITIES: readonly RTECapability[] = [
     status: "instavel",
     note: "Endpoint retorna HTTP 500 na RTE (bug do servidor).",
   },
-  { action: "digital-carrier-quotation", gateway: "quotation", status: "nao_testado" },
-  { action: "update-quotation-contact", gateway: "quotation", status: "nao_testado" },
-  { action: "update-quotation-invoice-key", gateway: "quotation", status: "nao_testado" },
+  {
+    action: "digital-carrier-quotation",
+    gateway: "quotation",
+    status: "nao_testado",
+  },
+  {
+    action: "update-quotation-contact",
+    gateway: "quotation",
+    status: "nao_testado",
+  },
+  {
+    action: "update-quotation-invoice-key",
+    gateway: "quotation",
+    status: "nao_testado",
+  },
   {
     action: "cubage-factor",
     gateway: "quotation",
@@ -108,18 +132,34 @@ const CAPABILITIES: readonly RTECapability[] = [
     note: "Fator de cubagem exige liberação comercial (peso-cubado / 403).",
   },
   { action: "deadline", gateway: "quotation", status: "liberado" },
-  { action: "validate-customer-quotation", gateway: "quotation", status: "nao_testado" },
+  {
+    action: "validate-customer-quotation",
+    gateway: "quotation",
+    status: "nao_testado",
+  },
 
   // ---------- pickup ----------
   { action: "pickup-get", gateway: "pickup", status: "liberado" },
   { action: "pickup-get-by-protocol", gateway: "pickup", status: "liberado" },
   { action: "pickup-available-dates", gateway: "pickup", status: "liberado" },
-  { action: "pickup-available-dates-by-params", gateway: "pickup", status: "liberado" },
+  {
+    action: "pickup-available-dates-by-params",
+    gateway: "pickup",
+    status: "liberado",
+  },
   { action: "pickup-create", gateway: "pickup", status: "nao_testado" },
-  { action: "pickup-create-by-quotation", gateway: "pickup", status: "nao_testado" },
+  {
+    action: "pickup-create-by-quotation",
+    gateway: "pickup",
+    status: "nao_testado",
+  },
   { action: "pickup-reschedule", gateway: "pickup", status: "nao_testado" },
   { action: "pickup-cancel", gateway: "pickup", status: "nao_testado" },
-  { action: "pickup-reschedule-or-finalize", gateway: "pickup", status: "nao_testado" },
+  {
+    action: "pickup-reschedule-or-finalize",
+    gateway: "pickup",
+    status: "nao_testado",
+  },
   { action: "pickup-automatic", gateway: "pickup", status: "nao_testado" },
   {
     action: "pickup-resend-express",
@@ -149,13 +189,33 @@ const CAPABILITIES: readonly RTECapability[] = [
   // ---------- selfattendance ----------
   { action: "city-search", gateway: "selfattendance", status: "liberado" },
   { action: "city-by-zipcode", gateway: "selfattendance", status: "liberado" },
-  { action: "address-by-zipcode", gateway: "selfattendance", status: "liberado" },
-  { action: "tracking-steps-bot", gateway: "selfattendance", status: "liberado" },
-  { action: "tracking-last-steps-bot", gateway: "selfattendance", status: "liberado" },
+  {
+    action: "address-by-zipcode",
+    gateway: "selfattendance",
+    status: "liberado",
+  },
+  {
+    action: "tracking-steps-bot",
+    gateway: "selfattendance",
+    status: "liberado",
+  },
+  {
+    action: "tracking-last-steps-bot",
+    gateway: "selfattendance",
+    status: "liberado",
+  },
   { action: "unit-data", gateway: "selfattendance", status: "liberado" },
   { action: "unit-calendar", gateway: "selfattendance", status: "liberado" },
-  { action: "self-attendance-quotation", gateway: "selfattendance", status: "liberado" },
-  { action: "self-attendance-delivery-time", gateway: "selfattendance", status: "liberado" },
+  {
+    action: "self-attendance-quotation",
+    gateway: "selfattendance",
+    status: "liberado",
+  },
+  {
+    action: "self-attendance-delivery-time",
+    gateway: "selfattendance",
+    status: "liberado",
+  },
 
   // ---------- unittocity ----------
   { action: "unit-to-city", gateway: "unittocity", status: "liberado" },
@@ -185,23 +245,24 @@ export function getCapability(action: string): RTECapability | null {
 export function isActionAvailable(action: string): boolean {
   const capability = getCapability(action);
   if (!capability) return true;
-  return capability.status === "liberado" || capability.status === "nao_testado";
+  return (
+    capability.status === "liberado" || capability.status === "nao_testado"
+  );
 }
 
 /** Mensagem explicativa para o operador quando a ação está indisponível. */
 export function capabilityReason(action: string): string | null {
   const capability = getCapability(action);
   if (!capability || isActionAvailable(action)) return null;
-  return (
-    capability.note ?? CAPABILITY_STATUS_LABELS[capability.status]
-  );
+  return capability.note ?? CAPABILITY_STATUS_LABELS[capability.status];
 }
 
 /** Agrupa as capacidades por gateway, para painéis de diagnóstico. */
 export function capabilitiesByGateway(): Record<RTEGateway, RTECapability[]> {
   const grouped = {} as Record<RTEGateway, RTECapability[]>;
   for (const capability of CAPABILITIES) {
-    (grouped[capability.gateway] ??= []).push(capability);
+    grouped[capability.gateway] ??= [];
+    grouped[capability.gateway].push(capability);
   }
   return grouped;
 }

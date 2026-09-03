@@ -44,24 +44,41 @@ describe("evaluateSLOAlerts", () => {
   });
 
   it("ignora gateways saudáveis com minSeverity padrão", () => {
-    const ok = evaluateAllSLO([{ gateway: "pickup", checks: 10, uptimePct: 100, p95LatencyMs: 100 }]);
+    const ok = evaluateAllSLO([
+      { gateway: "pickup", checks: 10, uptimePct: 100, p95LatencyMs: 100 },
+    ]);
     expect(evaluateSLOAlerts(ok, [], { now: 1 })).toHaveLength(0);
-    expect(evaluateSLOAlerts(ok, [], { now: 1, minSeverity: "info" })).toHaveLength(1);
+    expect(
+      evaluateSLOAlerts(ok, [], { now: 1, minSeverity: "info" }),
+    ).toHaveLength(1);
   });
 
   it("respeita cooldown para mesma severidade", () => {
-    const prev: AlertState[] = [{ gateway: "tracking", severity: "critical", firedAt: 0 }];
-    expect(evaluateSLOAlerts(violated, prev, { now: HOUR / 2 })).toHaveLength(0);
-    expect(evaluateSLOAlerts(violated, prev, { now: HOUR + 1 })).toHaveLength(1);
+    const prev: AlertState[] = [
+      { gateway: "tracking", severity: "critical", firedAt: 0 },
+    ];
+    expect(evaluateSLOAlerts(violated, prev, { now: HOUR / 2 })).toHaveLength(
+      0,
+    );
+    expect(evaluateSLOAlerts(violated, prev, { now: HOUR + 1 })).toHaveLength(
+      1,
+    );
   });
 
   it("ignora cooldown em escalonamento de severidade", () => {
-    const prev: AlertState[] = [{ gateway: "tracking", severity: "warning", firedAt: 0 }];
+    const prev: AlertState[] = [
+      { gateway: "tracking", severity: "warning", firedAt: 0 },
+    ];
     expect(evaluateSLOAlerts(violated, prev, { now: 1 })).toHaveLength(1);
   });
 
   it("usa rótulo amigável na mensagem", () => {
-    const [alert] = evaluateSLOAlerts(violated, [], { now: 1 }, { tracking: "Rastreio" });
+    const [alert] = evaluateSLOAlerts(
+      violated,
+      [],
+      { now: 1 },
+      { tracking: "Rastreio" },
+    );
     expect(alert.message).toContain("Rastreio");
   });
 
@@ -78,11 +95,16 @@ describe("evaluateSLOAlerts", () => {
 describe("applyAlerts / summarizeAlerts", () => {
   it("atualiza estado por gateway", () => {
     const alerts = evaluateSLOAlerts(
-      evaluateAllSLO([{ gateway: "dne", checks: 5, uptimePct: 10, p95LatencyMs: 100 }]),
+      evaluateAllSLO([
+        { gateway: "dne", checks: 5, uptimePct: 10, p95LatencyMs: 100 },
+      ]),
       [],
       { now: 500 },
     );
-    const state = applyAlerts([{ gateway: "dne", severity: "warning", firedAt: 0 }], alerts);
+    const state = applyAlerts(
+      [{ gateway: "dne", severity: "warning", firedAt: 0 }],
+      alerts,
+    );
     expect(state).toHaveLength(1);
     expect(state[0].severity).toBe("critical");
     expect(state[0].firedAt).toBe(500);
@@ -90,8 +112,22 @@ describe("applyAlerts / summarizeAlerts", () => {
 
   it("resume alertas por severidade", () => {
     const summary = summarizeAlerts([
-      { gateway: "a", severity: "critical", message: "", errorBudgetUsedPct: 100, latencyOverBudgetMs: 0, firedAt: 0 },
-      { gateway: "b", severity: "warning", message: "", errorBudgetUsedPct: 80, latencyOverBudgetMs: 0, firedAt: 0 },
+      {
+        gateway: "a",
+        severity: "critical",
+        message: "",
+        errorBudgetUsedPct: 100,
+        latencyOverBudgetMs: 0,
+        firedAt: 0,
+      },
+      {
+        gateway: "b",
+        severity: "warning",
+        message: "",
+        errorBudgetUsedPct: 80,
+        latencyOverBudgetMs: 0,
+        firedAt: 0,
+      },
     ]);
     expect(summary).toEqual({ total: 2, critical: 1, warning: 1, info: 0 });
   });
@@ -104,8 +140,12 @@ describe("persistência", () => {
   });
 
   it("faz round-trip do estado", () => {
-    saveAlertState([{ gateway: "tracking", severity: "critical", firedAt: 42 }]);
-    expect(loadAlertState()).toEqual([{ gateway: "tracking", severity: "critical", firedAt: 42 }]);
+    saveAlertState([
+      { gateway: "tracking", severity: "critical", firedAt: 42 },
+    ]);
+    expect(loadAlertState()).toEqual([
+      { gateway: "tracking", severity: "critical", firedAt: 42 },
+    ]);
   });
 });
 
@@ -130,9 +170,12 @@ describe("fuzz determinístico (500 cenários)", () => {
           firedAt: Math.max(0, now - Math.floor(rand() * 3 * HOUR)),
         }));
 
-      const alerts = evaluateSLOAlerts(results, previous, { now, cooldownMs: HOUR });
+      const alerts = evaluateSLOAlerts(results, previous, {
+        now,
+        cooldownMs: HOUR,
+      });
 
-      // Todo alerta corresponde a um gateway avaliado e nunca é "info" por padrão.
+      // Cada alerta corresponde a um gateway avaliado e nunca é "info" por padrão.
       for (const alert of alerts) {
         expect(results.some((r) => r.gateway === alert.gateway)).toBe(true);
         expect(alert.severity).not.toBe("info");
@@ -147,17 +190,23 @@ describe("fuzz determinístico (500 cenários)", () => {
       // Ordenação por severidade decrescente.
       for (let k = 1; k < alerts.length; k += 1) {
         const order = { info: 0, warning: 1, critical: 2 } as const;
-        expect(order[alerts[k - 1].severity]).toBeGreaterThanOrEqual(order[alerts[k].severity]);
+        expect(order[alerts[k - 1].severity]).toBeGreaterThanOrEqual(
+          order[alerts[k].severity],
+        );
       }
 
       // O estado resultante cobre todos os gateways disparados.
       const state = applyAlerts(previous, alerts);
       for (const alert of alerts) {
-        expect(state.some((s) => s.gateway === alert.gateway && s.firedAt === now)).toBe(true);
+        expect(
+          state.some((s) => s.gateway === alert.gateway && s.firedAt === now),
+        ).toBe(true);
       }
 
       // Reexecução imediata não redispara (mesma severidade, dentro do cooldown).
-      expect(evaluateSLOAlerts(results, state, { now, cooldownMs: HOUR })).toHaveLength(0);
+      expect(
+        evaluateSLOAlerts(results, state, { now, cooldownMs: HOUR }),
+      ).toHaveLength(0);
     }
   });
 });

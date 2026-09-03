@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -37,9 +37,13 @@ export function usePredictionAccuracySettings(carrier: string | null) {
 
       let q = supabase
         .from("prediction_accuracy_settings" as never)
-        .select("target_pct, consecutive_days_alert, transportadora, notify_email, notify_whatsapp, email, whatsapp_phone")
+        .select(
+          "target_pct, consecutive_days_alert, transportadora, notify_email, notify_whatsapp, email, whatsapp_phone",
+        )
         .eq("user_id", uid);
-      q = carrier ? q.eq("transportadora", carrier) : q.is("transportadora", null);
+      q = carrier
+        ? q.eq("transportadora", carrier)
+        : q.is("transportadora", null);
 
       const { data, error } = await q.maybeSingle();
       if (error) throw error;
@@ -47,7 +51,9 @@ export function usePredictionAccuracySettings(carrier: string | null) {
         const row = data as unknown as Partial<AccuracySettings>;
         return {
           target_pct: Number(row.target_pct) || DEFAULT.target_pct,
-          consecutive_days_alert: Number(row.consecutive_days_alert) || DEFAULT.consecutive_days_alert,
+          consecutive_days_alert:
+            Number(row.consecutive_days_alert) ||
+            DEFAULT.consecutive_days_alert,
           notify_email: Boolean(row.notify_email),
           notify_whatsapp: Boolean(row.notify_whatsapp),
           email: row.email ?? null,
@@ -101,10 +107,13 @@ export function useBreachDays(target: number, carrier: string | null) {
   return useQuery({
     queryKey: ["prediction-breach-days", target, carrier],
     queryFn: async (): Promise<number> => {
-      const { data, error } = await supabase.rpc("count_prediction_breach_days" as never, {
-        _target: target,
-        _carrier: carrier,
-      } as never);
+      const { data, error } = await supabase.rpc(
+        "count_prediction_breach_days" as never,
+        {
+          _target: target,
+          _carrier: carrier,
+        } as never,
+      );
       if (error) throw error;
       return Number(data ?? 0);
     },
@@ -113,7 +122,11 @@ export function useBreachDays(target: number, carrier: string | null) {
 }
 
 /** Debounce leve para persistir alterações no input sem hammer no banco. */
-export function useDebouncedEffect(effect: () => void, delay: number, deps: unknown[]) {
+export function useDebouncedEffect(
+  effect: () => void,
+  delay: number,
+  deps: unknown[],
+) {
   useEffect(() => {
     const t = setTimeout(effect, delay);
     return () => clearTimeout(t);

@@ -23,10 +23,15 @@ const SUPABASE_URL =
   "https://jvfhclubfpxrtrrazrgr.supabase.co";
 
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Senha dos usuarios de seed (somente ambiente de dev); sobrescreva com SEED_PASSWORD.
+// eslint-disable-next-line sonarjs/no-hardcoded-passwords -- credencial de seed local, nao de producao
+const SEED_PASSWORD = process.env.SEED_PASSWORD ?? "LoggiFlow@2026";
 
 if (!SERVICE_ROLE_KEY) {
   console.error("❌ Defina SUPABASE_SERVICE_ROLE_KEY antes de rodar.");
-  console.error("   Ex: SUPABASE_SERVICE_ROLE_KEY=eyJ... npx tsx scripts/seed-database.ts");
+  console.error(
+    "   Ex: SUPABASE_SERVICE_ROLE_KEY=eyJ... npx tsx scripts/seed-database.ts",
+  );
   process.exit(1);
 }
 
@@ -57,34 +62,81 @@ const fakePhone = (): string =>
   `(${10 + Math.floor(Math.random() * 89)})${Math.floor(Math.random() * 90000) + 10000}-${Math.floor(Math.random() * 9000) + 1000}`;
 
 const REAL_NAMES = [
-  "Ana Silva", "Carlos Mendes", "Mariana Costa", "Pedro Almeida",
-  "Juliana Rocha", "Rafael Santos", "Beatriz Lima", "Lucas Oliveira",
-  "Fernanda Souza", "Diego Ferreira", "Camila Ribeiro", "Bruno Cardoso",
+  "Ana Silva",
+  "Carlos Mendes",
+  "Mariana Costa",
+  "Pedro Almeida",
+  "Juliana Rocha",
+  "Rafael Santos",
+  "Beatriz Lima",
+  "Lucas Oliveira",
+  "Fernanda Souza",
+  "Diego Ferreira",
+  "Camila Ribeiro",
+  "Bruno Cardoso",
 ];
 
 const COMPANY_RAZOES = [
-  "Indústria Aurora Ltda", "Comércio Estrela do Sul S.A.", "Logística Phoenix ME",
-  "Distribuidora Atlas Ltda", "Transportes Vanguarda S.A.", "Comércio Delta Ltda",
-  "Indústria Sigma Eireli", "Logística Beta S.A.", "Distribuidora Omega ME",
-  "Comércio Polaris Ltda", "Indústria Nebula S.A.", "Logística Cosmos ME",
+  "Indústria Aurora Ltda",
+  "Comércio Estrela do Sul S.A.",
+  "Logística Phoenix ME",
+  "Distribuidora Atlas Ltda",
+  "Transportes Vanguarda S.A.",
+  "Comércio Delta Ltda",
+  "Indústria Sigma Eireli",
+  "Logística Beta S.A.",
+  "Distribuidora Omega ME",
+  "Comércio Polaris Ltda",
+  "Indústria Nebula S.A.",
+  "Logística Cosmos ME",
 ];
 
 const COMPANY_FANTASIAS = [
-  "Aurora", "Estrela Sul", "PhoenixLog", "Atlas", "Vanguarda", "Delta",
-  "Sigma", "BetaLog", "Omega", "Polaris", "Nebula", "Cosmos",
+  "Aurora",
+  "Estrela Sul",
+  "PhoenixLog",
+  "Atlas",
+  "Vanguarda",
+  "Delta",
+  "Sigma",
+  "BetaLog",
+  "Omega",
+  "Polaris",
+  "Nebula",
+  "Cosmos",
 ];
 
 const CIDADES_BRASIL = [
-  ["São Paulo", "SP"], ["Rio de Janeiro", "RJ"], ["Belo Horizonte", "MG"],
-  ["Curitiba", "PR"], ["Porto Alegre", "RS"], ["Salvador", "BA"],
-  ["Fortaleza", "CE"], ["Brasília", "DF"], ["Recife", "PE"], ["Goiânia", "GO"],
-  ["Manaus", "AM"], ["Florianópolis", "SC"], ["Vitória", "ES"],
-  ["Campinas", "SP"], ["Santos", "SP"], ["Niterói", "RJ"], ["Juiz de Fora", "MG"],
+  ["São Paulo", "SP"],
+  ["Rio de Janeiro", "RJ"],
+  ["Belo Horizonte", "MG"],
+  ["Curitiba", "PR"],
+  ["Porto Alegre", "RS"],
+  ["Salvador", "BA"],
+  ["Fortaleza", "CE"],
+  ["Brasília", "DF"],
+  ["Recife", "PE"],
+  ["Goiânia", "GO"],
+  ["Manaus", "AM"],
+  ["Florianópolis", "SC"],
+  ["Vitória", "ES"],
+  ["Campinas", "SP"],
+  ["Santos", "SP"],
+  ["Niterói", "RJ"],
+  ["Juiz de Fora", "MG"],
 ];
 
 const STATUS_ENVIO = [
-  "aguardando_producao", "pronto_despacho", "cotacao_frete", "nf_emitida",
-  "despachado", "em_transito", "saiu_entrega", "entregue", "ocorrencia", "finalizado",
+  "aguardando_producao",
+  "pronto_despacho",
+  "cotacao_frete",
+  "nf_emitida",
+  "despachado",
+  "em_transito",
+  "saiu_entrega",
+  "entregue",
+  "ocorrencia",
+  "finalizado",
 ] as const;
 
 // --- Seeders por módulo -----------------------------------------------------
@@ -96,7 +148,7 @@ async function getOrCreateUserId(): Promise<string> {
 
   const { data, error } = await supabase.auth.admin.createUser({
     email: "admin@loggiflow.com.br",
-    password: "LoggiFlow@2026",
+    password: SEED_PASSWORD,
     email_confirm: true,
     user_metadata: { full_name: "Admin Demo" },
   });
@@ -108,18 +160,16 @@ async function seedProfilesAndUsers(): Promise<string> {
   console.log("\n📋 profiles + user_roles");
   const adminId = await getOrCreateUserId();
 
-  const { error: profileErr } = await supabase
-    .from("profiles")
-    .upsert(
-      {
-        id: adminId,
-        email: "admin@loggiflow.com.br",
-        full_name: "Admin Demo",
-        cargo: "Administrador",
-        avatar_url: null,
-      },
-      { onConflict: "id" },
-    );
+  const { error: profileErr } = await supabase.from("profiles").upsert(
+    {
+      id: adminId,
+      email: "admin@loggiflow.com.br",
+      full_name: "Admin Demo",
+      cargo: "Administrador",
+      avatar_url: null,
+    },
+    { onConflict: "id" },
+  );
   if (profileErr && /no unique/i.test(profileErr.message)) {
     // Sem unique: insert direto
     await supabase.from("profiles").insert({
@@ -135,9 +185,14 @@ async function seedProfilesAndUsers(): Promise<string> {
 
   const { error: roleErr } = await supabase
     .from("user_roles")
-    .upsert({ user_id: adminId, role: "admin" }, { onConflict: "user_id,role" });
+    .upsert(
+      { user_id: adminId, role: "admin" },
+      { onConflict: "user_id,role" },
+    );
   if (roleErr && /no unique/i.test(roleErr.message)) {
-    await supabase.from("user_roles").insert({ user_id: adminId, role: "admin" });
+    await supabase
+      .from("user_roles")
+      .insert({ user_id: adminId, role: "admin" });
   } else if (roleErr) {
     console.warn("  user_roles upsert:", roleErr.message);
   }
@@ -153,7 +208,7 @@ async function seedProfilesAndUsers(): Promise<string> {
     } else {
       const { data } = await supabase.auth.admin.createUser({
         email,
-        password: "LoggiFlow@2026",
+        password: SEED_PASSWORD,
         email_confirm: true,
         user_metadata: { full_name: REAL_NAMES[i] },
       });
@@ -168,10 +223,12 @@ async function seedProfilesAndUsers(): Promise<string> {
       },
       { onConflict: "id" },
     );
-    await supabase.from("user_roles").upsert(
-      { user_id: userId, role: "user" },
-      { onConflict: "user_id,role" },
-    );
+    await supabase
+      .from("user_roles")
+      .upsert(
+        { user_id: userId, role: "user" },
+        { onConflict: "user_id,role" },
+      );
     await supabase.from("user_levels").upsert(
       {
         user_id: userId,
@@ -282,14 +339,70 @@ async function seedFornecedores(): Promise<string[]> {
 async function seedTransportadoras(): Promise<string[]> {
   console.log("\n📋 transportadoras");
   const transportadoras = [
-    { razao_social: "Transportes Rápido Sul", nome_fantasia: "Rápido Sul", cnpj: fakeCNPJ(), email_comercial: "contato@rapidosul.com.br", contato_comercial: "(11) 99999-0001", prazo_medio_dias: 3 },
-    { razao_social: "Expresso Nacional", nome_fantasia: "Expresso Nacional", cnpj: fakeCNPJ(), email_comercial: "vendas@expressonacional.com.br", contato_comercial: "(21) 99999-0002", prazo_medio_dias: 2 },
-    { razao_social: "Loggi Própria", nome_fantasia: "Loggi", cnpj: fakeCNPJ(), email_comercial: "operacoes@loggi.com", contato_comercial: "(11) 99999-0003", prazo_medio_dias: 4 },
-    { razao_social: "TransCargo Brasil", nome_fantasia: "TransCargo", cnpj: fakeCNPJ(), email_comercial: "contato@transcargo.com.br", contato_comercial: "(31) 99999-0004", prazo_medio_dias: 3 },
-    { razao_social: "Veloz Express", nome_fantasia: "Veloz Express", cnpj: fakeCNPJ(), email_comercial: "vendas@velozexpress.com.br", contato_comercial: "(41) 99999-0005", prazo_medio_dias: 1 },
-    { razao_social: "Atlas Cargas", nome_fantasia: "Atlas", cnpj: fakeCNPJ(), email_comercial: "contato@atlaslog.com.br", contato_comercial: "(51) 99999-0006", prazo_medio_dias: 5 },
-    { razao_social: "Polar Log", nome_fantasia: "Polar Log", cnpj: fakeCNPJ(), email_comercial: "operacional@polarlog.com.br", contato_comercial: "(61) 99999-0007", prazo_medio_dias: 3 },
-    { razao_social: "Rota Certa", nome_fantasia: "Rota Certa", cnpj: fakeCNPJ(), email_comercial: "contato@rotacerta.com.br", contato_comercial: "(71) 99999-0008", prazo_medio_dias: 4 },
+    {
+      razao_social: "Transportes Rápido Sul",
+      nome_fantasia: "Rápido Sul",
+      cnpj: fakeCNPJ(),
+      email_comercial: "contato@rapidosul.com.br",
+      contato_comercial: "(11) 99999-0001",
+      prazo_medio_dias: 3,
+    },
+    {
+      razao_social: "Expresso Nacional",
+      nome_fantasia: "Expresso Nacional",
+      cnpj: fakeCNPJ(),
+      email_comercial: "vendas@expressonacional.com.br",
+      contato_comercial: "(21) 99999-0002",
+      prazo_medio_dias: 2,
+    },
+    {
+      razao_social: "Loggi Própria",
+      nome_fantasia: "Loggi",
+      cnpj: fakeCNPJ(),
+      email_comercial: "operacoes@loggi.com",
+      contato_comercial: "(11) 99999-0003",
+      prazo_medio_dias: 4,
+    },
+    {
+      razao_social: "TransCargo Brasil",
+      nome_fantasia: "TransCargo",
+      cnpj: fakeCNPJ(),
+      email_comercial: "contato@transcargo.com.br",
+      contato_comercial: "(31) 99999-0004",
+      prazo_medio_dias: 3,
+    },
+    {
+      razao_social: "Veloz Express",
+      nome_fantasia: "Veloz Express",
+      cnpj: fakeCNPJ(),
+      email_comercial: "vendas@velozexpress.com.br",
+      contato_comercial: "(41) 99999-0005",
+      prazo_medio_dias: 1,
+    },
+    {
+      razao_social: "Atlas Cargas",
+      nome_fantasia: "Atlas",
+      cnpj: fakeCNPJ(),
+      email_comercial: "contato@atlaslog.com.br",
+      contato_comercial: "(51) 99999-0006",
+      prazo_medio_dias: 5,
+    },
+    {
+      razao_social: "Polar Log",
+      nome_fantasia: "Polar Log",
+      cnpj: fakeCNPJ(),
+      email_comercial: "operacional@polarlog.com.br",
+      contato_comercial: "(61) 99999-0007",
+      prazo_medio_dias: 3,
+    },
+    {
+      razao_social: "Rota Certa",
+      nome_fantasia: "Rota Certa",
+      cnpj: fakeCNPJ(),
+      email_comercial: "contato@rotacerta.com.br",
+      contato_comercial: "(71) 99999-0008",
+      prazo_medio_dias: 4,
+    },
   ];
   const ids: string[] = [];
   for (const t of transportadoras) {
@@ -318,18 +431,29 @@ async function seedTransportadoras(): Promise<string[]> {
 
 async function seedColetas(fornecedorIds: string[]): Promise<string[]> {
   console.log("\n📋 coletas");
-  const STATUS_COLETA = ["aguardando_liberacao", "solicitada", "em_transito", "chegou_expedicao", "conferencia_ok", "divergencia", "finalizada"] as const;
+  const STATUS_COLETA = [
+    "aguardando_liberacao",
+    "solicitada",
+    "em_transito",
+    "chegou_expedicao",
+    "conferencia_ok",
+    "divergencia",
+    "finalizada",
+  ] as const;
   const rows = Array.from({ length: 12 }, (_, i) => ({
     numero_coleta: `COL-${Date.now()}-${i}`.slice(-12),
     fornecedor_id: fornecedorIds[i % fornecedorIds.length],
-    data_prevista_coleta: DAYS_AGO(i % 7 - 2),
+    data_prevista_coleta: DAYS_AGO((i % 7) - 2),
     endereco_coleta: `Av. Principal, ${100 + i * 10}, São Paulo, SP`,
     status: STATUS_COLETA[i % STATUS_COLETA.length],
     qtd_volumes: 1 + (i % 5),
     peso_estimado_kg: 5 + i * 2.5,
     observacoes: i % 3 === 0 ? "Carga frágil" : null,
   }));
-  const { data, error } = await supabase.from("coletas").insert(rows).select("id");
+  const { data, error } = await supabase
+    .from("coletas")
+    .insert(rows)
+    .select("id");
   if (error) throw error;
   return data?.map((r) => r.id) ?? [];
 }
@@ -351,7 +475,10 @@ async function seedEntregas(
     endereco_entrega: `Rua ${pick(REAL_NAMES).split(" ")[1]}, ${50 + i * 7}, São Paulo, SP`,
     valor_frete: 25 + i * 8.5,
   }));
-  const { data, error } = await supabase.from("entregas").insert(rows).select("id");
+  const { data, error } = await supabase
+    .from("entregas")
+    .insert(rows)
+    .select("id");
   if (error) throw error;
   return data?.map((r) => r.id) ?? [];
 }
@@ -359,8 +486,12 @@ async function seedEntregas(
 async function seedOcorrencias(entregaIds: string[]): Promise<void> {
   console.log("\n📋 ocorrencias");
   const tipos = [
-    "avaria", "atraso", "extravio", "endereco_incorreto",
-    "destinatario_ausente", "reentrega",
+    "avaria",
+    "atraso",
+    "extravio",
+    "endereco_incorreto",
+    "destinatario_ausente",
+    "reentrega",
   ] as const;
   const rows = entregaIds.slice(0, 8).map((entregaId, i) => ({
     entrega_id: entregaId,
@@ -392,32 +523,183 @@ async function seedCotacoes(
 async function seedAchievementsAndRewards(): Promise<void> {
   console.log("\n📋 achievements + reward_items");
   const achievements = [
-    { code: "first_delivery", name: "Primeira Entrega", description: "Complete sua primeira entrega", icon: "package", category: "deliveries", rarity: "common", xp_reward: 50, coins_reward: 10, requirement_type: "deliveries", requirement_value: 1 },
-    { code: "marathon_10", name: "Maratonista", description: "Complete 10 entregas", icon: "zap", category: "deliveries", rarity: "rare", xp_reward: 100, coins_reward: 25, requirement_type: "deliveries", requirement_value: 10 },
-    { code: "pro_50", name: "Profissional", description: "Complete 50 entregas", icon: "award", category: "deliveries", rarity: "epic", xp_reward: 250, coins_reward: 50, requirement_type: "deliveries", requirement_value: 50 },
-    { code: "legend_100", name: "Lenda", description: "Complete 100 entregas", icon: "crown", category: "deliveries", rarity: "legendary", xp_reward: 500, coins_reward: 100, requirement_type: "deliveries", requirement_value: 100 },
-    { code: "streak_7", name: "Sequência de 7 dias", description: "Mantenha uma sequência de 7 dias", icon: "flame", category: "streak", rarity: "common", xp_reward: 150, coins_reward: 30, requirement_type: "streak", requirement_value: 7 },
-    { code: "streak_30", name: "Sequência de 30 dias", description: "Mantenha uma sequência de 30 dias", icon: "fire", category: "streak", rarity: "epic", xp_reward: 500, coins_reward: 100, requirement_type: "streak", requirement_value: 30 },
-    { code: "sla_master", name: "SLA Master", description: "Mantenha 95% de SLA", icon: "target", category: "sla", rarity: "epic", xp_reward: 200, coins_reward: 50, requirement_type: "sla", requirement_value: 95 },
-    { code: "collector_25", name: "Coletor Ágil", description: "Complete 25 coletas", icon: "truck", category: "collections", rarity: "rare", xp_reward: 175, coins_reward: 35, requirement_type: "collections", requirement_value: 25 },
+    {
+      code: "first_delivery",
+      name: "Primeira Entrega",
+      description: "Complete sua primeira entrega",
+      icon: "package",
+      category: "deliveries",
+      rarity: "common",
+      xp_reward: 50,
+      coins_reward: 10,
+      requirement_type: "deliveries",
+      requirement_value: 1,
+    },
+    {
+      code: "marathon_10",
+      name: "Maratonista",
+      description: "Complete 10 entregas",
+      icon: "zap",
+      category: "deliveries",
+      rarity: "rare",
+      xp_reward: 100,
+      coins_reward: 25,
+      requirement_type: "deliveries",
+      requirement_value: 10,
+    },
+    {
+      code: "pro_50",
+      name: "Profissional",
+      description: "Complete 50 entregas",
+      icon: "award",
+      category: "deliveries",
+      rarity: "epic",
+      xp_reward: 250,
+      coins_reward: 50,
+      requirement_type: "deliveries",
+      requirement_value: 50,
+    },
+    {
+      code: "legend_100",
+      name: "Lenda",
+      description: "Complete 100 entregas",
+      icon: "crown",
+      category: "deliveries",
+      rarity: "legendary",
+      xp_reward: 500,
+      coins_reward: 100,
+      requirement_type: "deliveries",
+      requirement_value: 100,
+    },
+    {
+      code: "streak_7",
+      name: "Sequência de 7 dias",
+      description: "Mantenha uma sequência de 7 dias",
+      icon: "flame",
+      category: "streak",
+      rarity: "common",
+      xp_reward: 150,
+      coins_reward: 30,
+      requirement_type: "streak",
+      requirement_value: 7,
+    },
+    {
+      code: "streak_30",
+      name: "Sequência de 30 dias",
+      description: "Mantenha uma sequência de 30 dias",
+      icon: "fire",
+      category: "streak",
+      rarity: "epic",
+      xp_reward: 500,
+      coins_reward: 100,
+      requirement_type: "streak",
+      requirement_value: 30,
+    },
+    {
+      code: "sla_master",
+      name: "SLA Master",
+      description: "Mantenha 95% de SLA",
+      icon: "target",
+      category: "sla",
+      rarity: "epic",
+      xp_reward: 200,
+      coins_reward: 50,
+      requirement_type: "sla",
+      requirement_value: 95,
+    },
+    {
+      code: "collector_25",
+      name: "Coletor Ágil",
+      description: "Complete 25 coletas",
+      icon: "truck",
+      category: "collections",
+      rarity: "rare",
+      xp_reward: 175,
+      coins_reward: 35,
+      requirement_type: "collections",
+      requirement_value: 25,
+    },
   ];
   await upsertByField("achievements", "code", achievements);
 
   const rewards = [
-    { name: "Vale Presente R$50", description: "Vale presente em estabelecimentos parceiros", icon: "Gift", coins_cost: 500, stock: 50, available: true, category: "vale", rarity: "rare" },
-    { name: "Dia de Folga", description: "Uma folga remunerada", icon: "Calendar", coins_cost: 1000, stock: 5, available: true, category: "beneficio", rarity: "epic" },
-    { name: "Kit Loggi", description: "Kit com camiseta, caneca e garrafa", icon: "Package", coins_cost: 300, stock: 100, available: true, category: "produto", rarity: "common" },
-    { name: "Bonificação R$100", description: "Bônus em dinheiro", icon: "DollarSign", coins_cost: 1500, stock: null, available: true, category: "dinheiro", rarity: "legendary" },
-    { name: "Curso de Capacitação", description: "Curso online com certificado", icon: "Book", coins_cost: 800, stock: 30, available: true, category: "educacao", rarity: "epic" },
-    { name: "Fone Bluetooth", description: "Fone de ouvido sem fio", icon: "Headphones", coins_cost: 1200, stock: 15, available: true, category: "produto", rarity: "epic" },
+    {
+      name: "Vale Presente R$50",
+      description: "Vale presente em estabelecimentos parceiros",
+      icon: "Gift",
+      coins_cost: 500,
+      stock: 50,
+      available: true,
+      category: "vale",
+      rarity: "rare",
+    },
+    {
+      name: "Dia de Folga",
+      description: "Uma folga remunerada",
+      icon: "Calendar",
+      coins_cost: 1000,
+      stock: 5,
+      available: true,
+      category: "beneficio",
+      rarity: "epic",
+    },
+    {
+      name: "Kit Loggi",
+      description: "Kit com camiseta, caneca e garrafa",
+      icon: "Package",
+      coins_cost: 300,
+      stock: 100,
+      available: true,
+      category: "produto",
+      rarity: "common",
+    },
+    {
+      name: "Bonificação R$100",
+      description: "Bônus em dinheiro",
+      icon: "DollarSign",
+      coins_cost: 1500,
+      stock: null,
+      available: true,
+      category: "dinheiro",
+      rarity: "legendary",
+    },
+    {
+      name: "Curso de Capacitação",
+      description: "Curso online com certificado",
+      icon: "Book",
+      coins_cost: 800,
+      stock: 30,
+      available: true,
+      category: "educacao",
+      rarity: "epic",
+    },
+    {
+      name: "Fone Bluetooth",
+      description: "Fone de ouvido sem fio",
+      icon: "Headphones",
+      coins_cost: 1200,
+      stock: 15,
+      available: true,
+      category: "produto",
+      rarity: "epic",
+    },
   ];
   await upsertByField("reward_items", "name", rewards);
 }
 
 async function seedConciliacoes(userId: string): Promise<void> {
   console.log("\n📋 conciliacoes");
-  const TIPOS = ["faturas_entregas", "custos_previstos_realizados", "pagamentos_notas"] as const;
-  const STATUS_CONC = ["rascunho", "em_andamento", "concluida", "arquivada"] as const;
+  const TIPOS = [
+    "faturas_entregas",
+    "custos_previstos_realizados",
+    "pagamentos_notas",
+  ] as const;
+  const STATUS_CONC = [
+    "rascunho",
+    "em_andamento",
+    "concluida",
+    "arquivada",
+  ] as const;
   const rows = Array.from({ length: 8 }, (_, i) => ({
     tipo: TIPOS[i % TIPOS.length],
     nome: `Conciliação ${i + 1}`,
@@ -440,11 +722,41 @@ async function seedConciliacoes(userId: string): Promise<void> {
 async function seedNotifications(userId: string): Promise<void> {
   console.log("\n📋 notifications");
   const rows = [
-    { user_id: userId, title: "Nova coleta agendada", message: "Coleta #1234 agendada para hoje às 14h", type: "info", read: false },
-    { user_id: userId, title: "Entrega concluída", message: "Envio para São Paulo foi entregue", type: "success", read: false },
-    { user_id: userId, title: "Alerta de SLA", message: "1 envio próximo do vencimento de SLA", type: "warning", read: true },
-    { user_id: userId, title: "Conquista desbloqueada!", message: "Você desbloqueou 'Maratonista' +100 XP", type: "achievement", read: false },
-    { user_id: userId, title: "Custo acima do esperado", message: "Frete SP→RJ 15% acima da média", type: "warning", read: false },
+    {
+      user_id: userId,
+      title: "Nova coleta agendada",
+      message: "Coleta #1234 agendada para hoje às 14h",
+      type: "info",
+      read: false,
+    },
+    {
+      user_id: userId,
+      title: "Entrega concluída",
+      message: "Envio para São Paulo foi entregue",
+      type: "success",
+      read: false,
+    },
+    {
+      user_id: userId,
+      title: "Alerta de SLA",
+      message: "1 envio próximo do vencimento de SLA",
+      type: "warning",
+      read: true,
+    },
+    {
+      user_id: userId,
+      title: "Conquista desbloqueada!",
+      message: "Você desbloqueou 'Maratonista' +100 XP",
+      type: "achievement",
+      read: false,
+    },
+    {
+      user_id: userId,
+      title: "Custo acima do esperado",
+      message: "Frete SP→RJ 15% acima da média",
+      type: "warning",
+      read: false,
+    },
   ];
   const { error } = await supabase.from("notifications").insert(rows);
   if (error) console.warn("  notifications:", error.message);
@@ -452,14 +764,23 @@ async function seedNotifications(userId: string): Promise<void> {
 
 async function seedOcorrenciasCatalog(): Promise<void> {
   console.log("\n📋 ip_access_rules + geo_blocking_rules");
-  await supabase.from("ip_access_rules").upsert(
-    { rule_type: "blacklist", ip_pattern: "0.0.0.0", is_active: false, descricao: "Placeholder" },
-    { onConflict: "ip_pattern,rule_type" },
-  );
-  await supabase.from("geo_blocking_rules").upsert(
-    { country_code: "BR", is_active: false },
-    { onConflict: "country_code" },
-  );
+  await supabase
+    .from("ip_access_rules")
+    .upsert(
+      {
+        rule_type: "blacklist",
+        ip_pattern: "0.0.0.0",
+        is_active: false,
+        descricao: "Placeholder",
+      },
+      { onConflict: "ip_pattern,rule_type" },
+    );
+  await supabase
+    .from("geo_blocking_rules")
+    .upsert(
+      { country_code: "BR", is_active: false },
+      { onConflict: "country_code" },
+    );
 }
 
 async function seedAuditAndLogs(userId: string): Promise<void> {
@@ -520,7 +841,7 @@ async function main() {
     console.log("   - reward_items: 6");
     console.log("   - conciliacoes: 8");
     console.log("   - notifications: 5");
-    console.log("\n🔐 Login admin: admin@loggiflow.com.br / LoggiFlow@2026");
+    console.log(`\n🔐 Login admin: admin@loggiflow.com.br / ${SEED_PASSWORD}`);
   } catch (err: any) {
     console.error("\n❌ Erro durante seed:", err.message);
     process.exit(1);
