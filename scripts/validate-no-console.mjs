@@ -1,28 +1,37 @@
 #!/usr/bin/env node
 // Fails CI when supabase/functions contains raw console.* calls.
 // Prevents PII regressions in Edge Function logs.
-import { execSync } from "node:child_process";
+// Node puro (sem ripgrep): o runner ubuntu-latest não tem `rg`.
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
-const CMD =
-  "rg -n \"console\\.(log|info|warn|error|debug)\" supabase/functions " +
-  "--glob '!**/*.test.ts' --glob '!**/_shared/logger.ts' --glob '!**/_shared/redis.ts'";
+const ROOT = "supabase/functions";
+const PATTERN = /console\.(log|info|warn|error|debug)/;
+// Mesma semântica dos globs antigos: exclui *.test.ts (não *_test.ts),
+// _shared/logger.ts e _shared/redis.ts.
+const EXCLUDED = new Set(["_shared/logger.ts", "_shared/redis.ts"]);
 
-
-let output = "";
-try {
-  output = execSync(CMD, { encoding: "utf8" });
-} catch (err) {
-  // rg exits non-zero when no matches — that's the success case.
-  if (err.status === 1) {
-    console.log("✅ No raw console.* calls in supabase/functions");
-    process.exit(0);
+function* walk(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) yield* walk(path);
+    else if (entry.isFile() && entry.name.endsWith(".ts")) yield path;
   }
-  throw err;
 }
 
-if (output.trim()) {
+const hits = [];
+for (const path of walk(ROOT)) {
+  const rel = path.replace(`${ROOT}/`, "");
+  if (rel.endsWith(".test.ts") || EXCLUDED.has(rel)) continue;
+  const lines = readFileSync(path, "utf8").split("\n");
+  lines.forEach((line, i) => {
+    if (PATTERN.test(line)) hits.push(`${path}:${i + 1}:${line.trim()}`);
+  });
+}
+
+if (hits.length > 0) {
   console.error("❌ Raw console.* calls detected in supabase/functions:");
-  console.error(output);
+  console.error(hits.join("\n"));
   console.error("\nUse `log.info / log.warn / log.error` from _shared/logger.ts");
   process.exit(1);
 }

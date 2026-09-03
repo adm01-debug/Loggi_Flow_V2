@@ -3,6 +3,8 @@ import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
+import { requireUser } from "../_shared/auth.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 const SANDBOX_URL = "https://sandbox.melhorenvio.com.br/api/v2";
 const PRODUCTION_URL = "https://melhorenvio.com.br/api/v2";
@@ -20,6 +22,32 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const rl = await checkRateLimit(req, "melhor-envio-api", {
+      maxRequests: 60,
+      windowMs: 60_000,
+    });
+    if (!rl.allowed) {
+      return new Response(
+        JSON.stringify({ error: "rate_limited" }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "Retry-After": "60",
+          },
+        }
+      );
+    }
+
+    const auth = await requireUser(req);
+    if (!auth.ok) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const token = Deno.env.get("MELHOR_ENVIO_TOKEN");
     if (!token) {
       return new Response(

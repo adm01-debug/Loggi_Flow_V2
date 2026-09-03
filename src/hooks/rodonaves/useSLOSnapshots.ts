@@ -32,7 +32,9 @@ export interface SLOSnapshotAggregate {
 const SNAPSHOTS_KEY = ["rte-slo-snapshots"] as const;
 
 /** Agrega as linhas diárias por gateway (função pura, testável). */
-export function aggregateSnapshots(rows: readonly SLOSnapshotRow[]): SLOSnapshotAggregate[] {
+export function aggregateSnapshots(
+  rows: readonly SLOSnapshotRow[],
+): SLOSnapshotAggregate[] {
   const buckets = new Map<string, SLOSnapshotRow[]>();
   for (const row of rows) {
     const list = buckets.get(row.gateway);
@@ -46,15 +48,30 @@ export function aggregateSnapshots(rows: readonly SLOSnapshotRow[]): SLOSnapshot
       days: list.length,
       violatedDays: list.filter((row) => row.status === "violado").length,
       avgUptimePct:
-        Math.round((list.reduce((sum, row) => sum + Number(row.uptime_pct), 0) / list.length) * 10) /
-        10,
-      worstP95Ms: list.reduce((max, row) => Math.max(max, Number(row.p95_latency_ms)), 0),
+        Math.round(
+          (list.reduce((sum, row) => sum + Number(row.uptime_pct), 0) /
+            list.length) *
+            10,
+        ) / 10,
+      worstP95Ms: list.reduce(
+        (max, row) => Math.max(max, Number(row.p95_latency_ms)),
+        0,
+      ),
       avgBudgetUsedPct:
         Math.round(
-          (list.reduce((sum, row) => sum + Number(row.error_budget_used_pct), 0) / list.length) * 10,
+          (list.reduce(
+            (sum, row) => sum + Number(row.error_budget_used_pct),
+            0,
+          ) /
+            list.length) *
+            10,
         ) / 10,
     }))
-    .sort((a, b) => b.avgBudgetUsedPct - a.avgBudgetUsedPct || a.gateway.localeCompare(b.gateway));
+    .sort(
+      (a, b) =>
+        b.avgBudgetUsedPct - a.avgBudgetUsedPct ||
+        a.gateway.localeCompare(b.gateway),
+    );
 }
 
 /**
@@ -68,7 +85,9 @@ export function useSLOSnapshots(days = 90) {
   const snapshots = useQuery({
     queryKey: [...SNAPSHOTS_KEY, days],
     queryFn: async (): Promise<SLOSnapshotRow[]> => {
-      const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+      const since = new Date(Date.now() - days * 86_400_000)
+        .toISOString()
+        .slice(0, 10);
       const { data, error } = await supabase
         .from("rte_slo_daily_snapshots")
         .select(
@@ -93,9 +112,7 @@ export function useSLOSnapshots(days = 90) {
       if (error) throw error;
       return Number(data ?? 0);
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: SNAPSHOTS_KEY });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: SNAPSHOTS_KEY }),
   });
 
   const rows = useMemo(() => snapshots.data ?? [], [snapshots.data]);

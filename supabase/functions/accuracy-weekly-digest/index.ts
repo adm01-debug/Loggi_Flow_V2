@@ -7,12 +7,18 @@
 //     Usado pelo PainelSLA para permitir revisão antes do disparo real.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { log } from "../_shared/logger.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { buildDigest, DigestNotification, renderDigestEmail } from "./digest.ts";
+import {
+  buildDigest,
+  DigestNotification,
+  renderDigestEmail,
+} from "./digest.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface Recipient {
@@ -32,7 +38,10 @@ async function handlePreview(req: Request): Promise<Response> {
   if (!token) {
     return new Response(
       JSON.stringify({ ok: false, error: "Missing Authorization header" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 
@@ -44,12 +53,17 @@ async function handlePreview(req: Request): Promise<Response> {
   if (uErr || !userRes?.user) {
     return new Response(
       JSON.stringify({ ok: false, error: "Invalid session" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 
   const now = new Date();
-  const windowStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const windowStart = new Date(
+    now.getTime() - 7 * 24 * 60 * 60 * 1000,
+  ).toISOString();
   const { data: notifs, error: nErr } = await service
     .from("notifications")
     .select("id, created_at, metadata")
@@ -60,10 +74,10 @@ async function handlePreview(req: Request): Promise<Response> {
     .limit(500);
 
   if (nErr) {
-    return new Response(
-      JSON.stringify({ ok: false, error: nErr.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ ok: false, error: nErr.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   const report = buildDigest((notifs ?? []) as DigestNotification[], now);
@@ -77,22 +91,32 @@ async function handlePreview(req: Request): Promise<Response> {
       html: email?.html ?? null,
       report,
     }),
-    { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
   );
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS")
+    return new Response(null, { headers: corsHeaders });
 
   // Modo preview — não envia email, retorna HTML pro usuário chamador.
   if (req.method === "POST") {
     try {
       const cloned = req.clone();
       const body = await cloned.json().catch(() => null);
-      if (body && typeof body === "object" && (body as { preview?: unknown }).preview === true) {
+      if (
+        body &&
+        typeof body === "object" &&
+        (body as { preview?: unknown }).preview === true
+      ) {
         return await handlePreview(req);
       }
-    } catch { /* ignora e cai no fluxo padrão */ }
+    } catch {
+      /* ignora e cai no fluxo padrão */
+    }
   }
 
   const supabase = createClient(
@@ -114,11 +138,14 @@ serve(async (req) => {
     for (const s of settings ?? []) {
       const email = (s.email ?? "").trim();
       if (!email) continue;
-      if (!recipients.has(s.user_id)) recipients.set(s.user_id, { user_id: s.user_id, email });
+      if (!recipients.has(s.user_id))
+        recipients.set(s.user_id, { user_id: s.user_id, email });
     }
 
     const now = new Date();
-    const windowStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const windowStart = new Date(
+      now.getTime() - 7 * 24 * 60 * 60 * 1000,
+    ).toISOString();
     const results: DispatchResult[] = [];
 
     for (const r of recipients.values()) {
@@ -132,7 +159,11 @@ serve(async (req) => {
         .limit(500);
 
       if (nErr) {
-        results.push({ user_id: r.user_id, status: "error", detail: nErr.message });
+        results.push({
+          user_id: r.user_id,
+          status: "error",
+          detail: nErr.message,
+        });
         continue;
       }
 
@@ -145,11 +176,18 @@ serve(async (req) => {
       }
 
       try {
-        const { error: eErr } = await supabase.functions.invoke("resend-email", {
-          body: { to: r.email, subject: email.subject, html: email.html },
-        });
+        const { error: eErr } = await supabase.functions.invoke(
+          "resend-email",
+          {
+            body: { to: r.email, subject: email.subject, html: email.html },
+          },
+        );
         if (eErr) {
-          results.push({ user_id: r.user_id, status: "error", detail: eErr.message });
+          results.push({
+            user_id: r.user_id,
+            status: "error",
+            detail: eErr.message,
+          });
         } else {
           results.push({ user_id: r.user_id, status: "sent" });
           await supabase.from("notifications").insert({
@@ -184,13 +222,24 @@ serve(async (req) => {
         errors: results.filter((r) => r.status === "error").length,
         results,
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   } catch (err) {
-    console.error("accuracy-weekly-digest failed", err);
+    log.error("accuracy-weekly-digest failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     return new Response(
-      JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 });

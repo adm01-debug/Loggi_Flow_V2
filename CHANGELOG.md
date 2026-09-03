@@ -5,6 +5,27 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [1.1.0] - 2026-09-02
+
+### Segurança
+- Autenticação obrigatória em 5 edge functions que aceitavam chamadas sem verificação de usuário
+- Testes de RLS passam a usar a anon key correta do projeto atual (antes usavam a key de um projeto antigo e passavam sem testar nada)
+
+### Corrigido
+- `npm ci` restaurado com eslint 9 (major 10 revertido — plugins ainda não suportam)
+- 9 erros de typecheck causados por mudanças de API em bumps major de dependências
+- CVEs de severidade alta corrigidos via `npm audit fix`
+
+### Alterado
+- CI sem steps que dependiam de secrets inexistentes (SonarCloud, Slack, PDF de auditoria)
+- Gate de tamanho de bundle ajustado para o build real (8192 KB; lazy chunks carregados sob demanda)
+- Sentry agora é opcional, habilitado via `VITE_SENTRY_DSN`
+
+### Banco
+- Migrations de remediação registradas no histórico versionado
+- Policy de RLS criada em partição futura
+- Índices adicionados em foreign keys sem cobertura
+
 ## [1.0.0] - 2024-12-21
 
 ### Adicionado

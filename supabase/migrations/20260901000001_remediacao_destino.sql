@@ -71,10 +71,21 @@ DROP POLICY IF EXISTS "Users can view their own scheduled reports" ON public.sch
 CREATE POLICY "Users can view their own scheduled reports" ON public.scheduled_reports AS PERMISSIVE FOR SELECT TO public USING ((auth.uid() = user_id));
 
 -- Etapa 35: dropar triggers duplicados residuais
-DROP TRIGGER IF EXISTS notify_ocorrencia_trigger ON public.ocorrencias;
-DROP TRIGGER IF EXISTS fretes_internos_updated_at ON public.fretes_internos;
-DROP TRIGGER IF EXISTS tr_cotacoes_multicanal_version ON public.cotacoes_multicanal;
-DROP TRIGGER IF EXISTS lalamove_orders_updated_at ON public.lalamove_orders;
+-- (replay-safe: DROP TRIGGER IF EXISTS falha se a TABELA nao existir — lalamove_orders foi removida no destino)
+DO $$
+DECLARE _t record;
+BEGIN
+  FOR _t IN SELECT * FROM (VALUES
+    ('notify_ocorrencia_trigger','public.ocorrencias'),
+    ('fretes_internos_updated_at','public.fretes_internos'),
+    ('tr_cotacoes_multicanal_version','public.cotacoes_multicanal'),
+    ('lalamove_orders_updated_at','public.lalamove_orders')
+  ) AS v(trg, tbl) LOOP
+    IF to_regclass(_t.tbl) IS NOT NULL THEN
+      EXECUTE format('DROP TRIGGER IF EXISTS %I ON %s', _t.trg, _t.tbl);
+    END IF;
+  END LOOP;
+END $$;
 
 -- Etapa 49: corrigir alert_slow_queries()
 CREATE OR REPLACE FUNCTION public.alert_slow_queries(threshold_ms numeric DEFAULT 1000)
@@ -95,9 +106,9 @@ BEGIN
            now(),
            jsonb_build_object('mean_exec_time', mean_exec_time, 'calls', calls, 'level', 'crit', 'query', left(query, 500))
       FROM extensions.pg_stat_statements
-     WHERE mean_exec_time > %%s
+     WHERE mean_exec_time > %s
        AND calls > 10
-       AND query NOT LIKE '%%%%pg_stat_statements%%%%'
+       AND query NOT LIKE '%%pg_stat_statements%%'
      ORDER BY mean_exec_time DESC
      LIMIT 20
   $f$, threshold_ms);

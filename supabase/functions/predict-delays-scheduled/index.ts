@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
+import { requireInternalSecret, requireUser } from "../_shared/auth.ts";
 
 interface PredictionItem {
   id: string;
@@ -19,6 +20,20 @@ export const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Só o cron interno (x-internal-secret) ou Bearer service_role.
+    if (!requireInternalSecret(req)) {
+      const auth = await requireUser(req);
+      if (!auth.ok || auth.claims.role !== "service_role") {
+        return new Response(
+          JSON.stringify({ success: false, message: "Unauthorized" }),
+          {
+            status: 401,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,

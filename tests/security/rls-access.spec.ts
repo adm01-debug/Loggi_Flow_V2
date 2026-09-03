@@ -8,8 +8,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 
 const SUPABASE_URL = 'https://jvfhclubfpxrtrrazrgr.supabase.co';
+// anon key (pública) do projeto jvfhclubfpxrtrrazrgr
 const ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnaWNmcWpheXJqdXJpdnR5Z3FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0ODQzNzksImV4cCI6MjA5NDA2MDM3OX0.TvD6_8T9-wRgXTpXeFnZ17rdL47oYpxBaGbWnjZVeGQ';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2ZmhjbHViZnB4cnRycmF6cmdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2NzUxNzksImV4cCI6MjEwMTI1MTE3OX0.nqc4_idYS8m172fRiSD_OXuEzWJkaIrA61Q61mmrwEo';
 
 const headers = {
   apikey: ANON_KEY,

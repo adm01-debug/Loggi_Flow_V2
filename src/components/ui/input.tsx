@@ -9,11 +9,16 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-input focus:border-primary focus:ring-2 focus:ring-primary/20",
-        filled: "border-transparent bg-muted focus:bg-background focus:border-primary focus:ring-2 focus:ring-primary/20",
-        ghost: "border-transparent bg-transparent focus:bg-muted/50 focus:border-border",
-        error: "border-destructive focus:border-destructive focus:ring-2 focus:ring-destructive/20",
-        success: "border-success focus:border-success focus:ring-2 focus:ring-success/20",
+        default:
+          "border-input focus:border-primary focus:ring-2 focus:ring-primary/20",
+        filled:
+          "border-transparent bg-muted focus:bg-background focus:border-primary focus:ring-2 focus:ring-primary/20",
+        ghost:
+          "border-transparent bg-transparent focus:bg-muted/50 focus:border-border",
+        error:
+          "border-destructive focus:border-destructive focus:ring-2 focus:ring-destructive/20",
+        success:
+          "border-success focus:border-success focus:ring-2 focus:ring-success/20",
       },
       inputSize: {
         default: "h-11 min-h-[44px] px-3 py-2 text-base sm:text-sm",
@@ -26,11 +31,12 @@ const inputVariants = cva(
       variant: "default",
       inputSize: "default",
     },
-  }
+  },
 );
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
     VariantProps<typeof inputVariants> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -42,7 +48,23 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, variant, inputSize, leftIcon, rightIcon, error, hint, clearable, onClear, animated = true, ...props }, ref) => {
+  (
+    {
+      className,
+      type,
+      variant,
+      inputSize,
+      leftIcon,
+      rightIcon,
+      error,
+      hint,
+      clearable,
+      onClear,
+      animated = true,
+      ...props
+    },
+    ref,
+  ) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [isFocused, setIsFocused] = React.useState(false);
     const isPassword = type === "password";
@@ -64,13 +86,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               transition={{ duration: 0.2 }}
             />
           )}
-          
+
           {leftIcon && (
-            <motion.div 
+            <motion.div
               className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10"
-              animate={{ 
+              animate={{
                 scale: isFocused ? 1.1 : 1,
-                color: isFocused ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"
+                color: isFocused
+                  ? "hsl(var(--primary))"
+                  : "hsl(var(--muted-foreground))",
               }}
               transition={{ duration: 0.2 }}
             >
@@ -84,7 +108,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               leftIcon && "pl-10",
               (rightIcon || isPassword || clearable) && "pr-10",
               "relative z-0",
-              className
+              className,
             )}
             ref={ref}
             onFocus={(e) => {
@@ -122,18 +146,27 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 whileTap={{ scale: 0.9 }}
                 aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </motion.button>
             )}
             {rightIcon && !isPassword && !clearable && (
-              <span className="text-muted-foreground pointer-events-none p-1">{rightIcon}</span>
+              <span className="text-muted-foreground pointer-events-none p-1">
+                {rightIcon}
+              </span>
             )}
           </div>
         </div>
         <AnimatePresence>
           {(error || hint) && (
-            <motion.p 
-              className={cn("mt-1.5 text-xs font-medium", error ? "text-destructive" : "text-muted-foreground")}
+            <motion.p
+              className={cn(
+                "mt-1.5 text-xs font-medium",
+                error ? "text-destructive" : "text-muted-foreground",
+              )}
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
@@ -145,7 +178,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </AnimatePresence>
       </div>
     );
-  }
+  },
 );
 Input.displayName = "Input";
 
@@ -169,9 +202,8 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         {...props}
       />
     );
-  }
+  },
 );
 SearchInput.displayName = "SearchInput";
 
-// eslint-disable-next-line react-refresh/only-export-components
 export { Input, SearchInput, inputVariants };

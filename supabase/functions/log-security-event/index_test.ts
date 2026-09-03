@@ -24,3 +24,26 @@ Deno.test("log-security-event: rejects wrong method", async () => {
   await res.text();
   assertEquals(res.status < 500, true);
 });
+
+Deno.test("log-security-event: request sem auth retorna 401", async () => {
+  // Sem Authorization e com o anon key como Bearer — ambos rejeitados.
+  const semAuth = await fetch(`${SUPABASE_URL}/functions/v1/log-security-event`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: ANON },
+    body: JSON.stringify({ event_type: "test", description: "t" }),
+  });
+  await semAuth.text();
+  assertEquals(semAuth.status, 401);
+
+  const anonBearer = await fetch(`${SUPABASE_URL}/functions/v1/log-security-event`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: ANON,
+      Authorization: `Bearer ${ANON}`,
+    },
+    body: JSON.stringify({ event_type: "test", description: "t" }),
+  });
+  await anonBearer.text();
+  assertEquals(anonBearer.status, 401);
+});
