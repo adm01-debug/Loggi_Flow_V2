@@ -1,0 +1,38 @@
+# Deploy manual das Edge Functions no projeto jvfhclubfpxrtrrazrgr.
+# Requer o secret SUPABASE_ACCESS_TOKEN (token pessoal sbp_... da conta dona do projeto,
+# criado em https://supabase.com/dashboard/account/tokens e salvo em Settings → Secrets → Actions).
+# Sem trigger de push de propósito: enquanto o secret não existir, nada roda nem fica vermelho.
+name: Deploy Edge Functions
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Nome de uma function específica (vazio = todas)"
+        required: false
+        default: ""
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: jvfhclubfpxrtrrazrgr
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar credencial
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN não configurado (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Deploy
+        run: |
+          if [ -n "${{ github.event.inputs.only }}" ]; then
+            supabase functions deploy "${{ github.event.inputs.only }}" --project-ref "$PROJECT_REF"
+          else
+            supabase functions deploy --project-ref "$PROJECT_REF"
+          fi
