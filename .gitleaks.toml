@@ -1,0 +1,24 @@
+# Config do gitleaks (usada pelos workflows de security).
+# Allowlist SOMENTE para credenciais públicas por design — nunca adicione
+# service_role, sb_secret_, senhas ou tokens privados aqui.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Chaves públicas por design do stack Supabase/Mapbox"
+paths = [
+  # Anon/publishable key do Supabase (JWT com role=anon, embarcada no bundle
+  # do frontend por definição) e token público pk. do Mapbox.
+  '''\.env$''',
+  '''\.env\.example$''',
+  # Specs de RLS batem no PostgREST com a anon key hardcoded de propósito
+  # (histórico inclui a key do projeto antigo, também anon/pública).
+  '''tests/security/.*\.spec\.ts$''',
+]
+regexes = [
+  # JWTs do Supabase com payload role=anon ("role":"anon" em base64url aparece
+  # como cm9sZSI6ImFub24i) — públicos por definição.
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]*cm9sZSI6ImFub24i[A-Za-z0-9_-]*''',
+  # Token público do Mapbox (pk.*) — escopo somente-leitura de tiles.
+  '''pk\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+''',
+]
