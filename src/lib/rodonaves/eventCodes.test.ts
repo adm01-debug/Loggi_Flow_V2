@@ -187,10 +187,27 @@ describe("isDelivered / collectExceptions", () => {
 describe("fuzz — 500 cenários determinísticos", () => {
   const EVENT_CODES = ["0", "1", "1.1", "2", "3", "6", "7", "1.4", "", "abc"];
   const PROCEDA_CODES = [
-    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "98", "99", "77", "",
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "98",
+    "99",
+    "77",
+    "",
   ];
   const STEP_CODES = ["1", "204", "205", "206", "209", "300", ""];
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   it("mantém invariantes em 500 trilhas aleatórias", () => {
     const rand = mulberry32(20260726);
     let processed = 0;

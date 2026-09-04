@@ -231,12 +231,14 @@ export function normalizeRTEEvent(raw: RTERawEvent): RTENormalizedEvent {
     : "info";
 
   const description = raw.description?.trim();
-  const label =
-    exception !== null
-      ? EXCEPTION_LABELS[exception]
-      : description && description.length > 0
-        ? description
-        : PHASE_LABELS[phase];
+  let label: string;
+  if (exception !== null) {
+    label = EXCEPTION_LABELS[exception];
+  } else if (description && description.length > 0) {
+    label = description;
+  } else {
+    label = PHASE_LABELS[phase];
+  }
 
   return {
     system: raw.system,

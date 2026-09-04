@@ -19,7 +19,12 @@ function mulberry32(seed: number) {
 
 const BASE = Date.UTC(2026, 6, 26, 0, 0, 0);
 
-function sample(offsetMinutes: number, latency: number, online = true, gateway = "tracking"): LatencySample {
+function sample(
+  offsetMinutes: number,
+  latency: number,
+  online = true,
+  gateway = "tracking",
+): LatencySample {
   return {
     gateway,
     online,
@@ -44,24 +49,40 @@ describe("buildLatencyTrend", () => {
   });
 
   it("separa buckets por hora e ordena cronologicamente", () => {
-    const trend = buildLatencyTrend([sample(120, 100), sample(0, 50), sample(60, 80)]);
-    expect(trend.points.map((p) => p.label)).toEqual(["00:00", "01:00", "02:00"]);
+    const trend = buildLatencyTrend([
+      sample(120, 100),
+      sample(0, 50),
+      sample(60, 80),
+    ]);
+    expect(trend.points.map((p) => p.label)).toEqual([
+      "00:00",
+      "01:00",
+      "02:00",
+    ]);
   });
 
   it("respeita bucketMinutes customizado", () => {
-    const trend = buildLatencyTrend([sample(0, 10), sample(20, 20)], { bucketMinutes: 15 });
+    const trend = buildLatencyTrend([sample(0, 10), sample(20, 20)], {
+      bucketMinutes: 15,
+    });
     expect(trend.points).toHaveLength(2);
   });
 
   it("calcula uptime por bucket", () => {
-    const trend = buildLatencyTrend([sample(0, 10, true), sample(1, 10, false)]);
+    const trend = buildLatencyTrend([
+      sample(0, 10, true),
+      sample(1, 10, false),
+    ]);
     expect(trend.points[0].uptimePct).toBe(50);
   });
 
   it("filtra por gateway", () => {
-    const trend = buildLatencyTrend([sample(0, 10, true, "tracking"), sample(1, 900, true, "pickup")], {
-      gateway: "pickup",
-    });
+    const trend = buildLatencyTrend(
+      [sample(0, 10, true, "tracking"), sample(1, 900, true, "pickup")],
+      {
+        gateway: "pickup",
+      },
+    );
     expect(trend.points[0].avgLatencyMs).toBe(900);
   });
 
@@ -76,7 +97,12 @@ describe("buildLatencyTrend", () => {
 
   it("descarta latência não numérica", () => {
     const trend = buildLatencyTrend([
-      { gateway: "a", online: true, latency_ms: Number.NaN, checked_at: new Date(BASE).toISOString() },
+      {
+        gateway: "a",
+        online: true,
+        latency_ms: Number.NaN,
+        checked_at: new Date(BASE).toISOString(),
+      },
     ]);
     expect(trend.points).toHaveLength(0);
   });
@@ -98,18 +124,28 @@ describe("buildLatencyTrend", () => {
   });
 
   it("não marca degradação em latência estável", () => {
-    const trend = buildLatencyTrend([sample(0, 100), sample(60, 105), sample(120, 98)]);
+    const trend = buildLatencyTrend([
+      sample(0, 100),
+      sample(60, 105),
+      sample(120, 98),
+    ]);
     expect(trend.degrading).toBe(false);
   });
 
   it("respeita threshold customizado", () => {
     const points = [sample(0, 100), sample(60, 130)];
-    expect(buildLatencyTrend(points, { degradationThresholdPct: 50 }).degrading).toBe(false);
-    expect(buildLatencyTrend(points, { degradationThresholdPct: 10 }).degrading).toBe(true);
+    expect(
+      buildLatencyTrend(points, { degradationThresholdPct: 50 }).degrading,
+    ).toBe(false);
+    expect(
+      buildLatencyTrend(points, { degradationThresholdPct: 10 }).degrading,
+    ).toBe(true);
   });
 
   it("tolera lista nula sem lançar", () => {
-    expect(() => buildLatencyTrend(undefined as unknown as LatencySample[])).not.toThrow();
+    expect(() =>
+      buildLatencyTrend(undefined as unknown as LatencySample[]),
+    ).not.toThrow();
   });
 });
 
@@ -142,6 +178,7 @@ describe("computeDrift", () => {
 });
 
 describe("fuzz: 500 cenários aleatórios determinísticos", () => {
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   it("mantém todas as invariantes", () => {
     for (let seed = 1; seed <= 500; seed++) {
       const rand = mulberry32(seed);
@@ -157,7 +194,10 @@ describe("fuzz: 500 cenários aleatórios determinísticos", () => {
             gateway: "tracking",
             online: rand() > 0.5,
             latency_ms: rand() > 0.5 ? Number.NaN : 10,
-            checked_at: rand() > 0.5 ? "invalid" : new Date(BASE + i * 60_000).toISOString(),
+            checked_at:
+              rand() > 0.5
+                ? "invalid"
+                : new Date(BASE + i * 60_000).toISOString(),
           });
           continue;
         }
@@ -165,7 +205,9 @@ describe("fuzz: 500 cenários aleatórios determinísticos", () => {
           gateway: rand() > 0.5 ? "tracking" : "pickup",
           online: rand() > 0.2,
           latency_ms: Math.floor(rand() * 5000) - 200,
-          checked_at: new Date(BASE + Math.floor(rand() * 86_400_000)).toISOString(),
+          checked_at: new Date(
+            BASE + Math.floor(rand() * 86_400_000),
+          ).toISOString(),
         });
       }
 
@@ -188,7 +230,9 @@ describe("fuzz: 500 cenários aleatórios determinísticos", () => {
       }
 
       const validCount = samples.filter(
-        (s) => Number.isFinite(s.latency_ms) && Number.isFinite(new Date(s.checked_at).getTime()),
+        (s) =>
+          Number.isFinite(s.latency_ms) &&
+          Number.isFinite(new Date(s.checked_at).getTime()),
       ).length;
       const totalChecks = trend.points.reduce((sum, p) => sum + p.checks, 0);
       expect(totalChecks).toBe(validCount);

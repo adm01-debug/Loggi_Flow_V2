@@ -65,11 +65,14 @@ export function useSLOTargets() {
   const globalRow = rows.find((row) => row.gateway === GLOBAL_SLO_GATEWAY);
 
   // Fonte da verdade: banco → localStorage → default.
-  const globalTarget: GatewaySLOTarget = globalRow
-    ? rowToTarget(globalRow)
-    : query.isError
-      ? loadSLOTarget()
-      : { ...DEFAULT_SLO_TARGET };
+  let globalTarget: GatewaySLOTarget;
+  if (globalRow) {
+    globalTarget = rowToTarget(globalRow);
+  } else if (query.isError) {
+    globalTarget = loadSLOTarget();
+  } else {
+    globalTarget = { ...DEFAULT_SLO_TARGET };
+  }
 
   /** Meta efetiva de um gateway (override específico ou meta global). */
   const targetFor = (gateway: string): GatewaySLOTarget => {

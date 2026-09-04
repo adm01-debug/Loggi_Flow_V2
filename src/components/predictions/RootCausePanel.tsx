@@ -3,13 +3,31 @@ import { AlertOctagon, Filter, Lightbulb, PlusCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useRootCauseAnalysis } from "@/hooks/logistics/useRootCauseAnalysis";
-import { ROOT_CAUSE_LABELS, type RootCauseCategory } from "@/lib/predictions/rootCauseAnalyzer";
-import { buildMitigations, rerankByROI, PRIORITY_LABELS, type MitigationPriority, type RankedMitigation } from "@/lib/predictions/mitigationRecommender";
-import { computeROI, type MitigationRecord } from "@/lib/predictions/mitigationROI";
+import {
+  ROOT_CAUSE_LABELS,
+  type RootCauseCategory,
+} from "@/lib/predictions/rootCauseAnalyzer";
+import {
+  buildMitigations,
+  rerankByROI,
+  PRIORITY_LABELS,
+  type MitigationPriority,
+  type RankedMitigation,
+} from "@/lib/predictions/mitigationRecommender";
+import {
+  computeROI,
+  type MitigationRecord,
+} from "@/lib/predictions/mitigationROI";
 import { useMitigationActions } from "@/hooks/predictions/useMitigationActions";
 import { WhatIfPanel } from "./WhatIfPanel";
 
@@ -25,7 +43,11 @@ interface RootCausePanelProps {
   currentOtif?: number | null;
 }
 
-export function RootCausePanel({ transportadora, availableCarriers = [], currentOtif }: RootCausePanelProps) {
+export function RootCausePanel({
+  transportadora,
+  availableCarriers = [],
+  currentOtif,
+}: RootCausePanelProps) {
   const [carrier, setCarrier] = useState<string>(transportadora ?? "all");
   const [windowDays, setWindowDays] = useState<string>("30");
 
@@ -35,7 +57,8 @@ export function RootCausePanel({ transportadora, availableCarriers = [], current
   });
 
   const maxCount = useMemo(
-    () => (data?.buckets.length ? Math.max(...data.buckets.map((b) => b.count)) : 0),
+    () =>
+      data?.buckets.length ? Math.max(...data.buckets.map((b) => b.count)) : 0,
     [data],
   );
 
@@ -76,50 +99,69 @@ export function RootCausePanel({ transportadora, availableCarriers = [], current
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
-        ) : error ? (
-          <EmptyState
-            icon={AlertOctagon}
-            title="Falha ao carregar análise"
-            description={(error as Error).message}
-          />
-        ) : !data || data.totalWithDelay === 0 ? (
-          <EmptyState
-            icon={AlertOctagon}
-            title="Sem atrasos no período"
-            description="Nenhum atraso confirmado foi registrado para o filtro selecionado."
-          />
-        ) : (
-          <>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <SummaryCard label="Predições analisadas" value={data.totalAnalyzed} />
-              <SummaryCard label="Com atraso confirmado" value={data.totalWithDelay} />
-              <SummaryCard
-                label="Principal causa"
-                value={data.topCategory ? ROOT_CAUSE_LABELS[data.topCategory] : "—"}
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="space-y-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
+              </div>
+            );
+          }
+          if (error) {
+            return (
+              <EmptyState
+                icon={AlertOctagon}
+                title="Falha ao carregar análise"
+                description={(error as Error).message}
               />
-            </div>
-            <div className="space-y-3">
-              {data.buckets.map((b) => (
-                <BucketRow
-                  key={b.category}
-                  category={b.category}
-                  count={b.count}
-                  totalDelayHours={b.totalDelayHours}
-                  maxCount={maxCount}
-                  sampleMotivos={b.sampleMotivos}
-                  topCarrier={topCarrierOf(b.carriers)}
+            );
+          }
+          if (!data || data.totalWithDelay === 0) {
+            return (
+              <EmptyState
+                icon={AlertOctagon}
+                title="Sem atrasos no período"
+                description="Nenhum atraso confirmado foi registrado para o filtro selecionado."
+              />
+            );
+          }
+          return (
+            <>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <SummaryCard
+                  label="Predições analisadas"
+                  value={data.totalAnalyzed}
                 />
-              ))}
-            </div>
-            <MitigationList report={data} currentOtif={currentOtif} />
-          </>
-        )}
+                <SummaryCard
+                  label="Com atraso confirmado"
+                  value={data.totalWithDelay}
+                />
+                <SummaryCard
+                  label="Principal causa"
+                  value={
+                    data.topCategory ? ROOT_CAUSE_LABELS[data.topCategory] : "—"
+                  }
+                />
+              </div>
+              <div className="space-y-3">
+                {data.buckets.map((b) => (
+                  <BucketRow
+                    key={b.category}
+                    category={b.category}
+                    count={b.count}
+                    totalDelayHours={b.totalDelayHours}
+                    maxCount={maxCount}
+                    sampleMotivos={b.sampleMotivos}
+                    topCarrier={topCarrierOf(b.carriers)}
+                  />
+                ))}
+              </div>
+              <MitigationList report={data} currentOtif={currentOtif} />
+            </>
+          );
+        })()}
       </CardContent>
     </Card>
   );
@@ -137,7 +179,9 @@ interface SummaryCardProps {
 function SummaryCard({ label, value }: SummaryCardProps) {
   return (
     <div className="rounded-lg border bg-muted/30 p-3">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
       <p className="mt-1 text-2xl font-semibold">{value}</p>
     </div>
   );
@@ -151,7 +195,14 @@ interface BucketRowProps {
   sampleMotivos: string[];
   topCarrier: string | null;
 }
-function BucketRow({ category, count, totalDelayHours, maxCount, sampleMotivos, topCarrier }: BucketRowProps) {
+function BucketRow({
+  category,
+  count,
+  totalDelayHours,
+  maxCount,
+  sampleMotivos,
+  topCarrier,
+}: BucketRowProps) {
   const pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
   return (
     <div className="space-y-1">
@@ -190,7 +241,10 @@ const PRIORITY_STYLES: Record<MitigationPriority, string> = {
   baixa: "border-border bg-muted/30",
 };
 
-const PRIORITY_BADGE: Record<MitigationPriority, "destructive" | "secondary" | "outline"> = {
+const PRIORITY_BADGE: Record<
+  MitigationPriority,
+  "destructive" | "secondary" | "outline"
+> = {
   alta: "destructive",
   media: "secondary",
   baixa: "outline",
@@ -235,7 +289,10 @@ function MitigationList({ report, currentOtif }: MitigationListProps) {
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {sorted.map((s) => (
-          <div key={s.category} className={`rounded-lg border p-3 ${PRIORITY_STYLES[s.priority]}`}>
+          <div
+            key={s.category}
+            className={`rounded-lg border p-3 ${PRIORITY_STYLES[s.priority]}`}
+          >
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -248,8 +305,12 @@ function MitigationList({ report, currentOtif }: MitigationListProps) {
               </Badge>
             </div>
             {s.roiMeasured > 0 && s.roiAdjustment !== 0 ? (
-              <p className={`mt-1 text-[11px] font-medium ${s.roiAdjustment > 0 ? "text-success" : "text-destructive"}`}>
-                {s.roiAdjustment > 0 ? "▲" : "▼"} ROI histórico: Δ {s.roiAvgDelta?.toFixed(1)}% ({s.roiAdjustment > 0 ? "+" : ""}{s.roiAdjustment} pts)
+              <p
+                className={`mt-1 text-[11px] font-medium ${s.roiAdjustment > 0 ? "text-success" : "text-destructive"}`}
+              >
+                {s.roiAdjustment > 0 ? "▲" : "▼"} ROI histórico: Δ{" "}
+                {s.roiAvgDelta?.toFixed(1)}% ({s.roiAdjustment > 0 ? "+" : ""}
+                {s.roiAdjustment} pts)
               </p>
             ) : null}
             <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
