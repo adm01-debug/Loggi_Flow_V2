@@ -51,6 +51,8 @@ import { usePagination } from "@/hooks/common/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { useSorting } from "@/hooks/common/useSorting";
 
+type AchievementRarity = "common" | "rare" | "epic" | "legendary";
+
 interface AchievementDisplay {
   id: string;
   name: string;
@@ -59,7 +61,7 @@ interface AchievementDisplay {
   xpReward: number;
   icon: LucideIcon;
   unlocked: boolean;
-  rarity: "common" | "rare" | "epic" | "legendary";
+  rarity: AchievementRarity;
 }
 
 const iconMap: Record<string, LucideIcon> = {
@@ -238,27 +240,30 @@ export default function Conquistas() {
   const mappedAchievements = useMemo((): AchievementDisplay[] => {
     if (!dbAchievements) return [];
     return dbAchievements.map((a) => ({
-      id: (a as Record<string, unknown>).id as string,
-      name: (a as Record<string, unknown>).name as string,
-      description: (a as Record<string, unknown>).description as string,
+      id: (a as unknown as Record<string, unknown>).id as string,
+      name: (a as unknown as Record<string, unknown>).name as string,
+      description: (a as unknown as Record<string, unknown>)
+        .description as string,
       category:
-        ((a as Record<string, unknown>).category as string) || "performance",
+        ((a as unknown as Record<string, unknown>).category as string) ||
+        "performance",
       xpReward:
-        ((a as Record<string, unknown>).xp_reward as number) ||
-        ((a as Record<string, unknown>).xp_requirement as number) ||
+        ((a as unknown as Record<string, unknown>).xp_reward as number) ||
+        ((a as unknown as Record<string, unknown>).xp_requirement as number) ||
         0,
-      icon: iconMap[(a as Record<string, unknown>).icon as string] || Award,
+      icon:
+        iconMap[(a as unknown as Record<string, unknown>).icon as string] ||
+        Award,
       unlocked:
         unlockedAchievementIds instanceof Set
           ? unlockedAchievementIds.has(
-              (a as Record<string, unknown>).id as string,
+              (a as unknown as Record<string, unknown>).id as string,
             )
           : false,
-      rarity:
-        ((a as Record<string, unknown>).rarity as string) ||
+      rarity: (((a as unknown as Record<string, unknown>).rarity as string) ||
         getTierRarity(
-          (a as Record<string, unknown>).tier as string | undefined,
-        ),
+          (a as unknown as Record<string, unknown>).tier as string | undefined,
+        )) as AchievementRarity,
     }));
   }, [dbAchievements, unlockedAchievementIds]);
 

@@ -12,16 +12,19 @@ type ProfileWithXP = {
 // user_achievements, user_ranks. RPC: add_user_xp. As antigas
 // rank_badges/task_gifts/update_user_streak não existem (404/403).
 
+export type BadgeTier = "bronze" | "silver" | "gold" | "platinum" | "diamond";
+export type BadgeRarity = "common" | "rare" | "epic" | "legendary";
+
 export interface RankBadge {
   id: string;
   name: string;
   description: string;
-  tier: "bronze" | "silver" | "gold" | "platinum" | "diamond";
+  tier: BadgeTier;
   icon_url: string;
   xp_requirement: number;
   code: string;
   icon: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
+  rarity: BadgeRarity;
   xp_reward: number;
   coins_reward: number;
   category: string;
@@ -94,7 +97,7 @@ export const useGamification = (userId?: string) => {
           coins_reward: (b as Record<string, unknown>).coins_reward || 0,
           category:
             (b as Record<string, unknown>).requirement_type || "performance",
-        } as RankBadge;
+        } as unknown as RankBadge;
       });
     },
   });
