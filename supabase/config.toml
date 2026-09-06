@@ -8,6 +8,7 @@ import_map = "supabase/functions/import_map.json"
 verify_jwt = true
 import_map = "supabase/functions/import_map.json"
 
+# Público p/ pg_cron — auth in-code: x-internal-secret (INTERNAL_FN_SECRET) ou Bearer service_role
 [functions.predict-delays-scheduled]
 verify_jwt = false
 
@@ -28,15 +29,19 @@ verify_jwt = false
 [functions.nexus-webhook-receiver]
 verify_jwt = false
 
+# Auth in-code via _shared/auth.ts requireUser (JWT authenticated/service_role; anon rejeitado) + rate limit
 [functions.evolution-whatsapp]
 verify_jwt = false
 
+# Só chamadas internas — auth in-code: Bearer service_role ou x-internal-secret (INTERNAL_FN_SECRET)
 [functions.resend-email]
 verify_jwt = false
 
+# Auth in-code via _shared/auth.ts requireUser + rate limit; user_id forçado ao sub do token
 [functions.log-security-event]
 verify_jwt = false
 
+# Auth in-code via auth.getUser
 [functions.webhook-status]
 verify_jwt = false
 
@@ -46,6 +51,7 @@ verify_jwt = false
 [functions.health-check]
 verify_jwt = false
 
+# Auth in-code via _shared/auth.ts requireUser (JWT authenticated/service_role; anon rejeitado) + rate limit
 [functions.melhor-envio-api]
 verify_jwt = false
 

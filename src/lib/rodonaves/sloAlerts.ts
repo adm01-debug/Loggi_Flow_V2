@@ -39,7 +39,11 @@ export interface SLOAlertOptions {
   minSeverity?: AlertSeverity;
 }
 
-const SEVERITY_ORDER: Record<AlertSeverity, number> = { info: 0, warning: 1, critical: 2 };
+const SEVERITY_ORDER: Record<AlertSeverity, number> = {
+  info: 0,
+  warning: 1,
+  critical: 2,
+};
 
 export const DEFAULT_COOLDOWN_MS = 60 * 60 * 1000;
 
@@ -50,11 +54,18 @@ export function severityForStatus(status: SLOStatus): AlertSeverity {
   return "info";
 }
 
-function sanitizeTimestamp(value: number | undefined, fallback: number): number {
+function sanitizeTimestamp(
+  value: number | undefined,
+  fallback: number,
+): number {
   return Number.isFinite(value) ? (value as number) : fallback;
 }
 
-function buildMessage(result: GatewaySLOResult, severity: AlertSeverity, label: string): string {
+function buildMessage(
+  result: GatewaySLOResult,
+  severity: AlertSeverity,
+  label: string,
+): string {
   const parts: string[] = [];
   if (severity === "critical") parts.push(`SLO violado em ${label}`);
   else if (severity === "warning") parts.push(`SLO em risco em ${label}`);
@@ -66,6 +77,17 @@ function buildMessage(result: GatewaySLOResult, severity: AlertSeverity, label: 
     parts.push(`P95 ${result.latencyOverBudgetMs}ms acima da meta`);
   }
   return parts.join(" · ");
+}
+
+function isSuppressed(
+  last: AlertState,
+  severity: AlertSeverity,
+  now: number,
+  cooldownMs: number,
+): boolean {
+  const escalated = SEVERITY_ORDER[severity] > SEVERITY_ORDER[last.severity];
+  const withinCooldown = now - last.firedAt < cooldownMs;
+  return !escalated && withinCooldown;
 }
 
 /**
@@ -85,7 +107,10 @@ export function evaluateSLOAlerts(
 ): SLOAlert[] {
   const now = sanitizeTimestamp(options.now, Date.now());
   const rawCooldown = Number(options.cooldownMs ?? DEFAULT_COOLDOWN_MS);
-  const cooldownMs = Number.isFinite(rawCooldown) && rawCooldown >= 0 ? rawCooldown : DEFAULT_COOLDOWN_MS;
+  const cooldownMs =
+    Number.isFinite(rawCooldown) && rawCooldown >= 0
+      ? rawCooldown
+      : DEFAULT_COOLDOWN_MS;
   const minSeverity = options.minSeverity ?? "warning";
 
   const lastByGateway = new Map<string, AlertState>();
@@ -104,16 +129,16 @@ export function evaluateSLOAlerts(
     if (SEVERITY_ORDER[severity] < SEVERITY_ORDER[minSeverity]) continue;
 
     const last = lastByGateway.get(result.gateway);
-    if (last) {
-      const escalated = SEVERITY_ORDER[severity] > SEVERITY_ORDER[last.severity];
-      const withinCooldown = now - last.firedAt < cooldownMs;
-      if (!escalated && withinCooldown) continue;
-    }
+    if (last && isSuppressed(last, severity, now, cooldownMs)) continue;
 
     alerts.push({
       gateway: result.gateway,
       severity,
-      message: buildMessage(result, severity, labels[result.gateway] ?? result.gateway),
+      message: buildMessage(
+        result,
+        severity,
+        labels[result.gateway] ?? result.gateway,
+      ),
       errorBudgetUsedPct: result.errorBudgetUsedPct,
       latencyOverBudgetMs: result.latencyOverBudgetMs,
       firedAt: now,
@@ -129,7 +154,10 @@ export function evaluateSLOAlerts(
 }
 
 /** Aplica os alertas disparados sobre o estado anterior, retornando o novo estado. */
-export function applyAlerts(previous: AlertState[], alerts: SLOAlert[]): AlertState[] {
+export function applyAlerts(
+  previous: AlertState[],
+  alerts: SLOAlert[],
+): AlertState[] {
   const map = new Map<string, AlertState>();
   for (const state of previous) {
     if (state?.gateway) map.set(state.gateway, state);
@@ -141,7 +169,9 @@ export function applyAlerts(previous: AlertState[], alerts: SLOAlert[]): AlertSt
       firedAt: alert.firedAt,
     });
   }
-  return Array.from(map.values()).sort((a, b) => a.gateway.localeCompare(b.gateway));
+  return Array.from(map.values()).sort((a, b) =>
+    a.gateway.localeCompare(b.gateway),
+  );
 }
 
 export interface AlertSummary {
@@ -173,11 +203,16 @@ export function loadAlertState(): AlertState[] {
       .filter((item): item is AlertState => {
         if (!item || typeof item !== "object") return false;
         const candidate = item as Partial<AlertState>;
-        return typeof candidate.gateway === "string" && typeof candidate.severity === "string";
+        return (
+          typeof candidate.gateway === "string" &&
+          typeof candidate.severity === "string"
+        );
       })
       .map((item) => ({
         gateway: item.gateway,
-        severity: (["info", "warning", "critical"] as AlertSeverity[]).includes(item.severity)
+        severity: (["info", "warning", "critical"] as AlertSeverity[]).includes(
+          item.severity,
+        )
           ? item.severity
           : "warning",
         firedAt: sanitizeTimestamp(item.firedAt, 0),

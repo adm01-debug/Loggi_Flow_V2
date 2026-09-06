@@ -12,7 +12,10 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/common/EmptyState";
 import { simulateWhatIf } from "@/lib/predictions/whatIfSimulator";
-import { ROOT_CAUSE_LABELS, type RootCauseCategory } from "@/lib/predictions/rootCauseAnalyzer";
+import {
+  ROOT_CAUSE_LABELS,
+  type RootCauseCategory,
+} from "@/lib/predictions/rootCauseAnalyzer";
 import type { RankedMitigation } from "@/lib/predictions/mitigationRecommender";
 import {
   deleteScenario,
@@ -20,7 +23,11 @@ import {
   saveScenario,
   type SavedScenario,
 } from "@/lib/predictions/whatIfScenarios";
-import { compareScenarios, toScenarioLike, type ScenarioLike } from "@/lib/predictions/whatIfCompare";
+import {
+  compareScenarios,
+  toScenarioLike,
+  type ScenarioLike,
+} from "@/lib/predictions/whatIfCompare";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +38,11 @@ interface WhatIfPanelProps {
 
 const getStore = (): Storage | null => {
   if (typeof window === "undefined") return null;
-  try { return window.localStorage; } catch { return null; }
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
 };
 
 export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
@@ -62,7 +73,10 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
 
   const handleSave = useCallback(() => {
     const store = getStore();
-    if (!store) { toast.error("Armazenamento local indisponível"); return; }
+    if (!store) {
+      toast.error("Armazenamento local indisponível");
+      return;
+    }
     try {
       const next = saveScenario(store, { name, projection });
       setScenarios(next);
@@ -87,22 +101,28 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
 
   const canSave = projection.selectedCount > 0 && name.trim().length > 0;
 
-  const currentAsScenario: ScenarioLike = useMemo(() => ({
-    id: "__current__",
-    name: "Seleção atual",
-    baselineOtif: projection.baselineOtif,
-    projectedOtif: projection.projectedOtif,
-    totalGain: projection.totalGain,
-    confidence: projection.confidence,
-    categories: projection.contributions.map((c) => c.category),
-  }), [projection]);
+  const currentAsScenario: ScenarioLike = useMemo(
+    () => ({
+      id: "__current__",
+      name: "Seleção atual",
+      baselineOtif: projection.baselineOtif,
+      projectedOtif: projection.projectedOtif,
+      totalGain: projection.totalGain,
+      confidence: projection.confidence,
+      categories: projection.contributions.map((c) => c.category),
+    }),
+    [projection],
+  );
 
-  const resolveScenario = useCallback((id: string): ScenarioLike | null => {
-    if (!id) return null;
-    if (id === "__current__") return currentAsScenario;
-    const s = scenarios.find((x) => x.id === id);
-    return s ? toScenarioLike(s) : null;
-  }, [scenarios, currentAsScenario]);
+  const resolveScenario = useCallback(
+    (id: string): ScenarioLike | null => {
+      if (!id) return null;
+      if (id === "__current__") return currentAsScenario;
+      const s = scenarios.find((x) => x.id === id);
+      return s ? toScenarioLike(s) : null;
+    },
+    [scenarios, currentAsScenario],
+  );
 
   const diff = useMemo(() => {
     const A = resolveScenario(pickA);
@@ -119,11 +139,17 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
           <CardTitle>Simulador What-if</CardTitle>
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
-          <Badge variant="outline">Baseline: {projection.baselineOtif.toFixed(1)}%</Badge>
-          <Badge variant={projection.totalGain >= 0 ? "default" : "destructive"}>
+          <Badge variant="outline">
+            Baseline: {projection.baselineOtif.toFixed(1)}%
+          </Badge>
+          <Badge
+            variant={projection.totalGain >= 0 ? "default" : "destructive"}
+          >
             Projetado: {projection.projectedOtif.toFixed(1)}%
           </Badge>
-          <Badge variant="secondary">Confiança: {Math.round(projection.confidence * 100)}%</Badge>
+          <Badge variant="secondary">
+            Confiança: {Math.round(projection.confidence * 100)}%
+          </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -138,22 +164,36 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
             <div className="rounded-lg border bg-muted/20 p-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2 font-medium">
-                  <TrendingUp className="h-4 w-4 text-primary" /> Ganho combinado projetado
+                  <TrendingUp className="h-4 w-4 text-primary" /> Ganho
+                  combinado projetado
                 </span>
-                <span className={cn("text-lg font-bold tabular-nums", projection.totalGain >= 0 ? "text-success" : "text-destructive")}>
-                  {projection.totalGain > 0 ? "+" : ""}{projection.totalGain.toFixed(2)} pts
+                <span
+                  className={cn(
+                    "text-lg font-bold tabular-nums",
+                    projection.totalGain >= 0
+                      ? "text-success"
+                      : "text-destructive",
+                  )}
+                >
+                  {projection.totalGain > 0 ? "+" : ""}
+                  {projection.totalGain.toFixed(2)} pts
                 </span>
               </div>
               <Progress value={projection.projectedOtif} className="mt-2 h-2" />
               <p className="mt-1 text-xs text-muted-foreground">
-                {projection.selectedCount} mitigação(ões) selecionada(s) · retornos decrescentes aplicados
+                {projection.selectedCount} mitigação(ões) selecionada(s) ·
+                retornos decrescentes aplicados
               </p>
             </div>
 
             <ul className="space-y-2">
               {ranked.map((m) => {
                 const isOn = selected.has(m.category);
-                const contribution = projection.contributions.find((c) => c.category === m.category);
+                const contribution = projection.contributions.find(
+                  (c) => c.category === m.category,
+                );
+                const contribVariant: "default" | "outline" =
+                  contribution?.source === "historico" ? "default" : "outline";
                 return (
                   <li
                     key={m.category}
@@ -177,13 +217,19 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
                           <p className="truncate font-medium">{m.headline}</p>
                         </div>
                         {contribution ? (
-                          <Badge variant={contribution.source === "historico" ? "default" : "outline"} className="shrink-0 gap-1">
+                          <Badge
+                            variant={contribVariant}
+                            className="shrink-0 gap-1"
+                          >
                             <Sparkles className="h-3 w-3" />
                             {contribution.expectedGain > 0 ? "+" : ""}
-                            {contribution.expectedGain.toFixed(1)} pts · {contribution.source}
+                            {contribution.expectedGain.toFixed(1)} pts ·{" "}
+                            {contribution.source}
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="shrink-0">Score {m.effectiveScore}</Badge>
+                          <Badge variant="outline" className="shrink-0">
+                            Score {m.effectiveScore}
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -209,29 +255,44 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
               </div>
               {scenarios.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  Nenhum cenário salvo. Selecione mitigações e salve para comparar projeções depois.
+                  Nenhum cenário salvo. Selecione mitigações e salve para
+                  comparar projeções depois.
                 </p>
               ) : (
                 <ul className="space-y-2">
                   {scenarios.map((s) => {
                     const gain = s.totalGain;
                     return (
-                      <li key={s.id} className="flex items-start justify-between gap-2 rounded-md border bg-background p-2">
+                      <li
+                        key={s.id}
+                        className="flex items-start justify-between gap-2 rounded-md border bg-background p-2"
+                      >
                         <button
                           type="button"
                           onClick={() => handleRestore(s)}
                           className="min-w-0 flex-1 text-left"
                         >
-                          <p className="truncate text-sm font-medium">{s.name}</p>
+                          <p className="truncate text-sm font-medium">
+                            {s.name}
+                          </p>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(s.createdAt).toLocaleString("pt-BR")} · {s.categories.length} mitigação(ões)
+                            {new Date(s.createdAt).toLocaleString("pt-BR")} ·{" "}
+                            {s.categories.length} mitigação(ões)
                           </p>
                           <div className="mt-1 flex flex-wrap gap-1 text-[11px]">
-                            <Badge variant="outline">Base {s.baselineOtif.toFixed(1)}%</Badge>
-                            <Badge variant={gain >= 0 ? "default" : "destructive"}>
-                              Proj {s.projectedOtif.toFixed(1)}% ({gain >= 0 ? "+" : ""}{gain.toFixed(1)})
+                            <Badge variant="outline">
+                              Base {s.baselineOtif.toFixed(1)}%
                             </Badge>
-                            <Badge variant="secondary">Conf {Math.round(s.confidence * 100)}%</Badge>
+                            <Badge
+                              variant={gain >= 0 ? "default" : "destructive"}
+                            >
+                              Proj {s.projectedOtif.toFixed(1)}% (
+                              {gain >= 0 ? "+" : ""}
+                              {gain.toFixed(1)})
+                            </Badge>
+                            <Badge variant="secondary">
+                              Conf {Math.round(s.confidence * 100)}%
+                            </Badge>
                           </div>
                         </button>
                         <Button
@@ -252,7 +313,8 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
             {scenarios.length > 0 && (
               <div className="rounded-lg border bg-muted/10 p-3 space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <Sparkles className="h-4 w-4 text-primary" /> Comparar cenários
+                  <Sparkles className="h-4 w-4 text-primary" /> Comparar
+                  cenários
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <select
@@ -263,7 +325,9 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
                   >
                     <option value="">— Cenário A —</option>
                     {scenarios.map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
                     ))}
                   </select>
                   <select
@@ -274,35 +338,82 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
                   >
                     <option value="__current__">Seleção atual</option>
                     {scenarios.map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
                     ))}
                   </select>
                 </div>
                 {diff ? (
                   <div className="space-y-2 rounded-md border bg-background p-3 text-sm">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-medium">
-                        {diff.a.name} <span className="text-muted-foreground">vs</span> {diff.b.name}
-                      </span>
-                      <Badge variant={diff.winner === "tie" ? "outline" : "default"}>
-                        Vencedor: {diff.winner === "tie" ? "empate" : (diff.winner === "a" ? diff.a.name : diff.b.name)}
-                      </Badge>
-                    </div>
+                    {(() => {
+                      let winnerLabel: string;
+                      if (diff.winner === "tie") winnerLabel = "empate";
+                      else if (diff.winner === "a") winnerLabel = diff.a.name;
+                      else winnerLabel = diff.b.name;
+                      return (
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-medium">
+                            {diff.a.name}{" "}
+                            <span className="text-muted-foreground">vs</span>{" "}
+                            {diff.b.name}
+                          </span>
+                          <Badge
+                            variant={
+                              diff.winner === "tie" ? "outline" : "default"
+                            }
+                          >
+                            Vencedor: {winnerLabel}
+                          </Badge>
+                        </div>
+                      );
+                    })()}
                     <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-                      <Metric label="Δ OTIF proj." value={diff.projectedDelta} suffix="pts" />
-                      <Metric label="Δ Ganho" value={diff.gainDelta} suffix="pts" />
-                      <Metric label="Δ Confiança" value={diff.confidenceDelta * 100} suffix="%" digits={0} />
-                      <Metric label="Similaridade" value={diff.jaccard * 100} suffix="%" digits={0} neutral />
+                      <Metric
+                        label="Δ OTIF proj."
+                        value={diff.projectedDelta}
+                        suffix="pts"
+                      />
+                      <Metric
+                        label="Δ Ganho"
+                        value={diff.gainDelta}
+                        suffix="pts"
+                      />
+                      <Metric
+                        label="Δ Confiança"
+                        value={diff.confidenceDelta * 100}
+                        suffix="%"
+                        digits={0}
+                      />
+                      <Metric
+                        label="Similaridade"
+                        value={diff.jaccard * 100}
+                        suffix="%"
+                        digits={0}
+                        neutral
+                      />
                     </div>
                     {Math.abs(diff.baselineDrift) > 0.01 && (
                       <p className="text-xs text-warning">
-                        ⚠ Baseline diferente entre cenários (drift {diff.baselineDrift > 0 ? "+" : ""}{diff.baselineDrift} pts) — comparação pode ser enviesada.
+                        ⚠ Baseline diferente entre cenários (drift{" "}
+                        {diff.baselineDrift > 0 ? "+" : ""}
+                        {diff.baselineDrift} pts) — comparação pode ser
+                        enviesada.
                       </p>
                     )}
                     <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-3">
-                      <CatList title="Compartilhadas" items={diff.sharedCategories} />
-                      <CatList title={`Só em ${diff.a.name}`} items={diff.onlyInA} />
-                      <CatList title={`Só em ${diff.b.name}`} items={diff.onlyInB} />
+                      <CatList
+                        title="Compartilhadas"
+                        items={diff.sharedCategories}
+                      />
+                      <CatList
+                        title={`Só em ${diff.a.name}`}
+                        items={diff.onlyInA}
+                      />
+                      <CatList
+                        title={`Só em ${diff.b.name}`}
+                        items={diff.onlyInB}
+                      />
                     </div>
                   </div>
                 ) : (
@@ -319,25 +430,53 @@ export function WhatIfPanel({ ranked, baselineOtif }: WhatIfPanelProps) {
   );
 }
 
-interface MetricProps { label: string; value: number; suffix?: string; digits?: number; neutral?: boolean }
-function Metric({ label, value, suffix = "", digits = 2, neutral = false }: MetricProps) {
+interface MetricProps {
+  label: string;
+  value: number;
+  suffix?: string;
+  digits?: number;
+  neutral?: boolean;
+}
+function Metric({
+  label,
+  value,
+  suffix = "",
+  digits = 2,
+  neutral = false,
+}: MetricProps) {
   const positive = value > 0.005;
   const negative = value < -0.005;
-  const color = neutral ? "text-foreground" : positive ? "text-success" : negative ? "text-destructive" : "text-muted-foreground";
+  let color: string;
+  if (neutral) color = "text-foreground";
+  else if (positive) color = "text-success";
+  else if (negative) color = "text-destructive";
+  else color = "text-muted-foreground";
   return (
     <div className="rounded border bg-muted/20 p-2">
-      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
       <p className={cn("font-semibold tabular-nums", color)}>
-        {positive ? "+" : ""}{value.toFixed(digits)}{suffix}
+        {positive ? "+" : ""}
+        {value.toFixed(digits)}
+        {suffix}
       </p>
     </div>
   );
 }
 
-function CatList({ title, items }: { title: string; items: readonly RootCauseCategory[] }) {
+function CatList({
+  title,
+  items,
+}: {
+  title: string;
+  items: readonly RootCauseCategory[];
+}) {
   return (
     <div className="rounded border bg-muted/10 p-2">
-      <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">{title}</p>
+      <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+        {title}
+      </p>
       {items.length === 0 ? (
         <p className="text-[11px] text-muted-foreground">—</p>
       ) : (

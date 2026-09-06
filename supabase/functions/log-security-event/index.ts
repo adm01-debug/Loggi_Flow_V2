@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
+import { requireUser } from "../_shared/auth.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,6 +25,32 @@ serve(async (req: Request) => {
   }
 
   try {
+    const rl = await checkRateLimit(req, "log-security-event", {
+      maxRequests: 60,
+      windowMs: 60_000,
+    });
+    if (!rl.allowed) {
+      return new Response(
+        JSON.stringify({ error: "rate_limited" }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "Retry-After": "60",
+          },
+        }
+      );
+    }
+
+    const auth = await requireUser(req);
+    if (!auth.ok) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -31,6 +59,12 @@ serve(async (req: Request) => {
     });
 
     const event: SecurityEventRequest = await req.json();
+
+    // Usuário autenticado só registra eventos em nome próprio: sobrescreve o
+    // user_id do payload com o sub do token para impedir falsificação.
+    if (auth.claims.role === "authenticated") {
+      event.user_id = auth.claims.sub;
+    }
 
     if (!event.event_type || !event.description) {
       return new Response(

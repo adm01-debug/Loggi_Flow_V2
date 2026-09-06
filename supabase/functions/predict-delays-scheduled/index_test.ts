@@ -15,3 +15,13 @@ Deno.test("predict-delays-scheduled: never leaks secrets and never 5xx to anon",
   assertEquals(res.status < 500, true);
   assert(!/LOVABLE_API_KEY|service_role|SUPABASE_SERVICE_ROLE_KEY/i.test(body));
 });
+
+Deno.test("predict-delays-scheduled: request sem auth retorna 401", async () => {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/predict-delays-scheduled`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: ANON },
+    body: JSON.stringify({}),
+  });
+  await res.text();
+  assertEquals(res.status, 401);
+});

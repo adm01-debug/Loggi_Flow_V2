@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 import { CalendarRange, Download } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -45,13 +51,18 @@ export function RTESLOReportPanel({
   className,
 }: RTESLOReportPanelProps) {
   const [expanded, setExpanded] = useState(false);
-  const report = useMemo(() => buildSLOReport(samples, target), [samples, target]);
+  const report = useMemo(
+    () => buildSLOReport(samples, target),
+    [samples, target],
+  );
 
   const visibleRows = expanded ? report.rows : report.rows.slice(-12);
 
   const handleExport = () => {
     const csv = sloReportToCSV(report.rows);
-    const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob([`\ufeff${csv}`], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -62,6 +73,16 @@ export function RTESLOReportPanel({
     URL.revokeObjectURL(url);
   };
 
+  let description: string;
+  if (report.summary.rows > 0) {
+    const worst = report.summary.worstGateway
+      ? ` · pior: ${labels[report.summary.worstGateway] ?? report.summary.worstGateway}`
+      : "";
+    description = `${report.summary.days} dia(s) · ${report.summary.compliancePct.toFixed(1)}% em conformidade · uptime médio ${report.summary.avgUptimePct.toFixed(1)}%${worst}`;
+  } else {
+    description = "Sem histórico suficiente para gerar o relatório.";
+  }
+
   return (
     <Card className={cn("card-flat", className)}>
       <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
@@ -70,15 +91,7 @@ export function RTESLOReportPanel({
             <CalendarRange className="h-4 w-4 text-primary" aria-hidden />
             Conformidade diária de SLO
           </CardTitle>
-          <CardDescription>
-            {report.summary.rows > 0
-              ? `${report.summary.days} dia(s) · ${report.summary.compliancePct.toFixed(1)}% em conformidade · uptime médio ${report.summary.avgUptimePct.toFixed(1)}%${
-                  report.summary.worstGateway
-                    ? ` · pior: ${labels[report.summary.worstGateway] ?? report.summary.worstGateway}`
-                    : ""
-                }`
-              : "Sem histórico suficiente para gerar o relatório."}
-          </CardDescription>
+          <CardDescription>{description}</CardDescription>
         </div>
         <Button
           type="button"
@@ -105,28 +118,50 @@ export function RTESLOReportPanel({
               <table className="w-full text-left text-xs">
                 <thead className="text-muted-foreground">
                   <tr>
-                    <th scope="col" className="py-2 pr-3 font-medium">Dia</th>
-                    <th scope="col" className="py-2 pr-3 font-medium">Gateway</th>
-                    <th scope="col" className="py-2 pr-3 font-medium">Uptime</th>
-                    <th scope="col" className="py-2 pr-3 font-medium">P95</th>
-                    <th scope="col" className="py-2 pr-3 font-medium">Budget</th>
-                    <th scope="col" className="py-2 font-medium">Status</th>
+                    <th scope="col" className="py-2 pr-3 font-medium">
+                      Dia
+                    </th>
+                    <th scope="col" className="py-2 pr-3 font-medium">
+                      Gateway
+                    </th>
+                    <th scope="col" className="py-2 pr-3 font-medium">
+                      Uptime
+                    </th>
+                    <th scope="col" className="py-2 pr-3 font-medium">
+                      P95
+                    </th>
+                    <th scope="col" className="py-2 pr-3 font-medium">
+                      Budget
+                    </th>
+                    <th scope="col" className="py-2 font-medium">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {visibleRows.map((row) => (
-                    <tr key={`${row.day}-${row.gateway}`} className="border-t border-border">
+                    <tr
+                      key={`${row.day}-${row.gateway}`}
+                      className="border-t border-border"
+                    >
                       <td className="py-2 pr-3 text-foreground">{row.day}</td>
                       <td className="py-2 pr-3 text-muted-foreground">
                         {labels[row.gateway] ?? row.gateway}
                       </td>
-                      <td className="py-2 pr-3 text-muted-foreground">{row.uptimePct.toFixed(1)}%</td>
-                      <td className="py-2 pr-3 text-muted-foreground">{row.p95LatencyMs}ms</td>
+                      <td className="py-2 pr-3 text-muted-foreground">
+                        {row.uptimePct.toFixed(1)}%
+                      </td>
+                      <td className="py-2 pr-3 text-muted-foreground">
+                        {row.p95LatencyMs}ms
+                      </td>
                       <td className="py-2 pr-3 text-muted-foreground">
                         {row.errorBudgetUsedPct.toFixed(1)}%
                       </td>
                       <td className="py-2">
-                        <Badge variant="outline" className={cn("text-[10px]", STATUS_TONE[row.status])}>
+                        <Badge
+                          variant="outline"
+                          className={cn("text-[10px]", STATUS_TONE[row.status])}
+                        >
                           {STATUS_LABEL[row.status]}
                         </Badge>
                       </td>
@@ -144,7 +179,9 @@ export function RTESLOReportPanel({
                 className="w-full"
                 onClick={() => setExpanded((value) => !value)}
               >
-                {expanded ? "Mostrar menos" : `Ver todos os ${report.rows.length} registros`}
+                {expanded
+                  ? "Mostrar menos"
+                  : `Ver todos os ${report.rows.length} registros`}
               </Button>
             )}
           </>

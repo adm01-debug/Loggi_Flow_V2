@@ -4,14 +4,22 @@ import { GiftCard } from "./GiftCard";
 import { useGamification } from "@/hooks/gamification/useGamification";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Gift, Star, Zap } from "lucide-react";
+import { Trophy, Gift, Star } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 export const GamificationPanel: React.FC = () => {
   const { user } = useAuth();
-  const { badges, gifts, unlockedAchievementIds, userLevel, levelProgress, isLoading } = useGamification(user?.id);
+  const {
+    badges,
+    gifts,
+    unlockedAchievementIds,
+    userLevel,
+    levelProgress,
+    isLoading,
+  } = useGamification(user?.id);
 
-  if (isLoading) return <div className="p-8 text-center">Carregando Gamificação...</div>;
+  if (isLoading)
+    return <div className="p-8 text-center">Carregando Gamificação...</div>;
 
   return (
     <div className="space-y-6">
@@ -20,7 +28,9 @@ export const GamificationPanel: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-              <span className="text-2xl font-black text-primary">{userLevel.level}</span>
+              <span className="text-2xl font-black text-primary">
+                {userLevel.level}
+              </span>
             </div>
             <div>
               <h2 className="text-xl font-bold tracking-tight">Nível Atual</h2>

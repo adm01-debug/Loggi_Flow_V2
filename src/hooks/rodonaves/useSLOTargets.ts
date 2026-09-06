@@ -25,7 +25,9 @@ export interface SLOTargetRow {
 const QUERY_KEY = ["rte-slo-targets"] as const;
 
 /** Converte uma linha do banco no formato do motor de SLO. */
-export function rowToTarget(row: Pick<SLOTargetRow, "uptime_target_pct" | "latency_p95_budget_ms">): GatewaySLOTarget {
+export function rowToTarget(
+  row: Pick<SLOTargetRow, "uptime_target_pct" | "latency_p95_budget_ms">,
+): GatewaySLOTarget {
   return normalizeTarget({
     uptimeTargetPct: Number(row.uptime_target_pct),
     latencyP95BudgetMs: Number(row.latency_p95_budget_ms),
@@ -48,7 +50,9 @@ export function useSLOTargets() {
     queryFn: async (): Promise<SLOTargetRow[]> => {
       const { data, error } = await supabase
         .from("rte_slo_targets")
-        .select("id, gateway, uptime_target_pct, latency_p95_budget_ms, updated_at, updated_by")
+        .select(
+          "id, gateway, uptime_target_pct, latency_p95_budget_ms, updated_at, updated_by",
+        )
         .order("gateway", { ascending: true });
       if (error) throw error;
       return (data ?? []) as SLOTargetRow[];
@@ -61,11 +65,14 @@ export function useSLOTargets() {
   const globalRow = rows.find((row) => row.gateway === GLOBAL_SLO_GATEWAY);
 
   // Fonte da verdade: banco → localStorage → default.
-  const globalTarget: GatewaySLOTarget = globalRow
-    ? rowToTarget(globalRow)
-    : query.isError
-      ? loadSLOTarget()
-      : { ...DEFAULT_SLO_TARGET };
+  let globalTarget: GatewaySLOTarget;
+  if (globalRow) {
+    globalTarget = rowToTarget(globalRow);
+  } else if (query.isError) {
+    globalTarget = loadSLOTarget();
+  } else {
+    globalTarget = { ...DEFAULT_SLO_TARGET };
+  }
 
   /** Meta efetiva de um gateway (override específico ou meta global). */
   const targetFor = (gateway: string): GatewaySLOTarget => {
@@ -74,7 +81,10 @@ export function useSLOTargets() {
   };
 
   const saveTarget = useMutation({
-    mutationFn: async (input: { gateway?: string; target: Partial<GatewaySLOTarget> }) => {
+    mutationFn: async (input: {
+      gateway?: string;
+      target: Partial<GatewaySLOTarget>;
+    }) => {
       const gateway = input.gateway ?? GLOBAL_SLO_GATEWAY;
       const normalized = normalizeTarget(input.target);
       // Espelho local: garante continuidade caso o banco fique indisponível.
@@ -92,9 +102,7 @@ export function useSLOTargets() {
       if (error) throw error;
       return normalized;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
   });
 
   return {

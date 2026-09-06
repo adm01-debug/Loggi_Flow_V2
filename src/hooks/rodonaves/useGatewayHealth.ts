@@ -46,7 +46,10 @@ const HISTORY_KEY = ["rte-gateway-health", "history"] as const;
 function percentile(values: number[], p: number): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1);
+  const index = Math.min(
+    sorted.length - 1,
+    Math.ceil((p / 100) * sorted.length) - 1,
+  );
   return sorted[Math.max(0, index)];
 }
 
@@ -63,7 +66,8 @@ export function aggregateUptime(rows: GatewayHealthRow[]): GatewayUptime[] {
     .map(([gateway, list]) => {
       // O histórico chega ordenado do mais recente para o mais antigo.
       const ordered = [...list].sort(
-        (a, b) => new Date(b.checked_at).getTime() - new Date(a.checked_at).getTime(),
+        (a, b) =>
+          new Date(b.checked_at).getTime() - new Date(a.checked_at).getTime(),
       );
       const latencies = ordered.map((r) => r.latency_ms);
       const onlineCount = ordered.filter((r) => r.online).length;
@@ -72,7 +76,9 @@ export function aggregateUptime(rows: GatewayHealthRow[]): GatewayUptime[] {
         checks: ordered.length,
         uptimePct: ordered.length ? (onlineCount / ordered.length) * 100 : 0,
         avgLatencyMs: latencies.length
-          ? Math.round(latencies.reduce((sum, v) => sum + v, 0) / latencies.length)
+          ? Math.round(
+              latencies.reduce((sum, v) => sum + v, 0) / latencies.length,
+            )
           : 0,
         p95LatencyMs: Math.round(percentile(latencies, 95)),
         lastOnline: ordered[0]?.online ?? false,
@@ -100,9 +106,12 @@ export function useGatewayHealth(hours = 24) {
   const downtime = useQuery({
     queryKey: [...HISTORY_KEY, "downtime"],
     queryFn: async (): Promise<GatewayDowntime[]> => {
-      const { data, error } = await supabase.rpc("rte_gateway_sustained_downtime", {
-        window_hours: 2,
-      });
+      const { data, error } = await supabase.rpc(
+        "rte_gateway_sustained_downtime",
+        {
+          window_hours: 2,
+        },
+      );
       if (error) throw error;
       return (data ?? []) as GatewayDowntime[];
     },
@@ -116,7 +125,9 @@ export function useGatewayHealth(hours = 24) {
       const since = new Date(Date.now() - hours * 3_600_000).toISOString();
       const { data, error } = await supabase
         .from("rte_gateway_health")
-        .select("id, gateway, online, http_status, latency_ms, error_message, checked_at")
+        .select(
+          "id, gateway, online, http_status, latency_ms, error_message, checked_at",
+        )
         .gte("checked_at", since)
         .order("checked_at", { ascending: false })
         .limit(2000);
@@ -134,15 +145,17 @@ export function useGatewayHealth(hours = 24) {
         body: { action: "health-all", persist: true },
       });
       if (error) throw error;
-      const payload = data as { success?: boolean; data?: GatewayHealthResult; error?: string };
+      const payload = data as {
+        success?: boolean;
+        data?: GatewayHealthResult;
+        error?: string;
+      };
       if (!payload?.success || !payload.data) {
         throw new Error(payload?.error ?? "Falha ao verificar os gateways");
       }
       return payload.data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: HISTORY_KEY });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: HISTORY_KEY }),
   });
 
   return {

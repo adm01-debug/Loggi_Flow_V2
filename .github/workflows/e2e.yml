@@ -1,0 +1,24 @@
+# E2E (Playwright) — manual até estabilizar: os specs em tests/e2e fazem login com
+# credenciais que precisam existir no ambiente alvo. Antes de tornar isso um gate:
+# seedar usuário de teste + passar credenciais via secrets (E2E_EMAIL/E2E_PASSWORD)
+# e ajustar os specs para lê-las de process.env.
+name: E2E (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e -- --project=chromium

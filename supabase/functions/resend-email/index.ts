@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireInternalSecret, requireUser } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,6 +19,17 @@ serve(async (req) => {
   }
 
   try {
+    // Só functions internas: exige Bearer service_role ou x-internal-secret.
+    if (!requireInternalSecret(req)) {
+      const auth = await requireUser(req);
+      if (!auth.ok || auth.claims.role !== "service_role") {
+        return new Response(
+          JSON.stringify({ success: false, error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
       throw new Error("RESEND_API_KEY not configured");

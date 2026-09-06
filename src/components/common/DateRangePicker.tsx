@@ -1,12 +1,26 @@
 import * as React from "react";
-import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, startOfQuarter, endOfQuarter } from "date-fns";
+import {
+  format,
+  subDays,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
+  startOfQuarter,
+  endOfQuarter,
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar as CalendarIcon, X, ChevronDown } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { motion } from "framer-motion";
 
 // Presets de períodos
@@ -37,7 +51,10 @@ export const dateRangePresets = {
   },
   thisWeek: () => {
     const now = new Date();
-    return { from: startOfWeek(now, { locale: ptBR }), to: endOfWeek(now, { locale: ptBR }) };
+    return {
+      from: startOfWeek(now, { locale: ptBR }),
+      to: endOfWeek(now, { locale: ptBR }),
+    };
   },
   lastWeek: () => {
     const lastWeekStart = startOfWeek(subDays(new Date(), 7), { locale: ptBR });
@@ -102,7 +119,9 @@ export function DateRangePicker({
   showPresets = true,
 }: DateRangePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [selectedPreset, setSelectedPreset] = React.useState<string | null>(null);
+  const [selectedPreset, setSelectedPreset] = React.useState<string | null>(
+    null,
+  );
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -110,7 +129,10 @@ export function DateRangePicker({
     setSelectedPreset(null);
   };
 
-  const handlePresetClick = (preset: keyof typeof dateRangePresets, label: string) => {
+  const handlePresetClick = (
+    preset: keyof typeof dateRangePresets,
+    label: string,
+  ) => {
     const range = dateRangePresets[preset]();
     onChange(range);
     setSelectedPreset(label);
@@ -127,23 +149,27 @@ export function DateRangePicker({
 
   const renderLabel = () => {
     if (!value?.from) return <span className="truncate">{placeholder}</span>;
-    
+
     if (value.to) {
       if (selectedPreset) {
-        return <span className="font-medium text-primary">{selectedPreset}</span>;
+        return (
+          <span className="font-medium text-primary">{selectedPreset}</span>
+        );
       }
       return (
         <>
           <span className="hidden sm:inline">
-            {format(value.from, "dd/MM/yyyy", { locale: ptBR })} - {format(value.to, "dd/MM/yyyy", { locale: ptBR })}
+            {format(value.from, "dd/MM/yyyy", { locale: ptBR })} -{" "}
+            {format(value.to, "dd/MM/yyyy", { locale: ptBR })}
           </span>
           <span className="sm:hidden">
-            {format(value.from, "dd/MM", { locale: ptBR })} - {format(value.to, "dd/MM", { locale: ptBR })}
+            {format(value.from, "dd/MM", { locale: ptBR })} -{" "}
+            {format(value.to, "dd/MM", { locale: ptBR })}
           </span>
         </>
       );
     }
-    
+
     return <span>{format(value.from, "dd/MM/yyyy", { locale: ptBR })}</span>;
   };
 
@@ -157,13 +183,11 @@ export function DateRangePicker({
             disabled={disabled}
             className={cn(
               "justify-start text-left font-normal h-10 min-h-[44px] text-xs sm:text-sm group",
-              !value && "text-muted-foreground"
+              !value && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-1.5 sm:mr-2 h-4 w-4 shrink-0 group-hover:text-primary transition-colors" />
-            <span className="truncate flex-1">
-              {renderLabel()}
-            </span>
+            <span className="truncate flex-1">{renderLabel()}</span>
             {value ? (
               <X
                 className="ml-auto h-4 w-4 opacity-50 hover:opacity-100 shrink-0 hover:text-destructive transition-colors"
@@ -179,16 +203,21 @@ export function DateRangePicker({
             {/* Presets sidebar */}
             {showPresets && (
               <div className="border-b sm:border-b-0 sm:border-r border-border p-2 sm:p-3 sm:w-44 flex-shrink-0">
-                <p className="text-xs font-medium text-muted-foreground mb-2 px-2">Atalhos</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2 px-2">
+                  Atalhos
+                </p>
                 <div className="flex flex-wrap sm:flex-col gap-1">
                   {presetButtons.map((preset) => (
                     <motion.button
                       key={preset.value}
-                      onClick={() => handlePresetClick(preset.value, preset.label)}
+                      onClick={() =>
+                        handlePresetClick(preset.value, preset.label)
+                      }
                       className={cn(
                         "text-left text-xs sm:text-sm px-2 sm:px-3 py-1.5 rounded-md transition-colors",
                         "hover:bg-accent hover:text-accent-foreground",
-                        selectedPreset === preset.label && "bg-primary/10 text-primary font-medium"
+                        selectedPreset === preset.label &&
+                          "bg-primary/10 text-primary font-medium",
                       )}
                       whileHover={{ x: 2 }}
                       whileTap={{ scale: 0.98 }}
@@ -203,12 +232,16 @@ export function DateRangePicker({
             {/* Calendar */}
             <div>
               <Calendar
-                initialFocus
+                autoFocus
                 mode="range"
                 defaultMonth={value?.from}
                 selected={value}
                 onSelect={handleCustomSelect}
-                numberOfMonths={typeof window !== 'undefined' && window.innerWidth < 640 ? 1 : 2}
+                numberOfMonths={
+                  typeof window !== "undefined" && window.innerWidth < 640
+                    ? 1
+                    : 2
+                }
                 locale={ptBR}
                 className="text-sm p-3"
               />
@@ -216,7 +249,11 @@ export function DateRangePicker({
                 <span className="text-xs text-muted-foreground">
                   {value?.from && value?.to && (
                     <>
-                      {Math.ceil((value.to.getTime() - value.from.getTime()) / (1000 * 60 * 60 * 24)) + 1} dias selecionados
+                      {Math.ceil(
+                        (value.to.getTime() - value.from.getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      ) + 1}{" "}
+                      dias selecionados
                     </>
                   )}
                 </span>

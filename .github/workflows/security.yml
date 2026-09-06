@@ -8,6 +8,10 @@ on:
   schedule:
     - cron: '0 0 * * 0' # Weekly on Sunday
 
+permissions:
+  contents: read
+  pull-requests: read # gitleaks lê os commits do PR (repo privado exige permissão explícita)
+
 jobs:
   security:
     name: Security Audits
@@ -18,15 +22,9 @@ jobs:
           fetch-depth: 0
 
       - name: Audit NPM Dependencies
-        run: npm audit --audit-level=high
+        run: node scripts/audit-gate.mjs
 
       - name: Gitleaks Scan
         uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

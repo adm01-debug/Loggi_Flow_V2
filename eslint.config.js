@@ -72,4 +72,12 @@ export default tseslint.config(
       // sonarjs/link-with-target-blank remain at their recommended "error" severity.
     },
   },
+  {
+    // Padrão shadcn/ui: os arquivos exportam variants/hooks junto dos componentes.
+    // A regra só protege o fast-refresh do dev server; não se aplica a esta pasta.
+    files: ["src/components/ui/**"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );

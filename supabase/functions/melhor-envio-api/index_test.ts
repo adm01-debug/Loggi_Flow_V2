@@ -15,3 +15,26 @@ Deno.test("melhor-envio-api: rejects invalid action without 5xx", async () => {
   assertEquals(res.status < 500, true);
   assert(!/service_role|SUPABASE_SERVICE_ROLE_KEY|MELHOR_ENVIO_TOKEN/i.test(body));
 });
+
+Deno.test("melhor-envio-api: request sem auth retorna 401", async () => {
+  // Sem Authorization e com o anon key como Bearer — ambos rejeitados.
+  const semAuth = await fetch(`${SUPABASE_URL}/functions/v1/melhor-envio-api`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: ANON },
+    body: JSON.stringify({ action: "listarTransportadoras" }),
+  });
+  await semAuth.text();
+  assertEquals(semAuth.status, 401);
+
+  const anonBearer = await fetch(`${SUPABASE_URL}/functions/v1/melhor-envio-api`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: ANON,
+      Authorization: `Bearer ${ANON}`,
+    },
+    body: JSON.stringify({ action: "listarTransportadoras" }),
+  });
+  await anonBearer.text();
+  assertEquals(anonBearer.status, 401);
+});

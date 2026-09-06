@@ -1,0 +1,25 @@
+-- Runbook pós-deploy das edge functions (auditoria 2026-09-02)
+-- As 5 functions fechadas (resend-email, evolution-whatsapp, melhor-envio-api,
+-- log-security-event, predict-delays-scheduled) exigem JWT de usuário, service_role
+-- ou o header x-internal-secret. Os crons já enviam x-internal-secret (vault).
+--
+-- PASSO 1 — pegar o valor do secret compartilhado (rodar no SQL editor do projeto):
+--   SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'internal_fn_secret';
+--
+-- PASSO 2 — setar a env nas functions e deployar (terminal, com SUPABASE_ACCESS_TOKEN
+-- da conta dona do projeto jvfhclubfpxrtrrazrgr):
+--   supabase secrets set INTERNAL_FN_SECRET=<valor do passo 1> --project-ref jvfhclubfpxrtrrazrgr
+--   supabase functions deploy --project-ref jvfhclubfpxrtrrazrgr
+--   (ou via GitHub: Actions -> "Deploy Edge Functions" depois de criar o secret
+--    SUPABASE_ACCESS_TOKEN em Settings -> Secrets and variables -> Actions)
+--
+-- PASSO 3 — validar (deve dar 401 sem auth e 200 com o secret):
+--   curl -s -o /dev/null -w '%{http_code}\n' -X POST \
+--     https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/resend-email
+--   -> esperado: 401
+--
+-- OPCIONAL — corrigir a service_role_key do vault (hoje é uma sb_secret de OUTRO
+-- projeto; "Unregistered API key"). Pegar a chave no painel (Settings -> API) e:
+--   SELECT vault.update_secret(
+--     (SELECT id FROM vault.secrets WHERE name='service_role_key'),
+--     '<service_role JWT ou sb_secret DESTE projeto>');

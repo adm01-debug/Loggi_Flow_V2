@@ -43,15 +43,18 @@ export type RTESeverity = "info" | "atencao" | "critico";
 /** Sistema de códigos de origem do evento. Nunca deve ser inferido. */
 export type RTECodeSystem = "event" | "step";
 
+/** Código cru vindo da API: string ("1.1"), número ou ausente. */
+export type RTERawCode = string | number | null;
+
 export interface RTERawEvent {
   /** Sistema de origem do evento (obrigatório — evita mistura de sistemas). */
   readonly system: RTECodeSystem;
   /** EventCode (system "event"). Aceita subníveis decimais como "1.1". */
-  readonly eventCode?: string | number | null;
+  readonly eventCode?: RTERawCode;
   /** ProcedaCode (system "event"). */
-  readonly procedaCode?: string | number | null;
+  readonly procedaCode?: RTERawCode;
   /** StepCode (system "step"). */
-  readonly stepCode?: string | number | null;
+  readonly stepCode?: RTERawCode;
   /** Descrição textual devolvida pela API (opcional). */
   readonly description?: string | null;
   /** Data ISO do evento (opcional). */
@@ -81,38 +84,36 @@ export const PHASE_LABELS: Readonly<Record<RTEPhase, string>> = {
 };
 
 /** Rótulos legíveis por categoria de exceção. */
-export const EXCEPTION_LABELS: Readonly<
-  Record<RTEExceptionCategory, string>
-> = {
-  tentativa: "Tentativa de entrega sem sucesso",
-  recusa: "Recusa do destinatário",
-  estabelecimento_fechado: "Estabelecimento fechado",
-  endereco_nao_localizado: "Endereço não localizado",
-  pessoa_nao_localizada: "Pessoa não localizada",
-  aguardando_retirada: "Aguardando retirada no balcão",
-  avaria: "Avaria na mercadoria",
-  extravio: "Extravio",
-  reagendado: "Entrega reagendada",
-  devolucao: "Devolvido ao remetente",
-  parcial: "Entrega parcial",
-};
+export const EXCEPTION_LABELS: Readonly<Record<RTEExceptionCategory, string>> =
+  {
+    tentativa: "Tentativa de entrega sem sucesso",
+    recusa: "Recusa do destinatário",
+    estabelecimento_fechado: "Estabelecimento fechado",
+    endereco_nao_localizado: "Endereço não localizado",
+    pessoa_nao_localizada: "Pessoa não localizada",
+    aguardando_retirada: "Aguardando retirada no balcão",
+    avaria: "Avaria na mercadoria",
+    extravio: "Extravio",
+    reagendado: "Entrega reagendada",
+    devolucao: "Devolvido ao remetente",
+    parcial: "Entrega parcial",
+  };
 
 /** Severidade de cada categoria de exceção. */
-const EXCEPTION_SEVERITY: Readonly<
-  Record<RTEExceptionCategory, RTESeverity>
-> = {
-  tentativa: "atencao",
-  recusa: "atencao",
-  estabelecimento_fechado: "atencao",
-  endereco_nao_localizado: "atencao",
-  pessoa_nao_localizada: "atencao",
-  aguardando_retirada: "atencao",
-  avaria: "critico",
-  extravio: "critico",
-  reagendado: "atencao",
-  devolucao: "critico",
-  parcial: "atencao",
-};
+const EXCEPTION_SEVERITY: Readonly<Record<RTEExceptionCategory, RTESeverity>> =
+  {
+    tentativa: "atencao",
+    recusa: "atencao",
+    estabelecimento_fechado: "atencao",
+    endereco_nao_localizado: "atencao",
+    pessoa_nao_localizada: "atencao",
+    aguardando_retirada: "atencao",
+    avaria: "critico",
+    extravio: "critico",
+    reagendado: "atencao",
+    devolucao: "critico",
+    parcial: "atencao",
+  };
 
 /**
  * EventCode → fase canônica (validado empiricamente em 5 meses de tracking).
@@ -165,7 +166,7 @@ export const TYPE_UNITY_LABELS: Readonly<Record<string, string>> = {
 };
 
 /** Normaliza um código cru para string comparável ("1.10" → "1.1"). */
-export function normalizeCode(value: string | number | null | undefined): string {
+export function normalizeCode(value: RTERawCode | undefined): string {
   if (value === null || value === undefined) return "";
   const text = String(value).trim();
   if (text === "") return "";
@@ -178,7 +179,7 @@ export function normalizeCode(value: string | number | null | undefined): string
 
 /** Resolve a fase a partir de um EventCode, considerando subníveis. */
 export function phaseFromEventCode(
-  eventCode: string | number | null | undefined,
+  eventCode: RTERawCode | undefined,
 ): RTEPhase {
   const code = normalizeCode(eventCode);
   if (code === "") return "desconhecido";
@@ -189,9 +190,7 @@ export function phaseFromEventCode(
 }
 
 /** Resolve a fase a partir de um StepCode. */
-export function phaseFromStepCode(
-  stepCode: string | number | null | undefined,
-): RTEPhase {
+export function phaseFromStepCode(stepCode: RTERawCode | undefined): RTEPhase {
   const code = normalizeCode(stepCode);
   if (code === "") return "desconhecido";
   return STEP_CODE_PHASE[code] ?? "desconhecido";
@@ -199,7 +198,7 @@ export function phaseFromStepCode(
 
 /** Resolve a categoria de exceção a partir de um ProcedaCode. */
 export function exceptionFromProcedaCode(
-  procedaCode: string | number | null | undefined,
+  procedaCode: RTERawCode | undefined,
 ): RTEExceptionCategory | null {
   const code = normalizeCode(procedaCode);
   if (code === "" || PROCEDA_OPERATIONAL.has(code)) return null;
@@ -232,12 +231,14 @@ export function normalizeRTEEvent(raw: RTERawEvent): RTENormalizedEvent {
     : "info";
 
   const description = raw.description?.trim();
-  const label =
-    exception !== null
-      ? EXCEPTION_LABELS[exception]
-      : description && description.length > 0
-        ? description
-        : PHASE_LABELS[phase];
+  let label: string;
+  if (exception !== null) {
+    label = EXCEPTION_LABELS[exception];
+  } else if (description && description.length > 0) {
+    label = description;
+  } else {
+    label = PHASE_LABELS[phase];
+  }
 
   return {
     system: raw.system,

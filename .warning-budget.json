@@ -1,6 +1,6 @@
 {
-  "$comment": "CI gate — see scripts/check-warning-budget.mjs. Lower these numbers as debt is paid; increases require reviewer approval.",
-  "lintWarnings": 0,
+  "$comment": "CI gate — see scripts/check-warning-budget.mjs. Lower these numbers as debt is paid; increases require reviewer approval. Baseline 46 medido em 2026-09-03 após upgrade eslint 9.32→9.39/typescript-eslint 8.46 (regras novas expuseram dívida pré-existente: 21 no-nested-conditional, 18 no-explicit-any, 6 cognitive-complexity, 1 max-lines). Errors permanecem 0.",
+  "lintWarnings": 46,
   "lintErrors": 0,
   "tsErrors": 0
 }

@@ -44,7 +44,7 @@ export const authService = {
     // não existir para este user, ignora silenciosamente.
     try {
       const today = new Date().toISOString().slice(0, 10);
-      await (supabase as any)
+      await supabase
         .from("user_levels")
         .update({ last_activity_date: today })
         .eq("user_id", userId);

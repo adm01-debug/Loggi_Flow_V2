@@ -3,6 +3,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
+import { requireUser } from "../_shared/auth.ts";
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,6 +13,35 @@ serve(async (req) => {
 
   let action: string | undefined;
   try {
+    const rl = await checkRateLimit(req, "evolution-whatsapp", {
+      maxRequests: 30,
+      windowMs: 60_000,
+    });
+    if (!rl.allowed) {
+      return new Response(
+        JSON.stringify({ success: false, error: "rate_limited" }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "Retry-After": "60",
+          },
+        },
+      );
+    }
+
+    const auth = await requireUser(req);
+    if (!auth.ok) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL");
     const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
 

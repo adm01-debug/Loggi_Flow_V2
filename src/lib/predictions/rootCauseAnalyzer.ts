@@ -49,7 +49,10 @@ const KEYWORD_MAP: ReadonlyArray<readonly [RegExp, RootCauseCategory]> = [
   [/(document|nota\s*fiscal|nf-?e|ct-?e)/i, "documentacao"],
   [/\b(dist[aâ]ncia|rota|km|percurso|longe)/i, "distancia"],
   [/\b(demanda|volume|pico|black|natal|sazon)/i, "demanda"],
-  [/\b(transportadora|carrier|frota|motorista|ve[ií]culo|greve|opera[cç][aã]o)/i, "transportadora"],
+  [
+    /\b(transportadora|carrier|frota|motorista|ve[ií]culo|greve|opera[cç][aã]o)/i,
+    "transportadora",
+  ],
 ];
 
 /** Classifica um motivo textual em uma categoria de causa raiz. */
@@ -62,12 +65,18 @@ export function classifyMotivo(motivo: string): RootCauseCategory {
   return "outros";
 }
 
+function unknownToString(m: unknown): string {
+  if (typeof m === "string") return m;
+  if (typeof m === "object" && m !== null) return JSON.stringify(m);
+  return String(m);
+}
+
 /** Normaliza o campo `motivos` (jsonb) em uma lista textual limpa. */
 export function normalizeMotivos(raw: unknown): string[] {
   if (!raw) return [];
   if (Array.isArray(raw)) {
     return raw
-      .map((m) => (typeof m === "string" ? m : typeof m === "object" && m !== null ? JSON.stringify(m) : String(m)))
+      .map(unknownToString)
       .map((s) => s.trim())
       .filter((s) => s.length > 0 && s.length <= 500);
   }
@@ -83,26 +92,70 @@ export function normalizeMotivos(raw: unknown): string[] {
 /** Considera "com atraso" quando o preditor errou OU houve atraso real registrado. */
 export function hasDelay(rec: PredictionRecord): boolean {
   if (rec.was_accurate === false) return true;
-  if (typeof rec.actual_delay_hours === "number" && rec.actual_delay_hours > 0) return true;
+  if (typeof rec.actual_delay_hours === "number" && rec.actual_delay_hours > 0)
+    return true;
   return false;
 }
 
 /** Estima horas de atraso a atribuir à ocorrência (fallback para estimativa). */
 export function delayHoursOf(rec: PredictionRecord): number {
-  if (typeof rec.actual_delay_hours === "number" && rec.actual_delay_hours > 0) {
+  if (
+    typeof rec.actual_delay_hours === "number" &&
+    rec.actual_delay_hours > 0
+  ) {
     return rec.actual_delay_hours;
   }
-  if (typeof rec.horas_estimadas_atraso === "number" && rec.horas_estimadas_atraso > 0) {
+  if (
+    typeof rec.horas_estimadas_atraso === "number" &&
+    rec.horas_estimadas_atraso > 0
+  ) {
     return rec.horas_estimadas_atraso;
   }
   return 0;
+}
+
+function collectCategories(motivos: string[]): Set<RootCauseCategory> {
+  const cats = new Set<RootCauseCategory>();
+  for (const motivo of motivos) cats.add(classifyMotivo(motivo));
+  if (cats.size === 0) cats.add("outros");
+  return cats;
+}
+
+function accumulateBucket(
+  map: Map<RootCauseCategory, CategoryBucket>,
+  cat: RootCauseCategory,
+  carrier: string,
+  motivos: string[],
+  delayShare: number,
+): void {
+  const bucket = map.get(cat) ?? {
+    category: cat,
+    count: 0,
+    totalDelayHours: 0,
+    carriers: {},
+    sampleMotivos: [],
+  };
+  bucket.count += 1;
+  bucket.totalDelayHours += delayShare;
+  bucket.carriers[carrier] = (bucket.carriers[carrier] ?? 0) + 1;
+  if (bucket.sampleMotivos.length < 5 && motivos.length > 0) {
+    for (const m of motivos) {
+      if (classifyMotivo(m) === cat && !bucket.sampleMotivos.includes(m)) {
+        bucket.sampleMotivos.push(m);
+        if (bucket.sampleMotivos.length >= 5) break;
+      }
+    }
+  }
+  map.set(cat, bucket);
 }
 
 /**
  * Agrega uma lista de predições em um relatório de causa raiz.
  * Cada motivo do registro conta uma vez por bucket detectado.
  */
-export function analyzeRootCauses(records: readonly PredictionRecord[]): RootCauseReport {
+export function analyzeRootCauses(
+  records: readonly PredictionRecord[],
+): RootCauseReport {
   const map = new Map<RootCauseCategory, CategoryBucket>();
   const carrierCount: Record<string, number> = {};
   let totalWithDelay = 0;
@@ -111,40 +164,23 @@ export function analyzeRootCauses(records: readonly PredictionRecord[]): RootCau
     if (!hasDelay(rec)) continue;
     totalWithDelay += 1;
 
-    const carrier = (rec.transportadora ?? "desconhecida").trim() || "desconhecida";
+    const carrier =
+      (rec.transportadora ?? "desconhecida").trim() || "desconhecida";
     carrierCount[carrier] = (carrierCount[carrier] ?? 0) + 1;
 
     const motivos = normalizeMotivos(rec.motivos);
-    const categoriesInRec = new Set<RootCauseCategory>();
-    for (const motivo of motivos) categoriesInRec.add(classifyMotivo(motivo));
-    if (categoriesInRec.size === 0) categoriesInRec.add("outros");
+    const categoriesInRec = collectCategories(motivos);
 
     const delayShare = delayHoursOf(rec);
     for (const cat of categoriesInRec) {
-      const bucket = map.get(cat) ?? {
-        category: cat,
-        count: 0,
-        totalDelayHours: 0,
-        carriers: {},
-        sampleMotivos: [],
-      };
-      bucket.count += 1;
-      bucket.totalDelayHours += delayShare;
-      bucket.carriers[carrier] = (bucket.carriers[carrier] ?? 0) + 1;
-      if (bucket.sampleMotivos.length < 5 && motivos.length > 0) {
-        for (const m of motivos) {
-          if (classifyMotivo(m) === cat && !bucket.sampleMotivos.includes(m)) {
-            bucket.sampleMotivos.push(m);
-            if (bucket.sampleMotivos.length >= 5) break;
-          }
-        }
-      }
-      map.set(cat, bucket);
+      accumulateBucket(map, cat, carrier, motivos, delayShare);
     }
   }
 
   const buckets = Array.from(map.values()).sort((a, b) => b.count - a.count);
-  const topCarrierEntry = Object.entries(carrierCount).sort((a, b) => b[1] - a[1])[0];
+  const topCarrierEntry = Object.entries(carrierCount).sort(
+    (a, b) => b[1] - a[1],
+  )[0];
 
   return {
     totalAnalyzed: records.length,
