@@ -17,10 +17,15 @@ const restHeaders = {
   'Content-Type': 'application/json',
 };
 
-let online = true;
+// Começa como offline: beforeAll confirma conectividade antes de liberar.
+// Evita timeout individual nos testes quando o runner não alcança o Supabase.
+let online = false;
 beforeAll(async () => {
   try {
-    const r = await fetch(`${SUPABASE_URL}/auth/v1/health`, { headers: { apikey: ANON_KEY } });
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+      headers: { apikey: ANON_KEY },
+      signal: AbortSignal.timeout(4000),
+    });
     online = r.ok;
   } catch {
     online = false;
@@ -96,7 +101,8 @@ describe('Integração: chamadas simuladas de webhook público', () => {
   ];
 
   for (const fn of endpoints) {
-    it(`${fn} rejeita payload inválido sem 5xx`, async () => {
+    // timeout alto: Edge Functions têm cold-start de ~5-8s em runners CI
+    it(`${fn} rejeita payload inválido sem 5xx`, { timeout: 15000 }, async () => {
       if (!online) return;
       const r = await fetch(`${SUPABASE_URL}/functions/v1/${fn}`, {
         method: 'POST',
@@ -106,6 +112,7 @@ describe('Integração: chamadas simuladas de webhook público', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ invalid: '__fuzz__' }),
+        signal: AbortSignal.timeout(10000),
       });
       // 400/401/403/422 são respostas seguras; 5xx indica bug
       expect(r.status).toBeLessThan(500);

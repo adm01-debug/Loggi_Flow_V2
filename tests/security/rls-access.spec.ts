@@ -18,11 +18,16 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-let online = true;
+// Começa como offline: beforeAll confirma conectividade antes de liberar.
+// Evita timeout individual nos testes quando o runner não alcança o Supabase.
+let online = false;
 
 beforeAll(async () => {
   try {
-    const r = await fetch(`${SUPABASE_URL}/auth/v1/health`, { headers: { apikey: ANON_KEY } });
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+      headers: { apikey: ANON_KEY },
+      signal: AbortSignal.timeout(4000),
+    });
     online = r.ok;
   } catch {
     online = false;

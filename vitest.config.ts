@@ -13,6 +13,10 @@ export default defineConfig({
       "tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
     ],
     exclude: ["node_modules", "dist", "tests/e2e"],
+    // Timeout global aumentado para cobrir cold-start de Edge Functions (~8s)
+    // e beforeAll de health-check com AbortSignal.timeout(4000).
+    testTimeout: 10000,
+    hookTimeout: 8000,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
