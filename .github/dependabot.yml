@@ -5,11 +5,25 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    # eslint 10 quebra o lint: plugins typescript-eslint/react-hooks ainda não suportam major 10
     ignore:
+      # eslint 10 quebra o lint: plugins typescript-eslint/react-hooks ainda não suportam major 10
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
       - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      # vite 8 troca rollup por rolldown — vite.config.ts (manualChunks + vite-plugin-pwa + lovable-tagger)
+      # precisa de migração dedicada antes de aceitar major 8+
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      # React 19 exige react-dom, @types/react-dom e validação de react-day-picker/recharts/framer-motion
+      # migrar em PR dedicada com tudo junto
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react-dom"
         update-types: ["version-update:semver-major"]
   - package-ecosystem: "github-actions"
     directory: "/"
