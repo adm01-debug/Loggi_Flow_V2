@@ -15,33 +15,62 @@ const REQUIRED = {
   'font-src': ['https://fonts.gstatic.com', "'self'"],
   'script-src': ["'self'"],
   'connect-src': ["'self'", 'https://*.supabase.co'],
+  'img-src': ["'self'", 'data:', 'blob:', 'https://*.supabase.co', 'https://api.mapbox.com'],
+  'worker-src': ["'self'", 'blob:'],
 };
 
-const html = readFileSync(INDEX, 'utf8');
-const matches = [...html.matchAll(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]+content=(["'])([\s\S]*?)\1/gi)];
+/** Keywords CSP ('self', 'unsafe-inline', ...) são case-sensitive; hosts e schemes não. */
+const isKeyword = (token) => token.startsWith("'") || token === '*';
+const tokenMatches = (actual, required) =>
+  isKeyword(required) ? actual === required : actual.toLowerCase() === required.toLowerCase();
 
-if (matches.length === 0) {
+/** Decodifica as character references HTML que o parser do browser aplica ao atributo. */
+const decodeEntities = (s) =>
+  s
+    .replace(/&#0*39;|&#x0*27;/gi, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&');
+
+const html = readFileSync(INDEX, 'utf8');
+const cspContents = [];
+for (const meta of html.matchAll(/<meta\b[^>]*>/gi)) {
+  const tag = meta[0];
+  const equiv = tag.match(/http-equiv\s*=\s*(?:["']([^"']*)["']|([^\s>]+))/i);
+  if (!equiv) continue;
+  if ((equiv[1] ?? equiv[2] ?? '').toLowerCase() !== 'content-security-policy') continue;
+  const content = tag.match(/content\s*=\s*(["'])([\s\S]*?)\1/i);
+  cspContents.push(content ? decodeEntities(content[2]) : '');
+}
+
+if (cspContents.length === 0) {
   console.error('❌ CSP meta tag not found in index.html');
   process.exit(1);
 }
 
-if (matches.length > 1) {
+if (cspContents.length > 1) {
   console.error('❌ Mais de uma meta CSP encontrada: o browser ignora todas as políticas quando há múltiplas metas CSP.');
   process.exit(1);
 }
 
+const errors = [];
 const directives = new Map();
-for (const d of matches[0][2].split(';')) {
+for (const d of cspContents[0].split(';')) {
   const [name, ...values] = d.trim().split(/\s+/);
   if (!name) continue;
-  if (!directives.has(name)) directives.set(name, values);
+  const key = name.toLowerCase();
+  if (directives.has(key)) {
+    errors.push(`  • diretiva duplicada "${key}": múltiplas ocorrências tornam a política inválida`);
+    continue;
+  }
+  directives.set(key, values);
 }
 
-const errors = [];
 for (const [directive, required] of Object.entries(REQUIRED)) {
   const values = directives.get(directive) || [];
   for (const token of required) {
-    if (!values.includes(token)) {
+    if (!values.some((v) => tokenMatches(v, token))) {
       errors.push(`  • ${directive} está sem "${token}"`);
     }
   }
@@ -52,4 +81,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log('✅ CSP validada: fonts.googleapis.com e fonts.gstatic.com liberados.');
+console.log('✅ CSP validada: fontes, estilos, scripts, conexões, imagens e workers liberados.');
