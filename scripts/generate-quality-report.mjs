@@ -21,7 +21,7 @@ function runEslint() {
   const res = spawnSync(
     'npx',
     ['--no-install', 'eslint', '.', '--format', 'json'],
-    { cwd: repoRoot, encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 },
+    { cwd: repoRoot, encoding: 'utf8', maxBuffer: 128 * 1024 * 1024, shell: true },
   );
   if (res.status !== 0 && res.status !== 1) {
     process.stderr.write(res.stderr || '');
@@ -34,7 +34,7 @@ function runTsc() {
   const res = spawnSync(
     'npx',
     ['--no-install', 'tsc', '--noEmit', '--pretty', 'false'],
-    { cwd: repoRoot, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
+    { cwd: repoRoot, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, shell: true },
   );
   // tsc sai com 0 (ok), 1 (erros por arquivo) ou 2 (falha fatal de config).
   // Falha fatal não produz linhas `file(l,c): error TS...`; sem este check o
