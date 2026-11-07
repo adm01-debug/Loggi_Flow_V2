@@ -40,7 +40,7 @@ const errors = [];
 for (const [directive, required] of Object.entries(REQUIRED)) {
   const values = directives[directive] || [];
   for (const token of required) {
-    if (!values.includes(token) && !values.some((v) => v === token)) {
+    if (!values.includes(token)) {
       errors.push(`  • ${directive} está sem "${token}"`);
     }
   }
