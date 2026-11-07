@@ -1,38 +1,62 @@
 -- Manifesto de auditoria — detalhado por objeto
--- Sections: tables, columns, indexes, policies, functions, triggers, enums, constraints
+-- Sections: schema, table, column, constraint, index, policy, function, trigger, enum
+-- Saída única: (section, key, def) no padrão do pipeline audit_tmp.manifest
+-- Idempotente e robusto: CREATE TEMP TABLE + INSERT + SELECT final + DROP.
 
--- Tables
-SELECT 'table' AS type, schemaname||'.'||tablename AS name,
-       md5(schemaname||tablename) AS hash
-  FROM pg_tables WHERE schemaname IN ('public','internal') ORDER BY 2;
+CREATE TEMP TABLE _manifest_detail (section text, key text, def text);
 
--- Columns (com NOT NULL e default)
-SELECT 'column' AS type,
-       table_schema||'.'||table_name||'.'||column_name AS name,
-       md5(table_schema||table_name||column_name||data_type||COALESCE(is_nullable,'')::text||COALESCE(column_default,'')) AS hash
-  FROM information_schema.columns
-  WHERE table_schema IN ('public','internal') ORDER BY 2;
-
--- Indexes
-SELECT 'index' AS type, schemaname||'.'||indexname AS name,
-       md5(indexdef) AS hash
-  FROM pg_indexes WHERE schemaname IN ('public','internal') ORDER BY 2;
-
--- Policies
-SELECT 'policy' AS type, schemaname||'.'||tablename||'.'||policyname AS name,
-       md5(policyname||COALESCE(cmd,'')||COALESCE(qual,'')||COALESCE(with_check,'')||COALESCE(roles::text,'')) AS hash
-  FROM pg_policies WHERE schemaname IN ('public','storage') ORDER BY 2;
-
--- Functions
-SELECT 'function' AS type, n.nspname||'.'||p.proname AS name,
-       md5(pg_get_functiondef(p.oid)) AS hash
+INSERT INTO _manifest_detail
+SELECT 'schema', n.nspname,
+       coalesce(n.nspacl::text,'<default>')
+  FROM pg_namespace n WHERE n.nspname IN ('public','internal')
+UNION ALL
+SELECT 'table', n.nspname||'.'||c.relname,
+       c.relkind::text||' rls='||c.relrowsecurity||' force='||c.relforcerowsecurity||' part='||c.relispartition||' opts='||coalesce(c.reloptions::text,'')
+  FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname IN ('public','internal') AND c.relkind IN ('r','p')
+UNION ALL
+SELECT 'column', n.nspname||'.'||c.relname||'.'||a.attname,
+       format_type(a.atttypid,a.atttypmod)||' nn='||a.attnotnull||' def='||coalesce(pg_get_expr(d.adbin,d.adrelid),'')
+  FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
+  WHERE n.nspname IN ('public','internal') AND c.relkind IN ('r','p')
+    AND a.attnum > 0 AND a.atttypid <> 0 AND NOT a.attisdropped
+UNION ALL
+SELECT 'constraint', n.nspname||'.'||c.relname||'.'||k.conname,
+       k.contype::text||' '||pg_get_constraintdef(k.oid)||' defer='||k.condeferrable||k.condeferred||' valid='||k.convalidated
+  FROM pg_constraint k JOIN pg_class c ON c.oid = k.conrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname IN ('public','internal')
+UNION ALL
+SELECT 'index', i.schemaname||'.'||i.indexname,
+       i.indexdef
+  FROM pg_indexes i WHERE i.schemaname IN ('public','internal')
+UNION ALL
+SELECT 'policy', p.schemaname||'.'||p.tablename||'.'||p.policyname,
+       p.cmd||' roles='||p.roles::text||' using='||coalesce(p.qual,'')||' check='||coalesce(p.with_check,'')
+  FROM pg_policies p WHERE p.schemaname IN ('public','internal','storage')
+UNION ALL
+SELECT 'function', n.nspname||'.'||p.proname||'('||pg_get_function_identity_arguments(p.oid)||')',
+       CASE WHEN p.prokind IN ('f','p') THEN pg_get_functiondef(p.oid)
+            ELSE p.prokind::text||':'||pg_get_function_result(p.oid) END
   FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
-  WHERE n.nspname IN ('public','internal') ORDER BY 2;
-
--- Triggers
-SELECT 'trigger' AS type,
-       n.nspname||'.'||c.relname||'.'||t.tgname AS name,
-       md5(t.tgname||c.relname||t.tgenabled::text) AS hash
+  WHERE n.nspname IN ('public','internal')
+UNION ALL
+SELECT 'trigger', n.nspname||'.'||c.relname||'.'||t.tgname,
+       t.tgenabled::text
   FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
   JOIN pg_namespace n ON n.oid = c.relnamespace
-  WHERE n.nspname = 'public' AND NOT t.tgisinternal ORDER BY 2;
+  WHERE n.nspname IN ('public','internal')
+    AND NOT t.tgisinternal
+UNION ALL
+SELECT 'enum', n.nspname||'.'||t.typname,
+       string_agg(e.enumlabel, ',' ORDER BY e.enumsortorder)
+  FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+  JOIN pg_enum e ON e.enumtypid = t.oid
+  WHERE n.nspname IN ('public','internal')
+  GROUP BY 1, 2;
+
+SELECT section, key, def FROM _manifest_detail ORDER BY section, key;
+
+DROP TABLE _manifest_detail;
