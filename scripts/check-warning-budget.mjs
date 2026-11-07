@@ -40,7 +40,7 @@ function runEslint() {
   const res = spawnSync(
     'npx',
     ['--no-install', 'eslint', '.', '--format', 'json'],
-    { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+    { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, shell: true },
   );
   // ESLint exits 1 when warnings/errors are found — that is expected here.
   if (res.status !== 0 && res.status !== 1) {
@@ -67,6 +67,7 @@ function runTypecheck() {
     cwd: repoRoot,
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024,
+    shell: true,
   });
   const output = (res.stdout || '') + (res.stderr || '');
   // tsc sai com 0 (ok), 1 (erros por arquivo) ou 2 (falha fatal: config/sem inputs).

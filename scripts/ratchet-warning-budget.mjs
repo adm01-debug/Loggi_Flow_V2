@@ -34,7 +34,7 @@ const budget = JSON.parse(readFileSync(budgetPath, 'utf8'));
 const res = spawnSync(
   'npx',
   ['--no-install', 'eslint', '.', '--format', 'json'],
-  { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+  { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, shell: true },
 );
 if (res.status !== 0 && res.status !== 1) {
   process.stderr.write(res.stderr || '');
