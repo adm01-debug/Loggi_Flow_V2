@@ -18,27 +18,28 @@ const REQUIRED = {
 };
 
 const html = readFileSync(INDEX, 'utf8');
-const match = html.match(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]+content="([^"]+)"/i);
+const matches = [...html.matchAll(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]+content=(["'])([\s\S]*?)\1/gi)];
 
-if (!match) {
+if (matches.length === 0) {
   console.error('❌ CSP meta tag not found in index.html');
   process.exit(1);
 }
 
-const directives = Object.fromEntries(
-  match[1]
-    .split(';')
-    .map((d) => d.trim())
-    .filter(Boolean)
-    .map((d) => {
-      const [name, ...values] = d.split(/\s+/);
-      return [name, values];
-    }),
-);
+if (matches.length > 1) {
+  console.error('❌ Mais de uma meta CSP encontrada: o browser ignora todas as políticas quando há múltiplas metas CSP.');
+  process.exit(1);
+}
+
+const directives = new Map();
+for (const d of matches[0][2].split(';')) {
+  const [name, ...values] = d.trim().split(/\s+/);
+  if (!name) continue;
+  if (!directives.has(name)) directives.set(name, values);
+}
 
 const errors = [];
 for (const [directive, required] of Object.entries(REQUIRED)) {
-  const values = directives[directive] || [];
+  const values = directives.get(directive) || [];
   for (const token of required) {
     if (!values.includes(token)) {
       errors.push(`  • ${directive} está sem "${token}"`);
