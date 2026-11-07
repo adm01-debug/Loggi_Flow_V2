@@ -1,25 +1,117 @@
--- Runbook pós-deploy das edge functions (auditoria 2026-09-02)
+-- Runbook pós-deploy das edge functions (auditoria 2026-09-02, revisado 2026-11-07)
+-- Projeto: jvfhclubfpxrtrrazrgr (Loggi Flux)
+--
 -- As 5 functions fechadas (resend-email, evolution-whatsapp, melhor-envio-api,
 -- log-security-event, predict-delays-scheduled) exigem JWT de usuário, service_role
 -- ou o header x-internal-secret. Os crons já enviam x-internal-secret (vault).
 --
--- PASSO 1 — pegar o valor do secret compartilhado (rodar no SQL editor do projeto):
---   SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'internal_fn_secret';
+-- ⚠️ SEGURANÇA: este runbook toca SEGREDOS e DEPLOY de PRODUÇÃO.
+--    - NUNCA cole o VALOR de um segredo em log, comando, commit ou PR — só o NOME/env.
+--    - NUNCA rode `supabase secrets set` sem antes confirmar o que vai mudar (dry-run).
+--    - NÃO execute deploy real nem leia o valor do secret fora de um ambiente seguro.
 --
--- PASSO 2 — setar a env nas functions e deployar (terminal, com SUPABASE_ACCESS_TOKEN
--- da conta dona do projeto jvfhclubfpxrtrrazrgr):
---   supabase secrets set INTERNAL_FN_SECRET=<valor do passo 1> --project-ref jvfhclubfpxrtrrazrgr
---   supabase functions deploy --project-ref jvfhclubfpxrtrrazrgr
---   (ou via GitHub: Actions -> "Deploy Edge Functions" depois de criar o secret
---    SUPABASE_ACCESS_TOKEN em Settings -> Secrets and variables -> Actions)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PASSO 0 — PRÉ-REQUISITOS (valide ANTES de qualquer deploy)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0.1 Credencial: confirme que SUPABASE_ACCESS_TOKEN existe e pertence à conta dona
+--     do projeto (Settings -> API / Account -> Access Tokens). Sem ele, o deploy
+--     falha com 401/403 — não adianta prosseguir.
+--       [ -n "$SUPABASE_ACCESS_TOKEN" ] && echo "token presente" || echo "FALTA token"
+-- 0.2 CLI: confirme o supabase CLI instalado e logado no projeto.
+--       supabase --version
+--       supabase projects list   # deve listar jvfhclubfpxrtrrazrgr
+-- 0.3 Functions existem? Liste as functions deployadas e confira as 5 abaixo.
+--       supabase functions list --project-ref jvfhclubfpxrtrrazrgr
+--     Esperado (todas presentes): resend-email, evolution-whatsapp,
+--     melhor-envio-api, log-security-event, predict-delays-scheduled.
+--     Se alguma faltar, PARE e investigue antes de deployar.
+-- 0.4 Envs ausentes? Liste as envs setadas (mostra só NOME, nunca o valor):
+--       supabase secrets list --project-ref jvfhclubfpxrtrrazrgr
+--     Confira que existem (pelo menos): INTERNAL_FN_SECRET, SUPABASE_URL,
+--     SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY, e as específicas de cada
+--     function (RESEND_API_KEY, EVOLUTION_API_URL/KEY, MELHOR_ENVIO_TOKEN,
+--     SECURITY_ALERT_EMAIL, SECURITY_SLACK_WEBHOOK_URL).
+--     Env ausente => a function responde 500/400 em runtime (fail-closed), não 401.
 --
--- PASSO 3 — validar (deve dar 401 sem auth e 200 com o secret):
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PASSO 1 — SECRET COMPARTILHADO (somente leitura, sem expor o valor)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- O secret 'internal_fn_secret' vive no vault. Para CONFIRMAR que existe (sem
+-- imprimir o valor), rode no SQL editor do projeto:
+--   SELECT name, length(decrypted_secret) AS tamanho
+--   FROM vault.decrypted_secrets WHERE name = 'internal_fn_secret';
+--   -- Esperado: 1 linha, tamanho > 0. 0 linhas => secret não criado => PARE.
+-- NÃO rode `SELECT decrypted_secret` e cole o resultado em lugar nenhum.
+--
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PASSO 2 — SETAR ENV + DEPLOY (ordem determinística, com guarda de dry-run)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 2.1 DRY-RUN (padrão): mostre o que seria setado SEM alterar nada. O comando
+--     abaixo lista as envs atuais; compare com o esperado no passo 0.4.
+--       supabase secrets list --project-ref jvfhclubfpxrtrrazrgr
+--     Se INTERNAL_FN_SECRET JÁ estiver listada, NÃO rode `secrets set` de novo —
+--     sobrescrever um secret existente pode quebrar os crons em produção.
+-- 2.2 Só se o secret estiver AUSENTE (não para rotacionar), setar a env. O valor
+--     deve vir de uma variável de ambiente do seu shell, NUNCA digitado inline:
+--       export INTERNAL_FN_SECRET="$(valor obtido com segurança no vault)"
+--       supabase secrets set INTERNAL_FN_SECRET="$INTERNAL_FN_SECRET" \
+--         --project-ref jvfhclubfpxrtrrazrgr
+--     (o valor não aparece no histórico do shell nem no log do comando)
+-- 2.3 Deploy das functions (todas, ou uma por vez na ordem abaixo):
+--       supabase functions deploy --project-ref jvfhclubfpxrtrrazrgr
+--     Ordem recomendada (dependências): resend-email, evolution-whatsapp,
+--     melhor-envio-api, log-security-event, predict-delays-scheduled.
+--     Alternativa via GitHub: Actions -> "Deploy Edge Functions" (workflow
+--     deploy-functions.yml) depois de criar o secret SUPABASE_ACCESS_TOKEN em
+--     Settings -> Secrets and variables -> Actions.
+--
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PASSO 3 — HEALTHCHECK REAL (por function e por ambiente)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 3.1 Sem auth (deve dar 401 — prova que a function está no ar e protegida):
+--   for fn in resend-email evolution-whatsapp melhor-envio-api \
+--             log-security-event predict-delays-scheduled; do
+--     code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+--       "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn")
+--     echo "$fn sem-auth -> $code (esperado 401)"
+--   done
+-- 3.2 Com x-internal-secret (deve dar 200/4xx de negócio, NUNCA 401 — prova que o
+--     secret bate). Use o valor via variável de ambiente, sem imprimir:
+--   for fn in resend-email predict-delays-scheduled; do
+--     code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+--       -H "x-internal-secret: $INTERNAL_FN_SECRET" \
+--       "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn")
+--     echo "$fn com-secret -> $code (esperado != 401)"
+--   done
+-- 3.3 Com JWT de usuário autenticado (evolution-whatsapp, melhor-envio-api,
+--     log-security-event exigem requireUser): gere um token de usuário real e:
 --   curl -s -o /dev/null -w '%{http_code}\n' -X POST \
---     https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/resend-email
---   -> esperado: 401
+--     -H "Authorization: Bearer $USER_JWT" \
+--     "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/evolution-whatsapp"
+--   -> esperado: 200/4xx de negócio, NUNCA 401.
+-- 3.4 Interpretação de códigos:
+--     401 sem auth  = OK (function no ar e protegida)
+--     401 com secret = secret errado/ausente => revalide o PASSO 1/2
+--     500/400        = env específica ausente ou erro de runtime => veja logs
+--     timeout/000    = function não respondeu => pode não estar deployada
+-- 3.5 Logs (se algo falhar):
+--       supabase functions logs <fn> --project-ref jvfhclubfpxrtrrazrgr
 --
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ROLLBACK
+-- ─────────────────────────────────────────────────────────────────────────────
+-- - Deploy anterior: o Supabase mantém versões anteriores. Para reverter uma
+--   function, redeploy do commit anterior (git checkout do index.ts antigo) ou
+--   use o painel (Edge Functions -> versões). Não há comando nativo de rollback.
+-- - Secret errado: re-setar o valor CORRETO (mesmo fluxo do PASSO 2.2). Nunca
+--   apagar o secret sem ter o valor correto à mão — os crons param de autenticar.
+-- - Se o deploy quebrou produção: pare os crons afetados (cron.unschedule) até
+--   corrigir, para não gerar fila de erros.
+--
+-- ─────────────────────────────────────────────────────────────────────────────
 -- OPCIONAL — corrigir a service_role_key do vault (hoje é uma sb_secret de OUTRO
 -- projeto; "Unregistered API key"). Pegar a chave no painel (Settings -> API) e:
 --   SELECT vault.update_secret(
 --     (SELECT id FROM vault.secrets WHERE name='service_role_key'),
 --     '<service_role JWT ou sb_secret DESTE projeto>');
+-- ⚠️ Isso é DDL/dado sensível em produção: só execute com aprovação explícita.
