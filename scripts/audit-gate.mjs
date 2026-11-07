@@ -17,7 +17,25 @@ try {
 } catch (err) {
   raw = err.stdout; // npm audit sai com código != 0 quando há vulnerabilidades
 }
-const report = JSON.parse(raw);
+
+// npm audit com rede/registro indisponível pode emitir JSON com campo `error`
+// (sem `vulnerabilities`) ou saída não-JSON. Nos dois casos o audit não rodou:
+// falhar é o comportamento seguro — um gate que passa sem validar é pior que
+// um gate que derruba o build por tooling quebrado.
+let report;
+try {
+  report = JSON.parse(raw);
+} catch (err) {
+  console.error("❌ npm audit não produziu JSON (rede/registro indisponível?).");
+  console.error(`  ${err.message}`);
+  process.exit(1);
+}
+if (report.error) {
+  console.error("❌ npm audit reportou erro na execução:");
+  console.error(`  ${[report.error.code, report.error.summary].filter(Boolean).join(" ")}`);
+  process.exit(1);
+}
+
 const offenders = Object.values(report.vulnerabilities ?? {}).filter(
   (v) => ["critical", "high"].includes(v.severity) && !ALLOWLIST.has(v.name),
 );

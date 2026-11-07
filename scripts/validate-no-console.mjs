@@ -3,7 +3,7 @@
 // Prevents PII regressions in Edge Function logs.
 // Node puro (sem ripgrep): o runner ubuntu-latest não tem `rg`.
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 const ROOT = "supabase/functions";
 const PATTERN = /console\.(log|info|warn|error|debug)/;
@@ -21,7 +21,11 @@ function* walk(dir) {
 
 const hits = [];
 for (const path of walk(ROOT)) {
-  const rel = path.replace(`${ROOT}/`, "");
+  // O antigo replace(`${ROOT}/`) nunca casava no Windows (path.join usa `\`),
+  // deixando _shared/logger.ts etc. fora da exclusão (falso positivo).
+  // relative() normaliza caminho independente do OS, mas no Windows devolve
+  // separador `\`; o Set EXCLUDED usa `/`, então normaliza para forward-slash.
+  const rel = relative(ROOT, path).split("\\").join("/");
   if (rel.endsWith(".test.ts") || EXCLUDED.has(rel)) continue;
   const lines = readFileSync(path, "utf8").split("\n");
   lines.forEach((line, i) => {

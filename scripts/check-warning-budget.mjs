@@ -69,6 +69,13 @@ function runTypecheck() {
     maxBuffer: 32 * 1024 * 1024,
   });
   const output = (res.stdout || '') + (res.stderr || '');
+  // tsc sai com 0 (ok), 1 (erros por arquivo) ou 2 (falha fatal: config/sem inputs).
+  // Falha fatal (ex.: TS18003) não tem o formato `file(l,c): error TS...` e o regex
+  // contaria 0 — um falso "dentro do orçamento". Tooling quebrado derruba o gate.
+  if (res.status !== 0 && res.status !== 1) {
+    process.stderr.write(output);
+    throw new Error(`tsc failed to run (exit ${res.status}).`);
+  }
   // Each diagnostic line looks like: `path/to/file.ts(12,34): error TS2322: ...`
   const errors = (output.match(/^.*: error TS\d+:/gm) || []).length;
   return { errors, output };
