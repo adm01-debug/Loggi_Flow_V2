@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Seed script — popula o banco Supabase com dados fictícios realistas
  * para desenvolvimento e demos.
  *
@@ -142,9 +142,12 @@ const STATUS_ENVIO = [
 // --- Seeders por módulo -----------------------------------------------------
 
 async function getOrCreateUserId(): Promise<string> {
-  // Pega o primeiro usuário existente, ou cria um admin fake
-  const { data: users } = await supabase.auth.admin.listUsers({ perPage: 1 });
-  if (users && users.users.length > 0) return users.users[0].id;
+  // Reaproveita o admin@loggiflow se já existir; senão cria um admin fake.
+  // Buscar por email evita anexar o perfil admin ao primeiro usuário da lista
+  // (que pode ser um usuário comum em re-execuções do seed).
+  const { data: users } = await supabase.auth.admin.listUsers();
+  const admin = users?.users.find((u) => u.email === "admin@loggiflow.com.br");
+  if (admin) return admin.id;
 
   const { data, error } = await supabase.auth.admin.createUser({
     email: "admin@loggiflow.com.br",
@@ -764,7 +767,7 @@ async function seedNotifications(userId: string): Promise<void> {
 
 async function seedOcorrenciasCatalog(): Promise<void> {
   console.log("\n📋 ip_access_rules + geo_blocking_rules");
-  await supabase
+  const { error: ipErr } = await supabase
     .from("ip_access_rules")
     .upsert(
       {
@@ -775,12 +778,32 @@ async function seedOcorrenciasCatalog(): Promise<void> {
       },
       { onConflict: "ip_pattern,rule_type" },
     );
-  await supabase
+  if (ipErr && /no unique or exclusion constraint/i.test(ipErr.message)) {
+    // Sem unique: insert direto (pode duplicar se rodar 2×)
+    await supabase.from("ip_access_rules").insert({
+      rule_type: "blacklist",
+      ip_pattern: "0.0.0.0",
+      is_active: false,
+      descricao: "Placeholder",
+    });
+  } else if (ipErr) {
+    console.warn("  ip_access_rules:", ipErr.message);
+  }
+
+  const { error: geoErr } = await supabase
     .from("geo_blocking_rules")
     .upsert(
       { country_code: "BR", is_active: false },
       { onConflict: "country_code" },
     );
+  if (geoErr && /no unique or exclusion constraint/i.test(geoErr.message)) {
+    await supabase.from("geo_blocking_rules").insert({
+      country_code: "BR",
+      is_active: false,
+    });
+  } else if (geoErr) {
+    console.warn("  geo_blocking_rules:", geoErr.message);
+  }
 }
 
 async function seedAuditAndLogs(userId: string): Promise<void> {
