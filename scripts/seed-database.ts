@@ -9,8 +9,15 @@
  * frontend nem commit ela no repositório. Use .env.local ou variável
  * de ambiente temporária.
  *
- * O script é idempotente para dados de catálogo (não duplica itens com
- * nomes únicos), mas reseta tabelas transacionais antes de inserir.
+ * Flags:
+ *   --dry-run          valida e imprime o plano sem nenhuma escrita.
+ *   --apply            confirma escrita quando SUPABASE_URL é PRODUÇÃO
+ *                      (o fallback abaixo aponta para o projeto de produção).
+ *
+ * O script é idempotente: re-execuções não duplicam linhas. Tabelas sem
+ * UNIQUE usam pré-filtro client-side; coletas/entregas usam número fixo + upsert.
+ * Não há transação: via PostgREST cada statement é autônomo — em falha parcial,
+ * o estado reflete o que foi commitado até o erro (re-execute para convergir).
  */
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
@@ -26,6 +33,24 @@ const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 // Senha dos usuarios de seed (somente ambiente de dev); sobrescreva com SEED_PASSWORD.
 // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- credencial de seed local, nao de producao
 const SEED_PASSWORD = process.env.SEED_PASSWORD ?? "LoggiFlow@2026";
+
+// --- Flags de segurança -----------------------------------------------------
+
+const isDryRun = process.argv.includes("--dry-run");
+// URL do projeto de produção (usada como fallback): seed nela exige confirmação.
+const PRODUCTION_URL = "https://jvfhclubfpxrtrrazrgr.supabase.co";
+const allowProduction =
+  process.argv.includes("--apply") ||
+  process.env.SEED_ALLOW_PRODUCTION === "1";
+
+if (isDryRun) {
+  console.log("🧪 Modo dry-run: nenhuma escrita será feita.\n");
+  console.log(`📡 URL: ${SUPABASE_URL}`);
+  console.log(
+    "📋 Plano: profiles · user_roles · user_levels · clientes · fornecedores · transportadoras · coletas · entregas · ocorrencias · cotacoes_frete · achievements · reward_items · conciliacoes · notifications · ip_access_rules · geo_blocking_rules · audit_logs · system_heartbeat",
+  );
+  process.exit(0);
+}
 
 if (!SERVICE_ROLE_KEY) {
   console.error("❌ Defina SUPABASE_SERVICE_ROLE_KEY antes de rodar.");
@@ -50,11 +75,10 @@ const DAYS_AHEAD = (n: number) =>
 const pick = <T>(arr: readonly T[]): T =>
   arr[Math.floor(Math.random() * arr.length)];
 
-// CNPJ fake (apenas para preencher campo — não é válido de verdade)
-const fakeCNPJ = (): string => {
-  const n = Array.from({ length: 14 }, () =>
-    Math.floor(Math.random() * 10),
-  ).join("");
+// CNPJ fake determinístico por índice (não é válido de verdade).
+// Mesmo índice → mesmo CNPJ → upserts idempotentes entre execuções.
+const fakeCNPJ = (index: number): string => {
+  const n = String(index * 982451653).padStart(14, "0").slice(-14);
   return `${n.slice(0, 2)}.${n.slice(2, 5)}.${n.slice(5, 8)}/${n.slice(8, 12)}-${n.slice(12)}`;
 };
 
@@ -286,26 +310,36 @@ async function upsertByField(
   field: string,
   rows: Array<Record<string, any>>,
 ): Promise<void> {
+  if (isDryRun) return;
   const { error } = await supabase
     .from(table)
     .upsert(rows, { onConflict: field, ignoreDuplicates: false });
   if (error && /no unique or exclusion constraint/i.test(error.message)) {
-    // Sem constraint: faz insert simples
-    const { error: insErr } = await supabase.from(table).insert(rows);
-    if (insErr && !/duplicate key/i.test(insErr.message)) throw insErr;
+    // Sem constraint: pré-filtra client-side por `field` e insere só o novo.
+    const fieldValues = rows.map((r) => String(r[field]));
+    const { data: existing, error: selErr } = await supabase
+      .from(table)
+      .select(field)
+      .in(field, fieldValues);
+    if (selErr) throw selErr;
+    const existingSet = new Set(existing?.map((e) => String(e[field])) ?? []);
+    const fresh = rows.filter((r) => !existingSet.has(String(r[field])));
+    if (fresh.length === 0) return;
+    const { error: insErr } = await supabase.from(table).insert(fresh);
+    if (insErr) throw insErr;
     return;
   }
   if (error) throw error;
 }
 
-async function seedClientes(): Promise<string[]> {
+async function seedClientes(): Promise<{ ids: string[]; [key: string]: any }> {
   console.log("\n📋 clientes");
   const rows = COMPANY_RAZOES.slice(0, 10).map((razao, i) => {
     const [cidade, estado] = pick(CIDADES_BRASIL);
     return {
       razao_social: razao,
       nome_fantasia: COMPANY_FANTASIAS[i],
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(i + 1),
       contato_nome: pick(REAL_NAMES),
       contato_email: `contato@${COMPANY_FANTASIAS[i].toLowerCase().replace(/\s+/g, "")}.com.br`,
       contato_telefone: fakePhone(),
@@ -316,17 +350,20 @@ async function seedClientes(): Promise<string[]> {
       horario_entrega: "08:00 - 18:00",
     };
   });
-  return await upsertByCnpj("clientes", rows);
+  const ids = await upsertByCnpj("clientes", rows);
+  const result = { ids } as { ids: string[]; [key: string]: any };
+  if (isDryRun) result.table = "clientes";
+  return result;
 }
 
-async function seedFornecedores(): Promise<string[]> {
+async function seedFornecedores(): Promise<{ ids: string[]; [key: string]: any }> {
   console.log("\n📋 fornecedores");
   const rows = COMPANY_RAZOES.slice(2, 12).map((razao, i) => {
     const [cidade, estado] = pick(CIDADES_BRASIL);
     return {
       razao_social: razao,
       nome_fantasia: `${COMPANY_FANTASIAS[(i + 4) % 12]} Supply`,
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(i + 100),
       contato_nome: pick(REAL_NAMES),
       contato_email: `compras@${COMPANY_FANTASIAS[(i + 4) % 12].toLowerCase()}.com.br`,
       contato_telefone: fakePhone(),
@@ -336,16 +373,19 @@ async function seedFornecedores(): Promise<string[]> {
       cep: `${20000 + i * 1000}-${200 + i * 10}`,
     };
   });
-  return await upsertByCnpj("fornecedores", rows);
+  const ids = await upsertByCnpj("fornecedores", rows);
+  const result = { ids } as { ids: string[]; [key: string]: any };
+  if (isDryRun) result.table = "fornecedores";
+  return result;
 }
 
-async function seedTransportadoras(): Promise<string[]> {
+async function seedTransportadoras(): Promise<{ ids: string[]; [key: string]: any }> {
   console.log("\n📋 transportadoras");
   const transportadoras = [
     {
       razao_social: "Transportes Rápido Sul",
       nome_fantasia: "Rápido Sul",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(1),
       email_comercial: "contato@rapidosul.com.br",
       contato_comercial: "(11) 99999-0001",
       prazo_medio_dias: 3,
@@ -353,7 +393,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Expresso Nacional",
       nome_fantasia: "Expresso Nacional",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(2),
       email_comercial: "vendas@expressonacional.com.br",
       contato_comercial: "(21) 99999-0002",
       prazo_medio_dias: 2,
@@ -361,7 +401,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Loggi Própria",
       nome_fantasia: "Loggi",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3),
       email_comercial: "operacoes@loggi.com",
       contato_comercial: "(11) 99999-0003",
       prazo_medio_dias: 4,
@@ -369,7 +409,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "TransCargo Brasil",
       nome_fantasia: "TransCargo",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(4),
       email_comercial: "contato@transcargo.com.br",
       contato_comercial: "(31) 99999-0004",
       prazo_medio_dias: 3,
@@ -377,7 +417,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Veloz Express",
       nome_fantasia: "Veloz Express",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(5),
       email_comercial: "vendas@velozexpress.com.br",
       contato_comercial: "(41) 99999-0005",
       prazo_medio_dias: 1,
@@ -385,7 +425,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Atlas Cargas",
       nome_fantasia: "Atlas",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(6),
       email_comercial: "contato@atlaslog.com.br",
       contato_comercial: "(51) 99999-0006",
       prazo_medio_dias: 5,
@@ -393,7 +433,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Polar Log",
       nome_fantasia: "Polar Log",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(7),
       email_comercial: "operacional@polarlog.com.br",
       contato_comercial: "(61) 99999-0007",
       prazo_medio_dias: 3,
@@ -401,12 +441,13 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Rota Certa",
       nome_fantasia: "Rota Certa",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(8),
       email_comercial: "contato@rotacerta.com.br",
       contato_comercial: "(71) 99999-0008",
       prazo_medio_dias: 4,
     },
   ];
+  if (isDryRun) return { ids: [], table: "transportadoras" };
   const ids: string[] = [];
   for (const t of transportadoras) {
     const { data, error } = await supabase
@@ -429,10 +470,10 @@ async function seedTransportadoras(): Promise<string[]> {
       ids.push(data.id);
     }
   }
-  return ids;
+  return { ids };
 }
 
-async function seedColetas(fornecedorIds: string[]): Promise<string[]> {
+async function seedColetas(fornecedorIds: string[]): Promise<void> {
   console.log("\n📋 coletas");
   const STATUS_COLETA = [
     "aguardando_liberacao",
@@ -443,8 +484,9 @@ async function seedColetas(fornecedorIds: string[]): Promise<string[]> {
     "divergencia",
     "finalizada",
   ] as const;
+  // Número fixo por iteração → upsert por numero_coleta idempotente.
   const rows = Array.from({ length: 12 }, (_, i) => ({
-    numero_coleta: `COL-${Date.now()}-${i}`.slice(-12),
+    numero_coleta: `COL-${String(i + 1).padStart(4, "0")}`,
     fornecedor_id: fornecedorIds[i % fornecedorIds.length],
     data_prevista_coleta: DAYS_AGO((i % 7) - 2),
     endereco_coleta: `Av. Principal, ${100 + i * 10}, São Paulo, SP`,
@@ -453,12 +495,11 @@ async function seedColetas(fornecedorIds: string[]): Promise<string[]> {
     peso_estimado_kg: 5 + i * 2.5,
     observacoes: i % 3 === 0 ? "Carga frágil" : null,
   }));
-  const { data, error } = await supabase
+  if (isDryRun) return;
+  const { error } = await supabase
     .from("coletas")
-    .insert(rows)
-    .select("id");
+    .upsert(rows, { onConflict: "numero_coleta" });
   if (error) throw error;
-  return data?.map((r) => r.id) ?? [];
 }
 
 async function seedEntregas(
@@ -466,11 +507,12 @@ async function seedEntregas(
   transportadoraIds: string[],
 ): Promise<string[]> {
   console.log("\n📋 entregas");
+  // Número fixo por iteração → upsert por numero_entrega idempotente.
   const rows = Array.from({ length: 15 }, (_, i) => ({
-    numero_entrega: `ENT-${Date.now()}-${i}`.slice(-12),
+    numero_entrega: `ENT-${String(i + 1).padStart(4, "0")}`,
     cliente_id: clienteIds[i % clienteIds.length],
     transportadora_id: transportadoraIds[i % transportadoraIds.length],
-    codigo_rastreamento: `BR${Date.now()}${i}`.slice(-13),
+    codigo_rastreamento: `BR${String(i + 1).padStart(3, "0")}000${i}`,
     status: STATUS_ENVIO[i % STATUS_ENVIO.length],
     data_despacho: DAYS_AGO(i % 14),
     previsao_entrega: DAYS_AHEAD((i % 7) + 1),
@@ -478,9 +520,10 @@ async function seedEntregas(
     endereco_entrega: `Rua ${pick(REAL_NAMES).split(" ")[1]}, ${50 + i * 7}, São Paulo, SP`,
     valor_frete: 25 + i * 8.5,
   }));
+  if (isDryRun) return [];
   const { data, error } = await supabase
     .from("entregas")
-    .insert(rows)
+    .upsert(rows, { onConflict: "numero_entrega" })
     .select("id");
   if (error) throw error;
   return data?.map((r) => r.id) ?? [];
@@ -503,8 +546,19 @@ async function seedOcorrencias(entregaIds: string[]): Promise<void> {
     resolvida: i % 3 === 0,
     acao_tomada: i % 3 === 0 ? "Ação corretiva tomada" : null,
   }));
-  const { error } = await supabase.from("ocorrencias").insert(rows);
-  if (error) console.warn("  ocorrencias:", error.message);
+  if (isDryRun) return;
+  // Ocorrências/entrega fixa (sempre a mesma posição) → não duplica em re-execução.
+  for (const row of rows) {
+    const { data: existing } = await supabase
+      .from("ocorrencias")
+      .select("id")
+      .eq("entrega_id", row.entrega_id)
+      .eq("tipo_ocorrencia", row.tipo_ocorrencia)
+      .maybeSingle();
+    if (existing) continue;
+    const { error } = await supabase.from("ocorrencias").insert(row);
+    if (error) console.warn("  ocorrencias:", error.message);
+  }
 }
 
 async function seedCotacoes(
@@ -519,8 +573,19 @@ async function seedCotacoes(
     prazo_dias: 1 + (i % 5),
     observacoes: i % 2 === 0 ? "Frete competitivo" : null,
   }));
-  const { error } = await supabase.from("cotacoes_frete").insert(rows);
-  if (error) console.warn("  cotacoes_frete:", error.message);
+  if (isDryRun) return;
+  // Posição i fixa → mesmo par (entrega, transportadora) → não duplica.
+  for (const row of rows) {
+    const { data: existing } = await supabase
+      .from("cotacoes_frete")
+      .select("id")
+      .eq("entrega_id", row.entrega_id)
+      .eq("transportadora_id", row.transportadora_id)
+      .maybeSingle();
+    if (existing) continue;
+    const { error } = await supabase.from("cotacoes_frete").insert(row);
+    if (error) console.warn("  cotacoes_frete:", error.message);
+  }
 }
 
 async function seedAchievementsAndRewards(): Promise<void> {
@@ -718,8 +783,33 @@ async function seedConciliacoes(userId: string): Promise<void> {
     diferenca_total: i * 20,
     created_by: userId,
   }));
-  const { error } = await supabase.from("conciliacoes").insert(rows);
-  if (error) console.warn("  conciliacoes:", error.message);
+  if (isDryRun) return;
+  // Nome fixo → upsert por nome idempotente (sem UNIQUE, fallback via RPC abaixo).
+  const { error } = await supabase
+    .from("conciliacoes")
+    .upsert(rows, { onConflict: "nome" })
+    .select("id");
+  if (error) {
+    if (/no unique or exclusion constraint/i.test(error.message)) {
+      // Sem unique: pré-filtra client-side por nome
+      const nomes = rows.map((r) => r.nome);
+      const { data: existing, error: selErr } = await supabase
+        .from("conciliacoes")
+        .select("nome")
+        .in("nome", nomes);
+      if (selErr) throw selErr;
+      const existingSet = new Set(existing?.map((e) => e.nome) ?? []);
+      const fresh = rows.filter((r) => !existingSet.has(r.nome));
+      if (fresh.length > 0) {
+        const { error: insErr } = await supabase
+          .from("conciliacoes")
+          .insert(fresh);
+        if (insErr) throw insErr;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 async function seedNotifications(userId: string): Promise<void> {
@@ -761,46 +851,68 @@ async function seedNotifications(userId: string): Promise<void> {
       read: false,
     },
   ];
-  const { error } = await supabase.from("notifications").insert(rows);
-  if (error) console.warn("  notifications:", error.message);
+  if (isDryRun) return;
+  // Pré-filtra por (user_id, title) → não duplica em re-execução.
+  const titulos = rows.map((r) => r.title);
+  const { data: existing, error: selErr } = await supabase
+    .from("notifications")
+    .select("title")
+    .eq("user_id", userId)
+    .in("title", titulos);
+  if (selErr) throw selErr;
+  const existingSet = new Set(existing?.map((e) => e.title) ?? []);
+  const fresh = rows.filter((r) => !existingSet.has(r.title));
+  if (fresh.length > 0) {
+    const { error } = await supabase.from("notifications").insert(fresh);
+    if (error) console.warn("  notifications:", error.message);
+  }
 }
 
 async function seedOcorrenciasCatalog(): Promise<void> {
   console.log("\n📋 ip_access_rules + geo_blocking_rules");
-  const { error: ipErr } = await supabase
+  if (isDryRun) return;
+  // ip_access_rules não tem UNIQUE em (ip_pattern, rule_type): pré-filtra.
+  const ipRows = [
+    { rule_type: "blacklist", ip_pattern: "0.0.0.0", description: "Placeholder", is_active: false },
+  ];
+  const { data: ipExisting, error: ipSelErr } = await supabase
     .from("ip_access_rules")
-    .upsert(
-      {
-        rule_type: "blacklist",
-        ip_pattern: "0.0.0.0",
-        is_active: false,
-        descricao: "Placeholder",
-      },
-      { onConflict: "ip_pattern,rule_type" },
-    );
-  if (ipErr && /no unique or exclusion constraint/i.test(ipErr.message)) {
-    // Sem unique: insert direto (pode duplicar se rodar 2×)
-    await supabase.from("ip_access_rules").insert({
-      rule_type: "blacklist",
-      ip_pattern: "0.0.0.0",
-      is_active: false,
-      descricao: "Placeholder",
-    });
-  } else if (ipErr) {
-    console.warn("  ip_access_rules:", ipErr.message);
+    .select("id, rule_type, ip_pattern, description")
+    .eq("rule_type", "blacklist")
+    .eq("ip_pattern", "0.0.0.0")
+    .maybeSingle();
+  if (ipSelErr) console.warn("  ip_access_rules:", ipSelErr.message);
+  if (!ipExisting) {
+    const { error: insErr } = await supabase
+      .from("ip_access_rules")
+      .insert(ipRows);
+    if (insErr && !/duplicate key/i.test(insErr.message)) {
+      console.warn("  ip_access_rules:", insErr.message);
+    }
   }
 
+  // geo_blocking_rules tem UNIQUE(country_code) e rule_type NOT NULL CHECK ('allow'|'block'): upsert idempotente.
+  const geoRow = {
+    country_code: "BR",
+    country_name: "Brasil",
+    rule_type: "block" as const,
+    is_active: false,
+  };
   const { error: geoErr } = await supabase
     .from("geo_blocking_rules")
-    .upsert(
-      { country_code: "BR", is_active: false },
-      { onConflict: "country_code" },
-    );
+    .upsert(geoRow, { onConflict: "country_code" });
   if (geoErr && /no unique or exclusion constraint/i.test(geoErr.message)) {
-    await supabase.from("geo_blocking_rules").insert({
-      country_code: "BR",
-      is_active: false,
-    });
+    const { data: geoExisting } = await supabase
+      .from("geo_blocking_rules")
+      .select("id")
+      .eq("country_code", "BR")
+      .maybeSingle();
+    if (!geoExisting) {
+      const { error: insErr } = await supabase
+        .from("geo_blocking_rules")
+        .insert(geoRow);
+      if (insErr) console.warn("  geo_blocking_rules:", insErr.message);
+    }
   } else if (geoErr) {
     console.warn("  geo_blocking_rules:", geoErr.message);
   }
@@ -808,23 +920,29 @@ async function seedOcorrenciasCatalog(): Promise<void> {
 
 async function seedAuditAndLogs(userId: string): Promise<void> {
   console.log("\n📋 audit_logs + system_heartbeat");
+  if (isDryRun) return;
+  // Audit_logs usa colunas do schema real (entity_type/entity_id/action/old_data/new_data).
   await supabase.from("audit_logs").insert(
     Array.from({ length: 5 }, (_, i) => ({
       user_id: userId,
       action: pick(["login", "create", "update", "delete"] as const),
-      resource: "clientes",
-      resource_id: null,
-      details: { source: "seed" },
+      entity_type: "clientes",
+      entity_id: String(i + 1),
+      old_data: null,
+      new_data: { source: "seed", index: i },
     })),
   );
+  // system_heartbeat usa colunas do schema real (service_name/status/last_check).
   await supabase.from("system_heartbeat").upsert(
     {
-      component: "api",
-      status: "healthy",
-      last_heartbeat: NOW(),
-      metadata: { version: "1.0.0", env: "dev" },
+      service_name: "api",
+      status: "operational",
+      last_check: NOW(),
+      latency_ms: null,
+      version: "1.0.0",
+      metadata: { env: "dev" },
     },
-    { onConflict: "component" },
+    { onConflict: "service_name" },
   );
 }
 
@@ -833,13 +951,29 @@ async function seedAuditAndLogs(userId: string): Promise<void> {
 async function main() {
   console.log("🚀 Iniciando seed do banco Loggi Flow…\n");
   console.log(`📡 URL: ${SUPABASE_URL}`);
-  console.log(`🔑 Service role key: ${SERVICE_ROLE_KEY.slice(0, 12)}…\n`);
+  // Não imprime a service role key (evita vazar segredo em logs).
+
+  // Guarda de produção: URL aponta para o projeto de produção (fallback) →
+  // exige flag --apply (ou SEED_ALLOW_PRODUCTION=1) para prosseguir.
+  if (
+    SUPABASE_URL === PRODUCTION_URL &&
+    !allowProduction
+  ) {
+    console.error(
+      "🚫 A URL configurada aponta para PRODUÇÃO (jvfhclubfpxrtrrazrgr).",
+    );
+    console.error(
+      "   Este seed NÃO deve rodar em produção sem confirmação explícita.",
+    );
+    console.error('   Se realmente deseja, rode com " --apply" (ou SEED_ALLOW_PRODUCTION=1).');
+    process.exit(1);
+  }
 
   try {
     const userId = await seedProfilesAndUsers();
-    const clienteIds = await seedClientes();
-    const fornecedorIds = await seedFornecedores();
-    const transportadoraIds = await seedTransportadoras();
+    const { ids: clienteIds } = await seedClientes();
+    const { ids: fornecedorIds } = await seedFornecedores();
+    const { ids: transportadoraIds } = await seedTransportadoras();
     await seedColetas(fornecedorIds);
     const entregaIds = await seedEntregas(clienteIds, transportadoraIds);
     await seedOcorrencias(entregaIds);
