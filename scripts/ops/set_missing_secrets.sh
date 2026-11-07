@@ -39,8 +39,7 @@ guard_placeholder() {
     eval "valor=\${$nome:-}"
     case "$valor" in
       *\<*|*\>*|*[Pp][Ll][Aa][Cc][Ee][Hh][Oo][Ll][Dd][Ee][Rr]*)
-        echo "Erro: a variavel '$nome' ainda contem placeholder ('$valor')." >&2
-        echo "Preencha o valor real no topo do script antes de executar." >&2
+        echo "Erro: a variavel '$nome' ainda contem placeholder. Preencha o valor real no topo do script antes de executar." >&2
         exit 1
         ;;
     esac
