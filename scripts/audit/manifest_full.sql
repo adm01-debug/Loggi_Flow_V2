@@ -1,4 +1,6 @@
-SELECT section, key, def FROM (
+CREATE TEMP TABLE _manifest_full (section text, key text, def text);
+
+INSERT INTO _manifest_full
 SELECT 'schema'::text AS section, n.nspname::text AS key, (CASE WHEN n.nspname IN ('public','internal','extensions') THEN regexp_replace(coalesce(n.nspacl::text,'<default>'), '(,)?sandbox_exec=[^,}]*', '', 'g') ELSE 'exists' END)||' owner='||pg_get_userbyid(n.nspowner) AS def
   FROM pg_namespace n WHERE n.nspname IN ('public','internal','auth','storage','cron','net','vault','extensions','graphql','graphql_public','realtime','supabase_migrations')
 UNION ALL
@@ -58,11 +60,22 @@ SELECT 'event_trigger', e.evtname, e.evtevent||' '||e.evtenabled::text||' '||e.e
   FROM pg_event_trigger e
 UNION ALL
 SELECT 'publication', p.pubname, p.puballtables::text||p.pubinsert::text||p.pubupdate::text||p.pubdelete::text||' tables='||coalesce((SELECT string_agg(pt.schemaname||'.'||pt.tablename, ',' ORDER BY 1) FROM pg_publication_tables pt WHERE pt.pubname=p.pubname),'')
-  FROM pg_publication p
-UNION ALL
-SELECT 'cron', j.jobname, j.schedule||' active='||j.active||' db='||j.database||' user='||j.username||' cmd='||regexp_replace(regexp_replace(regexp_replace(j.command, '\s+', ' ', 'g'), 'https://[a-z]+\.supabase\.co', '<URL>', 'g'), 'eyJ[A-Za-z0-9_.-]+', '<KEY>', 'g')
-  FROM cron.job j
-UNION ALL
+  FROM pg_publication p;
+
+-- pg_cron pode não estar instalado; trata a ausência sem quebrar o manifesto
+DO $$
+BEGIN
+  IF to_regclass('cron.job') IS NOT NULL THEN
+    INSERT INTO _manifest_full
+    SELECT 'cron', j.jobname, j.schedule||' active='||j.active||' db='||j.database||' user='||j.username||' cmd='||regexp_replace(regexp_replace(regexp_replace(j.command, '\s+', ' ', 'g'), 'https://[a-z]+\.supabase\.co', '<URL>', 'g'), 'eyJ[A-Za-z0-9_.-]+', '<KEY>', 'g')
+      FROM cron.job j;
+  ELSE
+    INSERT INTO _manifest_full VALUES ('cron', '<ausente>', 'pg_cron não instalado');
+  END IF;
+END
+$$;
+
+INSERT INTO _manifest_full
 SELECT 'bucket', b.id, b.public::text||' limit='||coalesce(b.file_size_limit::text,'')||' mime='||coalesce(b.allowed_mime_types::text,'')
   FROM storage.buckets b
 UNION ALL
@@ -77,7 +90,20 @@ SELECT 'migration', m.version, coalesce(m.name,'') FROM supabase_migrations.sche
 UNION ALL
 SELECT 'auth_user', u.email, u.id::text||' providers='||coalesce(u.raw_app_meta_data->>'providers','')||' confirmed='||(u.email_confirmed_at IS NOT NULL)::text FROM auth.users u
 UNION ALL
-SELECT 'storage_objects', x.b, x.n::text FROM (SELECT coalesce(o.bucket_id,'<none>') AS b, count(*) AS n FROM storage.objects o GROUP BY 1) x
-UNION ALL
-SELECT 'vault', s.name, coalesce(s.description,'') FROM vault.secrets s
-) m
+SELECT 'storage_objects', x.b, x.n::text FROM (SELECT coalesce(o.bucket_id,'<none>') AS b, count(*) AS n FROM storage.objects o GROUP BY 1) x;
+
+-- vault pode não estar instalado; trata a ausência sem quebrar o manifesto
+DO $$
+BEGIN
+  IF to_regclass('vault.secrets') IS NOT NULL THEN
+    INSERT INTO _manifest_full
+    SELECT 'vault', s.name, coalesce(s.description,'') FROM vault.secrets s;
+  ELSE
+    INSERT INTO _manifest_full VALUES ('vault', '<ausente>', 'vault não instalado');
+  END IF;
+END
+$$;
+
+SELECT section, key, def FROM _manifest_full ORDER BY section, key;
+
+DROP TABLE _manifest_full;
