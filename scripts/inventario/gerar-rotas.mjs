@@ -15,7 +15,8 @@
  *
  * NOTA(loggi): assume a estrutura de arquivos do Zapp_Web_V2 (AppRoutes.tsx, ViewRouter.tsx,
  * lazyViews.ts, navigation.service.ts). Se o Loggi_Flow_V2 usa outra estrutura de rotas,
- * este script falha com ENOENT - adapte os caminhos antes de confiar no resultado.
+ * main() pula a geracao com aviso (rotas.json nao e escrito) - adapte os caminhos quando a
+ * estrutura de rotas do Loggi estiver definida.
  *
  * Uso:
  *   node scripts/inventario/gerar-rotas.mjs           grava inventario/estado/rotas.json
@@ -303,7 +304,16 @@ export const serializar = (inv) => JSON.stringify(inv, null, 2) + '\n';
 
 function main(argv) {
   const saida = path.join(RAIZ_PADRAO, SAIDA_REL);
-  const conteudo = serializar(gerarRotas(RAIZ_PADRAO));
+  let conteudo;
+  try {
+    conteudo = serializar(gerarRotas(RAIZ_PADRAO));
+  } catch (erro) {
+    if (erro && erro.code === 'ENOENT') {
+      console.warn(`gerar-rotas.mjs: estrutura de rotas do Zapp_Web_V2 nao encontrada (${erro.path ?? erro.message}) - pulando, rotas.json nao foi gerado neste repo.`);
+      return;
+    }
+    throw erro;
+  }
   if (argv.includes('--check')) {
     const atual = fs.existsSync(saida) ? fs.readFileSync(saida, 'utf8') : '';
     if (atual !== conteudo) {
