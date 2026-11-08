@@ -26,3 +26,8 @@ dist-ssr
 # Python (scripts/supabase_snapshot, scripts/regras_negocio)
 __pycache__/
 *.pyc
+# Grafo de código (graphify): dezenas de MB, cada clone gera o seu — ver scripts/graphify/README.md
+graphify-out/
+# Gerados por `graphify hook install` com o caminho do Python da máquina
+.husky/post-commit
+.husky/post-checkout

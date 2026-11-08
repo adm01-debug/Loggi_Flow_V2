@@ -16,6 +16,8 @@
     "lint:budget": "node scripts/check-warning-budget.mjs",
     "lint:budget:ratchet": "node scripts/ratchet-warning-budget.mjs",
     "quality:report": "node scripts/generate-quality-report.mjs",
+    "graph:setup": "bash scripts/graphify/setup.sh",
+    "graph:update": "graphify update .",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",

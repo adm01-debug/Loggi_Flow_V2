@@ -1,136 +1,56 @@
 ---
 name: loggi-flow-v2-conventions
-description: Development conventions and patterns for Loggi_Flow_V2. TypeScript project with conventional commits.
+description: Convenções de código e commit do Loggi Flow V2 (TypeScript, Conventional Commits). Use ao alterar código, criar testes ou escrever mensagem de commit neste repositório; as regras operacionais ficam em AGENTS.md.
 ---
 
-# Loggi Flow V2 Conventions
+# Loggi Flow V2 — convenções
 
-> Generated from [adm01-debug/Loggi_Flow_V2](https://github.com/adm01-debug/Loggi_Flow_V2) on 2026-09-03
+As regras de trabalho (banco, fluxo Git, PR, deploy, comunicação) estão em `AGENTS.md` na raiz e em
+`docs/agentes/*.md` — este skill só resume convenções de código e commit.
 
-## Overview
+## Commits
 
-This skill teaches Claude the development patterns and conventions used in Loggi_Flow_V2.
+Padrão Conventional Commits (`@commitlint/config-conventional`, configurado em `.commitlintrc.json`):
+`<tipo>(<escopo>): <descrição>` — escopo opcional e minúsculo, assunto curto no imperativo e sem ponto
+final. Mensagem em PT-BR.
 
-## Tech Stack
+**Nada executa o commitlint neste repo**: `.husky/` só tem `pre-commit` (`npx lint-staged`). O padrão é
+responsabilidade de quem commita.
 
-- **Primary Language**: TypeScript
-- **Architecture**: hybrid module organization
-- **Test Location**: separate
+Exemplo: `fix(coletas): corrige status que travava em conferencia_ok`
 
-## When to Use This Skill
+## Código
 
-Activate this skill when:
-- Making changes to this repository
-- Adding new features following established patterns
-- Writing tests that match project conventions
-- Creating commits with proper message format
+- TypeScript: front Vite + React 18 em `src/`, edge functions Deno em `supabase/functions/`.
+- **Páginas e componentes**: arquivo `PascalCase.tsx`; páginas usam `export default`, componentes seguem o
+  padrão do vizinho.
+- **Hooks**: `use<Algo>.ts(x)` com **export nomeado**, dentro da pasta de domínio
+  (`src/hooks/logistics/`, `integrations/`, `gamification/`, `security/`, …).
+- Funções `camelCase`, tipos/classes/componentes `PascalCase`, constantes `SCREAMING_SNAKE_CASE`.
+- Import por alias `@/` (`@/hooks/...`, `@/components/...`), nunca caminho relativo longo.
+- Dados do servidor via **TanStack Query**, com chave vinda de `src/lib/queryKeys.ts` e opções de
+  `queryConfig.ts` — não invente chave solta.
+- Validação com **Zod** (`src/lib/schemas/`, `supabase/functions/_shared/schemas/`).
+- `src/integrations/supabase/types.ts` é **gerado** — nunca editar à mão.
+- Em edge function: use `_shared/` (`logger.ts` em vez de `console.*`, `cors.ts`, `auth.ts`,
+  `webhookSignature.ts`, `rateLimiter.ts`, `circuitBreaker.ts`) — o CI reprova `console.*` cru.
+- Nada de query sem filtrar `deleted_at IS NULL` em tabela com soft delete.
 
-## Commit Conventions
+## Testes
 
-Follow these commit message conventions based on 2 analyzed commits.
+- Centralizados em `tests/`: `unit/`, `integration/`, `security/`, `contracts/`, `fuzzing/`, `load/`,
+  `e2e/` (Playwright, fora do vitest). Testes de utilitário também aparecem ao lado do módulo em `src/`
+  (`*.test.ts`) — os dois caminhos estão no `include` do `vitest.config.ts`.
+- Rode só o que tocou: `npx vitest run <caminho>`. A suíte completa (`npm run test:coverage`) tem piso de
+  cobertura que **sobe, nunca desce**.
+- `vitest.config.ts` é a config válida; o bloco `test:` do `vite.config.ts` é morto (aponta para um
+  `setupFiles` que não existe).
 
-### Commit Style: Conventional Commits
+## Lint
 
-### Prefixes Used
+`npx eslint <arquivos>` nos arquivos tocados. O gate do CI é **orçamento**, não zero:
+`.warning-budget.json` (`lintWarnings: 105`, `lintErrors: 0`, `tsErrors: 0`) — erro novo reprova, warning
+novo acima do orçamento reprova. Baixar o orçamento é bem-vindo (`npm run lint:budget:ratchet`); subir é
+decisão do dono.
 
-- `docs`
-- `fix`
-
-### Message Guidelines
-
-- Average message length: ~102 characters
-- Keep first line concise and descriptive
-- Use imperative mood ("Add feature" not "Added feature")
-
-
-*Commit message example*
-
-```text
-docs(audit): auditoria técnica 22 dimensões — 2026-09-02 (nota geral 7,1/10)
-```
-
-*Commit message example*
-
-```text
-fix(security+ci): auth obrigatória nas 5 edge functions abertas, CI sem gates impossíveis, migrations de remediação replay-safe
-```
-
-## Architecture
-
-### Project Structure: Single Package
-
-This project uses **hybrid** module organization.
-
-### Configuration Files
-
-- `.github/workflows/ci.yml`
-- `.github/workflows/deploy-functions.yml`
-- `.github/workflows/security.yml`
-
-### Guidelines
-
-- This project uses a hybrid organization
-- Follow existing patterns when adding new code
-
-## Code Style
-
-### Language: TypeScript
-
-### Naming Conventions
-
-| Element | Convention |
-|---------|------------|
-| Files | snake_case |
-| Functions | camelCase |
-| Classes | PascalCase |
-| Constants | SCREAMING_SNAKE_CASE |
-
-### Import Style: Mixed Style
-
-### Export Style: Named Exports
-
-
-*Preferred export style*
-
-```typescript
-// Use named exports
-export function calculateTotal() { ... }
-export const TAX_RATE = 0.1
-export interface Order { ... }
-```
-
-## Error Handling
-
-### Error Handling Style: Try-Catch Blocks
-
-
-*Standard error handling pattern*
-
-```typescript
-try {
-  const result = await riskyOperation()
-  return result
-} catch (error) {
-  console.error('Operation failed:', error)
-  throw new Error('User-friendly message')
-}
-```
-
-## Best Practices
-
-Based on analysis of the codebase, follow these practices:
-
-### Do
-
-- Use conventional commit format (feat:, fix:, etc.)
-- Use snake_case for file names
-- Prefer named exports
-
-### Don't
-
-- Don't write vague commit messages
-- Don't deviate from established patterns without discussion
-
----
-
-*This skill was auto-generated by [ECC Tools](https://ecc.tools). Review and customize as needed for your team.*
+Siga os padrões já existentes no módulo; não desvie sem motivo registrado na PR.

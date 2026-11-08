@@ -1,0 +1,22 @@
+# .graphifyignore — Loggi Flow V2
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+dist/
+coverage/
+build/
+node_modules/
+graphify-out/graph.json
+graphify-out/graph.html
+
+# Lockfiles: centenas de milhares de linhas, zero sinal de arquitetura
+package-lock.json
+bun.lock
+bun.lockb
+
+# Dumps e manifestos grandes de auditoria/contrato: ruído na busca do grafo
+docs/migrations/lovable_schema_migrations.json
+docs/rodonaves_tracking_openapi_v1.27.3.json
+src/integrations/supabase/types.ts
