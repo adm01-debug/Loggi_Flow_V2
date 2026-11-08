@@ -26,6 +26,23 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+
+      // eslint-plugin-react-hooks 7 passou a incluir o ruleset do React Compiler no
+      // preset `recommended`, como error. Isso expôs 97 violações pré-existentes de uma
+      // vez: o código não quebrou um gate, o gate mudou embaixo dele. `rules-of-hooks` e
+      // `exhaustive-deps` seguem como error (o rigor que o repo sempre teve); estas sete
+      // pedem reescrever componentes (mover setState de effects, extrair componentes
+      // aninhados) e entram no orçamento de avisos, mesma política do bloco sonarjs
+      // abaixo. As demais regras novas do Compiler continuam error: não há dívida nelas,
+      // então uma violação nova barra o CI.
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/static-components": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
+      "react-hooks/purity": "warn",
+      "react-hooks/globals": "warn",
+
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },

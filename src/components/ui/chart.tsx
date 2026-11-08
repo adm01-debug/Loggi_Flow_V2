@@ -89,10 +89,25 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+// Recharts 3 moveu `payload`/`label` do tooltip e `payload`/`verticalAlign` da legenda
+// para props lidas do contexto, que os tipos públicos omitem. Quem renderiza o conteúdo
+// continua recebendo esses valores em runtime, então declaramos só o que o corpo usa.
+type ChartPayloadItem = {
+  name?: string | number;
+  dataKey?: string | number;
+  value?: string | number;
+  color?: string;
+  fill?: string;
+  payload?: Record<string, unknown> & { fill?: string };
+};
+
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
     React.ComponentProps<"div"> & {
+      active?: boolean;
+      payload?: ChartPayloadItem[];
+      label?: React.ReactNode;
       hideLabel?: boolean;
       hideIndicator?: boolean;
       indicator?: "line" | "dot" | "dashed";
@@ -134,7 +149,11 @@ const ChartTooltipContent = React.forwardRef<
           : itemConfig?.label;
 
       if (labelFormatter) {
-        return <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>;
+        return (
+          <div className={cn("font-medium", labelClassName)}>
+            {labelFormatter(value, payload as unknown as Parameters<typeof labelFormatter>[1])}
+          </div>
+        );
       }
 
       if (!value) {
@@ -163,7 +182,7 @@ const ChartTooltipContent = React.forwardRef<
           {payload.map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
-            const indicatorColor = color || item.payload.fill || item.color;
+            const indicatorColor = color || item.payload?.fill || item.color;
 
             return (
               <div
@@ -174,7 +193,13 @@ const ChartTooltipContent = React.forwardRef<
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
-                  formatter(item.value, item.name, item, index, item.payload)
+                  formatter(
+                    item.value,
+                    item.name,
+                    item as Parameters<typeof formatter>[2],
+                    index,
+                    item.payload as unknown as Parameters<typeof formatter>[4],
+                  )
                 ) : (
                   <>
                     {itemConfig?.icon ? (
@@ -229,11 +254,12 @@ const ChartLegend = RechartsPrimitive.Legend;
 
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean;
-      nameKey?: string;
-    }
+  React.ComponentProps<"div"> & {
+    payload?: ChartPayloadItem[];
+    verticalAlign?: "top" | "middle" | "bottom";
+    hideIcon?: boolean;
+    nameKey?: string;
+  }
 >(({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
   const { config } = useChart();
 

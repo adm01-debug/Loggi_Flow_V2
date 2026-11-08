@@ -510,7 +510,12 @@ export default function Relatorios() {
                 <CardContent>
                   {dailyData.some((d) => d.coletas > 0 || d.entregas > 0) ? (
                     <ResponsiveContainer width="100%" height={250}>
-                      <BarChart data={dailyData} onClick={handleBarClick}>
+                      {/* Recharts 3 alargou as assinaturas de onClick; o runtime continua
+                          entregando activePayload / a fatia clicada. */}
+                      <BarChart
+                        data={dailyData}
+                        onClick={(state) => handleBarClick(state as unknown as Parameters<typeof handleBarClick>[0])}
+                      >
                         <CartesianGrid
                           strokeDasharray="3 3"
                           className="stroke-muted"
@@ -573,9 +578,9 @@ export default function Relatorios() {
                           dataKey="count"
                           nameKey="status"
                           label={({ name, percent }) =>
-                            `${name} ${(percent * 100).toFixed(0)}%`
+                            `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
                           }
-                          onClick={handlePieClick}
+                          onClick={(sector) => handlePieClick(sector as unknown as Parameters<typeof handlePieClick>[0])}
                           className="cursor-pointer"
                         >
                           {statusDistribution.map((entry, index) => (

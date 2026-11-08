@@ -270,8 +270,8 @@ export default function InteligenciaFrete() {
                         tickFormatter={(v) => `R$${v}`}
                       />
                       <Tooltip
-                        formatter={(v: number) => [
-                          formatCurrency(v),
+                        formatter={(v) => [
+                          formatCurrency(Number(v)),
                           "Custo Médio",
                         ]}
                       />
@@ -302,7 +302,7 @@ export default function InteligenciaFrete() {
                         outerRadius={100}
                         dataKey="value"
                         label={({ name, percent }) =>
-                          `${name} (${(percent * 100).toFixed(0)}%)`
+                          `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`
                         }
                         labelLine={false}
                       >
@@ -314,8 +314,8 @@ export default function InteligenciaFrete() {
                         ))}
                       </Pie>
                       <Tooltip
-                        formatter={(v: number) => [
-                          formatCurrency(v),
+                        formatter={(v) => [
+                          formatCurrency(Number(v)),
                           "Custo Total",
                         ]}
                       />
