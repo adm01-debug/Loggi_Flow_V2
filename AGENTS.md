@@ -16,9 +16,16 @@ Auto-carregado por agentes compatíveis (Hermes, Claude Code, Codex, OpenCode).
 
 ## Regra de ouro antes de agir
 
-1. **Leia o README.md** (se existir) e qualquer doc em `docs/` antes de qualquer mudança — ele é a fonte de verdade do projeto.
-2. **Pronto = ligado em produção com tráfego real.** Código existir não é pronto.
-3. **Diagnóstico antes de patch.** Em bug de produção: leia logs/estado real antes de qualquer fix.
+1. **Leia o estado real antes do README.** Uma automação mantém o retrato do projeto sempre atualizado na
+   branch gerada `contexto`. Comece por:
+   `git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md`
+   (ou `raw.githubusercontent.com/adm01-debug/Loggi_Flow_V2/contexto/docs/contexto/00-INDEX.md`, ou MCP do
+   GitHub com `ref=contexto`). Três fontes, cada fato com um dono: `codigo/` (rotas, hooks, edges, grafo),
+   `supabase/` (banco oficial ao vivo), `regras/` (o que pode e o que não pode). Detalhe em
+   `docs/agentes/contexto-ia.md`. Migrations do repo são histórico, não estado.
+2. **Leia o README.md** (se existir) e qualquer doc em `docs/` antes de qualquer mudança.
+3. **Pronto = ligado em produção com tráfego real.** Código existir não é pronto.
+4. **Diagnóstico antes de patch.** Em bug de produção: leia logs/estado real antes de qualquer fix.
 
 ## GIT: Isolamento Worktree (OBRIGATÓRIO)
 
