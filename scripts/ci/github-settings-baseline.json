@@ -1,0 +1,23 @@
+{
+  "_comentario": [
+    "Baseline MINIMO: so o suficiente para checksObrigatorios() do fila-merge.mjs",
+    "(auto-update-pr-branch.yml). NAO e o baseline completo do settings-guard do Zapp",
+    "(perimetro de settings, secrets, workflows, environments) - esse baseline so",
+    "existe quando/se settings-guard.yml for portado para este repositorio.",
+    "required_status_checks medidos ao vivo via API em 2026-11-08."
+  ],
+  "medido_em": "2026-11-08",
+  "branch_protection_main": {
+    "required_status_checks": [
+      "Security Scan",
+      "Lint",
+      "Type Check",
+      "Warning Budget Gate",
+      "Unit & Integration Tests",
+      "Build Artifact",
+      "quality-gate",
+      "Security Audits",
+      "Agents Docs Integrity"
+    ]
+  }
+}
