@@ -74,6 +74,22 @@ jobs:
       - run: npm ci
       - run: npm run test:coverage
 
+  agents-docs:
+    name: Agents Docs Integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # o guard compara os bytes com a main (git cat-file na base)
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+      # Guard sem dependencias: nao roda npm ci de proposito.
+      - name: Integridade das instrucoes para agentes
+        run: |
+          git fetch --no-tags --depth=1 origin main
+          CLAUDE_MD_BASE=FETCH_HEAD node scripts/ci/check-claude-md-integrity.mjs
+
   build:
     name: Build Artifact
     runs-on: ubuntu-latest
