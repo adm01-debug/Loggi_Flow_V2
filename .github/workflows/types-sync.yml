@@ -1,0 +1,685 @@
+# docs:
+#   gatilho: push na main, agendado e dispatch
+#   prova: os tipos gerados batem com o banco oficial (Gates 1 e 2)
+#   falha: PR em `automation/types-sync` ou issue `[types-sync]`; nunca passa com tipo divergente
+#   avisa: PR de types e issue de gate
+# NOTA(loggi): Este workflow depende de scripts/db-audit/ e scripts/ci/ (typecheck-ratchet,
+# install-postgresql-client, install-pgbouncer) que nao existem neste repositorio.
+# Requer secret DESTINO_URL (URL do banco Loggi: postgres://postgres.jvfhclubfpxrtrrazrgr:[senha]@...)
+# e environment banco-leitura. Porte os scripts do Zapp_Web_V2 e adapte database-identity.json
+# (fingerprint do banco jvfhclubfpxrtrrazrgr) antes de usar.
+# ==================================================================
+# LOGGI-FLOW · Sincronizacao assistida dos artefatos do banco
+# ==================================================================
+# Consulta o banco somente em eventos confiaveis da main. Quando encontra
+# drift, valida os artefatos e abre/atualiza um PR; nunca faz push direto na
+# main. Isso continua funcionando quando a branch protection for ativada.
+# ==================================================================
+
+name: types-sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'scripts/db-audit/**'
+      - '!scripts/db-audit/grants-baseline.json'
+      - '.github/workflows/types-sync.yml'
+  schedule:
+    - cron: '49 5 * * 1'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: types-sync-${{ github.ref }}-${{ github.event_name == 'schedule' && github.run_id || 'push' }}
+  cancel-in-progress: false
+
+env:
+  SUPABASE_CLI_VERSION: '2.116.0'
+
+jobs:
+  preflight:
+    name: Debounce — verificar PR de sync recente
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    permissions:
+      pull-requests: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - id: check
+        name: Checar idade do head do PR de sync
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            if (context.eventName !== 'push') {
+              core.setOutput('skip', 'false');
+              return;
+            }
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 20,
+            });
+            const syncPr = prs.find(pr => pr.labels.some(l => l.name === 'types-sync'));
+            if (!syncPr) {
+              core.setOutput('skip', 'false');
+              return;
+            }
+            const { data: commit } = await github.rest.git.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: syncPr.head.sha,
+            });
+            const headDate = new Date(commit.committer.date);
+            const ageSec = Math.floor((Date.now() - headDate.getTime()) / 1000);
+            if (ageSec < 1200) {
+              core.info(`PR #${syncPr.number} head commit há ${ageSec}s (<20min) — debounce ativo.`);
+              core.setOutput('skip', 'true');
+            } else {
+              core.info(`PR #${syncPr.number} head commit há ${ageSec}s — prosseguindo.`);
+              core.setOutput('skip', 'false');
+            }
+
+  ler-banco:
+    name: Ler banco oficial e gerar candidatos
+    needs: preflight
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      needs.preflight.outputs.skip != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: banco-leitura
+    permissions:
+      contents: read
+    outputs:
+      types_changed: ${{ steps.diff.outputs.types_changed }}
+      catalog_changed: ${{ steps.diff.outputs.catalog_changed }}
+      manifest_changed: ${{ steps.diff.outputs.manifest_changed }}
+      grants_changed: ${{ steps.diff.outputs.grants_changed }}
+      schema_changed: ${{ steps.diff.outputs.schema_changed }}
+      awaiting_apply: ${{ steps.apply-pending.outputs.awaiting_apply }}
+    steps:
+      - name: Checkout confiavel da main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Supabase CLI ${{ env.SUPABASE_CLI_VERSION }}
+        uses: supabase/setup-cli@d239d1052f6f024a8d746d7e5aeddead63b9cb53 # v3.1.0
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Instalar cliente PostgreSQL
+        run: bash scripts/ci/install-postgresql-client.sh
+
+      - name: Instalar pgbouncer (proxy local para credencial do gen types)
+        run: bash scripts/ci/install-pgbouncer.sh
+
+      - name: Exigir credencial do banco oficial
+        env:
+          DESTINO_URL: ${{ secrets.DESTINO_URL }}
+        run: |
+          if [ -z "$DESTINO_URL" ]; then
+            echo "::error::DESTINO_URL nao configurado."
+            exit 1
+          fi
+          node --input-type=module <<'NODE'
+          import {
+            carregarIdentidadeEsperada,
+            endurecerDestinoTls,
+            validarDestino,
+            validarSupabaseCa,
+          } from './scripts/db-audit/database-identity.mjs';
+          import { appendFileSync } from 'node:fs';
+          const identidade = carregarIdentidadeEsperada('scripts/db-audit/database-identity.json');
+          const erros = validarDestino(process.env.DESTINO_URL, identidade);
+          erros.push(...validarSupabaseCa());
+          const tls = endurecerDestinoTls(process.env.DESTINO_URL);
+          erros.push(...tls.erros);
+          for (const erro of erros) console.error('ERRO: ' + erro);
+          if (erros.length) process.exit(1);
+          const destinoSeguro = tls.connectionString;
+          console.log(`::add-mask::${destinoSeguro}`);
+          appendFileSync(process.env.GITHUB_ENV, `DESTINO_URL=${destinoSeguro}\n`);
+          appendFileSync(process.env.GITHUB_ENV, 'PGSSLMODE=verify-full\n');
+          console.log('OK: endpoint do banco oficial comprovado por fingerprint; TLS verify-full e CA Supabase pinada.');
+          NODE
+
+      - name: ghcr.io login (previne rate-limit no gen-types)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GITHUB_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin || true
+        continue-on-error: true
+
+      - name: Pre-pull postgres-meta via ghcr.io (evita rate-limit do ECR public)
+        continue-on-error: true
+        run: |
+          GHCR_IMG="ghcr.io/supabase/postgres-meta:v0.98.0"
+          ECR_IMG="public.ecr.aws/supabase/postgres-meta:v0.98.0"
+          if docker pull "$GHCR_IMG" 2>&1; then
+            docker tag "$GHCR_IMG" "$ECR_IMG"
+            echo "Pre-pull concluido: $ECR_IMG em cache local."
+          else
+            echo "::warning::Pre-pull de $GHCR_IMG falhou; CLI tentara ECR diretamente."
+          fi
+
+      - name: Gerar candidatos em diretorio temporario
+        run: |
+          umask 077
+          bash scripts/db-audit/gen-types.sh /tmp/types.new.ts
+
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import fs from 'node:fs';
+          import { withPsqlEnvironment } from './scripts/db-audit/psql-environment.mjs';
+
+          const PSQL_BIN = process.env.PSQL_BIN || 'psql';
+          const url = process.env.DESTINO_URL;
+
+          function psqlFile(file) {
+            return withPsqlEnvironment(url, (env) => execFileSync(
+              PSQL_BIN,
+              ['-X', '-v', 'ON_ERROR_STOP=1', '-At', '-f', file],
+              { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000, env, maxBuffer: 64 * 1024 * 1024 },
+            ));
+          }
+
+          fs.writeFileSync('/tmp/catalog.new.json', psqlFile('scripts/db-audit/catalog.sql'));
+          fs.writeFileSync('/tmp/manifest.new.json', psqlFile('scripts/db-audit/manifest.sql'));
+          fs.writeFileSync('/tmp/grants.new.json', psqlFile('scripts/db-audit/grants-baseline.sql'));
+          NODE
+
+          TYPE_SIZE=$(wc -c < /tmp/types.new.ts)
+          echo "types.ts gerado: ${TYPE_SIZE} bytes"
+          if [ "$TYPE_SIZE" -lt 102400 ]; then
+            echo "::error::types.ts menor que 100KB; a identidade do banco precisa ser revisada."
+            exit 1
+          fi
+          test -s /tmp/catalog.new.json
+          test -s /tmp/manifest.new.json
+          test -s /tmp/grants.new.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/catalog.new.json', 'utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/manifest.new.json', 'utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/grants.new.json', 'utf8'))"
+
+      - name: Classificar drift com identidade comprovada
+        id: diff
+        run: |
+          grep -v '^// ' /tmp/types.new.ts > /tmp/types.new.stripped
+          grep -v '^// ' src/integrations/supabase/types.ts > /tmp/types.old.stripped
+
+          if diff -q /tmp/types.new.stripped /tmp/types.old.stripped > /dev/null 2>&1; then
+            TYPES_CHANGED=false
+          else
+            TYPES_CHANGED=true
+          fi
+
+          set +e
+          node scripts/db-audit/check-catalog-fresh.mjs /tmp/catalog.new.json
+          CATALOG_STATUS=$?
+          node scripts/db-audit/check-manifest-fresh.mjs /tmp/manifest.new.json
+          MANIFEST_STATUS=$?
+          node scripts/db-audit/check-grants-fresh.mjs /tmp/grants.new.json
+          GRANTS_STATUS=$?
+          set -e
+
+          case "$CATALOG_STATUS" in
+            0) CATALOG_CHANGED=false ;;
+            1) CATALOG_CHANGED=true ;;
+            *) echo "::error::Catalogo candidato rejeitado."; exit 1 ;;
+          esac
+          case "$MANIFEST_STATUS" in
+            0) MANIFEST_CHANGED=false ;;
+            1) MANIFEST_CHANGED=true ;;
+            *) echo "::error::Manifesto candidato rejeitado."; exit 1 ;;
+          esac
+          case "$GRANTS_STATUS" in
+            0) GRANTS_CHANGED=false ;;
+            1) GRANTS_CHANGED=true ;;
+            *) echo "::error::Baseline de grants candidato rejeitado."; exit 1 ;;
+          esac
+
+          if [ "$TYPES_CHANGED" = true ] || [ "$CATALOG_CHANGED" = true ] || [ "$MANIFEST_CHANGED" = true ] || [ "$GRANTS_CHANGED" = true ]; then
+            SCHEMA_CHANGED=true
+          else
+            SCHEMA_CHANGED=false
+          fi
+
+          echo "types_changed=${TYPES_CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "catalog_changed=${CATALOG_CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "manifest_changed=${MANIFEST_CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "grants_changed=${GRANTS_CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "schema_changed=${SCHEMA_CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "Drift: types=${TYPES_CHANGED}, catalogo=${CATALOG_CHANGED}, manifesto=${MANIFEST_CHANGED}, grants=${GRANTS_CHANGED}"
+
+      - name: Finalizar se nao houver drift
+        if: steps.diff.outputs.schema_changed != 'true'
+        run: echo "Banco e artefatos commitados estao em sincronia."
+
+      - name: Aplicar candidatos no worktree
+        if: steps.diff.outputs.schema_changed == 'true'
+        run: |
+          if [ "${{ steps.diff.outputs.types_changed }}" = true ]; then
+            cp /tmp/types.new.ts src/integrations/supabase/types.ts
+          fi
+          if [ "${{ steps.diff.outputs.catalog_changed }}" = true ]; then
+            cp /tmp/catalog.new.json supabase/schema-catalog.json
+          fi
+          if [ "${{ steps.diff.outputs.manifest_changed }}" = true ]; then
+            cp /tmp/manifest.new.json supabase/schema-manifest.json
+          fi
+          if [ "${{ steps.diff.outputs.grants_changed }}" = true ]; then
+            cp /tmp/grants.new.json scripts/db-audit/grants-baseline.json
+          fi
+
+      - name: Classificar apply pendente
+        id: apply-pending
+        if: steps.diff.outputs.schema_changed == 'true'
+        run: |
+          set +e
+          node scripts/db-audit/lote-pendente.mjs > /tmp/drift.log 2>&1
+          drift_exit=$?
+          set -e
+          if [ "$drift_exit" -eq 2 ]; then
+            echo "awaiting_apply=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "awaiting_apply=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publicar candidatos como artifact
+        if: steps.diff.outputs.schema_changed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: types-sync-candidates-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            src/integrations/supabase/types.ts
+            supabase/schema-catalog.json
+            supabase/schema-manifest.json
+            scripts/db-audit/grants-baseline.json
+          retention-days: 14
+
+
+  gates-e-pr:
+    name: Gates e PR de sincronizacao (sem credencial)
+    needs: [preflight, ler-banco]
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      needs.preflight.outputs.skip != 'true' &&
+      needs.ler-banco.outputs.schema_changed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:  # zizmor: ignore[excessive-permissions]
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+    steps:
+      - name: Checkout confiavel da main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Baixar candidatos do job protegido
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: types-sync-candidates-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/sync-in
+
+      - name: Normalizar candidatos baixados
+        run: |
+          for f in types.ts schema-catalog.json schema-manifest.json grants-baseline.json; do
+            found=$(find /tmp/sync-in -name "$f" -type f -print -quit)
+            test -n "$found"
+            case "$f" in
+              types.ts) dest=/tmp/types.new.ts ;;
+              schema-catalog.json) dest=/tmp/catalog.new.json ;;
+              schema-manifest.json) dest=/tmp/manifest.new.json ;;
+              grants-baseline.json) dest=/tmp/grants.new.json ;;
+            esac
+            cp "$found" "$dest"
+          done
+
+      - name: Aplicar candidatos no worktree
+        run: |
+          if [ "${{ needs.ler-banco.outputs.types_changed }}" = true ]; then cp /tmp/types.new.ts src/integrations/supabase/types.ts; fi
+          if [ "${{ needs.ler-banco.outputs.catalog_changed }}" = true ]; then cp /tmp/catalog.new.json supabase/schema-catalog.json; fi
+          if [ "${{ needs.ler-banco.outputs.manifest_changed }}" = true ]; then cp /tmp/manifest.new.json supabase/schema-manifest.json; fi
+          if [ "${{ needs.ler-banco.outputs.grants_changed }}" = true ]; then cp /tmp/grants.new.json scripts/db-audit/grants-baseline.json; fi
+
+      - name: Setup Bun
+        if: needs.ler-banco.outputs.schema_changed == 'true'
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: '1.4.0'
+
+      - name: 💾 Cache de dependências Bun
+        if: needs.ler-banco.outputs.schema_changed == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-
+
+      - name: Instalar dependencias
+        if: needs.ler-banco.outputs.schema_changed == 'true'
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Gate 1 — TypeScript nao piora
+        id: gate1
+        if: needs.ler-banco.outputs.schema_changed == 'true'
+        run: |
+          set -o pipefail
+          if node scripts/ci/typecheck-ratchet.mjs 2>&1 | tee /tmp/tsc.log; then
+            echo "passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "passed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Gate 1 falhou: novos erros de TypeScript introduzidos pelo novo types.ts."
+          fi
+
+      - name: Gate 1b — classificar apply pendente
+        id: gate1b
+        if: needs.ler-banco.outputs.awaiting_apply == 'true' && steps.gate1.outputs.passed == 'false'
+        run: |
+          echo "awaiting_apply=true" >> "$GITHUB_OUTPUT"
+          echo "::notice::Gate 1 aguardando apply de migrations pendentes."
+
+      - name: Gate 2 — usage-guard
+        id: gate2
+        if: needs.ler-banco.outputs.schema_changed == 'true' && steps.gate1.outputs.passed == 'true'
+        run: |
+          set -o pipefail
+          if node scripts/db-audit/supabase-usage-guard.mjs --prune-obsolete 2>&1 | tee /tmp/guard.log; then
+            echo "passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "passed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Gate 2 falhou: violacoes no usage-guard."
+          fi
+
+      - name: Gate 3 — remocoes destrutivas
+        id: gate3
+        if: needs.ler-banco.outputs.schema_changed == 'true' && steps.gate2.outputs.passed == 'true'
+        run: |
+          set -o pipefail
+          if node scripts/db-audit/check-remocoes-destrutivas.mjs supabase/schema-catalog.json /tmp/catalog.new.json 2>&1 | tee /tmp/gate3.log; then
+            echo "passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "passed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Gate 3 bloqueou: objeto removido pelo sync ainda tem consumidor no codigo."
+          fi
+
+      - name: Garantir label types-sync
+        if: needs.ler-banco.outputs.schema_changed == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'types-sync',
+                color: '0075ca',
+                description: 'Sincronizacao automatizada de artefatos do banco'
+              });
+            } catch (error) {
+              if (error.status !== 422) throw error;
+            }
+
+      - name: Registrar falha dos gates
+        if: >-
+          needs.ler-banco.outputs.schema_changed == 'true' &&
+          steps.gate1b.outputs.awaiting_apply != 'true' &&
+          (steps.gate1.outputs.passed == 'false' ||
+           steps.gate2.outputs.passed == 'false' ||
+           steps.gate3.outputs.passed == 'false')
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const gate1 = '${{ steps.gate1.outputs.passed }}';
+            const gate2 = '${{ steps.gate2.outputs.passed }}';
+            const gate3 = '${{ steps.gate3.outputs.passed }}';
+            const causa = gate1 === 'false' ? 'typescript' :
+              gate2 === 'false' ? 'usage-guard' : 'remocoes-destrutivas';
+            const failed = gate1 === 'false' ? 'TypeScript' :
+              gate2 === 'false' ? 'usage-guard' : 'remoçoes destrutivas';
+            const fs = require('fs');
+            const excerpt = gate1 === 'false' && fs.existsSync('/tmp/tsc.log')
+              ? fs.readFileSync('/tmp/tsc.log', 'utf8').slice(0, 2000)
+              : gate2 === 'false' && fs.existsSync('/tmp/guard.log')
+                ? fs.readFileSync('/tmp/guard.log', 'utf8').slice(0, 2000)
+                : gate3 === 'false' && fs.existsSync('/tmp/gate3.log')
+                  ? fs.readFileSync('/tmp/gate3.log', 'utf8').slice(0, 2000)
+                  : '';
+            const marker = `<!-- causa:${causa} -->`;
+            const title = '[types-sync] Falha ao propor sincronizacao';
+            const body = [
+              marker,
+              `**Gate:** ${failed}`,
+              `**Commit da main:** ${{ github.sha }}`,
+              `**Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+              excerpt ? `\n\`\`\`\n${excerpt}\n\`\`\`` : ''
+            ].filter(Boolean).join('\n');
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'types-sync'
+            });
+            const existing = issues.find(issue => issue.title === title);
+            if (existing) {
+              const primeira = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                per_page: 1
+              });
+              const ultimaPaginaMatch = (primeira.headers?.link || '')
+                .match(/[?&]page=(\d+)[^>]*>;\s*rel="last"/);
+              const ultimaPagina = ultimaPaginaMatch ? Number(ultimaPaginaMatch[1]) : 1;
+              if (ultimaPagina > 20) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: existing.number,
+                  body: `⚠️ Esta issue atingiu ${ultimaPagina} comentários e está sendo rotacionada (política E51/W91).\n\n---\n\n${body}`,
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: existing.number, state: 'closed', state_reason: 'completed',
+                });
+                await github.rest.issues.create({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  title,
+                  body: `Continuação de #${existing.number}.\n\n---\n\n${body}`,
+                  labels: ['types-sync'],
+                });
+                return;
+              }
+              const { data: comentarios } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                per_page: 1,
+                page: ultimaPagina
+              });
+              const ultimo = comentarios[0];
+              const causaAnterior = ultimo?.body?.match(/<!-- causa:([a-z-]+) -->/)?.[1] ?? null;
+              const idadeUltimoMs = ultimo ? Date.now() - new Date(ultimo.created_at).getTime() : Infinity;
+              if (causaAnterior === causa && idadeUltimoMs < 6 * 60 * 60 * 1000) {
+                core.info(`Dedupe: mesma causa (${causa}) ha menos de 6h; comentario suprimido.`);
+                return;
+              }
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                labels: ['types-sync'],
+                body
+              });
+            }
+
+      - name: Falhar quando um gate rejeitar a proposta
+        if: >-
+          needs.ler-banco.outputs.schema_changed == 'true' &&
+          (steps.gate1.outputs.passed == 'false' ||
+           steps.gate2.outputs.passed == 'false' ||
+           steps.gate3.outputs.passed == 'false')
+        run: |
+          echo "::error::A sincronizacao foi bloqueada por um ou mais gates."
+          exit 1
+
+      - name: Abrir ou atualizar PR de sincronizacao
+        id: pull-request
+        if: >-
+          needs.ler-banco.outputs.schema_changed == 'true' &&
+          steps.gate1.outputs.passed == 'true' &&
+          steps.gate2.outputs.passed == 'true' &&
+          steps.gate3.outputs.passed == 'true'
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        env:
+          HUSKY: '0'
+        with:
+          token: ${{ secrets.TYPES_SYNC_PR_TOKEN || github.token }}
+          base: main
+          branch: automation/types-sync
+          delete-branch: true
+          commit-message: 'chore(db): sincronizar artefatos com o banco [auto]'
+          title: 'chore(db): sincronizar artefatos derivados do banco'
+          body: |
+            Sincronização automatizada a partir do banco oficial.
+
+            - main de origem: `${{ github.sha }}`
+            - types.ts alterado: `${{ needs.ler-banco.outputs.types_changed }}`
+            - catálogo alterado: `${{ needs.ler-banco.outputs.catalog_changed }}`
+            - manifesto alterado: `${{ needs.ler-banco.outputs.manifest_changed }}`
+            - baseline de grants alterado: `${{ needs.ler-banco.outputs.grants_changed }}`
+            - gates TypeScript, usage-guard e remoções: aprovados
+
+            Revisão humana e checks da PR continuam obrigatórios.
+          labels: types-sync
+          add-paths: |
+            src/integrations/supabase/types.ts
+            supabase/schema-catalog.json
+            supabase/schema-manifest.json
+            scripts/db-audit/grants-baseline.json
+            scripts/db-audit/known-violations.json
+
+      - name: Exigir PR criado ou atualizado
+        if: >-
+          needs.ler-banco.outputs.schema_changed == 'true' &&
+          steps.gate1.outputs.passed == 'true' &&
+          steps.gate2.outputs.passed == 'true' &&
+          steps.gate3.outputs.passed == 'true'
+        run: |
+          if [ -z "${{ steps.pull-request.outputs.pull-request-number }}" ]; then
+            echo "::error::Havia drift validado, mas nenhum PR foi criado ou atualizado."
+            exit 1
+          fi
+          echo "PR #${{ steps.pull-request.outputs.pull-request-number }} pronto para revisao."
+
+      - name: Destravar os checks do PR de sincronizacao
+        if: steps.pull-request.outputs.pull-request-number != ''
+        continue-on-error: true
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PR_HEAD_SHA: ${{ steps.pull-request.outputs.pull-request-head-sha }}
+        with:
+          script: |
+            const headSha = process.env.PR_HEAD_SHA;
+            if (!headSha) {
+              core.warning('create-pull-request nao devolveu o head sha; nada a destravar.');
+              return;
+            }
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            let pendentes = [];
+            for (let tentativa = 1; tentativa <= 6; tentativa += 1) {
+              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner,
+                repo,
+                head_sha: headSha,
+                head_branch: 'automation/types-sync',
+                status: 'action_required',
+                per_page: 20,
+              });
+              pendentes = data.workflow_runs || [];
+              if (pendentes.length > 0) break;
+              await new Promise((resolve) => setTimeout(resolve, 10000));
+            }
+            if (pendentes.length === 0) {
+              core.info('Nenhum run aguardando aprovacao.');
+              return;
+            }
+            const liberados = [];
+            const recusados = [];
+            for (const run of pendentes) {
+              try {
+                await github.rest.actions.approveWorkflowRun({ owner, repo, run_id: run.id });
+                liberados.push(run.name);
+              } catch (error) {
+                recusados.push(`${run.name} (${error.status})`);
+              }
+            }
+            const linhas = [
+              '### Checks do PR de sincronizacao',
+              `- head sha: \`${headSha}\``,
+              `- liberados: ${liberados.length > 0 ? liberados.join(', ') : 'nenhum'}`,
+            ];
+            if (recusados.length > 0) {
+              linhas.push(`- recusados pelo GITHUB_TOKEN: ${recusados.join(', ')}`);
+            }
+            await core.summary.addRaw(linhas.join('\n')).write();
+
+      - name: Habilitar auto-merge no PR de sincronizacao
+        if: steps.pull-request.outputs.pull-request-number != ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pull-request.outputs.pull-request-number }}
+        run: gh pr merge --auto --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## types-sync / gates-e-pr — $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo
+            echo "| Item | Alterado |"
+            echo "|---|---|"
+            echo "| types.ts | ${{ needs.ler-banco.outputs.types_changed || 'n/a' }} |"
+            echo "| schema-catalog.json | ${{ needs.ler-banco.outputs.catalog_changed || 'n/a' }} |"
+            echo "| schema-manifest.json | ${{ needs.ler-banco.outputs.manifest_changed || 'n/a' }} |"
+            echo "| grants-baseline.json | ${{ needs.ler-banco.outputs.grants_changed || 'n/a' }} |"
+            echo "| PR | ${{ steps.pull-request.outputs.pull-request-number || 'n/a' }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Resumo de falha
+        if: failure()
+        run: |
+          {
+            echo ""
+            echo "## ❌ types-sync falhou"
+            echo ""
+            mostrou=0
+            mostra() {
+              echo "### $1"; echo '```'; head -100 "$2" 2>/dev/null || echo "(log $2 ausente)"; echo '```'; mostrou=1
+            }
+            [ "${{ steps.gate1.outputs.passed }}" = "false" ] && mostra "Gate 1 — TypeScript" /tmp/tsc.log
+            [ "${{ steps.gate2.outputs.passed }}" = "false" ] && mostra "Gate 2 — usage-guard" /tmp/guard.log
+            [ "${{ steps.gate3.outputs.passed }}" = "false" ] && mostra "Gate 3 — remoções destrutivas" /tmp/gate3.log
+            [ "$mostrou" = 1 ] || echo "Verifique os logs do step anterior para detalhes."
+          } >> "$GITHUB_STEP_SUMMARY"
