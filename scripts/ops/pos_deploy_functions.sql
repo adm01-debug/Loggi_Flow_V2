@@ -51,13 +51,18 @@
 --       supabase secrets list --project-ref jvfhclubfpxrtrrazrgr
 --     Se INTERNAL_FN_SECRET JÁ estiver listada, NÃO rode `secrets set` de novo —
 --     sobrescrever um secret existente pode quebrar os crons em produção.
--- 2.2 Só se o secret estiver AUSENTE (não para rotacionar), setar a env. O valor
---     deve vir de uma variável de ambiente do seu shell, NUNCA digitado inline:
---       export INTERNAL_FN_SECRET="$(valor obtido com segurança no vault)"
+-- 2.2 Carregar o valor do secret na variável local do shell (SEMPRE — mesmo que o
+--     secret remoto já exista, o PASSO 3.2/3.4 precisa de INTERNAL_FN_SECRET
+--     preenchido, e um shell novo não tem essa variável). Obtenha o valor com
+--     segurança (vault/painel do projeto) e exporte SEM exibir:
+--       export INTERNAL_FN_SECRET="<valor obtido com segurança>"
+--       [ -n "$INTERNAL_FN_SECRET" ] && echo "local ok (sem exibir o valor)" \
+--         || echo "FALTA carregar a variável local"
+-- 2.3 Só se o secret estiver AUSENTE no remoto (não para rotacionar), setar a env:
 --       supabase secrets set INTERNAL_FN_SECRET="$INTERNAL_FN_SECRET" \
 --         --project-ref jvfhclubfpxrtrrazrgr
 --     (o valor não aparece no histórico do shell nem no log do comando)
--- 2.3 Deploy das functions (todas, ou uma por vez na ordem abaixo):
+-- 2.4 Deploy das functions (todas, ou uma por vez na ordem abaixo):
 --       supabase functions deploy --project-ref jvfhclubfpxrtrrazrgr
 --     Ordem recomendada (dependências): resend-email, evolution-whatsapp,
 --     melhor-envio-api, log-security-event, predict-delays-scheduled.
@@ -66,7 +71,7 @@
 --     Settings -> Secrets and variables -> Actions.
 --
 -- ─────────────────────────────────────────────────────────────────────────────
--- PASSO 3 — HEALTHCHECK REAL (por function e por ambiente)
+-- PASSO 3 — VALIDAÇÃO APÓS DEPLOY (sondagem de auth + healthcheck funcional)
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3.1 Sem auth (deve dar 401 — prova que a function está no ar e protegida):
 --   for fn in resend-email evolution-whatsapp melhor-envio-api \
@@ -75,27 +80,44 @@
 --       "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn")
 --     echo "$fn sem-auth -> $code (esperado 401)"
 --   done
--- 3.2 Com x-internal-secret (deve dar 200/4xx de negócio, NUNCA 401 — prova que o
---     secret bate). Use o valor via variável de ambiente, sem imprimir:
+-- 3.2 Sondagem de auth COM x-internal-secret (importa só não dar 401). Use a
+--     variável local do PASSO 2.2, SEM imprimir o valor. Pode vir 500/400 sem
+--     corpo (a function faz req.json() e o parse falha) — aceitável; 401 =
+--     secret errado/ausente:
 --   for fn in resend-email predict-delays-scheduled; do
 --     code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
 --       -H "x-internal-secret: $INTERNAL_FN_SECRET" \
 --       "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn")
 --     echo "$fn com-secret -> $code (esperado != 401)"
 --   done
--- 3.3 Com JWT de usuário autenticado (evolution-whatsapp, melhor-envio-api,
---     log-security-event exigem requireUser): gere um token de usuário real e:
---   curl -s -o /dev/null -w '%{http_code}\n' -X POST \
---     -H "Authorization: Bearer $USER_JWT" \
---     "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/evolution-whatsapp"
---   -> esperado: 200/4xx de negócio, NUNCA 401.
+-- 3.3 Sondagem de auth COM JWT (evolution-whatsapp, melhor-envio-api e
+--     log-security-event usam requireUser): gere um access token de usuário
+--     real e exporte na variável SB_JWT (SEM colar o valor no comando):
+--       export SB_JWT="<access token gerado no painel, sessão de usuário real>"
+--       [ -n "$SB_JWT" ] && echo "JWT local ok (sem exibir o valor)" \
+--         || echo "FALTA gerar/exportar o JWT"
+--   for fn in evolution-whatsapp melhor-envio-api log-security-event; do
+--     code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+--       -H "Authorization: Bearer $SB_JWT" \
+--       "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn")
+--     echo "$fn com-jwt -> $code (esperado != 401)"
+--   done
+--   -> 401 com JWT ainda = token inválido/expirado => gere outro (não o 3.2).
+--      Qualquer código != 401 prova caminho de auth OK (pode vir 400/500 do
+--      parse do corpo, como no 3.2). NUNCA imprima o valor do JWT.
 -- 3.4 Interpretação de códigos:
---     401 sem auth  = OK (function no ar e protegida)
---     401 com secret = secret errado/ausente => revalide o PASSO 1/2
---     500/400        = env específica ausente ou erro de runtime => veja logs
+--     401 sem auth    = OK (function no ar e protegida)
+--     401 com secret  = secret errado/ausente => revalide o PASSO 1/2
+--     401 com JWT     = token expirado/inválido => gere outro (3.3)
+--     500/400 sem corpo NA SONDAGEM (sem payload) = também OK: o parse de
+--       req.json() falhou, mas o auth passou — não é falso alarme
+--     500/400 COM payload válido = env específica ausente ou erro de runtime
+--       => veja logs (3.5)
 --     timeout/000    = function não respondeu => pode não estar deployada
--- 3.5 Logs (se algo falhar):
---       supabase functions logs <fn> --project-ref jvfhclubfpxrtrrazrgr
+-- 3.5 Logs (se algo falhar): o CLI NÃO tem `supabase functions logs`. Use o
+--     Dashboard do Supabase (Logs -> Edge Functions), filtre pelo nome da
+--     function, método POST e intervalo do deploy; ou a API de telemetria do
+--     projeto (project == jvfhclubfpxrtrrazrgr).
 --
 -- ─────────────────────────────────────────────────────────────────────────────
 -- ROLLBACK
