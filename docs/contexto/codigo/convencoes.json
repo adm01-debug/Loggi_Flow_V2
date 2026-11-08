@@ -1,0 +1,83 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "onde_ficam": {
+  "telas": [
+   "src/pages (61)"
+  ],
+  "componentes": [
+   "src/components (256)",
+   "src/pages (77)",
+   "src/features (41)"
+  ],
+  "hooks": [
+   "src/hooks (119)",
+   "src/features (41)",
+   "src/components (14)"
+  ],
+  "servicos_logica": [
+   "src/lib (26)",
+   "src/utils (6)",
+   "src/services (5)"
+  ],
+  "testes": [
+   "co-localizado (*.test) (24)",
+   "tests/ (11)",
+   "outro (4)"
+  ],
+  "edge_functions": "supabase/functions",
+  "migrations": "supabase/migrations",
+  "scripts": [
+   "scripts/audit (5)",
+   "scripts/ops (3)",
+   "scripts/regras_negocio (3)"
+  ],
+  "docs": [
+   "docs (26)",
+   "(raiz) (8)",
+   ".github (1)"
+  ]
+ },
+ "nomenclatura": {
+  "componentes": "PascalCase (86%)",
+  "hooks": "use + PascalCase",
+  "servicos": "camelCase (93%)",
+  "edge_functions": "kebab-case (98%)",
+  "tabelas": "snake_case (88%)"
+ },
+ "barrels_index": 25,
+ "extensao_componentes": [
+  ".tsx (380)"
+ ],
+ "alias_imports": {
+  "(raiz)": {
+   "@/": "src/",
+   "~/": "src/"
+  }
+ },
+ "commits": {
+  "convencao": "commitlint",
+  "exemplos": [
+   "chore(contexto): automação de contexto para agentes de IA (branch `contexto`) (#104)",
+   "fix(deps): destrava a CI do repo — lockfile, tipos Recharts 3, ruleset do React Compiler e 4 CVEs (#108)",
+   "fix: endurece manifest_detail e manifest_data com padrao idempotente (#103)",
+   "delete x",
+   "delete x"
+  ]
+ },
+ "pr_template": ".github/pull_request_template.md",
+ "codeowners": null,
+ "contributing": "CONTRIBUTING.md",
+ "instrucoes_agentes": [
+  "AGENTS.md"
+ ],
+ "typescript": {
+  "strict": true,
+  "noImplicitAny": true,
+  "tsconfigs": [
+   "tsconfig.app.json",
+   "tsconfig.json",
+   "tsconfig.node.json"
+  ]
+ }
+}

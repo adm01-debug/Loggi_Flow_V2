@@ -1,0 +1,264 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "total": 23,
+ "scripts": [
+  {
+   "arquivo": "scripts/ai-context/cenarios.mjs",
+   "descricao": "Simulação de cenários do gerador: monta centenas de repositórios sintéticos (variantes de SQL, rotas, menus, edges, workflows, monorepo, Python, arquivos corrompidos, fuzz) e confere:",
+   "linhas": 173,
+   "env": [
+    "A",
+    "K",
+    "NODE_ENV",
+    "SCRIPT_ONLY",
+    "SRK",
+    "SUPABASE_URL",
+    "VITE_A",
+    "VITE_C",
+    "VITE_FEATURE_X",
+    "X"
+   ],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ai-context/gerar.mjs",
+   "descricao": "Gera o contexto de projeto para agentes de IA (padrão: inventario/ia/*). Zero dependências. Node >= 18. Genérico: funciona em qualquer repositório.",
+   "linhas": 924,
+   "env": [
+    "AI_CONTEXT_DIR",
+    "AI_CONTEXT_PUBLICACAO",
+    "AI_CONTEXT_ROOT"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit-gate.mjs",
+   "descricao": "Gate de vulnerabilidades: falha em qualquer CRITICAL/HIGH fora da allowlist. Allowlist só para pacotes SEM fix disponível no npm, com justificativa e revisão",
+   "linhas": 54,
+   "env": [],
+   "npm_scripts": [
+    "security-scan"
+   ],
+   "workflows": [
+    "ci.yml",
+    "security.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/content_hash.sql",
+   "descricao": null,
+   "linhas": 15,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": true
+  },
+  {
+   "arquivo": "scripts/audit/manifest_data.sql",
+   "descricao": null,
+   "linhas": 17,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/manifest_detail.sql",
+   "descricao": null,
+   "linhas": 63,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": true
+  },
+  {
+   "arquivo": "scripts/audit/manifest_full.sql",
+   "descricao": null,
+   "linhas": 110,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/manifest_summary.sql",
+   "descricao": null,
+   "linhas": 30,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": true
+  },
+  {
+   "arquivo": "scripts/check-warning-budget.mjs",
+   "descricao": "* Warning budget gate.",
+   "linhas": 116,
+   "env": [
+    "LINT_ERROR_BUDGET",
+    "LINT_WARNING_BUDGET",
+    "TS_ERROR_BUDGET"
+   ],
+   "npm_scripts": [
+    "lint:budget"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/cleanup_triggers_source.sql",
+   "descricao": null,
+   "linhas": 105,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": true
+  },
+  {
+   "arquivo": "scripts/generate-quality-report.mjs",
+   "descricao": "* Generates a Quality Gate report:",
+   "linhas": 129,
+   "env": [],
+   "npm_scripts": [
+    "quality:report"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ops/backup_origem.sh",
+   "descricao": "Backup diario da ORIGEM (Lovable hgicfqjayrjurivtygqf) ate o descomissionamento. Roda no container claude-code da VPS. Segredo fora do repo: /workspace/.secrets/loggi-origem.pgpass (formato pgpass: ho",
+   "linhas": 56,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ops/pos_deploy_functions.sql",
+   "descricao": null,
+   "linhas": 26,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ops/set_missing_secrets.sh",
+   "descricao": "Secrets com PLACEHOLDER_NEEDS_SETUP — preencher antes do cutover (etapa 83) Uso: export SUPABASE_ACCESS_TOKEN=sbp_... && sh scripts/ops/set_missing_secrets.sh",
+   "linhas": 57,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/origem_remediacao_2026-08-31.sql",
+   "descricao": null,
+   "linhas": 59,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": true
+  },
+  {
+   "arquivo": "scripts/ratchet-warning-budget.mjs",
+   "descricao": "* Auto-ratchet the warning budget.",
+   "linhas": 101,
+   "env": [],
+   "npm_scripts": [
+    "lint:budget:ratchet"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/regras_negocio/generate.py",
+   "descricao": null,
+   "linhas": 2138,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/regras_negocio/indice.py",
+   "descricao": null,
+   "linhas": 237,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/regras_negocio/publish.sh",
+   "descricao": "Publica docs/ai-context gerados: commit + push na branch padrão, ou PR quando a branch é protegida. Variáveis:",
+   "linhas": 195,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/seed-database.ts",
+   "descricao": "* Seed script — popula o banco Supabase com dados fictícios realistas",
+   "linhas": 875,
+   "env": [
+    "SEED_PASSWORD",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL",
+    "VITE_SUPABASE_URL"
+   ],
+   "npm_scripts": [
+    "seed"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/supabase_snapshot/snapshot.py",
+   "descricao": "Somente leitura no banco (sessão read-only, statement_timeout, lock_timeout). Nunca grava linhas de tabelas, valores de segredos, chaves, senhas ou DSN.",
+   "linhas": 1791,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/validate-csp.mjs",
+   "descricao": "* Valida a meta CSP em index.html contra domínios de fontes/estilos necessários.",
+   "linhas": 85,
+   "env": [],
+   "npm_scripts": [
+    "prebuild",
+    "validate:csp"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/validate-no-console.mjs",
+   "descricao": "Fails CI when supabase/functions contains raw console.* calls. Prevents PII regressions in Edge Function logs.",
+   "linhas": 43,
+   "env": [],
+   "npm_scripts": [
+    "validate:no-console"
+   ],
+   "workflows": [],
+   "orfao": false
+  }
+ ]
+}

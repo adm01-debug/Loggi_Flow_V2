@@ -1,0 +1,684 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "git": {
+  "commit": "44ea285e1efc085a1382038ea0b4e1490196bc81",
+  "branch": "main",
+  "data_commit": "2026-11-08T16:57:25-03:00",
+  "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
+  "ultimos_commits": [
+   {
+    "sha": "44ea285e",
+    "data": "2026-11-08",
+    "assunto": "chore(contexto): automação de contexto para agentes de IA (branch `contexto`) (#104)"
+   },
+   {
+    "sha": "b43d84b2",
+    "data": "2026-11-08",
+    "assunto": "fix(deps): destrava a CI do repo — lockfile, tipos Recharts 3, ruleset do React Compiler e 4 CVEs (#108)"
+   },
+   {
+    "sha": "17bd3887",
+    "data": "2026-11-08",
+    "assunto": "fix: endurece manifest_detail e manifest_data com padrao idempotente (#103)"
+   },
+   {
+    "sha": "770cfae2",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "8464b793",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "96258876",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "716282ce",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "a4585991",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "cb4dd0ff",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "d62cc113",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "1ada5785",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "3d9375cd",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "aa987630",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "45ecb658",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "b6f67642",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "38fa76c2",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "8218f2b8",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "65e68a9e",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "5ac41452",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "1b9cf91d",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "45bd5a4c",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "bb0a78a5",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "76013296",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "e100d646",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   },
+   {
+    "sha": "f7f4ae18",
+    "data": "2026-11-08",
+    "assunto": "delete x"
+   }
+  ],
+  "arquivos_mudados_7d": 45,
+  "pastas_mais_mudadas_30d": [
+   {
+    "pasta": "scripts/validate-csp.mjs",
+    "mudancas": 3
+   },
+   {
+    "pasta": "docs/contexto/regras",
+    "mudancas": 2
+   },
+   {
+    "pasta": "scripts/audit/manifest_detail.sql",
+    "mudancas": 2
+   },
+   {
+    "pasta": "scripts/check-warning-budget.mjs",
+    "mudancas": 2
+   },
+   {
+    "pasta": "scripts/generate-quality-report.mjs",
+    "mudancas": 2
+   },
+   {
+    "pasta": "scripts/ratchet-warning-budget.mjs",
+    "mudancas": 2
+   },
+   {
+    "pasta": "src/components/freight",
+    "mudancas": 2
+   },
+   {
+    "pasta": "x",
+    "mudancas": 2
+   },
+   {
+    "pasta": ".github/workflows/contexto.yml",
+    "mudancas": 1
+   },
+   {
+    "pasta": ".gitignore",
+    "mudancas": 1
+   },
+   {
+    "pasta": ".warning-budget.json",
+    "mudancas": 1
+   },
+   {
+    "pasta": "AGENTS.md",
+    "mudancas": 1
+   },
+   {
+    "pasta": "ai-context.config.json",
+    "mudancas": 1
+   },
+   {
+    "pasta": "docs/agentes/contexto-ia.md",
+    "mudancas": 1
+   },
+   {
+    "pasta": "eslint.config.js",
+    "mudancas": 1
+   }
+  ],
+  "arquivos_mais_mudados_90d": [
+   {
+    "arquivo": "package-lock.json",
+    "mudancas": 40
+   },
+   {
+    "arquivo": "package.json",
+    "mudancas": 38
+   },
+   {
+    "arquivo": "src/hooks/gamification/useGamification.ts",
+    "mudancas": 9
+   },
+   {
+    "arquivo": "index.html",
+    "mudancas": 8
+   },
+   {
+    "arquivo": "supabase/config.toml",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "ESTADO_ATUAL.md",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "ESTADO_ATUAL_EVIDENCIAS.md",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/validate-csp.mjs",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "src/components/gamification/GamificationPanel.tsx",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "supabase/functions/ai-logistics-assistant/index.ts",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "tests/security/integrations-access.spec.ts",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "tests/security/rls-access.spec.ts",
+    "mudancas": 4
+   },
+   {
+    "arquivo": ".github/dependabot.yml",
+    "mudancas": 3
+   },
+   {
+    "arquivo": ".github/workflows/ci-nexus.yml",
+    "mudancas": 3
+   },
+   {
+    "arquivo": ".github/workflows/ci.yml",
+    "mudancas": 3
+   },
+   {
+    "arquivo": ".github/workflows/deploy-functions.yml",
+    "mudancas": 3
+   },
+   {
+    "arquivo": ".github/workflows/security.yml",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "AGENTS.md",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "eslint.config.js",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "scripts/audit/manifest_detail.sql",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "scripts/check-warning-budget.mjs",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "scripts/generate-quality-report.mjs",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "scripts/origem_remediacao_2026-08-31.sql",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "scripts/ratchet-warning-budget.mjs",
+    "mudancas": 3
+   },
+   {
+    "arquivo": "scripts/seed-database.ts",
+    "mudancas": 3
+   }
+  ],
+  "autores_30d": [
+   {
+    "autor": "adm01-debug",
+    "commits": 71
+   }
+  ]
+ },
+ "contagens": {
+  "arquivos_total": 1157,
+  "arquivos_codigo": 792,
+  "linhas_codigo": 139587,
+  "rotas": 61,
+  "rotas_http_backend": 12,
+  "vistas_por_id": 0,
+  "itens_menu": 77,
+  "modulos": 74,
+  "componentes": 380,
+  "hooks": 176,
+  "edge_functions": 43,
+  "tabelas": 147,
+  "migrations": 244,
+  "cron_jobs": 28,
+  "testes": 39,
+  "workflows": 6,
+  "scripts": 23,
+  "docs_md": 66
+ },
+ "por_pasta": {
+  "eslint.config.js": {
+   "arquivos": 1,
+   "linhas": 101
+  },
+  "playwright.config.ts": {
+   "arquivos": 1,
+   "linhas": 39
+  },
+  "postcss.config.js": {
+   "arquivos": 1,
+   "linhas": 7
+  },
+  "public/sw.js": {
+   "arquivos": 1,
+   "linhas": 200
+  },
+  "scripts/ai-context": {
+   "arquivos": 3,
+   "linhas": 1458
+  },
+  "scripts/audit-gate.mjs": {
+   "arquivos": 1,
+   "linhas": 54
+  },
+  "scripts/check-warning-budget.mjs": {
+   "arquivos": 1,
+   "linhas": 116
+  },
+  "scripts/generate-quality-report.mjs": {
+   "arquivos": 1,
+   "linhas": 129
+  },
+  "scripts/ratchet-warning-budget.mjs": {
+   "arquivos": 1,
+   "linhas": 101
+  },
+  "scripts/regras_negocio": {
+   "arquivos": 3,
+   "linhas": 2539
+  },
+  "scripts/seed-database.ts": {
+   "arquivos": 1,
+   "linhas": 875
+  },
+  "scripts/supabase_snapshot": {
+   "arquivos": 2,
+   "linhas": 2669
+  },
+  "scripts/validate-csp.mjs": {
+   "arquivos": 1,
+   "linhas": 85
+  },
+  "scripts/validate-no-console.mjs": {
+   "arquivos": 1,
+   "linhas": 43
+  },
+  "src/App.tsx": {
+   "arquivos": 1,
+   "linhas": 216
+  },
+  "src/components": {
+   "arquivos": 295,
+   "linhas": 48164
+  },
+  "src/features": {
+   "arquivos": 90,
+   "linhas": 6345
+  },
+  "src/hooks": {
+   "arquivos": 122,
+   "linhas": 18892
+  },
+  "src/i18n.ts": {
+   "arquivos": 1,
+   "linhas": 38
+  },
+  "src/integrations": {
+   "arquivos": 4,
+   "linhas": 6643
+  },
+  "src/lib": {
+   "arquivos": 42,
+   "linhas": 5794
+  },
+  "src/main.tsx": {
+   "arquivos": 1,
+   "linhas": 64
+  },
+  "src/pages": {
+   "arquivos": 80,
+   "linhas": 30687
+  },
+  "src/services": {
+   "arquivos": 5,
+   "linhas": 299
+  },
+  "src/test": {
+   "arquivos": 1,
+   "linhas": 65
+  },
+  "src/utils": {
+   "arquivos": 7,
+   "linhas": 713
+  },
+  "supabase/functions": {
+   "arquivos": 110,
+   "linhas": 12196
+  },
+  "tailwind.config.ts": {
+   "arquivos": 1,
+   "linhas": 296
+  },
+  "tests/contracts": {
+   "arquivos": 1,
+   "linhas": 110
+  },
+  "tests/e2e": {
+   "arquivos": 2,
+   "linhas": 66
+  },
+  "tests/fuzzing": {
+   "arquivos": 1,
+   "linhas": 31
+  },
+  "tests/integration": {
+   "arquivos": 3,
+   "linhas": 116
+  },
+  "tests/load": {
+   "arquivos": 1,
+   "linhas": 20
+  },
+  "tests/security": {
+   "arquivos": 2,
+   "linhas": 229
+  },
+  "tests/unit": {
+   "arquivos": 1,
+   "linhas": 29
+  },
+  "vite.config.ts": {
+   "arquivos": 1,
+   "linhas": 112
+  },
+  "vitest.config.ts": {
+   "arquivos": 1,
+   "linhas": 46
+  }
+ },
+ "maiores_arquivos": [
+  {
+   "arquivo": "src/integrations/supabase/types.ts",
+   "linhas": 6551
+  },
+  {
+   "arquivo": "scripts/regras_negocio/generate.py",
+   "linhas": 2138
+  },
+  {
+   "arquivo": "scripts/supabase_snapshot/snapshot.py",
+   "linhas": 1791
+  },
+  {
+   "arquivo": "supabase/functions/rodonaves-api/index.ts",
+   "linhas": 1354
+  },
+  {
+   "arquivo": "src/pages/Envios.tsx",
+   "linhas": 1241
+  },
+  {
+   "arquivo": "src/pages/Transportadoras.tsx",
+   "linhas": 1209
+  },
+  {
+   "arquivo": "src/components/dashboard/LogisticsMapWidget.tsx",
+   "linhas": 1128
+  },
+  {
+   "arquivo": "src/pages/Clientes.tsx",
+   "linhas": 1102
+  },
+  {
+   "arquivo": "src/pages/ConfiguracoesFrete.tsx",
+   "linhas": 1071
+  },
+  {
+   "arquivo": "src/pages/Ocorrencias.tsx",
+   "linhas": 1060
+  },
+  {
+   "arquivo": "src/pages/DashboardExecutivo.tsx",
+   "linhas": 948
+  },
+  {
+   "arquivo": "src/pages/CotacaoMultiCanal.tsx",
+   "linhas": 945
+  },
+  {
+   "arquivo": "scripts/ai-context/gerar.mjs",
+   "linhas": 924
+  },
+  {
+   "arquivo": "src/pages/Fornecedores.tsx",
+   "linhas": 884
+  },
+  {
+   "arquivo": "scripts/seed-database.ts",
+   "linhas": 875
+  },
+  {
+   "arquivo": "src/components/melhorenvio/MECarrinhoPanel.tsx",
+   "linhas": 840
+  },
+  {
+   "arquivo": "src/pages/FretesInternos.tsx",
+   "linhas": 834
+  },
+  {
+   "arquivo": "src/pages/Relatorios.tsx",
+   "linhas": 825
+  },
+  {
+   "arquivo": "src/pages/Coletas.tsx",
+   "linhas": 810
+  },
+  {
+   "arquivo": "src/pages/RastreamentoRealTime.tsx",
+   "linhas": 783
+  },
+  {
+   "arquivo": "src/components/ui/sidebar.tsx",
+   "linhas": 771
+  },
+  {
+   "arquivo": "src/components/map/MapboxMap.tsx",
+   "linhas": 731
+  },
+  {
+   "arquivo": "src/pages/InteligenciaFrete.tsx",
+   "linhas": 687
+  },
+  {
+   "arquivo": "supabase/functions/accuracy-meta-monitor/simulator_test.ts",
+   "linhas": 657
+  },
+  {
+   "arquivo": "src/pages/DashboardCotacoes.tsx",
+   "linhas": 640
+  }
+ ],
+ "qualidade": {
+  "any": 58,
+  "console_log": 57,
+  "ts_ignore": 0,
+  "eslint_disable": 1,
+  "todos": 3,
+  "arquivos_acima_500_linhas": 34
+ },
+ "todos": [
+  {
+   "arquivo": "scripts/ai-context/gerar.mjs",
+   "linha": 188,
+   "tipo": "TODO",
+   "texto": "|FIXME|HACK|XXX)\\b[:\\s-]*([^\\n]{0,100})/.exec(line); if (m) todos.push({ linha: ln, tipo: m[1], text"
+  },
+  {
+   "arquivo": "scripts/ai-context/gerar.mjs",
+   "linha": 222,
+   "tipo": "TODO",
+   "texto": "|FIXME|HACK|XXX)\\b[:\\s-]*([^\\n]{0,100})/.exec(l); return m ? { linha: i + 1, tipo: m[1], texto: m[2]"
+  },
+  {
+   "arquivo": "scripts/regras_negocio/generate.py",
+   "linha": 570,
+   "tipo": "TODO",
+   "texto": "\", \"http\", \"import\")) and \"://\" not in c:"
+  }
+ ],
+ "alertas": {
+  "rotas_sem_arquivo": [],
+  "componentes_ambiguos": [],
+  "menu_sem_destino": [
+   "Integrações -> /gestao-melhor-envio"
+  ],
+  "edges_orfas": [
+   "get-weather-data",
+   "ingest-biosync",
+   "lgpd-erase-user",
+   "secure-store"
+  ],
+  "edges_chamadas_sem_pasta": [],
+  "tabelas_sem_rls": [
+   "audit_logs_y2026m01",
+   "audit_logs_y2026m02",
+   "audit_logs_y2026m03",
+   "audit_logs_y2026m04",
+   "audit_logs_y2026m05",
+   "audit_logs_y2026m06",
+   "audit_logs_y2026m07",
+   "audit_logs_y2026m08",
+   "audit_logs_y2026m09",
+   "audit_logs_y2026m10",
+   "audit_logs_y2026m11",
+   "audit_logs_y2026m12"
+  ],
+  "tabelas_usadas_sem_definicao": [
+   "avatars",
+   "documents",
+   "integracoes_bitrix"
+  ],
+  "tabelas_com_drift_migration_vs_types": [
+   "business_rules_config",
+   "feature_flags",
+   "freight_integration_mappings",
+   "profiles",
+   "user_achievements"
+  ],
+  "rpcs_sem_definicao": [],
+  "componentes_orfaos": [
+   "src/components/common/TiltCard.tsx",
+   "src/components/gamification/GamificationPanel.tsx"
+  ],
+  "componentes_com_nome_duplicado": [
+   "ConfirmProvider",
+   "DeleteButton",
+   "InlineConfirm",
+   "Pagination",
+   "PerformanceChart",
+   "SearchInput",
+   "Skeleton",
+   "Toaster"
+  ],
+  "scripts_orfaos": [
+   "scripts/audit/content_hash.sql",
+   "scripts/audit/manifest_detail.sql",
+   "scripts/audit/manifest_summary.sql",
+   "scripts/cleanup_triggers_source.sql",
+   "scripts/origem_remediacao_2026-08-31.sql"
+  ],
+  "env_usadas_nao_declaradas": [
+   "DEV",
+   "MODE",
+   "NODE_ENV",
+   "VITE_SUPABASE_ANON_KEY"
+  ],
+  "ciclos_de_import": 3,
+  "possiveis_segredos_no_codigo": [
+   "scripts/ai-context/cenarios.mjs:102",
+   "src/components/dashboard/LogisticsMapWidget.tsx:73",
+   "tests/security/integrations-access.spec.ts:7",
+   "tests/security/rls-access.spec.ts:7"
+  ]
+ },
+ "erros_do_gerador": []
+}

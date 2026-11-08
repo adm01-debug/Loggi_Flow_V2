@@ -1,0 +1,681 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "frameworks": [
+  "vitest",
+  "playwright"
+ ],
+ "total": 39,
+ "por_tipo": {
+  "contrato": 1,
+  "e2e": 2,
+  "pytest": 2,
+  "unit": 34
+ },
+ "onde_ficam": [
+  {
+   "padrao": "co-localizado (*.test)",
+   "arquivos": 24
+  },
+  {
+   "padrao": "tests/",
+   "arquivos": 11
+  },
+  {
+   "padrao": "outro",
+   "arquivos": 4
+  }
+ ],
+ "arquivos": [
+  {
+   "arquivo": "scripts/ai-context/gerar.unit.mjs",
+   "tipo": "unit",
+   "linhas": 361,
+   "testa": [
+    "src/components/auth/ProtectedRoute.tsx",
+    "src/components/ui/index.ts"
+   ],
+   "casos": 18
+  },
+  {
+   "arquivo": "scripts/regras_negocio/test_generate.py",
+   "tipo": "pytest",
+   "linhas": 164,
+   "testa": [],
+   "casos": 0
+  },
+  {
+   "arquivo": "scripts/supabase_snapshot/test_snapshot.py",
+   "tipo": "pytest",
+   "linhas": 878,
+   "testa": [],
+   "casos": 0
+  },
+  {
+   "arquivo": "src/components/security/SecurityOverviewPanel.regression.test.ts",
+   "tipo": "unit",
+   "linhas": 163,
+   "testa": [],
+   "casos": 12
+  },
+  {
+   "arquivo": "src/hooks/common/useBulkActions.test.ts",
+   "tipo": "unit",
+   "linhas": 156,
+   "testa": [
+    "src/hooks/common/useBulkActions.ts"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "src/hooks/rodonaves/useGatewayHealth.test.ts",
+   "tipo": "unit",
+   "linhas": 118,
+   "testa": [
+    "src/hooks/rodonaves/useGatewayHealth.ts"
+   ],
+   "casos": 8
+  },
+  {
+   "arquivo": "src/hooks/rodonaves/useSLOSnapshots.test.ts",
+   "tipo": "unit",
+   "linhas": 100,
+   "testa": [
+    "src/hooks/rodonaves/useSLOSnapshots.ts"
+   ],
+   "casos": 5
+  },
+  {
+   "arquivo": "src/lib/conciliacaoImport.test.ts",
+   "tipo": "unit",
+   "linhas": 59,
+   "testa": [
+    "src/lib/conciliacaoImport.ts"
+   ],
+   "casos": 6
+  },
+  {
+   "arquivo": "src/lib/formatters.parse.test.ts",
+   "tipo": "unit",
+   "linhas": 40,
+   "testa": [
+    "src/lib/formatters.ts"
+   ],
+   "casos": 6
+  },
+  {
+   "arquivo": "src/lib/predictions/mitigationRecommender.test.ts",
+   "tipo": "unit",
+   "linhas": 125,
+   "testa": [
+    "src/lib/predictions/mitigationRecommender.ts",
+    "src/lib/predictions/rootCauseAnalyzer.ts"
+   ],
+   "casos": 8
+  },
+  {
+   "arquivo": "src/lib/predictions/mitigationRerank.test.ts",
+   "tipo": "unit",
+   "linhas": 120,
+   "testa": [
+    "src/lib/predictions/mitigationROI.ts",
+    "src/lib/predictions/mitigationRecommender.ts",
+    "src/lib/predictions/rootCauseAnalyzer.ts"
+   ],
+   "casos": 5
+  },
+  {
+   "arquivo": "src/lib/predictions/mitigationROI.test.ts",
+   "tipo": "unit",
+   "linhas": 116,
+   "testa": [
+    "src/lib/predictions/mitigationROI.ts",
+    "src/lib/predictions/mitigationRecommender.ts",
+    "src/lib/predictions/rootCauseAnalyzer.ts"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "src/lib/predictions/rootCauseAnalyzer.test.ts",
+   "tipo": "unit",
+   "linhas": 209,
+   "testa": [
+    "src/lib/predictions/rootCauseAnalyzer.ts"
+   ],
+   "casos": 16
+  },
+  {
+   "arquivo": "src/lib/predictions/whatIfCompare.test.ts",
+   "tipo": "unit",
+   "linhas": 128,
+   "testa": [
+    "src/lib/predictions/rootCauseAnalyzer.ts",
+    "src/lib/predictions/whatIfCompare.ts"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "src/lib/predictions/whatIfScenarios.test.ts",
+   "tipo": "unit",
+   "linhas": 106,
+   "testa": [
+    "src/lib/predictions/whatIfScenarios.ts",
+    "src/lib/predictions/whatIfSimulator.ts"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "src/lib/predictions/whatIfSimulator.test.ts",
+   "tipo": "unit",
+   "linhas": 118,
+   "testa": [
+    "src/lib/predictions/mitigationRecommender.ts",
+    "src/lib/predictions/rootCauseAnalyzer.ts",
+    "src/lib/predictions/whatIfSimulator.ts"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "src/lib/rodonaves/capabilities.test.ts",
+   "tipo": "unit",
+   "linhas": 92,
+   "testa": [
+    "src/lib/rodonaves/capabilities.ts"
+   ],
+   "casos": 11
+  },
+  {
+   "arquivo": "src/lib/rodonaves/eventCodes.test.ts",
+   "tipo": "unit",
+   "linhas": 284,
+   "testa": [
+    "src/lib/rodonaves/eventCodes.ts"
+   ],
+   "casos": 21
+  },
+  {
+   "arquivo": "src/lib/rodonaves/freightHealth.test.ts",
+   "tipo": "unit",
+   "linhas": 239,
+   "testa": [
+    "src/lib/rodonaves/eventCodes.ts",
+    "src/lib/rodonaves/freightHealth.ts"
+   ],
+   "casos": 13
+  },
+  {
+   "arquivo": "src/lib/rodonaves/gatewaySLO.test.ts",
+   "tipo": "unit",
+   "linhas": 150,
+   "testa": [
+    "src/lib/rodonaves/gatewaySLO.ts"
+   ],
+   "casos": 14
+  },
+  {
+   "arquivo": "src/lib/rodonaves/latencyTrend.test.ts",
+   "tipo": "unit",
+   "linhas": 243,
+   "testa": [
+    "src/lib/rodonaves/latencyTrend.ts"
+   ],
+   "casos": 18
+  },
+  {
+   "arquivo": "src/lib/rodonaves/sloAlerts.test.ts",
+   "tipo": "unit",
+   "linhas": 213,
+   "testa": [
+    "src/lib/rodonaves/gatewaySLO.ts",
+    "src/lib/rodonaves/sloAlerts.ts"
+   ],
+   "casos": 12
+  },
+  {
+   "arquivo": "src/lib/rodonaves/sloReport.test.ts",
+   "tipo": "unit",
+   "linhas": 180,
+   "testa": [
+    "src/lib/rodonaves/sloReport.ts"
+   ],
+   "casos": 12
+  },
+  {
+   "arquivo": "src/test/setup.ts",
+   "tipo": "unit",
+   "linhas": 65,
+   "testa": [],
+   "casos": 0
+  },
+  {
+   "arquivo": "src/utils/systemTester.spec.ts",
+   "tipo": "unit",
+   "linhas": 80,
+   "testa": [
+    "src/integrations/supabase/client.ts",
+    "src/utils/systemTester.ts"
+   ],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/_shared/circuitBreaker.test.ts",
+   "tipo": "unit",
+   "linhas": 50,
+   "testa": [
+    "supabase/functions/_shared/circuitBreaker.ts"
+   ],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/ai-logistics-assistant/index.test.ts",
+   "tipo": "unit",
+   "linhas": 73,
+   "testa": [
+    "supabase/functions/ai-logistics-assistant/index.ts"
+   ],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/scheduled-reports/index.test.ts",
+   "tipo": "unit",
+   "linhas": 97,
+   "testa": [
+    "supabase/functions/scheduled-reports/index.ts"
+   ],
+   "casos": 3
+  },
+  {
+   "arquivo": "tests/contracts/nexus-contracts.spec.ts",
+   "tipo": "contrato",
+   "linhas": 110,
+   "testa": [],
+   "casos": 5
+  },
+  {
+   "arquivo": "tests/e2e/critical-paths.spec.ts",
+   "tipo": "e2e",
+   "linhas": 36,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "tests/e2e/dashboard.spec.ts",
+   "tipo": "e2e",
+   "linhas": 30,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "tests/fuzzing/edge-functions.spec.ts",
+   "tipo": "unit",
+   "linhas": 31,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "tests/integration/fuzzing.spec.ts",
+   "tipo": "unit",
+   "linhas": 29,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "tests/integration/massive-simulation.spec.ts",
+   "tipo": "unit",
+   "linhas": 46,
+   "testa": [],
+   "casos": 1
+  },
+  {
+   "arquivo": "tests/integration/webhooks.spec.ts",
+   "tipo": "unit",
+   "linhas": 41,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "tests/load/backend-stress.spec.ts",
+   "tipo": "unit",
+   "linhas": 20,
+   "testa": [],
+   "casos": 1
+  },
+  {
+   "arquivo": "tests/security/integrations-access.spec.ts",
+   "tipo": "unit",
+   "linhas": 125,
+   "testa": [],
+   "casos": 5
+  },
+  {
+   "arquivo": "tests/security/rls-access.spec.ts",
+   "tipo": "unit",
+   "linhas": 104,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "tests/unit/modules-integrity.spec.ts",
+   "tipo": "unit",
+   "linhas": 29,
+   "testa": [],
+   "casos": 2
+  }
+ ],
+ "sql": [],
+ "cobertura_por_arquivo": {
+  "src/components/auth/ProtectedRoute.tsx": 1,
+  "src/components/ui/index.ts": 1,
+  "src/hooks/common/useBulkActions.ts": 1,
+  "src/hooks/rodonaves/useGatewayHealth.ts": 1,
+  "src/hooks/rodonaves/useSLOSnapshots.ts": 1,
+  "src/integrations/supabase/client.ts": 1,
+  "src/lib/conciliacaoImport.ts": 1,
+  "src/lib/formatters.ts": 1,
+  "src/lib/predictions/mitigationROI.ts": 2,
+  "src/lib/predictions/mitigationRecommender.ts": 4,
+  "src/lib/predictions/rootCauseAnalyzer.ts": 6,
+  "src/lib/predictions/whatIfCompare.ts": 1,
+  "src/lib/predictions/whatIfScenarios.ts": 1,
+  "src/lib/predictions/whatIfSimulator.ts": 2,
+  "src/lib/rodonaves/capabilities.ts": 1,
+  "src/lib/rodonaves/eventCodes.ts": 2,
+  "src/lib/rodonaves/freightHealth.ts": 1,
+  "src/lib/rodonaves/gatewaySLO.ts": 2,
+  "src/lib/rodonaves/latencyTrend.ts": 1,
+  "src/lib/rodonaves/sloAlerts.ts": 1,
+  "src/lib/rodonaves/sloReport.ts": 1,
+  "src/utils/systemTester.ts": 1,
+  "supabase/functions/_shared/circuitBreaker.ts": 1,
+  "supabase/functions/ai-logistics-assistant/index.ts": 1,
+  "supabase/functions/scheduled-reports/index.ts": 1
+ },
+ "sem_teste": {
+  "telas": [
+   "src/pages/APIDocumentation.tsx",
+   "src/pages/AdminADR.tsx",
+   "src/pages/AdminTelemetria.tsx",
+   "src/pages/AlertasCusto.tsx",
+   "src/pages/Analytics.tsx",
+   "src/pages/AprovacaoResetSenha.tsx",
+   "src/pages/AuditTrail.tsx",
+   "src/pages/Auth.tsx",
+   "src/pages/AutomacaoRegras.tsx",
+   "src/pages/CalendarioLogistico.tsx",
+   "src/pages/CentralRastreamento.tsx",
+   "src/pages/Clientes.tsx",
+   "src/pages/Coletas.tsx",
+   "src/pages/ConciliacaoAutomatica.tsx",
+   "src/pages/ConciliacaoFinanceira.tsx",
+   "src/pages/Configuracoes.tsx",
+   "src/pages/ConfiguracoesFrete.tsx",
+   "src/pages/Conquistas.tsx",
+   "src/pages/CotacaoFrete.tsx",
+   "src/pages/CotacaoMultiCanal.tsx",
+   "src/pages/CustosDashboard.tsx",
+   "src/pages/DashboardCotacoes.tsx",
+   "src/pages/DashboardExecutivo.tsx",
+   "src/pages/Despachos.tsx",
+   "src/pages/Envios.tsx",
+   "src/pages/ExportacaoDados.tsx",
+   "src/pages/Fornecedores.tsx",
+   "src/pages/FretesInternos.tsx",
+   "src/pages/GerenciamentoUsuarios.tsx",
+   "src/pages/GestaoBox.tsx",
+   "src/pages/GestaoMelhorEnvio.tsx",
+   "src/pages/GestaoRodonaves.tsx",
+   "src/pages/GestaoWebhooks.tsx",
+   "src/pages/ImportacaoMassa.tsx",
+   "src/pages/Index.tsx",
+   "src/pages/IntegracaoBitrix.tsx",
+   "src/pages/InteligenciaFrete.tsx",
+   "src/pages/KanbanEntregas.tsx",
+   "src/pages/LogisticaReversa.tsx",
+   "src/pages/LojaRecompensas.tsx",
+   "src/pages/MapaRotas.tsx",
+   "src/pages/NotFound.tsx",
+   "src/pages/Notificacoes.tsx",
+   "src/pages/Ocorrencias.tsx",
+   "src/pages/PainelOTIF.tsx",
+   "src/pages/PainelSLA.tsx",
+   "src/pages/Profile.tsx",
+   "src/pages/Ranking.tsx",
+   "src/pages/RastreamentoMotorista.tsx",
+   "src/pages/RastreamentoPublico.tsx",
+   "src/pages/RastreamentoRealTime.tsx",
+   "src/pages/RateLimitDashboard.tsx",
+   "src/pages/RelatorioPDF.tsx",
+   "src/pages/Relatorios.tsx",
+   "src/pages/ResetPassword.tsx",
+   "src/pages/RotasTransportadoras.tsx",
+   "src/pages/SLADashboard.tsx",
+   "src/pages/Seguranca.tsx",
+   "src/pages/Transportadoras.tsx",
+   "src/pages/admin/DbHealth.tsx",
+   "src/pages/admin/QualityGate.tsx"
+  ],
+  "hooks": [
+   "scripts/ai-context/cenarios.mjs",
+   "src/components/accessibility/index.ts",
+   "src/components/accessibility/LiveRegion.tsx",
+   "src/components/accessibility/ReducedMotion.tsx",
+   "src/components/common/ConfirmDialog.tsx",
+   "src/components/common/ConfirmProvider.tsx",
+   "src/components/common/ErrorBoundary.tsx",
+   "src/components/common/index.ts",
+   "src/components/pwa/index.ts",
+   "src/components/pwa/InstallPrompt.tsx",
+   "src/components/security/PermissionGate.tsx",
+   "src/components/ui/form.tsx",
+   "src/components/ui/sidebar.tsx",
+   "src/components/ui/use-toast.ts",
+   "src/features/analytics/hooks/useAnalyticsFeature.ts",
+   "src/features/db-observability/hooks/useActiveSessions.ts",
+   "src/features/db-observability/hooks/useAutovacuumHealth.ts",
+   "src/features/db-observability/hooks/useBloatHotspots.ts",
+   "src/features/db-observability/hooks/useCacheHitRatios.ts",
+   "src/features/db-observability/hooks/useCapacityForecast.ts",
+   "src/features/db-observability/hooks/useCronJobs.ts",
+   "src/features/db-observability/hooks/useDbRegressionAlerts.ts",
+   "src/features/db-observability/hooks/useDbRegressions.ts",
+   "src/features/db-observability/hooks/useDuplicateIndexes.ts",
+   "src/features/db-observability/hooks/useExtensionsAudit.ts",
+   "src/features/db-observability/hooks/useGlobalHealthScore.ts",
+   "src/features/db-observability/hooks/useHealthAnomalies.ts",
+   "src/features/db-observability/hooks/useHealthScoreHistory.ts",
+   "src/features/db-observability/hooks/useHealthScoreRegression.ts",
+   "src/features/db-observability/hooks/useHealthSnapshots.ts",
+   "src/features/db-observability/hooks/useIndexProposals.ts",
+   "src/features/db-observability/hooks/useIndexRoi.ts",
+   "src/features/db-observability/hooks/useLoadHeatmap.ts",
+   "src/features/db-observability/hooks/useLockConflicts.ts",
+   "src/features/db-observability/hooks/useLongRunningQueries.ts",
+   "src/features/db-observability/hooks/useMaintenanceWindows.ts",
+   "src/features/db-observability/hooks/useQueryDetail.ts",
+   "src/features/db-observability/hooks/useRemediationActions.ts",
+   "src/features/db-observability/hooks/useRemediationMttr.ts",
+   "src/features/db-observability/hooks/useRemediationSuggestions.ts",
+   "src/features/db-observability/hooks/useReplicationStatus.ts",
+   "src/features/db-observability/hooks/useRlsAudit.ts",
+   "src/features/db-observability/hooks/useSeqScanHotspots.ts",
+   "src/features/db-observability/hooks/useSloDaily.ts",
+   "src/features/db-observability/hooks/useTableCoaccess.ts",
+   "src/features/db-observability/hooks/useTempFileStats.ts",
+   "src/features/db-observability/hooks/useTopQueries.ts",
+   "src/features/db-observability/hooks/useTopTablesBySize.ts",
+   "src/features/db-observability/hooks/useTransactionHealth.ts",
+   "src/features/db-observability/hooks/useUnindexedForeignKeys.ts",
+   "src/features/db-observability/hooks/useUnusedIndexes.ts",
+   "src/features/db-observability/hooks/useWalHealth.ts",
+   "src/features/db-observability/hooks/useWraparoundStatus.ts",
+   "src/features/db-observability/index.ts",
+   "src/features/preferences/hooks/useUserPreferences.ts",
+   "src/hooks/ai/useNexusSimulator.ts",
+   "src/hooks/analytics/useAnalytics.tsx",
+   "src/hooks/analytics/useDashboardData.tsx",
+   "src/hooks/analytics/useDashboardMetrics.tsx",
+   "src/hooks/analytics/useDashboardWidgets.tsx",
+   "src/hooks/analytics/useDrillDown.tsx",
+   "src/hooks/analytics/useExecutiveMetrics.tsx",
+   "src/hooks/analytics/useFavoriteMetrics.tsx",
+   "src/hooks/analytics/useKPIBenchmark.tsx",
+   "src/hooks/analytics/usePerformanceMonitor.ts",
+   "src/hooks/analytics/useScheduledReports.tsx",
+   "src/hooks/analytics/useTelemetry.ts",
+   "src/hooks/auth/useAuth.tsx",
+   "src/hooks/auth/useDeviceSessions.ts",
+   "src/hooks/auth/useMFA.ts",
+   "src/hooks/auth/useNewDeviceDetection.tsx",
+   "src/hooks/auth/usePermissions.ts",
+   "src/hooks/auth/useRole.ts",
+   "src/hooks/auth/useSessionTimeout.ts",
+   "src/hooks/auth/useWebAuthn.tsx",
+   "src/hooks/common/useComments.tsx",
+   "src/hooks/common/useConfirmExit.ts",
+   "src/hooks/common/useDebounce.ts",
+   "src/hooks/common/useDensity.ts",
+   "src/hooks/common/useExport.tsx",
+   "src/hooks/common/useFilters.ts",
+   "src/hooks/common/useGlobalSearch.tsx",
+   "src/hooks/common/useImportData.ts",
+   "src/hooks/common/useKeyboardShortcuts.ts",
+   "src/hooks/common/useLocalStorage.ts",
+   "src/hooks/common/useMediaQuery.ts",
+   "src/hooks/common/useNavigationHistory.tsx",
+   "src/hooks/common/useOnlineStatus.tsx",
+   "src/hooks/common/usePagination.ts",
+   "src/hooks/common/useSearch.ts",
+   "src/hooks/common/useSelection.ts",
+   "src/hooks/common/useSorting.ts",
+   "src/hooks/common/useTimezone.tsx",
+   "src/hooks/data/useDocumentUpload.ts",
+   "src/hooks/data/useImageUpload.tsx",
+   "src/hooks/data/useMemoizedQuery.ts",
+   "src/hooks/data/usePrefetch.ts",
+   "src/hooks/data/useRealtime.tsx",
+   "src/hooks/data/useResilientMutation.ts",
+   "src/hooks/data/useSoftDelete.ts",
+   "src/hooks/gamification/useAchievementNotifications.tsx",
+   "src/hooks/gamification/useGamification.ts",
+   "src/hooks/gamification/useGamification.tsx",
+   "src/hooks/gamification/useRewardPurchases.tsx",
+   "src/hooks/index.ts",
+   "src/hooks/integrations/useBitrixEntregaSync.tsx",
+   "src/hooks/integrations/useClientWebhooks.tsx",
+   "src/hooks/integrations/useEvolutionWhatsApp.tsx",
+   "src/hooks/integrations/useExternalDbBridge.tsx",
+   "src/hooks/integrations/useGeocoding.tsx",
+   "src/hooks/logistics/useAccuracyMetaAudit.ts",
+   "src/hooks/logistics/useAccuracyMetaCycle.ts",
+   "src/hooks/logistics/useBiometricAnomalies.ts",
+   "src/hooks/logistics/useBoxManagement.tsx",
+   "src/hooks/logistics/useBusinessRuleEngine.tsx",
+   "src/hooks/logistics/useBusinessRules.tsx",
+   "src/hooks/logistics/useCarrierAccuracy.ts",
+   "src/hooks/logistics/useChannelHealth.ts",
+   "src/hooks/logistics/useConciliacao.tsx",
+   "src/hooks/logistics/useCostAlerts.tsx",
+   "src/hooks/logistics/useCotacoesFrete.tsx",
+   "src/hooks/logistics/useCotacoesMulticanal.tsx",
+   "src/hooks/logistics/useDelayPrediction.tsx",
+   "src/hooks/logistics/useDeliveryRoutes.tsx",
+   "src/hooks/logistics/useFreightIntelligence.tsx",
+   "src/hooks/logistics/useFreightQuotation.tsx",
+   "src/hooks/logistics/useLalamoveOrders.tsx",
+   "src/hooks/logistics/useLalamoveTracking.tsx",
+   "src/hooks/logistics/useLogisticaReversaReal.tsx",
+   "src/hooks/logistics/useLogisticsCalendar.tsx",
+   "src/hooks/logistics/useLogisticsCosts.tsx",
+   "src/hooks/logistics/useLogisticsIntelligence.tsx",
+   "src/hooks/logistics/useMapWeatherSync.ts",
+   "src/hooks/logistics/useMelhorEnvio.tsx",
+   "src/hooks/logistics/usePredictionAccuracy.ts",
+   "src/hooks/logistics/usePredictionAccuracyDaily.ts",
+   "src/hooks/logistics/usePredictionAccuracySettings.ts",
+   "src/hooks/logistics/useQuotationFlow.tsx",
+   "src/hooks/logistics/useRodonavesTracking.tsx",
+   "src/hooks/logistics/useRodonavesWebhook.tsx",
+   "src/hooks/logistics/useRootCauseAnalysis.ts",
+   "src/hooks/logistics/useSLAAlerts.tsx",
+   "src/hooks/logistics/useSLAMetrics.tsx",
+   "src/hooks/logistics/useSLANotifications.tsx",
+   "src/hooks/logistics/useSmartAlerts.tsx",
+   "src/hooks/logistics/useSmartCarrierSelection.tsx",
+   "src/hooks/logistics/useTrackingAnalytics.tsx",
+   "src/hooks/logistics/useTransportadoraRotas.tsx",
+   "src/hooks/logistics/useUnifiedTracking.tsx",
+   "src/hooks/notifications/useAudioFeedback.tsx",
+   "src/hooks/notifications/useNotificationPreferences.tsx",
+   "src/hooks/notifications/useNotifications.tsx",
+   "src/hooks/notifications/usePushNotifications.tsx",
+   "src/hooks/notifications/useSecurityPushNotifications.tsx",
+   "src/hooks/notifications/useWhatsAppNotification.tsx",
+   "src/hooks/predictions/useMitigationActions.ts",
+   "src/hooks/rodonaves/index.ts",
+   "src/hooks/rodonaves/useSLOTargets.ts",
+   "src/hooks/security/useAuditLogs.tsx",
+   "src/hooks/security/useEntityHistory.tsx",
+   "src/hooks/security/useFeatureFlags.tsx",
+   "src/hooks/security/useIntegrationValidation.tsx",
+   "src/hooks/security/useRateLimitLogs.ts",
+   "src/hooks/security/useSecurityEvents.ts",
+   "src/hooks/security/useSelfHealing.ts",
+   "src/hooks/ui/use-mobile.tsx",
+   "src/hooks/ui/use-toast.ts",
+   "src/hooks/ui/useOnboarding.tsx",
+   "src/hooks/ui/useQRScanner.tsx",
+   "src/hooks/ui/useTouchGestures.ts",
+   "src/hooks/ui/useVirtualTable.ts",
+   "src/utils/performance.ts"
+  ],
+  "edges": [
+   "accuracy-meta-monitor",
+   "accuracy-weekly-digest",
+   "bitrix24-integration",
+   "carrier-webhook-receiver",
+   "check-password-breach",
+   "check-rate-limit",
+   "db-health-snapshot",
+   "db-health-weekly-report",
+   "db-regression-monitor",
+   "evolution-whatsapp",
+   "execute-protocol",
+   "external-db-bridge",
+   "geocode-address",
+   "get-mapbox-token",
+   "get-weather-data",
+   "health",
+   "health-check",
+   "ingest-biosync",
+   "lalamove-api",
+   "lalamove-tracking",
+   "lalamove-webhook",
+   "lgpd-erase-user",
+   "log-login-attempt",
+   "log-security-event",
+   "melhor-envio-api",
+   "new-device-alert",
+   "nexus-auto-healing",
+   "nexus-webhook-receiver",
+   "normalize-freight-response",
+   "ocr-receipt-processor",
+   "predict-delays",
+   "predict-delays-scheduled",
+   "resend-email",
+   "rodonaves-api",
+   "rodonaves-webhook",
+   "secure-store",
+   "send-password-reset",
+   "smart-carrier-selection",
+   "validate-login",
+   "webhook-status",
+   "whatsapp-notification"
+  ],
+  "servicos": [
+   "src/services/api/authService.ts",
+   "src/services/api/logisticsService.ts",
+   "src/services/base/BaseService.ts",
+   "src/services/resilience/CircuitBreaker.ts"
+  ]
+ }
+}
