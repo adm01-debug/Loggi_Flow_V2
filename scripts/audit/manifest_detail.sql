@@ -34,7 +34,7 @@ SELECT 'index', i.schemaname||'.'||i.indexname,
   FROM pg_indexes i WHERE i.schemaname IN ('public','internal')
 UNION ALL
 SELECT 'policy', p.schemaname||'.'||p.tablename||'.'||p.policyname,
-       p.cmd||' roles='||p.roles::text||' using='||coalesce(p.qual,'')||' check='||coalesce(p.with_check,'')
+       p.cmd||' roles='||coalesce(p.roles::text,'')||' using='||coalesce(p.qual,'')||' check='||coalesce(p.with_check,'')
   FROM pg_policies p WHERE p.schemaname IN ('public','internal','storage')
 UNION ALL
 SELECT 'function', n.nspname||'.'||p.proname||'('||pg_get_function_identity_arguments(p.oid)||')',
