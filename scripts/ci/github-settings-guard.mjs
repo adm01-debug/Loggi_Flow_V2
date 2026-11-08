@@ -353,18 +353,26 @@ async function checarEnvironments() {
 // ---------------------------------------------------------------- restauração
 
 async function restaurar(campo) {
+  // Loggi (achado por simulação nesta sessão): a versão original hardcodava `true`
+  // aqui — coincide com o baseline do Zapp (strict=true), mas no Loggi o baseline
+  // é strict=false (AGENTS.md: "PR atrasada da main mergeia mesmo assim"). Com o
+  // valor fixo, uma divergência real (ex.: alguém liga strict ao vivo) seria
+  // "restaurada" para `true` — fixando o próprio valor divergente, no sentido
+  // contrário ao baseline. Lê do baseline, não do literal.
   if (campo === 'branch_protection_main.strict') {
     const protection = await gh('GET', `/repos/${OWNER}/${REPO_NAME}/branches/${BRANCH}/protection`);
     const contexts = protection?.required_status_checks?.contexts ?? [];
+    const valorBaseline = baseline.branch_protection_main.strict;
     await gh('PATCH', `/repos/${OWNER}/${REPO_NAME}/branches/${BRANCH}/protection/required_status_checks`, {
-      strict: true,
+      strict: valorBaseline,
       contexts,
     });
-    return '`branch_protection_main.strict` restaurado para `true`';
+    return `\`branch_protection_main.strict\` restaurado para \`${valorBaseline}\``;
   }
   if (campo === 'merge.allow_auto_merge') {
-    await gh('PATCH', `/repos/${OWNER}/${REPO_NAME}`, { allow_auto_merge: true });
-    return '`merge.allow_auto_merge` restaurado para `true`';
+    const valorBaseline = baseline.merge.allow_auto_merge;
+    await gh('PATCH', `/repos/${OWNER}/${REPO_NAME}`, { allow_auto_merge: valorBaseline });
+    return `\`merge.allow_auto_merge\` restaurado para \`${valorBaseline}\``;
   }
   return null;
 }
