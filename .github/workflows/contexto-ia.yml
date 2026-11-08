@@ -37,7 +37,7 @@ on:
       - 'ai-context.config.json'
       - 'package.json'
       - 'tsconfig*.json'
-      - '.github/workflows/contexto.yml'
+      - '.github/workflows/contexto-ia.yml'
   schedule:
     - cron: '7-59/10 * * * *' # minuto 7: fora do minuto 0 (fila do GitHub)
   workflow_dispatch:
@@ -372,7 +372,7 @@ jobs:
           # Branch gerada: contexto para agentes de IA
 
           Comece por `docs/contexto/00-INDEX.md`. Pastas `codigo/`, `supabase/` e `regras/` sao regeradas a cada
-          10 min pelo workflow `contexto.yml` da main - nao edite nem abra PR desta branch. Regras humanas vivem
+          10 min pelo workflow `contexto-ia.yml` da main - nao edite nem abra PR desta branch. Regras humanas vivem
           em `docs/contexto/regras/manual/` na **main**.
           EOF
           cd "$PUB"
