@@ -14,7 +14,7 @@ workflow falhar de forma estranha.
 - Sessão na nuvem: `git clone`/`git fetch` funcionam quando o repo está entre as fontes autorizadas da
   sessão; fora disso, só leitura pelo MCP. Para listar PRs abertas com os arquivos que tocam numa chamada só,
   use `github_graphql` (`pullRequests(states:OPEN){ nodes { number headRefName files { nodes { path } } } }`):
-  `github_list_pull_requests` devolve o reppositório inteiro em cada nó e estoura o contexto.
+  `github_list_pull_requests` devolve o repositório inteiro em cada nó e estoura o contexto.
 - Commits: `<tipo>(<escopo>): <assunto>` no padrão `@commitlint/config-conventional` (`.commitlintrc.json`).
   **Nada executa o commitlint**: `.husky/` só tem `pre-commit` (`npx lint-staged`). Via MCP nenhum hook roda
   — siga o padrão de qualquer forma.
