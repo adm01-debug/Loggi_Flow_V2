@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python (scripts/supabase_snapshot, scripts/regras_negocio)
+__pycache__/
+*.pyc
