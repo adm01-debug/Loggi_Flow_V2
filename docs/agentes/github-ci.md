@@ -14,23 +14,24 @@ workflow falhar de forma estranha.
 - Sessão na nuvem: `git clone`/`git fetch` funcionam quando o repo está entre as fontes autorizadas da
   sessão; fora disso, só leitura pelo MCP. Para listar PRs abertas com os arquivos que tocam numa chamada só,
   use `github_graphql` (`pullRequests(states:OPEN){ nodes { number headRefName files { nodes { path } } } }`):
-  `github_list_pull_requests` devolve o repositório inteiro em cada nó e estoura o contexto.
+  `github_list_pull_requests` devolve o reppositório inteiro em cada nó e estoura o contexto.
 - Commits: `<tipo>(<escopo>): <assunto>` no padrão `@commitlint/config-conventional` (`.commitlintrc.json`).
   **Nada executa o commitlint**: `.husky/` só tem `pre-commit` (`npx lint-staged`). Via MCP nenhum hook roda
   — siga o padrão de qualquer forma.
 
 ## Perímetro do GitHub — estado canônico
 
-Lido da API em 2026-11-08. Qualquer mudança nesses campos atualiza **esta tabela no mesmo PR**.
+Lido da API em 2026-11-08 (atualizado no mesmo dia: `Agents Docs Integrity` passou a required check após o
+merge da #110). Qualquer mudança nesses campos atualiza **esta tabela no mesmo PR**.
 
 | Campo | Estado canônico |
 |---|---|
-| Branch protection — required checks | **8**: `Security Scan` · `Lint` · `Type Check` · `Warning Budget Gate` · `Unit & Integration Tests` · `Build Artifact` · `quality-gate` · `Security Audits` |
+| Branch protection — required checks | **9**: `Security Scan` · `Lint` · `Type Check` · `Warning Budget Gate` · `Unit & Integration Tests` · `Build Artifact` · `quality-gate` · `Security Audits` · `Agents Docs Integrity` |
 | Branch protection — `strict` (branch atualizada) | **`false`** — PR atrasada da `main` mergeia sem atualizar |
 | Branch protection — `enforce_admins` | `false` |
 | Branch protection — histórico linear | `false` |
 | Branch protection — review obrigatório | **nenhum** (deliberado: vários agentes com merge próprio) |
-| Branch protection — force push / deleção da `main` | bloqueados |
+| Branch protection — force push / deleição da `main` | bloqueados |
 | Merge | `allow_squash_merge=true` · `allow_merge_commit=true` · `allow_rebase_merge=true` · `allow_auto_merge=false` · `delete_branch_on_merge=false` |
 | Squash | `squash_merge_commit_message=COMMIT_MESSAGES` · `squash_merge_commit_title=COMMIT_OR_PR_TITLE` |
 | Apps de review no PR | `Vercel` (deploy de preview), `Vercel Agent Review`, `Devin Review`, `Vercel Preview Comments` — **nenhum é required check** |
@@ -41,11 +42,13 @@ Consequências práticas:
 - **Padronize squash.** Os três métodos de merge estão habilitados; merge commit e rebase sujam o histórico
   que o `strict=false` já deixa frouxo.
 - **Apague a branch à mão depois do merge** — `delete_branch_on_merge` está desligado.
-- **Sem auto-merge**: não existe fila. Mergeie só com os 8 checks verdes na sua PR.
+- **Sem auto-merge**: não existe fila. Mergeie só com os 9 checks verdes na sua PR.
 - **`Build Artifact` depende de todos os outros** (`needs: [security, lint, typecheck, warning-budget, test]`
   em `ci.yml`): se qualquer um falhar, ele sai `skipped` — e check obrigatório `skipped` conta como
   **sucesso** para o GitHub. Aqui isso não abre brecha porque os cinco também são obrigatórios; não remova
   nenhum deles da lista sem criar um gate agregador (`if: always()`) no lugar.
+- **`Agents Docs Integrity` não está no `needs` do `build`** — roda em paralelo, como job independente; ele
+  bloqueia o merge por ser required check, não por dependência de pipeline.
 - **`enforce_admins=false`** significa que o dono pode mergear com check vermelho. Você não: vermelho é
   vermelho.
 

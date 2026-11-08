@@ -60,7 +60,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
   responsabilidade, ninguém o cobra no caminho.
 - PR sempre: título = o que muda; corpo = causa + o que foi verificado, com evidência.
 - Mergeie sem aprovação (squash; **apague a branch à mão** — `delete_branch_on_merge` está desligado) PR sua
-  pronta: os 8 required checks verdes, sem conflito, escopo comum (front, edge function, config).
+  pronta: os 9 required checks verdes, sem conflito, escopo comum (front, edge function, config).
   **Deixe aberta e chame o dono**: DDL/migration em produção; CI/workflows, segredos, Dockerfile; deleção de
   dado, arquitetura ou custo; conflito com PR de outro agente.
 - `strict` está **desligado**: PR atrasada da `main` mergeia mesmo assim. CI de PR antiga não prova nada
@@ -96,7 +96,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 - **Lovable** — o repo nasceu no Lovable e ainda carrega `lovable-tagger` no build e `.lovable/`; o que você
   muda aqui não volta para lá sozinho.
 - **GitHub/CI** — ler `docs/agentes/github-ci.md` ao mexer em settings, branch protection ou workflows
-  (8 checks obrigatórios, `strict=false`, sem revisor obrigatório).
+  (9 checks obrigatórios — inclui `Agents Docs Integrity` — `strict=false`, sem revisor obrigatório).
 - **Regras de domínio** — ler `docs/agentes/regras-dominio.md` ao mexer em coleta, entrega, frete,
   gamificação, papéis de usuário ou CSP.
 - **Contexto gerado para agentes** — branch gerada `contexto`, regerada por automação
