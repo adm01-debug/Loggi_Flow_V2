@@ -118,8 +118,8 @@ export function RTELatencyTrendChart({ samples, labels = {}, className }: RTELat
                 color: "hsl(var(--popover-foreground))",
                 fontSize: 12,
               }}
-              formatter={(value: number, name: string) => [`${value}ms`, name]}
-              labelFormatter={(label: string) => `Bucket ${label}`}
+              formatter={(value, name) => [`${value}ms`, name]}
+              labelFormatter={(label) => `Bucket ${label}`}
             />
             <Area
               type="monotone"

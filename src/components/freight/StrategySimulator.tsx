@@ -209,7 +209,7 @@ export function StrategySimulator({
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" />
                 <YAxis tickFormatter={(v) => `R$${v / 1000}k`} />
-                <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                <Tooltip formatter={(v) => formatCurrency(Number(v))} />
                 <Bar
                   dataKey="valor"
                   fill="hsl(var(--primary))"
