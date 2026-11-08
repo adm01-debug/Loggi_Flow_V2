@@ -373,7 +373,7 @@ export default function PainelOTIF() {
                     />
                     <XAxis dataKey="name" className="text-xs" />
                     <YAxis domain={[0, 100]} unit="%" />
-                    <Tooltip formatter={(val: number) => `${val}%`} />
+                    <Tooltip formatter={(val) => `${val}%`} />
                     <Bar dataKey="otif" name="OTIF %" radius={[4, 4, 0, 0]}>
                       {chartData.map((entry, index) => {
                         let fill = "hsl(0 84% 60%)";
@@ -413,7 +413,7 @@ export default function PainelOTIF() {
                     <XAxis dataKey="name" className="text-xs" />
                     <YAxis />
                     <Tooltip
-                      formatter={(val: number) => `R$ ${val.toFixed(2)}`}
+                      formatter={(val) => `R$ ${Number(val).toFixed(2)}`}
                     />
                     <Bar
                       dataKey="custo_medio"

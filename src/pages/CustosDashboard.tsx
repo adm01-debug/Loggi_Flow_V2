@@ -222,8 +222,8 @@ export default function CustosDashboard() {
                       tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
                     />
                     <Tooltip
-                      formatter={(v: number) => [
-                        `R$ ${v.toLocaleString()}`,
+                      formatter={(v) => [
+                        `R$ ${Number(v).toLocaleString()}`,
                         "Custo",
                       ]}
                     />
@@ -262,7 +262,7 @@ export default function CustosDashboard() {
                       outerRadius={100}
                       dataKey="value"
                       label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
+                        `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
                       }
                       labelLine={false}
                     >
@@ -271,8 +271,8 @@ export default function CustosDashboard() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(v: number) => [
-                        `R$ ${v.toLocaleString()}`,
+                      formatter={(v) => [
+                        `R$ ${Number(v).toLocaleString()}`,
                         "Custo",
                       ]}
                     />
@@ -306,8 +306,8 @@ export default function CustosDashboard() {
                       tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
                     />
                     <Tooltip
-                      formatter={(v: number) => [
-                        `R$ ${v.toLocaleString()}`,
+                      formatter={(v) => [
+                        `R$ ${Number(v).toLocaleString()}`,
                         "Custo",
                       ]}
                     />
@@ -343,8 +343,8 @@ export default function CustosDashboard() {
                     <XAxis dataKey="name" fontSize={12} />
                     <YAxis fontSize={12} tickFormatter={(v) => `R$${v}`} />
                     <Tooltip
-                      formatter={(v: number) => [
-                        `R$ ${v.toLocaleString()}`,
+                      formatter={(v) => [
+                        `R$ ${Number(v).toLocaleString()}`,
                         "Médio",
                       ]}
                     />

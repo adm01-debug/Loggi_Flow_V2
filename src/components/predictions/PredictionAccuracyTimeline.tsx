@@ -274,7 +274,7 @@ export function PredictionAccuracyTimeline() {
                     borderRadius: 8,
                     fontSize: 12,
                   }}
-                  formatter={(value: number, name) =>
+                  formatter={(value, name) =>
                     name === "acuracia" ? [`${value}%`, "Acurácia"] : [value, "Confirmadas"]
                   }
                 />

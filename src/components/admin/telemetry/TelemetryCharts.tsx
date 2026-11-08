@@ -178,7 +178,7 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
                 <XAxis dataKey="time" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}s` : `${v}ms`} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => value >= 1000 ? `${(value / 1000).toFixed(1)}s` : `${value}ms`} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(value) => (Number(value) >= 1000 ? `${(Number(value) / 1000).toFixed(1)}s` : `${value}ms`)} />
                 <Area type="monotone" dataKey="maxMs" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive))" fillOpacity={0.2} name="Máxima" />
                 <Area type="monotone" dataKey="mediaMs" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} name="Média" />
               </AreaChart>
@@ -201,7 +201,7 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie data={severityData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                  label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
                   {severityData.map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}

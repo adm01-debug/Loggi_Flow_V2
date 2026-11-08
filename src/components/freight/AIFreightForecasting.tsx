@@ -70,7 +70,7 @@ export function AIFreightForecasting({ currentTotal }: AIFreightForecastingProps
                 <XAxis dataKey="name" className="text-xs" />
                 <YAxis className="text-xs" tickFormatter={v => `R$${v/1000}k`} />
                 <Tooltip 
-                  formatter={(v: number) => formatCurrency(v)}
+                  formatter={(v) => formatCurrency(Number(v))}
                   contentStyle={{ backgroundColor: "hsl(var(--background))", borderColor: "hsl(var(--border))" }}
                 />
                 <Area type="monotone" dataKey="real" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorReal)" strokeWidth={3} name="Realizado" />
