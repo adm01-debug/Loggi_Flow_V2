@@ -385,17 +385,17 @@ jobs:
           if [ -z "$STRUCTURAL" ] && git rev-parse --verify -q HEAD >/dev/null; then
             if [ -d "$ART/contexto-supabase" ]; then
               LAST=$(git show "HEAD:$CONTEXTO_DIR/supabase/manifest.json" 2>/dev/null | python3 -c '
-          import json, sys
-          from datetime import datetime, timezone
-          try:
-              stamp = json.load(sys.stdin).get("gerado_em", "")
-              value = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
-              timestamp = int(value.timestamp())
-              now = int(datetime.now(timezone.utc).timestamp())
-              print(timestamp if value.tzinfo is not None and 0 < timestamp <= now else 0)
-          except Exception:
-              print(0)
-          ') || LAST=0
+import json, sys
+from datetime import datetime, timezone
+try:
+    stamp = json.load(sys.stdin).get("gerado_em", "")
+    value = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    timestamp = int(value.timestamp())
+    now = int(datetime.now(timezone.utc).timestamp())
+    print(timestamp if value.tzinfo is not None and 0 < timestamp <= now else 0)
+except Exception:
+    print(0)
+') || LAST=0
               if [ "$LAST" -eq 0 ]; then
                 echo "Nao foi possivel validar a data bancaria publicada - publicando sem esperar."
               fi
@@ -408,5 +408,5 @@ jobs:
             fi
           fi
           git commit --quiet -m "chore(contexto): $novos fonte(s) regerada(s) @ main ${HEAD_MAIN:0:7} [skip ci]"
-          git push --quiet "$REMOTE" "HEAD:refs/heads/$CONTEXTO_BRANCH"
+          git push --force --quiet "$REMOTE" "HEAD:refs/heads/$CONTEXTO_BRANCH"
           echo "Publicado em $CONTEXTO_BRANCH: $(git rev-parse --short HEAD) (fontes novas: $novos)"
