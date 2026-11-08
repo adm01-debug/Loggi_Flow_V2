@@ -86,8 +86,15 @@ function bytesNaBase(base) {
 }
 
 const BASE = process.env.CLAUDE_MD_BASE || 'HEAD';
+const baseIsExplicit = process.env.CLAUDE_MD_BASE !== undefined && process.env.CLAUDE_MD_BASE !== 'HEAD';
 const atual = bytesAtuais();
 const base = bytesNaBase(BASE);
+
+if (!base && baseIsExplicit) {
+  console.error(`::error::CLAUDE_MD_BASE="${BASE}" nao retornou nenhum arquivo do conjunto — ref invalida ou checkout raso demais. Comparacao de tamanho ignorada mas isso indica configuracao incorreta do CI.`);
+  process.exitCode = 1;
+  process.exit();
+}
 
 if (base) {
   const ratio = atual / base.total;

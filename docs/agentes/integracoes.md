@@ -1,16 +1,16 @@
 # Integrações externas e edge functions — referência para agentes
 
-Ler antes de mexer em transportadora, WhatsApp, webhook, IA ou qualquer edge function. São 44 functions em
-`supabase/functions/`; o que importa aqui é **quem chama**, **qual segredo** e **como a auth é feita**.
+Ler antes de mexer em transportadora, WhatsApp, webhook, IA ou qualquer edge function. São 43 deployáveis em
+`supabase/functions/` (+ `_shared/`); o que importa aqui é **quem chama**, **qual segredo** e **como a auth é feita**.
 
 ## Regras que valem para todas
 
 - **Segredo só em secret de edge function** (`supabase secrets set` ou painel do projeto
   `jvfhclubfpxrtrrazrgr`). Nunca no front, nunca no Vercel, nunca em `VITE_*`. Os nomes esperados estão em
   `scripts/ops/set_missing_secrets.sh` — ele também tem guard contra gravar placeholder.
-- **As functions leem o Supabase por `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY`** (nomes herdados
-  do Lovable, apesar de rodarem no servidor). Ao criar function nova, siga o mesmo nome — não invente
-  `SUPABASE_URL`, que não existe no ambiente delas.
+- **As functions acessam o Supabase por `SUPABASE_URL` e `SUPABASE_ANON_KEY`** (injetados automaticamente
+  pelo runtime Deno/Supabase — não são vars `VITE_*`). `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY`
+  existem no **front** e em fixtures de teste, nunca em `index.ts` de produção.
 - **Nenhum `console.*` cru**: use `_shared/logger.ts`. O gate `npm run validate:no-console` reprova (evita
   PII em log).
 - **Utilidades compartilhadas em `_shared/`** — use, não reescreva: `cors.ts` (CORS), `auth.ts`
@@ -27,7 +27,11 @@ Ler antes de mexer em transportadora, WhatsApp, webhook, IA ou qualquer edge fun
 | `rodonaves-webhook` | HMAC com `RODONAVES_WEBHOOK_SECRET` (+ `ALLOW_TEST_MODE` para teste) |
 | `carrier-webhook-receiver` | HMAC com `CARRIER_WEBHOOK_SECRET` |
 | `nexus-webhook-receiver` | HMAC com `NEXUS_WEBHOOK_SECRET` (se o secret existir, é obrigatório) |
-| `predict-delays-scheduled` | header `x-internal-secret` (`INTERNAL_FN_SECRET`) ou `Bearer service_role` — é chamada pelo `pg_cron` |
+| `predict-delays-scheduled` | header `x-internal-secret` (`INTERNAL_FN_SECRET`) ou `Bearer service_role` — chamada pelo `pg_cron` |
+| `evolution-whatsapp`, `melhor-envio-api`, `log-security-event` | `requireUser` — JWT do usuário validado no código via Supabase Auth |
+| `resend-email` | `requireInternalSecret` ou `Bearer service_role` — chamada interna |
+| `webhook-status` | Authorization header obrigatório |
+| `health`, `health-check` | health checks — auth presente mas não bloqueante (sem dados sensíveis) |
 
 Mexer na assinatura, no nome ou na auth de uma dessas quebra o chamador externo (ou o cron) **em silêncio**:
 o webhook passa a responder 401 e ninguém olha. Teste com request real antes de dizer pronto.

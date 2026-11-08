@@ -18,14 +18,14 @@ Ler quando precisar saber onde fica algo antes de buscar por texto.
 | Onde | O que tem |
 |---|---|
 | `src/App.tsx` | **todas as rotas** e os providers; feature nova sem entrada aqui não existe para o usuário |
-| `src/pages/` | 59 páginas `PascalCase.tsx` com `export default` (+ subpastas por domínio: `admin/`, `auth/`, `ranking/`, `conciliacao/`, `cotacao-multicanal/`, `dashboard-cotacoes/`, `admin-telemetria/`, `aprovacao-reset/`) |
+| `src/pages/` | **78 páginas** `PascalCase.tsx` com `export default` — 59 na raiz + 19 em subpastas por domínio: `admin/`, `auth/`, `ranking/`, `conciliacao/`, `cotacao-multicanal/`, `dashboard-cotacoes/`, `admin-telemetria/`, `aprovacao-reset/` |
 | `src/components/` | 33 pastas por domínio (`coletas/`, `freight/`, `shipping/`, `transportadoras/`, `rodonaves/`, `melhorenvio/`, `gamification/`, `map/`, `security/`, …) + `ui/` (shadcn) e `common/` (Pagination, FilterBar, BulkActions, CSVImporter…) |
 | `src/hooks/` | hooks `use*.ts(x)` com export nomeado, agrupados por domínio: `logistics/`, `integrations/`, `gamification/`, `predictions/`, `security/`, `analytics/`, `ai/`, `auth/`, `data/`, `notifications/`, `rodonaves/`, `ui/`, `common/` |
 | `src/features/` | fatias novas no padrão do ADR 0008: `analytics/`, `db-observability/`, `incidents/`, `logistics/`, `preferences/` |
 | `src/services/` | `api/` (authService, logisticsService, storageService), `base/BaseService.ts`, `resilience/CircuitBreaker.ts` |
 | `src/lib/` | utilitários e contratos: `schemas/` (Zod), `queryKeys.ts`/`queryConfig.ts` (TanStack Query), `formatters.ts`, importadores CSV/Excel, `predictions/`, `rodonaves/` |
 | `src/integrations/` | `supabase/client.ts` + `supabase/types.ts` (**gerado — não editar à mão**), `lovable/`, `shared/` |
-| `supabase/functions/` | 44 edge functions + `_shared/` (CORS em `cors.ts`, auth em `auth.ts`, `webhookSignature.ts`, `rateLimiter.ts`, `circuitBreaker.ts`, `idempotency.ts`, `logger.ts`, `crypto.ts`, `safeFetch.ts`, `schemas/`) |
+| `supabase/functions/` | **43 edge functions deployáveis** + `_shared/` (CORS em `cors.ts`, auth em `auth.ts`, `webhookSignature.ts`, `rateLimiter.ts`, `circuitBreaker.ts`, `idempotency.ts`, `logger.ts`, `crypto.ts`, `safeFetch.ts`, `schemas/`) |
 | `supabase/migrations/` | 244 arquivos `.sql` — **histórico**, não estado; o estado é o banco ao vivo |
 | `supabase/config.toml` | `project_id` oficial e quais functions rodam com `verify_jwt = false` (auth no código) |
 | `scripts/` | gates e operação: `validate-csp.mjs`, `validate-no-console.mjs`, `audit-gate.mjs`, `check-warning-budget.mjs`, `ratchet-warning-budget.mjs`, `generate-quality-report.mjs`, `seed-database.ts`, `ci/` (guarda das instruções de agente), `audit/` (manifestos SQL), `ops/` (backup, secrets, pós-deploy), `graphify/` (grafo), `ai-context/` + `regras_negocio/` + `supabase_snapshot/` (produtores do contexto para agentes) |
