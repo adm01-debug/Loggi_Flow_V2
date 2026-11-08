@@ -49,6 +49,21 @@ variables → Actions). Até lá o job `banco` sai verde com aviso e as outras d
 O `SUPABASE_ACCESS_TOKEN` que já existe no repo serve à Management API, não à introspecção do Postgres.
 Formato exigido e por quê (session pooler, usuário `postgres`): `scripts/supabase_snapshot/README.md`.
 
+## Enquanto isso: o banco real pelo MCP
+
+O projeto oficial é **`jvfhclubfpxrtrrazrgr`** (`supabase/config.toml`). Numa sessão de agente com MCP,
+consulte o banco pelo **`SUPABASE - LOGGI FLOW V2 - MCP`**. Confira qual MCP carregou antes de usar: há
+vários Supabase quase homônimos na conta (Zapp Web V2, Gestão de Clientes, Gestão de Produtos, Promo
+Finance/Supply, Fast Gravações) e nenhum deles é este banco.
+
+Esse MCP conecta como **`postgres` com service_role e aceita DDL** — ele ignora RLS e escreve em produção:
+
+- **Diagnóstico é somente leitura.** `db_list_tables`, `db_list_policies`, `db_describe_table`,
+  `db_explain`, `db_missing_indexes`, `db_health`. Nunca um `UPDATE`/`DELETE`/`DDL` "para testar".
+- **DDL/migration em produção é decisão do dono** — abra PR com a migration e chame, não aplique.
+- O que o MCP responde é o estado de **agora**; o snapshot em `docs/contexto/supabase/` é o retrato
+  versionado, com histórico e `CHANGELOG.md`. Quando as duas discordarem, vale o MCP (é o banco ao vivo).
+
 ## Regras que só o negócio sabe
 
 Escreva em `docs/contexto/regras/manual/*.md` na **main** (comece copiando

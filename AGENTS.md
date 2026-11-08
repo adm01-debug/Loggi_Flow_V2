@@ -23,9 +23,13 @@ Auto-carregado por agentes compatíveis (Hermes, Claude Code, Codex, OpenCode).
    GitHub com `ref=contexto`). Três fontes, cada fato com um dono: `codigo/` (rotas, hooks, edges, grafo),
    `supabase/` (banco oficial ao vivo), `regras/` (o que pode e o que não pode). Detalhe em
    `docs/agentes/contexto-ia.md`. Migrations do repo são histórico, não estado.
-2. **Leia o README.md** (se existir) e qualquer doc em `docs/` antes de qualquer mudança.
-3. **Pronto = ligado em produção com tráfego real.** Código existir não é pronto.
-4. **Diagnóstico antes de patch.** Em bug de produção: leia logs/estado real antes de qualquer fix.
+2. **Banco: projeto oficial `jvfhclubfpxrtrrazrgr`**, consultado pelo MCP **`SUPABASE - LOGGI FLOW V2 - MCP`**
+   (confira qual carregou: há vários Supabase quase homônimos na conta e nenhum é este banco). Esse MCP é
+   `postgres` com service_role e aceita DDL — **diagnóstico é só leitura**; DDL/migration em produção é
+   decisão do dono: abra PR com a migration e chame.
+3. **Leia o README.md** (se existir) e qualquer doc em `docs/` antes de qualquer mudança.
+4. **Pronto = ligado em produção com tráfego real.** Código existir não é pronto.
+5. **Diagnóstico antes de patch.** Em bug de produção: leia logs/estado real antes de qualquer fix.
 
 ## GIT: Isolamento Worktree (OBRIGATÓRIO)
 
