@@ -26,6 +26,9 @@ SELECT jsonb_pretty(jsonb_build_object(
   'views',    (SELECT coalesce(jsonb_agg(c.relname ORDER BY c.relname), '[]'::jsonb)
                FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
                WHERE n.nspname = 'public' AND c.relkind IN ('v','m')),
+  'enums',    (SELECT coalesce(jsonb_agg(t.typname ORDER BY t.typname), '[]'::jsonb)
+               FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+               WHERE n.nspname = 'public' AND t.typtype = 'e'),
   'columns',  (SELECT coalesce(jsonb_agg(
                          format(
                            '%s.%s:%s:%s',

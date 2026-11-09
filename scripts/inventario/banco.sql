@@ -6,8 +6,7 @@
 --
 -- Imprime UMA linha com UM JSON. So SELECT em catalogo e em tabelas de estado; nada de
 -- texto livre que possa carregar segredo: de cron.job sai so o nome das funcoes chamadas (nome seguido de "(")
--- (nunca o command inteiro, que pode ter URL/cabecalho), e de whatsapp_connections nao
--- sai telefone, QR nem token. Ordem de toda lista e explicita para o diff ser estavel.
+-- (nunca o command inteiro, que pode ter URL/cabecalho).
 
 WITH
 -- Linhas: count(*) exato quando a estimativa do planner (reltuples, persiste entre
@@ -138,22 +137,5 @@ SELECT jsonb_build_object(
       'mais_antigo', (SELECT to_char(min(start_time) AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') FROM cron.job_run_details),
       'bytes', pg_total_relation_size('cron.job_run_details')
     )
-  ),
-
-  'whatsapp', jsonb_build_object(
-    'conexoes', (
-      SELECT coalesce(jsonb_agg(jsonb_build_object(
-               'nome', w.name,
-               'instance_id', w.instance_id,
-               'padrao', w.is_default,
-               'status', w.status,
-               'health_status', w.health_status,
-               'health_reason', w.health_reason,
-               'ultimo_health_check', to_char(w.last_health_check AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-               'atualizada_em', to_char(w.updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
-             ) ORDER BY w.is_default DESC, w.instance_id), '[]'::jsonb)
-        FROM public.whatsapp_connections w
-    ),
-    'mensagens_7d', (SELECT count(*) FROM public.messages WHERE created_at > now() - interval '7 days')
   )
 ) AS inventario;

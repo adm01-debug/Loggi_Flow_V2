@@ -53,7 +53,7 @@ export function extrairInventario(bruto) {
   if (Array.isArray(dado)) dado = dado[0];
   if (dado && dado.inventario) dado = dado.inventario;
   if (typeof dado === 'string') dado = JSON.parse(dado);
-  const faltando = ['format_version', 'medido_em', 'resumo', 'tabelas', 'cron', 'whatsapp']
+  const faltando = ['format_version', 'medido_em', 'resumo', 'tabelas', 'cron']
     .filter((chave) => !(dado && chave in dado));
   if (faltando.length) throw new Error(`entrada sem as chaves: ${faltando.join(', ')}`);
   if (dado.format_version !== 1) throw new Error(`format_version ${dado.format_version} desconhecido (esperado 1)`);
@@ -211,13 +211,6 @@ export function montarInventario(dado, uso, edges = compararEdges(null, [])) {
   }
   if (dado.cron.historico.mais_de_7_dias > LIMIARES.historicoCronMaisDe7Dias) {
     alertas.push({ tipo: 'historico_cron_sem_limpeza', detalhe: [`${dado.cron.historico.mais_de_7_dias} linhas com mais de 7 dias`] });
-  }
-  const padrao = dado.whatsapp.conexoes.find((c) => c.padrao);
-  if (!padrao) alertas.push({ tipo: 'whatsapp_sem_conexao_padrao', detalhe: [] });
-  else if (padrao.status !== 'connected') {
-    alertas.push({ tipo: 'whatsapp_desconectado', detalhe: [`${padrao.instance_id}: ${padrao.status}`] });
-  } else if (padrao.health_status && !['connected', 'healthy'].includes(padrao.health_status)) {
-    alertas.push({ tipo: 'whatsapp_saude_degradada', detalhe: [`${padrao.instance_id}: ${padrao.health_status}`] });
   }
   if (edges.no_repo_sem_deploy?.length) alertas.push({ tipo: 'edge_sem_deploy', detalhe: edges.no_repo_sem_deploy });
   if (edges.publicadas_sem_codigo_no_repo?.length) {
