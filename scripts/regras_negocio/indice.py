@@ -7,10 +7,10 @@ eles publicaram (manifest.json + arquivos) e escreve UM índice dizendo "tabelas
 ali, regras → acolá", com a idade de cada fonte. Se uma fonte não rodou, o índice diz isso em vez
 de quebrar.
 
-Uso:
-  python3 scripts/ai_context/indice.py --out docs/contexto/00-INDEX.md \
-      --fonte "banco real=docs/supabase@supabase-snapshot" \
-      --fonte "código=inventario/ia@contexto-ia" \
+Uso (como o job `publicar` de .github/workflows/contexto-ia.yml roda, com --repo no worktree da branch `contexto`):
+  python3 scripts/regras_negocio/indice.py --repo . --out docs/contexto/00-INDEX.md \
+      --fonte "banco real=docs/contexto/supabase" \
+      --fonte "código=docs/contexto/codigo" \
       --fonte "regras de negócio=docs/contexto/regras"
 
   --fonte "NOME=CAMINHO[@BRANCH]"   CAMINHO relativo ao repo; @BRANCH quando a saída vive em branch derivada.
@@ -19,6 +19,8 @@ Uso:
   --repo .                          raiz do repositório
   --remote owner/repo               para montar URLs raw (default: lido de git remote)
   --stale-min 90                    idade (min) a partir da qual uma fonte é marcada como desatualizada
+
+Exit: 0 = índice escrito (ou sem mudança estrutural); 2 = uso inválido (sem --fonte, fonte malformada ou repetida).
 """
 from __future__ import annotations
 
@@ -40,6 +42,8 @@ ROTEIRO = {
                           "Qualquer mudança de comportamento · Antes de criar status/valor/validação · Antes de planejar"),
 }
 ORDEM = ["regras de negócio", "banco real", "código"]
+# Produtor e índice rodam em runners diferentes: até isto de adiantamento é relógio, acima é data inválida.
+FUTURE_TOLERANCE_S = 300
 
 
 def git(root: Path, *a: str) -> str:
@@ -58,7 +62,11 @@ def parse_dt(v) -> datetime | None:
             return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
         except ValueError:
             continue
-    return None
+    try:
+        d = datetime.fromisoformat(v.strip().replace("Z", "+00:00"))  # demais variantes ISO-8601 (sem segundos, só data)
+        return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
 
 
 def read_manifest(d: Path) -> dict:
@@ -128,6 +136,8 @@ def main() -> int:
     now = datetime.now(timezone.utc)
     head = args.head or git(root, "rev-parse", "HEAD")
 
+    if not args.fonte:
+        print('[indice] nenhuma --fonte "NOME=CAMINHO[@BRANCH]" informada — nada foi escrito', file=sys.stderr); return 2
     fontes = []
     for spec in args.fonte:
         if "=" not in spec:
@@ -135,6 +145,8 @@ def main() -> int:
         nome, resto = spec.split("=", 1)
         caminho, _, branch = resto.partition("@")
         nome, caminho, branch = nome.strip(), caminho.strip().strip("/"), branch.strip()
+        if not nome or not caminho or any(f["nome"] == nome for f in fontes):
+            print(f"[indice] fonte inválida (nome/caminho vazio ou nome repetido): {spec}", file=sys.stderr); return 2
         d = root / caminho
         local = d.is_dir() and any(d.iterdir())
         man = read_manifest(d) if local else {}
@@ -148,11 +160,20 @@ def main() -> int:
                     gerado = parse_dt(m.group(1).replace("Z", " UTC") if m.group(1).endswith("Z") else m.group(1))
             if not gerado:
                 gerado = parse_dt(git(root, "log", "-1", "--format=%cI", "--", caminho))
-        idade_min = int((now - gerado).total_seconds() // 60) if gerado else None
+        futuro = gerado is not None and (gerado - now).total_seconds() > FUTURE_TOLERANCE_S
+        idade_min = max(0, int((now - gerado).total_seconds() // 60)) if gerado and not futuro else None
         commit = man.get("commit") or man.get("sha") or ""
         status, avisos = producer_health(d, man) if local else ("ok", [])
         if not local:
             status = "não disponível neste checkout" if branch else "ainda não gerado"
+        elif idade_min is None:
+            # sem data confiável não há como dizer que a fonte está atual: nunca "ok" por omissão
+            if futuro:
+                avisos.append(f"data de geração no futuro ({gerado.astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')})")
+            elif not man.get("_erro"):
+                avisos.append("sem data de geração legível (`gerado_em` no manifest.json)")
+            if status == "ok":
+                status = "não verificável"
         mesmo_commit = (isinstance(commit, str) and isinstance(head, str)
                         and min(len(commit), len(head)) >= 7
                         and (head.startswith(commit) or commit.startswith(head)))
@@ -201,6 +222,7 @@ def main() -> int:
             estado += " · ⚠️ " + "; ".join(f["avisos"])
         L.append(f"| {desc} | **{nome}** | {como_ler(f)} | {estado} |")
     L.append("")
+    L.append("_As idades da coluna Estado contam até a data deste índice (cabeçalho), não até agora._\n")
     L.append("## Ordem de leitura antes de qualquer tarefa ou planejamento\n")
     for i, nome in enumerate([n for n in ORDEM if n in by] + [n for n in by if n not in ORDEM], 1):
         _, quando = ROTEIRO.get(nome, ("", ""))
