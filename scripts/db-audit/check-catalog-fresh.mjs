@@ -61,7 +61,7 @@ function lerCatalogo(arquivo, rotulo) {
 
 const A = lerCatalogo(catalogoCommitado, 'commitado');
 const B = lerCatalogo(frescoPath, 'fresco');
-const SECOES = ['tables', 'views', 'columns', 'functions', 'function_signatures', 'check_constraints'];
+const SECOES = ['tables', 'views', 'enums', 'columns', 'functions', 'function_signatures', 'check_constraints'];
 
 let identidadeEsperada;
 try {
