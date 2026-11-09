@@ -3,6 +3,9 @@
 -- Saída única: (section, key, def) no padrão do pipeline audit_tmp.manifest
 -- Idempotente e robusto: CREATE TEMP TABLE + INSERT + SELECT final + DROP.
 
+-- Sobra de execução interrompida na mesma sessão: sem este DROP o CREATE falha e, com o psql no modo
+-- padrão (segue após erro), as linhas velhas saem misturadas no manifesto novo.
+DROP TABLE IF EXISTS pg_temp._manifest_detail;
 CREATE TEMP TABLE _manifest_detail (section text, key text, def text);
 
 INSERT INTO _manifest_detail

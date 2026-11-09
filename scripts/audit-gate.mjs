@@ -11,11 +11,16 @@ import { execSync } from "node:child_process";
 // major vite 8 (upgrade dedicado com validação de plugin-pwa/swc/Lovable).
 const ALLOWLIST = new Set(["xlsx", "vite"]);
 
+// Registry pendurado não pode segurar o job até o timeout do runner (6h).
+const AUDIT_TIMEOUT_MS = Number(process.env.AUDIT_TIMEOUT_MS) || 5 * 60 * 1000;
+
 let raw;
+let execError;
 try {
-  raw = execSync("npm audit --json", { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  raw = execSync("npm audit --json", { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: AUDIT_TIMEOUT_MS });
 } catch (err) {
   raw = err.stdout; // npm audit sai com código != 0 quando há vulnerabilidades
+  execError = err;
 }
 
 // npm audit com rede/registro indisponível pode emitir JSON com campo `error`
@@ -28,15 +33,27 @@ try {
 } catch (err) {
   console.error("❌ npm audit não produziu JSON (rede/registro indisponível?).");
   console.error(`  ${err.message}`);
+  if (execError?.code === "ETIMEDOUT") {
+    console.error(`  npm audit não respondeu em ${AUDIT_TIMEOUT_MS / 1000}s e foi interrompido.`);
+  }
   process.exit(1);
 }
-if (report.error) {
+const isPlainObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+// O npm 10 devolve o motivo real (ECONNREFUSED, 503...) em `message`, com `error.summary` vazio.
+if (report?.error) {
   console.error("❌ npm audit reportou erro na execução:");
-  console.error(`  ${[report.error.code, report.error.summary].filter(Boolean).join(" ")}`);
+  console.error(`  ${[report.error.code, report.error.summary, report.message].filter(Boolean).join(" ")}`);
+  process.exit(1);
+}
+// JSON válido sem o mapa `vulnerabilities` (corpo de erro do registry, formato `advisories` do
+// npm 6, `{}`) também é audit que não rodou: sem esta checagem o gate passava com zero achados.
+if (!isPlainObject(report) || !isPlainObject(report.vulnerabilities)) {
+  console.error("❌ npm audit devolveu JSON sem o mapa `vulnerabilities` (formato inesperado: exige npm >= 7 e resposta válida do registry).");
+  if (report?.message) console.error(`  ${report.message}`);
   process.exit(1);
 }
 
-const offenders = Object.values(report.vulnerabilities ?? {}).filter(
+const offenders = Object.values(report.vulnerabilities).filter(
   (v) => ["critical", "high"].includes(v.severity) && !ALLOWLIST.has(v.name),
 );
 
@@ -45,9 +62,14 @@ if (offenders.length > 0) {
   for (const v of offenders) console.error(`  - ${v.name} (${v.severity})`);
   process.exit(1);
 }
-const ignored = Object.values(report.vulnerabilities ?? {}).filter(
+const ignored = Object.values(report.vulnerabilities).filter(
   (v) => ["critical", "high"].includes(v.severity) && ALLOWLIST.has(v.name),
 );
 console.log(
   `✅ Sem critical/high fora da allowlist${ignored.length ? ` (allowlist ativa: ${[...new Set(ignored.map((v) => v.name))].join(", ")})` : ""}`,
 );
+// Entrada que não cobre mais nada é só risco: a próxima vulnerabilidade do pacote passaria calada.
+const stale = [...ALLOWLIST].filter((name) => !ignored.some((v) => v.name === name));
+if (stale.length > 0) {
+  console.error(`⚠️  Allowlist sem efeito para: ${stale.join(", ")} — remova a entrada em scripts/audit-gate.mjs.`);
+}

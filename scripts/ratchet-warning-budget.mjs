@@ -36,6 +36,10 @@ try {
   console.error(`.warning-budget.json inválido: ${err.message} — refusing to ratchet.`);
   process.exit(1);
 }
+if (budget === null || typeof budget !== 'object' || Array.isArray(budget)) {
+  console.error('.warning-budget.json não é um objeto JSON — refusing to ratchet.');
+  process.exit(1);
+}
 for (const field of ['lintWarnings', 'lintErrors', 'tsErrors']) {
   if (typeof budget[field] !== 'number' || Number.isNaN(budget[field])) {
     console.error(`.warning-budget.json sem campo numérico "${field}" — refusing to ratchet.`);
@@ -59,6 +63,11 @@ try {
   report = JSON.parse(res.stdout);
 } catch (err) {
   console.error(`Could not parse ESLint JSON output: ${err.message}`);
+  process.exit(1);
+}
+// Relatório vazio = ESLint não lintou nada; ratchetear daí gravaria teto 0 sem medição nenhuma.
+if (!Array.isArray(report) || report.length === 0) {
+  console.error('ESLint JSON report is empty or not a list — refusing to ratchet.');
   process.exit(1);
 }
 

@@ -27,7 +27,17 @@ function runEslint() {
     process.stderr.write(res.stderr || '');
     throw new Error(`ESLint failed (exit ${res.status})`);
   }
-  return JSON.parse(res.stdout);
+  let report;
+  try {
+    report = JSON.parse(res.stdout);
+  } catch (err) {
+    throw new Error(`Could not parse ESLint JSON output: ${err.message}`);
+  }
+  // Lista vazia = nada foi lintado; gravar o relatório daria um painel zerado (falso verde).
+  if (!Array.isArray(report) || report.length === 0) {
+    throw new Error('ESLint JSON report is empty or not a list — nothing was linted.');
+  }
+  return report;
 }
 
 function runTsc() {
@@ -36,14 +46,18 @@ function runTsc() {
     ['--no-install', 'tsc', '--noEmit', '--pretty', 'false'],
     { cwd: repoRoot, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, shell: true },
   );
-  // tsc sai com 0 (ok), 1 (erros por arquivo) ou 2 (falha fatal de config).
-  // Falha fatal não produz linhas `file(l,c): error TS...`; sem este check o
-  // relatório sairia falso-verde com 0 erros de TS.
-  if (res.status !== 0 && res.status !== 1) {
-    process.stderr.write(res.stderr || '');
+  const out = (res.stdout || '') + (res.stderr || '');
+  // O exit code do tsc não separa erro de tipo de falha de execução (o tsc 5 sai com 2 nos dois
+  // casos; 1 em opção inválida/crash) — mesma regra do check-warning-budget.mjs: erro global
+  // (`error TSxxxx:` sem arquivo), erro no próprio tsconfig*.json ou saída != 0 sem nenhum erro por
+  // arquivo é ferramenta quebrada;
+  // sem este check o relatório sairia falso-verde com 0 erros de TS.
+  const fatal = /^(?:error TS\d+:|(?:.*[\\/])?tsconfig[^\\/]*\.json\(\d+,\d+\): error TS\d+:)/m.test(out);
+  const hasFileErrors = /^.+\(\d+,\d+\): error TS\d+:/m.test(out);
+  if (![0, 1, 2].includes(res.status) || fatal || (res.status !== 0 && !hasFileErrors)) {
+    process.stderr.write(out);
     throw new Error(`tsc failed (exit ${res.status})`);
   }
-  const out = (res.stdout || '') + (res.stderr || '');
   const perFile = new Map();
   const line = /^(.+?)\((\d+),(\d+)\): error (TS\d+): (.+)$/gm;
   let m;

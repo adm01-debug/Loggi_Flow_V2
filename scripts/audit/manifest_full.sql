@@ -1,3 +1,6 @@
+-- Sobra de execução interrompida na mesma sessão: sem este DROP o CREATE falha e, com o psql no modo
+-- padrão (segue após erro), as linhas velhas saem misturadas no manifesto novo.
+DROP TABLE IF EXISTS pg_temp._manifest_full;
 CREATE TEMP TABLE _manifest_full (section text, key text, def text);
 
 INSERT INTO _manifest_full
@@ -67,7 +70,7 @@ DO $$
 BEGIN
   IF to_regclass('cron.job') IS NOT NULL THEN
     INSERT INTO _manifest_full
-    SELECT 'cron', j.jobname, j.schedule||' active='||j.active||' db='||j.database||' user='||j.username||' cmd='||regexp_replace(regexp_replace(regexp_replace(j.command, '\s+', ' ', 'g'), 'https://[a-z]+\.supabase\.co', '<URL>', 'g'), 'eyJ[A-Za-z0-9_.-]+', '<KEY>', 'g')
+    SELECT 'cron', coalesce(j.jobname, '<sem-nome:'||j.jobid||'>'), j.schedule||' active='||j.active||' db='||j.database||' user='||j.username||' cmd='||regexp_replace(regexp_replace(regexp_replace(j.command, '\s+', ' ', 'g'), 'https://[a-z]+\.supabase\.co', '<URL>', 'g'), 'eyJ[A-Za-z0-9_.-]+', '<KEY>', 'g')
       FROM cron.job j;
   ELSE
     INSERT INTO _manifest_full VALUES ('cron', '<ausente>', 'pg_cron não instalado');
@@ -76,19 +79,19 @@ END
 $$;
 
 INSERT INTO _manifest_full
-SELECT 'bucket', b.id, b.public::text||' limit='||coalesce(b.file_size_limit::text,'')||' mime='||coalesce(b.allowed_mime_types::text,'')
+SELECT 'bucket', b.id, coalesce(b.public::text,'')||' limit='||coalesce(b.file_size_limit::text,'')||' mime='||coalesce(b.allowed_mime_types::text,'')
   FROM storage.buckets b
 UNION ALL
 SELECT 'comment', n.nspname||'.'||c.relname||coalesce('.'||a.attname,''), d.description
   FROM pg_description d JOIN pg_class c ON c.oid=d.objoid AND d.classoid='pg_class'::regclass JOIN pg_namespace n ON n.oid=c.relnamespace LEFT JOIN pg_attribute a ON a.attrelid=c.oid AND a.attnum=d.objsubid AND d.objsubid>0
   WHERE n.nspname IN ('public','internal')
 UNION ALL
-SELECT 'comment', n.nspname||'.'||p.proname||'()', d.description
+SELECT 'comment', n.nspname||'.'||p.proname||'('||pg_get_function_identity_arguments(p.oid)||')', d.description
   FROM pg_description d JOIN pg_proc p ON p.oid=d.objoid AND d.classoid='pg_proc'::regclass JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname IN ('public','internal')
 UNION ALL
 SELECT 'migration', m.version, coalesce(m.name,'') FROM supabase_migrations.schema_migrations m
 UNION ALL
-SELECT 'auth_user', u.email, u.id::text||' providers='||coalesce(u.raw_app_meta_data->>'providers','')||' confirmed='||(u.email_confirmed_at IS NOT NULL)::text FROM auth.users u
+SELECT 'auth_user', coalesce(u.email, '<sem-email:'||u.id||'>'), u.id::text||' providers='||coalesce(u.raw_app_meta_data->>'providers','')||' confirmed='||(u.email_confirmed_at IS NOT NULL)::text FROM auth.users u
 UNION ALL
 SELECT 'storage_objects', x.b, x.n::text FROM (SELECT coalesce(o.bucket_id,'<none>') AS b, count(*) AS n FROM storage.objects o GROUP BY 1) x;
 
@@ -104,6 +107,6 @@ BEGIN
 END
 $$;
 
-SELECT section, key, def FROM _manifest_full ORDER BY section, key;
+SELECT section, key, def FROM _manifest_full ORDER BY section, key, def;
 
 DROP TABLE _manifest_full;

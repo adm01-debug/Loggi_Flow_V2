@@ -13,6 +13,17 @@ Precisa de `uv` (recomendado) ou `pipx`. Versão fixada em `GRAPHIFY_VERSION` de
 linha é a **fonte única** da versão: `.claude/hooks/session-start.sh` lê o número dela com `sed`, então não
 mude o formato da linha.
 
+O `setup.sh` acha a raiz do repo pelo próprio caminho, então funciona de qualquer pasta. Se o `graphify`
+já está na versão fixada ele não reinstala (rodar de novo não precisa de rede nem de `uv`/`pipx`); depois
+confere o husky (`core.hooksPath`), instala os hooks e roda `graphify update .`. Falha de instalação ou
+husky ausente para o script antes de tocar em hook ou grafo.
+
+Teste do `setup.sh` (offline; `uv`, `pipx`, `graphify` e `husky` são stubs, nada é instalado):
+
+```sh
+node --test scripts/graphify/setup.unit.mjs
+```
+
 ## Como usar
 
 ```sh

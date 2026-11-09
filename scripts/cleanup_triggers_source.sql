@@ -3,7 +3,16 @@
 -- Gerado em 2026-08-28
 -- Espelha o cleanup já aplicado no destino (jvfhclubfpxrtrrazrgr)
 -- APLICAR VIA: Lovable Studio → SQL Editor, ou psql direto
+--
+-- HISTÓRICO — NÃO REEXECUTAR. Blocos 1-2 foram aplicados na origem em 2026-08-31 (registro em
+-- scripts/origem_remediacao_2026-08-31.sql); o bloco 3 foi substituído lá por cron.unschedule.
+-- Desde o cutover a origem é somente leitura (AGENTS.md › Banco). Fica no repo como registro.
+-- Revisão 2026-11-09, só para que uma reexecução acidental seja inofensiva: BEGIN/COMMIT (antes,
+-- um erro no meio deixava cotacoes_frete sem trigger de updated_at) e CREATE OR REPLACE TRIGGER
+-- (antes, a 2ª execução falhava com "trigger already exists").
 -- ==========================================================
+
+BEGIN;
 
 -- ==========================================
 -- BLOCO 1: Version-increment duplicados
@@ -35,11 +44,11 @@ DROP TRIGGER IF EXISTS tr_increment_version_cotacoes_frete ON public.cotacoes_fr
 DROP TRIGGER IF EXISTS tr_cotacoes_version                ON public.cotacoes_frete;  -- trigger misto
 
 -- cotacoes_frete: criar triggers separados (já aplicado no destino)
-CREATE TRIGGER update_cotacoes_frete_updated_at
+CREATE OR REPLACE TRIGGER update_cotacoes_frete_updated_at
   BEFORE UPDATE ON public.cotacoes_frete
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-CREATE TRIGGER tr_increment_cotacoes_frete_version
+CREATE OR REPLACE TRIGGER tr_increment_cotacoes_frete_version
   BEFORE UPDATE ON public.cotacoes_frete
   FOR EACH ROW EXECUTE FUNCTION public.increment_version_column();
 
@@ -88,6 +97,8 @@ SELECT cron.alter_job(
   (SELECT jobid FROM cron.job WHERE jobname = 'nexus_heartbeat')::bigint,
   active := false
 ) WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'nexus_heartbeat' AND active = true);
+
+COMMIT;
 
 -- ==========================================
 -- VERIFICAÇÃO FINAL
