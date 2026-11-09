@@ -5,10 +5,16 @@
  * Imprime `true` ou `false` (usado pelo inventario-estado-semanal.yml para decidir se abre PR).
  *
  * Uso: node scripts/inventario/mudou-conteudo.mjs [arquivo...]   (padrao: banco, rotas e edges)
+ * Os arquivos padrao sao os da raiz do repo, de qualquer cwd; argumento relativo vale a partir do cwd.
+ * Exit: 0 = imprimiu true/false; 2 = nao da para decidir (sem git, fora de repositorio, .json gerado
+ * vazio/truncado) - nada sai no stdout, entao o passo da CI falha em vez de abrir PR no escuro.
  */
 import fs from 'node:fs';
+import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 export const PADRAO = ['inventario/estado/banco.json', 'inventario/estado/rotas.json', 'inventario/estado/edges.json'];
 const CARIMBOS = new Set(['medido_em', 'gerado_em']);
@@ -69,11 +75,61 @@ export function mudou(arquivos, lerAntes, lerDepois) {
   return arquivos.some((f) => semCarimbos(lerAntes(f)) !== semCarimbos(lerDepois(f)));
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const arquivos = process.argv.length > 2 ? process.argv.slice(2) : PADRAO;
-  const lerAntes = (f) => {
-    try { return execFileSync('git', ['show', `HEAD:${f}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch { return null; }
+/** Texto do arquivo; binario (UTF-8 invalido) vira base64, para dois binarios diferentes nunca empatarem. */
+const comoTexto = (buf) => {
+  const texto = buf.toString('utf8');
+  return Buffer.from(texto, 'utf8').equals(buf) ? texto : `base64:${buf.toString('base64')}`;
+};
+
+// maxBuffer: o padrao (1 MB) estourava em inventario grande e a versao do HEAD virava "arquivo novo".
+const git = (args) => execFileSync('git', args, { cwd: RAIZ, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 1024 ** 3 });
+
+function cli(argv) {
+  if (argv.includes('--help') || argv.includes('-h')) {
+    console.log('Uso: node scripts/inventario/mudou-conteudo.mjs [arquivo...]\n'
+      + `Imprime true se algum arquivo mudou alem dos carimbos de data em relacao ao HEAD (padrao: ${PADRAO.join(', ')}).`);
+    return;
+  }
+  const arquivos = argv.length > 0 ? argv.map((f) => path.resolve(f)) : PADRAO.map((f) => path.join(RAIZ, f));
+  try {
+    git(['rev-parse', '--is-inside-work-tree']);
+  } catch (erro) {
+    const motivo = String(erro.stderr ?? '').trim().split('\n')[0];
+    throw new Error(erro.code === 'ENOENT'
+      ? 'git nao encontrado no PATH: sem o HEAD nao da para saber se o inventario mudou.'
+      : `git nao leu o repositorio em ${RAIZ}${motivo ? ` (${motivo})` : ''}: sem o HEAD nao da para saber se o inventario mudou.`);
+  }
+  const lerAntes = (abs) => {
+    const relativo = path.relative(RAIZ, abs).split(path.sep).join('/');
+    if (relativo.startsWith('../') || path.isAbsolute(relativo)) return null; // fora do repo: nunca esteve no HEAD
+    let blob;
+    try {
+      // --verify --quiet sai 1 calado quando o caminho nao existe no HEAD (ou o repo ainda nao tem commit).
+      blob = git(['rev-parse', '--verify', '--quiet', `HEAD:./${relativo}`]).toString().trim();
+    } catch (erro) {
+      if (erro.status === 1) return null;
+      throw erro;
+    }
+    return comoTexto(git(['cat-file', 'blob', blob]));
   };
-  const lerDepois = (f) => (fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null);
+  const lerDepois = (abs) => {
+    if (!fs.existsSync(abs)) return null;
+    const texto = comoTexto(fs.readFileSync(abs));
+    if (abs.endsWith('.json')) {
+      try { JSON.parse(texto); } catch {
+        throw new Error(`${path.relative(RAIZ, abs)} nao e JSON valido (vazio ou truncado?): o gerador falhou, nada a comparar.`);
+      }
+    }
+    return texto;
+  };
   console.log(String(mudou(arquivos, lerAntes, lerDepois)));
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  try {
+    cli(process.argv.slice(2));
+  } catch (erro) {
+    console.error(`ERRO: ${erro.message}`);
+    process.exit(2);
+  }
 }

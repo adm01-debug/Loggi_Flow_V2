@@ -873,5 +873,433 @@ for _auth_error in (False, True):
                 db_stats_case("exercise_recovery", _auth_error, _empty))
 
 
+# --------------------------------------------------------------------------- #
+# Robustez: segredos x guard do workflow, falha de conexão, privacidade, catálogo, Management API
+# --------------------------------------------------------------------------- #
+
+# Cópia do grep do passo "Guard - nenhum segredo na saida" de .github/workflows/contexto-ia.yml.
+WORKFLOW_GUARD = (r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|sb_secret_|sb_publishable_|"
+                  r"postgres(ql)?://[^ ]*:[^ @]+@")
+# Montado em tempo de execução: um JWT literal no arquivo dispara o gitleaks.
+JWT = ".".join(("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9", "eyJyb2xlIjoic2VydmljZV9yb2xlIn0", "assinatura_de_teste_123"))
+
+
+class SnapshotSecretGuardTests(SnapshotFixture):
+    def test_guard_copy_matches_the_workflow_that_consumes_the_output(self):
+        workflow = pathlib.Path(__file__).resolve().parents[2] / ".github" / "workflows" / "contexto-ia.yml"
+        if not workflow.is_file():
+            self.skipTest("workflow consumidor ausente neste checkout")
+        self.assertIn(f"grep -rIEl '{WORKFLOW_GUARD}'", workflow.read_text(encoding="utf-8"))
+
+    def test_redacted_text_never_trips_the_workflow_guard(self):
+        samples = {
+            "dsn": "PERFORM dblink('postgresql://postgres.ref:S3nh4-Secreta@aws-0-sa-east-1.pooler.supabase.com:5432/postgres');",
+            "dsn seguido de arroba": "x := 'postgres://app:S3nh4-Secreta@db.interno:5432/erp?application_name=a@b';",
+            "prefixo solto": "SELECT chave LIKE 'sb_secret_%' OR chave LIKE 'sb_publishable_%'",
+            "chave nova": "apikey sb_secret_AbCdEf0123456789 e sb_publishable_AbCdEf0123456789",
+            "chave curta": "sb_secret_abc",
+            "jwt": f'headers := \'{{"Authorization": "Bearer {JWT}"}}\'',
+        }
+        for name, text in samples.items():
+            with self.subTest(name=name):
+                self.assertRegex(text, WORKFLOW_GUARD, "a amostra precisa reprovar no guard antes do scrub")
+                clean = self.snapshot.scrub(text)
+                self.assertNotRegex(clean, WORKFLOW_GUARD)
+                # Ordem e nome do laço evitam falso "chave = valor" da regra genérica de segredos do gitleaks.
+                for valor in ("assinatura_de_teste_123", "AbCdEf0123456789", "S3nh4-Secreta"):
+                    self.assertNotIn(valor, clean)
+
+    def test_redacted_dsn_keeps_host_and_drops_user_and_password(self):
+        clean = self.snapshot.scrub("postgresql://postgres.ref:S3nh4@aws-0-sa-east-1.pooler.supabase.com:5432/postgres")
+        self.assertEqual(clean, "postgresql://[REDACTED CREDENTIALS]@aws-0-sa-east-1.pooler.supabase.com:5432/postgres")
+
+    def test_ordinary_sql_and_urls_are_left_alone(self):
+        for text in ("SELECT public.has_role(auth.uid(), 'admin'::text)", "https://exemplo.com:443/hook?x=1",
+                     "postgresql://localhost:5432/postgres", "token := encode(gen_random_bytes(32), 'hex')"):
+            self.assertEqual(self.snapshot.scrub(text), text)
+
+    def test_pg_dump_output_is_scrubbed_before_it_is_written(self):
+        dump = ("CREATE TRIGGER hook AFTER INSERT ON public.pedidos FOR EACH ROW EXECUTE FUNCTION "
+                f"supabase_functions.http_request('https://x/hook', 'POST', '{{\"Authorization\":\"Bearer {JWT}\"}}');\n")
+        completed = types.SimpleNamespace(returncode=0, stdout=dump, stderr="")
+        self.snapshot.PGDUMP = True
+        with mock.patch.object(self.snapshot.shutil, "which", return_value="/usr/bin/pg_dump"):
+            with mock.patch.object(self.snapshot.subprocess, "run", return_value=completed):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    schema = self.snapshot.run_pg_dump()
+        self.assertIn("CREATE TRIGGER hook", schema)
+        self.assertNotIn("assinatura_de_teste_123", schema)
+        self.assertNotRegex(schema, WORKFLOW_GUARD)
+
+    def test_recorded_errors_are_scrubbed(self):
+        self.snapshot.ERRORS.clear()
+        with contextlib.redirect_stdout(io.StringIO()) as log:
+            self.snapshot.record_error("pg_dump", "pg_dump: error: postgresql://postgres.ref:S3nh4-Secreta@host:5432/postgres")
+        self.assertNotIn("S3nh4-Secreta", self.snapshot.ERRORS[-1]["error"] + log.getvalue())
+
+
+class SnapshotCommandLineTests(SnapshotFixture):
+    def run_cli(self, *argv):
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(self.snapshot, "main", side_effect=AssertionError("argumento não pode iniciar coleta")):
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                code = self.snapshot.cli(list(argv))
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def test_help_prints_the_environment_contract_and_collects_nothing(self):
+        for flag in ("--help", "-h"):
+            code, stdout, stderr = self.run_cli(flag)
+            self.assertEqual((code, stderr), (0, ""))
+            self.assertIn("SUPABASE_DB_URL", stdout)
+            self.assertIn("SNAPSHOT_DIR", stdout)
+
+    def test_unknown_argument_is_rejected_instead_of_starting_a_collection(self):
+        code, stdout, stderr = self.run_cli("--check")
+        self.assertEqual((code, stdout), (2, ""))
+        self.assertIn("Argumento não reconhecido: --check", stderr)
+        self.assertFalse(self.out.exists())
+
+    def test_no_argument_runs_the_collection(self):
+        with mock.patch.object(self.snapshot, "main", return_value=0) as main:
+            self.assertEqual(self.snapshot.cli([]), 0)
+        main.assert_called_once_with()
+
+
+CONNECTION_FAILURES = {
+    # nome: (SUPABASE_DB_URL, mensagem do driver, pedaços que não podem sair, trecho da dica)
+    "senha_errada": ("postgresql://postgres.ref:S3nh4-Secreta@pooler.exemplo.com:5432/postgres",
+                     'connection failed: FATAL:  password authentication failed for user "postgres.ref"',
+                     ["S3nh4-Secreta"], "usuário ou senha recusados"),
+    "arroba_na_senha": ("postgresql://postgres.ref:p@Segredo-Longo@pooler.exemplo.com:5432/postgres",
+                        "failed to resolve host 'Segredo-Longo@pooler.exemplo.com': [Errno -2] Name or service not known",
+                        ["Segredo-Longo"], "percent-encoding"),
+    "url_entre_aspas": ('"postgresql://postgres.ref:S3nh4-Secreta@pooler.exemplo.com:5432/postgres"',
+                        'missing "=" after ""postgresql://postgres.ref:S3nh4-Secreta@pooler.exemplo.com:5432/postgres"" in connection info string',
+                        ["S3nh4-Secreta"], "sem aspas"),
+    "url_sem_esquema": ("postgres.ref:S3nh4-Secreta@pooler.exemplo.com:5432/postgres",
+                        'missing "=" after "postgres.ref:S3nh4-Secreta@pooler.exemplo.com:5432/postgres" in connection info string',
+                        ["S3nh4-Secreta"], "postgresql://usuario:senha@host:porta/banco"),
+    "senha_ecoada_em_outro_url": ("postgresql://postgres.ref:S3nh4-Secreta@pooler.exemplo.com:5432/postgres",
+                                  "could not connect via postgresql://postgres.ref:S3nh4-Secreta@10.0.0.1:5432/postgres",
+                                  ["S3nh4-Secreta"], "confira host, porta e banco"),
+    "formato_chave_valor": ("host=pooler.exemplo.com user=postgres password=S3nh4-Secreta",
+                            'invalid connection option "S3nh4-Secreta"', ["S3nh4-Secreta"], "postgresql://usuario:senha@host:porta/banco"),
+    "so_ipv6": ("postgresql://postgres:S3nh4-Secreta@db.ref.supabase.co:5432/postgres",
+                'connection to server at "db.ref.supabase.co" (2600:1f1e::1), port 5432 failed: Network is unreachable',
+                ["S3nh4-Secreta"], "Session pooler"),
+    "timeout": ("postgresql://postgres:S3nh4-Secreta@pooler.exemplo.com:5432/postgres", "connection timeout expired",
+                ["S3nh4-Secreta"], "não respondeu em 30s"),
+    "porta_recusada": ("postgresql://postgres:S3nh4-Secreta@127.0.0.1:1/postgres",
+                       'connection failed: connection to server at "127.0.0.1", port 1 failed: Connection refused\n'
+                       "\tIs the server running on that host and accepting TCP/IP connections?",
+                       ["S3nh4-Secreta"], "confira host, porta e banco"),
+}
+
+
+class SnapshotConnectionFailureTests(SnapshotFixture):
+    def fail_to_connect(self, url, driver_message):
+        self.snapshot.ERRORS.clear()
+        self.snapshot.CARRIED.clear()
+        self.snapshot.DB_URL = url
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(self.snapshot.psycopg, "connect", side_effect=RuntimeError(driver_message)):
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                code = self.snapshot.main()
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def exercise(self, name):
+        url, driver_message, forbidden, hint = CONNECTION_FAILURES[name]
+        code, stdout, stderr = self.fail_to_connect(url, driver_message)
+        self.assertEqual(code, 1)
+        self.assertEqual(len(stderr.strip().splitlines()), 1, stderr)
+        self.assertIn("Banco inacessível", stderr)
+        self.assertIn(hint, stderr)
+        self.assertNotIn("Traceback", stdout + stderr)
+        for secret in forbidden + [url]:
+            self.assertNotIn(secret, stdout + stderr)
+        # Falha de conexão não publica nada: só o marcador de posse do diretório.
+        self.assertEqual([path.name for path in self.out.iterdir()], [self.snapshot.OUTPUT_MARKER])
+
+    def test_connection_failure_keeps_the_previous_snapshot_untouched(self):
+        self.assertEqual(self.collect(), 0)
+        before = {path.name: path.read_bytes() for path in self.out.iterdir() if path.is_file()}
+        code, _, stderr = self.fail_to_connect(*CONNECTION_FAILURES["timeout"][:2])
+        self.assertEqual(code, 1)
+        self.assertIn("nada foi coletado nem sobrescrito", stderr)
+        self.assertEqual(before, {path.name: path.read_bytes() for path in self.out.iterdir() if path.is_file()})
+
+
+for _name in CONNECTION_FAILURES:
+    setattr(SnapshotConnectionFailureTests, f"test_{_name}_is_one_line_without_secret",
+            lambda self, name=_name: self.exercise(name))
+
+
+class SnapshotCronPrivacyTests(SnapshotFixture):
+    def test_cron_message_keeps_only_the_primary_error_line(self):
+        cases = {
+            'ERROR:  duplicate key value violates unique constraint "clientes_email_key"\n'
+            "DETAIL:  Key (email)=(joao@exemplo.com) already exists.":
+                'ERROR:  duplicate key value violates unique constraint "clientes_email_key"',
+            'ERROR:  null value in column "nome" violates not-null constraint\n'
+            "DETAIL:  Failing row contains (7, null, joao@exemplo.com, 123.456.789-00).\nCONTEXT:  SQL statement":
+                'ERROR:  null value in column "nome" violates not-null constraint',
+            "ERROR: duplicate key DETAIL: Key (email, cpf)=(joao@exemplo.com, 123) already exists.":
+                "ERROR: duplicate key DETAIL: Key (email, cpf)=(?) already exists.",
+            "ERROR: x DETAIL: Failing row contains (7, joao@exemplo.com).": "ERROR: x DETAIL: Failing row contains (?).",
+            "1 row": "1 row", "": "", None: None,
+        }
+        for raw, expected in cases.items():
+            with self.subTest(raw=raw):
+                self.assertEqual(self.snapshot.cron_message(raw), expected)
+
+    def test_cron_runs_do_not_carry_row_values(self):
+        row = {"jobid": 2, "runid": 9, "status": "failed", "start_time": None, "end_time": None, "seconds": 1,
+               "return_message": "ERROR:  duplicate key\nDETAIL:  Key (email)=(joao@exemplo.com) already exists."}
+
+        def query(_conn, sql, params=None):
+            return [{"present": 1}] if "pg_extension" in sql else [dict(row)]
+
+        with mock.patch.object(self.snapshot, "q", side_effect=query):
+            with contextlib.redirect_stdout(io.StringIO()):
+                runs = self.snapshot.get_cron_runs(OfflineConnection())
+        self.assertEqual(runs[0]["return_message"], "ERROR:  duplicate key")
+
+    def cron(self, rls_active):
+        self.snapshot.ERRORS.clear()
+
+        def query(_conn, sql, params=None):
+            if "pg_extension" in sql:
+                return [{"present": 1}]
+            if "row_security_active" in sql:
+                return [{"active": rls_active}]
+            return [] if rls_active else [{"jobid": 1, "jobname": "demo", "schedule": "* * * * *", "command": "SELECT 1"}]
+
+        with mock.patch.object(self.snapshot, "q", side_effect=query):
+            with contextlib.redirect_stdout(io.StringIO()):
+                return self.snapshot.get_cron(OfflineConnection()), {e["section"] for e in self.snapshot.ERRORS}
+
+    def test_cron_jobs_hidden_by_row_security_are_reported_not_published_as_zero(self):
+        cron, errors = self.cron(rls_active=True)
+        self.assertEqual(cron, {"installed": True, "jobs": []})
+        self.assertEqual(errors, {"cron.rls"})
+
+    def test_cron_without_row_security_restriction_has_no_warning(self):
+        cron, errors = self.cron(rls_active=False)
+        self.assertEqual(len(cron["jobs"]), 1)
+        self.assertEqual(errors, set())
+
+
+class SnapshotCatalogQueryTests(SnapshotFixture):
+    def emitted_sql(self):
+        """Todo SQL que o módulo envia ao banco: 2º argumento de q() e 1º de conn.execute()."""
+        import ast
+        tree = ast.parse(pathlib.Path(self.snapshot.__file__).read_text(encoding="utf-8"))
+        statements = []
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            target = node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, "attr", "")
+            index = {"q": 1, "execute": 0}.get(target)
+            if index is None or len(node.args) <= index:
+                continue
+            argument = node.args[index]
+            parts = [argument]
+            while parts and not all(isinstance(part, (ast.Constant, ast.FormattedValue)) for part in parts):
+                parts = [child for part in parts for child in (
+                    part.values if isinstance(part, ast.JoinedStr) else
+                    [part.left, part.right] if isinstance(part, ast.BinOp) else [part])]
+                if any(not isinstance(part, (ast.Constant, ast.FormattedValue, ast.JoinedStr, ast.BinOp)) for part in parts):
+                    break
+            text = "".join(part.value if isinstance(part, ast.Constant) and isinstance(part.value, str) else " x "
+                           for part in parts if isinstance(part, (ast.Constant, ast.FormattedValue)))
+            if text.strip():
+                statements.append(" ".join(text.split()))
+        return statements
+
+    def test_every_statement_sent_to_the_database_is_read_only(self):
+        statements = self.emitted_sql()
+        self.assertGreater(len(statements), 50, "a varredura do fonte deixou de encontrar as consultas")
+        for sql in statements:
+            self.assertRegex(sql, r"(?i)^(SELECT|SET)\b", sql[:80])
+            # Um único SELECT sem INTO nem função de escrita não altera o banco; o resto a sessão read-only barra.
+            self.assertNotIn(";", sql)
+            self.assertNotRegex(sql, r"(?i)\b(INTO|nextval|setval|set_config|decrypted_secrets?)\b", sql[:80])
+        self.assertIn("SET default_transaction_read_only = on", statements)
+
+    def test_no_query_reads_rows_of_application_tables(self):
+        for sql in self.emitted_sql():
+            self.assertNotRegex(sql, r"(?i)\b(FROM|JOIN)\s+public\.", sql[:80])
+            if re.search(r"(?i)\bFROM\s+(auth|storage)\.(users|identities|mfa_factors|objects)\b", sql):
+                self.assertRegex(sql, r"(?i)count\(\*\)", "tabelas com dado pessoal só entram como contagem")
+
+    def captured(self, collector):
+        calls = []
+        with mock.patch.object(self.snapshot, "q", side_effect=lambda _conn, sql, params=None: calls.append(sql) or []):
+            with contextlib.redirect_stdout(io.StringIO()):
+                collector(OfflineConnection())
+        return [" ".join(sql.split()) for sql in calls]
+
+    def test_composite_key_columns_follow_the_constraint_order(self):
+        (sql,) = self.captured(self.snapshot.get_constraints)
+        for key, relation in (("conkey", "conrelid"), ("confkey", "confrelid")):
+            self.assertIn(f"unnest(con.{key}) WITH ORDINALITY k(attnum, ord) JOIN pg_attribute a "
+                          f"ON a.attrelid = con.{relation} AND a.attnum = k.attnum ORDER BY k.ord", sql)
+
+    def test_grants_come_from_the_catalog_not_from_the_caller_dependent_views(self):
+        tables, columns, *_ = self.captured(self.snapshot.get_grants)
+        for sql in (tables, columns):
+            self.assertNotIn("information_schema.", sql)
+            self.assertIn("aclexplode(", sql)
+        self.assertIn("c.relkind IN ('r','p','v','m','f')", tables)
+
+    def test_security_invoker_accepts_every_true_spelling(self):
+        pattern = re.search(r"~\* '([^']+)'", self.snapshot.SECURITY_INVOKER_ON).group(1)
+        views = " ".join(self.captured(self.snapshot.get_views))
+        self.assertIn(self.snapshot.SECURITY_INVOKER_ON, views)
+        for options in ("security_invoker=true", "security_invoker=on", "security_invoker=1", "security_invoker=yes",
+                        "security_invoker=TRUE", "security_barrier=true,security_invoker=on", "security_invoker=on,check_option=local"):
+            self.assertRegex(options, re.compile(pattern, re.I))
+        for options in ("", "security_invoker=false", "security_invoker=off", "security_invoker=0", "security_invoker=no",
+                        "security_barrier=true", "not_security_invoker=true"):
+            self.assertNotRegex(options, re.compile(pattern, re.I))
+
+    def test_storage_and_queue_failures_do_not_discard_the_other_database_metrics(self):
+        self.snapshot.ERRORS.clear()
+        self.snapshot.STAT_STATEMENTS_TOP = 0
+
+        def query(_conn, sql, params=None):
+            if "storage.objects" in sql:
+                raise RuntimeError('relation "storage.objects" does not exist')
+            if "pg_extension" in sql:
+                return [{"present": 1}]
+            if "pgmq.metrics_all" in sql:
+                raise PermissionError("permission denied for schema pgmq")
+            if "pg_database_size" in sql:
+                return [{"s": 123}]
+            if "FROM auth." in sql:
+                return [{"c": 1}]
+            return []
+
+        with mock.patch.object(self.snapshot, "q", side_effect=query):
+            with contextlib.redirect_stdout(io.StringIO()):
+                stats = self.snapshot.get_db_stats(OfflineConnection())
+        self.assertEqual(stats["database_bytes"], 123)
+        self.assertEqual(stats["storage"], [])
+        self.assertEqual(stats["queues"], [])
+        self.assertEqual({e["section"] for e in self.snapshot.ERRORS}, {"db_stats.storage", "db_stats.queues"})
+
+    def test_enums_with_the_same_name_in_two_schemas_do_not_share_usage(self):
+        db = {
+            "types": [{"schema": schema, "name": "status_pedido", "kind": "enum", "values": ["a"], "definition": None}
+                      for schema in ("app_privado", "public")],
+            "columns": [
+                {"schema": "public", "table": "pedidos", "name": "status", "type": "status_pedido", "is_enum": True,
+                 "enum_type": "public.status_pedido"},
+                {"schema": "public", "table": "pedidos", "name": "status_interno", "type": "app_privado.status_pedido",
+                 "is_enum": True, "enum_type": "app_privado.status_pedido"},
+            ],
+        }
+        self.out.mkdir()
+        self.snapshot.render_simple(db, {"enabled": False})
+        rendered = (self.out / "types-enums.md").read_text(encoding="utf-8")
+        self.assertIn("| app_privado.status_pedido | enum | a | public.pedidos.status_interno |", rendered)
+        self.assertIn("| public.status_pedido | enum | a | public.pedidos.status |", rendered)
+
+
+class SnapshotManagementApiTests(SnapshotFixture):
+    FUNCTIONS = [{"slug": "predict-delays", "name": "predict-delays", "status": "ACTIVE", "version": 3, "verify_jwt": False},
+                 {"slug": "send-password-reset", "name": "send-password-reset", "status": "ACTIVE", "version": 7, "verify_jwt": True}]
+
+    def collect_with_api(self, failure=None, functions=None):
+        snapshot = self.snapshot
+        snapshot.ERRORS.clear()
+        snapshot.CARRIED.clear()
+        snapshot._SLUG_SEEN.clear()
+        snapshot.PROJECT_REF, snapshot.ACCESS_TOKEN = "refteste", "token-de-teste"
+        answers = {
+            "": {"id": "refteste", "name": "Loggi", "region": "sa-east-1", "db_pass": "valor-secreto-da-api"},
+            "/functions": self.FUNCTIONS if functions is None else functions,
+            "/secrets": [{"name": "RESEND_API_KEY", "value": "valor-secreto-da-api"}],
+            "/config/auth": {"site_url": "https://exemplo.com", "smtp_pass": "valor-secreto-da-api"},
+            "/postgrest": {"db_schema": "public", "jwt_secret": "valor-secreto-da-api"},
+            "/config/database/pooler": {"pool_mode": "transaction"},
+        }
+
+        class Response(io.BytesIO):
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                return False
+
+        def urlopen(request, timeout=None):
+            path = request.full_url.split("/projects/refteste", 1)[1].split("?")[0]
+            if isinstance(failure, int):
+                raise snapshot.urllib.error.HTTPError(request.full_url, failure, "erro", {}, None)
+            if failure == "timeout":
+                raise TimeoutError("timed out")
+            if failure == "vazio":
+                return Response(b"")
+            if failure == "html":
+                return Response(b"<html>bad gateway</html>")
+            if path not in answers:
+                raise snapshot.urllib.error.HTTPError(request.full_url, 404, "Not Found", {}, None)
+            return Response(json.dumps(answers[path]).encode())
+
+        @snapshot.section("server")
+        def server(_conn):
+            return {"server_version": "offline-fixture"}
+
+        snapshot.DB_SECTIONS = [server]
+        with mock.patch.object(snapshot.psycopg, "connect", return_value=OfflineConnection()):
+            with mock.patch.object(snapshot.urllib.request, "urlopen", side_effect=urlopen):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    return snapshot.main()
+
+    def function_dirs(self):
+        return sorted(path.name for path in (self.out / "edge-functions").iterdir())
+
+    def exercise_failure(self, failure):
+        self.assertEqual(self.collect_with_api(), 0)
+        changelog = (self.out / "CHANGELOG.md").read_text(encoding="utf-8")
+        published = self.metadata()["api"]
+        self.assertEqual(self.collect_with_api(failure=failure), 0)
+        self.assertEqual(self.function_dirs(), ["predict-delays", "send-password-reset"])
+        self.assertEqual((self.out / "CHANGELOG.md").read_text(encoding="utf-8"), changelog)
+        for key in ("edge_functions", "secrets_names", "auth_config", "postgrest_config", "pooler_config"):
+            self.assertEqual(self.metadata()["api"][key], published[key])
+        self.assertIn("api.edge_functions", self.error_sections())
+        self.assertIn("api.edge_functions", self.metadata()["carried"])
+        self.assertIn("mostrando a versão anterior", (self.out / "edge-functions.md").read_text(encoding="utf-8"))
+
+    def test_successful_collection_publishes_metadata_without_secret_values(self):
+        self.assertEqual(self.collect_with_api(), 0)
+        self.assertEqual(self.function_dirs(), ["predict-delays", "send-password-reset"])
+        self.assertEqual(self.metadata()["api"]["secrets_names"], ["RESEND_API_KEY"])
+        for path in self.out.rglob("*"):
+            if path.is_file():
+                self.assertNotIn("valor-secreto-da-api", path.read_text(encoding="utf-8"), path.name)
+                self.assertNotIn("token-de-teste", path.read_text(encoding="utf-8"), path.name)
+
+    def test_recovery_after_failure_removes_a_function_that_was_really_deleted(self):
+        self.assertEqual(self.collect_with_api(), 0)
+        self.assertEqual(self.collect_with_api(failure=500), 0)
+        self.assertEqual(self.collect_with_api(functions=self.FUNCTIONS[:1]), 0)
+        self.assertEqual(self.function_dirs(), ["predict-delays"])
+        self.assertEqual(self.metadata()["carried"], [])
+        self.assertIn("**edge functions** removido (1): `send-password-reset`",
+                      (self.out / "CHANGELOG.md").read_text(encoding="utf-8"))
+
+    def test_failed_first_collection_says_unavailable_instead_of_listing_nothing(self):
+        self.assertEqual(self.collect_with_api(failure=500), 0)
+        self.assertIn("indisponível nesta coleta e sem versão anterior", (self.out / "edge-functions.md").read_text(encoding="utf-8"))
+        self.assertIn("api.edge_functions", self.error_sections())
+
+
+for _failure in (500, 429, 401, "timeout", "vazio", "html"):
+    setattr(SnapshotManagementApiTests, f"test_failure_{_failure}_keeps_previous_metadata_and_changelog",
+            lambda self, failure=_failure: self.exercise_failure(failure))
+
+
 if __name__ == "__main__":
     unittest.main()
