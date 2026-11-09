@@ -1,0 +1,4 @@
+{
+  "_comment": "Baseline (ratchet) do supabase-usage-guard para o Loggi_Flow_V2. Entradas aqui sao violacoes CONHECIDAS e aceitas. Vazio - ainda nao houve nenhuma execucao real do guard contra o catalogo do banco Loggi.",
+  "known": []
+}

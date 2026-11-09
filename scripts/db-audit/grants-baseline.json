@@ -1,0 +1,9 @@
+{
+  "note": "Placeholder ate a primeira execucao do types-sync contra o banco Loggi. Os nomes de tabela e contagens do Zapp nao se aplicam a este banco - copia-los geraria falso-positivo de drift. Regenerar com scripts/db-audit/grants-baseline.sql (E26).",
+  "generated_at": null,
+  "anon_execute": [],
+  "anon_table_select": [],
+  "authenticated_execute_count": 0,
+  "service_role_execute_count": 0,
+  "how_to_regenerate": "scripts/db-audit/grants-baseline.sql (E26)"
+}
