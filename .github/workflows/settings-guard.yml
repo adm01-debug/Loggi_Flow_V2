@@ -3,8 +3,6 @@
 #   prova: o perimetro do GitHub (branch protection, merge, environments) contra o baseline versionado
 #   falha: issue aberta; sem escopo suficiente o guarda reporta ponto cego em vez de falhar em silencio
 #   avisa: issue de settings
-# NOTA(loggi): Este workflow depende de scripts/ci/github-settings-guard.mjs
-# que ainda nao existe neste repositorio. Porte esse script do Zapp_Web_V2 antes de usar.
 # Secret necessario: SETTINGS_GUARD_TOKEN (PAT fine-grained administration:read + metadata:read).
 # Environment necessario: perimetro-leitura.
 name: Settings Guard
