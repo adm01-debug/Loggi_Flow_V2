@@ -121,16 +121,17 @@ errosOperacionais += errosDestino.length;
 for (const secao of SECOES) {
   const arrayA = A[secao];
   const arrayB = B[secao];
-  if (!Array.isArray(arrayA) || !arrayA.every((item) => typeof item === 'string')) {
+  const validA = Array.isArray(arrayA) && arrayA.every((item) => typeof item === 'string');
+  const validB = Array.isArray(arrayB) && arrayB.every((item) => typeof item === 'string');
+  if (!validA) {
     console.error('[' + secao + '] secao ausente ou invalida no catalogo commitado');
     drifts++;
-    continue;
   }
-  if (!Array.isArray(arrayB) || !arrayB.every((item) => typeof item === 'string')) {
+  if (!validB) {
     console.error('[' + secao + '] secao ausente ou invalida no catalogo fresco');
     errosOperacionais++;
-    continue;
   }
+  if (!validA || !validB) continue;
 
   const setA = new Set(arrayA);
   const setB = new Set(arrayB);
