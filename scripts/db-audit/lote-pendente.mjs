@@ -7,20 +7,21 @@
  *   exit 0 — sem drift e sem apply-pendente (clean)
  *   exit 1 — drift real (arquivo em producao sem par no disco, ou vice-versa)
  *   exit 2 — somente apply-pendente (migrations no disco sem ledger no banco)
+ *   exit 3 — nao classificado (check-migration-drift.mjs ausente ou nao executou)
  *
  * NOTA(loggi): check-migration-drift.mjs AINDA NAO foi portado do Zapp_Web_V2
  * para este repositorio (42KB, logica de ledger de migrations). Sem DESTINO_URL
- * configurado este script sai 0 sem chamar o drift script (ver abaixo), mas assim
- * que DESTINO_URL existir e houver schema_changed=true no types-sync, este
- * spawnSync vai falhar por falta do arquivo. Porte check-migration-drift.mjs
- * do Zapp antes de ativar DESTINO_URL/SUPABASE_DB_URL de verdade.
+ * este script sai 0 sem chamar o drift script. Com DESTINO_URL e o arquivo
+ * ausente, sai 3 e diz isso no resumo: o types-sync so trata o exit 2 como
+ * "aguardando apply", entao segue como sem apply pendente, sem afirmar um
+ * drift que ninguem mediu.
  *
  * Uso:
  *   node scripts/db-audit/lote-pendente.mjs [-- <args extras para check-migration-drift>]
  */
 
 import { spawnSync } from 'node:child_process';
-import { writeFileSync, appendFileSync } from 'node:fs';
+import { appendFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -45,6 +46,15 @@ if (!process.env.DESTINO_URL) {
     'DESTINO_URL nao definido; somente validacao local (sem banco).',
   ]);
   process.exitCode = 0;
+} else if (!existsSync(DRIFT_SCRIPT)) {
+  console.error('ERRO: scripts/db-audit/check-migration-drift.mjs ausente; apply pendente nao foi classificado.');
+  writeSummary([
+    '### ⚠️ Lote pendente — nao classificado',
+    '',
+    'scripts/db-audit/check-migration-drift.mjs nao existe neste repositorio;',
+    'nao foi possivel comparar as migrations do disco com o ledger do banco.',
+  ]);
+  process.exitCode = 3;
 } else {
   const result = spawnSync(
     process.execPath,
@@ -52,7 +62,7 @@ if (!process.env.DESTINO_URL) {
     { stdio: 'inherit', encoding: 'utf8' },
   );
 
-  const rc = result.status ?? 1;
+  const rc = result.status ?? 3;
 
   if (rc === 0) {
     writeSummary([
@@ -68,6 +78,12 @@ if (!process.env.DESTINO_URL) {
       'O apply acontecera no ciclo de lote do dia.',
       '',
       '> Nao e drift — e o estado esperado entre o merge e o apply.',
+    ]);
+  } else if (rc === 3) {
+    writeSummary([
+      '### ⚠️ Lote pendente — nao classificado',
+      '',
+      'check-migration-drift.mjs nao terminou (encerrado por sinal ou falha ao iniciar).',
     ]);
   } else {
     writeSummary([

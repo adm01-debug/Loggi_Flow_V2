@@ -13,7 +13,10 @@
  *
  * Violacoes ja conhecidas ficam em known-violations.json (padrao ratchet):
  * o CI passa com elas, mas falha se aparecer UMA nova. Entradas do baseline que
- * deixarem de existir tambem falham, para o arquivo nao apodrecer.
+ * deixarem de existir sao avisadas e, com --prune-obsolete (types-sync), removidas
+ * do arquivo, para ele nao apodrecer.
+ *
+ * Exit codes: 0=sem violacao nova, 1=violacao nova, 2=catalogo/baseline ausente ou invalido.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -158,35 +161,41 @@ function projectSchemaFromForwardMigrations(catalog) {
     if (filename.slice(0, 8) < cutoff) continue;
     const rawSql = fs.readFileSync(path.join(migrationsDir, filename), 'utf8');
     const sql = stripSqlComments(rawSql);
+    // As regex abaixo so casam no inicio de um statement: `ALTER PUBLICATION ... DROP TABLE x`
+    // (tirar a tabela do realtime) e nome de policy com texto livre nao sao DDL do objeto.
     const ops = [];
     const qual = (schema, name) => schema.toLowerCase() + '.' + name;
     const alvo = (schema, name) => qual(schema || 'public', name);
-    for (const m of sql.matchAll(/CREATE\s+(?:OR\s+REPLACE\s+)?(?:MATERIALIZED\s+)?VIEW(?:\s+IF\s+NOT\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
+    for (const m of sql.matchAll(/(?:^|;)\s*CREATE\s+(?:OR\s+REPLACE\s+)?(?:MATERIALIZED\s+)?VIEW(?:\s+IF\s+NOT\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
       ops.push({ at: m.index, kind: 'rel', op: 'add', name: alvo(m[1], m[2]) });
     }
-    for (const m of sql.matchAll(/DROP\s+(?:MATERIALIZED\s+)?VIEW(?:\s+IF\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
+    for (const m of sql.matchAll(/(?:^|;)\s*DROP\s+(?:MATERIALIZED\s+)?VIEW(?:\s+IF\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
       ops.push({ at: m.index, kind: 'rel', op: 'del', name: alvo(m[1], m[2]) });
     }
-    for (const m of sql.matchAll(/CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
+    for (const m of sql.matchAll(/(?:^|;)\s*CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
       ops.push({ at: m.index, kind: 'rel', op: 'add', name: alvo(m[1], m[2]) });
     }
-    for (const m of sql.matchAll(/DROP\s+TABLE(?:\s+IF\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
+    for (const m of sql.matchAll(/(?:^|;)\s*DROP\s+TABLE(?:\s+IF\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)/gi)) {
       ops.push({ at: m.index, kind: 'rel', op: 'del', name: alvo(m[1], m[2]) });
     }
-    for (const m of sql.matchAll(/ALTER\s+(?:MATERIALIZED\s+VIEW|TABLE|VIEW)(?:\s+IF\s+EXISTS)?\s+(?:ONLY\s+)?(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)\s+RENAME\s+TO\s+([a-zA-Z0-9_]+)/gi)) {
+    for (const m of sql.matchAll(/(?:^|;)\s*ALTER\s+(?:MATERIALIZED\s+VIEW|TABLE|VIEW)(?:\s+IF\s+EXISTS)?\s+(?:ONLY\s+)?(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)\s+RENAME\s+TO\s+([a-zA-Z0-9_]+)/gi)) {
       ops.push({ at: m.index, kind: 'rel', op: 'del', name: alvo(m[1], m[2]) });
       ops.push({ at: m.index + 1, kind: 'rel', op: 'add', name: alvo(m[1], m[3]) });
     }
-    for (const m of sql.matchAll(/CREATE\s+(?:OR\s+REPLACE\s+)?(?:FUNCTION|ROUTINE|PROCEDURE)\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/gi)) {
+    for (const m of sql.matchAll(/(?:^|;)\s*CREATE\s+(?:OR\s+REPLACE\s+)?(?:FUNCTION|ROUTINE|PROCEDURE)\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/gi)) {
       ops.push({ at: m.index, kind: 'fn', op: 'add', name: alvo(m[1], m[2]), sig: normArgs(m[3]) });
     }
-    for (const m of sql.matchAll(/DROP\s+(?:FUNCTION|ROUTINE|PROCEDURE)(?:\s+IF\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/gi)) {
+    for (const m of sql.matchAll(/(?:^|;)\s*DROP\s+(?:FUNCTION|ROUTINE|PROCEDURE)(?:\s+IF\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/gi)) {
       ops.push({ at: m.index, kind: 'fn', op: 'del', name: alvo(m[1], m[2]), sig: normArgs(m[3]) });
+    }
+    for (const m of sql.matchAll(/(?:^|;)\s*DROP\s+(?:FUNCTION|ROUTINE|PROCEDURE)(?:\s+IF\s+EXISTS)?\s+(?:([a-zA-Z0-9_]+)\.)?([a-zA-Z0-9_]+)\s*(?:CASCADE|RESTRICT)?\s*(?=;|$)/gi)) {
+      ops.push({ at: m.index, kind: 'fn', op: 'del', name: alvo(m[1], m[2]), sig: null });
     }
     ops.sort((a, b) => a.at - b.at);
     for (const change of ops) {
       if (change.kind === 'fn') {
         if (change.op === 'add') addSignature(functions, change.name, change.sig);
+        else if (change.sig === null) functions.delete(change.name);
         else dropSignature(functions, change.name, change.sig);
       } else if (change.op === 'add') {
         relations.add(change.name);
@@ -198,18 +207,36 @@ function projectSchemaFromForwardMigrations(catalog) {
   return { functions, relations };
 }
 
+function lerJson(arquivo, rotulo) {
+  try {
+    return JSON.parse(fs.readFileSync(arquivo, 'utf8'));
+  } catch (error) {
+    console.error('ERRO: ' + rotulo + ' invalido (' + arquivo + '): ' + error.message);
+    process.exit(2);
+  }
+}
+
 function main() {
   if (!fs.existsSync(CATALOG)) {
     console.error('ERRO: ' + CATALOG + ' nao encontrado. Regenere com scripts/db-audit/catalog.sql.');
     process.exit(2);
   }
-  const cat = JSON.parse(fs.readFileSync(CATALOG, 'utf8'));
+  const cat = lerJson(CATALOG, 'catalogo');
+  for (const secao of ['tables', 'views', 'functions']) {
+    if (!Array.isArray(cat?.[secao])) {
+      console.error('ERRO: catalogo invalido (' + CATALOG + '): secao [' + secao + '] ausente. Regenere com scripts/db-audit/catalog.sql.');
+      process.exit(2);
+    }
+  }
   const projected = projectSchemaFromForwardMigrations(cat);
   const relations = projected.relations;
   const functions = projected.functions;
-  const baseline = fs.existsSync(BASELINE)
-    ? new Set(JSON.parse(fs.readFileSync(BASELINE, 'utf8')).known)
-    : new Set();
+  const baselineAtual = fs.existsSync(BASELINE) ? lerJson(BASELINE, 'baseline') : { known: [] };
+  if (!Array.isArray(baselineAtual?.known)) {
+    console.error('ERRO: baseline invalido (' + BASELINE + '): "known" precisa ser uma lista.');
+    process.exit(2);
+  }
+  const baseline = new Set(baselineAtual.known);
 
   const violations = scan().filter((h) => {
     const alvo = h.schema + '.' + h.name;
@@ -251,19 +278,18 @@ function main() {
   }
   const pruneObsolete = process.argv.includes('--prune-obsolete');
   if (obsoletas.length) {
-    const mensagem = `\nEntradas obsoletas no baseline (${obsoletas.length}): a violacao sumiu; serao podadas automaticamente pelo types-sync.`;
+    const mensagem = `\nEntradas obsoletas no baseline (${obsoletas.length}): a violacao sumiu; ${pruneObsolete ? 'podando agora' : 'serao podadas automaticamente pelo types-sync (--prune-obsolete)'}.`;
     console.warn(mensagem);
     for (const k of obsoletas) console.warn('  ' + k);
     if (pruneObsolete && fs.existsSync(BASELINE)) {
-      const atual = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
-      const podado = { ...atual, known: atual.known.filter((k) => !obsoletas.includes(k)) };
+      const podado = { ...baselineAtual, known: baselineAtual.known.filter((k) => !obsoletas.includes(k)) };
       fs.writeFileSync(BASELINE, JSON.stringify(podado, null, 2) + '\n');
       console.log(`known-violations.json podado: ${obsoletas.length} entrada(s) removida(s).`);
     }
   }
 
   if (novas.length) process.exit(1);
-  console.log('OK: nenhuma violacao nova' + (obsoletas.length ? ` (${obsoletas.length} obsoleta(s) podada(s))` : '') + '.');
+  console.log('OK: nenhuma violacao nova' + (obsoletas.length ? ` (${obsoletas.length} obsoleta(s)${pruneObsolete ? ' podada(s)' : ' no baseline'})` : '') + '.');
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

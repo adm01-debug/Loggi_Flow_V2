@@ -30,4 +30,9 @@ SELECT jsonb_pretty(jsonb_build_object(
     WHERE n.nspname = 'public' AND c.relkind IN ('r','p','v','m')
       AND has_table_privilege('anon', c.oid, 'SELECT')
   )
-));
+))
+-- search_path fixo so durante este statement: format_type, pg_get_*def e
+-- pg_get_function_identity_arguments qualificam (ou nao) os nomes conforme o
+-- search_path da sessao; sem isto, outro papel ou outra config de sessao muda a
+-- saida sem o banco ter mudado. O valor e o padrao do papel postgres no Supabase.
+FROM (SELECT set_config('search_path', 'public, extensions', true)) AS caminho_fixo;

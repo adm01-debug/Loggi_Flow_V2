@@ -377,4 +377,9 @@ SELECT jsonb_pretty(jsonb_build_object(
   'type_grants',     (SELECT coalesce(jsonb_object_agg(k, h ORDER BY k), '{}'::jsonb) FROM type_grants_manifest),
   'default_grants',  (SELECT coalesce(jsonb_object_agg(k, h ORDER BY k), '{}'::jsonb) FROM default_grants_manifest),
   'schema_grants',   (SELECT coalesce(jsonb_object_agg(k, h ORDER BY k), '{}'::jsonb) FROM schema_grants_manifest)
-));
+))
+-- search_path fixo so durante este statement: format_type, pg_get_*def e
+-- pg_get_function_identity_arguments qualificam (ou nao) os nomes conforme o
+-- search_path da sessao; sem isto, outro papel ou outra config de sessao muda a
+-- saida sem o banco ter mudado. O valor e o padrao do papel postgres no Supabase.
+FROM (SELECT set_config('search_path', 'public, extensions', true)) AS caminho_fixo;

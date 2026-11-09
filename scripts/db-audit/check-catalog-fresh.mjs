@@ -11,6 +11,9 @@
  *     -f scripts/db-audit/catalog.sql > /tmp/fresh.json
  *   node scripts/db-audit/check-catalog-fresh.mjs /tmp/fresh.json
  *
+ * Catalogo commitado ausente (primeira execucao) conta como drift: sai 1 desde
+ * que o fresco e a identidade tenham sido comprovados.
+ *
  * Exit codes: 0=identico, 1=drift revisavel, 2=entrada/identidade insegura.
  */
 import fs from 'node:fs';
@@ -46,8 +49,9 @@ try {
   process.exit(2);
 }
 
-function lerCatalogo(arquivo, rotulo) {
+function lerCatalogo(arquivo, rotulo, opcoes = {}) {
   try {
+    if (opcoes.permitirAusente && !fs.existsSync(arquivo)) return null;
     const catalogo = JSON.parse(fs.readFileSync(arquivo, 'utf8'));
     if (!catalogo || typeof catalogo !== 'object' || Array.isArray(catalogo)) {
       throw new Error('a raiz precisa ser um objeto JSON');
@@ -59,7 +63,7 @@ function lerCatalogo(arquivo, rotulo) {
   }
 }
 
-const A = lerCatalogo(catalogoCommitado, 'commitado');
+const A = lerCatalogo(catalogoCommitado, 'commitado', { permitirAusente: true });
 const B = lerCatalogo(frescoPath, 'fresco');
 const SECOES = ['tables', 'views', 'enums', 'columns', 'functions', 'function_signatures', 'check_constraints'];
 
@@ -78,6 +82,7 @@ for (const [catalogo, rotulo, tipo] of [
   [A, 'catalogo commitado', 'drift'],
   [B, 'catalogo fresco', 'operacional'],
 ]) {
+  if (catalogo === null) continue;
   if (catalogo.format_version !== 2) {
     console.error(
       '[metadata] format_version invalido no ' + rotulo +
@@ -119,7 +124,7 @@ for (const erro of errosDestino) console.error('[metadata] ' + erro);
 errosOperacionais += errosDestino.length;
 
 for (const secao of SECOES) {
-  const arrayA = A[secao];
+  const arrayA = A === null ? [] : A[secao];
   const arrayB = B[secao];
   const validA = Array.isArray(arrayA) && arrayA.every((item) => typeof item === 'string');
   const validB = Array.isArray(arrayB) && arrayB.every((item) => typeof item === 'string');
@@ -137,6 +142,12 @@ for (const secao of SECOES) {
   const setB = new Set(arrayB);
   const duplicadosA = arrayA.length - setA.size;
   const duplicadosB = arrayB.length - setB.size;
+  if (A === null) {
+    errosOperacionais += duplicadosB;
+    console.log('[' + secao + '] banco: ' + setB.size);
+    if (duplicadosB) console.error('  entradas duplicadas no catalogo fresco: ' + duplicadosB);
+    continue;
+  }
   const soNoArquivo = [...setA].filter((x) => !setB.has(x)).sort((a, b) => a.localeCompare(b));
   const soNoBanco = [...setB].filter((x) => !setA.has(x)).sort((a, b) => a.localeCompare(b));
   drifts += soNoArquivo.length + soNoBanco.length + duplicadosA;
@@ -154,6 +165,14 @@ for (const secao of SECOES) {
 if (errosOperacionais) {
   console.error('\nERRO: catalogo fresco ou identidade nao sao confiaveis; snapshot nao deve ser atualizado.');
   process.exit(2);
+}
+
+if (A === null) {
+  console.error(
+    'DRIFT: catalogo commitado ausente (' + catalogoCommitado +
+    '); a geracao fresca teve identidade comprovada e requer revisao.',
+  );
+  process.exit(1);
 }
 
 if (drifts) {

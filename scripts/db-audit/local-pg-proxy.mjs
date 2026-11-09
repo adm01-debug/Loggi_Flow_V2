@@ -53,7 +53,14 @@ if (tls.erros.length) {
   process.exit(1);
 }
 
-const { fields, password } = parseConnection(tls.connectionString);
+let fields;
+let password;
+try {
+  ({ fields, password } = parseConnection(tls.connectionString));
+} catch {
+  console.error('ERRO: DESTINO_URL com parametros de conexao invalidos ou nao suportados (detalhes omitidos).');
+  process.exit(1);
+}
 
 function escapeIniValue(value) {
   // Formato "connstring" da secao [databases] do pgbouncer.ini: NAO e
@@ -112,7 +119,12 @@ const iniLines = [
   '',
 ].join('\n');
 
-fs.writeFileSync(path.join(proxyDir, 'userlist.txt'), '"proxy" "unused"\n', { mode: 0o600 });
-fs.writeFileSync(path.join(proxyDir, 'pgbouncer.ini'), iniLines, { mode: 0o600 });
+try {
+  fs.writeFileSync(path.join(proxyDir, 'userlist.txt'), '"proxy" "unused"\n', { mode: 0o600 });
+  fs.writeFileSync(path.join(proxyDir, 'pgbouncer.ini'), iniLines, { mode: 0o600 });
+} catch (erro) {
+  console.error('ERRO: nao foi possivel gravar a config do proxy em ' + proxyDir + ' (' + erro.code + ').');
+  process.exit(1);
+}
 
 console.log(String(port));

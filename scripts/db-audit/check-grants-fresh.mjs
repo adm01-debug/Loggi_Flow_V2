@@ -42,7 +42,7 @@ function ler(arquivo, rotulo) {
     return JSON.parse(fs.readFileSync(arquivo, 'utf8'));
   } catch (error) {
     console.error('ERRO: baseline de grants ' + rotulo + ' invalido (' + arquivo + '): ' + error.message);
-    return null;
+    return undefined;
   }
 }
 
@@ -71,10 +71,10 @@ const fresh = ler(frescoPath, 'fresco');
 const committed = ler(commitadoPath, 'commitado');
 
 if (!valid(fresh) || !valid(committed)) {
-  if (fresh !== null && !valid(fresh)) {
+  if (fresh !== undefined && !valid(fresh)) {
     console.error('ERRO: baseline de grants fresco tem formato invalido (' + fresco + ')');
   }
-  if (committed !== null && !valid(committed)) {
+  if (committed !== undefined && !valid(committed)) {
     console.error('ERRO: baseline de grants commitado tem formato invalido (' + commitadoPath + ')');
   }
   process.exit(2);
