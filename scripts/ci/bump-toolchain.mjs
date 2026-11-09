@@ -5,14 +5,14 @@
  * Saída: lista de atualizações disponíveis + link para changelog.
  * Não falha (exit 0) mesmo quando há updates — é informativo.
  * Rodado semanalmente via branch-hygiene-audit ou job próprio.
+ * Só lê: não altera o toolchain.json, não abre PR nem issue.
  */
 
 import { readFileSync } from 'node:fs';
 
 const TOKEN = process.env.GH_TOKEN ?? process.env.GITHUB_TOKEN ?? '';
 const TOOLCHAIN_PATH = new URL('../../.github/toolchain.json', import.meta.url);
-
-const toolchain = JSON.parse(readFileSync(TOOLCHAIN_PATH, 'utf8'));
+const TIMEOUT_MS = 15_000;
 
 const headers = {
   Accept: 'application/vnd.github+json',
@@ -25,7 +25,7 @@ const headers = {
 async function latestRelease(repo) {
   const url = `https://api.github.com/repos/${repo}/releases/latest`;
   try {
-    const res = await fetch(url, { headers });
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (!res.ok) return null;
     const data = await res.json();
     return data.tag_name ?? null;
@@ -34,9 +34,13 @@ async function latestRelease(repo) {
   }
 }
 
-/** Remove prefixo 'v' para comparar versões como semver puro. */
+/**
+ * Extrai a versão numérica para comparar como semver puro. O prefixo varia por
+ * projeto (`v2.9.5`, `bun-v1.4.0`): tirar só o `v` inicial fazia a tag do bun virar
+ * 0.x e nenhuma atualização dele aparecia. Sem número = '' (não dá para comparar).
+ */
 function semver(v) {
-  return String(v ?? '').replace(/^v/, '');
+  return String(v ?? '').match(/\d+(?:\.\d+)*/)?.[0] ?? '';
 }
 
 /** Compara versões simples: retorna true se remota > local. */
@@ -82,8 +86,12 @@ const FERRAMENTAS = [
 ];
 
 async function main() {
+  // Lido aqui dentro, e não no topo do módulo: arquivo ausente ou JSON inválido cai no
+  // `catch` do fim (aviso + exit 0), como o cabeçalho promete, em vez de derrubar o job.
+  const toolchain = JSON.parse(readFileSync(TOOLCHAIN_PATH, 'utf8'));
   const updates = [];
   const erros = [];
+  const verificadas = [];
 
   const checks = await Promise.all(
     FERRAMENTAS.map(async ({ chave, repo, changelog }) => {
@@ -101,6 +109,11 @@ async function main() {
       erros.push(`${chave}: não foi possível consultar ${repo}`);
       continue;
     }
+    if (!semver(remota) || !semver(local)) {
+      erros.push(`${chave}: versão não reconhecida (pinada \`${local}\`, tag \`${remota}\` em ${repo})`);
+      continue;
+    }
+    verificadas.push(chave);
     if (maisNova(local, remota)) {
       updates.push({ chave, local: semver(local), remota: semver(remota), changelog });
     }
@@ -126,8 +139,10 @@ async function main() {
     linhas.push(
       '> Para atualizar: edite `.github/toolchain.json` e os SHAs nos workflows afetados (W88).',
     );
+  } else if (verificadas.length > 0) {
+    linhas.push(`✅ Nenhuma atualização entre as ${verificadas.length} ferramentas verificadas (${verificadas.join(', ')}).`);
   } else {
-    linhas.push('✅ Todas as ferramentas estão na versão mais recente (ou não foi possível verificar).');
+    linhas.push('Nenhuma ferramenta pôde ser verificada nesta execução.');
   }
 
   if (erros.length > 0) {

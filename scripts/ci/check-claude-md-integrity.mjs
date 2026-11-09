@@ -9,10 +9,14 @@
  * Base: CLAUDE_MD_BASE (no CI, a main buscada com git fetch; no checkout do CI o HEAD e o proprio arquivo
  * e a comparacao viraria no-op). Localmente, sem a variavel, compara com o HEAD.
  * Na base o conjunto e o que existir la (antes deste padrao, so AGENTS.md).
+ * Tambem exige que o CLAUDE.md continue importando `@AGENTS.md` (sem isso o agente Claude nao le regra nenhuma).
+ * Confere sempre o repositorio em que este arquivo esta, qualquer que seja o cwd.
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { execSync } from 'node:child_process';
-import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+process.chdir(fileURLToPath(new URL('../..', import.meta.url)));
 
 const AGENTS = 'AGENTS.md';
 const DOCS_DIR = 'docs/agentes';
@@ -39,11 +43,30 @@ try {
   process.exit();
 }
 
-const missing = REQUIRED_SECTIONS.filter((s) => !content.includes(s));
+// Cabecalho = inicio de linha: citar `## Postura` numa frase ou rebaixar para `### Postura` nao conta.
+const linhas = content.split(/\r?\n/);
+const missing = REQUIRED_SECTIONS.filter((s) => !linhas.some((l) => l.startsWith(s)));
 if (missing.length > 0) {
   for (const s of missing) console.error(`::error::${AGENTS}: secao obrigatoria ausente: ${s}`);
   process.exitCode = 1;
   process.exit();
+}
+
+const claude = existsSync('CLAUDE.md') ? readFileSync('CLAUDE.md', 'utf8') : '';
+if (!/(^|\s)@(\.\/)?AGENTS\.md(\s|$)/.test(claude)) {
+  console.error(`::error::CLAUDE.md ausente ou sem a linha @${AGENTS}: os agentes Claude deixam de carregar as regras. Restaure o arquivo com o conteudo "@${AGENTS}".`);
+  process.exitCode = 1;
+  process.exit();
+}
+
+// Todo .md sob docs/agentes, subpastas inclusas — o mesmo conjunto que `git ls-tree -r` devolve na base.
+function mdsAtuais(dir = DOCS_DIR) {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const caminho = `${dir}/${e.name}`;
+    if (e.isDirectory()) return mdsAtuais(caminho);
+    return e.isFile() && e.name.endsWith('.md') ? [caminho] : [];
+  });
 }
 
 function bytesAtuais() {
@@ -51,21 +74,18 @@ function bytesAtuais() {
   for (const f of CONJUNTO_RAIZ) {
     if (existsSync(f)) total += Buffer.byteLength(readFileSync(f, 'utf8'));
   }
-  if (existsSync(DOCS_DIR)) {
-    for (const f of readdirSync(DOCS_DIR)) {
-      if (f.endsWith('.md')) total += Buffer.byteLength(readFileSync(join(DOCS_DIR, f), 'utf8'));
-    }
-  }
+  for (const f of mdsAtuais()) total += Buffer.byteLength(readFileSync(f, 'utf8'));
   return total;
 }
 
 // Tamanho na base de cada arquivo do conjunto: { total, porArquivo: Map(path -> bytes) } ou null
 // quando a base nao tem nenhum deles (ref inexistente, checkout raso sem a main).
+// execFileSync + `-z`: nome com espaco, acento ou aspas chega inteiro ao git, e nada da base passa por shell.
 function bytesNaBase(base) {
   const porArquivo = new Map();
   const tamanho = (path) => {
     try {
-      const out = execSync(`git cat-file -s ${base}:${path}`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const out = execFileSync('git', ['cat-file', '-s', `${base}:${path}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
       porArquivo.set(path, Number.parseInt(out.trim(), 10) || 0);
     } catch {
       /* nao existe na base */
@@ -74,11 +94,11 @@ function bytesNaBase(base) {
   for (const f of CONJUNTO_RAIZ) tamanho(f);
   let lista = '';
   try {
-    lista = execSync(`git ls-tree -r --name-only ${base} -- ${DOCS_DIR}`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    lista = execFileSync('git', ['ls-tree', '-r', '-z', '--name-only', base, '--', DOCS_DIR], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
   } catch {
     lista = '';
   }
-  for (const path of lista.split('\n').map((l) => l.trim()).filter((l) => l.endsWith('.md'))) tamanho(path);
+  for (const path of lista.split('\0').filter((l) => l.endsWith('.md'))) tamanho(path);
   if (porArquivo.size === 0) return null;
   let total = 0;
   for (const n of porArquivo.values()) total += n;

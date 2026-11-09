@@ -12,7 +12,7 @@
 // Uso: node scripts/ci/sla-code-scanning.mjs < alertas.json  (markdown no stdout)
 
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { executadoDiretamente } from '../lib/seguranca-processo.mjs';
 
 export const SLA_DIAS = { alto: 14, baixo: 30 };
 
@@ -24,16 +24,24 @@ export function nivel(alerta) {
   return alerta?.rule?.severity === 'error' ? 'high' : 'low';
 }
 
+// O id da regra e o caminho do arquivo vêm do conteúdo analisado: sem caractere de
+// controle, para uma quebra de linha não virar outro comando `::` no log do Actions
+// nem fechar o bloco de código do relatório.
+function emUmaLinha(valor) {
+  return String(valor).replace(/[\u0000-\u001f\u007f]+/g, ' ').replaceAll('`', "'");
+}
+
 export function avaliarSla(alertas, agoraMs = Date.now()) {
   const violacoes = [];
   for (const a of alertas) {
-    const sev = nivel(a);
+    const sev = emUmaLinha(nivel(a));
     const prazo = sev === 'high' || sev === 'critical' ? SLA_DIAS.alto : SLA_DIAS.baixo;
-    const dias = Math.floor((agoraMs - new Date(a.created_at).getTime()) / 86_400_000);
-    if (dias > prazo) {
-      const local = a.most_recent_instance?.location?.path ?? '?';
-      violacoes.push(`${sev.toUpperCase()} (${dias}d > ${prazo}d) — #${a.number}: ${a.rule?.id ?? '?'} em ${local}`);
-    }
+    const dias = Math.floor((agoraMs - new Date(a?.created_at ?? Number.NaN).getTime()) / 86_400_000);
+    const onde = `#${emUmaLinha(a?.number ?? '?')}: ${emUmaLinha(a?.rule?.id ?? '?')} em ${emUmaLinha(a?.most_recent_instance?.location?.path ?? '?')}`;
+    // Sem `created_at` válido não dá para provar que o alerta está no prazo: conta
+    // como violação (antes passava como "dentro do SLA").
+    if (!Number.isFinite(dias)) violacoes.push(`${sev.toUpperCase()} (idade desconhecida: created_at inválido) — ${onde}`);
+    else if (dias > prazo) violacoes.push(`${sev.toUpperCase()} (${dias}d > ${prazo}d) — ${onde}`);
   }
   return { total: alertas.length, violacoes };
 }
@@ -63,16 +71,19 @@ function main() {
     alertas = null;
   }
   if (!Array.isArray(alertas)) {
+    // Repo privado sem GitHub Advanced Security responde 403/404 aqui: é o caso
+    // esperado enquanto o code scanning não estiver habilitado, por isso exit 0.
+    const detalhe = typeof alertas?.message === 'string' ? ` Resposta: ${emUmaLinha(alertas.message)}` : '';
     console.error('::warning::W83: a API não devolveu uma lista de alertas');
-    process.stdout.write('\n### ⚠️ Code Scanning — SLA (W83)\n\nNão foi possível consultar os alertas (permissão ou API).\n');
+    process.stdout.write(`\n### ⚠️ Code Scanning — SLA (W83)\n\nNão foi possível consultar os alertas (permissão, API ou code scanning não habilitado no repositório).${detalhe}\n`);
     return;
   }
   const r = avaliarSla(alertas);
   process.stdout.write(relatorio(r));
   if (r.violacoes.length) {
-    for (const v of r.violacoes) console.error(`::error::W83: SLA vencido — ${v}`);
+    for (const v of r.violacoes) console.error(`::error::W83: SLA vencido — ${v.replaceAll('%', '%25')}`);
     process.exitCode = 1;
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) main();
+if (executadoDiretamente(import.meta.url)) main();

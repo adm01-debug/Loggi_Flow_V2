@@ -43,9 +43,13 @@ export const RAIZES_PERMITIDAS = [RAIZ_REPO, path.resolve(os.tmpdir()), path.res
 export function resolverExecutavel(comando) {
   const diretorios = (process.env.PATH || '').split(path.delimiter).filter(Boolean);
   for (const diretorio of diretorios) {
-    const candidato = path.join(diretorio, comando);
+    // `resolve` porque entrada relativa no PATH devolveria caminho relativo (a promessa
+    // e absoluto, e quem chama pode rodar o filho com outro `cwd`).
+    const candidato = path.resolve(path.join(diretorio, comando));
     try {
       fs.accessSync(candidato, fs.constants.X_OK);
+      // Diretorio tambem tem bit de execucao: o shell pula, entao aqui pula igual.
+      if (!fs.statSync(candidato).isFile()) continue;
       return candidato;
     } catch {
       // Nao esta neste diretorio: segue a busca, igual ao shell.
@@ -61,6 +65,35 @@ export function estaDentro(raiz, candidato) {
     || (!path.isAbsolute(relativo) && relativo !== '..' && !relativo.startsWith('..' + path.sep));
 }
 
+const LIMITE_DE_LINKS = 40; // mesmo teto do kernel (ELOOP)
+
+/** Destino de `caminho` quando ele e um link simbolico; null quando nao e (ou nao existe). */
+function alvoDeLinkPendente(caminho) {
+  try {
+    return fs.lstatSync(caminho).isSymbolicLink() ? fs.readlinkSync(caminho) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Verdadeiro quando o modulo de `metaUrl` (passe `import.meta.url`) e o script que o
+ * `node` foi chamado para rodar, e nao um import.
+ *
+ * Compara caminhos REAIS: o Node resolve links simbolicos em `import.meta.url` mas nao
+ * em `process.argv[1]`, e a URL vem codificada (espaco vira `%20`). Comparar as duas
+ * strings cruas faz o script sair com exit 0 sem executar nada quando o checkout esta
+ * atras de um link ou num caminho com espaco/acento.
+ */
+export function executadoDiretamente(metaUrl, argv1 = process.argv[1]) {
+  if (!argv1) return false;
+  try {
+    return fs.realpathSync(argv1) === fs.realpathSync(fileURLToPath(metaUrl));
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Resolve links simbolicos mesmo quando o alvo final ainda nao existe.
  *
@@ -70,11 +103,19 @@ export function estaDentro(raiz, candidato) {
  * inexistentes. Assim `tmp/link-para-fora/novo.json` nao passa apenas porque
  * `novo.json` ainda nao foi criado.
  */
-function caminhoRealMesmoSeAusente(caminho) {
+function caminhoRealMesmoSeAusente(caminho, saltos = 0) {
   let existente = caminho;
   const ausentes = [];
 
   while (!fs.existsSync(existente)) {
+    // Link pendente (o alvo ainda nao existe): `existsSync` responde "ausente", mas
+    // gravar nele cria o ALVO. O que precisa caber nas raizes e o alvo, nao o link.
+    const alvo = alvoDeLinkPendente(existente);
+    if (alvo !== null) {
+      if (saltos >= LIMITE_DE_LINKS) throw new Error('cadeia de links simbolicos longa demais: ' + caminho);
+      const paiReal = fs.realpathSync.native(path.dirname(existente));
+      return caminhoRealMesmoSeAusente(path.resolve(paiReal, alvo, ...ausentes), saltos + 1);
+    }
     const pai = path.dirname(existente);
     if (pai === existente) break;
     ausentes.unshift(path.basename(existente));

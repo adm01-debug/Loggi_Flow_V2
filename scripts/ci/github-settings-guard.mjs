@@ -3,10 +3,15 @@
  * E13/E14 + E95: confere o perimetro do GitHub contra o baseline versionado
  * (`github-settings-baseline.json`) e restaura o que sabe restaurar.
  *
- * Política esperada (baseline):
- *   - branch protection da main: strict=true, enforce_admins=true
- *   - repo: allow_auto_merge=true, squash-only, delete_branch_on_merge
- *   - actions: allowed_actions=selected, sha_pinning_required=true
+ * Política esperada: a que está no baseline, e só ela. No Loggi (tabela canônica em
+ * `docs/agentes/github-ci.md`): repo privado, 9 required checks, strict=false,
+ * enforce_admins=false, sem review obrigatório, allow_auto_merge=false,
+ * delete_branch_on_merge=false, allowed_actions=all. Os valores e números de issue/PR
+ * citados nas notas E95/W04 abaixo são a história do script no Zapp, não a política daqui.
+ *
+ * Uso: node scripts/ci/github-settings-guard.mjs [--dry-run] [--help]
+ *   --dry-run  só leitura: não restaura nada e não abre, comenta nem fecha issue;
+ *              mostra o que faria. O exit code é o mesmo do run de verdade.
  *
  * Regressão: restaura via PATCH (o que suporta) e abre/atualiza a issue
  * [settings-guard]. Tudo OK: fecha a issue se estiver aberta.
@@ -38,7 +43,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 
-const REPO = process.env.GITHUB_REPOSITORY ?? 'adm01-debug/Loggi_Flow_V2';
+const REPO = process.env.GITHUB_REPOSITORY || 'adm01-debug/Loggi_Flow_V2';
 const TOKEN = process.env.GITHUB_TOKEN;
 // W11/W12: PAT fine-grained com administration:read (secret `SETTINGS_GUARD_TOKEN` do
 // environment `perimetro-leitura`) para remover o ponto cego de branch protection.
@@ -55,19 +60,62 @@ let adminRejeitado = false;
 const RUNBOOK_SEGREDOS = 'AGENTS.md (seção Postura — segredos)';
 const [OWNER, REPO_NAME] = REPO.split('/');
 
+const BASELINE_ARQUIVO = 'scripts/ci/github-settings-baseline.json';
 const ISSUE_LABEL = 'settings-guard';
 const ISSUE_TITLE = '[settings-guard] perimeter regression detected';
 const BRANCH = 'main';
-// W05: so comentarios escritos pelo proprio guard contam para o dedupe. Repo publico:
-// qualquer pessoa pode colar o marcador `<!-- causa:... -->` num comentario e, sem esta
+// W05: so comentarios escritos pelo proprio guard contam para o dedupe. Qualquer conta com
+// acesso ao repo pode colar o marcador `<!-- causa:... -->` num comentario e, sem esta
 // checagem, silenciar o alerta por 6 h / 7 dias (achado do Codex na PR #1920). O GITHUB_TOKEN
 // de workflow comenta como `github-actions[bot]`; outro autor so via variavel explicita.
-const AUTOR_DO_GUARD = process.env.SETTINGS_GUARD_AUTOR ?? 'github-actions[bot]';
+const AUTOR_DO_GUARD = process.env.SETTINGS_GUARD_AUTOR || 'github-actions[bot]';
 const escritoPeloGuard = (registro) => registro?.user?.login === AUTOR_DO_GUARD;
 
-const baseline = JSON.parse(
-  readFileSync(new URL('./github-settings-baseline.json', import.meta.url), 'utf8'),
-);
+// Baseline ausente ou com JSON invalido nao pode derrubar o `import` com stack trace:
+// o erro fica guardado e o main() o reporta como `::error::` antes de chamar a API.
+let baseline = null;
+let baselineErro = null;
+try {
+  baseline = JSON.parse(
+    readFileSync(new URL('./github-settings-baseline.json', import.meta.url), 'utf8'),
+  );
+} catch (e) {
+  baselineErro = e.message;
+}
+
+const CHAVES_DO_BASELINE = new Set([
+  'medido_em', 'repo', 'branch_protection_main', 'merge', 'actions', 'workflow_permissions',
+  'security_and_analysis', 'selected_actions_patterns', 'selected_actions_verified_allowed',
+  'selected_actions_github_owned_allowed', 'rulesets_count', 'environments',
+  'environments_vercel_managed', 'nao_verificavel_automaticamente',
+]);
+
+/**
+ * O que impede o baseline de ser usado (`erros`) e as chaves de topo que nenhuma checagem
+ * le (`avisos` — quase sempre erro de digitacao, e o campo fica sem vigia sem ninguem notar).
+ */
+export function problemasDoBaseline(bl) {
+  const ehObjeto = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+  if (!ehObjeto(bl)) return { erros: ['o arquivo nao contem um objeto JSON'], avisos: [] };
+  const erros = [];
+  const bp = bl.branch_protection_main;
+  if (!ehObjeto(bp)) {
+    erros.push('falta o objeto `branch_protection_main`');
+  } else {
+    for (const campo of ['strict', 'enforce_admins']) {
+      if (typeof bp[campo] !== 'boolean') erros.push(`\`branch_protection_main.${campo}\` tem de ser true ou false`);
+    }
+    if (!Array.isArray(bp.required_status_checks) || bp.required_status_checks.some((c) => typeof c !== 'string')) {
+      erros.push('`branch_protection_main.required_status_checks` tem de ser uma lista de nomes de check');
+    }
+  }
+  for (const chave of ['merge', 'actions']) {
+    if (!ehObjeto(bl[chave]) || Object.keys(bl[chave]).length === 0) erros.push(`falta o objeto \`${chave}\``);
+  }
+  if (!Array.isArray(bl.environments)) erros.push('`environments` tem de ser uma lista de nomes');
+  const avisos = Object.keys(bl).filter((chave) => !chave.startsWith('_') && !CHAVES_DO_BASELINE.has(chave));
+  return { erros, avisos };
+}
 
 // jssecurity:S5145 — valores vindos da API do GitHub entram no log em #92/#115/#127.
 // Quebras de linha / caracteres de controle são neutralizados para impedir que
@@ -96,10 +144,67 @@ class TokenRecusado extends Error {
   }
 }
 
+const TIMEOUT_MS = 30_000;
+const MAX_TENTATIVAS = 3;
+const ESPERA_MAXIMA_MS = 60_000;
+const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+let dryRun = false;
+
+/** Quanto esperar (ms) quando a resposta e de rate limit; null quando nao e rate limit. */
+function esperaDoRateLimit(res) {
+  if (res.status !== 403 && res.status !== 429) return null;
+  const retryAfter = Number(res.headers.get('retry-after'));
+  if (retryAfter > 0) return retryAfter * 1000;
+  if (res.headers.get('x-ratelimit-remaining') === '0') {
+    return Math.max(1000, Number(res.headers.get('x-ratelimit-reset')) * 1000 - Date.now());
+  }
+  return res.status === 429 ? ESPERA_MAXIMA_MS : null;
+}
+
+/**
+ * fetch com timeout. Leitura (GET) repete ate MAX_TENTATIVAS em falha de rede, 5xx e rate
+ * limit curto; escrita nunca repete (POST duplicado = comentario/issue duplicado).
+ * Rate limit NUNCA vira "ponto cego": e falha transitoria, sai como erro (exit 1), senao um
+ * 403 de limite passava por falta de escopo e o run saia verde sem ter olhado nada.
+ */
+async function fetchComRetry(method, path, init) {
+  for (let tentativa = 1; ; tentativa += 1) {
+    const ultima = method !== 'GET' || tentativa >= MAX_TENTATIVAS;
+    let res;
+    try {
+      res = await fetch(`https://api.github.com${path}`, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
+    } catch (e) {
+      if (!ultima) {
+        await esperar(2000 * tentativa);
+        continue;
+      }
+      const motivo = e.name === 'TimeoutError' ? `sem resposta em ${TIMEOUT_MS / 1000}s` : (e.cause?.code ?? e.message);
+      throw new Error(`GitHub API ${method} ${path} → falha de rede (${motivo}) apos ${tentativa} tentativa(s)`);
+    }
+    const espera = esperaDoRateLimit(res);
+    if (espera !== null) {
+      if (ultima || !(espera <= ESPERA_MAXIMA_MS)) {
+        throw new Error(`GitHub API ${method} ${path} → rate limit (${res.status}); rode de novo mais tarde`);
+      }
+      console.log(`Rate limit em ${method} ${path}: nova tentativa em ${Math.ceil(espera / 1000)}s.`);
+      await esperar(espera);
+      continue;
+    }
+    if (res.status >= 500 && !ultima) {
+      await esperar(2000 * tentativa);
+      continue;
+    }
+    return res;
+  }
+}
+
 async function gh(method, path, body, overrideToken) {
   const tok = overrideToken ?? TOKEN;
-  const url = `https://api.github.com${path}`;
-  const res = await fetch(url, {
+  if (dryRun && method !== 'GET') {
+    console.log(`[dry-run] ${method} ${path} nao enviado.`);
+    return { number: 'dry-run' };
+  }
+  const res = await fetchComRetry(method, path, {
     method,
     headers: {
       Authorization: `Bearer ${tok}`,
@@ -113,6 +218,7 @@ async function gh(method, path, body, overrideToken) {
   if (res.status === 401) throw new TokenRecusado(path);
   if (res.status === 403 || res.status === 404) {
     const text = await res.text().catch(() => '');
+    if (/rate limit/i.test(text)) throw new Error(`GitHub API ${method} ${path} → rate limit (${res.status}); rode de novo mais tarde`);
     // 404 aqui também costuma ser escopo, não ausência: a API esconde o recurso.
     throw new NaoVerificavel(path, res.status, text.slice(0, 200));
   }
@@ -154,7 +260,18 @@ function fonteDaLeituraAdmin() {
 // `restauravel` diz se o guard sabe desfazer a divergência sozinho.
 
 async function checarBranchProtection() {
-  const protection = await ghAdmin('GET', `/repos/${OWNER}/${REPO_NAME}/branches/${BRANCH}/protection`);
+  let protection;
+  try {
+    protection = await ghAdmin('GET', `/repos/${OWNER}/${REPO_NAME}/branches/${BRANCH}/protection`);
+  } catch (e) {
+    // "Branch not protected" so e respondido a quem TEM acesso de leitura: e a protecao
+    // inteira removida — a pior regressao —, nao ponto cego. O 404 generico ("Not Found")
+    // continua sendo escopo.
+    if (e instanceof NaoVerificavel && e.status === 404 && /branch not protected/i.test(e.message)) {
+      return [{ campo: 'branch_protection_main', esperado: 'protegida', encontrado: 'sem protecao (Branch not protected)', restauravel: false }];
+    }
+    throw e;
+  }
   const esperado = baseline.branch_protection_main;
   const divergencias = [];
 
@@ -205,13 +322,38 @@ async function checarBranchProtection() {
     divergencias.push({ campo: 'branch_protection_main.allow_force_pushes', esperado: esperado.allow_force_pushes ?? null, encontrado: allowForcePushes, restauravel: false });
   }
 
+  // Campos do perimetro do Loggi que o guard do Zapp nao olhava; so valem se o baseline os declara.
+  if (Object.hasOwn(esperado, 'allow_deletions')) {
+    const allowDeletions = protection?.allow_deletions?.enabled ?? null;
+    if (allowDeletions !== esperado.allow_deletions) {
+      divergencias.push({ campo: 'branch_protection_main.allow_deletions', esperado: esperado.allow_deletions, encontrado: allowDeletions, restauravel: false });
+    }
+  }
+  // `null` no baseline = nenhum review obrigatorio; numero = aprovacoes exigidas.
+  if (Object.hasOwn(esperado, 'required_pull_request_reviews')) {
+    const reviews = protection.required_pull_request_reviews ?? null;
+    const aprovacoes = reviews === null ? null : (reviews.required_approving_review_count ?? 0);
+    if (aprovacoes !== esperado.required_pull_request_reviews) {
+      const texto = (n) => (n === null ? '(nenhum review obrigatorio)' : `${n} aprovacao(oes) obrigatoria(s)`);
+      divergencias.push({ campo: 'branch_protection_main.required_pull_request_reviews', esperado: texto(esperado.required_pull_request_reviews), encontrado: texto(aprovacoes), restauravel: false });
+    }
+  }
+
   return divergencias;
 }
 
 async function checarRepo() {
   const repo = await ghAdmin('GET', `/repos/${OWNER}/${REPO_NAME}`);
+  if (!repo || typeof repo !== 'object') throw new NaoVerificavel('/repos', 200, 'resposta nao e um objeto de repositorio');
   const divergencias = [];
   const ausentes = [];
+  // `private`/`visibility` vem para qualquer token: repo privado virar publico e pego ate
+  // com o GITHUB_TOKEN de fallback, que nao enxerga os campos de merge.
+  for (const [campo, esperado] of Object.entries(baseline.repo ?? {})) {
+    if (campo.startsWith('_')) continue;
+    const encontrado = repo?.[campo] ?? null;
+    if (encontrado !== esperado) divergencias.push({ campo: `repo.${campo}`, esperado, encontrado, restauravel: false });
+  }
   for (const [campo, esperado] of Object.entries(baseline.merge)) {
     // W04: o GET /repos so devolve os campos de merge para quem tem permissao
     // push/admin. Com GITHUB_TOKEN eles simplesmente NAO vem — `null`/ausente
@@ -225,7 +367,7 @@ async function checarRepo() {
       divergencias.push({ campo: `merge.${campo}`, esperado, encontrado, restauravel: campo === 'allow_auto_merge' });
     }
   }
-  if (ausentes.length === Object.keys(baseline.merge).length) {
+  if (ausentes.length === Object.keys(baseline.merge).length && divergencias.length === 0) {
     throw new NaoVerificavel(`/repos (merge.*)`, 200, 'resposta sem os campos de merge: o token nao tem permissao push/admin para le-los');
   }
   if (ausentes.length > 0) {
@@ -306,8 +448,10 @@ async function checarSelectedActions() {
 async function checarRulesets() {
   const rulesets = await ghAdmin('GET', `/repos/${OWNER}/${REPO_NAME}/rulesets`);
   const divergencias = [];
+  // 200 sem lista (corpo vazio, JSON invalido) nao e "zero rulesets": e resposta nao lida.
+  if (!Array.isArray(rulesets)) throw new NaoVerificavel('/rulesets', 200, 'resposta nao e uma lista de rulesets');
   const esperado = baseline.rulesets_count ?? 0;
-  const encontrado = (rulesets ?? []).length;
+  const encontrado = rulesets.length;
   if (encontrado !== esperado) {
     divergencias.push({ campo: 'rulesets.count', esperado, encontrado, restauravel: false });
   }
@@ -315,14 +459,21 @@ async function checarRulesets() {
 }
 
 async function checarEnvironments() {
-  const dados = await ghAdmin('GET', `/repos/${OWNER}/${REPO_NAME}/environments`);
+  // per_page=100: o padrao da API e 30, e uma lista cortada viraria "environment faltando".
+  const dados = await ghAdmin('GET', `/repos/${OWNER}/${REPO_NAME}/environments?per_page=100`);
   const encontrados = (dados?.environments ?? []).map((e) => e.name).sort();
+  if (Number(dados?.total_count ?? 0) > encontrados.length) {
+    throw new NaoVerificavel('/environments', 200, `lista incompleta: ${encontrados.length} de ${dados.total_count} environments`);
+  }
   const esperados = [...baseline.environments].sort();
   const prefixosVercel = (baseline.environments_vercel_managed?.prefixos ?? []);
-  const faltando = esperados.filter((e) => !encontrados.includes(e));
+  const daVercel = (nome) => prefixosVercel.some((p) => nome.startsWith(p));
+  // Environment gerenciado pela Vercel pode sumir sozinho: ausencia dele nao e regressao
+  // (mesma regra que ja vale para a presenca, abaixo).
+  const faltando = esperados.filter((e) => !encontrados.includes(e) && !daVercel(e));
   // W13: environments extras — podem ser gerenciados pela Vercel ou inesperados.
   const extras = encontrados.filter((e) => !esperados.includes(e));
-  const extrasVercel = extras.filter((e) => prefixosVercel.some((p) => e.startsWith(p)));
+  const extrasVercel = extras.filter(daVercel);
   const extrasInesperados = extras.filter((e) => !extrasVercel.includes(e));
 
   const divergencias = [];
@@ -484,6 +635,21 @@ async function main() {
     console.error('::error::GITHUB_TOKEN ausente');
     process.exit(1);
   }
+  if (!OWNER || !REPO_NAME || REPO.split('/').length !== 2) {
+    console.error(`::error::GITHUB_REPOSITORY invalido ("${semQuebra(REPO)}"): esperado "dono/repo".`);
+    process.exit(1);
+  }
+  const { erros: errosDoBaseline, avisos: chavesSemVigia } = baselineErro
+    ? { erros: [`nao foi possivel ler o arquivo: ${baselineErro}`], avisos: [] }
+    : problemasDoBaseline(baseline);
+  if (errosDoBaseline.length > 0) {
+    for (const erro of errosDoBaseline) console.error(`::error::Baseline invalido (${BASELINE_ARQUIVO}): ${semQuebra(erro)}`);
+    process.exit(1);
+  }
+  if (chavesSemVigia.length > 0) {
+    console.log(`::warning::Baseline (${BASELINE_ARQUIVO}) tem chave(s) que nenhuma checagem le: ${semQuebra(chavesSemVigia.join(', '))}. Confira a grafia.`);
+  }
+  if (dryRun) console.log('[dry-run] so leitura: nenhuma restauracao e nenhuma escrita em issue sera enviada.');
   console.log(`Leitura administrativa: ${fonteDaLeituraAdmin()}`);
   const checagens = [
     ['branch protection', checarBranchProtection],
@@ -532,8 +698,13 @@ async function main() {
       divergencias,
       nao_verificaveis: naoVerificaveis,
     };
-    writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
-    console.log(`Snapshot do perimetro salvo em ${snapshotPath}`);
+    // O snapshot e so um artefato de apoio: falhar ao grava-lo nao pode esconder o resultado.
+    try {
+      writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2));
+      console.log(`Snapshot do perimetro salvo em ${snapshotPath}`);
+    } catch (e) {
+      console.log(`::warning::Snapshot do perimetro nao foi salvo em ${semQuebra(snapshotPath)}: ${semQuebra(e.message)}`);
+    }
   }
 
   if (divergencias.length === 0 && naoVerificaveis.length === 0) {
@@ -547,6 +718,10 @@ async function main() {
   const restaurados = [];
   const restauracoesEfetivas = [];
   for (const d of divergencias.filter((x) => x.restauravel)) {
+    if (dryRun) {
+      console.log(`[dry-run] restauraria ${semQuebra(d.campo)} para ${semQuebra(d.esperado)}.`);
+      continue;
+    }
     try {
       const feito = await restaurar(d.campo);
       if (feito) {
@@ -565,7 +740,7 @@ async function main() {
     MARCADOR(assinatura),
     soCegos ? '## 👁️ Ponto cego do perímetro (nada divergiu do que foi possível ler)' : '## ⚠️ Divergência de perímetro detectada',
     '',
-    `Baseline: \`scripts/ci/github-settings-baseline.json\` (medido em ${baseline.medido_em})`,
+    `Baseline: \`${BASELINE_ARQUIVO}\` (medido em ${baseline.medido_em})`,
     '',
   ];
 
@@ -594,7 +769,7 @@ async function main() {
       '',
       '| Checagem | Motivo |',
       '|---|---|',
-      ...naoVerificaveis.map((n) => `| ${n.nome} | ${n.motivo.replace(/\|/g, '/')} |`),
+      ...naoVerificaveis.map((n) => `| ${n.nome} | ${semQuebra(n.motivo).replace(/\|/g, '/')} |`),
       '',
     );
   }
@@ -608,6 +783,7 @@ async function main() {
     `Timestamp: ${new Date().toISOString()}`,
   );
 
+  if (dryRun) console.log(`[dry-run] corpo que iria para a issue:\n${linhas.join('\n')}`);
   await abrirOuAtualizarIssue(linhas.join('\n'), {
     assinatura,
     janelaMs: soCegos ? SETE_DIAS_MS : SEIS_HORAS_MS,
@@ -626,6 +802,25 @@ async function main() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const args = process.argv.slice(2);
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(`Uso: node scripts/ci/github-settings-guard.mjs [--dry-run]
+
+Confere o perimetro do GitHub (branch protection da main, merge, Actions, rulesets,
+environments) contra ${BASELINE_ARQUIVO}.
+  --dry-run   so leitura: nao restaura nada e nao abre, comenta nem fecha issue.
+
+Variaveis: GITHUB_TOKEN (obrigatoria), ADMIN_READ_TOKEN (PAT com administration:read),
+GITHUB_REPOSITORY (dono/repo), PERIMETER_SNAPSHOT_PATH, SETTINGS_GUARD_AUTOR.
+Exit: 0 = perimetro OK ou so ponto cego; 1 = divergencia ou erro.`);
+    process.exit(0);
+  }
+  const desconhecidos = args.filter((a) => a !== '--dry-run');
+  if (desconhecidos.length > 0) {
+    console.error(`::error::Argumento desconhecido: ${semQuebra(desconhecidos.join(' '))}. Use --dry-run ou --help.`);
+    process.exit(1);
+  }
+  dryRun = args.includes('--dry-run');
   main().catch((e) => {
     console.error('::error::' + e.message);
     process.exit(1);

@@ -18,20 +18,35 @@
 //
 // Uso no workflow: `node scripts/ci/fila-merge.mjs` (lê `gh pr list` e grava
 // `pr=<número>` em $GITHUB_OUTPUT quando há alguém a atualizar).
+//
+// Este script só LÊ (`gh pr list`, `gh api .../compare`): quem chama o update-branch
+// é o passo seguinte do workflow, com a lista que sai daqui.
 
 import { readFileSync, appendFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-import { resolverExecutavel } from '../lib/seguranca-processo.mjs';
+import { executadoDiretamente, resolverExecutavel } from '../lib/seguranca-processo.mjs';
 
 const RAIZ = new URL('../../', import.meta.url);
+
+// O `gh pr list` devolve as mais novas primeiro: lista cortada esconderia justamente a
+// cabeça da fila (FIFO) e uma PR em voo antiga.
+const LIMITE_PRS = 1000;
+const TIMEOUT_GH_MS = 90_000;
+
+const USO = `Uso: node scripts/ci/fila-merge.mjs [--confirmar <PR> [--recusadas "<PR> <PR>"]]
+
+Sem argumentos: decide a próxima PR da fila e grava pr=/fila= em $GITHUB_OUTPUT.
+--confirmar N   exit 0 se N ainda é a próxima da fila recalculada; 3 se não.
+--recusadas     PRs que já recusaram o update-branch nesta execução (com --confirmar).
+Env: GITHUB_REPOSITORY (obrigatório) e GH_TOKEN (para o gh). Exit 2 = uso inválido.
+Só lê: quem atualiza a branch da PR é o workflow.`;
 
 function erroTransitorio(err) {
   const msg = String(err?.stderr ?? err?.message ?? '');
   return /HTTP 50[234]|50[234] Bad Gateway|50[234] Service Unavailable|connection reset|ECONNRESET|ETIMEDOUT|timeout expired|unexpected end of JSON/i.test(msg);
 }
 
-async function execComRetry(cmd, args, opts, { tentativas = 4, delaysMs = [5000, 10000, 20000] } = {}) {
+export async function execComRetry(cmd, args, opts, { tentativas = 4, delaysMs = [5000, 10000, 20000] } = {}) {
   for (let i = 0; i < tentativas; i++) {
     try {
       return execFileSync(cmd, args, opts);
@@ -42,9 +57,26 @@ async function execComRetry(cmd, args, opts, { tentativas = 4, delaysMs = [5000,
   }
 }
 
-export function checksObrigatorios() {
+function protecaoDaMain() {
   const baseline = JSON.parse(readFileSync(new URL('scripts/ci/github-settings-baseline.json', RAIZ), 'utf8'));
-  return baseline.branch_protection_main.required_status_checks;
+  return baseline.branch_protection_main;
+}
+
+export function checksObrigatorios() {
+  return protecaoDaMain().required_status_checks;
+}
+
+// A fila existe por causa do `strict=true`. Com `strict=false` a PR atrasada mergeia
+// assim mesmo e o GitHub nunca a marca BEHIND: sobraria só o caminho do UNKNOWN (logo
+// após cada push na main), que atualizaria uma PR ao acaso e reiniciaria a CI dela sem
+// necessidade. Então, com `strict=false` no baseline, a fila não atualiza ninguém.
+export function exigeBranchAtualizada() {
+  return protecaoDaMain().strict !== false;
+}
+
+function resumoDoErro(err) {
+  const ultimaDoStderr = String(err?.stderr ?? '').split('\n').map((l) => l.trim()).filter(Boolean).pop();
+  return ultimaDoStderr || String(err?.message ?? err).split('\n')[0];
 }
 
 const PASSOU = new Set(['SUCCESS', 'SKIPPED', 'NEUTRAL']);
@@ -139,26 +171,41 @@ export async function resolverDesconhecidos(prs, behindBy) {
 }
 
 async function decisaoAtual(repo) {
-  let json;
+  if (!exigeBranchAtualizada()) {
+    return { acao: 'nada', bloqueadas: [], motivo: 'Fila desligada: a proteção da `main` está com `strict=false` (github-settings-baseline.json) — PR atrasada mergeia sem atualizar, então ninguém é atualizado.' };
+  }
+  let parsedPrs;
   try {
-    json = await execComRetry(resolverExecutavel('gh'), [
-      'pr', 'list', '--repo', repo, '--state', 'open', '--base', 'main', '--limit', '100',
+    const json = await execComRetry(resolverExecutavel('gh'), [
+      'pr', 'list', '--repo', repo, '--state', 'open', '--base', 'main', '--limit', String(LIMITE_PRS),
       '--json', 'number,isDraft,isCrossRepository,baseRefName,headRefOid,autoMergeRequest,mergeStateStatus,statusCheckRollup',
-    ], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
+    ], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: TIMEOUT_GH_MS });
+    parsedPrs = JSON.parse(json);
+    if (!Array.isArray(parsedPrs)) throw new Error('a resposta não é uma lista de PRs');
   } catch (err) {
-    console.error(`gh pr list falhou (${err.message?.split('\n')[0]}); nenhuma PR atualizada nesta execução.`);
-    return decidir([], checksObrigatorios());
+    // Sem a lista não dá para provar que ninguém está em voo: ninguém é atualizado, e o
+    // resumo diz por quê (antes saía "nenhuma PR esperando", que era mentira).
+    const falha = `gh pr list falhou (${resumoDoErro(err)}); nenhuma PR atualizada nesta execução.`;
+    console.error(`::warning::${falha}`);
+    return { acao: 'nada', bloqueadas: [], falha };
   }
   const behindBy = async (head) => Number((await execComRetry(resolverExecutavel('gh'), [
     'api', `repos/${repo}/compare/main...${head}`, '--jq', '.behind_by',
-  ], { encoding: 'utf8' })).trim());
-  let parsedPrs;
-  try { parsedPrs = JSON.parse(json); } catch { return decidir([], checksObrigatorios()); }
-  const prs = await resolverDesconhecidos(parsedPrs, behindBy);
-  return decidir(prs, checksObrigatorios());
+  ], { encoding: 'utf8', timeout: TIMEOUT_GH_MS })).trim());
+  const prs = await resolverDesconhecidos(parsedPrs.filter((pr) => pr && typeof pr === 'object'), behindBy);
+  const decisao = decidir(prs, checksObrigatorios());
+  if (parsedPrs.length >= LIMITE_PRS) {
+    decisao.aviso = `A lista de PRs veio cheia (${parsedPrs.length}): pode haver PR que não entrou na conta.`;
+    console.error(`::warning::${decisao.aviso}`);
+  }
+  return decisao;
 }
 
 async function main() {
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    console.log(USO);
+    return;
+  }
   const repo = process.env.GITHUB_REPOSITORY;
   if (!repo) {
     console.error('GITHUB_REPOSITORY ausente');
@@ -179,19 +226,21 @@ async function main() {
       .split(/\s+/).map(Number).filter((n) => Number.isInteger(n) && n > 0);
     const decisao = await decisaoAtual(repo);
     if (confirmarCandidato(decisao, numero, recusadas)) return;
-    const motivo = decisao.acao === 'esperar' ? `em voo: #${decisao.emVoo.join(', #')}` : `#${numero} não é mais a próxima da fila`;
+    const motivo = decisao.falha ?? decisao.motivo
+      ?? (decisao.acao === 'esperar' ? `em voo: #${decisao.emVoo.join(', #')}` : `#${numero} não é mais a próxima da fila`);
     console.log(`Fila recalculada não autoriza #${numero} (${motivo}).`);
     process.exit(3);
   }
   const decisao = await decisaoAtual(repo);
   const linhas = [];
   if (decisao.acao === 'esperar') linhas.push(`Em voo: #${decisao.emVoo.join(', #')} — ninguém mais é atualizado agora.`);
-  if (decisao.acao === 'nada') linhas.push('Nenhuma PR com auto-merge esperando atualização.');
+  if (decisao.acao === 'nada') linhas.push(decisao.falha ?? decisao.motivo ?? 'Nenhuma PR com auto-merge esperando atualização.');
   if (decisao.acao === 'atualizar') {
     linhas.push(`Próxima da fila: #${decisao.pr}.`);
     if (decisao.restantes.length) linhas.push(`Esperando a vez (sem gastar CI): #${decisao.restantes.join(', #')}.`);
   }
   if (decisao.bloqueadas.length) linhas.push(`Fora da fila até corrigir check obrigatório: #${decisao.bloqueadas.join(', #')}.`);
+  if (decisao.aviso) linhas.push(decisao.aviso);
   for (const l of linhas) console.log(l);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Fila de merge\n\n${linhas.map((l) => `- ${l}`).join('\n')}\n`);
   if (process.env.GITHUB_OUTPUT && decisao.acao === 'atualizar') {
@@ -201,4 +250,4 @@ async function main() {
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) await main();
+if (executadoDiretamente(import.meta.url)) await main();

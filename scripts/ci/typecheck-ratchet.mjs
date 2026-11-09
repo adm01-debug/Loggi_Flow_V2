@@ -1,17 +1,16 @@
 #!/usr/bin/env node
 
-// tsc --noEmit (sem -p/-b) e um no-op nesta config: tsconfig.json tem "files": []
-// e so "references" para tsconfig.app.json/tsconfig.node.json. Sem "--build", o
-// tsc nao resolve as referencias e sai com exit 0 sem checar nenhum arquivo. O
-// jeito correto de checar um projeto com references e "tsc --build" (-b), que
-// respeita noEmit de cada projeto referenciado e falha de verdade se houver erro.
+// Roda "tsc -b --force" e compara as ocorrencias com um baseline versionado:
+// falha so se uma NOVA ocorrencia aparecer (mesmo principio do orcamento em
+// .warning-budget.json). "-b" tambem cobre tsconfig com "references", em que
+// "tsc --noEmit" sozinho nao checaria nada.
 //
-// O repo possui divida de tipos legada (confirmada rodando "tsc -b" de verdade,
-// nao o comando quebrado). Este ratchet segue o mesmo principio do lint-ratchet.mjs:
-// compara ocorrencias contra um baseline e falha so se uma NOVA ocorrencia aparecer.
+// Neste repo o tsconfig.json nao tem "references" (inclui src/ e tests/ direto),
+// entao "tsc -b" e "npm run typecheck" (tsc --noEmit) checam o mesmo projeto, e o
+// baseline e ZERO ocorrencias — igual a "tsErrors": 0 do .warning-budget.json.
 
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -88,7 +87,8 @@ function contextHashForLine(readLines, file, line) {
 
 function normalizeFilePath(filePath, root) {
   const absoluteRoot = path.resolve(root);
-  const absoluteFile = path.resolve(root, filePath);
+  // Saida capturada no Windows pode vir com "\\"; a chave do baseline e sempre com "/".
+  const absoluteFile = path.resolve(root, filePath.replace(/\\/gu, "/"));
   const relative = path.relative(absoluteRoot, absoluteFile);
   return (relative || ".").split(path.sep).join("/");
 }
@@ -114,8 +114,14 @@ function parseTscOutput(output, root) {
         code,
         messageLines: [firstMessageLine],
       };
-    } else if (current && rawLine.trim().length > 0) {
+    } else if (current && /^\s+\S/u.test(rawLine)) {
       current.messageLines.push(rawLine.trim());
+    } else if (rawLine.trim().length > 0) {
+      // O tsc indenta toda continuacao de mensagem. Linha nao indentada que nao e
+      // cabecalho (resumo "Found N errors.", aviso do Node no stderr) nao pertence ao
+      // diagnostico anterior: se entrasse na mensagem, mudaria a chave do erro conhecido.
+      if (current) issues.push(current);
+      current = null;
     }
   }
   if (current) issues.push(current);
@@ -131,11 +137,11 @@ function parseTscOutput(output, root) {
       message: normalizeWhitespace(issue.messageLines.join(" ")),
       contextHash: contextHashForLine(readLines, issue.file, issue.line),
     }))
-    .sort((a, b) =>
-      JSON.stringify([a.file, a.code, a.message, a.line, a.column]).localeCompare(
-        JSON.stringify([b.file, b.code, b.message, b.line, b.column]),
-      ),
-    );
+    .map((issue) => [JSON.stringify([issue.file, issue.code, issue.message, issue.line, issue.column]), issue])
+    // Ordem por codigo de caractere, nao localeCompare: o baseline gravado tem de ser
+    // byte a byte o mesmo em qualquer maquina/locale.
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([, issue]) => issue);
 }
 
 // Chave de correspondencia deliberadamente SEM linha/coluna: um erro identico
@@ -214,6 +220,15 @@ function validateBaseline(baseline) {
   if (!baseline || baseline.schemaVersion !== SCHEMA_VERSION || !Array.isArray(baseline.issues)) {
     throw new Error(`Baseline de typecheck invalido ou com schema diferente de ${SCHEMA_VERSION}.`);
   }
+  const quebrado = baseline.issues.findIndex(
+    (issue) => !issue || ["file", "severity", "code", "message"].some((campo) => typeof issue[campo] !== "string"),
+  );
+  if (quebrado !== -1) {
+    throw new Error(
+      `Baseline de typecheck invalido: issues[${quebrado}] sem file/severity/code/message. ` +
+        "Regere com --update-baseline em vez de editar a mao.",
+    );
+  }
 }
 
 export function compareBaseline(baseline, output, root = process.cwd()) {
@@ -262,8 +277,16 @@ export function assertUsableCompilerResult(status, output, root = process.cwd())
 function runTsc(root) {
   const tscEntry = path.join(root, "node_modules", "typescript", "bin", "tsc");
   if (!existsSync(tscEntry)) {
-    throw new Error("TypeScript local nao encontrado. Execute a instalacao das dependencias primeiro.");
+    throw new Error(
+      `TypeScript local nao encontrado em ${path.join(root, "node_modules")}. ` +
+        "Instale as dependencias (npm ci) e rode a partir da raiz do repo, ou passe --root.",
+    );
   }
+
+  // "tsc -b" grava <root>/tsconfig.tsbuildinfo mesmo com noEmit, e com --force nunca
+  // o le. O que este run criar e apagado para nao sobrar arquivo solto na raiz do repo.
+  const buildInfo = path.join(root, "tsconfig.tsbuildinfo");
+  const buildInfoJaExistia = existsSync(buildInfo);
 
   // -b/--build respeita "references" (o unico jeito correto de checar este
   // repo). --force ignora o cache incremental para nunca reportar falso-verde.
@@ -272,6 +295,7 @@ function runTsc(root) {
     encoding: "utf8",
     maxBuffer: 64 * 1024 * 1024,
   });
+  if (!buildInfoJaExistia) rmSync(buildInfo, { force: true });
 
   if (result.error) throw result.error;
 
@@ -333,8 +357,20 @@ Opcoes de teste: --output <tsc.txt> --baseline <arquivo> --root <diretorio>`);
 
     if (options.updateBaseline) {
       const baseline = createBaseline(output, options.root);
+      let anterior = null;
+      try {
+        anterior = JSON.parse(readFileSync(options.baseline, "utf8")).issues.length;
+      } catch {
+        anterior = null;
+      }
       writeFileSync(options.baseline, `${JSON.stringify(baseline, null, 2)}\n`, "utf8");
       console.log(`Baseline de typecheck atualizado: ${baseline.issues.length} ocorrencias em ${options.baseline}`);
+      if (Number.isInteger(anterior) && baseline.issues.length > anterior) {
+        console.error(
+          `ATENCAO: o baseline subiu de ${anterior} para ${baseline.issues.length} ocorrencias. ` +
+            "Divida de tipos nova exige aprovacao explicita do dono (.warning-budget.json: tsErrors).",
+        );
+      }
       return 0;
     }
 
@@ -347,6 +383,12 @@ Opcoes de teste: --output <tsc.txt> --baseline <arquivo> --root <diretorio>`);
 
     if (comparison.added.length === 0) {
       console.log("OK: nenhum novo erro de tipo foi introduzido.");
+      if (comparison.removed.length > 0) {
+        console.log(
+          `${comparison.removed.length} ocorrencia(s) do baseline nao existem mais: rode com --update-baseline ` +
+            "para a catraca descer (enquanto ficarem no baseline, o mesmo erro pode voltar sem falhar).",
+        );
+      }
       return 0;
     }
 
