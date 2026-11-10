@@ -1,4 +1,6 @@
 {
-  "_comment": "Baseline (ratchet) do supabase-usage-guard para o Loggi_Flow_V2. Entradas aqui sao violacoes CONHECIDAS e aceitas. Vazio - ainda nao houve nenhuma execucao real do guard contra o catalogo do banco Loggi.",
-  "known": []
+  "_comment": "Baseline (ratchet) do supabase-usage-guard para o Loggi_Flow_V2. Entradas aqui sao violacoes CONHECIDAS e aceitas. integracoes_bitrix: MissionDetail.tsx consulta uma tabela que nao existe no banco nem no types.ts; o componente trata o erro (console.warn) e segue sem os dados do Bitrix. Sai desta lista quando a tabela for criada por migration (decisao do dono) ou a consulta for removida.",
+  "known": [
+    "from:integracoes_bitrix:src/components/dashboard/MissionDetail.tsx"
+  ]
 }
