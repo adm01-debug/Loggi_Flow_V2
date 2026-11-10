@@ -1,0 +1,95 @@
+# docs:
+#   gatilho: PR ou push na main que toque scripts/** (ou este arquivo) e dispatch
+#   prova: os testes de scripts/ (gates, CI, banco, inventario, contexto, snapshot) passam em Node 20, o runtime da CI
+#   falha: o job fica vermelho com o teste que quebrou; nao e required check
+#   avisa: resultado do node --test / pytest no log do job
+name: Scripts Tests
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - '.gitattributes'
+      - '.github/workflows/scripts-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - '.gitattributes'
+      - '.github/workflows/scripts-tests.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scripts-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  testes:
+    name: Scripts Tests (Node 20)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust # banco descartavel do job; nada de segredo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Os testes de SQL criam e apagam bancos/roles proprios neste servidor descartavel.
+      AUDIT_TEST_PG_URL: postgresql://postgres@127.0.0.1:5432/postgres
+      INVENTARIO_PG_TEST_URL: postgresql://postgres@127.0.0.1:5432/postgres
+      SNAPSHOT_TEST_PG_URL: postgresql://postgres@127.0.0.1:5432/postgres
+      DB_AUDIT_TEST_URL: postgresql://postgres@127.0.0.1:5432/dbaudit_test_ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Instalar dependencias (o teste do seed roda o script com tsx)
+        run: npm ci --ignore-scripts
+
+      - name: Instalar ripgrep (usado por scripts/inventario)
+        run: command -v rg >/dev/null || sudo apt-get install -y --no-install-recommends ripgrep
+
+      - name: Preparar banco de teste do db-audit
+        run: psql "postgresql://postgres@127.0.0.1:5432/postgres" -v ON_ERROR_STOP=1 -c 'CREATE DATABASE dbaudit_test_ci'
+
+      - name: Testes Node (node --test)
+        run: |
+          node --version
+          mapfile -t arquivos < <(find scripts -name '*.unit.mjs' | sort)
+          echo "${#arquivos[@]} arquivos de teste"
+          node --test "${arquivos[@]}"
+
+      - name: Dependencias dos testes Python
+        run: python3 -m pip install --quiet --break-system-packages -r scripts/supabase_snapshot/requirements.txt
+
+      - name: Testes Python
+        run: |
+          python3 --version
+          python3 -B scripts/regras_negocio/test_generate.py
+          python3 -B scripts/regras_negocio/test_indice.py
+          python3 -B scripts/regras_negocio/test_publish.py
+          python3 -B scripts/supabase_snapshot/test_snapshot.py
+          python3 -B scripts/supabase_snapshot/test_snapshot_postgres.py

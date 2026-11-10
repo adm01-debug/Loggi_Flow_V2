@@ -3,8 +3,9 @@
 #   prova: fila de merge serial — so a proxima PR com auto-merge e atualizada; as demais esperam sem gastar CI
 #   falha: a fila para e as PRs com auto-merge ficam BEHIND ate o proximo evento
 #   avisa: Job Summary com a fila (em voo, proxima, esperando, bloqueadas)
-# NOTA(loggi): Este workflow depende de scripts/ci/fila-merge.mjs e scripts/lib/
-# que ainda nao existem neste repositorio. Porte esses scripts do Zapp_Web_V2 antes de habilitar.
+# NOTA(loggi): depende de scripts/ci/fila-merge.mjs e scripts/lib/ (existem). A politica do repo e
+# allow_auto_merge=false e strict=false (docs/agentes/github-ci.md): sem auto-merge nao ha fila para
+# atualizar, entao o workflow encerra com aviso (verde) em vez de falhar a cada 30 minutos.
 name: Auto Update PR Branches
 
 on:
@@ -37,6 +38,7 @@ jobs:
       actions: write
     steps:
       - name: 🔍 Verificar allow_auto_merge
+        id: auto_merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -46,12 +48,15 @@ jobs:
             exit 1
           fi
           if [ "$auto_merge" != "true" ]; then
-            echo "::error::allow_auto_merge esta desligado no repo ($auto_merge). Religue antes de usar este workflow."
-            exit 1
+            echo "::notice::allow_auto_merge esta desligado no repo ($auto_merge): sem auto-merge nao ha fila. Nada a fazer."
+            echo "continuar=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          echo "continuar=true" >> "$GITHUB_OUTPUT"
           echo "allow_auto_merge=true (ok)"
 
       - name: 📥 Checkout (so os scripts de CI da main)
+        if: steps.auto_merge.outputs.continuar == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -61,12 +66,14 @@ jobs:
             scripts/lib
 
       - name: 🟩 Setup Node
+        if: steps.auto_merge.outputs.continuar == 'true'
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24'
 
       - name: 🚦 Escolher a proxima PR da fila
         id: fila
+        if: steps.auto_merge.outputs.continuar == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/ci/fila-merge.mjs
