@@ -40,7 +40,7 @@ As suites usam fixtures descartáveis e não executam os scripts operacionais do
 
 ## Registro exato dos demais scripts
 
-Os registros `legacy` abaixo preservam ferramentas anteriores e seus chamadores; não são incluídos automaticamente no novo pipeline. Referência literal indica onde o arquivo é citado, sem garantir que esse caminho rode nem autorização para executar operações contra serviços. Sem referência, o arquivo é mantido manual porque função, parâmetros e ambiente precisam de revisão antes de ativar qualquer gatilho. Scripts novos não cobertos por registro fazem `doctor --static` falhar; não existe registro genérico `scripts/**` para ocultá-los.
+Os registros `legacy` abaixo preservam ferramentas anteriores e seus chamadores; não são incluídos automaticamente no novo pipeline. Para arquivos TypeScript de apoio sem runner comprovado, o comando listado só valida o inventário; os chamadores originais continuam sendo a referência de execução. Referência literal indica onde o arquivo é citado, sem garantir que esse caminho rode nem autorização para executar operações contra serviços. Sem referência, o arquivo é mantido manual porque função, parâmetros e ambiente precisam de revisão antes de ativar qualquer gatilho. Scripts novos não cobertos por registro fazem `doctor --static` falhar; não existe registro genérico `scripts/**` para ocultá-los.
 
 | Arquivo exato | Invocação manual de inventário | Chamadores literais / justificativa |
 |---|---|---|
@@ -122,7 +122,7 @@ Os registros `legacy` abaixo preservam ferramentas anteriores e seus chamadores;
 | `scripts/regras_negocio/test_generate.py` | `python3 scripts/regras_negocio/test_generate.py` | .github/workflows/contexto-ia.yml, .github/workflows/scripts-tests.yml |
 | `scripts/regras_negocio/test_indice.py` | `python3 scripts/regras_negocio/test_indice.py` | .github/workflows/contexto-ia.yml, .github/workflows/scripts-tests.yml |
 | `scripts/regras_negocio/test_publish.py` | `python3 scripts/regras_negocio/test_publish.py` | .github/workflows/contexto-ia.yml, .github/workflows/scripts-tests.yml |
-| `scripts/seed-database.ts` | `bun scripts/seed-database.ts` | package.json:scripts, .github/workflows/scripts-tests.yml |
+| `scripts/seed-database.ts` | `node scripts/automation.mjs doctor --static` | package.json:scripts, .github/workflows/scripts-tests.yml |
 | `scripts/seed/seed-database.unit.mjs` | `node --test scripts/seed/seed-database.unit.mjs` | Sem chamador literal; manter manual e revisar parâmetros/ambiente antes de executar. |
 | `scripts/supabase_snapshot/snapshot.py` | `python3 scripts/supabase_snapshot/snapshot.py` | .github/workflows/contexto-ia.yml |
 | `scripts/supabase_snapshot/test_snapshot.py` | `python3 scripts/supabase_snapshot/test_snapshot.py` | .github/workflows/contexto-ia.yml, .github/workflows/scripts-tests.yml |

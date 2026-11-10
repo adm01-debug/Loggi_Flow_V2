@@ -1341,13 +1341,15 @@
         "scripts/seed-database.ts"
       ],
       "manual": [
-        "bun",
-        "scripts/seed-database.ts"
+        "node",
+        "scripts/automation.mjs",
+        "doctor",
+        "--static"
       ],
       "triggers": [
         "manual"
       ],
-      "reason": "Legado mantido no fluxo existente; referências literais: package.json:scripts, .github/workflows/scripts-tests.yml. O dispatcher não executa esta operação."
+      "reason": "Legado mantido no fluxo existente; referências literais: package.json:scripts, .github/workflows/scripts-tests.yml. O dispatcher não executa esta operação. Arquivo TypeScript de apoio: a invocação manual verifica somente o inventário; execução operacional usa o chamador original e seu runtime."
     },
     {
       "id": "legacy-89f76b6c4ad8537d",
