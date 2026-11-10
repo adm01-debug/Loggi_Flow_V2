@@ -107,6 +107,6 @@ BEGIN
 END
 $$;
 
-SELECT section, key, def FROM _manifest_full ORDER BY section, key, def;
+SELECT section, key, def FROM _manifest_full ORDER BY section COLLATE "C", key COLLATE "C", def COLLATE "C";
 
 DROP TABLE _manifest_full;

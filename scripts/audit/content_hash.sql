@@ -41,7 +41,7 @@ BEGIN
 END
 $$;
 
-SELECT tablename, row_count, content_hash FROM _content_hash ORDER BY tablename;
+SELECT tablename, row_count, content_hash FROM _content_hash ORDER BY tablename COLLATE "C";
 
 DROP TABLE pg_temp._content_hash;
 

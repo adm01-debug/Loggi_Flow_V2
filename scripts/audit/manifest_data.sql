@@ -14,6 +14,6 @@ SELECT 'data'::text AS section, n.nspname||'.'||c.relname AS key,
 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
 WHERE n.nspname IN ('public','internal') AND c.relkind IN ('r','p') AND NOT c.relispartition;
 
-SELECT section, key, def FROM _manifest_data ORDER BY section, key;
+SELECT section, key, def FROM _manifest_data ORDER BY section COLLATE "C", key COLLATE "C";
 
 DROP TABLE _manifest_data;

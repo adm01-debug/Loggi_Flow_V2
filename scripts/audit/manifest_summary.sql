@@ -45,6 +45,6 @@ BEGIN
 END
 $$;
 
-SELECT section, total FROM _manifest_summary ORDER BY section;
+SELECT section, total FROM _manifest_summary ORDER BY section COLLATE "C";
 
 DROP TABLE pg_temp._manifest_summary;

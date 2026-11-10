@@ -60,6 +60,6 @@ SELECT 'enum', n.nspname||'.'||t.typname,
   WHERE n.nspname IN ('public','internal')
   GROUP BY 1, 2;
 
-SELECT section, key, def FROM _manifest_detail ORDER BY section, key;
+SELECT section, key, def FROM _manifest_detail ORDER BY section COLLATE "C", key COLLATE "C";
 
 DROP TABLE _manifest_detail;
