@@ -1,25 +1,58 @@
--- Runbook pós-deploy das edge functions (auditoria 2026-09-02)
--- As 5 functions fechadas (resend-email, evolution-whatsapp, melhor-envio-api,
--- log-security-event, predict-delays-scheduled) exigem JWT de usuário, service_role
--- ou o header x-internal-secret. Os crons já enviam x-internal-secret (vault).
+-- Runbook pós-deploy das edge functions (auditoria 2026-09-02) — projeto jvfhclubfpxrtrrazrgr
+-- Só comentários: colar este arquivo num SQL editor não executa nada.
 --
--- PASSO 1 — pegar o valor do secret compartilhado (rodar no SQL editor do projeto):
---   SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'internal_fn_secret';
+-- As 5 functions fechadas rodam com verify_jwt = false e autenticam no código (_shared/auth.ts):
+--   resend-email, predict-delays-scheduled ......... header x-internal-secret (= env INTERNAL_FN_SECRET)
+--                                                     ou Bearer service_role. JWT de usuário NÃO passa.
+--   evolution-whatsapp, melhor-envio-api,
+--   log-security-event ............................. Bearer de usuário logado ou service_role.
+--                                                     x-internal-secret e anon key NÃO passam.
+-- Os crons mandam x-internal-secret lido do vault ('internal_fn_secret'); ele só autentica se a env
+-- INTERNAL_FN_SECRET das functions tiver o MESMO valor.
 --
--- PASSO 2 — setar a env nas functions e deployar (terminal, com SUPABASE_ACCESS_TOKEN
--- da conta dona do projeto jvfhclubfpxrtrrazrgr):
---   supabase secrets set INTERNAL_FN_SECRET=<valor do passo 1> --project-ref jvfhclubfpxrtrrazrgr
---   supabase functions deploy --project-ref jvfhclubfpxrtrrazrgr
---   (ou via GitHub: Actions -> "Deploy Edge Functions" depois de criar o secret
---    SUPABASE_ACCESS_TOKEN em Settings -> Secrets and variables -> Actions)
+-- Regra: valor de segredo nunca vai para tela, chat, agente/MCP, commit ou log. Por isso NÃO rode
+-- `SELECT decrypted_secret ...` no SQL editor: o passo 2 copia o valor direto para um arquivo.
 --
--- PASSO 3 — validar (deve dar 401 sem auth e 200 com o secret):
---   curl -s -o /dev/null -w '%{http_code}\n' -X POST \
---     https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/resend-email
---   -> esperado: 401
+-- PASSO 1 — conferir o vault, sem mostrar valor (SQL editor do projeto, só leitura):
+--   SELECT name, length(decrypted_secret) AS tamanho FROM vault.decrypted_secrets
+--    WHERE name IN ('internal_fn_secret', 'project_url', 'anon_key');
+--   -> esperado: 3 linhas com tamanho > 0. Faltou 'internal_fn_secret' => pare e chame o dono.
 --
--- OPCIONAL — corrigir a service_role_key do vault (hoje é uma sb_secret de OUTRO
--- projeto; "Unregistered API key"). Pegar a chave no painel (Settings -> API) e:
+-- PASSO 2 — copiar o segredo do vault para a env das functions (terminal do dono, na raiz do repo;
+-- DATABASE_URL = conexão postgres do projeto, SUPABASE_ACCESS_TOKEN = token sbp_ da conta dona):
+--   umask 077
+--   psql "$DATABASE_URL" -Atc "SELECT 'INTERNAL_FN_SECRET=' || decrypted_secret
+--     FROM vault.decrypted_secrets WHERE name = 'internal_fn_secret'" > ~/loggi-internal.env
+--   sh scripts/ops/set_missing_secrets.sh --env-file ~/loggi-internal.env           # deve listar só "+ INTERNAL_FN_SECRET"
+--   sh scripts/ops/set_missing_secrets.sh --env-file ~/loggi-internal.env --apply
+--
+-- PASSO 3 — publicar as functions. Só pelo workflow, nunca `supabase functions deploy` na mão:
+--   GitHub -> Actions -> "Deploy Edge Functions" -> Run workflow (campo "only" vazio = todas)
+--   ou: gh workflow run deploy-functions.yml          (uma só: -f only=resend-email)
+--   Exige o secret SUPABASE_ACCESS_TOKEN em Settings -> Secrets and variables -> Actions.
+--
+-- PASSO 4 — validar com request real:
+--   4.1 sem auth, as 5 devolvem 401 (as 3 de usuário têm rate limit: 429 = repetiu demais, espere 1 min):
+--     for fn in resend-email predict-delays-scheduled evolution-whatsapp melhor-envio-api log-security-event; do
+--       printf '%s ' "$fn"; curl -s -o /dev/null -w '%{http_code}\n' -X POST \
+--         "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn"; done
+--   4.2 com o segredo, resend-email passa da auth (sem corpo ela não envia e-mail):
+--     sed 's/^INTERNAL_FN_SECRET=/x-internal-secret: /' ~/loggi-internal.env > ~/loggi-internal.hdr
+--     curl -s -o /dev/null -w '%{http_code}\n' -X POST -H @"$HOME/loggi-internal.hdr" \
+--       https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/resend-email
+--     -> esperado: 500 (passou da auth e parou no corpo vazio). 401 = env diferente do vault, ou
+--        function ainda não publicada.
+--     Não repita esse teste em predict-delays-scheduled: com o segredo ela RODA a previsão de verdade.
+--   4.3 apagar os arquivos com o segredo:
+--     rm -f ~/loggi-internal.env ~/loggi-internal.hdr
+--   4.4 os crons pararam de tomar 401 (SQL editor, só leitura; olhar depois do próximo disparo, até 30 min):
+--     SELECT status_code, count(*) FROM net._http_response
+--      WHERE created > now() - interval '1 hour' GROUP BY 1 ORDER BY 1;
+--     -> esperado: nenhuma linha com status_code 401.
+--
+-- OPCIONAL (decisão do dono) — a service_role_key do vault é uma sb_secret de OUTRO projeto
+-- ("Unregistered API key"). Nenhum cron versionado no repo a usa (mandam anon_key + x-internal-secret).
+-- Para corrigir, o dono cola a chave do painel (Settings -> API) direto no SQL editor:
 --   SELECT vault.update_secret(
 --     (SELECT id FROM vault.secrets WHERE name='service_role_key'),
 --     '<service_role JWT ou sb_secret DESTE projeto>');

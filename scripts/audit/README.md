@@ -31,6 +31,27 @@ Relatório: `docs/audit/2026-08-31_auditoria_pos_remediacao.md`.
 `exceptions.json` é só documentação das divergências aceitas — nenhum script o lê (parte dessas neutralizações está escrita à
 mão no `manifest_full.sql`).
 
+## Resumo e hash de conteúdo (comparação manual entre dois bancos)
+
+- `manifest_summary.sql` — uma linha por seção com a contagem em `public` (`tables`, `columns`, `indexes`,
+  `policies`, `functions`, `triggers`) mais `cron_jobs`, `migrations` e `storage_buckets`. `cron_jobs` sai
+  **NULL** quando o `pg_cron` não está instalado (0 = instalado, sem jobs).
+- `content_hash.sql` — `(tablename, row_count, content_hash)` por tabela de `public`, mesmo algoritmo de
+  `manifest_data.sql`: o hash não depende da ordem de inserção. Ficam de fora `audit_logs`,
+  `system_heartbeat` e `cron_job_run_details`; partições entram pela tabela-mãe; tabela vazia = hash `''`.
+  Fixa `TimeZone`/`IntervalStyle`/`extra_float_digits`/`bytea_output` só na própria transação e roda com
+  `row_security = off` (se RLS esconderia linhas do role, falha em vez de devolver hash parcial).
+
+Rodar nos dois bancos como `postgres` e comparar:
+`psql "$URL" -X -At -f scripts/audit/content_hash.sql > destino.txt` e `diff origem.txt destino.txt`.
+
+Limites: usam tabela temporária (não rodam em transação `READ ONLY`); `content_hash.sql` ignora chave com
+`null` dentro de coluna json/jsonb e guarda ~32 bytes por linha em memória (tabela com dezenas de milhões
+de linhas: pôr na lista de exclusão e comparar por faixa de id).
+
+Teste: `AUDIT_TEST_PG_URL=postgres://postgres@127.0.0.1:5432/postgres node --test scripts/audit/manifest-summary-content-hash.unit.mjs`
+— mesmo servidor descartável do `sql.unit.mjs` (cria e apaga bancos `audit_t_i_*`).
+
 ## Testes
 
 `node --test scripts/audit/sql.unit.mjs` roda os três manifestos e os dois scripts históricos da origem

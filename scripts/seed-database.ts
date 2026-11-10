@@ -1,43 +1,146 @@
 /**
- * Seed script — popula o banco Supabase com dados fictícios realistas
- * para desenvolvimento e demos.
+ * Seed script — popula um banco Supabase com dados fictícios realistas
+ * para desenvolvimento, demos e o usuário de teste do E2E.
  *
  * Uso:
- *   SUPABASE_SERVICE_ROLE_KEY=eyJ... npx tsx scripts/seed-database.ts
+ *   SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=... npm run seed
+ *   npm run seed -- --dry-run     (mostra o plano; não exige chave e não faz nenhuma requisição)
+ *
+ * Flags:
+ *   --dry-run              imprime o que seria semeado, sem tocar no banco.
+ *   --confirmar-producao   obrigatória quando a URL é o projeto de PRODUÇÃO
+ *                          (jvfhclubfpxrtrrazrgr); exige também SEED_PASSWORD própria.
+ *
+ * Env: SUPABASE_URL (ou VITE_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY,
+ *      SEED_PASSWORD (senha dos usuários de seed), SEED_TIMEOUT_MS (por requisição; padrão 30000).
  *
  * IMPORTANTE: usa SERVICE ROLE KEY (admin). NUNCA exponha essa chave no
  * frontend nem commit ela no repositório. Use .env.local ou variável
- * de ambiente temporária.
+ * de ambiente temporária. Não há URL padrão: sem SUPABASE_URL o script não roda.
  *
- * O script é idempotente para dados de catálogo (não duplica itens com
- * nomes únicos), mas reseta tabelas transacionais antes de inserir.
+ * Idempotente: só acrescenta o que falta. Cada linha tem chave fixa (cnpj, numero_*,
+ * code, name…) e só é inserida se ainda não existir; nada é apagado e linha já existente
+ * não é alterada — exceto profiles/user_roles/user_levels dos usuários de seed (upsert).
+ * Não há transação (PostgREST): se falhar no meio, o que já entrou fica; reexecute.
  */
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // --- Configuração -----------------------------------------------------------
 
-const SUPABASE_URL =
-  process.env.VITE_SUPABASE_URL ||
-  process.env.SUPABASE_URL ||
-  "https://jvfhclubfpxrtrrazrgr.supabase.co";
+const PRODUCAO_REF = "jvfhclubfpxrtrrazrgr";
+// Lovable Cloud, origem do cutover: AGENTS.md proíbe escrita nele.
+const ORIGEM_REF = "hgicfqjayrjurivtygqf";
+// Credencial de seed local, nao de producao.
+const SENHA_PADRAO = "LoggiFlow@2026";
 
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-// Senha dos usuarios de seed (somente ambiente de dev); sobrescreva com SEED_PASSWORD.
-// eslint-disable-next-line sonarjs/no-hardcoded-passwords -- credencial de seed local, nao de producao
-const SEED_PASSWORD = process.env.SEED_PASSWORD ?? "LoggiFlow@2026";
+const FLAGS = new Set(["--dry-run", "--confirmar-producao", "--help", "-h"]);
+const args = process.argv.slice(2);
 
-if (!SERVICE_ROLE_KEY) {
-  console.error("❌ Defina SUPABASE_SERVICE_ROLE_KEY antes de rodar.");
-  console.error(
-    "   Ex: SUPABASE_SERVICE_ROLE_KEY=eyJ... npx tsx scripts/seed-database.ts",
-  );
+function abortar(...linhas: string[]): never {
+  for (const l of linhas) console.error(l);
   process.exit(1);
 }
 
-const supabase: SupabaseClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+if (args.includes("--help") || args.includes("-h")) {
+  console.log(
+    "Uso: SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=... npm run seed -- [--dry-run] [--confirmar-producao]",
+  );
+  process.exit(0);
+}
+const desconhecidas = args.filter((a) => !FLAGS.has(a));
+if (desconhecidas.length > 0) {
+  // Flag digitada errada (ex.: --dryrun) não pode virar escrita de verdade.
+  abortar(
+    `❌ Argumento desconhecido: ${desconhecidas.join(" ")}`,
+    "   Aceitos: --dry-run, --confirmar-producao, --help",
+  );
+}
+const DRY_RUN = args.includes("--dry-run");
+
+const semBarraFinal = (u: string): string =>
+  u.endsWith("/") ? semBarraFinal(u.slice(0, -1)) : u;
+const urlsDefinidas = [
+  ...new Set(
+    [process.env.SUPABASE_URL, process.env.VITE_SUPABASE_URL]
+      .map((u) => semBarraFinal((u ?? "").trim()))
+      .filter(Boolean),
+  ),
+];
+if (urlsDefinidas.length > 1) {
+  abortar(
+    "❌ SUPABASE_URL e VITE_SUPABASE_URL apontam para lugares diferentes.",
+    "   Deixe só uma definida para não semear o banco errado.",
+  );
+}
+const SUPABASE_URL = urlsDefinidas[0] ?? "";
+
+const SERVICE_ROLE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim();
+// Senha dos usuarios de seed (somente ambiente de dev); sobrescreva com SEED_PASSWORD.
+const SEED_PASSWORD = process.env.SEED_PASSWORD || SENHA_PADRAO;
+const TIMEOUT_MS = Number(process.env.SEED_TIMEOUT_MS || 30000);
+
+const EH_PRODUCAO = SUPABASE_URL.toLowerCase().includes(PRODUCAO_REF);
+
+function validarAlvo(): void {
+  if (!SUPABASE_URL) {
+    abortar(
+      "❌ Defina SUPABASE_URL (o banco que vai receber o seed) antes de rodar.",
+      "   Ex: SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=... npm run seed",
+    );
+  }
+  if (!/^https?:\/\/[^/\s]+$/i.test(SUPABASE_URL)) {
+    abortar(`❌ SUPABASE_URL inválida: ${SUPABASE_URL} (esperado https://<ref>.supabase.co)`);
+  }
+  if (SUPABASE_URL.toLowerCase().includes(ORIGEM_REF)) {
+    abortar(
+      `🚫 ${ORIGEM_REF} é a origem do cutover (Lovable Cloud): não se escreve nela.`,
+    );
+  }
+  if (!Number.isFinite(TIMEOUT_MS) || TIMEOUT_MS <= 0) {
+    abortar("❌ SEED_TIMEOUT_MS precisa ser um número de milissegundos maior que zero.");
+  }
+  if (!EH_PRODUCAO) return;
+  if (!args.includes("--confirmar-producao")) {
+    abortar(
+      `🚫 A URL aponta para PRODUÇÃO (${PRODUCAO_REF}).`,
+      "   O seed grava clientes, entregas e usuários FICTÍCIOS, com um usuário admin.",
+      "   Se é isso mesmo que você quer: npm run seed -- --confirmar-producao",
+    );
+  }
+  if (SEED_PASSWORD === SENHA_PADRAO) {
+    abortar(
+      "🚫 Em produção, defina SEED_PASSWORD com uma senha própria:",
+      "   a senha padrão está escrita no repositório e criaria um admin com senha conhecida.",
+    );
+  }
+}
+
+if (!DRY_RUN) {
+  validarAlvo();
+  if (!SERVICE_ROLE_KEY) {
+    abortar(
+      "❌ Defina SUPABASE_SERVICE_ROLE_KEY antes de rodar.",
+      "   Ex: SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=... npm run seed",
+    );
+  }
+}
+
+// Em dry-run não existe cliente: qualquer acesso ao banco vira erro em vez de requisição.
+const supabase: SupabaseClient | null = DRY_RUN
+  ? null
+  : createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+      global: {
+        fetch: (input, init) =>
+          fetch(input, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) }),
+      },
+    });
+
+function db(): SupabaseClient {
+  if (!supabase) throw new Error("dry-run não acessa o banco");
+  return supabase;
+}
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -50,13 +153,10 @@ const DAYS_AHEAD = (n: number) =>
 const pick = <T>(arr: readonly T[]): T =>
   arr[Math.floor(Math.random() * arr.length)];
 
-// CNPJ fake (apenas para preencher campo — não é válido de verdade)
-const fakeCNPJ = (): string => {
-  const n = Array.from({ length: 14 }, () =>
-    Math.floor(Math.random() * 10),
-  ).join("");
-  return `${n.slice(0, 2)}.${n.slice(2, 5)}.${n.slice(5, 8)}/${n.slice(8, 12)}-${n.slice(12)}`;
-};
+// CNPJ fake (apenas para preencher campo — não é válido de verdade).
+// Fixo por (série, índice): é a chave que impede duplicar a cada execução.
+const fakeCNPJ = (serie: number, indice: number): string =>
+  `99.${String(serie).padStart(3, "0")}.${String(indice).padStart(3, "0")}/0001-00`;
 
 const fakePhone = (): string =>
   `(${10 + Math.floor(Math.random() * 89)})${Math.floor(Math.random() * 90000) + 10000}-${Math.floor(Math.random() * 9000) + 1000}`;
@@ -141,161 +241,177 @@ const STATUS_ENVIO = [
 
 // --- Seeders por módulo -----------------------------------------------------
 
-async function getOrCreateUserId(): Promise<string> {
-  // Reaproveita o admin@loggiflow se já existir; senão cria um admin fake.
-  // Buscar por email evita anexar o perfil admin ao primeiro usuário da lista
-  // (que pode ser um usuário comum em re-execuções do seed).
-  const { data: users } = await supabase.auth.admin.listUsers();
-  const admin = users?.users.find((u) => u.email === "admin@loggiflow.com.br");
-  if (admin) return admin.id;
+type Row = Record<string, unknown>;
 
-  const { data, error } = await supabase.auth.admin.createUser({
-    email: "admin@loggiflow.com.br",
+// Contagem real do que entrou, para o resumo final (tabela → novos/já existentes).
+const resumo = new Map<string, { novos: number; existentes: number }>();
+function registrar(tabela: string, novos: number, existentes: number): void {
+  const r = resumo.get(tabela) ?? { novos: 0, existentes: 0 };
+  resumo.set(tabela, {
+    novos: r.novos + novos,
+    existentes: r.existentes + existentes,
+  });
+}
+
+/**
+ * Insere só as linhas cuja `chave` ainda não existe e devolve, na ordem de `rows`,
+ * o valor de `idCol` de cada uma (nova ou já existente). Não depende de UNIQUE no
+ * banco e nunca altera linha existente.
+ */
+async function inserirFaltantes(
+  tabela: string,
+  chave: string[],
+  rows: Row[],
+  idCol = "id",
+): Promise<string[]> {
+  if (DRY_RUN) {
+    console.log(
+      `  [dry-run] ${tabela}: ${rows.length} linha(s), chave (${chave.join(", ")})`,
+    );
+    registrar(tabela, rows.length, 0);
+    return rows.map((_, i) => `dry-run-${tabela}-${i + 1}`);
+  }
+  const assinatura = (r: Row) => JSON.stringify(chave.map((k) => String(r[k])));
+  const colunas = [...new Set([idCol, ...chave])].join(",");
+
+  let consulta = db().from(tabela).select(colunas);
+  for (const k of chave) {
+    consulta = consulta.in(k, [...new Set(rows.map((r) => r[k]))]);
+  }
+  const { data: existentes, error: selErr } = await consulta;
+  if (selErr) throw new Error(`${tabela} (consulta): ${selErr.message}`);
+
+  const ids = new Map<string, string>();
+  for (const e of (existentes ?? []) as unknown as Row[]) {
+    if (!ids.has(assinatura(e))) ids.set(assinatura(e), String(e[idCol]));
+  }
+  const novos = rows.filter((r) => !ids.has(assinatura(r)));
+  if (novos.length > 0) {
+    const { data: inseridos, error: insErr } = await db()
+      .from(tabela)
+      .insert(novos)
+      .select(colunas);
+    if (insErr) throw new Error(`${tabela} (insert): ${insErr.message}`);
+    for (const r of (inseridos ?? []) as unknown as Row[]) {
+      ids.set(assinatura(r), String(r[idCol]));
+    }
+  }
+  registrar(tabela, novos.length, rows.length - novos.length);
+  return rows.map((r) => {
+    const id = ids.get(assinatura(r));
+    if (id === undefined) {
+      throw new Error(`${tabela}: o banco não devolveu a linha ${assinatura(r)}`);
+    }
+    return id;
+  });
+}
+
+/** Upsert das tabelas por usuário de seed, onde a linha já nasce por trigger no signup. */
+async function upsertRows(
+  tabela: string,
+  onConflict: string,
+  rows: Row[],
+): Promise<void> {
+  registrar(tabela, rows.length, 0);
+  if (DRY_RUN) {
+    console.log(
+      `  [dry-run] ${tabela}: ${rows.length} linha(s), upsert por (${onConflict})`,
+    );
+    return;
+  }
+  const { error } = await db().from(tabela).upsert(rows, { onConflict });
+  if (error) throw new Error(`${tabela} (upsert): ${error.message}`);
+}
+
+// E-mail → id de todos os usuários do Auth (todas as páginas, uma vez só).
+let usuariosPorEmail: Map<string, string> | null = null;
+const usuariosCriados: string[] = [];
+
+async function carregarUsuarios(): Promise<Map<string, string>> {
+  if (usuariosPorEmail) return usuariosPorEmail;
+  const mapa = new Map<string, string>();
+  const perPage = 200;
+  for (let page = 1; page <= 500; page++) {
+    const { data, error } = await db().auth.admin.listUsers({ page, perPage });
+    if (error) throw new Error(`auth (listar usuários): ${error.message}`);
+    for (const u of data.users) {
+      if (u.email) mapa.set(u.email.toLowerCase(), u.id);
+    }
+    if (data.users.length === 0) break;
+  }
+  usuariosPorEmail = mapa;
+  return mapa;
+}
+
+async function garantirUsuario(email: string, fullName: string): Promise<string> {
+  if (DRY_RUN) {
+    console.log(`  [dry-run] auth.users: ${email} (cria se não existir)`);
+    return `dry-run-user-${email}`;
+  }
+  const usuarios = await carregarUsuarios();
+  const existente = usuarios.get(email);
+  if (existente) return existente;
+
+  const { data, error } = await db().auth.admin.createUser({
+    email,
     password: SEED_PASSWORD,
     email_confirm: true,
-    user_metadata: { full_name: "Admin Demo" },
+    user_metadata: { full_name: fullName },
   });
-  if (error) throw new Error(`Falha ao criar admin user: ${error.message}`);
+  if (error || !data.user) {
+    throw new Error(
+      `auth (criar ${email}): ${error?.message ?? "resposta sem usuário"}`,
+    );
+  }
+  usuarios.set(email, data.user.id);
+  usuariosCriados.push(email);
   return data.user.id;
 }
 
 async function seedProfilesAndUsers(): Promise<string> {
-  console.log("\n📋 profiles + user_roles");
-  const adminId = await getOrCreateUserId();
+  console.log("\n📋 profiles + user_roles + user_levels");
+  // Reaproveita o admin@loggiflow se já existir; senão cria um admin fake.
+  // Buscar por email evita anexar o perfil admin ao primeiro usuário da lista
+  // (que pode ser um usuário comum em re-execuções do seed).
+  const adminId = await garantirUsuario("admin@loggiflow.com.br", "Admin Demo");
 
-  const { error: profileErr } = await supabase.from("profiles").upsert(
+  const profiles: Row[] = [
     {
       id: adminId,
       email: "admin@loggiflow.com.br",
       full_name: "Admin Demo",
       cargo: "Administrador",
-      avatar_url: null,
     },
-    { onConflict: "id" },
-  );
-  if (profileErr && /no unique/i.test(profileErr.message)) {
-    // Sem unique: insert direto
-    await supabase.from("profiles").insert({
-      id: adminId,
-      email: "admin@loggiflow.com.br",
-      full_name: "Admin Demo",
-      cargo: "Administrador",
-      avatar_url: null,
-    });
-  } else if (profileErr) {
-    console.warn("  profiles upsert:", profileErr.message);
-  }
-
-  const { error: roleErr } = await supabase
-    .from("user_roles")
-    .upsert(
-      { user_id: adminId, role: "admin" },
-      { onConflict: "user_id,role" },
-    );
-  if (roleErr && /no unique/i.test(roleErr.message)) {
-    await supabase
-      .from("user_roles")
-      .insert({ user_id: adminId, role: "admin" });
-  } else if (roleErr) {
-    console.warn("  user_roles upsert:", roleErr.message);
-  }
+  ];
+  const roles: Row[] = [{ user_id: adminId, role: "admin" }];
+  const levels: Row[] = [];
 
   // Cria 3 usuários adicionais para popular user_levels/achievements
   for (let i = 0; i < 3; i++) {
     const email = `user${i + 1}@loggiflow.com.br`;
-    const { data: existing } = await supabase.auth.admin.listUsers();
-    const found = existing?.users.find((u) => u.email === email);
-    let userId: string;
-    if (found) {
-      userId = found.id;
-    } else {
-      const { data } = await supabase.auth.admin.createUser({
-        email,
-        password: SEED_PASSWORD,
-        email_confirm: true,
-        user_metadata: { full_name: REAL_NAMES[i] },
-      });
-      userId = data.user!.id;
-    }
-    await supabase.from("profiles").upsert(
-      {
-        id: userId,
-        email,
-        full_name: REAL_NAMES[i],
-        cargo: "Operador",
-      },
-      { onConflict: "id" },
-    );
-    await supabase
-      .from("user_roles")
-      .upsert(
-        { user_id: userId, role: "user" },
-        { onConflict: "user_id,role" },
-      );
-    await supabase.from("user_levels").upsert(
-      {
-        user_id: userId,
-        current_xp: 250 + i * 100,
-        total_xp: 500 + i * 200,
-        level: 2 + i,
-        coins: 150 + i * 50,
-        streak_days: 3 + i,
-      },
-      { onConflict: "user_id" },
-    );
+    const userId = await garantirUsuario(email, REAL_NAMES[i]);
+    profiles.push({
+      id: userId,
+      email,
+      full_name: REAL_NAMES[i],
+      cargo: "Operador",
+    });
+    roles.push({ user_id: userId, role: "user" });
+    levels.push({
+      user_id: userId,
+      current_xp: 250 + i * 100,
+      total_xp: 500 + i * 200,
+      level: 2 + i,
+      coins: 150 + i * 50,
+      streak_days: 3 + i,
+    });
   }
+
+  await upsertRows("profiles", "id", profiles);
+  await upsertRows("user_roles", "user_id,role", roles);
+  await upsertRows("user_levels", "user_id", levels);
 
   return adminId;
-}
-
-async function upsertByCnpj(
-  table: string,
-  rows: Array<Record<string, any> & { cnpj: string }>,
-): Promise<string[]> {
-  // Tenta upsert por cnpj; se a tabela não tiver unique em cnpj,
-  // faz fallback para insert com deduplicação client-side.
-  const { data, error } = await supabase
-    .from(table)
-    .upsert(rows, { onConflict: "cnpj", ignoreDuplicates: false })
-    .select("id");
-
-  if (error && /no unique or exclusion constraint/i.test(error.message)) {
-    const { data: existing } = await supabase
-      .from(table)
-      .select("id, cnpj")
-      .in(
-        "cnpj",
-        rows.map((r) => r.cnpj),
-      );
-    const existingCnpjs = new Set(existing?.map((e) => e.cnpj) ?? []);
-    const fresh = rows.filter((r) => !existingCnpjs.has(r.cnpj));
-    if (fresh.length === 0) return existing?.map((e) => e.id) ?? [];
-    const { data: inserted, error: insErr } = await supabase
-      .from(table)
-      .insert(fresh)
-      .select("id");
-    if (insErr) throw insErr;
-    return inserted?.map((r) => r.id) ?? [];
-  }
-  if (error) throw error;
-  return data?.map((r) => r.id) ?? [];
-}
-
-async function upsertByField(
-  table: string,
-  field: string,
-  rows: Array<Record<string, any>>,
-): Promise<void> {
-  const { error } = await supabase
-    .from(table)
-    .upsert(rows, { onConflict: field, ignoreDuplicates: false });
-  if (error && /no unique or exclusion constraint/i.test(error.message)) {
-    // Sem constraint: faz insert simples
-    const { error: insErr } = await supabase.from(table).insert(rows);
-    if (insErr && !/duplicate key/i.test(insErr.message)) throw insErr;
-    return;
-  }
-  if (error) throw error;
 }
 
 async function seedClientes(): Promise<string[]> {
@@ -305,7 +421,7 @@ async function seedClientes(): Promise<string[]> {
     return {
       razao_social: razao,
       nome_fantasia: COMPANY_FANTASIAS[i],
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(1, i + 1),
       contato_nome: pick(REAL_NAMES),
       contato_email: `contato@${COMPANY_FANTASIAS[i].toLowerCase().replace(/\s+/g, "")}.com.br`,
       contato_telefone: fakePhone(),
@@ -316,7 +432,7 @@ async function seedClientes(): Promise<string[]> {
       horario_entrega: "08:00 - 18:00",
     };
   });
-  return await upsertByCnpj("clientes", rows);
+  return await inserirFaltantes("clientes", ["cnpj"], rows);
 }
 
 async function seedFornecedores(): Promise<string[]> {
@@ -326,7 +442,7 @@ async function seedFornecedores(): Promise<string[]> {
     return {
       razao_social: razao,
       nome_fantasia: `${COMPANY_FANTASIAS[(i + 4) % 12]} Supply`,
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(2, i + 1),
       contato_nome: pick(REAL_NAMES),
       contato_email: `compras@${COMPANY_FANTASIAS[(i + 4) % 12].toLowerCase()}.com.br`,
       contato_telefone: fakePhone(),
@@ -336,7 +452,7 @@ async function seedFornecedores(): Promise<string[]> {
       cep: `${20000 + i * 1000}-${200 + i * 10}`,
     };
   });
-  return await upsertByCnpj("fornecedores", rows);
+  return await inserirFaltantes("fornecedores", ["cnpj"], rows);
 }
 
 async function seedTransportadoras(): Promise<string[]> {
@@ -345,7 +461,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Transportes Rápido Sul",
       nome_fantasia: "Rápido Sul",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 1),
       email_comercial: "contato@rapidosul.com.br",
       contato_comercial: "(11) 99999-0001",
       prazo_medio_dias: 3,
@@ -353,7 +469,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Expresso Nacional",
       nome_fantasia: "Expresso Nacional",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 2),
       email_comercial: "vendas@expressonacional.com.br",
       contato_comercial: "(21) 99999-0002",
       prazo_medio_dias: 2,
@@ -361,7 +477,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Loggi Própria",
       nome_fantasia: "Loggi",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 3),
       email_comercial: "operacoes@loggi.com",
       contato_comercial: "(11) 99999-0003",
       prazo_medio_dias: 4,
@@ -369,7 +485,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "TransCargo Brasil",
       nome_fantasia: "TransCargo",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 4),
       email_comercial: "contato@transcargo.com.br",
       contato_comercial: "(31) 99999-0004",
       prazo_medio_dias: 3,
@@ -377,7 +493,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Veloz Express",
       nome_fantasia: "Veloz Express",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 5),
       email_comercial: "vendas@velozexpress.com.br",
       contato_comercial: "(41) 99999-0005",
       prazo_medio_dias: 1,
@@ -385,7 +501,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Atlas Cargas",
       nome_fantasia: "Atlas",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 6),
       email_comercial: "contato@atlaslog.com.br",
       contato_comercial: "(51) 99999-0006",
       prazo_medio_dias: 5,
@@ -393,7 +509,7 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Polar Log",
       nome_fantasia: "Polar Log",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 7),
       email_comercial: "operacional@polarlog.com.br",
       contato_comercial: "(61) 99999-0007",
       prazo_medio_dias: 3,
@@ -401,35 +517,13 @@ async function seedTransportadoras(): Promise<string[]> {
     {
       razao_social: "Rota Certa",
       nome_fantasia: "Rota Certa",
-      cnpj: fakeCNPJ(),
+      cnpj: fakeCNPJ(3, 8),
       email_comercial: "contato@rotacerta.com.br",
       contato_comercial: "(71) 99999-0008",
       prazo_medio_dias: 4,
     },
   ];
-  const ids: string[] = [];
-  for (const t of transportadoras) {
-    const { data, error } = await supabase
-      .from("transportadoras")
-      .upsert(t, { onConflict: "cnpj" })
-      .select("id")
-      .single();
-    if (error && /no unique or exclusion constraint/i.test(error.message)) {
-      // Sem unique: insert direto (pode duplicar se rodar 2×)
-      const { data: ins, error: insErr } = await supabase
-        .from("transportadoras")
-        .insert(t)
-        .select("id")
-        .single();
-      if (insErr) throw insErr;
-      ids.push(ins.id);
-    } else if (error) {
-      throw error;
-    } else {
-      ids.push(data.id);
-    }
-  }
-  return ids;
+  return await inserirFaltantes("transportadoras", ["cnpj"], transportadoras);
 }
 
 async function seedColetas(fornecedorIds: string[]): Promise<string[]> {
@@ -444,7 +538,7 @@ async function seedColetas(fornecedorIds: string[]): Promise<string[]> {
     "finalizada",
   ] as const;
   const rows = Array.from({ length: 12 }, (_, i) => ({
-    numero_coleta: `COL-${Date.now()}-${i}`.slice(-12),
+    numero_coleta: `SEED-COL-${String(i + 1).padStart(3, "0")}`,
     fornecedor_id: fornecedorIds[i % fornecedorIds.length],
     data_prevista_coleta: DAYS_AGO((i % 7) - 2),
     endereco_coleta: `Av. Principal, ${100 + i * 10}, São Paulo, SP`,
@@ -453,12 +547,7 @@ async function seedColetas(fornecedorIds: string[]): Promise<string[]> {
     peso_estimado_kg: 5 + i * 2.5,
     observacoes: i % 3 === 0 ? "Carga frágil" : null,
   }));
-  const { data, error } = await supabase
-    .from("coletas")
-    .insert(rows)
-    .select("id");
-  if (error) throw error;
-  return data?.map((r) => r.id) ?? [];
+  return await inserirFaltantes("coletas", ["numero_coleta"], rows);
 }
 
 async function seedEntregas(
@@ -467,10 +556,10 @@ async function seedEntregas(
 ): Promise<string[]> {
   console.log("\n📋 entregas");
   const rows = Array.from({ length: 15 }, (_, i) => ({
-    numero_entrega: `ENT-${Date.now()}-${i}`.slice(-12),
+    numero_entrega: `SEED-ENT-${String(i + 1).padStart(3, "0")}`,
     cliente_id: clienteIds[i % clienteIds.length],
     transportadora_id: transportadoraIds[i % transportadoraIds.length],
-    codigo_rastreamento: `BR${Date.now()}${i}`.slice(-13),
+    codigo_rastreamento: `BRSEED${String(i + 1).padStart(7, "0")}`,
     status: STATUS_ENVIO[i % STATUS_ENVIO.length],
     data_despacho: DAYS_AGO(i % 14),
     previsao_entrega: DAYS_AHEAD((i % 7) + 1),
@@ -478,12 +567,7 @@ async function seedEntregas(
     endereco_entrega: `Rua ${pick(REAL_NAMES).split(" ")[1]}, ${50 + i * 7}, São Paulo, SP`,
     valor_frete: 25 + i * 8.5,
   }));
-  const { data, error } = await supabase
-    .from("entregas")
-    .insert(rows)
-    .select("id");
-  if (error) throw error;
-  return data?.map((r) => r.id) ?? [];
+  return await inserirFaltantes("entregas", ["numero_entrega"], rows);
 }
 
 async function seedOcorrencias(entregaIds: string[]): Promise<void> {
@@ -493,8 +577,8 @@ async function seedOcorrencias(entregaIds: string[]): Promise<void> {
     "atraso",
     "extravio",
     "endereco_incorreto",
-    "destinatario_ausente",
-    "reentrega",
+    "ausente",
+    "recusa",
   ] as const;
   const rows = entregaIds.slice(0, 8).map((entregaId, i) => ({
     entrega_id: entregaId,
@@ -503,8 +587,7 @@ async function seedOcorrencias(entregaIds: string[]): Promise<void> {
     resolvida: i % 3 === 0,
     acao_tomada: i % 3 === 0 ? "Ação corretiva tomada" : null,
   }));
-  const { error } = await supabase.from("ocorrencias").insert(rows);
-  if (error) console.warn("  ocorrencias:", error.message);
+  await inserirFaltantes("ocorrencias", ["entrega_id", "tipo_ocorrencia"], rows);
 }
 
 async function seedCotacoes(
@@ -519,8 +602,11 @@ async function seedCotacoes(
     prazo_dias: 1 + (i % 5),
     observacoes: i % 2 === 0 ? "Frete competitivo" : null,
   }));
-  const { error } = await supabase.from("cotacoes_frete").insert(rows);
-  if (error) console.warn("  cotacoes_frete:", error.message);
+  await inserirFaltantes(
+    "cotacoes_frete",
+    ["entrega_id", "transportadora_id"],
+    rows,
+  );
 }
 
 async function seedAchievementsAndRewards(): Promise<void> {
@@ -623,7 +709,7 @@ async function seedAchievementsAndRewards(): Promise<void> {
       requirement_value: 25,
     },
   ];
-  await upsertByField("achievements", "code", achievements);
+  await inserirFaltantes("achievements", ["code"], achievements);
 
   const rewards = [
     {
@@ -687,7 +773,7 @@ async function seedAchievementsAndRewards(): Promise<void> {
       rarity: "epic",
     },
   ];
-  await upsertByField("reward_items", "name", rewards);
+  await inserirFaltantes("reward_items", ["name"], rewards);
 }
 
 async function seedConciliacoes(userId: string): Promise<void> {
@@ -718,8 +804,7 @@ async function seedConciliacoes(userId: string): Promise<void> {
     diferenca_total: i * 20,
     created_by: userId,
   }));
-  const { error } = await supabase.from("conciliacoes").insert(rows);
-  if (error) console.warn("  conciliacoes:", error.message);
+  await inserirFaltantes("conciliacoes", ["nome"], rows);
 }
 
 async function seedNotifications(userId: string): Promise<void> {
@@ -761,79 +846,87 @@ async function seedNotifications(userId: string): Promise<void> {
       read: false,
     },
   ];
-  const { error } = await supabase.from("notifications").insert(rows);
-  if (error) console.warn("  notifications:", error.message);
+  await inserirFaltantes("notifications", ["user_id", "title"], rows);
 }
 
 async function seedOcorrenciasCatalog(): Promise<void> {
   console.log("\n📋 ip_access_rules + geo_blocking_rules");
-  const { error: ipErr } = await supabase
-    .from("ip_access_rules")
-    .upsert(
+  await inserirFaltantes(
+    "ip_access_rules",
+    ["ip_pattern", "rule_type"],
+    [
       {
         rule_type: "blacklist",
         ip_pattern: "0.0.0.0",
         is_active: false,
-        descricao: "Placeholder",
+        description: "Placeholder",
       },
-      { onConflict: "ip_pattern,rule_type" },
-    );
-  if (ipErr && /no unique or exclusion constraint/i.test(ipErr.message)) {
-    // Sem unique: insert direto (pode duplicar se rodar 2×)
-    await supabase.from("ip_access_rules").insert({
-      rule_type: "blacklist",
-      ip_pattern: "0.0.0.0",
-      is_active: false,
-      descricao: "Placeholder",
-    });
-  } else if (ipErr) {
-    console.warn("  ip_access_rules:", ipErr.message);
-  }
-
-  const { error: geoErr } = await supabase
-    .from("geo_blocking_rules")
-    .upsert(
-      { country_code: "BR", is_active: false },
-      { onConflict: "country_code" },
-    );
-  if (geoErr && /no unique or exclusion constraint/i.test(geoErr.message)) {
-    await supabase.from("geo_blocking_rules").insert({
-      country_code: "BR",
-      is_active: false,
-    });
-  } else if (geoErr) {
-    console.warn("  geo_blocking_rules:", geoErr.message);
-  }
+    ],
+  );
+  await inserirFaltantes(
+    "geo_blocking_rules",
+    ["country_code"],
+    [
+      {
+        country_code: "BR",
+        country_name: "Brasil",
+        rule_type: "block",
+        is_active: false,
+        description: "Placeholder",
+      },
+    ],
+  );
 }
 
 async function seedAuditAndLogs(userId: string): Promise<void> {
   console.log("\n📋 audit_logs + system_heartbeat");
-  await supabase.from("audit_logs").insert(
+  const acoes = ["INSERT", "UPDATE", "DELETE"] as const;
+  await inserirFaltantes(
+    "audit_logs",
+    ["record_id", "table_name"],
     Array.from({ length: 5 }, (_, i) => ({
       user_id: userId,
-      action: pick(["login", "create", "update", "delete"] as const),
-      resource: "clientes",
-      resource_id: null,
-      details: { source: "seed" },
+      action: acoes[i % acoes.length],
+      table_name: "clientes",
+      record_id: `seed-${i + 1}`,
+      new_data: { source: "seed" },
     })),
   );
-  await supabase.from("system_heartbeat").upsert(
-    {
-      component: "api",
-      status: "healthy",
-      last_heartbeat: NOW(),
-      metadata: { version: "1.0.0", env: "dev" },
-    },
-    { onConflict: "component" },
+  await inserirFaltantes(
+    "system_heartbeat",
+    ["service_name"],
+    [
+      {
+        service_name: "api",
+        status: "operational",
+        last_check: NOW(),
+        version: "1.0.0",
+        metadata: { env: "dev" },
+      },
+    ],
+    "service_name",
   );
 }
 
 // --- Orquestração -----------------------------------------------------------
 
+// A chave nunca vai para o log, nem embutida em mensagem de erro de terceiros.
+function semSegredo(texto: string): string {
+  let limpo = texto;
+  for (const segredo of [SERVICE_ROLE_KEY, process.env.SEED_PASSWORD ?? ""]) {
+    if (segredo) limpo = limpo.split(segredo).join("***");
+  }
+  return limpo;
+}
+
 async function main() {
-  console.log("🚀 Iniciando seed do banco Loggi Flow…\n");
-  console.log(`📡 URL: ${SUPABASE_URL}`);
-  console.log(`🔑 Service role key: ${SERVICE_ROLE_KEY.slice(0, 12)}…\n`);
+  console.log(
+    DRY_RUN
+      ? "🧪 Dry-run do seed do banco Loggi Flow — nenhuma requisição será feita.\n"
+      : "🚀 Iniciando seed do banco Loggi Flow…\n",
+  );
+  console.log(`📡 URL: ${SUPABASE_URL || "(SUPABASE_URL não definida)"}`);
+  if (EH_PRODUCAO) console.log("⚠️  Alvo: PRODUÇÃO");
 
   try {
     const userId = await seedProfilesAndUsers();
@@ -847,26 +940,40 @@ async function main() {
     await seedAchievementsAndRewards();
     await seedConciliacoes(userId);
     await seedNotifications(userId);
-    await seedOcorrenciasCatalog();
     await seedAuditAndLogs(userId);
+    // Por último: o vocabulário de geo_blocking_rules.rule_type não está em nenhuma
+    // migration do repo; se o banco recusar, o restante já entrou.
+    await seedOcorrenciasCatalog();
 
-    console.log("\n✅ Seed concluído com sucesso!");
-    console.log("\n📊 Resumo:");
-    console.log("   - profiles: 4 usuários");
-    console.log("   - clientes: 10");
-    console.log("   - fornecedores: 10");
-    console.log("   - transportadoras: 8");
-    console.log("   - coletas: 12");
-    console.log("   - entregas: 15");
-    console.log("   - ocorrencias: 8");
-    console.log("   - cotacoes_frete: 10");
-    console.log("   - achievements: 8");
-    console.log("   - reward_items: 6");
-    console.log("   - conciliacoes: 8");
-    console.log("   - notifications: 5");
-    console.log(`\n🔐 Login admin: admin@loggiflow.com.br / ${SEED_PASSWORD}`);
-  } catch (err: any) {
-    console.error("\n❌ Erro durante seed:", err.message);
+    console.log(
+      DRY_RUN
+        ? "\n🧪 Dry-run concluído: nada foi gravado."
+        : "\n✅ Seed concluído com sucesso!",
+    );
+    console.log(DRY_RUN ? "\n📊 Plano:" : "\n📊 Resumo:");
+    for (const [tabela, r] of resumo) {
+      console.log(
+        DRY_RUN
+          ? `   - ${tabela}: ${r.novos}`
+          : `   - ${tabela}: ${r.novos} novo(s), ${r.existentes} já existia(m)`,
+      );
+    }
+    if (DRY_RUN) return;
+    if (usuariosCriados.includes("admin@loggiflow.com.br")) {
+      const senha =
+        SEED_PASSWORD === SENHA_PADRAO ? SENHA_PADRAO : "(valor de SEED_PASSWORD)";
+      console.log(`\n🔐 Login admin: admin@loggiflow.com.br / ${senha}`);
+    } else {
+      console.log(
+        "\n🔐 Login admin: admin@loggiflow.com.br (já existia — senha não alterada)",
+      );
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("\n❌ Erro durante seed:", semSegredo(msg));
+    console.error(
+      "   Nada é desfeito: o que entrou antes do erro continua no banco. Corrija e reexecute.",
+    );
     process.exit(1);
   }
 }
