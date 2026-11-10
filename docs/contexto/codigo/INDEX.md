@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `44ea285e1efc085a1382038ea0b4e1490196bc81` (2026-11-08T16:57:25-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `9c2edff8cc7f7f1a716030273948753d1a9247f5` (2026-11-10T07:22:00-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (776), SQL (253), Markdown (66), JSON (16), JavaScript (12), YAML (9), Python (5), Shell (3)
+- linguagens: TypeScript (776), SQL (257), Markdown (80), JavaScript (72), JSON (23), YAML (18), Python (8), Shell (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -24,7 +24,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - testes: vitest, playwright
 - ui: tailwind, radix/shadcn
 - estado: react-query
-- gerenciador_pacotes: bun
+- gerenciador_pacotes: npm
 - node: n/d
 - python: n/d
 - deploy: n/d
@@ -34,37 +34,37 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1157 |
-| arquivos_codigo | 792 |
-| linhas_codigo | 139587 |
+| arquivos_total | 1260 |
+| arquivos_codigo | 855 |
+| linhas_codigo | 158800 |
 | rotas | 61 |
-| rotas_http_backend | 12 |
+| rotas_http_backend | 0 |
 | vistas_por_id | 0 |
 | itens_menu | 77 |
 | modulos | 74 |
 | componentes | 380 |
-| hooks | 176 |
+| hooks | 175 |
 | edge_functions | 43 |
-| tabelas | 147 |
+| tabelas | 144 |
 | migrations | 244 |
 | cron_jobs | 28 |
-| testes | 39 |
-| workflows | 6 |
-| scripts | 23 |
-| docs_md | 66 |
+| testes | 120 |
+| workflows | 14 |
+| scripts | 56 |
+| docs_md | 80 |
 
 ## Onde ficam as coisas
 - telas: src/pages (61)
 - componentes: src/components (256), src/pages (77), src/features (41)
 - hooks: src/hooks (119), src/features (41), src/components (14)
 - servicos_logica: src/lib (26), src/utils (6), src/services (5)
-- testes: co-localizado (*.test) (24), tests/ (11), outro (4)
+- testes: co-localizado (*.test) (67), outro (42), tests/ (11)
 - edge_functions: supabase/functions
 - migrations: supabase/migrations
-- scripts: scripts/audit (5), scripts/ops (3), scripts/regras_negocio (3)
-- docs: docs (26), (raiz) (8), .github (1)
-- nomenclatura: {"componentes":"PascalCase (86%)","hooks":"use + PascalCase","servicos":"camelCase (93%)","edge_functions":"kebab-case (98%)","tabelas":"snake_case (88%)"}
-- instruções para agentes no repo: AGENTS.md
+- scripts: scripts/db-audit (15), scripts/ci (10), scripts/audit (5)
+- docs: docs (26), (raiz) (9), .github (1)
+- nomenclatura: {"componentes":"PascalCase (86%)","hooks":"use + PascalCase","servicos":"camelCase (93%)","edge_functions":"kebab-case (98%)","tabelas":"snake_case (89%)"}
+- instruções para agentes no repo: AGENTS.md, CLAUDE.md
 
 ## Módulos (menu → domínio)
 | módulo | itens de menu | telas/rotas | arquivos | hooks locais | edges | tabelas |
@@ -95,7 +95,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | lib | 0 | 0 | 11 | 0 | 0 | 0 |
 | lib/predictions | 0 | 0 | 6 | 0 | 0 | 0 |
 | lib/rodonaves | 0 | 0 | 8 | 0 | 0 | 0 |
-| pages | 75 | 59 | 59 | 125 | 30 | 82 |
+| pages | 75 | 59 | 59 | 125 | 30 | 81 |
 | pages/admin | 1 | 2 | 2 | 67 | 3 | 20 |
 | pages/auth | 0 | 0 | 5 | 2 | 3 | 1 |
 | utils | 0 | 0 | 6 | 0 | 1 | 3 |
@@ -112,7 +112,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `/api-docs` [tela] → src/pages/APIDocumentation.tsx (protegida)
 - `/aprovacao-reset-senha` [tela] → src/pages/AprovacaoResetSenha.tsx (protegida)
 - `/audit-trail` [tela] → src/pages/AuditTrail.tsx (protegida)
-- `/auth` [tela] → src/pages/Auth.tsx (protegida)
+- `/auth` [tela] → src/pages/Auth.tsx
 - `/automacao-regras` [tela] → src/pages/AutomacaoRegras.tsx (protegida)
 - `/bitrix24` [tela] → src/pages/IntegracaoBitrix.tsx (protegida)
 - `/calendario` [tela] → src/pages/CalendarioLogistico.tsx (protegida)
@@ -164,18 +164,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `/webhooks` [tela] → src/pages/GestaoWebhooks.tsx (protegida)
 
 ## Rotas HTTP de backend
-- `GET /{t}` → scripts/ai-context/cenarios.mjs
-- `GET /a` → scripts/ai-context/cenarios.mjs
-- `GET /a` → scripts/ai-context/cenarios.mjs
-- `POST /b` → scripts/ai-context/cenarios.mjs
-- `POST /b` → scripts/ai-context/cenarios.mjs
-- `DELETE /c` → scripts/ai-context/cenarios.mjs
-- `PUT /d` → scripts/ai-context/cenarios.mjs
-- `GET /items` → scripts/ai-context/gerar.unit.mjs
-- `GET /u` → scripts/ai-context/cenarios.mjs
-- `GET /users` → scripts/ai-context/cenarios.mjs
-- `POST /users/:id` → scripts/ai-context/cenarios.mjs
-- `GET /x` → scripts/ai-context/cenarios.mjs
+- (nenhum)
 
 ## Vistas por id (menu/ViewRouter → arquivo)
 - (nenhum)
@@ -211,7 +200,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `nexus-auto-healing` — tabelas: coletas, entregas, system_heartbeat, system_integrity_logs; chamada por 1 arquivo(s) do front
 - `nexus-webhook-receiver` (verify_jwt=false) — tabelas: cotacoes_multicanal, transportadoras; chamada por 1 arquivo(s) do front
 - `normalize-freight-response` — tabelas: cotacoes_multicanal, transportadoras, user_notification_preferences; chamada por 2 arquivo(s) do front
-- `ocr-receipt-processor` — tabelas: delivery_receipt_audit, documents, entregas; chamada por 1 arquivo(s) do front
+- `ocr-receipt-processor` — tabelas: delivery_receipt_audit, entregas; chamada por 1 arquivo(s) do front
 - `predict-delays` — tabelas: ai_delay_predictions, coletas, delay_predictions_history, entregas, ocorrencias, user_notification_preferences; chamada por 1 arquivo(s) do front, por SQL/cron
 - `predict-delays-scheduled` (verify_jwt=false) — tabelas: delay_predictions_history, notifications, user_roles; chamada por 0 arquivo(s) do front, por SQL/cron
 - `resend-email` (verify_jwt=false) — tabelas: -; chamada por 0 arquivo(s) do front
@@ -250,22 +239,22 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `refresh-dashboard-views-5m` */5 * * * * (20260901000000_cron_jobs_canonical.sql)
 - `reindex-hot-indexes-weekly` 0 5 * * 0 (20260901000000_cron_jobs_canonical.sql)
 - `rte-gateway-health-check` */15 * * * * → edge rodonaves-api (20260901000000_cron_jobs_canonical.sql)
-- `rte-gateway-health-purge` 20 3 * * * → edge db-regression-monitor (20260901000000_cron_jobs_canonical.sql)
-- `rte-slo-daily-rollup` 20 0 * * * → edge db-regression-monitor (20260901000000_cron_jobs_canonical.sql)
+- `rte-gateway-health-purge` 20 3 * * * (20260901000000_cron_jobs_canonical.sql)
+- `rte-slo-daily-rollup` 20 0 * * * (20260901000000_cron_jobs_canonical.sql)
 - `snapshot-query-baseline-daily` 30 4 * * * (20260901000000_cron_jobs_canonical.sql)
 - `system-heartbeat-1m` * * * * * (20260901000000_cron_jobs_canonical.sql)
 
 ## Integrações externas
 - SDKs: Sentry, Supabase, Upstash, i18next, react-query, zod
-- hosts mais citados: api.resend.com, jvfhclubfpxrtrrazrgr.supabase.co, api.ipify.org, viacep.com.br, wa.me, api.mapbox.com, generativelanguage.googleapis.com, rest.lalamove.com, x.supabase.co, 01wapi.rte.com.br, api.a-ticket.com.br, api.loggi-flow.com, api.openai.com, api.openweathermap.org, api.pwnedpasswords.com
+- hosts mais citados: api.resend.com, api.ipify.org, viacep.com.br, wa.me, api.mapbox.com, generativelanguage.googleapis.com, rest.lalamove.com, 01wapi.rte.com.br, api.a-ticket.com.br, api.loggi-flow.com, api.openai.com, api.openweathermap.org, api.pwnedpasswords.com, api.transportadora.com, bitrix24.com
 - webhooks recebidos: carrier-webhook-receiver, evolution-whatsapp, health, health-check, lalamove-webhook, log-security-event, melhor-envio-api, nexus-webhook-receiver, predict-delays-scheduled, resend-email, rodonaves-webhook, webhook-status
 - env de integração (só nomes): ATICKET_API_KEY, BITRIX24_WEBHOOK_URL, EVOLUTION_API_KEY, EVOLUTION_API_URL, GOOGLE_API_KEY, INTERNAL_FN_SECRET, LALAMOVE_API_KEY, LALAMOVE_API_SECRET, MAPBOX_PUBLIC_TOKEN, MELHOR_ENVIO_TOKEN, NEXUS_WEBHOOK_SECRET, OPENAI_API_KEY, OPENWEATHER_API_KEY, RESEND_API_KEY, SECURITY_SLACK_WEBHOOK_URL, UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL, VITE_BITRIX24_WEBHOOK, VITE_GOOGLE_MAPS_API_KEY, VITE_MAPBOX_TOKEN, VITE_N8N_WEBHOOK_URL, VITE_SENTRY_DSN
 
 ## Permissões / papéis
-- papéis no código: admin (8), alert (5), user (5), navigation (3), service_role (3), system (3), authenticated (2), group (2), presentation (2), region (2), CEO (1), Coordenadora (1), agent (1), assistant (1), link (1), main (1), separator (1), status (1), sup (1)
+- papéis no código: admin (5), user (4), service_role (3), system (3), authenticated (2), CEO (1), Coordenadora (1), assistant (1)
 - enums de papel: app_role: admin|user
-- guards: src/components/auth/ProtectedRoute.tsx · rotas protegidas: 58 · públicas: /*, /rastrear, /reset-password
-- feature flags: FEATURE_X, nova-tela, novo-inbox
+- guards: src/components/auth/ProtectedRoute.tsx · rotas protegidas: 57 · públicas: /*, /auth, /rastrear, /reset-password
+- feature flags: nenhuma
 
 ## Alertas (baseline.json → alertas)
 - rotas_sem_arquivo: 0
@@ -274,46 +263,54 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - edges_orfas: 4 — ex.: get-weather-data, ingest-biosync, lgpd-erase-user
 - edges_chamadas_sem_pasta: 0
 - tabelas_sem_rls: 12 — ex.: audit_logs_y2026m01, audit_logs_y2026m02, audit_logs_y2026m03
-- tabelas_usadas_sem_definicao: 3 — ex.: avatars, documents, integracoes_bitrix
+- tabelas_usadas_sem_definicao: 1 — ex.: integracoes_bitrix
 - tabelas_com_drift_migration_vs_types: 5 — ex.: business_rules_config, feature_flags, freight_integration_mappings
 - rpcs_sem_definicao: 0
 - componentes_orfaos: 2 — ex.: src/components/common/TiltCard.tsx, src/components/gamification/GamificationPanel.tsx
 - componentes_com_nome_duplicado: 8 — ex.: ConfirmProvider, DeleteButton, InlineConfirm
-- scripts_orfaos: 5 — ex.: scripts/audit/content_hash.sql, scripts/audit/manifest_detail.sql, scripts/audit/manifest_summary.sql
+- scripts_orfaos: 0
 - env_usadas_nao_declaradas: 4 — ex.: DEV, MODE, NODE_ENV
 - ciclos_de_import: 3
-- possiveis_segredos_no_codigo: 4 — ex.: scripts/ai-context/cenarios.mjs:102, src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:7
+- possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 6810 nós · 17610 arestas · 644 comunidades · grafo do commit `44ea285e`
-- comunidades maiores: lucide-react (190), db-observability/index.ts (166), react (152), input.tsx (146), date-fns (120), client.ts (107), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), snapshot.py (102), ui/index.ts (98), cn (90), gerar.mjs (81), rodonaves-api/index.ts (80)
-- símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), playNote() (src/utils/celebrationSounds.ts), useFilters() (src/hooks/common/useFilters.ts), usePagination() (src/hooks/common/usePagination.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), excluded_sql() (scripts/supabase_snapshot/snapshot.py), useToast() (src/hooks/ui/use-toast.ts)
+- 7825 nós · 19729 arestas · 692 comunidades · grafo do commit `9c2edff8`
+- comunidades maiores: input.tsx (176), lucide-react (164), @tanstack/react-query (149), db-observability/index.ts (144), react (128), Coletas.tsx (116), date-fns (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (98), ui/index.ts (92), client.ts (89), MainLayout (87)
+- símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
 - package-lock.json (40)
-- package.json (38)
+- package.json (39)
+- index.html (9)
 - src/hooks/gamification/useGamification.ts (9)
-- index.html (8)
-- supabase/config.toml (5)
+- AGENTS.md (5)
+- scripts/validate-csp.mjs (5)
+- .github/workflows/ci.yml (4)
 - ESTADO_ATUAL.md (4)
 - ESTADO_ATUAL_EVIDENCIAS.md (4)
-- scripts/validate-csp.mjs (4)
-- src/components/gamification/GamificationPanel.tsx (4)
-- supabase/functions/ai-logistics-assistant/index.ts (4)
-- tests/security/integrations-access.spec.ts (4)
-- tests/security/rls-access.spec.ts (4)
-- .github/dependabot.yml (3)
-- .github/workflows/ci-nexus.yml (3)
-- .github/workflows/ci.yml (3)
+- scripts/audit/manifest_detail.sql (4)
+- scripts/check-warning-budget.mjs (4)
+- scripts/generate-quality-report.mjs (4)
+- scripts/origem_remediacao_2026-08-31.sql (4)
+- scripts/ratchet-warning-budget.mjs (4)
+- scripts/seed-database.ts (4)
 
 ## Workflows
+- `auto-update-pr-branch.yml` — Auto Update PR Branches (push, schedule, workflow_dispatch, workflow_run; cron 7,37 * * * *)
+- `branch-hygiene-audit.yml` — Branch Hygiene Audit (schedule, workflow_dispatch; cron 56 7 * * 1)
 - `ci-nexus.yml` — CI Quality Gate Nexus (pull_request, push)
 - `ci.yml` — CI/CD Pipeline (pull_request, push)
-- `contexto.yml` — Contexto para agentes de IA (10 min) (push, schedule, workflow_dispatch; cron 7-59/10 * * * *)
+- `codeql.yml` — CodeQL (schedule, workflow_dispatch; cron 30 9 * * *)
+- `contexto-ia.yml` — Contexto para agentes de IA (10 min) (push, schedule, workflow_dispatch; cron 7-59/10 * * * *)
 - `deploy-functions.yml` — Deploy Edge Functions (workflow_dispatch)
 - `e2e.yml` — E2E (manual) (workflow_dispatch)
+- `inventario-estado-semanal.yml` — Inventário do estado real (semanal) (schedule, workflow_dispatch; cron 23 10 * * 1)
+- `notifica-falha-main.yml` — Notifica falha na main (workflow_run)
+- `scripts-tests.yml` — Scripts Tests (pull_request, push, workflow_dispatch)
 - `security.yml` — Security Scan (pull_request, push, schedule; cron 0 0 * * 0)
+- `settings-guard.yml` — Settings Guard (schedule, workflow_dispatch; cron 15 7 * * *)
+- `types-sync.yml` — types-sync (push, schedule, workflow_dispatch; cron 49 5 * * 1)
 
 ## Scripts npm
 - `dev`: `vite`
@@ -328,6 +325,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `lint:budget`: `node scripts/check-warning-budget.mjs`
 - `lint:budget:ratchet`: `node scripts/ratchet-warning-budget.mjs`
 - `quality:report`: `node scripts/generate-quality-report.mjs`
+- `graph:setup`: `bash scripts/graphify/setup.sh`
+- `graph:update`: `graphify update .`
 - `preview`: `vite preview`
 - `test`: `vitest`
 - `test:ui`: `vitest --ui`
@@ -343,8 +342,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 
 ## Documentos (raiz e docs/)
 - `.github/pull_request_template.md` — Resumo (10 linhas)
-- `AGENTS.md` — AGENTS.md — Loggi_Flow_V2 (71 linhas)
+- `AGENTS.md` — AGENTS.md — Loggi Flow V2 (129 linhas)
 - `CHANGELOG.md` — Changelog (118 linhas)
+- `CLAUDE.md` (2 linhas)
 - `CONTRIBUTING.md` — Contribuindo para o Loggi-Flow (42 linhas)
 - `DOCUMENTATION.md` — 📋 Documentação Técnica - Loggi-Flow (740 linhas)
 - `ESTADO_ATUAL.md` — ESTADO ATUAL DO SISTEMA — LogiFlow / loggi-flow-v2 (523 linhas)
@@ -377,25 +377,25 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `docs/SLO.md` — 📈 Service Level Objectives (SLOs) — LogiFlow (40 linhas)
 - `docs/SOFT_DELETE_POLICY.md` — Política de Soft Delete — LogiFlow (30 linhas)
 - `docs/SRE_HANDBOOK.md` — 🚒 LOGIFLOW SRE & ON-CALL HANDBOOK (24 linhas)
-- subpastas de docs/: docs/adr (20), docs/audit (2), docs/contexto (2), docs/agentes (1), docs/data (1)
+- subpastas de docs/: docs/adr (20), docs/agentes (7), docs/audit (2), docs/contexto (2), docs/data (1)
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-10 `9c2edff8` fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)
+- 2026-11-10 `f2dc8925` fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)
+- 2026-11-09 `6de3c961` feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)
+- 2026-11-08 `28c0f7e3` feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi
+- 2026-11-08 `b0a699a4` fix(ci): renomeia contexto.yml → contexto-ia.yml para forçar novo registro (#115)
+- 2026-11-08 `4b14063a` docs(agentes): atualiza contagem de required checks para 9 (#113)
+- 2026-11-08 `10d5df3a` feat(ci): porta 7 workflows autônomos genéricos do Zapp (#112)
+- 2026-11-08 `b74bb21c` chore: padrão de instruções para agentes (#110)
+- 2026-11-08 `ab4852bc` fix(ci): adiciona --force no push da branch contexto (#111)
+- 2026-11-08 `d6a824f7` fix(index): remover div oculto com textos de prompt internos
 - 2026-11-08 `44ea285e` chore(contexto): automação de contexto para agentes de IA (branch `contexto`) (#104)
 - 2026-11-08 `b43d84b2` fix(deps): destrava a CI do repo — lockfile, tipos Recharts 3, ruleset do React Compiler e 4 CVEs (#108)
 - 2026-11-08 `17bd3887` fix: endurece manifest_detail e manifest_data com padrao idempotente (#103)
 - 2026-11-08 `770cfae2` delete x
 - 2026-11-08 `8464b793` delete x
-- 2026-11-08 `96258876` delete x
-- 2026-11-08 `716282ce` delete x
-- 2026-11-08 `a4585991` delete x
-- 2026-11-08 `cb4dd0ff` delete x
-- 2026-11-08 `d62cc113` delete x
-- 2026-11-08 `1ada5785` delete x
-- 2026-11-08 `3d9375cd` delete x
-- 2026-11-08 `aa987630` delete x
-- 2026-11-08 `45ecb658` delete x
-- 2026-11-08 `b6f67642` delete x
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

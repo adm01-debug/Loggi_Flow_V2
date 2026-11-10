@@ -4,13 +4,13 @@
  "stack": {
   "linguagens": [
    "TypeScript (776)",
-   "SQL (253)",
-   "Markdown (66)",
-   "JSON (16)",
-   "JavaScript (12)",
-   "YAML (9)",
-   "Python (5)",
-   "Shell (3)"
+   "SQL (257)",
+   "Markdown (80)",
+   "JavaScript (72)",
+   "JSON (23)",
+   "YAML (18)",
+   "Python (8)",
+   "Shell (8)"
   ],
   "linguagem_principal": "TypeScript",
   "framework": "React",
@@ -29,7 +29,7 @@
   "estado": [
    "react-query"
   ],
-  "gerenciador_pacotes": "bun",
+  "gerenciador_pacotes": "npm",
   "node": null,
   "python": null,
   "deploy": [],
@@ -47,6 +47,8 @@
    "build:dev": "vite build --mode development",
    "check-circular": "madge --circular src",
    "dev": "vite",
+   "graph:setup": "bash scripts/graphify/setup.sh",
+   "graph:update": "graphify update .",
    "lint": "eslint .",
    "lint:budget": "node scripts/check-warning-budget.mjs",
    "lint:budget:ratchet": "node scripts/ratchet-warning-budget.mjs",
@@ -122,6 +124,67 @@
  ],
  "workflows": [
   {
+   "arquivo": ".github/workflows/auto-update-pr-branch.yml",
+   "nome": "Auto Update PR Branches",
+   "gatilhos": [
+    "push",
+    "schedule",
+    "workflow_dispatch",
+    "workflow_run"
+   ],
+   "crons": [
+    "7,37 * * * *"
+   ],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "update-behind-branches"
+   ],
+   "permissoes": [],
+   "scripts_usados": [
+    "scripts/ci/fila-merge.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "GITHUB_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/branch-hygiene-audit.yml",
+   "nome": "Branch Hygiene Audit",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "56 7 * * 1"
+   ],
+   "branches": [],
+   "jobs": [
+    "audit"
+   ],
+   "permissoes": [
+    "contents: read",
+    "pull-requests: read"
+   ],
+   "scripts_usados": [
+    "scripts/ci/actions-kpi.mjs",
+    "scripts/ci/branch-podaveis.mjs",
+    "scripts/ci/bump-toolchain.mjs",
+    "scripts/ci/sla-code-scanning.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout"
+   ]
+  },
+  {
    "arquivo": ".github/workflows/ci-nexus.yml",
    "nome": "CI Quality Gate Nexus",
    "gatilhos": [
@@ -177,14 +240,16 @@
     "typecheck",
     "warning-budget",
     "test",
+    "agents-docs",
     "build"
    ],
    "permissoes": [
     "contents: read",
-    "pull-requests: read # gitleaks lê os commits do PR (repo privado exige permissão explícita)"
+    "pull-requests: read"
    ],
    "scripts_usados": [
-    "scripts/audit-gate.mjs"
+    "scripts/audit-gate.mjs",
+    "scripts/ci/check-claude-md-integrity.mjs"
    ],
    "npm_scripts": [
     "build",
@@ -204,7 +269,34 @@
    ]
   },
   {
-   "arquivo": ".github/workflows/contexto.yml",
+   "arquivo": ".github/workflows/codeql.yml",
+   "nome": "CodeQL",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "30 9 * * *"
+   ],
+   "branches": [],
+   "jobs": [
+    "analyze",
+    "analyze-actions"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout",
+    "github/codeql-action/analyze",
+    "github/codeql-action/init"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/contexto-ia.yml",
    "nome": "Contexto para agentes de IA (10 min)",
    "gatilhos": [
     "push",
@@ -229,8 +321,11 @@
    ],
    "scripts_usados": [
     "scripts/ai-context/gerar.mjs",
+    "scripts/ai-context/gerar.unit.mjs",
     "scripts/regras_negocio/generate.py",
     "scripts/regras_negocio/indice.py",
+    "scripts/supabase_snapshot/README.md",
+    "scripts/supabase_snapshot/requirements.txt",
     "scripts/supabase_snapshot/snapshot.py"
    ],
    "npm_scripts": [],
@@ -294,6 +389,95 @@
    ]
   },
   {
+   "arquivo": ".github/workflows/inventario-estado-semanal.yml",
+   "nome": "Inventário do estado real (semanal)",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "23 10 * * 1"
+   ],
+   "branches": [],
+   "jobs": [
+    "gerar"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/inventario/gerar-banco.mjs",
+    "scripts/inventario/gerar-repo.mjs",
+    "scripts/inventario/gerar-rotas.mjs",
+    "scripts/inventario/mudou-conteudo.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "SUPABASE_ACCESS_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/github-script",
+    "actions/setup-node",
+    "actions/upload-artifact",
+    "peter-evans/create-pull-request"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/notifica-falha-main.yml",
+   "nome": "Notifica falha na main",
+   "gatilhos": [
+    "workflow_run"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "notificar"
+   ],
+   "permissoes": [],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/github-script"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/scripts-tests.yml",
+   "nome": "Scripts Tests",
+   "gatilhos": [
+    "pull_request",
+    "push",
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "testes"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/regras_negocio/test_generate.py",
+    "scripts/regras_negocio/test_indice.py",
+    "scripts/regras_negocio/test_publish.py",
+    "scripts/supabase_snapshot/requirements.txt",
+    "scripts/supabase_snapshot/test_snapshot.py",
+    "scripts/supabase_snapshot/test_snapshot_postgres.py"
+   ],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node"
+   ]
+  },
+  {
    "arquivo": ".github/workflows/security.yml",
    "nome": "Security Scan",
    "gatilhos": [
@@ -313,7 +497,7 @@
    ],
    "permissoes": [
     "contents: read",
-    "pull-requests: read # gitleaks lê os commits do PR (repo privado exige permissão explícita)"
+    "pull-requests: read"
    ],
    "scripts_usados": [
     "scripts/audit-gate.mjs"
@@ -325,6 +509,95 @@
    "actions": [
     "actions/checkout",
     "gitleaks/gitleaks-action"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/settings-guard.yml",
+   "nome": "Settings Guard",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "15 7 * * *"
+   ],
+   "branches": [],
+   "jobs": [
+    "guard"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/ci/github-settings-guard.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "GITHUB_TOKEN",
+    "SETTINGS_GUARD_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node",
+    "actions/upload-artifact"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/types-sync.yml",
+   "nome": "types-sync",
+   "gatilhos": [
+    "push",
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "49 5 * * 1"
+   ],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "preflight",
+    "ler-banco",
+    "gates-e-pr"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/ci/install-pgbouncer.sh",
+    "scripts/ci/install-postgresql-client.sh",
+    "scripts/ci/typecheck-ratchet.mjs",
+    "scripts/db-audit/catalog.sql",
+    "scripts/db-audit/check-catalog-fresh.mjs",
+    "scripts/db-audit/check-grants-fresh.mjs",
+    "scripts/db-audit/check-manifest-fresh.mjs",
+    "scripts/db-audit/check-remocoes-destrutivas.mjs",
+    "scripts/db-audit/database-identity.json",
+    "scripts/db-audit/database-identity.mjs",
+    "scripts/db-audit/gen-types.sh",
+    "scripts/db-audit/grants-baseline.json",
+    "scripts/db-audit/grants-baseline.sql",
+    "scripts/db-audit/known-violations.json",
+    "scripts/db-audit/lote-pendente.mjs",
+    "scripts/db-audit/manifest.sql",
+    "scripts/db-audit/psql-environment.mjs",
+    "scripts/db-audit/supabase-usage-guard.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL",
+    "GITHUB_TOKEN",
+    "TYPES_SYNC_PR_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/download-artifact",
+    "actions/github-script",
+    "actions/setup-node",
+    "actions/upload-artifact",
+    "peter-evans/create-pull-request",
+    "supabase/setup-cli"
    ]
   }
  ],
@@ -344,13 +617,18 @@
   },
   {
    "arquivo": "AGENTS.md",
-   "titulo": "AGENTS.md — Loggi_Flow_V2",
-   "linhas": 71
+   "titulo": "AGENTS.md — Loggi Flow V2",
+   "linhas": 129
   },
   {
    "arquivo": "CHANGELOG.md",
    "titulo": "Changelog",
    "linhas": 118
+  },
+  {
+   "arquivo": "CLAUDE.md",
+   "titulo": null,
+   "linhas": 2
   },
   {
    "arquivo": "CONTRIBUTING.md",
@@ -519,16 +797,16 @@
    "arquivos_md": 20
   },
   {
+   "pasta": "docs/agentes",
+   "arquivos_md": 7
+  },
+  {
    "pasta": "docs/audit",
    "arquivos_md": 2
   },
   {
    "pasta": "docs/contexto",
    "arquivos_md": 2
-  },
-  {
-   "pasta": "docs/agentes",
-   "arquivos_md": 1
   },
   {
    "pasta": "docs/data",
@@ -597,9 +875,7 @@
    "SUPABASE_SERVICE_ROLE_KEY",
    "SUPABASE_URL",
    "UPSTASH_REDIS_REST_TOKEN",
-   "UPSTASH_REDIS_REST_URL",
-   "VITE_SUPABASE_PUBLISHABLE_KEY",
-   "VITE_SUPABASE_URL"
+   "UPSTASH_REDIS_REST_URL"
   ],
   "usadas_no_python": [
    "AI_CONTEXT_INDEX",
@@ -609,12 +885,14 @@
    "ANTHROPIC_API_KEY",
    "CODE_SCAN_DIRS",
    "GEN_TYPES",
+   "PATH",
    "PGDUMP",
    "PGDUMP_SCHEMAS",
    "REPO_ROOT",
    "SNAPSHOT_DIR",
    "SNAPSHOT_EXCLUDE_SCHEMAS",
    "SNAPSHOT_INCLUDE_SCHEMAS",
+   "SNAPSHOT_TEST_PG_URL",
    "SUPABASE_ACCESS_TOKEN",
    "SUPABASE_DB_URL",
    "SUPABASE_PROJECT_REF",
@@ -627,9 +905,12 @@
    "VITE_SUPABASE_ANON_KEY"
   ],
   "secrets_em_workflows": [
+   "DESTINO_URL",
    "GITHUB_TOKEN",
+   "SETTINGS_GUARD_TOKEN",
    "SUPABASE_ACCESS_TOKEN",
-   "SUPABASE_DB_URL"
+   "SUPABASE_DB_URL",
+   "TYPES_SYNC_PR_TOKEN"
   ]
  },
  "deploy": {
@@ -679,11 +960,7 @@
   "hosts_externos": [
    {
     "host": "api.resend.com",
-    "arquivos": 6
-   },
-   {
-    "host": "jvfhclubfpxrtrrazrgr.supabase.co",
-    "arquivos": 4
+    "arquivos": 5
    },
    {
     "host": "api.ipify.org",
@@ -707,10 +984,6 @@
    },
    {
     "host": "rest.lalamove.com",
-    "arquivos": 2
-   },
-   {
-    "host": "x.supabase.co",
     "arquivos": 2
    },
    {
@@ -742,10 +1015,6 @@
     "arquivos": 1
    },
    {
-    "host": "api.x.com",
-    "arquivos": 1
-   },
-   {
     "host": "bitrix24.com",
     "arquivos": 1
    },
@@ -759,14 +1028,6 @@
    },
    {
     "host": "dne-apigateway.rte.com.br",
-    "arquivos": 1
-   },
-   {
-    "host": "fonts.googleapis.com",
-    "arquivos": 1
-   },
-   {
-    "host": "fonts.gstatic.com",
     "arquivos": 1
    },
    {
@@ -811,10 +1072,6 @@
    },
    {
     "host": "seu-servidor.com",
-    "arquivos": 1
-   },
-   {
-    "host": "test.com",
     "arquivos": 1
    },
    {
@@ -886,19 +1143,11 @@
   "papeis_no_codigo": [
    {
     "papel": "admin",
-    "ocorrencias": 8
-   },
-   {
-    "papel": "alert",
     "ocorrencias": 5
    },
    {
     "papel": "user",
-    "ocorrencias": 5
-   },
-   {
-    "papel": "navigation",
-    "ocorrencias": 3
+    "ocorrencias": 4
    },
    {
     "papel": "service_role",
@@ -913,18 +1162,6 @@
     "ocorrencias": 2
    },
    {
-    "papel": "group",
-    "ocorrencias": 2
-   },
-   {
-    "papel": "presentation",
-    "ocorrencias": 2
-   },
-   {
-    "papel": "region",
-    "ocorrencias": 2
-   },
-   {
     "papel": "CEO",
     "ocorrencias": 1
    },
@@ -933,31 +1170,7 @@
     "ocorrencias": 1
    },
    {
-    "papel": "agent",
-    "ocorrencias": 1
-   },
-   {
     "papel": "assistant",
-    "ocorrencias": 1
-   },
-   {
-    "papel": "link",
-    "ocorrencias": 1
-   },
-   {
-    "papel": "main",
-    "ocorrencias": 1
-   },
-   {
-    "papel": "separator",
-    "ocorrencias": 1
-   },
-   {
-    "papel": "status",
-    "ocorrencias": 1
-   },
-   {
-    "papel": "sup",
     "ocorrencias": 1
    }
   ],
@@ -971,15 +1184,15 @@
    }
   ],
   "rpcs_de_autorizacao": [
-   "get_seq_scan_hotspots",
    "get_user_permissions"
   ],
   "guards": [
    "src/components/auth/ProtectedRoute.tsx"
   ],
-  "rotas_protegidas": 58,
+  "rotas_protegidas": 57,
   "rotas_publicas": [
    "/*",
+   "/auth",
    "/rastrear",
    "/reset-password"
   ],
@@ -1000,21 +1213,8 @@
   ]
  },
  "feature_flags": {
-  "total": 3,
-  "flags": [
-   {
-    "flag": "FEATURE_X",
-    "arquivos": 1
-   },
-   {
-    "flag": "nova-tela",
-    "arquivos": 1
-   },
-   {
-    "flag": "novo-inbox",
-    "arquivos": 1
-   }
-  ],
+  "total": 0,
+  "flags": [],
   "tabelas_de_flag": [
    "feature_flags",
    "geo_blocking_settings",

@@ -3,7 +3,7 @@
  "format_version": 2,
  "resumo": {
   "urls": 61,
-  "rotas_http_backend": 12,
+  "rotas_http_backend": 0,
   "vistas_por_id": 0,
   "itens_menu": 77,
   "lazy": 74
@@ -189,8 +189,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 124
@@ -335,8 +333,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 81
@@ -564,10 +560,7 @@
    "flags": [],
    "papeis": [
     "admin",
-    "alert",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 163
@@ -684,8 +677,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 81
@@ -804,8 +795,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 93
@@ -934,8 +923,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 91
@@ -1061,8 +1048,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 86
@@ -1181,8 +1166,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
@@ -1301,8 +1284,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
@@ -1441,14 +1422,12 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 97
   },
   {
-   "protegida": true,
+   "protegida": false,
    "wrappers": [],
    "pai": null,
    "indice": false,
@@ -1495,8 +1474,7 @@
    "papeis": [
     "CEO",
     "Coordenadora",
-    "admin",
-    "alert"
+    "admin"
    ],
    "arquivos_puxados": 23
   },
@@ -1615,8 +1593,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
@@ -1736,8 +1712,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 80
@@ -1856,8 +1830,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 81
@@ -1985,10 +1957,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "group",
-    "main",
-    "navigation",
-    "region",
     "user"
    ],
    "arquivos_puxados": 88
@@ -2115,12 +2083,7 @@
    "flags": [],
    "papeis": [
     "admin",
-    "alert",
     "assistant",
-    "group",
-    "main",
-    "navigation",
-    "region",
     "user"
    ],
    "arquivos_puxados": 101
@@ -2253,10 +2216,7 @@
    "flags": [],
    "papeis": [
     "admin",
-    "alert",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 98
@@ -2580,8 +2540,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 179
@@ -2699,8 +2657,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 83
@@ -2821,8 +2777,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
@@ -3146,8 +3100,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 176
@@ -3270,8 +3222,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 87
@@ -3605,8 +3555,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 206
@@ -3943,10 +3891,7 @@
    "flags": [],
    "papeis": [
     "admin",
-    "alert",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 209
@@ -4069,8 +4014,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
@@ -4398,10 +4341,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "group",
-    "main",
-    "navigation",
-    "region",
     "user"
    ],
    "arquivos_puxados": 178
@@ -4524,8 +4463,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 85
@@ -4620,7 +4557,6 @@
     "clientes",
     "coletas",
     "delivery_receipt_audit",
-    "documents",
     "entregas",
     "error_events",
     "fornecedores",
@@ -4656,8 +4592,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 93
@@ -4793,8 +4727,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 105
@@ -4966,10 +4898,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "group",
-    "main",
-    "navigation",
-    "region",
     "user"
    ],
    "arquivos_puxados": 94
@@ -5097,10 +5025,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "group",
-    "main",
-    "navigation",
-    "region",
     "user"
    ],
    "arquivos_puxados": 97
@@ -5217,8 +5141,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 81
@@ -5351,8 +5273,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 93
@@ -5484,10 +5404,7 @@
    "flags": [],
    "papeis": [
     "admin",
-    "alert",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 104
@@ -5603,10 +5520,7 @@
    "flags": [],
    "papeis": [
     "admin",
-    "alert",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 86
@@ -5940,8 +5854,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 200
@@ -6032,7 +5944,6 @@
     "clientes",
     "coletas",
     "delivery_receipt_audit",
-    "documents",
     "entregas",
     "error_events",
     "fornecedores",
@@ -6067,8 +5978,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 83
@@ -6394,8 +6303,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 174
@@ -6522,8 +6429,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 89
@@ -6662,8 +6567,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 88
@@ -6800,8 +6703,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 117
@@ -6928,8 +6829,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 90
@@ -7062,8 +6961,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 97
@@ -7180,8 +7077,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 82
@@ -7263,8 +7158,7 @@
    "canais_realtime": [],
    "flags": [],
    "papeis": [
-    "admin",
-    "alert"
+    "admin"
    ],
    "arquivos_puxados": 45
   },
@@ -7384,8 +7278,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 82
@@ -7512,8 +7404,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 89
@@ -7639,8 +7529,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 82
@@ -7774,8 +7662,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 88
@@ -7930,8 +7816,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
@@ -8048,10 +7932,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "group",
-    "main",
-    "navigation",
-    "region",
     "user"
    ],
    "arquivos_puxados": 81
@@ -8189,8 +8069,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 87
@@ -8343,8 +8221,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 88
@@ -8486,9 +8362,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
-    "separator",
     "user"
    ],
    "arquivos_puxados": 106
@@ -8613,8 +8486,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
@@ -8743,8 +8614,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 98
@@ -8866,311 +8735,12 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "arquivos_puxados": 84
   }
  ],
- "rotas_http_backend": [
-  {
-   "metodo": "GET",
-   "caminho": "/{t}",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "GET",
-   "caminho": "/a",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "GET",
-   "caminho": "/a",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "POST",
-   "caminho": "/b",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "POST",
-   "caminho": "/b",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "DELETE",
-   "caminho": "/c",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "PUT",
-   "caminho": "/d",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "GET",
-   "caminho": "/items",
-   "arquivo": "scripts/ai-context/gerar.unit.mjs",
-   "tabelas": [
-    "contacts",
-    "dashboard_table",
-    "emails",
-    "fixture_table",
-    "ghost_table",
-    "payments",
-    "runtime_table",
-    "tools_runtime"
-   ],
-   "env": [
-    "DB_URL",
-    "RESEND_API_KEY",
-    "VITE_ANON",
-    "VITE_SUPABASE_URL"
-   ]
-  },
-  {
-   "metodo": "GET",
-   "caminho": "/u",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "GET",
-   "caminho": "/users",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "POST",
-   "caminho": "/users/:id",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  },
-  {
-   "metodo": "GET",
-   "caminho": "/x",
-   "arquivo": "scripts/ai-context/cenarios.mjs",
-   "tabelas": [
-    "a",
-    "fantasma",
-    "so_teste",
-    "t",
-    "t1",
-    "tx"
-   ],
-   "env": [
-    "A",
-    "K",
-    "NODE_ENV",
-    "SCRIPT_ONLY",
-    "SRK",
-    "SUPABASE_URL",
-    "VITE_A",
-    "VITE_C",
-    "VITE_FEATURE_X",
-    "X"
-   ]
-  }
- ],
+ "rotas_http_backend": [],
  "vistas": [],
  "menu": [
   {

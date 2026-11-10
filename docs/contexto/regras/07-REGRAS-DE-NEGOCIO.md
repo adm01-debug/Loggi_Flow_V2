@@ -1,29 +1,23 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `44ea285e1e` · branch `main` · 2026-11-08 19:58 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `9c2edff8cc` · branch `main` · 2026-11-10 10:22 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
 
 _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para `manual/regras.md` e preencha._
 
-## B. Quem pode ver/alterar o quê (RLS — conforme migrations do repo; schema real em `06`)
+## B. Quem pode ver/alterar o quê (RLS — conforme migrations do repo; schema real em `docs/contexto/supabase/` (snapshot do banco real))
 
 | Tabela | Política | Comando | Roles | Modo | USING | WITH CHECK |
 |---|---|---|---|---|---|---|
 | `rank_badges` | Allow public read for authenticated | SELECT | authenticated | permissive | `true` |  |
 | `task_gifts` | Allow public read for authenticated | SELECT | authenticated | permissive | `true` |  |
 | `user_achievements` | Users can view their own achievements | SELECT | authenticated | permissive | `auth.uid() = user_id` |  |
-| `saved_filters` | Users can view own filters | SELECT | public | permissive | `auth.uid() = user_id` |  |
-| `saved_filters` | Users can insert own filters | INSERT | public | permissive |  | `auth.uid() = user_id` |
-| `saved_filters` | Users can update own filters | UPDATE | public | permissive | `auth.uid() = user_id` | `auth.uid() = user_id` |
-| `saved_filters` | Users can delete own filters | DELETE | public | permissive | `auth.uid() = user_id` |  |
-| `entity_versions` | Users can insert versions | INSERT | public | permissive |  | `auth.uid() = changed_by OR changed_by IS NULL` |
 | `profiles` | Users can view their own profile | SELECT | public | permissive | `auth.uid() = id` |  |
 | `profiles` | Users can update their own profile | UPDATE | public | permissive | `auth.uid() = id` |  |
 | `profiles` | Admins can view all profiles | SELECT | public | permissive | `public.has_role(auth.uid(), 'admin')` |  |
 | `user_roles` | Users can view their own roles | SELECT | public | permissive | `auth.uid() = user_id` |  |
-| `audit_logs_old` | Admins can view all audit logs | SELECT | public | permissive | `public.has_role(auth.uid(), 'admin')` |  |
 | `user_levels` | Users can view their own level | SELECT | public | permissive | `auth.uid() = user_id` |  |
 | `achievements` | Admins can manage achievements | ALL | public | permissive | `has_role(auth.uid(), 'admin')` |  |
 | `user_achievements` | Users can view their achievements | SELECT | public | permissive | `auth.uid() = user_id` |  |
@@ -59,11 +53,6 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `reward_purchases` | Usuários podem criar compras | INSERT | public | permissive |  | `auth.uid() = user_id` |
 | `reward_purchases` | Admins podem ver todas compras | SELECT | public | permissive | `has_role(auth.uid(), 'admin'::app_role)` |  |
 | `reward_purchases` | Admins podem atualizar compras | UPDATE | public | permissive | `has_role(auth.uid(), 'admin'::app_role)` |  |
-| `saved_filters` | Users can manage own filters | ALL | public | permissive | `auth.uid() = user_id` |  |
-| `entity_versions` | Users can view versions | SELECT | public | permissive | `true` |  |
-| `entity_versions` | Users can create versions | INSERT | public | permissive |  | `auth.uid() = changed_by` |
-| `activity_logs` | Users can view activity logs | SELECT | public | permissive | `true` |  |
-| `activity_logs` | Users can create activity logs | INSERT | public | permissive |  | `auth.uid() = user_id` |
 | `user_onboarding` | Users can view their own onboarding progress | SELECT | public | permissive | `auth.uid() = user_id` |  |
 | `user_onboarding` | Users can insert their own onboarding progress | INSERT | public | permissive |  | `auth.uid() = user_id` |
 | `user_onboarding` | Users can update their own onboarding progress | UPDATE | public | permissive | `auth.uid() = user_id` |  |
@@ -101,24 +90,12 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `reward_redemptions` | Users can view own redemptions | SELECT | public | permissive | `auth.uid() = user_id` |  |
 | `reward_redemptions` | Users can create redemptions | INSERT | public | permissive |  | `auth.uid() = user_id` |
 | `rewards` | Anyone can view rewards | SELECT | public | permissive | `true` |  |
-| `lalamove_orders` | Authenticated users can view lalamove orders | SELECT | public | permissive | `auth.role() = 'authenticated'` |  |
-| `lalamove_orders` | Authenticated users can insert lalamove orders | INSERT | public | permissive |  | `auth.role() = 'authenticated'` |
-| `lalamove_orders` | Authenticated users can update lalamove orders | UPDATE | public | permissive | `auth.role() = 'authenticated'` |  |
-| `lalamove_stops` | Authenticated users can view stops | SELECT | public | permissive | `auth.role() = 'authenticated'` |  |
-| `lalamove_stops` | Authenticated users can manage stops | ALL | public | permissive | `auth.role() = 'authenticated'` |  |
-| `lalamove_status_history` | Authenticated users can view history | SELECT | public | permissive | `auth.role() = 'authenticated'` |  |
-| `lalamove_status_history` | Authenticated users can insert history | INSERT | public | permissive |  | `auth.role() = 'authenticated'` |
-| `n8n_workflows` | Authenticated users can view workflows | SELECT | public | permissive | `auth.role() = 'authenticated'` |  |
-| `n8n_workflows` | Admins can manage workflows | ALL | public | permissive | `auth.jwt() ->> 'role' = 'admin'` |  |
-| `n8n_execution_logs` | Authenticated users can view logs | SELECT | public | permissive | `auth.role() = 'authenticated'` |  |
-| `n8n_execution_logs` | System can insert logs | INSERT | public | permissive |  | `true` |
 | `user_sessions` | Users can view their own sessions | SELECT | authenticated | permissive | `auth.uid() = user_id` |  |
 | `user_sessions` | Admins can view all sessions | SELECT | authenticated | permissive | `public.has_role(auth.uid(), 'admin')` |  |
 | `user_sessions` | Users can insert their own sessions | INSERT | authenticated | permissive |  | `auth.uid() = user_id` |
 | `user_sessions` | Users can update their own sessions | UPDATE | authenticated | permissive | `auth.uid() = user_id` | `auth.uid() = user_id` |
 | `user_sessions` | Users can delete their own sessions | DELETE | authenticated | permissive | `auth.uid() = user_id` |  |
 | `notifications` | Users can create their own notifications | INSERT | authenticated | permissive |  | `auth.uid() = user_id` |
-| `audit_logs_old` | System can insert audit logs | INSERT | service_role | permissive |  | `true` |
 | `security_events` | Users can insert their own security events | INSERT | authenticated | permissive |  | `auth.uid() IS NOT NULL AND (user_id IS NULL OR user_id = auth.uid())` |
 | `entregas` | Admins can delete entregas | DELETE | authenticated | permissive | `has_role(auth.uid(), 'admin')` |  |
 | `clientes` | Admins can delete clientes | DELETE | authenticated | permissive | `has_role(auth.uid(), 'admin')` |  |
@@ -193,6 +170,9 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `storage.objects` | Documents: users can upload own files | INSERT | authenticated | permissive |  | `bucket_id = 'documents' AND (auth.uid())::text = (storage.foldername(name))[1]` |
 | `storage.objects` | Documents: users can update own files | UPDATE | authenticated | permissive | `bucket_id = 'documents' AND (auth.uid())::text = (storage.foldername(name))[1]` |  |
 | `storage.objects` | Documents: users can delete own files | DELETE | authenticated | permissive | `bucket_id = 'documents' AND (auth.uid())::text = (storage.foldername(name))[1]` |  |
+| `user_roles` | Only admins can insert roles | INSERT | authenticated | permissive |  | `public.has_role(auth.uid(), 'admin')` |
+| `user_roles` | Only admins can update roles | UPDATE | authenticated | permissive | `public.has_role(auth.uid(), 'admin')` |  |
+| `user_roles` | Only admins can delete roles | DELETE | authenticated | permissive | `public.has_role(auth.uid(), 'admin')` |  |
 | `query_telemetry` | Users can insert own telemetry | INSERT | authenticated | permissive |  | `user_id = auth.uid() OR user_id IS NULL` |
 | `telemetry_logs` | Admins can view all telemetry logs | SELECT | public | permissive | `EXISTS ( SELECT 1 FROM public.user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role = 'admin' )` |  |
 | `push_subscriptions` | Users can manage their own push subscriptions | ALL | public | permissive | `auth.uid() = user_id` | `auth.uid() = user_id` |
@@ -200,10 +180,6 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `logistica_reversa` | Usuários podem inserir solicitações de logística reversa | INSERT | public | permissive |  | `auth.uid() IS NOT NULL` |
 | `logistica_reversa` | Apenas admins podem atualizar solicitações | UPDATE | public | permissive | `auth.uid() IS NOT NULL` |  |
 | `feature_flags` | Only admins can modify feature flags | ALL | public | permissive | `public.has_role(auth.uid(), 'admin')` |  |
-| `audit_logs_old` | Admin can view all audit logs | SELECT | public | permissive | `EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')` |  |
-| `audit_logs_old` | Users can view their own audit logs | SELECT | public | permissive | `user_id = auth.uid()` |  |
-| `audit_logs_old` | System can insert audit logs | INSERT | public | permissive |  | `true` |
-| `webhook_events_processed` | System can manage webhook events | ALL | public | permissive | `true` | `true` |
 | `error_events` | Users can insert their own errors | INSERT | public | permissive |  | `auth.uid() = user_id` |
 | `error_events` | Admins can view all error events | SELECT | public | permissive | `EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')` |  |
 | `audit_logs` | Allow admins to view audit logs | SELECT | public | permissive | `EXISTS ( SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin' )` |  |
@@ -243,6 +219,7 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `user_achievements` | Strict insert user achievements | INSERT | authenticated | permissive |  | `auth.uid() IS NOT NULL` |
 | `user_levels` | Strict insert user levels | INSERT | authenticated | permissive |  | `auth.uid() IS NOT NULL` |
 | `webhook_deliveries` | Strict insert webhook deliveries | INSERT | authenticated | permissive |  | `auth.uid() IS NOT NULL` |
+| `webhook_events_processed` | Admins can view webhook logs | SELECT | public | permissive | `auth.uid() IN (SELECT id FROM public.profiles WHERE cargo = 'admin')` |  |
 | `ai_delay_predictions` | Users can view AI delay predictions | SELECT | public | permissive | `auth.uid() IS NOT NULL` |  |
 | `ai_delay_predictions` | Admins can manage AI delay predictions | ALL | public | permissive | `EXISTS ( SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin' )` |  |
 | `reward_items` | Authenticated users can view reward items | SELECT | public | permissive | `auth.uid() IS NOT NULL` |  |
@@ -250,7 +227,6 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `freight_selection_rules` | Allow all for authenticated on rules | ALL | public | permissive | `auth.role() = 'authenticated'` |  |
 | `freight_integration_mappings` | Allow all for authenticated on mappings | ALL | public | permissive | `auth.role() = 'authenticated'` |  |
 | `freight_decisions` | Users can view their own freight decisions | SELECT | public | permissive | `auth.uid() = user_id OR auth.role() = 'service_role'` |  |
-| `freight_webhooks` | Enable all for authenticated users on webhooks | ALL | public | permissive | `auth.role() = 'authenticated'` |  |
 | `automation_audit_logs` | Enable all for authenticated users on audit logs | ALL | public | permissive | `auth.role() = 'authenticated'` |  |
 | `user_ranks` | Ranks são visíveis por todos | SELECT | public | permissive | `true` |  |
 | `performance_metrics` | Full access to performance_metrics for authenticated | ALL | public | permissive | `auth.role() = 'authenticated'` |  |
@@ -262,6 +238,9 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `system_integrity_logs` | Admins can manage system logs | ALL | public | permissive | `auth.uid() IN (SELECT id FROM profiles WHERE cargo = 'admin' OR cargo = 'gestor')` |  |
 | `system_heartbeat` | All users can view heartbeat | SELECT | public | permissive | `true` |  |
 | `system_contract_schemas` | Allow authenticated read for schemas | SELECT | authenticated | permissive | `true` |  |
+| `fretes_internos` | Users can view their organization's fretes | SELECT | public | permissive | `organization_id = public.get_current_organization_id()` |  |
+| `fretes_internos` | Users can insert their organization's fretes | INSERT | public | permissive |  | `organization_id = public.get_current_organization_id()` |
+| `audit_logs` | Users can view their organization's audit logs | SELECT | public | permissive | `user_id IN (SELECT id FROM public.profiles WHERE organization_id = public.get_current_organization_id())` |  |
 | `risk_zones` | Users can view risk zones | SELECT | public | permissive | `auth.role() = 'authenticated'` |  |
 | `bio_sync_alert_rules` | Rules are viewable by everyone | SELECT | public | permissive | `true` |  |
 | `organizations` | Admins manage organizations | ALL | authenticated | permissive | `public.has_role(auth.uid(), 'admin')` | `public.has_role(auth.uid(), 'admin')` |
@@ -286,6 +265,7 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `storage.objects` | Users delete own avatar | DELETE | authenticated | permissive | `bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]` |  |
 | `delivery_receipt_audit` | Admins view delivery receipt audit | SELECT | authenticated | permissive | `public.has_role(auth.uid(), 'admin')` |  |
 | `delivery_receipt_audit` | System inserts delivery receipt audit | INSERT | authenticated | permissive |  | `auth.uid() IS NOT NULL` |
+| `db_health_snapshots` | Admins can view db health snapshots | SELECT | authenticated | permissive | `public.has_role(auth.uid(), 'admin'::app_role)` |  |
 | `db_slo_daily` | Admins can view db slo daily | SELECT | authenticated | permissive | `public.has_role(auth.uid(), 'admin'::app_role)` |  |
 | `remediation_actions` | Admins can view remediation actions | SELECT | authenticated | permissive | `public.has_role(auth.uid(), 'admin'::app_role)` |  |
 | `remediation_actions` | Admins can insert remediation actions | INSERT | authenticated | permissive |  | `public.has_role(auth.uid(), 'admin'::app_role)` |
@@ -311,7 +291,27 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `rte_slo_daily_snapshots` | Admins can update slo snapshots | UPDATE | authenticated | permissive | `public.has_role(auth.uid(), 'admin')` | `public.has_role(auth.uid(), 'admin')` |
 | `rte_slo_daily_snapshots` | Admins can delete slo snapshots | DELETE | authenticated | permissive | `public.has_role(auth.uid(), 'admin')` |  |
 | `comments` | Users can create their own comments | INSERT | authenticated | permissive |  | `auth.uid() = user_id` |
-| … +23 linhas — lista completa em `context.json` | | | | | | |
+| `comments` | Users can delete their own comments | DELETE | authenticated | permissive | `auth.uid() = user_id` |  |
+| `comments` | Users can update their own comments | UPDATE | authenticated | permissive | `auth.uid() = user_id` |  |
+| `fretes_internos` | Authenticated users can insert fretes_internos | INSERT | authenticated | permissive |  | `auth.uid() IS NOT NULL` |
+| `fretes_internos` | Authenticated users can view fretes_internos | SELECT | authenticated | permissive | `auth.uid() IS NOT NULL` |  |
+| `notifications` | Users can update their own notifications | UPDATE | public | permissive | `auth.uid() = user_id` |  |
+| `notifications` | Users can view their own notifications | SELECT | public | permissive | `auth.uid() = user_id` |  |
+| `clientes` | Authenticated users can view clientes | SELECT | authenticated | permissive | `true` |  |
+| `coletas` | Authenticated users can view coletas | SELECT | authenticated | permissive | `(auth.uid() IS NOT NULL)` |  |
+| `entregas` | Authenticated users can view entregas | SELECT | authenticated | permissive | `(auth.uid() IS NOT NULL)` |  |
+| `fornecedores` | Authenticated users can view fornecedores | SELECT | authenticated | permissive | `true` |  |
+| `transportadoras` | Authenticated users can view transportadoras | SELECT | authenticated | permissive | `true` |  |
+| `comments` | Users can view all comments | SELECT | authenticated | permissive | `true` |  |
+| `notifications` | Users can delete their own notifications | DELETE | public | permissive | `(auth.uid() = user_id)` |  |
+| `geo_blocking_settings` | Admins can manage geo settings | ALL | public | permissive | `has_role(auth.uid(), 'admin'::app_role)` |  |
+| `geo_blocking_settings` | Admins can view geo settings | SELECT | authenticated | permissive | `has_role(auth.uid(), 'admin'::app_role)` |  |
+| `geo_blocking_rules` | Admins can manage geo blocking rules | ALL | public | permissive | `has_role(auth.uid(), 'admin'::app_role)` |  |
+| `geo_blocking_rules` | Admins can view geo rules | SELECT | authenticated | permissive | `has_role(auth.uid(), 'admin'::app_role)` |  |
+| `scheduled_reports` | Users can create their own scheduled reports | INSERT | public | permissive |  | `(auth.uid() = user_id)` |
+| `scheduled_reports` | Users can delete their own scheduled reports | DELETE | public | permissive | `(auth.uid() = user_id)` |  |
+| `scheduled_reports` | Users can update their own scheduled reports | UPDATE | public | permissive | `(auth.uid() = user_id)` |  |
+| … +5 linhas — lista completa em `context.json` | | | | | | |
 
 ## C. Restrições de dados (obrigatório / único / default / CHECK / FK / calculada)
 
@@ -334,6 +334,10 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `user_achievements` | `achievement_id` | obrigatório; FK → achievements.id ON DELETE CASCADE |
 | `user_achievements` | `unlocked_at` | default now() |
 | `user_achievements` | `(tabela)` | UNIQUE(user_id, achievement_id) |
+| `profiles` | `id` | PK; FK → users.id ON DELETE CASCADE |
+| `profiles` | `created_at` | default now() |
+| `profiles` | `updated_at` | default now() |
+| `profiles` | `organization_id` | FK → organizations.id |
 | `transportadoras` | `id` | PK; default gen_random_uuid() |
 | `transportadoras` | `razao_social` | obrigatório |
 | `transportadoras` | `cnpj` | obrigatório; único |
@@ -349,6 +353,8 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `transportadoras` | `updated_at` | default now() |
 | `transportadoras` | `version` | default 1 |
 | `transportadoras` | `credentials` | default '{}'::jsonb |
+| `transportadoras` | `coverage_details` | default '{}'::jsonb |
+| `transportadoras` | `non_api_config` | default '{}'::jsonb |
 | `fornecedores` | `id` | PK; default gen_random_uuid() |
 | `fornecedores` | `razao_social` | obrigatório |
 | `fornecedores` | `endereco_completo` | obrigatório |
@@ -366,7 +372,14 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `coletas` | `updated_at` | default now() |
 | `coletas` | `version` | default 0 |
 | `coletas` | `is_reverse` | default false |
-| `coletas` | `(tabela)` | constraint fk_coletas_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES public.fornecedores(id) ON DELETE SET NULL, ADD CONSTRAINT fk_coletas_transportadora FOREIGN KEY (transportadora_id) REFERENCES public.transportadoras(id) ON DELETE SET NULL |
+| `coletas` | `is_urgent` | default false |
+| `coletas` | `custo_estimado` | default 0 |
+| `coletas` | `custo_real` | default 0 |
+| `coletas` | `(tabela)` | constraint fk_coletas_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES public.fornecedores(id) ON DELETE SET NULL |
+| `coletas` | `(tabela)` | constraint fk_coletas_transportadora FOREIGN KEY (transportadora_id) REFERENCES public.transportadoras(id) ON DELETE SET NULL |
+| `coletas` | `(tabela)` | constraint fk_coletas_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES public.fornecedores(id) ON DELETE SET NULL |
+| `coletas` | `(tabela)` | constraint fk_coletas_transportadora FOREIGN KEY (transportadora_id) REFERENCES public.transportadoras(id) ON DELETE SET NULL |
+| `coletas` | `(tabela)` | constraint coletas_qtd_volumes_nonneg CHECK (qtd_volumes IS NULL OR qtd_volumes >= 0) NOT VALID |
 | `clientes` | `id` | PK; default gen_random_uuid() |
 | `clientes` | `razao_social` | obrigatório |
 | `clientes` | `endereco_completo` | obrigatório |
@@ -383,8 +396,11 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `entregas` | `updated_at` | default now() |
 | `entregas` | `is_cross_docking` | default false |
 | `entregas` | `version` | default 1 |
+| `entregas` | `tags` | default '{}' |
 | `entregas` | `ocr_data_extraida` | default '{}'::jsonb |
+| `entregas` | `comprovante_audit_info` | default '{}'::jsonb |
 | `entregas` | `weather_risk_score` | default 0 |
+| `entregas` | `(tabela)` | constraint entregas_valor_frete_nonneg CHECK (valor_frete IS NULL OR valor_frete >= 0) NOT VALID |
 | `ocorrencias` | `id` | PK; default gen_random_uuid() |
 | `ocorrencias` | `entrega_id` | FK → entregas.id |
 | `ocorrencias` | `coleta_id` | FK → coletas.id |
@@ -399,9 +415,6 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `cotacoes_frete` | `selecionada` | default FALSE |
 | `cotacoes_frete` | `created_at` | default now() |
 | `cotacoes_frete` | `version` | default 1 |
-| `profiles` | `id` | PK; FK → users.id ON DELETE CASCADE |
-| `profiles` | `created_at` | default now() |
-| `profiles` | `updated_at` | default now() |
 | `user_roles` | `id` | PK; default gen_random_uuid() |
 | `user_roles` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
 | `user_roles` | `role` | default 'user' |
@@ -417,18 +430,24 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `user_levels` | `created_at` | default now() |
 | `user_levels` | `updated_at` | default now() |
 | `user_levels` | `rank_id` | FK → user_ranks.id |
+| `user_levels` | `nexus_score` | default 0 |
+| `user_levels` | `(tabela)` | constraint user_levels_coins_nonneg CHECK (coins >= 0) NOT VALID |
+| `user_levels` | `(tabela)` | constraint user_levels_total_xp_nonneg CHECK (total_xp >= 0) NOT VALID |
+| `user_levels` | `(tabela)` | constraint user_levels_level_min CHECK (level >= 1) NOT VALID |
 | `user_levels` | `(tabela)` | constraint user_levels_nexus_score_check CHECK ((nexus_score >= 0::numeric) AND (nexus_score <= 100::numeric)) |
 | `achievements` | `id` | PK; default gen_random_uuid() |
+| `achievements` | `code` | obrigatório; único |
 | `achievements` | `name` | obrigatório |
-| `achievements` | `icon` | default 'trophy' |
-| `achievements` | `xp_reward` | default 0 |
-| `achievements` | `coins_reward` | default 0 |
+| `achievements` | `description` | obrigatório |
+| `achievements` | `icon` | default 'Trophy' |
+| `achievements` | `category` | default 'general' |
+| `achievements` | `rarity` | default 'common'; CHECK rarity IN ('common', 'rare', 'epic', 'legendary') |
+| `achievements` | `xp_reward` | default 50 |
+| `achievements` | `coins_reward` | default 10 |
 | `achievements` | `requirement_type` | obrigatório |
-| `achievements` | `requirement_value` | obrigatório |
-| `achievements` | `created_at` | default NOW() |
-| `achievements` | `category` | obrigatório |
-| `achievements` | `code` | obrigatório |
-| `achievements` | `rarity` | obrigatório |
+| `achievements` | `requirement_value` | default 1 |
+| `achievements` | `created_at` | default now() |
+| `achievements` | `(tabela)` | constraint achievements_rewards_nonneg CHECK (xp_reward >= 0 AND coins_reward >= 0) NOT VALID |
 | `tabelas_frete` | `id` | PK; default gen_random_uuid() |
 | `tabelas_frete` | `transportadora_id` | obrigatório; FK → transportadoras.id ON DELETE CASCADE |
 | `tabelas_frete` | `regiao_destino` | obrigatório |
@@ -475,11 +494,13 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `fretes_internos` | `xp_reward` | default 50 |
 | `fretes_internos` | `created_at` | default now() |
 | `fretes_internos` | `updated_at` | default now() |
+| `fretes_internos` | `organization_id` | FK → organizations.id |
+| `fretes_internos` | `(tabela)` | constraint fretes_internos_xp_nonneg CHECK (xp_reward IS NULL OR xp_reward >= 0) NOT VALID |
 | `notifications` | `id` | PK; default gen_random_uuid() |
 | `notifications` | `user_id` | obrigatório |
 | `notifications` | `title` | obrigatório |
 | `notifications` | `message` | obrigatório |
-| `notifications` | `type` | obrigatório |
+| `notifications` | `type` | default 'info'::public.notification_type |
 | `notifications` | `read` | default false |
 | `notifications` | `metadata` | default '{}'::jsonb |
 | `notifications` | `created_at` | default now() |
@@ -490,6 +511,7 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `comments` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
 | `comments` | `created_at` | default now() |
 | `comments` | `updated_at` | default now() |
+| `comments` | `(tabela)` | constraint comments_entity_type_check CHECK ((entity_type = ANY (ARRAY['ocorrencia'::text,'coleta'::text,'entrega'::text,'frete_interno'::text]))) |
 | `reward_items` | `id` | PK; default gen_random_uuid() |
 | `reward_items` | `name` | obrigatório |
 | `reward_items` | `description` | obrigatório |
@@ -500,6 +522,7 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `reward_items` | `available` | default true |
 | `reward_items` | `stock` | default NULL |
 | `reward_items` | `created_at` | default now() |
+| `reward_items` | `(tabela)` | constraint reward_items_cost_nonneg CHECK (coins_cost >= 0) NOT VALID |
 | `reward_purchases` | `id` | PK; default gen_random_uuid() |
 | `reward_purchases` | `user_id` | obrigatório |
 | `reward_purchases` | `reward_item_id` | obrigatório; FK → reward_items.id ON DELETE CASCADE |
@@ -507,6 +530,7 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `reward_purchases` | `status` | default 'pending' |
 | `reward_purchases` | `redeemed_at` | default NULL |
 | `reward_purchases` | `created_at` | default now() |
+| `reward_purchases` | `(tabela)` | constraint reward_purchases_coins_nonneg CHECK (coins_spent >= 0) NOT VALID |
 | `conciliacoes` | `id` | PK; default gen_random_uuid() |
 | `conciliacoes` | `tipo` | obrigatório; CHECK tipo IN ('faturas_entregas', 'custos_previstos_realizados', 'pagamentos_notas') |
 | `conciliacoes` | `nome` | obrigatório |
@@ -593,38 +617,12 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `rate_limit_logs` | `ip_address` | obrigatório |
 | `rate_limit_logs` | `endpoint` | obrigatório |
 | `rate_limit_logs` | `user_id` | FK → users.id ON DELETE SET NULL |
-| `rate_limit_logs` | `request_count` | default 1 |
-| `rate_limit_logs` | `blocked` | default false |
-| `rate_limit_logs` | `created_at` | default now() |
-| `rate_limit_logs` | `window_start` | default now() |
-| `user_sessions` | `id` | PK; default gen_random_uuid() |
-| `user_sessions` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
-| `user_sessions` | `is_current` | default false |
-| `user_sessions` | `last_active_at` | default now() |
-| `user_sessions` | `created_at` | default now() |
-| `permissions` | `id` | PK; default gen_random_uuid() |
-| `permissions` | `code` | obrigatório; único |
-| `permissions` | `name` | obrigatório |
-| `permissions` | `module` | obrigatório |
-| `permissions` | `created_at` | default now() |
-| `role_permissions` | `id` | PK; default gen_random_uuid() |
-| `role_permissions` | `role` | obrigatório |
-| `role_permissions` | `permission_id` | obrigatório; FK → permissions.id ON DELETE CASCADE |
-| `role_permissions` | `created_at` | default now() |
-| `role_permissions` | `(tabela)` | UNIQUE(role, permission_id) |
-| `email_verification_tokens` | `id` | PK; default gen_random_uuid() |
-| `email_verification_tokens` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
-| `email_verification_tokens` | `token` | obrigatório; único |
-| `email_verification_tokens` | `expires_at` | obrigatório |
-| `email_verification_tokens` | `created_at` | default now() |
-| … +649 linhas — lista completa em `context.json` | | |
+| … +674 linhas — lista completa em `context.json` | | |
 
 ## D. Automações no banco (triggers e funções — regras que rodam sozinhas)
 
 | Trigger | Quando | Tabela | Executa | Condição |
 |---|---|---|---|---|
-| trigger_saved_filters_updated_at | BEFORE UPDATE | `saved_filters` | `update_saved_filters_updated_at` |  |
-| trigger_single_default_filter | BEFORE INSERT OR UPDATE OF IS_DEFAULT | `saved_filters` | `ensure_single_default_filter` | `NEW.is_default = true` |
 | update_transportadoras_updated_at | BEFORE UPDATE | `transportadoras` | `update_updated_at_column` |  |
 | update_fornecedores_updated_at | BEFORE UPDATE | `fornecedores` | `update_updated_at_column` |  |
 | update_coletas_updated_at | BEFORE UPDATE | `coletas` | `update_updated_at_column` |  |
@@ -660,7 +658,6 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | update_business_rules_updated_at | BEFORE UPDATE | `business_rules` | `update_updated_at_column` |  |
 | update_transportadora_rotas_updated_at | BEFORE UPDATE | `transportadora_rotas` | `update_updated_at_column` |  |
 | update_known_devices_last_seen | BEFORE UPDATE | `known_devices` | `update_device_last_seen` |  |
-| lalamove_orders_updated_at | BEFORE UPDATE | `lalamove_orders` | `update_lalamove_updated_at` |  |
 | trg_audit_transportadoras | AFTER INSERT OR UPDATE OR DELETE | `transportadoras` | `fn_audit_trigger` |  |
 | trg_audit_tabelas_frete | AFTER INSERT OR UPDATE OR DELETE | `tabelas_frete` | `fn_audit_trigger` |  |
 | trg_audit_alertas_custo | AFTER INSERT OR UPDATE OR DELETE | `alertas_custo` | `fn_audit_trigger` |  |
@@ -673,6 +670,8 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | update_logistica_reversa_updated_at | BEFORE UPDATE | `logistica_reversa` | `update_updated_at_column` |  |
 | update_feature_flags_updated_at | BEFORE UPDATE | `feature_flags` | `update_updated_at_column` |  |
 | update_business_rules_updated_at | BEFORE UPDATE | `business_rules_config` | `update_updated_at_column` |  |
+| tr_increment_entregas_version | BEFORE UPDATE | `entregas` | `increment_version_column` |  |
+| tr_increment_coletas_version | BEFORE UPDATE | `coletas` | `increment_version_column` |  |
 | tr_version_entregas | BEFORE UPDATE | `entregas` | `increment_version` |  |
 | tr_version_coletas | BEFORE UPDATE | `coletas` | `increment_version` |  |
 | tr_version_transportadoras | BEFORE UPDATE | `transportadoras` | `increment_version` |  |
@@ -764,24 +763,16 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 
 | Tabela | Coluna | Valores permitidos (enum/CHECK) | Default |
 |---|---|---|---|
-| `fornecedores` | `estado` | **livre (sem enum/CHECK)** |  |
 | `coletas` | `status` | `aguardando_liberacao`, `solicitada`, `em_transito`, `chegou_expedicao`, `conferencia_ok`, `divergencia`, `finalizada` | `aguardando_liberacao` |
-| `clientes` | `estado` | **livre (sem enum/CHECK)** |  |
 | `entregas` | `status` | `aguardando_producao`, `pronto_despacho`, `cotacao_frete`, `nf_emitida`, `despachado`, `em_transito`, `saiu_entrega`, `entregue`, `ocorrencia`, `finalizado` | `aguardando_producao` |
-| `tabelas_frete` | `estado_destino` | **livre (sem enum/CHECK)** |  |
-| `alertas_custo` | `estado_destino` | **livre (sem enum/CHECK)** |  |
 | `fretes_internos` | `status` | `pendente`, `em_transito`, `entregue`, `atrasado`, `cancelado` | `pendente` |
 | `reward_purchases` | `status` | **livre (sem enum/CHECK)** | `pending` |
 | `conciliacoes` | `status` | `arquivada`, `concluida`, `em_andamento`, `rascunho` | `rascunho` |
 | `conciliacao_itens_importados` | `status` | `conciliado`, `divergencia`, `ignorado`, `pendente` | `pendente` |
 | `user_onboarding` | `current_step` | **livre (sem enum/CHECK)** | `0` |
-| `transportadora_rotas` | `origem_estado` | **livre (sem enum/CHECK)** |  |
-| `transportadora_rotas` | `destino_estado` | **livre (sem enum/CHECK)** |  |
 | `password_reset_requests` | `status` | `approved`, `pending`, `rejected` | `pending` |
 | `reward_redemptions` | `status` | **livre (sem enum/CHECK)** | `pending` |
 | `cotacoes_multicanal` | `status` | `expirado`, `pendente`, `respondido`, `selecionado` | `pendente` |
-| `cotacoes_multicanal` | `origem_estado` | **livre (sem enum/CHECK)** |  |
-| `cotacoes_multicanal` | `destino_estado` | **livre (sem enum/CHECK)** |  |
 | `webhook_deliveries` | `response_status` | **livre (sem enum/CHECK)** |  |
 | `logistica_reversa` | `status` | **livre (sem enum/CHECK)** | `pendente` |
 | `architecture_decisions` | `status` | **livre (sem enum/CHECK)** | `accepted` |
@@ -800,24 +791,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `mitigation_actions` | `status` | `cancelada`, `concluida`, `em_execucao`, `planejada` | `planejada` |
 | `rte_gateway_health` | `http_status` | **livre (sem enum/CHECK)** | `0` |
 | `rte_slo_daily_snapshots` | `status` | `atencao`, `ok`, `violado` | `ok` |
-| `rastreamento_historico_y2026m01` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m02` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m03` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m04` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m05` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m06` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m07` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m08` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m09` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m10` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m11` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2026m12` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2027m01` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2027m02` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2027m03` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2027m04` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2027m05` | `order_status` | **livre (sem enum/CHECK)** |  |
-| `rastreamento_historico_y2027m06` | `order_status` | **livre (sem enum/CHECK)** |  |
 
 ### E.2 Mapas de transição declarados no código
 
@@ -1081,6 +1054,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 
 | Nome | Valores | Onde |
 |---|---|---|
+| achievement_tier | `bronze`, `silver`, `gold`, `platinum`, `diamond` | banco |
 | coleta_tipo | `lalamove`, `transportadora` | banco |
 | coleta_status | `aguardando_liberacao`, `solicitada`, `em_transito`, `chegou_expedicao`, `conferencia_ok`, `divergencia`, `finalizada` | banco |
 | entrega_status | `aguardando_producao`, `pronto_despacho`, `cotacao_frete`, `nf_emitida`, `despachado`, `em_transito`, `saiu_entrega`, `entregue`, `ocorrencia`, `finalizado` | banco |
@@ -1286,8 +1260,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 
 | View | SELECT |
 |---|---|
-| `mv_dashboard_metrics` | `SELECT 1 AS singleton, (SELECT count(*) FROM public.coletas) AS total_coletas, (SELECT count(*) FROM public.coletas WHERE status IN ('aguardando_liberacao','solicitada')) AS coletas_pendentes, (SELECT count(*) FROM public.coletas WHERE status = 'em_transito') AS coletas_em_transito, (SELECT count(*) …` |
-| `mv_carrier_performance` | `SELECT t.id AS transportadora_id, t.nome_fantasia, count(e.id) AS total_entregas, count(e.id) FILTER (WHERE e.data_entrega_efetiva <= e.previsao_entrega) AS entregas_no_prazo, CASE WHEN count(e.id) > 0 THEN (count(e.id) FILTER (WHERE e.data_entrega_efetiva <= e.previsao_entrega))::numeric / count(e. …` |
 | `internal.mv_dashboard_metrics` | `SELECT 1 AS singleton, (SELECT count(*) FROM public.coletas) AS total_coletas, (SELECT count(*) FROM public.coletas WHERE status IN ('aguardando_liberacao','solicitada')) AS coletas_pendentes, (SELECT count(*) FROM public.coletas WHERE status = 'em_transito') AS coletas_em_transito, (SELECT count(*) …` |
 | `internal.mv_carrier_performance` | `SELECT t.id AS transportadora_id, t.nome_fantasia, count(e.id) AS total_entregas, count(e.id) FILTER (WHERE e.data_entrega_efetiva <= e.previsao_entrega) AS entregas_no_prazo, CASE WHEN count(e.id) > 0 THEN (count(e.id) FILTER (WHERE e.data_entrega_efetiva <= e.previsao_entrega))::numeric / count(e. …` |
 | `v_prediction_accuracy` | `SELECT date_trunc('day', predicted_at)::date AS dia, risco, COUNT(*) FILTER (WHERE confirmed_at IS NOT NULL) AS total_confirmadas, COUNT(*) FILTER (WHERE was_accurate = true) AS total_acertos, ROUND( (COUNT(*) FILTER (WHERE was_accurate = true)::numeric / NULLIF(COUNT(*) FILTER (WHERE confirmed_at I …` |
@@ -1582,17 +1554,17 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 |---|---|---|
 | `ALL` | `"__all__"` | `src/components/predictions/PredictionAccuracyTimeline.tsx` |
 | `BULK_BATCH_SIZE` | `200` | `src/components/transportadoras/BulkRouteImport.tsx` |
-| `SIDEBAR_COOKIE_MAX_AGE` | `60` | `src/components/ui/sidebar.tsx` |
+| `SIDEBAR_COOKIE_MAX_AGE` | `60 * 60 * 24 * 7` | `src/components/ui/sidebar.tsx` |
 | `SIDEBAR_WIDTH` | `"16rem"` | `src/components/ui/sidebar.tsx` |
 | `SIDEBAR_WIDTH_MOBILE` | `"18rem"` | `src/components/ui/sidebar.tsx` |
 | `SESSION_DURATION_HOURS` | `24` | `src/hooks/auth/useSessionTimeout.ts` |
 | `SESSION_WARNING_MINUTES` | `5` | `src/hooks/auth/useSessionTimeout.ts` |
-| `SESSION_CHECK_INTERVAL_MS` | `60` | `src/hooks/auth/useSessionTimeout.ts` |
+| `SESSION_CHECK_INTERVAL_MS` | `60 * 1000` | `src/hooks/auth/useSessionTimeout.ts` |
 | `MAX_RECENT` | `12` | `src/hooks/common/useNavigationHistory.tsx` |
 | `MAX_CACHE_SIZE` | `50` | `src/hooks/data/useRealtime.tsx` |
 | `TOTAL_BOXES` | `16` | `src/hooks/logistics/useBoxManagement.tsx` |
-| `CACHE_TTL` | `1000` | `src/hooks/logistics/useDelayPrediction.tsx` |
-| `CACHE_TTL` | `1000` | `src/hooks/logistics/useSmartCarrierSelection.tsx` |
+| `CACHE_TTL` | `1000 * 60 * 5` | `src/hooks/logistics/useDelayPrediction.tsx` |
+| `CACHE_TTL` | `1000 * 60 * 10` | `src/hooks/logistics/useSmartCarrierSelection.tsx` |
 | `STOP_THRESHOLD_METERS` | `50` | `src/hooks/logistics/useTrackingAnalytics.tsx` |
 | `STOP_TIME_THRESHOLD_SECONDS` | `120` | `src/hooks/logistics/useTrackingAnalytics.tsx` |
 | `GLOBAL_SLO_GATEWAY` | `"*"` | `src/hooks/rodonaves/useSLOTargets.ts` |
@@ -1602,16 +1574,16 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `MAX_SCENARIOS` | `20` | `src/lib/predictions/whatIfScenarios.ts` |
 | `WHATIF_MAX_CAP` | `25` | `src/lib/predictions/whatIfSimulator.ts` |
 | `DEFAULT_STALLED_HOURS` | `48` | `src/lib/rodonaves/freightHealth.ts` |
-| `DEFAULT_COOLDOWN_MS` | `60` | `src/lib/rodonaves/sloAlerts.ts` |
-| `WINDOW_MS` | `24` | `supabase/functions/accuracy-meta-monitor/index.ts` |
-| `WINDOW_MS` | `24` | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
+| `DEFAULT_COOLDOWN_MS` | `60 * 60 * 1000` | `src/lib/rodonaves/sloAlerts.ts` |
+| `WINDOW_MS` | `24 * 60 * 60 * 1000` | `supabase/functions/accuracy-meta-monitor/index.ts` |
+| `WINDOW_MS` | `24 * 60 * 60 * 1000` | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
 | `CRON_HOUR_UTC` | `8` | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
 | `CRON_MINUTE_UTC` | `15` | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
-| `WEEK_MS` | `7` | `supabase/functions/accuracy-weekly-digest/digest.ts` |
+| `WEEK_MS` | `7 * 24 * 60 * 60 * 1000` | `supabase/functions/accuracy-weekly-digest/digest.ts` |
 | `CARRIER_ALL_LABEL` | `"Todas as transportadoras"` | `supabase/functions/accuracy-weekly-digest/digest.ts` |
-| `RATE_LIMIT_WINDOW_MS` | `60` | `supabase/functions/check-rate-limit/index.ts` |
+| `RATE_LIMIT_WINDOW_MS` | `60 * 1000` | `supabase/functions/check-rate-limit/index.ts` |
 | `MAX_REQUESTS_PER_WINDOW` | `100` | `supabase/functions/check-rate-limit/index.ts` |
-| `BLOCK_DURATION_MS` | `15` | `supabase/functions/check-rate-limit/index.ts` |
+| `BLOCK_DURATION_MS` | `15 * 60 * 1000` | `supabase/functions/check-rate-limit/index.ts` |
 | `TRACKING_GATEWAY` | `"https://tracking-apigateway.rte.com.br"` | `supabase/functions/rodonaves-api/index.ts` |
 | `QUOTATION_GATEWAY` | `"https://quotation-apigateway.rte.com.br"` | `supabase/functions/rodonaves-api/index.ts` |
 | `DEADLINE_GATEWAY` | `"https://01wapi.rte.com.br"` | `supabase/functions/rodonaves-api/index.ts` |
@@ -1621,7 +1593,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `UNITTOCITY_GATEWAY` | `"https://unittocity-apigateway.rte.com.br"` | `supabase/functions/rodonaves-api/index.ts` |
 | `PAYMENTS_GATEWAY` | `"https://payments-apigateway.rte.com.br"` | `supabase/functions/rodonaves-api/index.ts` |
 | `DNE_GATEWAY` | `"https://dne-apigateway.rte.com.br"` | `supabase/functions/rodonaves-api/index.ts` |
-| `DEFAULT_TIMEOUT` | `15` | `supabase/functions/rodonaves-api/index.ts` |
+| `DEFAULT_TIMEOUT` | `15_000` | `supabase/functions/rodonaves-api/index.ts` |
 
 ### H.2 Prazos, expirações e janelas de tempo
 
@@ -1889,21 +1861,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 
 | Mensagem | Arquivo |
 |---|---|
-| Could not parse ESLint JSON output: ${(err).message} | `scripts/check-warning-budget.mjs` |
-| ESLint failed to run (exit ${res.status}). | `scripts/check-warning-budget.mjs` |
-| tsc failed to run (exit ${res.status}). | `scripts/check-warning-budget.mjs` |
-| ESLint failed (exit ${res.status}) | `scripts/generate-quality-report.mjs` |
-| tsc failed (exit ${res.status}) | `scripts/generate-quality-report.mjs` |
-| Falha ao criar admin user: ${error.message} | `scripts/seed-database.ts` |
-| ${msg}: esperado ${JSON.stringify(b)} obtido ${JSON.stringify(a)} | `scripts/ai-context/cenarios.mjs` |
-| O teste offline não permite consultas ao banco | `scripts/supabase_snapshot/test_snapshot.py` |
-| banco indisponível na fixture | `scripts/supabase_snapshot/test_snapshot.py` |
-| catálogo indisponível na fixture | `scripts/supabase_snapshot/test_snapshot.py` |
-| permission denied for schema auth | `scripts/supabase_snapshot/test_snapshot.py` |
-| relation  | `scripts/supabase_snapshot/test_snapshot.py` |
-| statement timeout simulado | `scripts/supabase_snapshot/test_snapshot.py` |
-| view removida depois da consulta ao catálogo | `scripts/supabase_snapshot/test_snapshot.py` |
-| view sem permissão na fixture | `scripts/supabase_snapshot/test_snapshot.py` |
 | Root element not found | `src/main.tsx` |
 |          aria-live= | `src/components/accessibility/LiveRegion.tsx` |
 | useLiveRegion must be used within LiveRegionProvider | `src/components/accessibility/LiveRegion.tsx` |
@@ -2189,7 +2146,22 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | HTTP ${r.status} | `src/pages/admin/QualityGate.tsx` |
 | Erro ao solicitar reset | `src/pages/auth/AuthForgotPassword.tsx` |
 | ; import { PasswordStrengthIndicator } from  | `src/pages/auth/AuthFormPanel.tsx` |
-| … +54 linhas — lista completa em `context.json` | |
+| Erro ao entrar com Google | `src/pages/auth/SocialLoginButtons.tsx` |
+| Circuit Breaker is OPEN. Request rejected to prevent overload. | `src/services/resilience/CircuitBreaker.ts` |
+| Auditoria: ${failures.length} falhas críticas detectadas. | `src/utils/systemTester.ts` |
+| Circuit Breaker [${name}] is OPEN. Refusing request. | `supabase/functions/_shared/circuitBreaker.ts` |
+| FIELD_ENCRYPTION_KEY missing or too short (fail-closed) | `supabase/functions/_shared/crypto.ts` |
+| Request timed out after ${timeout}ms | `supabase/functions/_shared/fetch-with-timeout.ts` |
+| host ${host} | `supabase/functions/_shared/safeFetch.ts` |
+| host ${host} not in allow-list | `supabase/functions/_shared/safeFetch.ts` |
+| invalid URL | `supabase/functions/_shared/safeFetch.ts` |
+| private IPv4 ${host} | `supabase/functions/_shared/safeFetch.ts` |
+| private IPv6 ${host} | `supabase/functions/_shared/safeFetch.ts` |
+| scheme ${parsed.protocol} | `supabase/functions/_shared/safeFetch.ts` |
+| escalated abaixo do threshold | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
+| fuzz não gerou nenhum escalonamento | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
+| ignoredCount fora de faixa | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
+| … +138 linhas — lista completa em `context.json` | |
 
 ## J. Controle de acesso no código (checagens de perfil/permissão)
 
@@ -2404,24 +2376,17 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Comentário | Arquivo |
 |---|---|
 | A regra só protege o fast-refresh do dev server; não se aplica a esta pasta. | `eslint.config.js` |
-| $%...)", met: /[!@#$%^&*()_+\-=[\]{};':"\\\|,.<>/?]/.test(password), required: true }, | `src/components/auth/PasswordStrengthIndicator.tsx` |
-| Prazo & Cubagem */} | `src/components/freight/RodonavesQuotation.tsx` |
 | Show prompt after a short delay if permission not granted and not dismissed | `src/components/notifications/BrowserNotificationPrompt.tsx` |
 | apenas por administradores) e consumo de error budget por gateway. | `src/components/rodonaves/RTEGatewaySLOPanel.tsx` |
-| Permission request overlay */} | `src/components/scanner/QRScannerModal.tsx` |
-| ").limit(1).maybeSingle(); | `src/components/security/GeoBlockingPanel.tsx` |
-| ").order("created_at", { ascending: false }).limit(50); | `src/components/security/GeoBlockingPanel.tsx` |
 | Check single permission | `src/components/security/PermissionGate.tsx` |
 | Check if role has permission | `src/components/security/PermissionMatrix.tsx` |
 | Toggle permission | `src/components/security/PermissionMatrix.tsx` |
-| ').limit(limit); | `src/features/logistics/services/LogisticsService.ts` |
 | Logistics & Business | `src/hooks/index.ts` |
 | @description Importação de CSV e Excel com validação Zod | `src/hooks/common/useImportData.ts` |
 | Includes magic-byte validation for security (Dimension 19). | `src/hooks/data/useDocumentUpload.ts` |
 | Magic byte validation for basic types | `src/hooks/data/useDocumentUpload.ts` |
-| * If true, return a signed URL (365 days) instead of the public URL. Required for private buckets. */ | `src/hooks/data/useImageUpload.tsx` |
 | Add urgency flag based on deadline | `src/hooks/logistics/useBoxManagement.tsx` |
-| * Business Rule Engine — evaluates rules against entity data and executes actions. | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
+| Business Rule Engine — evaluates rules against entity data and executes actions. | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | Debounced Batch Logging for high-frequency rule execution | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | Rule action failed — silent fail for background processing | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | Request notification permission | `src/hooks/logistics/useSLANotifications.tsx` |
@@ -2433,42 +2398,28 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Request notification permission | `src/hooks/notifications/useSecurityPushNotifications.tsx` |
 | O histórico é somente leitura no cliente; a gravação ocorre no backend. | `src/hooks/rodonaves/useGatewayHealth.ts` |
 | * Leitura: qualquer autenticado. Escrita: apenas administradores. | `src/hooks/rodonaves/useSLOTargets.ts` |
-| api.mapbox.com/geocoding/v5/mapbox.places/test.json?access_token=${data.token}&limit=1` | `src/hooks/security/useIntegrationValidation.tsx` |
 | Fetch rate limit logs | `src/hooks/security/useRateLimitLogs.ts` |
 | Check rate limit status | `src/hooks/security/useSecurityEvents.ts` |
 | Check for camera permission | `src/hooks/ui/useQRScanner.tsx` |
-| * Semi-static data: freight tables, cost alerts, business rules (3 min) */ | `src/lib/queryConfig.ts` |
 | Custom CNPJ validation with digit verification | `src/lib/validations.ts` |
-| * Sistema de códigos de origem do evento. Nunca deve ser inferido. */ | `src/lib/rodonaves/eventCodes.ts` |
 | * Implementa as três regras de negócio derivadas do mapa de EventCodes: | `src/lib/rodonaves/freightHealth.ts` |
 | - ATRASADO: dias úteis decorridos desde a emissão > prazo previsto, | `src/lib/rodonaves/freightHealth.ts` |
-| * Prazo previsto em dias úteis, conforme retorno da RTE. */ | `src/lib/rodonaves/freightHealth.ts` |
-| * Limite em horas para considerar o frete parado (default 48). */ | `src/lib/rodonaves/freightHealth.ts` |
 | Guarda de segurança: no máximo 10 anos de iteração. | `src/lib/rodonaves/freightHealth.ts` |
-| storage indisponível: meta permanece apenas em memória */ | `src/lib/rodonaves/gatewaySLO.ts` |
 | lançar exceção — o painel nunca deve quebrar por dado sujo do banco. | `src/lib/rodonaves/latencyTrend.ts` |
-| * Tempo mínimo entre alertas repetidos do mesmo gateway/severidade (ms). Padrão: 1h. */ | `src/lib/rodonaves/sloAlerts.ts` |
-| storage indisponível: estado permanece apenas em memória */ | `src/lib/rodonaves/sloAlerts.ts` |
-| ").gte("created_at", from).lte("created_at", to).order("created_at", { ascending: false }).limit(500); | `src/pages/AdminTelemetria.tsx` |
 | Weight: 70% Price, 30% Deadline | `src/pages/CotacaoMultiCanal.tsx` |
-| $%^&*()_+\-=\[\]{};':"\\\|,.<>\/?]/, "Senha deve conter pelo menos um caractere especial"), | `src/pages/auth/authUtils.ts` |
 | P18: o RPC update_user_streak estava retornando 403 (permissão negada | `src/services/api/authService.ts` |
 | Resume if suspended (required for user interaction policy) | `src/utils/celebrationSounds.ts` |
-| ', { count: 'exact', head: true }).limit(1); | `src/utils/systemTester.ts` |
 | Aceita apenas role 'authenticated' (com sub) ou 'service_role' — o anon key é | `supabase/functions/_shared/auth.ts` |
 | Logs validation attempts to the database for auditing and monitoring. | `supabase/functions/_shared/contract-validator.ts` |
-| * Lightweight validation helpers for edge functions (no Zod dependency in Deno). | `supabase/functions/_shared/validate.ts` |
+| Lightweight validation helpers for edge functions (no Zod dependency in Deno). | `supabase/functions/_shared/validate.ts` |
 | disparo deve escalar para WhatsApp mesmo com toggle desligado. | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
-| * Nº mínimo de emails não lidos no histórico para acionar escalonamento. */ | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
-| * Decide se o próximo alerta para (user, carrier) deve escalar para WhatsApp | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
+| Decide se o próximo alerta para (user, carrier) deve escalar para WhatsApp | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
 | - Email exige formato mínimo `x@y.z`. | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
 | Contract Validation | `supabase/functions/carrier-webhook-receiver/index.ts` |
 | Rate limit configuration | `supabase/functions/check-rate-limit/index.ts` |
 | P15: smoke test — check-rate-limit | `supabase/functions/check-rate-limit/index_test.ts` |
 | Persiste quando ?persist=true (cron horário) OU retorna somente snapshot atual (painel admin). | `supabase/functions/db-health-snapshot/index.ts` |
-| valor* e *prazo de entrega*.`, | `supabase/functions/evolution-whatsapp/index.ts` |
 | Persist to local DB (fire-and-forget) only if not ok | `supabase/functions/external-db-bridge/index.ts` |
-| api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${mapboxToken}&country=BR&limit=1&language=pt`; | `supabase/functions/geocode-address/index.ts` |
 | P15: smoke test — get-mapbox-token must not leak secret token | `supabase/functions/get-mapbox-token/index_test.ts` |
 | P15: smoke test — health endpoint must always respond and never leak secrets | `supabase/functions/health/index_test.ts` |
 | P13: rate limit per IP (100 req/min for webhooks) | `supabase/functions/lalamove-webhook/index.ts` |
@@ -2492,5 +2443,3 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Use ip-api.com (free, no API key required, 45 req/min limit) | `supabase/functions/validate-login/index.ts` |
 | Handles notifying external clients about shipment status changes with HMAC signature validation. | `supabase/functions/webhook-status/index.ts` |
 | P15: smoke test — webhook-status must not leak secrets | `supabase/functions/webhook-status/index_test.ts` |
-| INTO bitrix_config FROM public.bitrix_sync_config LIMIT 1; | `supabase/migrations/20260522135837_361e17dd-e98f-4f3d-8665-a46233f12375.sql` |
-| FROM internal.mv_dashboard_metrics LIMIT 1; $$; | `supabase/migrations/20260712110919_2772614a-8b54-4b13-9dc1-72b5e30145a0.sql` |

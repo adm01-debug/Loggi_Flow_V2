@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `44ea285e1e` · branch `main` · 2026-11-08 19:58 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `9c2edff8cc` · branch `main` · 2026-11-10 10:22 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -56,13 +56,13 @@
 | `feature_flags` | _(sem COMMENT ON TABLE — significado não documentado)_ | 7 colunas | migration |
 | `fornecedores` | Supplier records for pickups | 14 colunas | migration |
 | `freight_decisions` | _(sem COMMENT ON TABLE — significado não documentado)_ | 10 colunas | migration |
-| `freight_integration_mappings` | _(sem COMMENT ON TABLE — significado não documentado)_ | 8 colunas | migration |
+| `freight_integration_mappings` | _(sem COMMENT ON TABLE — significado não documentado)_ | 6 colunas | migration |
 | `freight_selection_rules` | _(sem COMMENT ON TABLE — significado não documentado)_ | 10 colunas | migration |
 | `freight_webhooks` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | migration |
 | `fretes_internos` | _(sem COMMENT ON TABLE — significado não documentado)_ | 13 colunas | migration |
 | `geo_access_rules` | _(sem COMMENT ON TABLE — significado não documentado)_ | 6 colunas | migration |
 | `geo_blocked_attempts` | _(sem COMMENT ON TABLE — significado não documentado)_ | 7 colunas | migration |
-| `geo_blocking_rules` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | types.ts |
+| `geo_blocking_rules` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | migration |
 | `geo_blocking_settings` | _(sem COMMENT ON TABLE — significado não documentado)_ | 5 colunas | types.ts |
 | `idempotency_keys` | _(sem COMMENT ON TABLE — significado não documentado)_ | 4 colunas | migration |
 | `index_proposals` | _(sem COMMENT ON TABLE — significado não documentado)_ | 20 colunas | migration |
@@ -147,6 +147,7 @@
 | `webauthn_credentials` | _(sem COMMENT ON TABLE — significado não documentado)_ | 10 colunas | migration |
 | `webhook_deliveries` | _(sem COMMENT ON TABLE — significado não documentado)_ | 8 colunas | migration |
 | `webhook_events_processed` | _(sem COMMENT ON TABLE — significado não documentado)_ | 5 colunas | migration |
+| `achievement_tier` (enum) | bronze, silver, gold, platinum, diamond |  | banco |
 | `coleta_tipo` (enum) | lalamove, transportadora |  | banco |
 | `coleta_status` (enum) | aguardando_liberacao, solicitada, em_transito, chegou_expedicao, conferencia_ok, divergencia, finalizada |  | banco |
 | `entrega_status` (enum) | aguardando_producao, pronto_despacho, cotacao_frete, nf_emitida, despachado, em_transito, saiu_entrega, entregue, ocorrencia, finalizado |  | banco |
@@ -285,61 +286,19 @@
 | status | valor `SP` para `origem_estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/DashboardCotacoes.tsx` |
 | status | valor `RJ` para `destino_estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/DashboardCotacoes.tsx` |
 | status | valor `motorista_alocado` para `order_status` usado no código não existe em nenhum enum do banco/TS | `escreve:supabase/functions/lalamove-webhook/index.ts` |
-| coluna | coluna `score_frete` usada no código não existe no schema de `transportadoras` |  |
-| coluna | coluna `score_pontualidade` usada no código não existe no schema de `transportadoras` |  |
 | coluna | coluna `data_coleta_efetiva` usada no código não existe no schema de `coletas` |  |
 | coluna | coluna `user_id` usada no código não existe no schema de `entregas` |  |
 | coluna | coluna `gravidade` usada no código não existe no schema de `ocorrencias` |  |
 | coluna | coluna `status` usada no código não existe no schema de `ocorrencias` |  |
+| coluna | coluna `score_frete` usada no código não existe no schema de `transportadoras` |  |
+| coluna | coluna `score_pontualidade` usada no código não existe no schema de `transportadoras` |  |
 | coluna | coluna `user_id` usada no código não existe no schema de `login_attempts` |  |
 | coluna | coluna `deleted_at` usada no código não existe no schema de `fretes_internos` |  |
-| tabela | tabela `a` usada no código não existe nas migrations/types do repo | `scripts/ai-context/cenarios.mjs` |
-| tabela | tabela `avatars` usada no código não existe nas migrations/types do repo | `src/services/api/storageService.ts` |
-| tabela | tabela `contacts` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `dashboard_table` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `documents` usada no código não existe nas migrations/types do repo | `src/components/shipping/DeliveryReceiptUpload.tsx`<br>`src/services/api/storageService.ts`<br>`supabase/functions/ocr-receipt-processor/index.ts` |
-| tabela | tabela `emails` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `fantasma` usada no código não existe nas migrations/types do repo | `scripts/ai-context/cenarios.mjs` |
-| tabela | tabela `fixture_table` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `ghost_table` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `payments` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `runtime_table` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `so_teste` usada no código não existe nas migrations/types do repo | `scripts/ai-context/cenarios.mjs` |
-| tabela | tabela `t` usada no código não existe nas migrations/types do repo | `scripts/ai-context/cenarios.mjs` |
-| tabela | tabela `t1` usada no código não existe nas migrations/types do repo | `scripts/ai-context/cenarios.mjs` |
-| tabela | tabela `tools_runtime` usada no código não existe nas migrations/types do repo | `scripts/ai-context/gerar.unit.mjs` |
-| tabela | tabela `tx` usada no código não existe nas migrations/types do repo | `scripts/ai-context/cenarios.mjs` |
-| rls | `db_health_snapshots`: RLS ligado sem nenhuma política → só service_role acessa |  |
 | rls | `geo_blocking_rules`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | rls | `geo_blocking_settings`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | rls | `notificacoes_custo`: front faz UPDATE mas nenhuma política RLS permite UPDATE → vai falhar/retornar vazio para usuários | `src/hooks/logistics/useCostAlerts.tsx` |
 | rls | `user_levels`: front faz UPDATE mas nenhuma política RLS permite UPDATE → vai falhar/retornar vazio para usuários | `src/hooks/gamification/useGamification.tsx` |
-| rls | `user_roles`: front faz INSERT mas nenhuma política RLS permite INSERT → vai falhar/retornar vazio para usuários | `src/hooks/auth/useRole.ts` |
-| rls | `user_roles`: front faz INSERT mas nenhuma política RLS permite INSERT → vai falhar/retornar vazio para usuários | `src/pages/GerenciamentoUsuarios.tsx` |
-| rls | `user_roles`: front faz DELETE mas nenhuma política RLS permite DELETE → vai falhar/retornar vazio para usuários | `src/hooks/auth/useRole.ts` |
 | dinheiro | `internal.query_baseline.total_exec_time` guarda dinheiro em `double precision NOT NULL` (ponto flutuante) — arredondamento imprevisível; padrão é numeric |  |
-| edge | edge function `dashboard-edge` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| edge | edge function `fixture-edge` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| edge | edge function `ghost-edge` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| edge | edge function `inexistente` invocada mas não existe em supabase/functions/ | `scripts/ai-context/cenarios.mjs` |
-| edge | edge function `orphan-fn` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| edge | edge function `other` invocada mas não existe em supabase/functions/ | `scripts/ai-context/cenarios.mjs` |
-| edge | edge function `runtime-fn` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| edge | edge function `runtime-missing` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| edge | edge function `send-email` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| edge | edge function `tools-edge` invocada mas não existe em supabase/functions/ | `scripts/ai-context/gerar.unit.mjs` |
-| rpc | RPC `dashboard_rpc` chamada mas não definida nas migrations/types | `scripts/ai-context/gerar.unit.mjs` |
-| rpc | RPC `demo` chamada mas não definida nas migrations/types | `scripts/supabase_snapshot/test_snapshot.py` |
-| rpc | RPC `fixture_rpc` chamada mas não definida nas migrations/types | `scripts/ai-context/gerar.unit.mjs` |
-| rpc | RPC `fn` chamada mas não definida nas migrations/types | `scripts/supabase_snapshot/snapshot.py` |
-| rpc | RPC `ghost_rpc` chamada mas não definida nas migrations/types | `scripts/ai-context/gerar.unit.mjs` |
-| rpc | RPC `is_admin` chamada mas não definida nas migrations/types | `scripts/ai-context/gerar.unit.mjs` |
-| rpc | RPC `nome` chamada mas não definida nas migrations/types | `scripts/supabase_snapshot/snapshot.py` |
-| rpc | RPC `r1` chamada mas não definida nas migrations/types | `scripts/ai-context/cenarios.mjs` |
-| rpc | RPC `runtime_rpc` chamada mas não definida nas migrations/types | `scripts/ai-context/gerar.unit.mjs` |
-| rpc | RPC `tools_rpc` chamada mas não definida nas migrations/types | `scripts/ai-context/gerar.unit.mjs` |
-| dinâmico | 5 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `scripts/seed-database.ts` |
-| dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `scripts/regras_negocio/generate.py` |
 | dinâmico | 4 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/common/useBulkActions.ts` |
 | dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/data/useDocumentUpload.ts` |
 | dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/data/useImageUpload.tsx` |
@@ -347,28 +306,13 @@
 | dinâmico | 1 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | dinâmico | 1 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/pages/ImportacaoMassa.tsx` |
 | dinâmico | 4 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `supabase/functions/external-db-bridge/index.ts` |
-| segurança | função `cleanup_old_telemetry_logs` é SECURITY DEFINER sem `set search_path` (risco de escalação) | `supabase/migrations/20260519163240_a44a9ac2-837f-405f-ab86-8e651c62bd5b.sql` |
-| segurança | função `update_user_rank` é SECURITY DEFINER sem `set search_path` (risco de escalação) | `supabase/migrations/20260517191652_096dc9e8-604b-46f8-b774-bccf0864b8c0.sql` |
-| segurança | função `update_carrier_ranking` é SECURITY DEFINER sem `set search_path` (risco de escalação) | `supabase/migrations/20260519122701_bf370c87-0135-4d9e-9ba9-2a917b6419e1.sql` |
-| segurança | função `reconcile_pending_freights` é SECURITY DEFINER sem `set search_path` (risco de escalação) | `supabase/migrations/20260519163240_a44a9ac2-837f-405f-ab86-8e651c62bd5b.sql` |
-| segurança | função `validate_payload_schema` é SECURITY DEFINER sem `set search_path` (risco de escalação) | `supabase/migrations/20260519171908_e2e501b1-2672-4217-8c4e-dc0ee5a7582d.sql` |
-| segurança | função `execute_nexus_protocol` é SECURITY DEFINER sem `set search_path` (risco de escalação) | `supabase/migrations/20260520163558_6ad0d62b-50a0-49b4-b629-a05982f19f62.sql` |
-| segurança | função `log_biometric_anomaly` é SECURITY DEFINER sem `set search_path` (risco de escalação) | `supabase/migrations/20260522125611_63624b77-b52c-40d0-a1fd-4c8d282aa208.sql` |
 
 ## Lacunas — o que este contexto NÃO consegue responder (perguntas para o dono do negócio)
 
 - Nenhuma regra manual em `manual/`: prazos, limites, exceções comerciais, quem aprova o quê — só o negócio sabe.
-- `fornecedores.estado` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `clientes.estado` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `tabelas_frete.estado_destino` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `alertas_custo.estado_destino` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `reward_purchases.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `user_onboarding.current_step` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `transportadora_rotas.origem_estado` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `transportadora_rotas.destino_estado` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `reward_redemptions.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `cotacoes_multicanal.origem_estado` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `cotacoes_multicanal.destino_estado` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `webhook_deliveries.response_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `logistica_reversa.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `architecture_decisions.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
@@ -383,26 +327,7 @@
 - `delivery_receipt_audit.ocr_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `system_heartbeat.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `rte_gateway_health.http_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m01.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m02.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m03.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m04.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m05.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m06.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m07.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m08.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m09.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m10.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m11.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2026m12.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2027m01.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2027m02.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2027m03.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2027m04.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2027m05.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- `rastreamento_historico_y2027m06.order_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- 133/140 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `transportadoras`, `cotacoes_frete`, `profiles`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …
-- Há tabelas usadas no código sem migration no repo — o schema real pode ter sido alterado pelo painel.
+- 133/140 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `profiles`, `transportadoras`, `cotacoes_frete`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …
 
 ## Regras manuais presentes
 

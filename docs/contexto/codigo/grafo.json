@@ -1,16 +1,16 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "nos": 753,
- "arestas": 3044,
+ "nos": 735,
+ "arestas": 3053,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
-   "importado_por": 215
+   "importado_por": 216
   },
   {
    "arquivo": "src/integrations/supabase/client.ts",
-   "importado_por": 205
+   "importado_por": 206
   },
   {
    "arquivo": "src/components/ui/badge.tsx",
@@ -38,7 +38,7 @@
   },
   {
    "arquivo": "src/components/layout/MainLayout.tsx",
-   "importado_por": 56
+   "importado_por": 57
   },
   {
    "arquivo": "src/components/ui/dialog.tsx",
@@ -230,48 +230,7 @@
   "src/utils/index.ts",
   "src/utils/logger.ts",
   "src/utils/performance.ts",
-  "supabase/functions/accuracy-meta-monitor/channelHealth_test.ts",
-  "supabase/functions/accuracy-meta-monitor/escalation_test.ts",
-  "supabase/functions/accuracy-meta-monitor/index_test.ts",
-  "supabase/functions/accuracy-meta-monitor/simulator_test.ts",
-  "supabase/functions/accuracy-weekly-digest/digest_test.ts",
-  "supabase/functions/bitrix24-integration/index_test.ts",
-  "supabase/functions/carrier-webhook-receiver/index_test.ts",
-  "supabase/functions/check-password-breach/index_test.ts",
-  "supabase/functions/check-rate-limit/index_test.ts",
-  "supabase/functions/db-health-weekly-report/index_test.ts",
-  "supabase/functions/evolution-whatsapp/index_test.ts",
-  "supabase/functions/execute-protocol/index_test.ts",
-  "supabase/functions/external-db-bridge/index_test.ts",
-  "supabase/functions/geocode-address/index_test.ts",
-  "supabase/functions/get-mapbox-token/index_test.ts",
-  "supabase/functions/get-weather-data/index_test.ts",
-  "supabase/functions/health-check/index_test.ts",
-  "supabase/functions/health/index_test.ts",
-  "supabase/functions/ingest-biosync/index_test.ts",
-  "supabase/functions/lalamove-api/index_test.ts",
-  "supabase/functions/lalamove-tracking/index_test.ts",
-  "supabase/functions/lalamove-webhook/index_test.ts",
-  "supabase/functions/lgpd-erase-user/index_test.ts",
-  "supabase/functions/log-login-attempt/index_test.ts",
-  "supabase/functions/log-security-event/index_test.ts",
-  "supabase/functions/melhor-envio-api/index_test.ts",
-  "supabase/functions/new-device-alert/index_test.ts",
-  "supabase/functions/nexus-auto-healing/index_test.ts",
-  "supabase/functions/nexus-webhook-receiver/index_test.ts",
-  "supabase/functions/normalize-freight-response/index_test.ts",
-  "supabase/functions/ocr-receipt-processor/index_test.ts",
-  "supabase/functions/predict-delays-scheduled/index_test.ts",
-  "supabase/functions/predict-delays/index_test.ts",
-  "supabase/functions/resend-email/index_test.ts",
-  "supabase/functions/rodonaves-api/index_test.ts",
-  "supabase/functions/rodonaves-webhook/index_test.ts",
-  "supabase/functions/secure-store/index_test.ts",
-  "supabase/functions/send-password-reset/index_test.ts",
-  "supabase/functions/smart-carrier-selection/index_test.ts",
-  "supabase/functions/validate-login/index_test.ts",
-  "supabase/functions/webhook-status/index_test.ts",
-  "supabase/functions/whatsapp-notification/index_test.ts"
+  "supabase/functions/accuracy-meta-monitor/simulator.ts"
  ],
  "modulos_mais_acoplados": [
   {

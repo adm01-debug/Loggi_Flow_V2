@@ -3,10 +3,8 @@
  "format_version": 2,
  "nota": "Reconstruído de migrations/schemas/types do repo — visão do CÓDIGO, não do banco vivo. `drift` compara colunas (migrations) com colunas_types (types.ts).",
  "fonte": [
-  "drizzle",
   "src/integrations/supabase/types.ts",
-  "supabase/migrations",
-  "typeorm"
+  "supabase/migrations"
  ],
  "migrations": 244,
  "seeds": [
@@ -78,7 +76,8 @@
   ]
  },
  "views": [
-  "internal",
+  "internal.mv_carrier_performance",
+  "internal.mv_dashboard_metrics",
   "v_prediction_accuracy",
   "v_prediction_accuracy_by_carrier",
   "v_prediction_accuracy_daily",
@@ -161,7 +160,9 @@
   "has_role",
   "increment_version",
   "increment_version_column",
-  "internal",
+  "internal.collect_db_health",
+  "internal.reindex_hot_indexes",
+  "internal.snapshot_query_baseline",
   "jsonb_recursive_merge",
   "log_biometric_anomaly",
   "mark_predictions_accurate",
@@ -932,14 +933,12 @@
   {
    "nome": "rte-gateway-health-purge",
    "agenda": "20 3 * * *",
-   "migration": "20260901000000_cron_jobs_canonical.sql",
-   "chama_edge": "db-regression-monitor"
+   "migration": "20260901000000_cron_jobs_canonical.sql"
   },
   {
    "nome": "rte-slo-daily-rollup",
    "agenda": "20 0 * * *",
-   "migration": "20260901000000_cron_jobs_canonical.sql",
-   "chama_edge": "db-regression-monitor"
+   "migration": "20260901000000_cron_jobs_canonical.sql"
   },
   {
    "nome": "snapshot-query-baseline-daily",
@@ -956,7 +955,7 @@
   {
    "nome": "avatars",
    "criado_em_sql": true,
-   "usado_em": 0
+   "usado_em": 1
   },
   {
    "nome": "comprovantes",
@@ -966,7 +965,7 @@
   {
    "nome": "documents",
    "criado_em_sql": true,
-   "usado_em": 2
+   "usado_em": 3
   },
   {
    "nome": "entregas-fotos",
@@ -8800,49 +8799,6 @@
    "sem_rls": false,
    "nao_usada": false
   },
-  "mv_carrier_performance": {
-   "colunas": {},
-   "rls": false,
-   "policies": [],
-   "indices": [
-    {
-     "nome": "idx_mv_carrier_performance_otif",
-     "colunas": "otif_percent DESC",
-     "unico": false
-    },
-    {
-     "nome": "idx_mv_carrier_performance_pk",
-     "colunas": "transportadora_id",
-     "unico": true
-    }
-   ],
-   "fks": [],
-   "criada_em": null,
-   "usada_no_front": 0,
-   "usada_em_edges": [],
-   "triggers": [],
-   "sem_rls": false,
-   "nao_usada": true
-  },
-  "mv_dashboard_metrics": {
-   "colunas": {},
-   "rls": false,
-   "policies": [],
-   "indices": [
-    {
-     "nome": "idx_mv_dashboard_metrics_singleton",
-     "colunas": "singleton",
-     "unico": true
-    }
-   ],
-   "fks": [],
-   "criada_em": null,
-   "usada_no_front": 0,
-   "usada_em_edges": [],
-   "triggers": [],
-   "sem_rls": false,
-   "nao_usada": true
-  },
   "nexus_tactical_logs": {
    "colunas": {
     "alert_metadata": {
@@ -15376,34 +15332,6 @@
    "sem_rls": false,
    "nao_usada": false
   },
-  "users": {
-   "colunas": {
-    "id": {
-     "tipo": "uuid",
-     "nn": true,
-     "pk": false,
-     "default": null,
-     "ref": null
-    },
-    "name": {
-     "tipo": "text",
-     "nn": true,
-     "pk": false,
-     "default": null,
-     "ref": null
-    }
-   },
-   "rls": false,
-   "policies": [],
-   "indices": [],
-   "fks": [],
-   "criada_em": "scripts/ai-context/cenarios.mjs",
-   "usada_no_front": 0,
-   "usada_em_edges": [],
-   "triggers": [],
-   "sem_rls": false,
-   "nao_usada": true
-  },
   "webauthn_challenges": {
    "colunas": {
     "challenge": {
@@ -15816,8 +15744,6 @@
   }
  },
  "tabelas_usadas_no_codigo_sem_definicao": [
-  "avatars",
-  "documents",
   "integracoes_bitrix"
  ],
  "rpcs_usadas_no_codigo": [

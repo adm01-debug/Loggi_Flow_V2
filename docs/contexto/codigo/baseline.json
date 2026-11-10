@@ -2,11 +2,61 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "44ea285e1efc085a1382038ea0b4e1490196bc81",
+  "commit": "9c2edff8cc7f7f1a716030273948753d1a9247f5",
   "branch": "main",
-  "data_commit": "2026-11-08T16:57:25-03:00",
+  "data_commit": "2026-11-10T07:22:00-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "9c2edff8",
+    "data": "2026-11-10",
+    "assunto": "fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)"
+   },
+   {
+    "sha": "f2dc8925",
+    "data": "2026-11-10",
+    "assunto": "fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)"
+   },
+   {
+    "sha": "6de3c961",
+    "data": "2026-11-09",
+    "assunto": "feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)"
+   },
+   {
+    "sha": "28c0f7e3",
+    "data": "2026-11-08",
+    "assunto": "feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi"
+   },
+   {
+    "sha": "b0a699a4",
+    "data": "2026-11-08",
+    "assunto": "fix(ci): renomeia contexto.yml → contexto-ia.yml para forçar novo registro (#115)"
+   },
+   {
+    "sha": "4b14063a",
+    "data": "2026-11-08",
+    "assunto": "docs(agentes): atualiza contagem de required checks para 9 (#113)"
+   },
+   {
+    "sha": "10d5df3a",
+    "data": "2026-11-08",
+    "assunto": "feat(ci): porta 7 workflows autônomos genéricos do Zapp (#112)"
+   },
+   {
+    "sha": "b74bb21c",
+    "data": "2026-11-08",
+    "assunto": "chore: padrão de instruções para agentes (#110)"
+   },
+   {
+    "sha": "ab4852bc",
+    "data": "2026-11-08",
+    "assunto": "fix(ci): adiciona --force no push da branch contexto (#111)"
+   },
+   {
+    "sha": "d6a824f7",
+    "data": "2026-11-08",
+    "assunto": "fix(index): remover div oculto com textos de prompt internos"
+   },
    {
     "sha": "44ea285e",
     "data": "2026-11-08",
@@ -81,119 +131,69 @@
     "sha": "b6f67642",
     "data": "2026-11-08",
     "assunto": "delete x"
-   },
-   {
-    "sha": "38fa76c2",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "8218f2b8",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "65e68a9e",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "5ac41452",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "1b9cf91d",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "45bd5a4c",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "bb0a78a5",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "76013296",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "e100d646",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "f7f4ae18",
-    "data": "2026-11-08",
-    "assunto": "delete x"
    }
   ],
-  "arquivos_mudados_7d": 45,
+  "arquivos_mudados_7d": 164,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "scripts/validate-csp.mjs",
+    "mudancas": 4
+   },
+   {
+    "pasta": "AGENTS.md",
     "mudancas": 3
    },
    {
-    "pasta": "docs/contexto/regras",
-    "mudancas": 2
-   },
-   {
     "pasta": "scripts/audit/manifest_detail.sql",
-    "mudancas": 2
+    "mudancas": 3
    },
    {
     "pasta": "scripts/check-warning-budget.mjs",
-    "mudancas": 2
+    "mudancas": 3
    },
    {
     "pasta": "scripts/generate-quality-report.mjs",
-    "mudancas": 2
+    "mudancas": 3
    },
    {
     "pasta": "scripts/ratchet-warning-budget.mjs",
+    "mudancas": 3
+   },
+   {
+    "pasta": ".github/workflows/auto-update-pr-branch.yml",
     "mudancas": 2
    },
    {
-    "pasta": "src/components/freight",
-    "mudancas": 2
-   },
-   {
-    "pasta": "x",
+    "pasta": ".github/workflows/contexto-ia.yml",
     "mudancas": 2
    },
    {
     "pasta": ".github/workflows/contexto.yml",
-    "mudancas": 1
+    "mudancas": 2
+   },
+   {
+    "pasta": ".github/workflows/inventario-estado-semanal.yml",
+    "mudancas": 2
+   },
+   {
+    "pasta": ".github/workflows/settings-guard.yml",
+    "mudancas": 2
+   },
+   {
+    "pasta": ".github/workflows/types-sync.yml",
+    "mudancas": 2
    },
    {
     "pasta": ".gitignore",
-    "mudancas": 1
+    "mudancas": 2
    },
    {
-    "pasta": ".warning-budget.json",
-    "mudancas": 1
+    "pasta": "docs/agentes/github-ci.md",
+    "mudancas": 2
    },
    {
-    "pasta": "AGENTS.md",
-    "mudancas": 1
-   },
-   {
-    "pasta": "ai-context.config.json",
-    "mudancas": 1
-   },
-   {
-    "pasta": "docs/agentes/contexto-ia.md",
-    "mudancas": 1
-   },
-   {
-    "pasta": "eslint.config.js",
-    "mudancas": 1
+    "pasta": "docs/contexto/regras",
+    "mudancas": 2
    }
   ],
   "arquivos_mais_mudados_90d": [
@@ -203,19 +203,27 @@
    },
    {
     "arquivo": "package.json",
-    "mudancas": 38
+    "mudancas": 39
+   },
+   {
+    "arquivo": "index.html",
+    "mudancas": 9
    },
    {
     "arquivo": "src/hooks/gamification/useGamification.ts",
     "mudancas": 9
    },
    {
-    "arquivo": "index.html",
-    "mudancas": 8
+    "arquivo": "AGENTS.md",
+    "mudancas": 5
    },
    {
-    "arquivo": "supabase/config.toml",
+    "arquivo": "scripts/validate-csp.mjs",
     "mudancas": 5
+   },
+   {
+    "arquivo": ".github/workflows/ci.yml",
+    "mudancas": 4
    },
    {
     "arquivo": "ESTADO_ATUAL.md",
@@ -226,11 +234,39 @@
     "mudancas": 4
    },
    {
-    "arquivo": "scripts/validate-csp.mjs",
+    "arquivo": "scripts/audit/manifest_detail.sql",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/check-warning-budget.mjs",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/generate-quality-report.mjs",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/origem_remediacao_2026-08-31.sql",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/ratchet-warning-budget.mjs",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/seed-database.ts",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/validate-no-console.mjs",
     "mudancas": 4
    },
    {
     "arquivo": "src/components/gamification/GamificationPanel.tsx",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "supabase/config.toml",
     "mudancas": 4
    },
    {
@@ -254,76 +290,40 @@
     "mudancas": 3
    },
    {
-    "arquivo": ".github/workflows/ci.yml",
-    "mudancas": 3
-   },
-   {
     "arquivo": ".github/workflows/deploy-functions.yml",
     "mudancas": 3
    },
    {
     "arquivo": ".github/workflows/security.yml",
     "mudancas": 3
-   },
-   {
-    "arquivo": "AGENTS.md",
-    "mudancas": 3
-   },
-   {
-    "arquivo": "eslint.config.js",
-    "mudancas": 3
-   },
-   {
-    "arquivo": "scripts/audit/manifest_detail.sql",
-    "mudancas": 3
-   },
-   {
-    "arquivo": "scripts/check-warning-budget.mjs",
-    "mudancas": 3
-   },
-   {
-    "arquivo": "scripts/generate-quality-report.mjs",
-    "mudancas": 3
-   },
-   {
-    "arquivo": "scripts/origem_remediacao_2026-08-31.sql",
-    "mudancas": 3
-   },
-   {
-    "arquivo": "scripts/ratchet-warning-budget.mjs",
-    "mudancas": 3
-   },
-   {
-    "arquivo": "scripts/seed-database.ts",
-    "mudancas": 3
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 71
+    "commits": 81
    }
   ]
  },
  "contagens": {
-  "arquivos_total": 1157,
-  "arquivos_codigo": 792,
-  "linhas_codigo": 139587,
+  "arquivos_total": 1260,
+  "arquivos_codigo": 855,
+  "linhas_codigo": 158800,
   "rotas": 61,
-  "rotas_http_backend": 12,
+  "rotas_http_backend": 0,
   "vistas_por_id": 0,
   "itens_menu": 77,
   "modulos": 74,
   "componentes": 380,
-  "hooks": 176,
+  "hooks": 175,
   "edge_functions": 43,
-  "tabelas": 147,
+  "tabelas": 144,
   "migrations": 244,
   "cron_jobs": 28,
-  "testes": 39,
-  "workflows": 6,
-  "scripts": 23,
-  "docs_md": 66
+  "testes": 120,
+  "workflows": 14,
+  "scripts": 56,
+  "docs_md": 80
  },
  "por_pasta": {
   "eslint.config.js": {
@@ -344,43 +344,79 @@
   },
   "scripts/ai-context": {
    "arquivos": 3,
-   "linhas": 1458
+   "linhas": 1875
+  },
+  "scripts/audit": {
+   "arquivos": 2,
+   "linhas": 811
   },
   "scripts/audit-gate.mjs": {
    "arquivos": 1,
-   "linhas": 54
+   "linhas": 76
   },
   "scripts/check-warning-budget.mjs": {
    "arquivos": 1,
-   "linhas": 116
+   "linhas": 154
+  },
+  "scripts/ci": {
+   "arquivos": 17,
+   "linhas": 6269
+  },
+  "scripts/db-audit": {
+   "arquivos": 19,
+   "linhas": 3755
+  },
+  "scripts/gates": {
+   "arquivos": 7,
+   "linhas": 767
   },
   "scripts/generate-quality-report.mjs": {
    "arquivos": 1,
-   "linhas": 129
+   "linhas": 143
+  },
+  "scripts/graphify": {
+   "arquivos": 1,
+   "linhas": 234
+  },
+  "scripts/inventario": {
+   "arquivos": 8,
+   "linhas": 2902
+  },
+  "scripts/lib": {
+   "arquivos": 2,
+   "linhas": 411
+  },
+  "scripts/ops": {
+   "arquivos": 3,
+   "linhas": 748
   },
   "scripts/ratchet-warning-budget.mjs": {
    "arquivos": 1,
-   "linhas": 101
+   "linhas": 110
   },
   "scripts/regras_negocio": {
-   "arquivos": 3,
-   "linhas": 2539
+   "arquivos": 5,
+   "linhas": 3702
+  },
+  "scripts/seed": {
+   "arquivos": 1,
+   "linhas": 650
   },
   "scripts/seed-database.ts": {
    "arquivos": 1,
-   "linhas": 875
+   "linhas": 982
   },
   "scripts/supabase_snapshot": {
-   "arquivos": 2,
-   "linhas": 2669
+   "arquivos": 3,
+   "linhas": 3525
   },
   "scripts/validate-csp.mjs": {
    "arquivos": 1,
-   "linhas": 85
+   "linhas": 96
   },
   "scripts/validate-no-console.mjs": {
    "arquivos": 1,
-   "linhas": 43
+   "linhas": 72
   },
   "src/App.tsx": {
    "arquivos": 1,
@@ -482,11 +518,11 @@
   },
   {
    "arquivo": "scripts/regras_negocio/generate.py",
-   "linhas": 2138
+   "linhas": 2253
   },
   {
    "arquivo": "scripts/supabase_snapshot/snapshot.py",
-   "linhas": 1791
+   "linhas": 1909
   },
   {
    "arquivo": "supabase/functions/rodonaves-api/index.ts",
@@ -517,6 +553,14 @@
    "linhas": 1060
   },
   {
+   "arquivo": "scripts/ai-context/gerar.mjs",
+   "linhas": 999
+  },
+  {
+   "arquivo": "scripts/seed-database.ts",
+   "linhas": 982
+  },
+  {
    "arquivo": "src/pages/DashboardExecutivo.tsx",
    "linhas": 948
   },
@@ -525,16 +569,8 @@
    "linhas": 945
   },
   {
-   "arquivo": "scripts/ai-context/gerar.mjs",
-   "linhas": 924
-  },
-  {
    "arquivo": "src/pages/Fornecedores.tsx",
    "linhas": 884
-  },
-  {
-   "arquivo": "scripts/seed-database.ts",
-   "linhas": 875
   },
   {
    "arquivo": "src/components/melhorenvio/MECarrinhoPanel.tsx",
@@ -543,6 +579,10 @@
   {
    "arquivo": "src/pages/FretesInternos.tsx",
    "linhas": 834
+  },
+  {
+   "arquivo": "scripts/ci/github-settings-guard.mjs",
+   "linhas": 829
   },
   {
    "arquivo": "src/pages/Relatorios.tsx",
@@ -569,40 +609,30 @@
    "linhas": 687
   },
   {
-   "arquivo": "supabase/functions/accuracy-meta-monitor/simulator_test.ts",
-   "linhas": 657
-  },
-  {
    "arquivo": "src/pages/DashboardCotacoes.tsx",
    "linhas": 640
   }
  ],
  "qualidade": {
-  "any": 58,
-  "console_log": 57,
+  "any": 57,
+  "console_log": 139,
   "ts_ignore": 0,
-  "eslint_disable": 1,
-  "todos": 3,
+  "eslint_disable": 3,
+  "todos": 2,
   "arquivos_acima_500_linhas": 34
  },
  "todos": [
   {
-   "arquivo": "scripts/ai-context/gerar.mjs",
-   "linha": 188,
-   "tipo": "TODO",
-   "texto": "|FIXME|HACK|XXX)\\b[:\\s-]*([^\\n]{0,100})/.exec(line); if (m) todos.push({ linha: ln, tipo: m[1], text"
+   "arquivo": "scripts/ai-context/cenarios.mjs",
+   "linha": 154,
+   "tipo": "FIXME",
+   "texto": "rever\\nexport const A = () => <div role=\\\"alert\\\">{supabase.rpc('get_seq_scan_x')}</div>;\"); }, (J)"
   },
   {
-   "arquivo": "scripts/ai-context/gerar.mjs",
-   "linha": 222,
+   "arquivo": "scripts/ai-context/gerar.unit.mjs",
+   "linha": 617,
    "tipo": "TODO",
-   "texto": "|FIXME|HACK|XXX)\\b[:\\s-]*([^\\n]{0,100})/.exec(l); return m ? { linha: i + 1, tipo: m[1], texto: m[2]"
-  },
-  {
-   "arquivo": "scripts/regras_negocio/generate.py",
-   "linha": 570,
-   "tipo": "TODO",
-   "texto": "\", \"http\", \"import\")) and \"://\" not in c:"
+   "texto": "trocar a API\\nconst re = /\\\\b(TODO|FIXME)\\\\b/;\\nconst s = 'TODO';\\nexport const A = () => <p>\\n  {/*"
   }
  ],
  "alertas": {
@@ -633,8 +663,6 @@
    "audit_logs_y2026m12"
   ],
   "tabelas_usadas_sem_definicao": [
-   "avatars",
-   "documents",
    "integracoes_bitrix"
   ],
   "tabelas_com_drift_migration_vs_types": [
@@ -659,13 +687,7 @@
    "Skeleton",
    "Toaster"
   ],
-  "scripts_orfaos": [
-   "scripts/audit/content_hash.sql",
-   "scripts/audit/manifest_detail.sql",
-   "scripts/audit/manifest_summary.sql",
-   "scripts/cleanup_triggers_source.sql",
-   "scripts/origem_remediacao_2026-08-31.sql"
-  ],
+  "scripts_orfaos": [],
   "env_usadas_nao_declaradas": [
    "DEV",
    "MODE",
@@ -674,10 +696,9 @@
   ],
   "ciclos_de_import": 3,
   "possiveis_segredos_no_codigo": [
-   "scripts/ai-context/cenarios.mjs:102",
    "src/components/dashboard/LogisticsMapWidget.tsx:73",
-   "tests/security/integrations-access.spec.ts:7",
-   "tests/security/rls-access.spec.ts:7"
+   "tests/security/integrations-access.spec.ts:12",
+   "tests/security/rls-access.spec.ts:13"
   ]
  },
  "erros_do_gerador": []

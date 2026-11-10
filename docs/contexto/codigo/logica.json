@@ -54,7 +54,7 @@
     "upsert_pointer",
     "walk_repo"
    ],
-   "linhas": 2138,
+   "linhas": 2253,
    "tabelas": [],
    "rpcs": [],
    "edges": [],
@@ -96,7 +96,7 @@
     "producer_health",
     "read_manifest"
    ],
-   "linhas": 237,
+   "linhas": 259,
    "tabelas": [],
    "rpcs": [],
    "edges": [],
@@ -127,7 +127,11 @@
     "banner",
     "build_function_callers",
     "callers_status_table",
+    "cli",
     "code",
+    "connect_db",
+    "connection_error_text",
+    "cron_message",
     "diff_fingerprints",
     "dumps",
     "env_int",
@@ -195,9 +199,10 @@
     "update_changelog",
     "uslug",
     "valid_previous_snapshot",
-    "write"
+    "write",
+    "DatabaseUnavailable"
    ],
-   "linhas": 1791,
+   "linhas": 1909,
    "tabelas": [],
    "rpcs": [],
    "edges": [],
@@ -348,7 +353,7 @@
     "services/resilience",
     "utils"
    ],
-   "coberto_por_testes": 1,
+   "coberto_por_testes": 2,
    "orfao": false
   },
   {
@@ -1336,10 +1341,7 @@
    ],
    "export_default": null,
    "linhas": 51,
-   "tabelas": [
-    "avatars",
-    "documents"
-   ],
+   "tabelas": [],
    "rpcs": [],
    "edges": [],
    "env": [],

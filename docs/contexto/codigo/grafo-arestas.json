@@ -4,7 +4,43 @@
  "arestas": {
   "scripts/ai-context/cenarios.mjs": [
    "src/components/ui/index.ts",
-   "src/hooks/index.ts"
+   "src/hooks/index.ts",
+   "src/pages/Auth.tsx"
+  ],
+  "scripts/ci/actions-kpi.mjs": [
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/ci/branch-podaveis.mjs": [
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/ci/fila-merge.mjs": [
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/ci/sla-code-scanning.mjs": [
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/db-audit/check-catalog-fresh.mjs": [
+   "scripts/db-audit/database-identity.mjs",
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/db-audit/check-grants-fresh.mjs": [
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/db-audit/check-manifest-fresh.mjs": [
+   "scripts/db-audit/database-identity.mjs",
+   "scripts/db-audit/manifest-lib.mjs",
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/db-audit/check-remocoes-destrutivas.mjs": [
+   "scripts/db-audit/supabase-usage-guard.mjs"
+  ],
+  "scripts/db-audit/local-pg-proxy.mjs": [
+   "scripts/db-audit/database-identity.mjs",
+   "scripts/db-audit/psql-environment.mjs",
+   "scripts/lib/seguranca-processo.mjs"
+  ],
+  "scripts/db-audit/supabase-usage-guard.mjs": [
+   "scripts/db-audit/sql-lexer.mjs"
   ],
   "src/App.tsx": [
    "src/components/LazyProviders.tsx",
@@ -4065,9 +4101,6 @@
    "supabase/functions/_shared/logger.ts",
    "supabase/functions/_shared/validate.ts"
   ],
-  "supabase/functions/_shared/crypto_test.ts": [
-   "supabase/functions/_shared/crypto.ts"
-  ],
   "supabase/functions/_shared/idempotency.ts": [
    "supabase/functions/_shared/logger.ts"
   ],
@@ -4087,25 +4120,10 @@
   "supabase/functions/_shared/webhookSignature.ts": [
    "supabase/functions/_shared/logger.ts"
   ],
-  "supabase/functions/accuracy-meta-monitor/channelHealth_test.ts": [
-   "supabase/functions/accuracy-meta-monitor/channelHealth.ts"
-  ],
-  "supabase/functions/accuracy-meta-monitor/escalation_test.ts": [
-   "supabase/functions/accuracy-meta-monitor/escalation.ts"
-  ],
   "supabase/functions/accuracy-meta-monitor/index.ts": [
    "supabase/functions/_shared/cors.ts",
    "supabase/functions/_shared/logger.ts",
    "supabase/functions/accuracy-meta-monitor/escalation.ts"
-  ],
-  "supabase/functions/accuracy-meta-monitor/index_test.ts": [
-   "supabase/functions/accuracy-meta-monitor/index.ts"
-  ],
-  "supabase/functions/accuracy-meta-monitor/simulator_test.ts": [
-   "supabase/functions/accuracy-meta-monitor/simulator.ts"
-  ],
-  "supabase/functions/accuracy-weekly-digest/digest_test.ts": [
-   "supabase/functions/accuracy-weekly-digest/digest.ts"
   ],
   "supabase/functions/accuracy-weekly-digest/index.ts": [
    "supabase/functions/_shared/logger.ts",
@@ -4134,9 +4152,6 @@
   "supabase/functions/check-rate-limit/index.ts": [
    "supabase/functions/_shared/cors.ts",
    "supabase/functions/_shared/logger.ts"
-  ],
-  "supabase/functions/db-health-weekly-report/index_test.ts": [
-   "supabase/functions/db-health-weekly-report/index.ts"
   ],
   "supabase/functions/evolution-whatsapp/index.ts": [
    "supabase/functions/_shared/auth.ts",

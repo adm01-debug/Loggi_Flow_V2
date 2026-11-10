@@ -21,20 +21,20 @@
    "src/services (5)"
   ],
   "testes": [
-   "co-localizado (*.test) (24)",
-   "tests/ (11)",
-   "outro (4)"
+   "co-localizado (*.test) (67)",
+   "outro (42)",
+   "tests/ (11)"
   ],
   "edge_functions": "supabase/functions",
   "migrations": "supabase/migrations",
   "scripts": [
-   "scripts/audit (5)",
-   "scripts/ops (3)",
-   "scripts/regras_negocio (3)"
+   "scripts/db-audit (15)",
+   "scripts/ci (10)",
+   "scripts/audit (5)"
   ],
   "docs": [
    "docs (26)",
-   "(raiz) (8)",
+   "(raiz) (9)",
    ".github (1)"
   ]
  },
@@ -43,7 +43,7 @@
   "hooks": "use + PascalCase",
   "servicos": "camelCase (93%)",
   "edge_functions": "kebab-case (98%)",
-  "tabelas": "snake_case (88%)"
+  "tabelas": "snake_case (89%)"
  },
  "barrels_index": 25,
  "extensao_componentes": [
@@ -58,18 +58,19 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
-   "chore(contexto): automação de contexto para agentes de IA (branch `contexto`) (#104)",
-   "fix(deps): destrava a CI do repo — lockfile, tipos Recharts 3, ruleset do React Compiler e 4 CVEs (#108)",
-   "fix: endurece manifest_detail e manifest_data com padrao idempotente (#103)",
-   "delete x",
-   "delete x"
+   "fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)",
+   "fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)",
+   "feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)",
+   "feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi",
+   "fix(ci): renomeia contexto.yml → contexto-ia.yml para forçar novo registro (#115)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",
  "codeowners": null,
  "contributing": "CONTRIBUTING.md",
  "instrucoes_agentes": [
-  "AGENTS.md"
+  "AGENTS.md",
+  "CLAUDE.md"
  ],
  "typescript": {
   "strict": true,

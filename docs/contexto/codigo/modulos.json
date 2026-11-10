@@ -44,9 +44,7 @@
    ],
    "flags": [],
    "papeis": [
-    "admin",
-    "alert",
-    "status"
+    "admin"
    ],
    "diretos": {
     "edges": [],
@@ -94,10 +92,7 @@
    "canais_realtime": [],
    "env": [],
    "flags": [],
-   "papeis": [
-    "alert",
-    "status"
-   ],
+   "papeis": [],
    "diretos": {
     "edges": [],
     "tabelas": [],
@@ -585,9 +580,7 @@
     "VITE_SUPABASE_URL"
    ],
    "flags": [],
-   "papeis": [
-    "alert"
-   ],
+   "papeis": [],
    "diretos": {
     "edges": [],
     "tabelas": [
@@ -682,11 +675,7 @@
    ],
    "flags": [],
    "papeis": [
-    "admin",
-    "alert",
-    "group",
-    "navigation",
-    "region"
+    "admin"
    ],
    "diretos": {
     "edges": [
@@ -1328,8 +1317,6 @@
    "papeis": [
     "admin",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "diretos": {
@@ -1720,8 +1707,7 @@
    ],
    "flags": [],
    "papeis": [
-    "admin",
-    "alert"
+    "admin"
    ],
    "diretos": {
     "edges": [
@@ -1936,8 +1922,7 @@
    ],
    "flags": [],
    "papeis": [
-    "admin",
-    "alert"
+    "admin"
    ],
    "diretos": {
     "edges": [
@@ -2121,8 +2106,7 @@
    ],
    "flags": [],
    "papeis": [
-    "admin",
-    "separator"
+    "admin"
    ],
    "diretos": {
     "edges": [],
@@ -2181,7 +2165,6 @@
    ],
    "tabelas": [
     "delivery_receipt_audit",
-    "documents",
     "entregas",
     "kanban_history",
     "profiles",
@@ -2207,7 +2190,6 @@
     ],
     "tabelas": [
      "delivery_receipt_audit",
-     "documents",
      "entregas",
      "kanban_history"
     ],
@@ -2316,15 +2298,7 @@
    "canais_realtime": [],
    "env": [],
    "flags": [],
-   "papeis": [
-    "alert",
-    "group",
-    "link",
-    "navigation",
-    "presentation",
-    "region",
-    "separator"
-   ],
+   "papeis": [],
    "diretos": {
     "edges": [],
     "tabelas": [],
@@ -2655,8 +2629,7 @@
    ],
    "flags": [],
    "papeis": [
-    "admin",
-    "alert"
+    "admin"
    ],
    "diretos": {
     "edges": [],
@@ -4951,7 +4924,6 @@
     "cotacoes_multicanal",
     "delay_predictions_history",
     "delivery_receipt_audit",
-    "documents",
     "entregas",
     "error_events",
     "feature_flags",
@@ -5052,13 +5024,7 @@
     "CEO",
     "Coordenadora",
     "admin",
-    "alert",
     "assistant",
-    "group",
-    "main",
-    "navigation",
-    "region",
-    "separator",
     "user"
    ],
    "diretos": {
@@ -5319,10 +5285,7 @@
    "flags": [],
    "papeis": [
     "admin",
-    "alert",
     "assistant",
-    "main",
-    "navigation",
     "user"
    ],
    "diretos": {
@@ -5441,8 +5404,7 @@
    "flags": [],
    "papeis": [
     "CEO",
-    "Coordenadora",
-    "alert"
+    "Coordenadora"
    ],
    "diretos": {
     "edges": [
@@ -6173,15 +6135,14 @@
    "hooks_definidos": [],
    "edges": [],
    "tabelas": [
-    "avatars",
     "cotacoes_frete",
-    "documents",
     "profiles",
     "user_levels",
     "user_roles"
    ],
    "rpcs": [],
    "buckets": [
+    "avatars",
     "documents"
    ],
    "canais_realtime": [],
@@ -6194,9 +6155,7 @@
    "diretos": {
     "edges": [],
     "tabelas": [
-     "avatars",
      "cotacoes_frete",
-     "documents",
      "profiles",
      "user_levels",
      "user_roles"

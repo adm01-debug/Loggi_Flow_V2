@@ -5,51 +5,364 @@
   "vitest",
   "playwright"
  ],
- "total": 39,
+ "total": 120,
  "por_tipo": {
   "contrato": 1,
   "e2e": 2,
-  "pytest": 2,
-  "unit": 34
+  "pytest": 5,
+  "unit": 112
  },
  "onde_ficam": [
   {
    "padrao": "co-localizado (*.test)",
-   "arquivos": 24
+   "arquivos": 67
+  },
+  {
+   "padrao": "outro",
+   "arquivos": 42
   },
   {
    "padrao": "tests/",
    "arquivos": 11
-  },
-  {
-   "padrao": "outro",
-   "arquivos": 4
   }
  ],
  "arquivos": [
   {
    "arquivo": "scripts/ai-context/gerar.unit.mjs",
    "tipo": "unit",
-   "linhas": 361,
+   "linhas": 685,
    "testa": [
     "src/components/auth/ProtectedRoute.tsx",
     "src/components/ui/index.ts"
    ],
+   "casos": 40
+  },
+  {
+   "arquivo": "scripts/audit/manifest-summary-content-hash.unit.mjs",
+   "tipo": "unit",
+   "linhas": 356,
+   "testa": [],
+   "casos": 5
+  },
+  {
+   "arquivo": "scripts/audit/sql.unit.mjs",
+   "tipo": "unit",
+   "linhas": 455,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "scripts/ci/actions-kpi.unit.mjs",
+   "tipo": "unit",
+   "linhas": 632,
+   "testa": [
+    "scripts/ci/actions-kpi.mjs"
+   ],
+   "casos": 61
+  },
+  {
+   "arquivo": "scripts/ci/branch-podaveis.unit.mjs",
+   "tipo": "unit",
+   "linhas": 298,
+   "testa": [
+    "scripts/ci/branch-podaveis.mjs"
+   ],
+   "casos": 31
+  },
+  {
+   "arquivo": "scripts/ci/bump-toolchain.unit.mjs",
+   "tipo": "unit",
+   "linhas": 217,
+   "testa": [],
+   "casos": 17
+  },
+  {
+   "arquivo": "scripts/ci/check-claude-md-integrity.unit.mjs",
+   "tipo": "unit",
+   "linhas": 438,
+   "testa": [],
+   "casos": 40
+  },
+  {
+   "arquivo": "scripts/ci/fila-merge.unit.mjs",
+   "tipo": "unit",
+   "linhas": 552,
+   "testa": [
+    "scripts/ci/fila-merge.mjs"
+   ],
+   "casos": 57
+  },
+  {
+   "arquivo": "scripts/ci/github-settings-guard.unit.mjs",
+   "tipo": "unit",
+   "linhas": 813,
+   "testa": [
+    "scripts/ci/github-settings-guard.mjs"
+   ],
+   "casos": 59
+  },
+  {
+   "arquivo": "scripts/ci/install-scripts.unit.mjs",
+   "tipo": "unit",
+   "linhas": 183,
+   "testa": [],
+   "casos": 14
+  },
+  {
+   "arquivo": "scripts/ci/sla-code-scanning.unit.mjs",
+   "tipo": "unit",
+   "linhas": 204,
+   "testa": [
+    "scripts/ci/sla-code-scanning.mjs"
+   ],
+   "casos": 23
+  },
+  {
+   "arquivo": "scripts/ci/typecheck-ratchet.unit.mjs",
+   "tipo": "unit",
+   "linhas": 480,
+   "testa": [
+    "scripts/ci/typecheck-ratchet.mjs"
+   ],
+   "casos": 46
+  },
+  {
+   "arquivo": "scripts/db-audit/check-fresh.unit.mjs",
+   "tipo": "unit",
+   "linhas": 399,
+   "testa": [
+    "scripts/db-audit/manifest-lib.mjs"
+   ],
+   "casos": 4
+  },
+  {
+   "arquivo": "scripts/db-audit/database-identity.unit.mjs",
+   "tipo": "unit",
+   "linhas": 205,
+   "testa": [
+    "scripts/db-audit/database-identity.mjs"
+   ],
+   "casos": 10
+  },
+  {
+   "arquivo": "scripts/db-audit/gen-types.unit.mjs",
+   "tipo": "unit",
+   "linhas": 283,
+   "testa": [],
+   "casos": 1
+  },
+  {
+   "arquivo": "scripts/db-audit/lote-pendente.unit.mjs",
+   "tipo": "unit",
+   "linhas": 108,
+   "testa": [],
+   "casos": 7
+  },
+  {
+   "arquivo": "scripts/db-audit/psql-environment.unit.mjs",
+   "tipo": "unit",
+   "linhas": 281,
+   "testa": [
+    "scripts/db-audit/database-identity.mjs",
+    "scripts/db-audit/psql-environment.mjs"
+   ],
+   "casos": 13
+  },
+  {
+   "arquivo": "scripts/db-audit/sql-banco-local.unit.mjs",
+   "tipo": "unit",
+   "linhas": 227,
+   "testa": [
+    "scripts/db-audit/psql-environment.mjs"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "scripts/db-audit/sql-lexer.unit.mjs",
+   "tipo": "unit",
+   "linhas": 129,
+   "testa": [
+    "scripts/db-audit/sql-lexer.mjs"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "scripts/db-audit/supabase-usage-guard.unit.mjs",
+   "tipo": "unit",
+   "linhas": 418,
+   "testa": [],
+   "casos": 8
+  },
+  {
+   "arquivo": "scripts/gates/audit-gate.unit.mjs",
+   "tipo": "unit",
+   "linhas": 92,
+   "testa": [
+    "scripts/gates/helpers.mjs"
+   ],
+   "casos": 6
+  },
+  {
+   "arquivo": "scripts/gates/check-warning-budget.unit.mjs",
+   "tipo": "unit",
+   "linhas": 173,
+   "testa": [
+    "scripts/gates/helpers.mjs"
+   ],
+   "casos": 17
+  },
+  {
+   "arquivo": "scripts/gates/generate-quality-report.unit.mjs",
+   "tipo": "unit",
+   "linhas": 116,
+   "testa": [
+    "scripts/gates/helpers.mjs"
+   ],
+   "casos": 9
+  },
+  {
+   "arquivo": "scripts/gates/ratchet-warning-budget.unit.mjs",
+   "tipo": "unit",
+   "linhas": 90,
+   "testa": [
+    "scripts/gates/helpers.mjs"
+   ],
+   "casos": 7
+  },
+  {
+   "arquivo": "scripts/gates/validate-csp.unit.mjs",
+   "tipo": "unit",
+   "linhas": 112,
+   "testa": [
+    "scripts/gates/helpers.mjs"
+   ],
+   "casos": 6
+  },
+  {
+   "arquivo": "scripts/gates/validate-no-console.unit.mjs",
+   "tipo": "unit",
+   "linhas": 122,
+   "testa": [
+    "scripts/gates/helpers.mjs"
+   ],
+   "casos": 9
+  },
+  {
+   "arquivo": "scripts/graphify/setup.unit.mjs",
+   "tipo": "unit",
+   "linhas": 234,
+   "testa": [],
+   "casos": 22
+  },
+  {
+   "arquivo": "scripts/inventario/gerar-banco.unit.mjs",
+   "tipo": "unit",
+   "linhas": 818,
+   "testa": [
+    "scripts/inventario/gerar-banco.mjs"
+   ],
+   "casos": 56
+  },
+  {
+   "arquivo": "scripts/inventario/gerar-repo.unit.mjs",
+   "tipo": "unit",
+   "linhas": 200,
+   "testa": [],
+   "casos": 14
+  },
+  {
+   "arquivo": "scripts/inventario/gerar-rotas.unit.mjs",
+   "tipo": "unit",
+   "linhas": 491,
+   "testa": [
+    "scripts/inventario/gerar-rotas.mjs",
+    "src/components/auth/ProtectedRoute.tsx",
+    "src/components/layout/MainLayout.tsx",
+    "src/components/ui/button.tsx",
+    "src/integrations/supabase/client.ts"
+   ],
+   "casos": 26
+  },
+  {
+   "arquivo": "scripts/inventario/mudou-conteudo.unit.mjs",
+   "tipo": "unit",
+   "linhas": 252,
+   "testa": [
+    "scripts/inventario/mudou-conteudo.mjs"
+   ],
+   "casos": 21
+  },
+  {
+   "arquivo": "scripts/lib/seguranca-processo.unit.mjs",
+   "tipo": "unit",
+   "linhas": 269,
+   "testa": [
+    "scripts/lib/seguranca-processo.mjs"
+   ],
+   "casos": 28
+  },
+  {
+   "arquivo": "scripts/ops/backup_origem.unit.mjs",
+   "tipo": "unit",
+   "linhas": 236,
+   "testa": [],
    "casos": 18
+  },
+  {
+   "arquivo": "scripts/ops/pos-deploy-functions.unit.mjs",
+   "tipo": "unit",
+   "linhas": 181,
+   "testa": [],
+   "casos": 18
+  },
+  {
+   "arquivo": "scripts/ops/set-missing-secrets.unit.mjs",
+   "tipo": "unit",
+   "linhas": 331,
+   "testa": [],
+   "casos": 37
   },
   {
    "arquivo": "scripts/regras_negocio/test_generate.py",
    "tipo": "pytest",
-   "linhas": 164,
+   "linhas": 557,
    "testa": [],
-   "casos": 0
+   "casos": 33
+  },
+  {
+   "arquivo": "scripts/regras_negocio/test_indice.py",
+   "tipo": "pytest",
+   "linhas": 236,
+   "testa": [],
+   "casos": 18
+  },
+  {
+   "arquivo": "scripts/regras_negocio/test_publish.py",
+   "tipo": "pytest",
+   "linhas": 397,
+   "testa": [],
+   "casos": 27
+  },
+  {
+   "arquivo": "scripts/seed/seed-database.unit.mjs",
+   "tipo": "unit",
+   "linhas": 650,
+   "testa": [],
+   "casos": 41
+  },
+  {
+   "arquivo": "scripts/supabase_snapshot/test_snapshot_postgres.py",
+   "tipo": "pytest",
+   "linhas": 310,
+   "testa": [],
+   "casos": 11
   },
   {
    "arquivo": "scripts/supabase_snapshot/test_snapshot.py",
    "tipo": "pytest",
-   "linhas": 878,
+   "linhas": 1306,
    "testa": [],
-   "casos": 0
+   "casos": 59
   },
   {
    "arquivo": "src/components/security/SecurityOverviewPanel.regression.test.ts",
@@ -267,6 +580,60 @@
    "casos": 2
   },
   {
+   "arquivo": "supabase/functions/_shared/crypto_test.ts",
+   "tipo": "unit",
+   "linhas": 27,
+   "testa": [
+    "supabase/functions/_shared/crypto.ts"
+   ],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/accuracy-meta-monitor/channelHealth_test.ts",
+   "tipo": "unit",
+   "linhas": 108,
+   "testa": [
+    "supabase/functions/accuracy-meta-monitor/channelHealth.ts"
+   ],
+   "casos": 6
+  },
+  {
+   "arquivo": "supabase/functions/accuracy-meta-monitor/escalation_test.ts",
+   "tipo": "unit",
+   "linhas": 132,
+   "testa": [
+    "supabase/functions/accuracy-meta-monitor/escalation.ts"
+   ],
+   "casos": 9
+  },
+  {
+   "arquivo": "supabase/functions/accuracy-meta-monitor/index_test.ts",
+   "tipo": "unit",
+   "linhas": 9,
+   "testa": [
+    "supabase/functions/accuracy-meta-monitor/index.ts"
+   ],
+   "casos": 1
+  },
+  {
+   "arquivo": "supabase/functions/accuracy-meta-monitor/simulator_test.ts",
+   "tipo": "unit",
+   "linhas": 657,
+   "testa": [
+    "supabase/functions/accuracy-meta-monitor/simulator.ts"
+   ],
+   "casos": 28
+  },
+  {
+   "arquivo": "supabase/functions/accuracy-weekly-digest/digest_test.ts",
+   "tipo": "unit",
+   "linhas": 138,
+   "testa": [
+    "supabase/functions/accuracy-weekly-digest/digest.ts"
+   ],
+   "casos": 7
+  },
+  {
    "arquivo": "supabase/functions/ai-logistics-assistant/index.test.ts",
    "tipo": "unit",
    "linhas": 73,
@@ -276,6 +643,225 @@
    "casos": 2
   },
   {
+   "arquivo": "supabase/functions/bitrix24-integration/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/carrier-webhook-receiver/index_test.ts",
+   "tipo": "unit",
+   "linhas": 38,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/check-password-breach/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/check-rate-limit/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/db-health-weekly-report/index_test.ts",
+   "tipo": "unit",
+   "linhas": 7,
+   "testa": [
+    "supabase/functions/db-health-weekly-report/index.ts"
+   ],
+   "casos": 1
+  },
+  {
+   "arquivo": "supabase/functions/evolution-whatsapp/index_test.ts",
+   "tipo": "unit",
+   "linhas": 41,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/execute-protocol/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/external-db-bridge/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/geocode-address/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/get-mapbox-token/index_test.ts",
+   "tipo": "unit",
+   "linhas": 17,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/get-weather-data/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/health-check/index_test.ts",
+   "tipo": "unit",
+   "linhas": 17,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/health/index_test.ts",
+   "tipo": "unit",
+   "linhas": 21,
+   "testa": [],
+   "casos": 4
+  },
+  {
+   "arquivo": "supabase/functions/ingest-biosync/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/lalamove-api/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/lalamove-tracking/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/lalamove-webhook/index_test.ts",
+   "tipo": "unit",
+   "linhas": 31,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/lgpd-erase-user/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/log-login-attempt/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/log-security-event/index_test.ts",
+   "tipo": "unit",
+   "linhas": 50,
+   "testa": [],
+   "casos": 4
+  },
+  {
+   "arquivo": "supabase/functions/melhor-envio-api/index_test.ts",
+   "tipo": "unit",
+   "linhas": 41,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/new-device-alert/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/nexus-auto-healing/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/nexus-webhook-receiver/index_test.ts",
+   "tipo": "unit",
+   "linhas": 25,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/normalize-freight-response/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/ocr-receipt-processor/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/predict-delays-scheduled/index_test.ts",
+   "tipo": "unit",
+   "linhas": 28,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/predict-delays/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/resend-email/index_test.ts",
+   "tipo": "unit",
+   "linhas": 29,
+   "testa": [],
+   "casos": 4
+  },
+  {
+   "arquivo": "supabase/functions/rodonaves-api/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/rodonaves-webhook/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 1
+  },
+  {
    "arquivo": "supabase/functions/scheduled-reports/index.test.ts",
    "tipo": "unit",
    "linhas": 97,
@@ -283,6 +869,48 @@
     "supabase/functions/scheduled-reports/index.ts"
    ],
    "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/secure-store/index_test.ts",
+   "tipo": "unit",
+   "linhas": 29,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/send-password-reset/index_test.ts",
+   "tipo": "unit",
+   "linhas": 19,
+   "testa": [],
+   "casos": 3
+  },
+  {
+   "arquivo": "supabase/functions/smart-carrier-selection/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/validate-login/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/webhook-status/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
+  },
+  {
+   "arquivo": "supabase/functions/whatsapp-notification/index_test.ts",
+   "tipo": "unit",
+   "linhas": 18,
+   "testa": [],
+   "casos": 2
   },
   {
    "arquivo": "tests/contracts/nexus-contracts.spec.ts",
@@ -364,12 +992,29 @@
  ],
  "sql": [],
  "cobertura_por_arquivo": {
-  "src/components/auth/ProtectedRoute.tsx": 1,
+  "scripts/ci/actions-kpi.mjs": 1,
+  "scripts/ci/branch-podaveis.mjs": 1,
+  "scripts/ci/fila-merge.mjs": 1,
+  "scripts/ci/github-settings-guard.mjs": 1,
+  "scripts/ci/sla-code-scanning.mjs": 1,
+  "scripts/ci/typecheck-ratchet.mjs": 1,
+  "scripts/db-audit/database-identity.mjs": 2,
+  "scripts/db-audit/manifest-lib.mjs": 1,
+  "scripts/db-audit/psql-environment.mjs": 2,
+  "scripts/db-audit/sql-lexer.mjs": 1,
+  "scripts/gates/helpers.mjs": 6,
+  "scripts/inventario/gerar-banco.mjs": 1,
+  "scripts/inventario/gerar-rotas.mjs": 1,
+  "scripts/inventario/mudou-conteudo.mjs": 1,
+  "scripts/lib/seguranca-processo.mjs": 1,
+  "src/components/auth/ProtectedRoute.tsx": 2,
+  "src/components/layout/MainLayout.tsx": 1,
+  "src/components/ui/button.tsx": 1,
   "src/components/ui/index.ts": 1,
   "src/hooks/common/useBulkActions.ts": 1,
   "src/hooks/rodonaves/useGatewayHealth.ts": 1,
   "src/hooks/rodonaves/useSLOSnapshots.ts": 1,
-  "src/integrations/supabase/client.ts": 1,
+  "src/integrations/supabase/client.ts": 2,
   "src/lib/conciliacaoImport.ts": 1,
   "src/lib/formatters.ts": 1,
   "src/lib/predictions/mitigationROI.ts": 2,
@@ -387,7 +1032,14 @@
   "src/lib/rodonaves/sloReport.ts": 1,
   "src/utils/systemTester.ts": 1,
   "supabase/functions/_shared/circuitBreaker.ts": 1,
+  "supabase/functions/_shared/crypto.ts": 1,
+  "supabase/functions/accuracy-meta-monitor/channelHealth.ts": 1,
+  "supabase/functions/accuracy-meta-monitor/escalation.ts": 1,
+  "supabase/functions/accuracy-meta-monitor/index.ts": 1,
+  "supabase/functions/accuracy-meta-monitor/simulator.ts": 1,
+  "supabase/functions/accuracy-weekly-digest/digest.ts": 1,
   "supabase/functions/ai-logistics-assistant/index.ts": 1,
+  "supabase/functions/db-health-weekly-report/index.ts": 1,
   "supabase/functions/scheduled-reports/index.ts": 1
  },
  "sem_teste": {
@@ -455,7 +1107,6 @@
    "src/pages/admin/QualityGate.tsx"
   ],
   "hooks": [
-   "scripts/ai-context/cenarios.mjs",
    "src/components/accessibility/index.ts",
    "src/components/accessibility/LiveRegion.tsx",
    "src/components/accessibility/ReducedMotion.tsx",
@@ -629,47 +1280,8 @@
    "src/utils/performance.ts"
   ],
   "edges": [
-   "accuracy-meta-monitor",
-   "accuracy-weekly-digest",
-   "bitrix24-integration",
-   "carrier-webhook-receiver",
-   "check-password-breach",
-   "check-rate-limit",
    "db-health-snapshot",
-   "db-health-weekly-report",
-   "db-regression-monitor",
-   "evolution-whatsapp",
-   "execute-protocol",
-   "external-db-bridge",
-   "geocode-address",
-   "get-mapbox-token",
-   "get-weather-data",
-   "health",
-   "health-check",
-   "ingest-biosync",
-   "lalamove-api",
-   "lalamove-tracking",
-   "lalamove-webhook",
-   "lgpd-erase-user",
-   "log-login-attempt",
-   "log-security-event",
-   "melhor-envio-api",
-   "new-device-alert",
-   "nexus-auto-healing",
-   "nexus-webhook-receiver",
-   "normalize-freight-response",
-   "ocr-receipt-processor",
-   "predict-delays",
-   "predict-delays-scheduled",
-   "resend-email",
-   "rodonaves-api",
-   "rodonaves-webhook",
-   "secure-store",
-   "send-password-reset",
-   "smart-carrier-selection",
-   "validate-login",
-   "webhook-status",
-   "whatsapp-notification"
+   "db-regression-monitor"
   ],
   "servicos": [
    "src/services/api/authService.ts",

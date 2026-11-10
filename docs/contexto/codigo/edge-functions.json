@@ -42,8 +42,8 @@
   {
    "nome": "accuracy-meta-monitor",
    "entrada": "supabase/functions/accuracy-meta-monitor/index.ts",
-   "arquivos": 8,
-   "linhas": 1616,
+   "arquivos": 4,
+   "linhas": 710,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -60,6 +60,9 @@
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_URL"
    ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
    "buckets": [],
    "chama_edges": [
     "resend-email",
@@ -74,13 +77,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": true,
    "orfa": false,
-   "testes": 0
+   "testes": 4
   },
   {
    "nome": "accuracy-weekly-digest",
    "entrada": "supabase/functions/accuracy-weekly-digest/index.ts",
-   "arquivos": 3,
-   "linhas": 577,
+   "arquivos": 2,
+   "linhas": 439,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS",
@@ -95,6 +98,7 @@
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [
     "resend-email"
@@ -109,7 +113,7 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": true,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "ai-logistics-assistant",
@@ -133,6 +137,9 @@
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_URL"
    ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -154,8 +161,8 @@
   {
    "nome": "bitrix24-integration",
    "entrada": "supabase/functions/bitrix24-integration/index.ts",
-   "arquivos": 2,
-   "linhas": 281,
+   "arquivos": 1,
+   "linhas": 263,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -167,10 +174,9 @@
    "env": [
     "BITRIX24_WEBHOOK_URL",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -188,13 +194,13 @@
    ],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "carrier-webhook-receiver",
    "entrada": "supabase/functions/carrier-webhook-receiver/index.ts",
-   "arquivos": 2,
-   "linhas": 144,
+   "arquivos": 1,
+   "linhas": 106,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -205,10 +211,9 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -224,23 +229,21 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "check-password-breach",
    "entrada": "supabase/functions/check-password-breach/index.ts",
-   "arquivos": 2,
-   "linhas": 125,
+   "arquivos": 1,
+   "linhas": 107,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
    ],
    "tabelas": [],
    "rpcs": [],
-   "env": [
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
-   ],
+   "env": [],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -255,13 +258,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "check-rate-limit",
    "entrada": "supabase/functions/check-rate-limit/index.ts",
-   "arquivos": 2,
-   "linhas": 167,
+   "arquivos": 1,
+   "linhas": 149,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -273,9 +276,10 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -290,7 +294,7 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "db-health-snapshot",
@@ -311,6 +315,7 @@
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -324,8 +329,8 @@
   {
    "nome": "db-health-weekly-report",
    "entrada": "supabase/functions/db-health-weekly-report/index.ts",
-   "arquivos": 2,
-   "linhas": 227,
+   "arquivos": 1,
+   "linhas": 220,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -345,6 +350,7 @@
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -355,7 +361,7 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": true,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "db-regression-monitor",
@@ -379,6 +385,7 @@
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -392,8 +399,8 @@
   {
    "nome": "evolution-whatsapp",
    "entrada": "supabase/functions/evolution-whatsapp/index.ts",
-   "arquivos": 2,
-   "linhas": 278,
+   "arquivos": 1,
+   "linhas": 237,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -402,9 +409,14 @@
    "rpcs": [],
    "env": [
     "EVOLUTION_API_KEY",
-    "EVOLUTION_API_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "EVOLUTION_API_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -423,13 +435,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "execute-protocol",
    "entrada": "supabase/functions/execute-protocol/index.ts",
-   "arquivos": 2,
-   "linhas": 83,
+   "arquivos": 1,
+   "linhas": 65,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -440,10 +452,9 @@
    ],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -454,13 +465,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "external-db-bridge",
    "entrada": "supabase/functions/external-db-bridge/index.ts",
-   "arquivos": 2,
-   "linhas": 355,
+   "arquivos": 1,
+   "linhas": 337,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -474,9 +485,10 @@
     "EXTERNAL_SUPABASE_URL",
     "SUPABASE_ANON_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -491,13 +503,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "geocode-address",
    "entrada": "supabase/functions/geocode-address/index.ts",
-   "arquivos": 2,
-   "linhas": 121,
+   "arquivos": 1,
+   "linhas": 103,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -505,10 +517,9 @@
    "tabelas": [],
    "rpcs": [],
    "env": [
-    "MAPBOX_PUBLIC_TOKEN",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "MAPBOX_PUBLIC_TOKEN"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -525,13 +536,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "get-mapbox-token",
    "entrada": "supabase/functions/get-mapbox-token/index.ts",
-   "arquivos": 2,
-   "linhas": 52,
+   "arquivos": 1,
+   "linhas": 35,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -539,10 +550,9 @@
    "tabelas": [],
    "rpcs": [],
    "env": [
-    "MAPBOX_PUBLIC_TOKEN",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "MAPBOX_PUBLIC_TOKEN"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -554,13 +564,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "get-weather-data",
    "entrada": "supabase/functions/get-weather-data/index.ts",
-   "arquivos": 2,
-   "linhas": 66,
+   "arquivos": 1,
+   "linhas": 48,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -570,10 +580,9 @@
    "env": [
     "OPENWEATHER_API_KEY",
     "SUPABASE_ANON_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -586,13 +595,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": true,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "health",
    "entrada": "supabase/functions/health/index.ts",
-   "arquivos": 2,
-   "linhas": 103,
+   "arquivos": 1,
+   "linhas": 82,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -603,27 +612,24 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
-   "chama_edges": [
-    "health-check"
-   ],
+   "chama_edges": [],
    "hosts_externos": [],
    "usa_shared": [],
    "chamada_pelo_front": [],
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "health-check",
    "entrada": "supabase/functions/health-check/index.ts",
-   "arquivos": 2,
-   "linhas": 73,
+   "arquivos": 1,
+   "linhas": 56,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -634,9 +640,10 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -650,18 +657,16 @@
    "chamada_pelo_front": [
     "src/utils/systemTester.ts"
    ],
-   "chamada_por_edges": [
-    "health"
-   ],
+   "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "ingest-biosync",
    "entrada": "supabase/functions/ingest-biosync/index.ts",
-   "arquivos": 2,
-   "linhas": 116,
+   "arquivos": 1,
+   "linhas": 98,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -674,10 +679,9 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [
     "bitrix24-integration"
@@ -690,13 +694,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": true,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "lalamove-api",
    "entrada": "supabase/functions/lalamove-api/index.ts",
-   "arquivos": 2,
-   "linhas": 188,
+   "arquivos": 1,
+   "linhas": 170,
    "verify_jwt": true,
    "metodos": [
     "GET",
@@ -709,9 +713,12 @@
    "env": [
     "LALAMOVE_API_KEY",
     "LALAMOVE_API_SECRET",
-    "LALAMOVE_BASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "LALAMOVE_BASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_URL"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -731,13 +738,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "lalamove-tracking",
    "entrada": "supabase/functions/lalamove-tracking/index.ts",
-   "arquivos": 2,
-   "linhas": 201,
+   "arquivos": 1,
+   "linhas": 183,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -746,9 +753,10 @@
    "rpcs": [],
    "env": [
     "LALAMOVE_API_KEY",
-    "LALAMOVE_API_SECRET",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "LALAMOVE_API_SECRET"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -769,13 +777,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "lalamove-webhook",
    "entrada": "supabase/functions/lalamove-webhook/index.ts",
-   "arquivos": 2,
-   "linhas": 274,
+   "arquivos": 1,
+   "linhas": 243,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS",
@@ -792,9 +800,10 @@
     "ALLOW_TEST_MODE",
     "LALAMOVE_API_SECRET",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -810,13 +819,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "lgpd-erase-user",
    "entrada": "supabase/functions/lgpd-erase-user/index.ts",
-   "arquivos": 2,
-   "linhas": 125,
+   "arquivos": 1,
+   "linhas": 107,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -830,9 +839,10 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -844,13 +854,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": true,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "log-login-attempt",
    "entrada": "supabase/functions/log-login-attempt/index.ts",
-   "arquivos": 2,
-   "linhas": 99,
+   "arquivos": 1,
+   "linhas": 81,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -861,10 +871,9 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -877,13 +886,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "log-security-event",
    "entrada": "supabase/functions/log-security-event/index.ts",
-   "arquivos": 2,
-   "linhas": 210,
+   "arquivos": 1,
+   "linhas": 160,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -897,9 +906,11 @@
     "SECURITY_ALERT_EMAIL",
     "SECURITY_SLACK_WEBHOOK_URL",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -917,13 +928,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "melhor-envio-api",
    "entrada": "supabase/functions/melhor-envio-api/index.ts",
-   "arquivos": 2,
-   "linhas": 397,
+   "arquivos": 1,
+   "linhas": 356,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -931,9 +942,16 @@
    "tabelas": [],
    "rpcs": [],
    "env": [
-    "MELHOR_ENVIO_TOKEN",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "MELHOR_ENVIO_TOKEN"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_URL"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -957,13 +975,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "new-device-alert",
    "entrada": "supabase/functions/new-device-alert/index.ts",
-   "arquivos": 2,
-   "linhas": 218,
+   "arquivos": 1,
+   "linhas": 200,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -975,10 +993,9 @@
    "env": [
     "RESEND_API_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -993,13 +1010,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "nexus-auto-healing",
    "entrada": "supabase/functions/nexus-auto-healing/index.ts",
-   "arquivos": 2,
-   "linhas": 120,
+   "arquivos": 1,
+   "linhas": 102,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1013,10 +1030,9 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -1029,13 +1045,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "nexus-webhook-receiver",
    "entrada": "supabase/functions/nexus-webhook-receiver/index.ts",
-   "arquivos": 2,
-   "linhas": 181,
+   "arquivos": 1,
+   "linhas": 156,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -1048,10 +1064,9 @@
    "env": [
     "NEXUS_WEBHOOK_SECRET",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [
     "normalize-freight-response"
@@ -1071,13 +1086,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "normalize-freight-response",
    "entrada": "supabase/functions/normalize-freight-response/index.ts",
-   "arquivos": 2,
-   "linhas": 229,
+   "arquivos": 1,
+   "linhas": 211,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1091,10 +1106,9 @@
    "env": [
     "OPENAI_API_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [
     "whatsapp-notification"
@@ -1117,30 +1131,30 @@
    ],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "ocr-receipt-processor",
    "entrada": "supabase/functions/ocr-receipt-processor/index.ts",
-   "arquivos": 2,
-   "linhas": 117,
+   "arquivos": 1,
+   "linhas": 99,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
    ],
    "tabelas": [
     "delivery_receipt_audit",
-    "documents",
     "entregas"
    ],
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
-   "buckets": [],
+   "env_via_shared": [],
+   "buckets": [
+    "documents"
+   ],
    "chama_edges": [],
    "hosts_externos": [],
    "usa_shared": [
@@ -1154,13 +1168,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "predict-delays",
    "entrada": "supabase/functions/predict-delays/index.ts",
-   "arquivos": 2,
-   "linhas": 388,
+   "arquivos": 1,
+   "linhas": 370,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1177,9 +1191,10 @@
    "env": [
     "GOOGLE_API_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [
@@ -1202,13 +1217,13 @@
    ],
    "chamada_por_sql_ou_cron": true,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "predict-delays-scheduled",
    "entrada": "supabase/functions/predict-delays-scheduled/index.ts",
-   "arquivos": 2,
-   "linhas": 182,
+   "arquivos": 1,
+   "linhas": 154,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -1221,9 +1236,12 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
    ],
    "buckets": [],
    "chama_edges": [
@@ -1239,13 +1257,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": true,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "resend-email",
    "entrada": "supabase/functions/resend-email/index.ts",
-   "arquivos": 2,
-   "linhas": 98,
+   "arquivos": 1,
+   "linhas": 69,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -1253,9 +1271,13 @@
    "tabelas": [],
    "rpcs": [],
    "env": [
-    "RESEND_API_KEY",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "RESEND_API_KEY"
+   ],
+   "env_via_shared": [
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -1272,13 +1294,13 @@
    ],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "rodonaves-api",
    "entrada": "supabase/functions/rodonaves-api/index.ts",
-   "arquivos": 2,
-   "linhas": 1372,
+   "arquivos": 1,
+   "linhas": 1354,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1294,9 +1316,12 @@
     "RODONAVES_PASSWORD",
     "RODONAVES_USERNAME",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_URL"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -1330,13 +1355,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": true,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "rodonaves-webhook",
    "entrada": "supabase/functions/rodonaves-webhook/index.ts",
-   "arquivos": 2,
-   "linhas": 251,
+   "arquivos": 1,
+   "linhas": 233,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -1350,10 +1375,9 @@
    "env": [
     "ALLOW_TEST_MODE",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -1370,7 +1394,7 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "scheduled-reports",
@@ -1391,6 +1415,9 @@
     "RESEND_API_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -1413,8 +1440,8 @@
   {
    "nome": "secure-store",
    "entrada": "supabase/functions/secure-store/index.ts",
-   "arquivos": 2,
-   "linhas": 126,
+   "arquivos": 1,
+   "linhas": 97,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1423,9 +1450,11 @@
    "rpcs": [],
    "env": [
     "SUPABASE_ANON_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "FIELD_ENCRYPTION_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -1439,13 +1468,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": true,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "send-password-reset",
    "entrada": "supabase/functions/send-password-reset/index.ts",
-   "arquivos": 2,
-   "linhas": 199,
+   "arquivos": 1,
+   "linhas": 180,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1457,10 +1486,9 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -1475,13 +1503,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "smart-carrier-selection",
    "entrada": "supabase/functions/smart-carrier-selection/index.ts",
-   "arquivos": 2,
-   "linhas": 269,
+   "arquivos": 1,
+   "linhas": 251,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1495,9 +1523,10 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -1512,13 +1541,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "validate-login",
    "entrada": "supabase/functions/validate-login/index.ts",
-   "arquivos": 2,
-   "linhas": 367,
+   "arquivos": 1,
+   "linhas": 349,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1532,10 +1561,9 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -1550,13 +1578,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "webhook-status",
    "entrada": "supabase/functions/webhook-status/index.ts",
-   "arquivos": 2,
-   "linhas": 232,
+   "arquivos": 1,
+   "linhas": 214,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"
@@ -1568,10 +1596,9 @@
    "rpcs": [],
    "env": [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [],
@@ -1584,13 +1611,13 @@
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   },
   {
    "nome": "whatsapp-notification",
    "entrada": "supabase/functions/whatsapp-notification/index.ts",
-   "arquivos": 2,
-   "linhas": 277,
+   "arquivos": 1,
+   "linhas": 259,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1605,10 +1632,9 @@
     "ATICKET_API_KEY",
     "ATICKET_API_URL",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_URL"
+    "SUPABASE_URL"
    ],
+   "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
@@ -1629,7 +1655,7 @@
    ],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
-   "testes": 0
+   "testes": 1
   }
  ],
  "chamadas_sem_pasta": []

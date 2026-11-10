@@ -1,6 +1,6 @@
 # 10 · ACESSO E SEGURANÇA — quem pode o quê
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `44ea285e1e` · branch `main` · 2026-11-08 19:58 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `9c2edff8cc` · branch `main` · 2026-11-10 10:22 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Perfis / roles identificados
@@ -9,8 +9,8 @@
 
 - Tabelas de perfil/permissão: `user_roles`, `permissions`, `role_permissions`
 - Colunas de perfil: `user_roles.role` (app_role NOT NULL DEFAULT 'user'), `ai_chat_messages.role` (TEXT NOT NULL CHECK (role IN ('user', 'assistant'))), `role_permissions.role` (app_role NOT NULL)
-- Claims do JWT usados em políticas/funções: `role`
-- Funções usadas dentro de políticas RLS (a regra real está no corpo delas — veja `06`): `has_role`
+- Claims do JWT usados em políticas/funções: nenhum
+- Funções usadas dentro de políticas RLS (a regra real está no corpo delas — veja `docs/contexto/supabase/` (snapshot do banco real)): `get_current_organization_id`, `has_role`
 
 ## Matriz tabela × operação → quem pode (derivada das políticas RLS)
 
@@ -23,7 +23,7 @@
 | `alertas_custo` | enabled | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') |
 | `allowed_ips` | enabled | public: auth.uid() = user_id<br>public: has_role(auth.uid(), 'admin'::app_role) | public: has_role(auth.uid(), 'admin'::app_role)<br>authenticated: user_id = auth.uid() OR has_role(auth.uid(), 'admin') | public: has_role(auth.uid(), 'admin'::app_role)<br>authenticated: user_id = auth.uid() OR has_role(auth.uid(), 'admin') | public: has_role(auth.uid(), 'admin'::app_role)<br>authenticated: user_id = auth.uid() OR has_role(auth.uid(), 'admin') |
 | `architecture_decisions` | enabled | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') |
-| `audit_logs` | enabled | public: EXISTS ( SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin' ) | authenticated: auth.uid() IS NOT NULL | — | — |
+| `audit_logs` | enabled | public: EXISTS ( SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin' )<br>public: user_id IN (SELECT id FROM public.profiles WHERE organization_id = public.get_current_organization_id()) | authenticated: auth.uid() IS NOT NULL | — | — |
 | `audit_logs_y2026m07` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
 | `audit_logs_y2026m08` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
 | `audit_logs_y2026m09` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
@@ -54,7 +54,7 @@
 | `cotacoes_frete` | enabled | authenticated: auth.uid() IS NOT NULL | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') |
 | `cotacoes_multicanal` | enabled | authenticated: user_id = auth.uid() OR has_role(auth.uid(), 'admin') | authenticated: user_id = auth.uid() | authenticated: user_id = auth.uid() OR has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') |
 | `db_health_score_history` | enabled | authenticated: public.has_role(auth.uid(), 'admin'::app_role) | — | — | — |
-| `db_health_snapshots` | enabled | — | — | — | — |
+| `db_health_snapshots` | enabled | authenticated: public.has_role(auth.uid(), 'admin'::app_role) | — | — | — |
 | `db_slo_daily` | enabled | authenticated: public.has_role(auth.uid(), 'admin'::app_role) | — | — | — |
 | `delay_predictions_history` | enabled | authenticated: true<br>authenticated: public.has_role(auth.uid(), 'admin')<br>service_role: true | authenticated: public.has_role(auth.uid(), 'admin')<br>service_role: true | authenticated: public.has_role(auth.uid(), 'admin')<br>service_role: true | authenticated: public.has_role(auth.uid(), 'admin')<br>service_role: true |
 | `delivery_receipt_audit` | enabled | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: auth.uid() IS NOT NULL | — | — |
@@ -67,8 +67,8 @@
 | `freight_decisions` | enabled | public: auth.uid() = user_id OR auth.role() = 'service_role' | service_role: true | — | — |
 | `freight_integration_mappings` | enabled | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin')<br>authenticated: true | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin') | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin') | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin') |
 | `freight_selection_rules` | enabled | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin')<br>authenticated: true | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin') | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin') | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(),'admin') |
-| `freight_webhooks` | enabled | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(), 'admin') | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(), 'admin') | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(), 'admin') | public: auth.role() = 'authenticated'<br>authenticated: public.has_role(auth.uid(), 'admin') |
-| `fretes_internos` | enabled | authenticated: true<br>authenticated: auth.uid() IS NOT NULL | authenticated: true<br>authenticated: auth.uid() IS NOT NULL | authenticated: true<br>authenticated: has_role(auth.uid(), 'admin') | authenticated: true<br>authenticated: has_role(auth.uid(), 'admin') |
+| `freight_webhooks` | enabled | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') |
+| `fretes_internos` | enabled | authenticated: true<br>public: organization_id = public.get_current_organization_id()<br>authenticated: auth.uid() IS NOT NULL | authenticated: true<br>public: organization_id = public.get_current_organization_id()<br>authenticated: auth.uid() IS NOT NULL | authenticated: true<br>authenticated: has_role(auth.uid(), 'admin') | authenticated: true<br>authenticated: has_role(auth.uid(), 'admin') |
 | `geo_access_rules` | enabled | public: public.has_role(auth.uid(), 'admin') | public: public.has_role(auth.uid(), 'admin') | public: public.has_role(auth.uid(), 'admin') | public: public.has_role(auth.uid(), 'admin') |
 | `geo_blocked_attempts` | enabled | public: public.has_role(auth.uid(), 'admin') | authenticated: auth.uid() IS NOT NULL | — | — |
 | `geo_blocking_rules` | não encontrado | public: has_role(auth.uid(), 'admin'::app_role)<br>authenticated: has_role(auth.uid(), 'admin'::app_role) | public: has_role(auth.uid(), 'admin'::app_role) | public: has_role(auth.uid(), 'admin'::app_role) | public: has_role(auth.uid(), 'admin'::app_role) |
@@ -146,7 +146,7 @@
 | `user_notification_preferences` | enabled | authenticated: auth.uid() = user_id | authenticated: auth.uid() = user_id | authenticated: auth.uid() = user_id | — |
 | `user_onboarding` | enabled | public: auth.uid() = user_id | public: auth.uid() = user_id | public: auth.uid() = user_id | — |
 | `user_ranks` | enabled | public: true | — | — | — |
-| `user_roles` | enabled | public: auth.uid() = user_id | — | — | — |
+| `user_roles` | enabled | public: auth.uid() = user_id | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: public.has_role(auth.uid(), 'admin') |
 | `user_sessions` | enabled | authenticated: auth.uid() = user_id<br>authenticated: public.has_role(auth.uid(), 'admin') | authenticated: auth.uid() = user_id | authenticated: auth.uid() = user_id | authenticated: auth.uid() = user_id |
 | `v_prediction_accuracy` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
 | `v_prediction_accuracy_by_carrier` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
@@ -155,20 +155,32 @@
 | `webauthn_challenges` | enabled | authenticated: auth.uid() = user_id<br>authenticated: public.has_role(auth.uid(), 'admin'::app_role) | authenticated: auth.uid() = user_id<br>authenticated: public.has_role(auth.uid(), 'admin'::app_role) | authenticated: auth.uid() = user_id<br>authenticated: public.has_role(auth.uid(), 'admin'::app_role) | authenticated: auth.uid() = user_id<br>authenticated: public.has_role(auth.uid(), 'admin'::app_role) |
 | `webauthn_credentials` | enabled | public: auth.uid() = user_id | public: auth.uid() = user_id | public: auth.uid() = user_id | public: auth.uid() = user_id |
 | `webhook_deliveries` | enabled | authenticated: EXISTS ( SELECT 1 FROM public.client_webhooks w WHERE w.id = webhook_deliveries.webhook_id AND (w.created_by = auth.uid() OR  | authenticated: auth.uid() IS NOT NULL | — | — |
-| `webhook_events_processed` | enabled | public: true<br>authenticated: public.has_role(auth.uid(), 'admin'::app_role) | public: true | public: true | public: true |
+| `webhook_events_processed` | enabled | authenticated: public.has_role(auth.uid(), 'admin'::app_role)<br>public: auth.uid() IN (SELECT id FROM public.profiles WHERE cargo = 'admin') | — | — | — |
 
 > `—` com RLS ligado = ninguém além de service_role. `sem RLS` = qualquer chave anon lê/escreve tudo.
 
-## Onde o RLS é IGNORADO (service_role) — 119 arquivo(s)
+## Onde o RLS é IGNORADO (service_role) — 131 arquivo(s)
 
 - `scripts/ai-context/cenarios.mjs`
 - `scripts/ai-context/gerar.unit.mjs`
+- `scripts/audit/manifest-summary-content-hash.unit.mjs`
 - `scripts/audit/manifest_full.sql`
+- `scripts/audit/sql.unit.mjs`
+- `scripts/db-audit/check-fresh.unit.mjs`
+- `scripts/db-audit/check-grants-fresh.mjs`
+- `scripts/db-audit/grants-baseline.sql`
+- `scripts/db-audit/sql-banco-local.unit.mjs`
+- `scripts/inventario/gerar-banco.mjs`
+- `scripts/inventario/gerar-banco.unit.mjs`
+- `scripts/ops/pos-deploy-functions.unit.mjs`
 - `scripts/ops/pos_deploy_functions.sql`
+- `scripts/ops/set-missing-secrets.unit.mjs`
 - `scripts/origem_remediacao_2026-08-31.sql`
 - `scripts/regras_negocio/generate.py`
 - `scripts/seed-database.ts`
+- `scripts/seed/seed-database.unit.mjs`
 - `scripts/supabase_snapshot/snapshot.py`
+- `scripts/supabase_snapshot/test_snapshot_postgres.py`
 - `supabase/functions/_shared/auth.ts`
 - `supabase/functions/_shared/idempotency.ts`
 - `supabase/functions/_shared/rateLimiter.ts`
@@ -401,7 +413,10 @@
 
 | Rota | Guard | Roles | Arquivo |
 |---|---|---|---|
+| / | ProtectedRoute |  | `scripts/ai-context/gerar.unit.mjs` |
+| / | ProtectedRoute |  | `scripts/inventario/gerar-rotas.unit.mjs` |
 | / | ProtectedRoute |  | `src/App.tsx` |
+| /admin | ProtectedRoute | admin | `scripts/inventario/gerar-rotas.unit.mjs` |
 | /admin/adr | ProtectedRoute | admin | `src/App.tsx` |
 | /admin/db-health | ProtectedRoute | admin | `src/App.tsx` |
 | /admin/quality-gate | ProtectedRoute | admin | `src/App.tsx` |
@@ -411,6 +426,7 @@
 | /api-docs | ProtectedRoute | admin | `src/App.tsx` |
 | /app | ProtectedRoute |  | `scripts/ai-context/gerar.unit.mjs` |
 | /aprovacao-reset-senha | ProtectedRoute | admin | `src/App.tsx` |
+| /area | ProtectedRoute |  | `scripts/ai-context/gerar.unit.mjs` |
 | /audit-trail | ProtectedRoute | admin | `src/App.tsx` |
 | /automacao-regras | ProtectedRoute |  | `src/App.tsx` |
 | /bitrix24 | ProtectedRoute | admin | `src/App.tsx` |
@@ -450,6 +466,7 @@
 | /perfil | ProtectedRoute |  | `src/App.tsx` |
 | /ranking | ProtectedRoute |  | `src/App.tsx` |
 | /rastreamento-motorista | ProtectedRoute |  | `src/App.tsx` |
+| /rastreamento/:id | ProtectedRoute |  | `scripts/inventario/gerar-rotas.unit.mjs` |
 | /rastreamento/:id | ProtectedRoute |  | `src/App.tsx` |
 | /rate-limit | ProtectedRoute | admin | `src/App.tsx` |
 | /relatorio-pdf | ProtectedRoute |  | `src/App.tsx` |
@@ -460,7 +477,7 @@
 | /transportadoras | ProtectedRoute |  | `src/App.tsx` |
 | /webhooks | ProtectedRoute | admin | `src/App.tsx` |
 
-Guards usados: Protected, ProtectedRoute
+Guards usados: Protected, ProtectedRoute, RequireAuth
 
 Middleware matcher (Next.js): nenhum
 
@@ -495,14 +512,10 @@ Middleware matcher (Next.js): nenhum
 
 | Tabela | Problema | Arquivos |
 |---|---|---|
-| `db_health_snapshots` | RLS ligado sem nenhuma política → só service_role acessa |  |
 | `geo_blocking_rules` | acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | `geo_blocking_settings` | acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | `notificacoes_custo` | front faz UPDATE mas nenhuma política RLS permite UPDATE → vai falhar/retornar vazio para usuários | `src/hooks/logistics/useCostAlerts.tsx` |
 | `user_levels` | front faz UPDATE mas nenhuma política RLS permite UPDATE → vai falhar/retornar vazio para usuários | `src/hooks/gamification/useGamification.tsx` |
-| `user_roles` | front faz INSERT mas nenhuma política RLS permite INSERT → vai falhar/retornar vazio para usuários | `src/hooks/auth/useRole.ts` |
-| `user_roles` | front faz INSERT mas nenhuma política RLS permite INSERT → vai falhar/retornar vazio para usuários | `src/pages/GerenciamentoUsuarios.tsx` |
-| `user_roles` | front faz DELETE mas nenhuma política RLS permite DELETE → vai falhar/retornar vazio para usuários | `src/hooks/auth/useRole.ts` |
 
 ## Multi-tenancy
 
@@ -542,6 +555,7 @@ Middleware matcher (Next.js): nenhum
 |---|---|
 | `rank_badges` | `created_at`, `updated_at` |
 | `task_gifts` | `created_at`, `updated_at` |
+| `profiles` | `created_at`, `updated_at` |
 | `transportadoras` | `created_at`, `updated_at` |
 | `fornecedores` | `created_at`, `updated_at` |
 | `coletas` | `created_at`, `updated_at` |
@@ -549,7 +563,6 @@ Middleware matcher (Next.js): nenhum
 | `entregas` | `created_at`, `updated_at` |
 | `ocorrencias` | `created_at` |
 | `cotacoes_frete` | `created_at` |
-| `profiles` | `created_at`, `updated_at` |
 | `user_roles` | `created_at` |
 | `user_levels` | `created_at`, `updated_at` |
 | `achievements` | `created_at` |
@@ -604,7 +617,7 @@ Middleware matcher (Next.js): nenhum
 | `system_adr` | `created_at`, `updated_at` |
 | `ai_delay_predictions` | `created_at` |
 | `freight_selection_rules` | `created_at`, `updated_at` |
-| `freight_integration_mappings` | `created_at`, `updated_at` |
+| `freight_integration_mappings` | `created_at` |
 | `freight_decisions` | `created_at` |
 | `freight_webhooks` | `created_at`, `updated_at` |
 | `automation_audit_logs` | `created_at` |
@@ -634,6 +647,7 @@ Middleware matcher (Next.js): nenhum
 | `rte_gateway_health` | `created_at` |
 | `rte_slo_targets` | `created_at`, `updated_at`, `updated_by` |
 | `rte_slo_daily_snapshots` | `created_at`, `updated_at` |
+| `geo_blocking_rules` | `created_at`, `created_by`, `updated_at` |
 | `audit_logs_y2026m07` | `created_at` |
 | `audit_logs_y2026m08` | `created_at` |
 | `audit_logs_y2026m09` | `created_at` |
@@ -646,7 +660,6 @@ Middleware matcher (Next.js): nenhum
 | `audit_logs_y2027m04` | `created_at` |
 | `audit_logs_y2027m05` | `created_at` |
 | `audit_logs_y2027m06` | `created_at` |
-| `geo_blocking_rules` | `created_at`, `created_by`, `updated_at` |
 | `geo_blocking_settings` | `updated_at`, `updated_by` |
 | `rastreamento_historico_y2026m01` | `created_at` |
 | `rastreamento_historico_y2026m02` | `created_at` |
@@ -672,6 +685,7 @@ Middleware matcher (Next.js): nenhum
 
 | Tabela | Coluna |
 |---|---|
+| `profiles` | `email` |
 | `transportadoras` | `cnpj` |
 | `fornecedores` | `cnpj` |
 | `fornecedores` | `cep` |
@@ -679,7 +693,6 @@ Middleware matcher (Next.js): nenhum
 | `clientes` | `cep` |
 | `entregas` | `latitude` |
 | `entregas` | `longitude` |
-| `profiles` | `email` |
 | `rastreamento_alertas` | `latitude` |
 | `rastreamento_alertas` | `longitude` |
 | `password_reset_requests` | `email` |
@@ -750,8 +763,8 @@ Middleware matcher (Next.js): nenhum
 
 | Tabela | Coluna | Tipo |
 |---|---|---|
-| `coletas` | `custo_estimado` | `number` |
-| `coletas` | `custo_real` | `number` |
+| `coletas` | `custo_estimado` | `NUMERIC(10,2)` |
+| `coletas` | `custo_real` | `NUMERIC(10,2)` |
 | `entregas` | `valor_frete` | `DECIMAL(10,2)` |
 | `cotacoes_frete` | `valor` | `DECIMAL(10,2)` |
 | `user_levels` | `total_xp` | `INTEGER` |
@@ -772,7 +785,7 @@ Middleware matcher (Next.js): nenhum
 | `cotacoes_multicanal` | `valor_mercadoria` | `NUMERIC` |
 | `cotacoes_multicanal` | `valor_cotado` | `NUMERIC` |
 | `logistica_reversa` | `valor_estorno` | `DECIMAL(10,2)` |
-| `freight_selection_rules` | `price_weight` | `INTEGER` |
+| `freight_selection_rules` | `price_weight` | `NUMERIC` |
 | `performance_metrics` | `total_freights` | `INTEGER` |
 | `carrier_rankings` | `total_shipments` | `INTEGER` |
 | `internal.query_baseline` | `total_exec_time` | `double` |
