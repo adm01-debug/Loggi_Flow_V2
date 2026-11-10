@@ -6,7 +6,9 @@
 //   scripts, workflows, git e baseline. Backends: Supabase (migrations/types/edges/config),
 //   Prisma, Drizzle, TypeORM, SQL solto.
 //
-// Uso: node scripts/ai-context/gerar.mjs [--root <dir>] [--out <dir>] [--quiet]
+// Uso: node scripts/ai-context/gerar.mjs [--root|--repo <dir>] [--out <dir>] [--quiet] [--help]
+//   --out relativo é resolvido a partir de --root (não do cwd). Sai com 2 em erro de uso (flag desconhecida,
+//   valor ausente, raiz inexistente) em vez de gerar um contexto vazio do diretório errado.
 // Config opcional na raiz do repo: ai-context.config.json
 //   { "out": "inventario/ia", "skipDirs": [...], "srcDirs": [...], "menuFiles": [...],
 //     "routeFiles": [...], "aliases": { "@/": "src/" }, "typesFile": "...", "maxFileMB": 8, "publicacao": "texto do rodapé do INDEX.md" }
@@ -18,9 +20,17 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 const FORMAT_VERSION = 2;
-const args = process.argv.slice(2);
+const args = process.argv.slice(2).flatMap((a) => { const m = /^(--[\w-]+)=(.*)$/.exec(a); return m ? [m[1], m[2]] : [a]; });
+const USO = 'Uso: node scripts/ai-context/gerar.mjs [--root|--repo <dir>] [--out <dir>] [--quiet] [--help]';
+const erroDeUso = (msg) => { console.error(`[contexto-ia] ${msg}\n${USO}`); process.exit(2); };
+if (args.includes('--help') || args.includes('-h')) { console.log(`${USO}\n  --root, --repo  raiz do repositório a inventariar (padrão: env AI_CONTEXT_ROOT ou o diretório atual)\n  --out           pasta de saída; relativa à raiz (padrão: env AI_CONTEXT_DIR, ai-context.config.json → out, ou inventario/ia)\n  --quiet         sem log de progresso`); process.exit(0); }
+for (let i = 0; i < args.length; i++) {
+  if (['--root', '--repo', '--out'].includes(args[i])) { if (!args[i + 1] || args[i + 1].startsWith('--')) erroDeUso(`${args[i]} exige um valor`); i++; }
+  else if (args[i] !== '--quiet') erroDeUso(`argumento desconhecido: ${args[i]}`);
+}
 const argOf = (k, d) => { const i = args.indexOf(k); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
-const ROOT = path.resolve(argOf('--root', process.env.AI_CONTEXT_ROOT || process.cwd()));
+const ROOT = path.resolve(argOf('--root', argOf('--repo', process.env.AI_CONTEXT_ROOT || process.cwd())));
+if (!fs.existsSync(ROOT) || !fs.statSync(ROOT).isDirectory()) erroDeUso(`raiz não é um diretório: ${ROOT}`);
 const QUIET = args.includes('--quiet');
 const log = (...m) => { if (!QUIET) console.log('[contexto-ia]', ...m); };
 const ERROS = [];
@@ -29,7 +39,21 @@ const secao = (nome, fn, fallback) => { try { return fn(); } catch (e) { ERROS.p
 // ---------- util ----------
 const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
 const abs = (p) => path.join(ROOT, p);
-const CFG = (() => { try { return JSON.parse(fs.readFileSync(abs('ai-context.config.json'), 'utf8')); } catch { return {}; } })();
+// Leitura negada (EACCES/EPERM…) não pode passar em silêncio: o inventário sairia parcial sem ninguém saber.
+const semLeitura = new Set();
+const falhaLeitura = (p, e) => { const r = rel(p) || '.'; if (!e || ['ENOENT', 'ENOTDIR', 'EISDIR'].includes(e.code) || semLeitura.has(r) || semLeitura.size >= 20) return; semLeitura.add(r); ERROS.push({ secao: 'leitura', erro: `${r}: ${e.code || e.message} — conteúdo fora do inventário` }); };
+const CFG = (() => {
+  let txt; try { txt = fs.readFileSync(abs('ai-context.config.json'), 'utf8'); } catch { return {}; }
+  try {
+    const j = JSON.parse(txt.replace(/^﻿/, '')); if (!j || typeof j !== 'object' || Array.isArray(j)) throw new Error('precisa ser um objeto JSON');
+    const invalida = (k, ok) => { if (k in j && !ok(j[k])) { ERROS.push({ secao: 'config', erro: `ai-context.config.json → ${k} ignorado: tipo inválido` }); delete j[k]; } };
+    for (const k of ['skipDirs', 'srcDirs', 'menuFiles', 'routeFiles']) invalida(k, (v) => Array.isArray(v) && v.every((x) => typeof x === 'string'));
+    for (const k of ['out', 'typesFile', 'publicacao', 'graphifyDir']) invalida(k, (v) => typeof v === 'string' && v !== '');
+    invalida('maxFileMB', (v) => typeof v === 'number' && v > 0);
+    invalida('aliases', (v) => v && typeof v === 'object' && !Array.isArray(v) && Object.values(v).every((x) => typeof x === 'string'));
+    return j;
+  } catch (e) { ERROS.push({ secao: 'config', erro: `ai-context.config.json ignorado: ${e.message}` }); return {}; }
+})();
 const OUT = path.resolve(ROOT, argOf('--out', process.env.AI_CONTEXT_DIR || CFG.out || 'inventario/ia'));
 const OUT_REL = rel(OUT);
 const MAX_FILE_BYTES = (CFG.maxFileMB || 8) * 1024 * 1024;
@@ -37,14 +61,32 @@ const MAX_FILE_BYTES = (CFG.maxFileMB || 8) * 1024 * 1024;
 // workflow/branch em ai-context.config.json → "publicacao" (ou env AI_CONTEXT_PUBLICACAO).
 const PUBLICACAO = process.env.AI_CONTEXT_PUBLICACAO || CFG.publicacao || 'Publicado pelo workflow de contexto do repositório (ver .github/workflows).';
 const exists = (p) => fs.existsSync(abs(p));
-const readText = (p) => { try { const a = path.isAbsolute(p) ? p : abs(p); if (fs.statSync(a).size > MAX_FILE_BYTES) return ''; return fs.readFileSync(a, 'utf8'); } catch { return ''; } };
+const readText = (p) => { const a = path.isAbsolute(p) ? p : abs(p); try { if (fs.statSync(a).size > MAX_FILE_BYTES) return ''; return fs.readFileSync(a, 'utf8'); } catch (e) { falhaLeitura(a, e); return ''; } };
 const readJson = (p) => { try { return JSON.parse(readText(p).replace(/^﻿/, '')); } catch { return null; } };
 const uniq = (a) => [...new Set(a)].sort();
 const sortObj = (o) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 16);
 const countLines = (s) => (s ? s.split('\n').length : 0);
 const git = (...args) => { try { return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 }).trim(); } catch { return ''; } };
-const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:\\'"`])\/\/[^\n]*/g, '$1');
+// Ciente de strings e templates (aninhados): "image/*", 'src/**/*.ts' e `${a ? `//cdn` : ''}` não abrem comentário.
+// Preserva as quebras de linha: a linha N do conteúdo é a linha N do arquivo. Aspas soltas (regex literal, texto
+// JSX) valem só até o fim da linha; na dúvida o erro é manter texto, nunca apagar código.
+const stripComments = (s) => {
+  const n = s.length; let out = '', i = 0, ini = 0; const chaves = [];
+  const template = () => { while (i < n) { const c = s[i]; if (c === '\\') { i += 2; continue; } i++; if (c === '`') return; if (c === '$' && s[i] === '{') { i++; chaves.push(0); return; } } };
+  while (i < n) {
+    const c = s[i];
+    if (c === '"' || c === "'") { let j = i + 1; while (j < n && s[j] !== c && s[j] !== '\n') j += s[j] === '\\' ? 2 : 1; i = s[j] === c ? j + 1 : i + 1; }
+    else if (c === '`') { i++; template(); }
+    else if (c === '{' && chaves.length) { chaves[chaves.length - 1]++; i++; }
+    else if (c === '}' && chaves.length) { i++; if (chaves[chaves.length - 1] === 0) { chaves.pop(); template(); } else chaves[chaves.length - 1]--; }
+    else if (c === '/' && s[i + 1] === '*' && s.indexOf('*/', i + 2) >= 0) { const fim = s.indexOf('*/', i + 2) + 2; out += s.slice(ini, i) + s.slice(i, fim).replace(/[^\n]/g, ''); i = ini = fim; }
+    else if (c === '/' && s[i + 1] === '/' && s[i - 1] !== ':' && s[i - 1] !== '\\') { const f = s.indexOf('\n', i); out += s.slice(ini, i); i = ini = f < 0 ? n : f; }
+    else i++;
+  }
+  return out + s.slice(ini);
+};
+// Toda ordenação usa localeCompare(x, 'en'): sem o locale fixo, LC_ALL/LANG da máquina mudam a ordem da saída.
 const cap = (arr, n = 200) => arr.slice(0, n);
 const allMatches = (re, s, g = 1) => { const out = []; re.lastIndex = 0; let m; while ((m = re.exec(s))) out.push(m[g]); return out; };
 const byCount = (arr) => Object.entries(arr.reduce((a, k) => { a[k] = (a[k] || 0) + 1; return a; }, {})).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
@@ -59,7 +101,7 @@ const KEEP_DOT = new Set(['.github', '.env.example', '.env.sample', '.env.templa
 const ALL = [];
 (function walk(dir) {
   let ents = [];
-  try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+  try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { falhaLeitura(dir, e); return; }
   for (const e of ents) {
     if (e.name.startsWith('.') && !KEEP_DOT.has(e.name)) continue;
     const full = path.join(dir, e.name);
@@ -74,7 +116,7 @@ log(`arquivos no repo: ${ALL.length}`);
 // ---------- linguagens / stack ----------
 const EXT_LANG = { '.ts': 'TypeScript', '.tsx': 'TypeScript', '.mts': 'TypeScript', '.cts': 'TypeScript', '.js': 'JavaScript', '.jsx': 'JavaScript', '.mjs': 'JavaScript', '.cjs': 'JavaScript', '.vue': 'Vue', '.svelte': 'Svelte', '.astro': 'Astro', '.py': 'Python', '.go': 'Go', '.rs': 'Rust', '.java': 'Java', '.kt': 'Kotlin', '.rb': 'Ruby', '.php': 'PHP', '.cs': 'C#', '.swift': 'Swift', '.dart': 'Dart', '.sql': 'SQL', '.sh': 'Shell', '.css': 'CSS', '.scss': 'SCSS', '.html': 'HTML', '.md': 'Markdown', '.json': 'JSON', '.yml': 'YAML', '.yaml': 'YAML', '.toml': 'TOML' };
 const CODE_EXT = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.mts', '.cts', '.vue', '.svelte', '.astro']);
-const TEST_RE = /(\.(test|spec|e2e|contract|contracts|unit|fixture|fixtures)\.[cm]?[jt]sx?$)|(^|\/)(__tests__|tests?|fixtures|__fixtures__|e2e|qa|__mocks__|spec|cypress|playwright)\/|(^|\/)(test_\w+\.py|\w+_test\.py|conftest\.py)$/;
+const TEST_RE = /(\.(test|spec|e2e|contract|contracts|unit|fixture|fixtures)\.[cm]?[jt]sx?$)|(_test\.[cm]?[jt]sx?$)|(^|\/)(__tests__|tests?|fixtures|__fixtures__|e2e|qa|__mocks__|spec|cypress|playwright)\/|(^|\/)(test_\w+\.py|\w+_test\.py|conftest\.py)$/;
 const STORY_RE = /\.stories\.[cm]?[jt]sx?$/;
 const pkg = readJson('package.json') || {};
 const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}), ...(pkg.peerDependencies || {}) };
@@ -83,14 +125,28 @@ const pyReqs = (() => { const out = new Set(); for (const f of ALL.filter((x) =>
 const pyImportados = (() => { const out = new Set(); for (const f of ALL.filter((x) => x.endsWith('.py') && !/^(docs|qa|analise)\//.test(x)).slice(0, 2000)) for (const m of readText(f).matchAll(/^\s*(?:from\s+([\w]+)|import\s+([\w]+))/gm)) out.add((m[1] || m[2]).toLowerCase()); return out; })();
 const hasPy = (d) => pyReqs.has(d) || pyImportados.has(d);
 const langCounts = byCount(ALL.map((f) => EXT_LANG[path.extname(f).toLowerCase()]).filter(Boolean));
-const workspaces = (() => {
+const workspaces = secao('workspaces', () => {
   const w = Array.isArray(pkg.workspaces) ? pkg.workspaces : (pkg.workspaces && pkg.workspaces.packages) || []; const dirs = [];
   for (const g of w) { const base = g.replace(/\/?\*+.*$/, ''); if (!exists(base)) continue; for (const d of fs.readdirSync(abs(base))) { const pj = `${base}/${d}/package.json`; if (FILESET.has(pj)) { const p = readJson(pj) || {}; dirs.push({ pasta: `${base}/${d}`, nome: p.name || null, scripts: Object.keys(p.scripts || {}) }); } } }
   for (const pj of ALL.filter((f) => /^(apps|packages|services|libs)\/[^/]+\/package\.json$/.test(f))) if (!dirs.some((d) => `${d.pasta}/package.json` === pj)) { const p = readJson(pj) || {}; dirs.push({ pasta: dirOf(pj), nome: p.name || null, scripts: Object.keys(p.scripts || {}) }); }
-  return dirs.sort((a, b) => a.pasta.localeCompare(b.pasta));
-})();
+  return dirs.sort((a, b) => a.pasta.localeCompare(b.pasta, 'en'));
+}, []);
 const SRC_DIRS = CFG.srcDirs || uniq([...['src', 'app', 'lib', 'server', 'client', 'backend', 'frontend'].filter((d) => exists(d)), ...workspaces.flatMap((w) => [`${w.pasta}/src`, `${w.pasta}/app`].filter((d) => exists(d)))]);
 const isSrc = (f) => SRC_DIRS.some((d) => f.startsWith(d + '/')) && !/^(supabase|netlify)\/functions\//.test(f);
+// Exemplos, testes e ferramentas continuam no inventário, mas não provam uso pela aplicação.
+// srcDirs explícito permite tratar uma raiz de ferramentas como código de aplicação.
+const TOOLING_ROOT = /^(?:(?:apps|packages|services|libs)\/[^/]+\/)?(?:scripts|bin|tools|\.github|docs|inventario|analise|examples?|samples?)\//;
+const isApp = (f, d) => !d.teste && !d.story && (isSrc(f) || !TOOLING_ROOT.test(f));
+// Com mais de um lockfile (ex.: bun.lock herdado + package-lock.json), vale o declarado em packageManager e,
+// na falta dele, o gerenciador que os workflows de CI realmente instalam.
+const gerenciadorJs = () => {
+  const locks = [['bun', exists('bun.lock') || exists('bun.lockb')], ['pnpm', exists('pnpm-lock.yaml')], ['yarn', exists('yarn.lock')], ['npm', exists('package-lock.json')]].filter(([, ok]) => ok).map(([n]) => n);
+  const declarado = (/^(npm|pnpm|yarn|bun)@/.exec(typeof pkg.packageManager === 'string' ? pkg.packageManager : '') || [])[1];
+  if (declarado || locks.length < 2) return declarado || locks[0] || null;
+  const ci = ALL.filter((f) => /^\.github\/workflows\/.+\.ya?ml$/.test(f)).map((f) => readText(f).replace(/^\s*#.*$/gm, '')).join('\n');
+  const usos = (n) => (ci.match(new RegExp(`\\b${n}\\s+(?:ci|install|i)\\b`, 'g')) || []).length;
+  return locks.slice().sort((a, b) => usos(b) - usos(a))[0];
+};
 const stack = {
   linguagens: langCounts.slice(0, 8).map(([l, n]) => `${l} (${n})`),
   linguagem_principal: (langCounts.find(([l]) => !['Markdown', 'JSON', 'YAML', 'TOML', 'CSS', 'SCSS', 'HTML', 'Shell', 'SQL'].includes(l)) || ['n/d'])[0],
@@ -102,7 +158,7 @@ const stack = {
   testes: [has('vitest') && 'vitest', has('jest') && 'jest', has('@playwright/test') && 'playwright', has('cypress') && 'cypress', has('mocha') && 'mocha', hasPy('pytest') && 'pytest'].filter(Boolean),
   ui: [has('tailwindcss') && 'tailwind', (has('@radix-ui/react-dialog') || exists('components.json')) && 'radix/shadcn', has('@mui/material') && 'mui', has('antd') && 'antd', has('@chakra-ui/react') && 'chakra'].filter(Boolean),
   estado: [has('@tanstack/react-query') && 'react-query', has('zustand') && 'zustand', has('redux') && 'redux', has('@reduxjs/toolkit') && 'redux-toolkit', has('jotai') && 'jotai', has('pinia') && 'pinia', has('swr') && 'swr'].filter(Boolean),
-  gerenciador_pacotes: exists('bun.lock') || exists('bun.lockb') ? 'bun' : exists('pnpm-lock.yaml') ? 'pnpm' : exists('yarn.lock') ? 'yarn' : exists('package-lock.json') ? 'npm' : exists('poetry.lock') ? 'poetry' : exists('uv.lock') ? 'uv' : exists('Pipfile.lock') ? 'pipenv' : exists('requirements.txt') ? 'pip' : 'não detectado',
+  gerenciador_pacotes: gerenciadorJs() || (exists('poetry.lock') ? 'poetry' : exists('uv.lock') ? 'uv' : exists('Pipfile.lock') ? 'pipenv' : exists('requirements.txt') ? 'pip' : 'não detectado'),
   node: readText('.nvmrc').trim() || (pkg.engines && pkg.engines.node) || null,
   python: readText('.python-version').trim() || null,
   deploy: [exists('vercel.json') && 'vercel', exists('netlify.toml') && 'netlify', exists('Dockerfile') && 'docker', ALL.some((f) => /docker-(compose|stack)[\w.-]*\.ya?ml$/.test(f)) && 'compose/swarm', exists('fly.toml') && 'fly', exists('render.yaml') && 'render', exists('railway.json') && 'railway', exists('wrangler.toml') && 'cloudflare', exists('serverless.yml') && 'serverless'].filter(Boolean),
@@ -152,7 +208,8 @@ const RE = {
   dyn: /import\(\s*['"]([^'"]+)['"]\s*\)/g,
   req: /require\(\s*['"]([^'"]+)['"]\s*\)/g,
   hook: /\b(use[A-Z]\w*)\s*\(/g,
-  from: /\.from\(\s*['"`]([\w.]+)['"`]/g,
+  // storage.from('bucket') é bucket (RE.storage), e Buffer/Array.from('x') não é tabela
+  from: /(?<!(?:\bstorage|\bBuffer|\bArray|\b(?:Big)?(?:Ui|I)nt\d+(?:Clamped)?Array|\bFloat\d+Array)\s*)\.from\(\s*['"`]([\w.]+)['"`]/g,
   rpc: /\.rpc\(\s*['"`](\w+)['"`]/g,
   invoke: /functions\.invoke\(\s*['"`]([\w-]+)['"`]/g,
   fnUrl: /\/functions\/v1\/([\w-]+)/g,
@@ -162,7 +219,7 @@ const RE = {
   exp: /export\s+(?:async\s+)?(?:const|let|var|function\*?|class|enum|interface|type|abstract\s+class)\s+([A-Za-z_$][\w$]*)/g,
   expList: /export\s*\{([^}]+)\}/g,
   expDefault: /export\s+default\s+(?:async\s+)?(?:function\s*\*?\s*|class\s+)?([A-Za-z_$][\w$]*)?/g,
-  storage: /storage\.from\(\s*['"`]([\w-]+)['"`]/g,
+  storage: /storage\s*\.from\(\s*['"`]([\w-]+)['"`]/g,
   channel: /\.channel\(\s*['"`]([^'"`]+)['"`]/g,
   urlHost: /https?:\/\/([a-z0-9.-]+\.[a-z]{2,})(?=[/'"`\s)?]|$)/gi,
   flag: /(?:isFeatureEnabled|useFeatureFlag|useFlag|useFeature|getFlag|featureFlag|isEnabled)\(\s*['"`]([\w.:-]+)['"`]/g,
@@ -175,6 +232,11 @@ const RE = {
   nestRoute: /@(Get|Post|Put|Patch|Delete|All)\(\s*(?:['"`]([^'"`]*)['"`])?\s*\)/g,
   nestCtrl: /@Controller\(\s*(?:['"`]([^'"`]*)['"`])?\s*\)/,
 };
+// role="alert" e afins são ARIA (acessibilidade), não papel de usuário
+const ARIA_ROLE = /\brole=(["'])(?:alert|alertdialog|application|article|banner|button|cell|checkbox|columnheader|combobox|complementary|contentinfo|dialog|document|feed|figure|form|grid|gridcell|group|heading|img|link|list|listbox|listitem|log|main|menu|menubar|menuitem|menuitemcheckbox|menuitemradio|navigation|none|note|option|presentation|progressbar|radio|radiogroup|region|row|rowgroup|rowheader|search|searchbox|separator|slider|spinbutton|status|switch|tab|table|tablist|tabpanel|textbox|timer|toolbar|tooltip|tree|treegrid|treeitem)\1/g;
+// Marcador de pendência só conta dentro de comentário; em string, regex ou texto de tela é falso positivo.
+const TODO_RE = /(?:\/\/|\/\*|^\s*\*|<!-{2})[^\n]*?\b(TODO|FIXME|HACK|XXX)\b[:\s-]*([^\n]{0,100})/;
+const TODO_PY_RE = /\x23[^\n]*?\b(TODO|FIXME|HACK|XXX)\b[:\s-]*([^\n]{0,100})/;
 const envNames = (s) => uniq([...allMatches(RE.envVite, s), ...allMatches(RE.envNode, s), ...allMatches(RE.envDeno, s)]);
 for (const f of CODE_FILES) secao(`arquivo:${f}`, () => {
   const raw = readText(f);
@@ -185,7 +247,7 @@ for (const f of CODE_FILES) secao(`arquivo:${f}`, () => {
   const expDef = allMatches(RE.expDefault, src).filter(Boolean);
   const exportsNamed = uniq([...allMatches(RE.exp, src), ...expDef, ...allMatches(RE.expList, src).flatMap((l) => l.split(',').map((x) => x.trim().split(/\s+as\s+/).pop()).filter((x) => x && /^[A-Za-z_$][\w$]*$/.test(x)))]);
   const todos = []; let ln = 0;
-  for (const line of raw.split('\n')) { ln++; const m = /\b(TODO|FIXME|HACK|XXX)\b[:\s-]*([^\n]{0,100})/.exec(line); if (m) todos.push({ linha: ln, tipo: m[1], texto: m[2].trim() }); }
+  for (const line of raw.split('\n')) { ln++; const m = TODO_RE.exec(line); if (m) todos.push({ linha: ln, tipo: m[1], texto: m[2].replace(/\s*\*\/\}?\s*$/, '').trim() }); }
   const isTest = TEST_RE.test(f); const isStory = STORY_RE.test(f);
   const base = baseOf(f);
   const temJsx = (/\.(tsx|jsx)$/.test(f) && /(?<![\w.])<[a-zA-Z][\w.-]*(?:\s[^<>]*)?\/?>/.test(src)) || /\.(vue|svelte|astro)$/.test(f);
@@ -197,7 +259,7 @@ for (const f of CODE_FILES) secao(`arquivo:${f}`, () => {
     hooks: uniq(allMatches(RE.hook, src)), tabelas: uniq([...allMatches(RE.from, src), ...allMatches(RE.prisma, src)]), rpcs: uniq(allMatches(RE.rpc, src)),
     edges: uniq([...allMatches(RE.invoke, src), ...allMatches(RE.fnUrl, src)]), env: envNames(src), buckets: uniq(allMatches(RE.storage, src)), canais_realtime: uniq(allMatches(RE.channel, src)),
     hosts_externos: uniq(allMatches(RE.urlHost, src).map((h) => h.toLowerCase())).filter((h) => !/localhost|example\.(com|org)|w3\.org|schema\.org|github\.com|npmjs\.com|deno\.land|esm\.sh|jsdelivr|unpkg/.test(h)),
-    flags: uniq([...allMatches(RE.flag, src), ...allMatches(RE.flagEnv, src)]), papeis: uniq(allMatches(RE.role, src)), zod: (src.match(RE.zod) || []).length,
+    flags: uniq([...allMatches(RE.flag, src), ...allMatches(RE.flagEnv, src)]), papeis: uniq(allMatches(RE.role, src.replace(ARIA_ROLE, ''))), zod: (src.match(RE.zod) || []).length,
     rotas_http: rotasHttp, drizzle: uniq(allMatches(RE.drizzleTable, src)),
     todos, teste: isTest, story: isStory,
     componente: temJsx && !isTest && !isStory && (exportsNamed.some((e) => /^[A-Z]/.test(e)) || /\.(vue|svelte|astro)$/.test(f)),
@@ -219,7 +281,7 @@ for (const f of PY_FILES) secao(`py:${f}`, () => {
   const local = uniq(mods.map((m) => { const k = m.replace(/^\.+/, ''); for (const cand of [k, 'src.' + k, 'app.' + k]) if (PY_MODS.has(cand)) return PY_MODS.get(cand); const parts = k.split('.'); while (parts.length) { const cnd = parts.join('.'); if (PY_MODS.has(cnd)) return PY_MODS.get(cnd); parts.pop(); } return null; }).filter(Boolean));
   const rotas = [...src.matchAll(/@(?:app|router|api|bp|blueprint)\.(get|post|put|patch|delete|route)\(\s*['"]([^'"]+)['"]([^)]*)\)/g)].map((m) => ({ metodo: m[1] === 'route' ? (/methods\s*=\s*\[([^\]]*)\]/.exec(m[3]) || [, 'GET'])[1].replace(/['"\s]/g, '') : m[1].toUpperCase(), caminho: m[2] }));
   for (const m of src.matchAll(/\b(?:path|re_path|url)\(\s*r?['"]([^'"]+)['"]/g)) rotas.push({ metodo: 'DJANGO', caminho: m[1] });
-  PY.set(f, { linhas: countLines(raw), imports: local, externos: uniq(mods.filter((m) => !m.startsWith('.')).map((m) => m.split('.')[0])).filter((m) => !PY_MODS.has(m)), defs: uniq(allMatches(/^(?:async\s+)?def\s+(\w+)/gm, src)), classes: uniq(allMatches(/^class\s+(\w+)/gm, src)), rotas_http: rotas, env: uniq([...allMatches(/os\.environ(?:\.get)?\s*[[(]\s*['"](\w+)['"]/g, src), ...allMatches(/getenv\(\s*['"](\w+)['"]/g, src)]), teste: TEST_RE.test(f), modelos: uniq(allMatches(/^class\s+(\w+)\((?:[\w.]*(?:Model|Base|BaseModel|DeclarativeBase)[\w.]*)\)/gm, src)), hooks: [], tabelas: [], rpcs: [], edges: [], buckets: [], canais_realtime: [], flags: [], papeis: [], todos: raw.split('\n').map((l, i) => { const m = /\b(TODO|FIXME|HACK|XXX)\b[:\s-]*([^\n]{0,100})/.exec(l); return m ? { linha: i + 1, tipo: m[1], texto: m[2].trim() } : null; }).filter(Boolean) });
+  PY.set(f, { linhas: countLines(raw), imports: local, externos: uniq(mods.filter((m) => !m.startsWith('.')).map((m) => m.split('.')[0])).filter((m) => !PY_MODS.has(m)), defs: uniq(allMatches(/^(?:async\s+)?def\s+(\w+)/gm, src)), classes: uniq(allMatches(/^class\s+(\w+)/gm, src)), rotas_http: rotas, env: uniq([...allMatches(/os\.environ(?:\.get)?\s*[[(]\s*['"](\w+)['"]/g, src), ...allMatches(/getenv\(\s*['"](\w+)['"]/g, src)]), teste: TEST_RE.test(f), modelos: uniq(allMatches(/^class\s+(\w+)\((?:[\w.]*(?:Model|Base|BaseModel|DeclarativeBase)[\w.]*)\)/gm, src)), hooks: [], tabelas: [], rpcs: [], edges: [], buckets: [], canais_realtime: [], flags: [], papeis: [], todos: raw.split('\n').map((l, i) => { const m = TODO_PY_RE.exec(l); return m ? { linha: i + 1, tipo: m[1], texto: m[2].trim() } : null; }).filter(Boolean), casos_teste: (src.match(/^\s*(?:async\s+)?def\s+test_\w*/gm) || []).length });
 });
 const anyFile = (f) => FILE.get(f) || PY.get(f);
 
@@ -262,13 +324,13 @@ const localHooks = (hooks) => hooks.filter((h) => HOOK_FILES_BY_NAME.has(h));
 const hooksOut = secao('hooks', () => {
   const out = [];
   for (const [f, d] of FILE) {
-    if (d.teste) continue;
+    if (!isApp(f, d)) continue;
     const names = d.exports.filter((e) => /^use[A-Z]/.test(e));
     if (!names.length && !d.hook_arquivo) continue;
     for (const n of names) if (!HOOK_FILES_BY_NAME.has(n)) HOOK_FILES_BY_NAME.set(n, f);
     out.push({ arquivo: f, hooks_exportados: names, linhas: d.linhas, dominio: dominioDe(f), tabelas: d.tabelas, rpcs: d.rpcs, edges: d.edges, hooks_internos: d.hooks.filter((h) => !names.includes(h)), canais_realtime: d.canais_realtime, usado_por: usedBy(f).length, usado_por_arquivos: cap(usedBy(f), 30), coberto_por_testes: 0 });
   }
-  return out.sort((a, b) => a.arquivo.localeCompare(b.arquivo));
+  return out.sort((a, b) => a.arquivo.localeCompare(b.arquivo, 'en'));
 }, []);
 
 // ---------- rotas / telas ----------
@@ -305,7 +367,7 @@ secao('rotas-jsx', () => {
       if (m[0].startsWith('</')) { stack.pop(); continue; }
       const attrs = m[1] || ''; const self = m[2] === '/';
       const p = /\bpath=["']([^"']*)["']/.exec(attrs) || /\bpath:\s*["']([^"']*)["']/.exec(attrs); const isIndex = /\bindex\b/.test(attrs);
-      const parent = stack.length ? stack[stack.length - 1] : null;
+      const parent = stack.length ? stack[stack.length - 1].full : null;
       const full = p ? joinPath(parent, p[1]) : isIndex ? parent || '/' : parent;
       const tags = [...attrs.matchAll(/<([A-Z]\w*)/g)].map((x) => x[1]);
       const props = [...attrs.matchAll(/\w+=\{\s*([A-Z]\w*)\s*\}/g)].map((x) => x[1]);
@@ -317,9 +379,12 @@ secao('rotas-jsx', () => {
       if (!comp) for (const cnd of ordem.filter((x) => !GENERIC.test(x))) { const fl = componentFile(cnd, rf); if (fl) { comp = cnd; file = fl; break; } }
       if (!comp) { const inner = tags[tags.length - 1]; if (inner && !/^(Navigate|Redirect)$/.test(inner)) { comp = inner; file = componentFile(inner, rf); } }
       const redir = /<(?:Navigate|Redirect)\b[^>]*\bto=["']([^"']+)["']/.exec(attrs);
-      const paiProtegido = parent ? !!rotas.find((r) => r.caminho === parent && r.definida_em === rf && r.protegida) : false;
-      if (p || isIndex) rotas.push(mk({ caminho: full, componente: comp, arquivo: file, protegida: tags.some((w) => /Protected|Private|Auth|Guard|Require|Admin/i.test(w)) || paiProtegido, wrappers: tags.filter((t) => t !== comp), pai: parent, indice: isIndex, definida_em: rf, lazy: comp ? lazyMap.has(comp) : false, tipo: redir && !comp ? 'redirect' : 'tela', redireciona: redir ? redir[1] : null }));
-      if (!self) stack.push(full);
+      // Guarda é o que ENVOLVE a tela (ou um layout-guarda sozinho, com ou sem path); a tela não se protege pelo
+      // próprio nome: <Auth/> é a página de login e <AdminPanel/> sem wrapper é rota pública.
+      const wrappers = tags.filter((t) => t !== comp);
+      const protegida = wrappers.some((w) => /Protected|Private|Auth|Guard|Require|Admin/i.test(w)) || /^(Protected|Private|Require|Authenticated|Authorized|With(Auth|Role))|Guard$|(Auth|Admin|Private|Protected)Route$|^Admin(Layout|Gate)$/.test(comp || '') || (stack.length ? stack[stack.length - 1].protegida : false);
+      if (p || isIndex) rotas.push(mk({ caminho: full, componente: comp, arquivo: file, protegida, wrappers, pai: parent, indice: isIndex, definida_em: rf, lazy: comp ? lazyMap.has(comp) : false, tipo: redir && !comp ? 'redirect' : 'tela', redireciona: redir ? redir[1] : null }));
+      if (!self) stack.push({ full, protegida });
     }
     const scanObjs = (text, parent, depth) => {
       const re2 = /\{\s*(?:[^{}]*?\b)?path:\s*['"]([^'"]*)['"]([^{}]*(?:\{[^{}]*\}[^{}]*)*)/g; let mm;
@@ -350,8 +415,8 @@ secao('rotas-fs', () => {
   }
 });
 const apiHttp = [];
-for (const [f, d] of [...FILE, ...PY]) for (const r of d.rotas_http || []) apiHttp.push({ ...r, arquivo: f, tabelas: d.tabelas || [], env: d.env || [] });
-apiHttp.sort((a, b) => a.caminho.localeCompare(b.caminho) || a.metodo.localeCompare(b.metodo) || a.arquivo.localeCompare(b.arquivo));
+for (const [f, d] of [...FILE, ...PY]) if (isApp(f, d)) for (const r of d.rotas_http || []) apiHttp.push({ ...r, arquivo: f, tabelas: d.tabelas || [], env: d.env || [] });
+apiHttp.sort((a, b) => a.caminho.localeCompare(b.caminho, 'en') || a.metodo.localeCompare(b.metodo, 'en') || a.arquivo.localeCompare(b.arquivo, 'en'));
 const vistas = [];
 secao('vistas', () => {
   for (const [f, d] of FILE) {
@@ -365,14 +430,14 @@ secao('vistas', () => {
     while ((m = re3.exec(src))) { const tags = [...m[2].matchAll(/<(?:[A-Z]\w*\.)?([A-Z]\w*)/g)].map((x) => x[1]).filter((t) => !/Boundary|Provider|Suspense|Fragment/.test(t)); for (const t of tags) { const fl = lazyMap.has(t) ? lazyMap.get(t) : componentFile(t, f, true); if (fl) { vistas.push({ id: m[1], componente: t, arquivo: fl, registrada_em: f }); break; } } }
   }
 });
-const vistasUniq = Object.values(Object.fromEntries(vistas.map((v) => [v.id + '|' + v.componente, v]))).sort((a, b) => a.id.localeCompare(b.id));
+const vistasUniq = Object.values(Object.fromEntries(vistas.map((v) => [v.id + '|' + v.componente, v]))).sort((a, b) => a.id.localeCompare(b.id, 'en'));
 const enrich = (r) => {
   if (!r.arquivo || !FILE.has(r.arquivo)) return { ...r, hooks: [], hooks_locais: [], tabelas: [], rpcs: [], edges: [], canais_realtime: [], flags: [], papeis: [], arquivos_puxados: 0 };
   const files = [r.arquivo, ...closure(r.arquivo)]; const a = aggregate(files);
   return { ...r, hooks: a.hooks, hooks_locais: localHooks(a.hooks), tabelas: a.tabelas, rpcs: a.rpcs, edges: a.edges, canais_realtime: a.canais_realtime, flags: a.flags, papeis: a.papeis, arquivos_puxados: files.length - 1 };
 };
 const rotasDedup = Object.values(Object.fromEntries(rotas.map((r) => [`${r.caminho}|${r.componente}|${r.definida_em}`, r])));
-const rotasEnriched = rotasDedup.sort((a, b) => a.caminho.localeCompare(b.caminho) || (a.indice ? 1 : 0) - (b.indice ? 1 : 0) || a.tipo.localeCompare(b.tipo) || a.definida_em.localeCompare(b.definida_em)).map(enrich);
+const rotasEnriched = rotasDedup.sort((a, b) => a.caminho.localeCompare(b.caminho, 'en') || (a.indice ? 1 : 0) - (b.indice ? 1 : 0) || a.tipo.localeCompare(b.tipo, 'en') || a.definida_em.localeCompare(b.definida_em, 'en')).map(enrich);
 const vistasEnriched = vistasUniq.map(enrich);
 
 // ---------- menu ----------
@@ -397,14 +462,14 @@ secao('menu', () => {
     }
   }
 });
-const menuUniq = Object.values(Object.fromEntries(menu.map((v) => [v.destino + '|' + v.rotulo, v]))).sort((a, b) => (a.grupo || '').localeCompare(b.grupo || '') || a.rotulo.localeCompare(b.rotulo));
+const menuUniq = Object.values(Object.fromEntries(menu.map((v) => [v.destino + '|' + v.rotulo, v]))).sort((a, b) => (a.grupo || '').localeCompare(b.grupo || '', 'en') || a.rotulo.localeCompare(b.rotulo, 'en'));
 const norm = (p) => String(p).replace(/^\//, '').replace(/\/$/, '').split('?')[0];
 const resolveDestino = (dest) => rotasEnriched.find((r) => r.caminho === dest) || vistasEnriched.find((v) => v.id === dest) || rotasEnriched.find((r) => norm(r.caminho) === norm(dest)) || vistasEnriched.find((v) => norm(v.id) === norm(dest)) || null;
 
 // ---------- módulos ----------
 const dominios = new Map();
 for (const f of [...FILE.keys(), ...PY.keys()]) { const dom = dominioDe(f); if (!dom) continue; if (!dominios.has(dom)) dominios.set(dom, []); dominios.get(dom).push(f); }
-const modulos = secao('modulos', () => [...dominios.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([dom, files]) => {
+const modulos = secao('modulos', () => [...dominios.entries()].sort(([a], [b]) => a.localeCompare(b, 'en')).map(([dom, files]) => {
   const prod = files.filter((f) => !anyFile(f).teste);
   const direto = aggregate(prod);
   const a = aggregate(uniq(prod.flatMap((f) => [f, ...closure(f)])));
@@ -429,12 +494,13 @@ const componentes = secao('componentes', () => [...FILE.entries()].filter(([, d]
   arquivo: f, exports: d.exports.filter((e) => /^[A-Z]/.test(e)), export_default: d.export_default, linhas: d.linhas, dominio: dominioDe(f),
   hooks_locais: localHooks(d.hooks), tabelas: d.tabelas, edges: d.edges, usado_por: usedBy(f).length,
   orfao: usedBy(f).length === 0 && !rotasEnriched.some((r) => r.arquivo === f) && !vistasEnriched.some((v) => v.arquivo === f) && !lazyTargets.has(f) && !/^(?:src\/)?(?:app|pages|routes)\//.test(f),
-})).sort((a, b) => a.arquivo.localeCompare(b.arquivo)), []);
+})).sort((a, b) => a.arquivo.localeCompare(b.arquivo, 'en')), []);
 const nomesComp = {};
 for (const co of componentes) for (const e of co.exports) (nomesComp[e] = nomesComp[e] || []).push(co.arquivo);
 const componentesDuplicados = sortObj(Object.fromEntries(Object.entries(nomesComp).filter(([k, v]) => v.length > 1 && !/^(Index|Page|Layout|App|Default|Root|Props)$/.test(k))));
 
 // ---------- banco (SQL em ordem de statement) ----------
+const appFiles = [...FILE.entries()].filter(([f, d]) => isApp(f, d));
 const banco = { tabelas: {}, funcoes: new Set(), triggers: [], views: new Set(), enums: {}, extensoes: new Set(), migrations: 0, fonte: [], cron: [], buckets_sql: new Set(), seeds: [], ddl_dinamico: 0 };
 let SQL_TEXT_LOWER = '';
 const isCurrentSql = (f) => f.endsWith('.sql') && !/(^|\/)(_foreign|_superseded)\//.test(f);
@@ -502,20 +568,21 @@ secao('banco-sql', () => {
       }
       if ((m = /^drop\s+policy\s+(?:if\s+exists\s+)?("[^"]+"|\w+)\s+on\s+((?:"?\w+"?\.)?"?\w+"?)/i.exec(st))) { const t = T(m[2]); t.policies = t.policies.filter((p) => p.nome !== m[1].replace(/"/g, '')); continue; }
       if ((m = /^create\s+(unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+not\s+exists\s+)?("?\w+"?)\s+on\s+(?:only\s+)?((?:"?\w+"?\.)?"?\w+"?)\s*(?:using\s+\w+\s*)?\(([^)]+)\)/i.exec(st))) {
+        if (banco.views.has(tname(m[3]))) continue;
         const t = T(m[3]); const nome = m[2].replace(/"/g, ''); t.indices = t.indices.filter((i) => i.nome !== nome); t.indices.push({ nome, colunas: m[4].replace(/\s+/g, ' ').trim(), unico: !!m[1] }); continue;
       }
       if ((m = /^drop\s+index\s+(?:concurrently\s+)?(?:if\s+exists\s+)?(?:public\.)?"?(\w+)"?/i.exec(st))) { for (const t of Object.values(banco.tabelas)) t.indices = t.indices.filter((i) => i.nome !== m[1]); continue; }
-      if ((m = /^create\s+(?:or\s+replace\s+)?(?:function|procedure)\s+(?:public\.)?"?(\w+)"?/i.exec(st))) { banco.funcoes.add(m[1]); continue; }
-      if ((m = /^drop\s+(?:function|procedure)\s+(?:if\s+exists\s+)?(?:public\.)?"?(\w+)"?/i.exec(st))) { banco.funcoes.delete(m[1]); continue; }
-      if ((m = /^create\s+(?:or\s+replace\s+)?trigger\s+"?(\w+)"?\s+(before|after|instead\s+of)\s+([\w\s]+?)\s+on\s+((?:"?\w+"?\.)?"?\w+"?)[\s\S]*?execute\s+(?:function|procedure)\s+(?:public\.)?"?(\w+)"?/i.exec(st))) {
+      if ((m = /^create\s+(?:or\s+replace\s+)?(?:function|procedure)\s+((?:"?\w+"?\.)?"?\w+"?)/i.exec(st))) { banco.funcoes.add(tname(m[1])); continue; }
+      if ((m = /^drop\s+(?:function|procedure)\s+(?:if\s+exists\s+)?((?:"?\w+"?\.)?"?\w+"?)/i.exec(st))) { banco.funcoes.delete(tname(m[1])); continue; }
+      if ((m = /^create\s+(?:or\s+replace\s+)?trigger\s+"?(\w+)"?\s+(before|after|instead\s+of)\s+([\w\s]+?)\s+on\s+((?:"?\w+"?\.)?"?\w+"?)[\s\S]*?execute\s+(?:function|procedure)\s+((?:"?\w+"?\.)?"?\w+"?)/i.exec(st))) {
         const tb = tname(m[4]); banco.triggers = banco.triggers.filter((t) => !(t.nome === m[1] && t.tabela === tb));
-        banco.triggers.push({ nome: m[1], quando: m[2].toLowerCase(), evento: m[3].replace(/\s+/g, ' ').toLowerCase(), tabela: tb, funcao: m[5] }); continue;
+        banco.triggers.push({ nome: m[1], quando: m[2].toLowerCase(), evento: m[3].replace(/\s+/g, ' ').toLowerCase(), tabela: tb, funcao: tname(m[5]) }); continue;
       }
       if ((m = /^drop\s+trigger\s+(?:if\s+exists\s+)?"?(\w+)"?\s+on\s+((?:"?\w+"?\.)?"?\w+"?)/i.exec(st))) { const tb = tname(m[2]); banco.triggers = banco.triggers.filter((t) => !(t.nome === m[1] && t.tabela === tb)); continue; }
-      if ((m = /^create\s+(?:or\s+replace\s+)?(?:materialized\s+)?view\s+(?:public\.)?"?(\w+)"?/i.exec(st))) { banco.views.add(m[1]); continue; }
-      if ((m = /^drop\s+(?:materialized\s+)?view\s+(?:if\s+exists\s+)?(?:public\.)?"?(\w+)"?/i.exec(st))) { banco.views.delete(m[1]); continue; }
-      if ((m = /^create\s+type\s+(?:public\.)?"?(\w+)"?\s+as\s+enum\s*\(([^)]*)\)/i.exec(st))) { banco.enums[m[1]] = m[2].split(',').map((v) => v.trim().replace(/'/g, '')).filter(Boolean); continue; }
-      if ((m = /^alter\s+type\s+(?:public\.)?"?(\w+)"?\s+add\s+value\s+(?:if\s+not\s+exists\s+)?'([^']+)'/i.exec(st))) { (banco.enums[m[1]] = banco.enums[m[1]] || []).push(m[2]); continue; }
+      if ((m = /^create\s+(?:or\s+replace\s+)?(?:materialized\s+)?view\s+(?:if\s+not\s+exists\s+)?((?:"?\w+"?\.)?"?\w+"?)/i.exec(st))) { banco.views.add(tname(m[1])); continue; }
+      if ((m = /^drop\s+(?:materialized\s+)?view\s+(?:if\s+exists\s+)?((?:"?\w+"?\.)?"?\w+"?)/i.exec(st))) { banco.views.delete(tname(m[1])); continue; }
+      if ((m = /^create\s+type\s+((?:"?\w+"?\.)?"?\w+"?)\s+as\s+enum\s*\(([^)]*)\)/i.exec(st))) { banco.enums[tname(m[1])] = m[2].split(',').map((v) => v.trim().replace(/'/g, '')).filter(Boolean); continue; }
+      if ((m = /^alter\s+type\s+((?:"?\w+"?\.)?"?\w+"?)\s+add\s+value\s+(?:if\s+not\s+exists\s+)?'([^']+)'/i.exec(st))) { const en = tname(m[1]); (banco.enums[en] = banco.enums[en] || []).push(m[2]); continue; }
       if ((m = /^create\s+extension\s+(?:if\s+not\s+exists\s+)?"?([\w-]+)"?/i.exec(st))) { banco.extensoes.add(m[1]); continue; }
       if ((m = /^insert\s+into\s+storage\.buckets\s*\(([^)]*)\)\s*values\s*\(\s*'([^']+)'/i.exec(st))) { banco.buckets_sql.add(m[2]); continue; }
       if ((m = /cron\.schedule\s*\(\s*'([^']+)'\s*,\s*'([^']+)'/i.exec(st))) { const ex = banco.cron.findIndex((cj) => cj.nome === m[1]); const job = { nome: m[1], agenda: m[2], migration: path.posix.basename(f) }; if (ex >= 0) banco.cron[ex] = job; else banco.cron.push(job); continue; }
@@ -524,7 +591,14 @@ secao('banco-sql', () => {
     for (const b of bodies) { let m; const re = /cron\.schedule\s*\(\s*'([^']+)'\s*,\s*'([^']+)'/gi; while ((m = re.exec(b))) if (!banco.cron.some((cj) => cj.nome === m[1])) banco.cron.push({ nome: m[1], agenda: m[2], migration: path.posix.basename(f) }); }
   }
   SQL_TEXT_LOWER = allSql.join('\n');
-  for (const cj of banco.cron) { const m = new RegExp(`cron\\.schedule\\s*\\(\\s*'${cj.nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'[\\s\\S]{0,600}?functions/v1/([\\w-]+)`, 'i').exec(SQL_TEXT_LOWER); if (m) cj.chama_edge = m[1]; }
+  // A edge chamada é a do próprio statement, na ÚLTIMA definição do job: sem o limite, um job só-SQL herdava a edge do cron.schedule seguinte.
+  for (const cj of banco.cron) {
+    const re = new RegExp(`cron\\.schedule\\s*\\(\\s*'${cj.nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`, 'gi'); let ult = -1, m;
+    while ((m = re.exec(SQL_TEXT_LOWER))) ult = m.index + m[0].length;
+    if (ult < 0) continue;
+    const resto = SQL_TEXT_LOWER.slice(ult, ult + 4000); const fim = resto.search(/cron\.(?:un)?schedule\s*\(/);
+    const e = /functions\/v1\/([\w-]+)/.exec(fim < 0 ? resto : resto.slice(0, fim)); if (e) cj.chama_edge = e[1];
+  }
   banco.seeds = ALL.filter((f) => /(^|\/)seed[\w-]*\.sql$/.test(f));
 });
 secao('banco-orm', () => {
@@ -533,9 +607,9 @@ secao('banco-orm', () => {
     while ((m = re.exec(s))) { const t = T(m[1]); t.criada_em = path.posix.basename(f); for (const l of m[2].split('\n')) { const cm = /^\s*(\w+)\s+([\w[\]?]+)(.*)$/.exec(l); if (cm && !cm[1].startsWith('@')) { const ref = /@relation/.test(cm[3]) ? cm[2].replace(/[[\]?]/g, '') : null; t.colunas[cm[1]] = { tipo: cm[2].toLowerCase(), nn: !cm[2].endsWith('?'), pk: /@id/.test(cm[3]), default: (/@default\(([^)]*)\)/.exec(cm[3]) || [])[1] || null, ref }; if (ref) t.fks.push({ coluna: cm[1], ref }); } } }
     const re2 = /enum\s+(\w+)\s*\{([^}]*)\}/g; while ((m = re2.exec(s))) banco.enums[m[1]] = m[2].split(/\s+/).map((x) => x.trim()).filter((x) => /^\w+$/.test(x) && !/^@/.test(x));
   }
-  for (const [f, d] of FILE) for (const t of d.drizzle) { const tb = T(t); tb.criada_em = tb.criada_em || f; if (!banco.fonte.includes('drizzle')) banco.fonte.push('drizzle'); const m = new RegExp(`(?:pgTable|mysqlTable|sqliteTable)\\(\\s*['"]${t}['"]\\s*,\\s*\\{([^}]*)\\}`).exec(d.conteudo); if (m) for (const cm of m[1].matchAll(/(\w+)\s*:\s*(\w+)\(/g)) tb.colunas[cm[1]] = tb.colunas[cm[1]] || { tipo: cm[2], nn: /notNull/.test(m[1]), pk: false, default: null, ref: null }; }
-  for (const [f, d] of FILE) { let m; const re = /@Entity\(\s*(?:['"](\w+)['"])?\s*\)[\s\S]*?class\s+(\w+)/g; while ((m = re.exec(d.conteudo))) { const tb = T(m[1] || m[2]); tb.criada_em = tb.criada_em || f; if (!banco.fonte.includes('typeorm')) banco.fonte.push('typeorm'); for (const cm of d.conteudo.matchAll(/@(?:Primary\w*|Column|CreateDateColumn|UpdateDateColumn)\([^)]*\)\s*\n\s*(\w+)\s*[?!]?:\s*([\w[\]]+)/g)) tb.colunas[cm[1]] = tb.colunas[cm[1]] || { tipo: cm[2].toLowerCase(), nn: true, pk: false, default: null, ref: null }; } }
-  for (const [f, d] of PY) for (const cls of d.modelos) { const tb = T(cls); tb.criada_em = tb.criada_em || f; if (!banco.fonte.includes('python-models')) banco.fonte.push('python-models'); }
+  for (const [f, d] of appFiles) for (const t of d.drizzle) { const tb = T(t); tb.criada_em = tb.criada_em || f; if (!banco.fonte.includes('drizzle')) banco.fonte.push('drizzle'); const m = new RegExp(`(?:pgTable|mysqlTable|sqliteTable)\\(\\s*['"]${t}['"]\\s*,\\s*\\{([^}]*)\\}`).exec(d.conteudo); if (m) for (const cm of m[1].matchAll(/(\w+)\s*:\s*(\w+)\(/g)) tb.colunas[cm[1]] = tb.colunas[cm[1]] || { tipo: cm[2], nn: /notNull/.test(m[1]), pk: false, default: null, ref: null }; }
+  for (const [f, d] of appFiles) { let m; const re = /@Entity\(\s*(?:['"](\w+)['"])?\s*\)[\s\S]*?class\s+(\w+)/g; while ((m = re.exec(d.conteudo))) { const tb = T(m[1] || m[2]); tb.criada_em = tb.criada_em || f; if (!banco.fonte.includes('typeorm')) banco.fonte.push('typeorm'); for (const cm of d.conteudo.matchAll(/@(?:Primary\w*|Column|CreateDateColumn|UpdateDateColumn)\([^)]*\)\s*\n\s*(\w+)\s*[?!]?:\s*([\w[\]]+)/g)) tb.colunas[cm[1]] = tb.colunas[cm[1]] || { tipo: cm[2].toLowerCase(), nn: true, pk: false, default: null, ref: null }; } }
+  for (const [f, d] of PY) if (isApp(f, d)) for (const cls of d.modelos) { const tb = T(cls); tb.criada_em = tb.criada_em || f; if (!banco.fonte.includes('python-models')) banco.fonte.push('python-models'); }
 });
 const tabelasTypes = {};
 secao('banco-types', () => {
@@ -551,38 +625,36 @@ secao('banco-types', () => {
 });
 for (const [t, cols] of Object.entries(tabelasTypes)) T(t).colunas_types = cols;
 const EDGE_DIR = ['supabase/functions', 'functions', 'netlify/functions', 'edge-functions'].find((d) => exists(d)) || 'supabase/functions';
-// Exemplos, testes e ferramentas continuam no inventário, mas não provam uso pela aplicação.
-// srcDirs explícito permite tratar uma raiz de ferramentas como código de aplicação.
-const TOOLING_ROOT = /^(?:(?:apps|packages|services|libs)\/[^/]+\/)?(?:scripts|bin|tools|\.github|docs|inventario|analise|examples?|samples?)\//;
-const appFiles = [...FILE.entries()].filter(([f, d]) => !d.teste && !d.story && (isSrc(f) || !TOOLING_ROOT.test(f)));
 const tabelasUsadas = new Map();
 for (const [f, d] of appFiles) for (const t of d.tabelas) { if (!tabelasUsadas.has(t)) tabelasUsadas.set(t, { front: [], edges: [] }); (f.startsWith(EDGE_DIR) ? tabelasUsadas.get(t).edges : tabelasUsadas.get(t).front).push(f); }
 const bancoOut = {
   fonte: uniq(banco.fonte), migrations: banco.migrations, seeds: banco.seeds, avisos: banco.ddl_dinamico ? [`${banco.ddl_dinamico} bloco(s) com DDL dinâmico (EXECUTE format/...) não modelado — policies/colunas criadas dinamicamente podem faltar; confira no banco vivo`] : [], extensoes: [...banco.extensoes].sort(), enums: sortObj(banco.enums), views: [...banco.views].sort(), funcoes: [...banco.funcoes].sort(),
-  triggers: banco.triggers.sort((a, b) => a.tabela.localeCompare(b.tabela) || a.nome.localeCompare(b.nome)),
-  cron_jobs: banco.cron.sort((a, b) => a.nome.localeCompare(b.nome)),
-  buckets: uniq([...banco.buckets_sql, ...[...FILE.values()].flatMap((d) => d.buckets)]).map((b) => ({ nome: b, criado_em_sql: banco.buckets_sql.has(b), usado_em: [...FILE.values()].filter((d) => d.buckets.includes(b)).length })),
+  triggers: banco.triggers.sort((a, b) => a.tabela.localeCompare(b.tabela, 'en') || a.nome.localeCompare(b.nome, 'en')),
+  cron_jobs: banco.cron.sort((a, b) => a.nome.localeCompare(b.nome, 'en')),
+  buckets: uniq([...banco.buckets_sql, ...appFiles.flatMap(([, d]) => d.buckets)]).map((b) => ({ nome: b, criado_em_sql: banco.buckets_sql.has(b), usado_em: appFiles.filter(([, d]) => d.buckets.includes(b)).length })),
   tabelas: sortObj(Object.fromEntries(Object.entries(banco.tabelas).map(([n, t]) => {
     const uso = tabelasUsadas.get(n) || { front: [], edges: [] };
     const cols = Object.keys(t.colunas); const colsT = t.colunas_types ? Object.keys(t.colunas_types) : null;
-    return [n, { ...t, colunas: sortObj(t.colunas), colunas_types: t.colunas_types ? sortObj(t.colunas_types) : undefined, drift: colsT && cols.length ? { so_na_migration: cols.filter((cc) => !colsT.includes(cc)), so_no_types: colsT.filter((cc) => !cols.includes(cc)) } : undefined, policies: t.policies.sort((a, b) => a.nome.localeCompare(b.nome)), indices: t.indices.sort((a, b) => a.nome.localeCompare(b.nome)), fks: uniq(t.fks.map((x) => `${x.coluna}->${x.ref}`)), usada_no_front: uniq(uso.front).length, usada_em_edges: uniq(uso.edges.map((f) => f.split('/').slice(-2)[0])), triggers: banco.triggers.filter((tr) => tr.tabela === n).map((tr) => tr.nome), sem_rls: !t.rls && !n.includes('.') && !!t.criada_em && /\.sql$/.test(t.criada_em), nao_usada: !uso.front.length && !uso.edges.length }];
+    return [n, { ...t, colunas: sortObj(t.colunas), colunas_types: t.colunas_types ? sortObj(t.colunas_types) : undefined, drift: colsT && cols.length ? { so_na_migration: cols.filter((cc) => !colsT.includes(cc)), so_no_types: colsT.filter((cc) => !cols.includes(cc)) } : undefined, policies: t.policies.sort((a, b) => a.nome.localeCompare(b.nome, 'en')), indices: t.indices.sort((a, b) => a.nome.localeCompare(b.nome, 'en')), fks: uniq(t.fks.map((x) => `${x.coluna}->${x.ref}`)), usada_no_front: uniq(uso.front).length, usada_em_edges: uniq(uso.edges.map((f) => f.split('/').slice(-2)[0])), triggers: banco.triggers.filter((tr) => tr.tabela === n).map((tr) => tr.nome), sem_rls: !t.rls && !n.includes('.') && !!t.criada_em && /\.sql$/.test(t.criada_em), nao_usada: !uso.front.length && !uso.edges.length }];
   }))),
   tabelas_usadas_no_codigo_sem_definicao: uniq([...tabelasUsadas.keys()]).filter((t) => !banco.tabelas[t] && !banco.views.has(t)),
   rpcs_usadas_no_codigo: uniq(appFiles.flatMap(([, d]) => d.rpcs)).map((r) => ({ nome: r, definida: banco.funcoes.has(r), usada_em: appFiles.filter(([, d]) => d.rpcs.includes(r)).length })),
 };
 
 // ---------- edge functions / serverless ----------
-const configToml = readText('supabase/config.toml');
+const configToml = readText('supabase/config.toml').replace(/^[ \t]*#.*$/gm, '');
 const verifyJwt = {}; { const re = /\[functions\.([\w-]+)\]\s*\n(?:[^[]*?)verify_jwt\s*=\s*(true|false)/g; let m; while ((m = re.exec(configToml))) verifyJwt[m[1]] = m[2] === 'true'; }
 const edges = secao('edges', () => {
   const out = [];
   if (!exists(EDGE_DIR)) return out;
   for (const name of fs.readdirSync(abs(EDGE_DIR)).sort()) {
     const dir = `${EDGE_DIR}/${name}`;
-    if (!fs.statSync(abs(dir)).isDirectory() || name.startsWith('_')) continue;
+    let ehPasta = false; try { ehPasta = fs.statSync(abs(dir)).isDirectory(); } catch { /* symlink quebrado: ignora só esta entrada */ }
+    if (!ehPasta || name.startsWith('_')) continue;
     const entry = ['index.ts', 'index.js', 'main.ts', 'handler.ts', 'mod.ts'].map((e) => `${dir}/${e}`).find((p) => FILESET.has(p));
     const files = ALL.filter((f) => f.startsWith(dir + '/') && CODE_EXT.has(path.extname(f)) && !TEST_RE.test(f));
     const a = aggregate(files);
+    const viaShared = aggregate(uniq(files.flatMap((f) => closure(f))).filter((f) => !f.startsWith(dir + '/')));
     const srcAll = files.map((f) => FILE.get(f)?.conteudo || '').join('\n');
     const callers = uniq(appFiles.filter(([f, d]) => !f.startsWith(EDGE_DIR) && d.edges.includes(name)).map(([f]) => f));
     const chamadaPorEdges = uniq(appFiles.filter(([f, d]) => f.startsWith(EDGE_DIR) && !f.startsWith(dir + '/') && !f.includes('/_shared/') && d.edges.includes(name)).map(([f]) => f.split('/').slice(-2)[0]));
@@ -590,7 +662,7 @@ const edges = secao('edges', () => {
     out.push({
       nome: name, entrada: entry || null, arquivos: files.length, linhas: files.reduce((s, f) => s + (FILE.get(f)?.linhas || 0), 0),
       verify_jwt: name in verifyJwt ? verifyJwt[name] : true, metodos: uniq([...srcAll.matchAll(/req(?:uest)?\.method\s*(?:===|==|!==)\s*['"](\w+)['"]/g)].map((m) => m[1])),
-      tabelas: a.tabelas, rpcs: a.rpcs, env: a.env, buckets: a.buckets, chama_edges: a.edges.filter((e) => e !== name),
+      tabelas: a.tabelas, rpcs: a.rpcs, env: a.env, env_via_shared: viaShared.env.filter((e) => !a.env.includes(e)), buckets: a.buckets, chama_edges: a.edges.filter((e) => e !== name),
       hosts_externos: uniq(files.flatMap((f) => FILE.get(f)?.hosts_externos || [])).filter((h) => !/supabase\.co$/.test(h)),
       usa_shared: uniq(files.flatMap((f) => FILE.get(f)?.imports || []).filter((i) => i.includes('/_shared/')).map((i) => path.posix.basename(i))),
       chamada_pelo_front: callers, chamada_por_edges: chamadaPorEdges, chamada_por_sql_ou_cron: noSql,
@@ -604,26 +676,28 @@ const edgesSemPasta = uniq(appFiles.flatMap(([, d]) => d.edges)).filter((e) => !
 
 // ---------- ferramentas / scripts / workflows / deploy ----------
 const workflows = secao('workflows', () => ALL.filter((f) => /^\.github\/workflows\/.+\.ya?ml$/.test(f)).map((f) => {
-  const y = readText(f);
+  const y = readText(f); const yExec = y.replace(/^\s*#.*$/gm, ''); // linha comentada do YAML não executa nada
   const name = (/^name:\s*(.+)$/m.exec(y) || [])[1]?.trim().replace(/^['"]|['"]$/g, '') || path.posix.basename(f);
   const onBlock = (y.split(/^on:/m)[1] || '').split(/^[a-z]/m)[0];
   const gatilhos = uniq([...onBlock.matchAll(/^\s{2}([a-z_]+):/gm)].map((m) => m[1]).concat((/^on:\s*\[([^\]]*)\]/m.exec(y) || [, ''])[1].split(',').map((s) => s.trim()).filter(Boolean)));
   const jobs = [...(y.split(/^jobs:/m)[1] || '').matchAll(/^\s{2}([\w-]+):\s*$/gm)].map((m) => m[1]);
   const branches = uniq([...onBlock.matchAll(/branches:\s*\[([^\]]*)\]/g)].flatMap((m) => m[1].split(',').map((s) => s.trim().replace(/['"]/g, ''))).concat([...onBlock.matchAll(/branches:\s*\n((?:\s+-\s*.+\n)+)/g)].flatMap((m) => (m[1].match(/-\s*(\S+)/g) || []).map((x) => x.replace(/-\s*/, '').replace(/['"]/g, '')))).filter(Boolean));
-  return { arquivo: f, nome: name, gatilhos, crons: [...y.matchAll(/cron:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]), branches, jobs, permissoes: (/^permissions:[ \t]*\n((?:[ \t]+[\w-]+:[^\n]*\n)+)/m.exec(y) || [])[1]?.trim().split('\n').map((l) => l.trim()) || [], scripts_usados: uniq([...y.matchAll(/(?:node|bash|sh|npx tsx|bun|python3?|deno run)\s+((?:scripts|\.github|tools|bin)\/[\w./-]+)/g)].map((m) => m[1])), npm_scripts: uniq([...y.matchAll(/(?:npm|bun|pnpm|yarn)\s+(?:run\s+)?([\w:-]+)/g)].map((m) => m[1]).filter((s) => pkg.scripts && pkg.scripts[s])), secrets: uniq([...y.matchAll(/secrets\.(\w+)/g)].map((m) => m[1])), actions: uniq([...y.matchAll(/uses:\s*([\w./-]+)@/g)].map((m) => m[1])) };
-}).sort((a, b) => a.arquivo.localeCompare(b.arquivo)), []);
+  return { arquivo: f, nome: name, gatilhos, crons: [...y.matchAll(/cron:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]), branches, jobs, permissoes: (/^permissions:[ \t]*\n((?:[ \t]+[\w-]+:[^\n]*\n)+)/m.exec(y) || [])[1]?.trim().split('\n').map((l) => l.replace(/\s+#.*$/, '').trim()) || [], scripts_usados: uniq([...[...yExec.matchAll(/(?:node|bash|sh|npx tsx|bun|python3?|deno run)\s+((?:scripts|\.github|tools|bin)\/[\w./-]+)/g)].map((m) => m[1]), ...[...yExec.matchAll(/(?:^|[^\w./-])(?:\.\/)?((?:scripts|\.github\/scripts|tools|bin)\/[\w./-]+)/gm)].map((m) => m[1].replace(/[.,;:]+$/, '')).filter((x) => FILESET.has(x))]), npm_scripts: uniq([...y.matchAll(/(?:npm|bun|pnpm|yarn)\s+(?:run\s+)?([\w:-]+)/g)].map((m) => m[1]).filter((s) => pkg.scripts && pkg.scripts[s])), secrets: uniq([...y.matchAll(/secrets\.(\w+)/g)].map((m) => m[1])), actions: uniq([...y.matchAll(/uses:\s*([\w./-]+)@/g)].map((m) => m[1])) };
+}).sort((a, b) => a.arquivo.localeCompare(b.arquivo, 'en')), []);
 const TEXT_CORPUS = ALL.filter((o) => /\.(mjs|cjs|js|ts|tsx|sh|ya?ml|json|md|toml|py)$/.test(o) && !o.startsWith(OUT_REL)).map((o) => [o, FILE.get(o)?.conteudo ?? (fs.statSync(abs(o)).size < 512 * 1024 ? readText(o) : '')]);
 const scriptsRepo = secao('scripts', () => ALL.filter((f) => /^(scripts|bin|tools|\.github\/scripts)\//.test(f) && /\.(mjs|cjs|js|ts|sh|py|sql|ps1)$/.test(f) && !TEST_RE.test(f)).map((f) => {
-  const src = readText(f); const first = src.split('\n').slice(0, 15).map((l) => l.trim()).filter((l) => /^(\/\/|#|\*|\/\*|""")/.test(l) && !/^#!/.test(l) && !/eslint|@ts-|^\*\/|^"""$/.test(l)).map((l) => l.replace(/^(\/\/|#|\*|\/\*|""")\s?/, '')).filter(Boolean);
+  const src = readText(f); const lider = f.endsWith('.sql') ? /^--+\s?/ : /^(\/\/+|#+|\/\*+|\*+|""")\s?/;
+  let first = src.split('\n').slice(0, 15).map((l) => l.trim()).filter((l) => lider.test(l) && !/^#!/.test(l) && !/eslint|@ts-|^\*\/|^"""$/.test(l)).map((l) => l.replace(lider, '').replace(/\s*(?:\*\/|""")$/, '')).filter(Boolean);
+  if (!first.length && f.endsWith('.py')) first = ((/^(?:\s*#[^\n]*\n)*\s*(?:"""|''')([\s\S]*?)(?:"""|''')/.exec(src) || [])[1] || '').split('\n').map((l) => l.trim()).filter(Boolean);
   const bn = path.posix.basename(f);
   const usadoPorNpm = Object.entries(pkg.scripts || {}).filter(([, v]) => v.includes(f) || v.includes(bn)).map(([k]) => k);
   const usadoPorWf = workflows.filter((w) => w.scripts_usados.includes(f)).map((w) => path.posix.basename(w.arquivo));
-  return { arquivo: f, descricao: first.slice(0, 2).join(' ').slice(0, 200) || null, linhas: countLines(src), env: envNames(src), npm_scripts: usadoPorNpm, workflows: usadoPorWf, orfao: !usadoPorNpm.length && !usadoPorWf.length && !TEXT_CORPUS.some(([o, t]) => o !== f && t.includes(bn)) };
+  return { arquivo: f, descricao: first.slice(0, 2).join(' ').slice(0, 200) || null, linhas: countLines(src), env: PY.get(f)?.env || envNames(src), npm_scripts: usadoPorNpm, workflows: usadoPorWf, orfao: !usadoPorNpm.length && !usadoPorWf.length && !TEXT_CORPUS.some(([o, t]) => o !== f && t.includes(bn)) };
 }), []);
 const envExample = uniq(ALL.filter((f) => /(^|\/)\.env\.(example|sample|template)$/.test(f)).flatMap((f) => [...readText(f).matchAll(/^\s*(?:export\s+)?([A-Z][A-Z0-9_]+)\s*=/gm)].map((m) => m[1])));
-const envUsadas = uniq([...FILE.entries()].filter(([f]) => isSrc(f)).flatMap(([, d]) => d.env));
+const envUsadas = uniq(appFiles.filter(([f]) => isSrc(f)).flatMap(([, d]) => d.env));
 const envPython = uniq([...PY.values()].flatMap((d) => d.env));
-const envEdges = uniq([...FILE.entries()].filter(([f]) => f.startsWith(EDGE_DIR)).flatMap(([, d]) => d.env));
+const envEdges = uniq(appFiles.filter(([f]) => f.startsWith(EDGE_DIR)).flatMap(([, d]) => d.env));
 const configs = ALL.filter((cf) => /^(vite|next|nuxt|svelte|astro|vitest|jest|playwright|cypress|eslint|prettier|tailwind|postcss|webpack|tsup|rollup|babel|commitlint|lint-staged|knip|dependency-cruiser)\.config\.[cm]?[jt]s$|^(tsconfig[\w.-]*|jsconfig|biome|deno|components|renovate|\.?release|lerna|nx|turbo|package)\.json$|^(vercel\.json|netlify\.toml|fly\.toml|render\.yaml|wrangler\.toml|serverless\.yml|Dockerfile[\w.-]*|docker-(compose|stack)[\w.-]*\.ya?ml|supabase\/config\.toml|\.nvmrc|\.python-version|pyproject\.toml|setup\.cfg|Makefile|\.husky\/[\w-]+|CODEOWNERS|\.github\/CODEOWNERS|\.github\/dependabot\.ya?ml|\.github\/PULL_REQUEST_TEMPLATE\.md|\.editorconfig|\.prettierrc[\w.]*|\.eslintrc[\w.]*|\.gitlab-ci\.yml|ai-context\.config\.json)$/.test(cf));
 const docTitle = (f) => { const s = readText(f); return (/^#\s+(.+)$/m.exec(s) || [])[1]?.trim().slice(0, 100) || null; };
 const docsRaiz = ALL.filter((f) => /^[A-Za-z][\w.-]*\.md$/.test(f) || /^docs\/[^/]+\.md$/.test(f) || /^\.github\/[\w-]+\.md$/.test(f)).map((f) => ({ arquivo: f, titulo: docTitle(f), linhas: countLines(readText(f)) }));
@@ -634,22 +708,22 @@ const vercelJson = readJson('vercel.json');
 const changelogTopo = (() => { const s = readText(ALL.find((f) => /^CHANGELOG\.md$/i.test(f)) || ''); const m = /^##\s+(.+)$/m.exec(s); return m ? m[1].trim() : null; })();
 const integracoes = secao('integracoes', () => {
   const SDK = { stripe: 'Stripe', '@stripe/stripe-js': 'Stripe', twilio: 'Twilio', openai: 'OpenAI', '@anthropic-ai/sdk': 'Anthropic', '@google/generative-ai': 'Gemini', '@elevenlabs/react': 'ElevenLabs', '@sentry/react': 'Sentry', '@sentry/node': 'Sentry', '@sentry/nextjs': 'Sentry', 'posthog-js': 'PostHog', mixpanel: 'Mixpanel', '@segment/analytics-next': 'Segment', resend: 'Resend', nodemailer: 'SMTP', '@sendgrid/mail': 'SendGrid', 'aws-sdk': 'AWS', '@aws-sdk/client-s3': 'AWS S3', firebase: 'Firebase', 'firebase-admin': 'Firebase', '@upstash/redis': 'Upstash', ioredis: 'Redis', redis: 'Redis', 'socket.io': 'Socket.IO', pusher: 'Pusher', 'web-push': 'Web Push', '@vercel/analytics': 'Vercel Analytics', 'next-auth': 'NextAuth', '@clerk/nextjs': 'Clerk', '@auth0/auth0-react': 'Auth0', axios: 'HTTP (axios)', i18next: 'i18next', 'react-i18next': 'i18next', zod: 'zod', '@tanstack/react-query': 'react-query', 'googleapis': 'Google APIs', '@supabase/supabase-js': 'Supabase' };
-  const sdks = Object.keys(deps).filter((d) => SDK[d]).map((d) => ({ pacote: d, servico: SDK[d], versao: deps[d] })).sort((a, b) => a.servico.localeCompare(b.servico) || a.pacote.localeCompare(b.pacote));
-  const hosts = byCount([...FILE.values()].flatMap((d) => d.hosts_externos)).map(([h, n]) => ({ host: h, arquivos: n }));
+  const sdks = Object.keys(deps).filter((d) => SDK[d]).map((d) => ({ pacote: d, servico: SDK[d], versao: deps[d] })).sort((a, b) => a.servico.localeCompare(b.servico, 'en') || a.pacote.localeCompare(b.pacote, 'en'));
+  const hosts = byCount(appFiles.flatMap(([, d]) => d.hosts_externos)).map(([h, n]) => ({ host: h, arquivos: n }));
   const envHints = uniq([...envUsadas, ...envEdges, ...envExample]).filter((e) => /(API_KEY|TOKEN|SECRET|WEBHOOK|DSN|SID|CLIENT_ID|SMTP|S3|BUCKET|STRIPE|TWILIO|OPENAI|ELEVEN|SENTRY|EVOLUTION|WHATSAPP|GMAIL|GOOGLE|FIREBASE|REDIS|RESEND)/i.test(e));
   const webhooks = edges.filter((e) => !e.verify_jwt).map((e) => e.nome).concat(apiHttp.filter((r) => /webhook|callback|hook/i.test(r.caminho)).map((r) => `${r.metodo} ${r.caminho}`));
-  return { sdks, hosts_externos: hosts, env_de_integracao: envHints, webhooks_recebidos: uniq(webhooks), realtime: uniq([...FILE.values()].flatMap((d) => d.canais_realtime)) };
+  return { sdks, hosts_externos: hosts, env_de_integracao: envHints, webhooks_recebidos: uniq(webhooks), realtime: uniq(appFiles.flatMap(([, d]) => d.canais_realtime)) };
 }, { sdks: [], hosts_externos: [], env_de_integracao: [], webhooks_recebidos: [], realtime: [] });
 const permissoes = secao('permissoes', () => ({
-  papeis_no_codigo: byCount([...FILE.values()].flatMap((d) => d.papeis)).map(([p, n]) => ({ papel: p, ocorrencias: n })),
+  papeis_no_codigo: byCount(appFiles.flatMap(([, d]) => d.papeis)).map(([p, n]) => ({ papel: p, ocorrencias: n })),
   enums_de_papel: Object.entries(banco.enums).filter(([k]) => /role|papel|perfil|permission/i.test(k)).map(([k, v]) => ({ enum: k, valores: v })),
-  rpcs_de_autorizacao: bancoOut.rpcs_usadas_no_codigo.filter((r) => /admin|role|permission|can_|has_|is_|auth/i.test(r.nome)).map((r) => r.nome),
+  rpcs_de_autorizacao: bancoOut.rpcs_usadas_no_codigo.filter((r) => /admin|role|permission|(?:^|_)(?:can|has|is)_|auth/i.test(r.nome)).map((r) => r.nome),
   guards: uniq([...FILE.entries()].filter(([, d]) => d.componente && /Protected|Guard|RequireAuth|RequireRole|PrivateRoute|Authorized/.test(d.exports.join(' '))).map(([f]) => f)),
   rotas_protegidas: rotasEnriched.filter((r) => r.protegida).length, rotas_publicas: rotasEnriched.filter((r) => !r.protegida && r.tipo === 'tela').map((r) => r.caminho),
   menu_com_papeis: menuUniq.filter((m) => m.papeis.length).map((m) => ({ rotulo: m.rotulo, papeis: m.papeis })),
   tabelas_sem_rls: Object.entries(bancoOut.tabelas).filter(([, t]) => t.sem_rls).map(([n]) => n),
 }), {});
-const flags = secao('flags', () => { const all = byCount([...FILE.values()].flatMap((d) => d.flags)); return { total: all.length, flags: all.map(([f, n]) => ({ flag: f, arquivos: n })), tabelas_de_flag: Object.keys(bancoOut.tabelas).filter((t) => /flag|feature|toggle|setting/i.test(t)) }; }, { total: 0, flags: [], tabelas_de_flag: [] });
+const flags = secao('flags', () => { const all = byCount(appFiles.flatMap(([, d]) => d.flags)); return { total: all.length, flags: all.map(([f, n]) => ({ flag: f, arquivos: n })), tabelas_de_flag: Object.keys(bancoOut.tabelas).filter((t) => /flag|feature|toggle|setting/i.test(t)) }; }, { total: 0, flags: [], tabelas_de_flag: [] });
 const providers = secao('providers', () => { const entry = ALL.find((f) => /^(?:src\/)?(main|index)\.[tj]sx$/.test(f)) || ALL.find((f) => /^(?:src\/)?(App|app|root|_app)\.[tj]sx$/.test(f)) || ALL.find((f) => /^(?:src\/)?app\/layout\.tsx$/.test(f)); if (!entry) return { entrada: null, providers: [] }; const files = [entry, ...closure(entry).filter((f) => /App\.[tj]sx$|providers?\//i.test(f)).slice(0, 10)]; return { entrada: entry, providers: uniq(files.flatMap((f) => allMatches(/<([A-Z]\w*(?:Provider|Context|Boundary|Router|Client|Store)\b[\w.]*)/g, FILE.get(f)?.conteudo || ''))) }; }, { entrada: null, providers: [] });
 const i18n = secao('i18n', () => { const arqs = ALL.filter((f) => /(^|\/)(i18n|locales?|lang|translations?)\/.+\.(json|ts|js|yml|yaml)$/.test(f)); const LANG = /^[a-z]{2}(?:[-_][A-Za-z]{2,4})?$/; const idiomas = uniq(arqs.map((f) => { const partes = f.split('/'); const i = partes.findIndex((p0) => /^(i18n|locales?|lang|translations?)$/.test(p0)); const resto = partes.slice(i + 1); const b0 = baseOf(f).split('.')[0]; return resto.slice(0, -1).find((p0) => LANG.test(p0)) || (LANG.test(b0) ? b0 : null); }).filter(Boolean)); return { arquivos: arqs.length, idiomas, lib: [has('i18next') && 'i18next', has('react-intl') && 'react-intl', has('vue-i18n') && 'vue-i18n', has('next-intl') && 'next-intl'].filter(Boolean) }; }, { arquivos: 0, idiomas: [], lib: [] });
 const ferramentas = {
@@ -671,8 +745,8 @@ const tipoTeste = (f) => (/(^|\/)(e2e|cypress|playwright)\/|\.e2e\./.test(f) ? '
 const testes = secao('testes', () => ({
   frameworks: stack.testes, total: testFiles.length + ALL.filter((f) => /^supabase\/tests\/.*\.sql$/.test(f)).length,
   por_tipo: sortObj(testFiles.reduce((acc, [f]) => { const t = tipoTeste(f); acc[t] = (acc[t] || 0) + 1; return acc; }, {})),
-  onde_ficam: byCount(testFiles.map(([f]) => (/__tests__\//.test(f) ? 'co-localizado (__tests__)' : /\.(test|spec)\./.test(f) && !/^(tests?|e2e|qa)\//.test(f) ? 'co-localizado (*.test)' : /^e2e\//.test(f) ? 'e2e/' : /^tests?\//.test(f) ? 'tests/' : 'outro'))).map(([k, n]) => ({ padrao: k, arquivos: n })),
-  arquivos: testFiles.map(([f, d]) => ({ arquivo: f, tipo: tipoTeste(f), linhas: d.linhas, testa: d.imports.filter((i) => !anyFile(i)?.teste), casos: d.conteudo ? (d.conteudo.match(/\b(?:it|test)(?:\.(?:each|only|skip|concurrent|todo))?\s*\(/g) || []).length : (d.defs || []).filter((x) => /^test_/.test(x)).length })).sort((a, b) => a.arquivo.localeCompare(b.arquivo)),
+  onde_ficam: byCount(testFiles.map(([f]) => (/__tests__\//.test(f) ? 'co-localizado (__tests__)' : /[._](test|spec)\./.test(f) && !/^(tests?|e2e|qa)\//.test(f) ? 'co-localizado (*.test)' : /^e2e\//.test(f) ? 'e2e/' : /^tests?\//.test(f) ? 'tests/' : 'outro'))).map(([k, n]) => ({ padrao: k, arquivos: n })),
+  arquivos: testFiles.map(([f, d]) => ({ arquivo: f, tipo: tipoTeste(f), linhas: d.linhas, testa: d.imports.filter((i) => !anyFile(i)?.teste), casos: d.conteudo ? (d.conteudo.match(/\b(?:it|test)(?:\.(?:each|only|skip|concurrent|todo))?\s*\(/g) || []).length : d.casos_teste || 0 })).sort((a, b) => a.arquivo.localeCompare(b.arquivo, 'en')),
   sql: ALL.filter((f) => /^supabase\/tests\/.*\.sql$/.test(f)),
   cobertura_por_arquivo: sortObj(Object.fromEntries(cobertoPor)),
   sem_teste: { telas: uniq(rotasEnriched.filter((r) => r.arquivo && !cobertoPor.has(r.arquivo)).map((r) => r.arquivo)), hooks: hooksOut.filter((h) => !h.coberto_por_testes).map((h) => h.arquivo), edges: edges.filter((e) => !e.testes).map((e) => e.nome), servicos: [] },
@@ -685,7 +759,7 @@ const logica = secao('logica', () => [...FILE.entries()].filter(([f, d]) => cama
   arquivo: f, camada: camadaDe(f), exports: d.exports, export_default: d.export_default, linhas: d.linhas, tabelas: d.tabelas, rpcs: d.rpcs, edges: d.edges, env: d.env, externos: d.externos, zod_schemas: d.zod, flags: d.flags, papeis: d.papeis,
   usado_por: usedBy(f).length, usado_por_modulos: uniq(usedBy(f).map(dominioDe).filter(Boolean)), coberto_por_testes: cobertoPor.get(f) || 0,
   orfao: usedBy(f).length === 0 && !/index\.[tj]sx?$|main\.[tj]sx?$|\.d\.ts$|\.config\./.test(f),
-})).concat([...PY.entries()].filter(([f, d]) => !d.teste && !/^(docs|qa|analise|inventario|examples?|samples?)\//.test(f)).map(([f, d]) => ({ arquivo: f, camada: camadaDe(f) || 'python', exports: [...d.defs, ...d.classes], linhas: d.linhas, tabelas: [], rpcs: [], edges: [], env: d.env, externos: d.externos, rotas_http: d.rotas_http.length, usado_por: usedBy(f).length, usado_por_modulos: uniq(usedBy(f).map(dominioDe).filter(Boolean)), coberto_por_testes: cobertoPor.get(f) || 0, orfao: usedBy(f).length === 0 && !/__init__|main\.py|manage\.py|app\.py|wsgi|asgi/.test(f) }))).sort((a, b) => a.arquivo.localeCompare(b.arquivo)), []);
+})).concat([...PY.entries()].filter(([f, d]) => !d.teste && !/^(docs|qa|analise|inventario|examples?|samples?)\//.test(f)).map(([f, d]) => ({ arquivo: f, camada: camadaDe(f) || 'python', exports: [...d.defs, ...d.classes], linhas: d.linhas, tabelas: [], rpcs: [], edges: [], env: d.env, externos: d.externos, rotas_http: d.rotas_http.length, usado_por: usedBy(f).length, usado_por_modulos: uniq(usedBy(f).map(dominioDe).filter(Boolean)), coberto_por_testes: cobertoPor.get(f) || 0, orfao: usedBy(f).length === 0 && !/__init__|main\.py|manage\.py|app\.py|wsgi|asgi/.test(f) }))).sort((a, b) => a.arquivo.localeCompare(b.arquivo, 'en')), []);
 testes.sem_teste.servicos = logica.filter((l) => !l.coberto_por_testes && l.usado_por > 0 && /^serv/.test(l.camada || '')).map((l) => l.arquivo);
 
 // ---------- grafo ----------
@@ -706,10 +780,10 @@ const grafo = secao('grafo', () => {
   const entradas = new Set([...rotasEnriched.map((r) => r.arquivo), ...vistasEnriched.map((v) => v.arquivo), ...edges.map((e) => e.entrada), ...lazyTargets, ...ALL.filter((f) => /^(src\/)?(main|index|App|app|server|worker)\.[tj]sx?$|^scripts\/|^(src\/)?(app|pages|routes)\//.test(f) || /(^|\/)(main|app|manage|wsgi|asgi|__main__)\.py$/.test(f))].filter(Boolean));
   return {
     nos: prodFiles.length, arestas: prodFiles.reduce((s, f) => s + importsOf(f).length, 0),
-    hubs: [...USED_BY.entries()].filter(([f]) => anyFile(f) && !anyFile(f).teste).map(([f, u]) => ({ arquivo: f, importado_por: u.length })).sort((a, b) => b.importado_por - a.importado_por || a.arquivo.localeCompare(b.arquivo)).slice(0, 40),
-    ciclos: { total: sccs.length, maiores: sccs.sort((a, b) => b.length - a.length || a[0].localeCompare(b[0])).slice(0, 15).map((comp) => ({ tamanho: comp.length, arquivos: comp.slice(0, 12) })) },
+    hubs: [...USED_BY.entries()].filter(([f]) => anyFile(f) && !anyFile(f).teste).map(([f, u]) => ({ arquivo: f, importado_por: u.length })).sort((a, b) => b.importado_por - a.importado_por || a.arquivo.localeCompare(b.arquivo, 'en')).slice(0, 40),
+    ciclos: { total: sccs.length, maiores: sccs.sort((a, b) => b.length - a.length || a[0].localeCompare(b[0], 'en')).slice(0, 15).map((comp) => ({ tamanho: comp.length, arquivos: comp.slice(0, 12) })) },
     orfaos: prodFiles.filter((f) => !usedBy(f).length && !entradas.has(f) && !/\.d\.ts$|\.config\.|_shared\/|\/types\/|\.stories\./.test(f)).slice(0, 300),
-    modulos_mais_acoplados: modulos.map((m) => ({ modulo: m.modulo, depende_de: m.depende_de_modulos.length, importado_por: m.importado_por_outros_modulos.length })).sort((a, b) => b.depende_de + b.importado_por - (a.depende_de + a.importado_por) || a.modulo.localeCompare(b.modulo)).slice(0, 20),
+    modulos_mais_acoplados: modulos.map((m) => ({ modulo: m.modulo, depende_de: m.depende_de_modulos.length, importado_por: m.importado_por_outros_modulos.length })).sort((a, b) => b.depende_de + b.importado_por - (a.depende_de + a.importado_por) || a.modulo.localeCompare(b.modulo, 'en')).slice(0, 20),
     arestas_em: `${OUT_REL}/grafo-arestas.json`,
   };
 }, { nos: 0, arestas: 0, hubs: [], ciclos: { total: 0, maiores: [] }, orfaos: [], modulos_mais_acoplados: [] });
@@ -719,7 +793,7 @@ const grafoArestas = Object.fromEntries(prodFiles.filter((f) => importsOf(f).len
 const graphify = secao('graphify', () => {
   const gdir = CFG.graphifyDir || 'graphify-out';
   const gjson = `${gdir}/graph.json`;
-  const base = { presente: false, como_gerar: 'uvx --from "graphifyy[sql]" graphify update .  (ou: bun run graph:update); saída em graphify-out/ — graph.json e graph.html NÃO são versionados (dezenas de MB); use `graphify query/path/explain` localmente', relatorio: FILESET.has(`${gdir}/GRAPH_REPORT.md`) ? `${gdir}/GRAPH_REPORT.md` : null };
+  const base = { presente: false, como_gerar: 'uvx --from "graphifyy[sql]" graphify update .  ' + (pkg.scripts && pkg.scripts['graph:update'] ? `(ou: ${gerenciadorJs() || 'npm'} run graph:update)` : '') + '; saída em graphify-out/ — graph.json e graph.html NÃO são versionados (dezenas de MB); use `graphify query/path/explain` localmente', relatorio: FILESET.has(`${gdir}/GRAPH_REPORT.md`) ? `${gdir}/GRAPH_REPORT.md` : null };
   if (!fs.existsSync(abs(gjson))) return base;
   const stat = fs.statSync(abs(gjson)); if (stat.size > 400 * 1024 * 1024) return { ...base, presente: true, erro: `graph.json com ${Math.round(stat.size / 1048576)} MB — acima do limite de leitura` };
   const g = JSON.parse(fs.readFileSync(abs(gjson), 'utf8'));
@@ -763,14 +837,15 @@ const convencoes = secao('convencoes', () => {
 }, { onde_ficam: {}, nomenclatura: {}, instrucoes_agentes: [] });
 
 // ---------- baseline ----------
-const gitInfo = secao('git', () => ({
+// Janelas (7/30/90 dias) contam a partir da data do HEAD, não do relógio: o mesmo commit gera sempre o mesmo baseline.
+const gitInfo = secao('git', () => { const base = Number(git('log', '-1', '--format=%ct')); const desde = (dias) => (base ? `--since=${new Date((base - dias * 86400) * 1000).toISOString().slice(0, 19)}Z` : `--since=${dias}.days`); return {
   commit: git('rev-parse', 'HEAD') || null, branch: git('rev-parse', '--abbrev-ref', 'HEAD') || null, data_commit: git('log', '-1', '--format=%cI') || null, remote: git('remote', 'get-url', 'origin').replace(/\/\/[^@]+@/, '//') || null,
   ultimos_commits: git('log', '-25', '--format=%h|%cs|%s').split('\n').filter(Boolean).map((l) => { const [h, d, ...s] = l.split('|'); return { sha: h, data: d, assunto: s.join('|').slice(0, 120) }; }),
-  arquivos_mudados_7d: uniq(git('log', '--since=7.days', '--name-only', '--format=').split('\n').filter(Boolean)).length,
-  pastas_mais_mudadas_30d: byCount(git('log', '--since=30.days', '--name-only', '--format=').split('\n').filter(Boolean).map((f) => f.split('/').slice(0, 3).join('/'))).slice(0, 15).map(([pasta, n]) => ({ pasta, mudancas: n })),
-  arquivos_mais_mudados_90d: byCount(git('log', '--since=90.days', '--name-only', '--format=').split('\n').filter((f) => f && FILESET.has(f))).slice(0, 25).map(([arquivo, n]) => ({ arquivo, mudancas: n })),
-  autores_30d: byCount(git('log', '--since=30.days', '--format=%an').split('\n').filter(Boolean)).slice(0, 10).map(([a, n]) => ({ autor: a, commits: n })),
-}), {});
+  arquivos_mudados_7d: uniq(git('log', desde(7), '--name-only', '--format=').split('\n').filter(Boolean)).length,
+  pastas_mais_mudadas_30d: byCount(git('log', desde(30), '--name-only', '--format=').split('\n').filter(Boolean).map((f) => f.split('/').slice(0, 3).join('/'))).slice(0, 15).map(([pasta, n]) => ({ pasta, mudancas: n })),
+  arquivos_mais_mudados_90d: byCount(git('log', desde(90), '--name-only', '--format=').split('\n').filter((f) => f && FILESET.has(f))).slice(0, 25).map(([arquivo, n]) => ({ arquivo, mudancas: n })),
+  autores_30d: byCount(git('log', desde(30), '--format=%an').split('\n').filter(Boolean)).slice(0, 10).map(([a, n]) => ({ autor: a, commits: n })),
+}; }, {});
 const byDir = {};
 for (const [f, d] of [...FILE, ...PY]) { const k = f.split('/').slice(0, 2).join('/'); byDir[k] = byDir[k] || { arquivos: 0, linhas: 0 }; byDir[k].arquivos++; byDir[k].linhas += d.linhas; }
 const allDocs = [...FILE.values(), ...PY.values()];
@@ -778,7 +853,7 @@ const baseline = {
   git: gitInfo,
   contagens: { arquivos_total: ALL.length, arquivos_codigo: CODE_FILES.length + PY_FILES.length, linhas_codigo: allDocs.reduce((s, d) => s + d.linhas, 0), rotas: rotasEnriched.length, rotas_http_backend: apiHttp.length, vistas_por_id: vistasEnriched.length, itens_menu: menuUniq.length, modulos: modulos.length, componentes: componentes.length, hooks: hooksOut.length, edge_functions: edges.length, tabelas: Object.keys(bancoOut.tabelas).length, migrations: bancoOut.migrations, cron_jobs: bancoOut.cron_jobs.length, testes: testes.total, workflows: workflows.length, scripts: scriptsRepo.length, docs_md: ALL.filter((f) => f.endsWith('.md')).length },
   por_pasta: sortObj(byDir),
-  maiores_arquivos: [...FILE.entries(), ...PY.entries()].filter(([, d]) => !d.teste).map(([f, d]) => ({ arquivo: f, linhas: d.linhas })).sort((a, b) => b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo)).slice(0, 25),
+  maiores_arquivos: [...FILE.entries(), ...PY.entries()].filter(([, d]) => !d.teste).map(([f, d]) => ({ arquivo: f, linhas: d.linhas })).sort((a, b) => b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo, 'en')).slice(0, 25),
   qualidade: { any: [...FILE.values()].reduce((s, d) => s + d.any_count, 0), console_log: [...FILE.values()].reduce((s, d) => s + d.console_count, 0), ts_ignore: [...FILE.values()].reduce((s, d) => s + d.ts_ignore, 0), eslint_disable: [...FILE.values()].reduce((s, d) => s + d.eslint_disable, 0), todos: allDocs.reduce((s, d) => s + d.todos.length, 0), arquivos_acima_500_linhas: allDocs.filter((d) => !d.teste && d.linhas > 500).length },
   todos: cap([...FILE.entries(), ...PY.entries()].flatMap(([f, d]) => d.todos.map((t) => ({ arquivo: f, ...t }))), 300),
   alertas: {

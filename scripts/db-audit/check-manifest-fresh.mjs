@@ -68,7 +68,7 @@ try {
 
 const errosFresco = [
   ...validarManifesto(fresco, 'fresco'),
-  ...validarIdentidadeDoArtefato(fresco.database_identity, esperada, 'manifesto fresco'),
+  ...validarIdentidadeDoArtefato(fresco?.database_identity, esperada, 'manifesto fresco'),
   ...validarDestino(process.env.DESTINO_URL, esperada),
 ];
 if (errosFresco.length) {

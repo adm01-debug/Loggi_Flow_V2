@@ -11,29 +11,45 @@
 //      commits únicos na comparação com origin/main);
 //   2. último commit da branch há MAIS de 7 dias;
 //   3. nenhuma PR aberta com essa branch como head (nome igual, de qualquer repo:
-//      na dúvida, a branch fica);
-//   4. não é `main` e não é branch protegida;
+//      na dúvida, a branch fica) nem como base, quando o JSON traz `baseRefName`
+//      (apagar a base fecha a PR empilhada nela);
+//   4. não é branch fixa do repositório (`main`, `master`, `develop`, e a `contexto`,
+//      que é gerada por automação e nunca tem PR) e não é branch protegida;
 //   5. o nome passa na lista de caracteres seguros. Um nome fora dela é RECUSADO,
 //      não escapado: o comando vai ser colado num terminal, e nome começando com
 //      `-` viraria opção do git, `$(...)`/`;`/crase viraria código do shell.
 //
 // Falha fechada: se a lista de PRs abertas ou de protegidas não puder ser lida, ou
 // se a lista de PRs vier cheia até o limite (pode haver mais PRs que não vieram),
-// o script não gera comando nenhum — avisa e explica por quê.
+// ou se o `--limite-prs` informado não for um inteiro positivo, o script não gera
+// comando nenhum — avisa e explica por quê.
 //
 // Uso:
 //   node scripts/ci/branch-podaveis.mjs --equivalentes <tsv> --prs <json> \
 //     --protegidas <txt> [--limite-prs N]
 // <tsv>: `<branch>\t<epoch do último commit>` por linha (gerado pelo workflow).
-// <json>: saída de `gh pr list --json headRefName`.
+// <json>: saída de `gh pr list --json headRefName` (ou `headRefName,baseRefName`).
 // <txt>: um nome de branch protegida por linha.
 // Markdown no stdout; sempre exit 0 (informativo, não bloqueia a auditoria).
 
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { executadoDiretamente } from '../lib/seguranca-processo.mjs';
 
 export const DIAS_MINIMOS = 7;
-export const SEMPRE_FORA = new Set(['main', 'HEAD']);
+// `main` é a padrão; `master` e `develop` disparam workflows (ci.yml, ci-nexus.yml,
+// security.yml); `contexto` é a branch gerada pelo contexto-ia.yml. Nenhuma entra em
+// comando de poda, mesmo patch-equivalente, antiga e sem proteção cadastrada.
+export const SEMPRE_FORA = new Set(['main', 'master', 'develop', 'contexto', 'HEAD']);
+
+const USO = `Uso: node scripts/ci/branch-podaveis.mjs --equivalentes <tsv> --prs <json> --protegidas <txt> [--limite-prs N]
+
+  --equivalentes  \`<branch>\\t<epoch do último commit>\` por linha
+  --prs           saída de \`gh pr list --json headRefName\` (aceita também baseRefName)
+  --protegidas    um nome de branch protegida por linha
+  --limite-prs    o --limit usado no gh pr list (lista cheia = comando não gerado)
+
+Imprime markdown no stdout e sempre sai com 0. Nunca apaga nada: só escreve o comando.
+`;
 
 // Subconjunto dos nomes que o git aceita, sem nada que o shell interprete.
 const NOME_SEGURO = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
@@ -82,8 +98,10 @@ export function selecionarPodaveis({ equivalentes, prsAbertas, protegidas, agora
   return { elegiveis, fora };
 }
 
+const FIXAS = [...SEMPRE_FORA].filter((b) => b !== 'HEAD').map((b) => `\`${b}\``).join(', ');
+
 const REGRA = `Regra: patch-equivalente à \`main\` (zero commits únicos), último commit há mais de ${DIAS_MINIMOS} dias, `
-  + 'nenhuma PR aberta com a branch como head, fora de `main` e das branches protegidas, e nome só com `[A-Za-z0-9._/-]`. '
+  + `nenhuma PR aberta com a branch como head, fora das branches fixas (${FIXAS}) e das protegidas, e nome só com \`[A-Za-z0-9._/-]\`. `
   + '**Nada é apagado automaticamente** (W98): rodar o bloco é decisão do dono.';
 
 export function relatorio({ elegiveis, fora }) {
@@ -99,7 +117,7 @@ export function relatorio({ elegiveis, fora }) {
     ['com PR aberta', fora.comPr],
     [`com commit nos últimos ${DIAS_MINIMOS} dias`, fora.recentes],
     ['protegidas', fora.protegidas],
-    ['main', fora.principal],
+    ['fixas do repositório', fora.principal],
   ].filter(([, lista]) => lista.length);
   if (resumo.length || fora.recusadas.length) {
     linhas.push('', 'Patch-equivalentes deixadas fora do comando:');
@@ -132,9 +150,9 @@ export function lerPrsAbertas(texto, limite) {
   if (Number.isFinite(limite) && dados.length >= limite) {
     throw new Error(`a lista de PRs abertas veio cheia (${dados.length} >= limite ${limite}); pode haver PR que não veio`);
   }
-  return dados.map((pr) => {
+  return dados.flatMap((pr) => {
     if (typeof pr?.headRefName !== 'string') throw new Error('PR sem headRefName');
-    return pr.headRefName;
+    return typeof pr.baseRefName === 'string' ? [pr.headRefName, pr.baseRefName] : [pr.headRefName];
   });
 }
 
@@ -170,8 +188,15 @@ export function executar(argv, ler = (p) => readFileSync(p, 'utf8'), agoraMs = D
   } catch (erro) {
     return { saida: relatorioIndisponivel(`lista de patch-equivalentes ilegível (${erro.message})`), aviso: erro.message };
   }
+  // Limite informado tem de ser inteiro positivo: valor inválido viraria NaN e
+  // desligaria, em silêncio, a checagem de lista cheia.
+  const limite = args['limite-prs'] === undefined ? Number.NaN : Number(args['limite-prs']);
+  if (args['limite-prs'] !== undefined && !(Number.isInteger(limite) && limite > 0)) {
+    const motivo = `--limite-prs inválido ("${args['limite-prs']}"): tem de ser inteiro positivo`;
+    return { saida: relatorioIndisponivel(motivo), aviso: motivo };
+  }
   try {
-    prsAbertas = lerPrsAbertas(ler(args.prs), args['limite-prs'] === undefined ? Number.NaN : Number(args['limite-prs']));
+    prsAbertas = lerPrsAbertas(ler(args.prs), limite);
   } catch (erro) {
     return { saida: relatorioIndisponivel(`PRs abertas indisponíveis (${erro.message})`), aviso: erro.message };
   }
@@ -184,9 +209,13 @@ export function executar(argv, ler = (p) => readFileSync(p, 'utf8'), agoraMs = D
 }
 
 function main() {
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    process.stdout.write(USO);
+    return;
+  }
   const { saida, aviso } = executar(process.argv.slice(2));
   if (aviso) console.error(`::warning::W98: comando de poda não gerado — ${aviso}`);
   process.stdout.write(saida);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) main();
+if (executadoDiretamente(import.meta.url)) main();

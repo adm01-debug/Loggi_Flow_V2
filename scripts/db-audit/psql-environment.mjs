@@ -69,8 +69,10 @@ export function parseConnection(connectionString) {
     const user = decodeURIComponent(url.username);
     const password = decodeURIComponent(url.password);
     const database = decodeURIComponent(url.pathname.slice(1));
+    // Lista de hosts (h1,h2): o pgpass e casado por host individual e nunca bateria.
     if (!['postgres:', 'postgresql:'].includes(url.protocol) || !host || !user || !database
-      || url.hash || [host, user, password, database].some(value => /[\r\n\0]/.test(value))) {
+      || url.hash || host.includes(',')
+      || [host, user, password, database].some(value => /[\r\n\0]/.test(value))) {
       throw new Error();
     }
     const fields = { PGHOST: host, PGPORT: url.port || '5432', PGUSER: user,

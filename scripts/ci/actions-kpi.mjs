@@ -15,11 +15,15 @@
 // nao tocam rede nem disco, entao a conta e testavel com runs sinteticos. O CLI so
 // busca, chama e publica.
 import { appendFileSync } from 'node:fs';
+import { executadoDiretamente } from '../lib/seguranca-processo.mjs';
 
 const CANCELADOS = new Set(['cancelled']);
 const FALHAS = new Set(['failure', 'timed_out', 'startup_failure']);
 const UM_DIA = 24 * 60 * 60 * 1000;
 const POR_PAGINA = 100; // teto da API do GitHub
+const MAX_RUNS_COM_JOBS = 50; // 1 requisicao por run: teto para nao estourar tempo nem rate limit
+const MAX_FALHAS_SEGUIDAS = 3;
+const TIMEOUT_MS = 30_000;
 
 export function duracaoMinutos(run) {
   const inicio = Date.parse(run.run_started_at ?? '');
@@ -112,13 +116,28 @@ export function tabelaLentos(lentos) {
 
 // Monta o corpo publicado (Job Summary + issue): tabela por workflow + ranking dos
 // jobs. Puro, para o teste provar que o ranking saem dos jobs reais e nao vazio.
-export function corpoDoKpi(runs, jobs, { janelaDias = 7, agora = Date.now(), titulo } = {}) {
+// `runsComJobs`: de quantos runs os jobs foram consultados. Menor que o total da
+// janela = o ranking e' de uma amostra, e o corpo diz isso em vez de vender a semana.
+export function corpoDoKpi(runs, jobs, { janelaDias = 7, agora = Date.now(), titulo, runsComJobs } = {}) {
   const agregado = agregar(runs, { janelaDias, agora });
-  return [
+  const totalRuns = agregado.reduce((a, l) => a + l.runs, 0);
+  const partes = [
     tabela(agregado, { titulo: titulo ?? `KPI do GitHub Actions — ${janelaDias} dias` }),
     '',
     tabelaLentos(maisLentos(jobs, { limite: 5 })),
-  ].join('\n');
+  ];
+  if (Number.isFinite(runsComJobs) && runsComJobs < totalRuns) {
+    partes.push('', `_Ranking de jobs calculado sobre ${runsComJobs} dos ${totalRuns} runs da janela (os mais longos; 1 requisicao por run)._`);
+  }
+  return partes.join('\n');
+}
+
+// Runs cujos jobs valem a consulta para o ranking: os mais longos da janela (empate
+// mantem a ordem da API, do mais novo para o mais antigo).
+export function runsParaRanking(runs, { janelaDias = 7, agora = Date.now(), limite = MAX_RUNS_COM_JOBS } = {}) {
+  return runsNaJanela(runs, { janelaDias, agora })
+    .sort((a, b) => duracaoMinutos(b) - duracaoMinutos(a))
+    .slice(0, limite);
 }
 
 // ---------------------------------------------------------------- CLI
@@ -129,17 +148,38 @@ const CABECALHOS = (token) => ({
   'X-GitHub-Api-Version': '2022-11-28',
 });
 
-async function pedir(caminho, token, { metodo = 'GET', corpo, tentativas = 4, delaysMs = [5000, 10000, 20000] } = {}) {
+export async function pedir(
+  caminho,
+  token,
+  { metodo = 'GET', corpo, tentativas = 4, delaysMs = [5000, 10000, 20000], timeoutMs = TIMEOUT_MS } = {},
+) {
   for (let i = 0; i < tentativas; i++) {
-    const r = await fetch(`${API}${caminho}`, {
-      method: metodo,
-      headers: { ...CABECALHOS(token), ...(corpo ? { 'Content-Type': 'application/json' } : {}) },
-      body: corpo ? JSON.stringify(corpo) : undefined,
-    });
+    const ultima = i >= tentativas - 1;
+    const esperar = () => new Promise((res) => setTimeout(res, delaysMs[Math.min(i, delaysMs.length - 1)]));
+    let r;
+    try {
+      r = await fetch(`${API}${caminho}`, {
+        method: metodo,
+        headers: { ...CABECALHOS(token), ...(corpo ? { 'Content-Type': 'application/json' } : {}) },
+        body: corpo ? JSON.stringify(corpo) : undefined,
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (erro) {
+      // Rede caiu ou estourou o tempo. So' GET e' repetido: sem resposta nao da' para
+      // saber se um POST chegou, e repetir criaria a issue duas vezes.
+      if (metodo !== 'GET' || ultima) {
+        throw new Error(`${metodo} ${caminho} -> sem resposta (${erro?.cause?.code ?? erro?.name ?? 'erro'}: ${erro?.message})`);
+      }
+      await esperar();
+      continue;
+    }
     if (r.ok) return r.json();
     const transitorio = r.status === 502 || r.status === 503 || r.status === 504;
-    if (!transitorio || i >= tentativas - 1) throw new Error(`${metodo} ${caminho} -> ${r.status}`);
-    await new Promise((res) => setTimeout(res, delaysMs[Math.min(i, delaysMs.length - 1)]));
+    if (!transitorio || ultima) {
+      const mensagem = await r.json().then((j) => j?.message, () => null);
+      throw new Error(`${metodo} ${caminho} -> ${r.status}${typeof mensagem === 'string' ? ` (${mensagem})` : ''}`);
+    }
+    await esperar();
   }
 }
 
@@ -162,11 +202,10 @@ export async function coletarRuns({
       token,
     );
     todos.push(...runs);
-    if (!paginaTemMais(runs, { janelaDias, agora, porPagina })) {
-      if (pagina === maxPaginas && runs.length >= porPagina) {
-        console.error(`::warning::paginacao de runs parou no teto de ${maxPaginas} paginas`);
-      }
-      break;
+    if (!paginaTemMais(runs, { janelaDias, agora, porPagina })) break;
+    // Chegou aqui na ultima pagina permitida = ainda havia run da janela para buscar.
+    if (pagina === maxPaginas) {
+      console.error(`::warning::paginacao de runs parou no teto de ${maxPaginas} paginas; o KPI esta incompleto`);
     }
   }
   return todos;
@@ -176,17 +215,38 @@ export async function coletarRuns({
 // preenche `workflow_name` com o nome do run quando o endpoint de jobs nao o traz.
 export async function coletarJobs(
   runs,
-  { repo, token, porPagina = POR_PAGINA, maxPaginas = 100, pedir: buscar = pedir } = {},
+  { repo, token, porPagina = POR_PAGINA, maxPaginas = 100, pedir: buscar = pedir, aoFalhar = () => {} } = {},
 ) {
   const jobs = [];
+  let falhasSeguidas = 0;
   for (const run of runs ?? []) {
     const id = run.id ?? run.run_id;
     if (id === undefined || id === null) continue;
+    // API fora do ar: cada consulta ainda gastaria o timeout e as tentativas inteiras.
+    // Depois de 3 runs seguidos sem resposta, os demais ficam sem consulta.
+    if (falhasSeguidas >= MAX_FALHAS_SEGUIDAS) {
+      aoFalhar(run, new Error('consulta nao tentada'));
+      continue;
+    }
     for (let pagina = 1; pagina <= maxPaginas; pagina += 1) {
-      const { jobs: paginaJobs = [] } = await buscar(
-        `/repos/${repo}/actions/runs/${id}/jobs?per_page=${porPagina}&page=${pagina}`,
-        token,
-      );
+      let paginaJobs;
+      try {
+        ({ jobs: paginaJobs = [] } = await buscar(
+          `/repos/${repo}/actions/runs/${id}/jobs?per_page=${porPagina}&page=${pagina}`,
+          token,
+        ));
+      } catch (erro) {
+        // Run apagado entre a listagem e esta consulta (404) nao pode derrubar o KPI
+        // inteiro: o ranking sai sem os jobs dele, e o aviso fica no log.
+        console.error(`::warning::jobs do run ${id} indisponiveis (${erro.message}); ranking sem eles`);
+        aoFalhar(run, erro);
+        falhasSeguidas += 1;
+        if (falhasSeguidas === MAX_FALHAS_SEGUIDAS) {
+          console.error(`::warning::${MAX_FALHAS_SEGUIDAS} runs seguidos sem jobs; os runs restantes nao serao consultados`);
+        }
+        break;
+      }
+      falhasSeguidas = 0;
       for (const job of paginaJobs) {
         jobs.push({ ...job, workflow_name: job.workflow_name ?? run.name ?? '' });
       }
@@ -225,11 +285,20 @@ async function principal() {
     console.error('::error::GITHUB_REPOSITORY e GH_TOKEN sao obrigatorios');
     process.exit(2);
   }
-  const janela = Number(process.env.JANELA_DIAS ?? 7);
+  const bruto = (process.env.JANELA_DIAS ?? '').trim();
+  const janela = bruto === '' ? 7 : Number(bruto);
+  if (!Number.isFinite(janela) || janela <= 0) {
+    console.error(`::error::JANELA_DIAS invalido ("${bruto}"): tem de ser um numero de dias maior que zero`);
+    process.exit(2);
+  }
   const runs = await coletarRuns({ repo, token, janelaDias: janela });
-  // Limita a 50 runs mais recentes para evitar timeout (1 req HTTP por run).
-  const jobs = await coletarJobs(runsNaJanela(runs, { janelaDias: janela }).slice(0, 50), { repo, token });
-  const corpo = corpoDoKpi(runs, jobs, { janelaDias: janela });
+  // 1 req HTTP por run: so' uma amostra tem os jobs consultados. A amostra sao os runs
+  // mais LONGOS da janela, e nao os mais recentes -- job lento mora em run longo, e os
+  // 50 mais recentes seriam so' as ultimas horas de cron (contexto-ia roda a cada 10 min).
+  const comJobs = runsParaRanking(runs, { janelaDias: janela });
+  let semJobs = 0;
+  const jobs = await coletarJobs(comJobs, { repo, token, aoFalhar: () => { semJobs += 1; } });
+  const corpo = corpoDoKpi(runs, jobs, { janelaDias: janela, runsComJobs: comJobs.length - semJobs });
   console.log(corpo);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, corpo + '\n');
   const marca = `[kpi-actions] Semana de ${new Date().toISOString().slice(0, 10)}`;
@@ -237,7 +306,7 @@ async function principal() {
   console.log(`issue ${r.acao}: #${r.numero}`);
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if (executadoDiretamente(import.meta.url)) {
   principal().catch((e) => {
     console.error(`::error::${e.message}`);
     process.exit(1);

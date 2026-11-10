@@ -2,6 +2,9 @@
 -- Saída única: (section, key, def) no padrão do pipeline audit_tmp.manifest
 -- Idempotente: CREATE TEMP TABLE + INSERT + SELECT final + DROP.
 
+-- Sobra de execução interrompida na mesma sessão: sem este DROP o CREATE falha e, com o psql no modo
+-- padrão (segue após erro), as linhas velhas saem misturadas no manifesto novo.
+DROP TABLE IF EXISTS pg_temp._manifest_data;
 CREATE TEMP TABLE _manifest_data (section text, key text, def text);
 
 INSERT INTO _manifest_data
@@ -11,6 +14,6 @@ SELECT 'data'::text AS section, n.nspname||'.'||c.relname AS key,
 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
 WHERE n.nspname IN ('public','internal') AND c.relkind IN ('r','p') AND NOT c.relispartition;
 
-SELECT section, key, def FROM _manifest_data ORDER BY section, key;
+SELECT section, key, def FROM _manifest_data ORDER BY section COLLATE "C", key COLLATE "C";
 
 DROP TABLE _manifest_data;

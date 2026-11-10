@@ -180,6 +180,7 @@ def prepare_output_directory() -> None:
 
 def record_error(section: str, err: Exception | str) -> None:
     text = str(err).strip().splitlines()[0] if str(err).strip() else repr(err)
+    text = scrub(text)  # stderr de pg_dump/CLI e erros do driver vão para errors.md e manifest.json
     ERRORS.append({"section": section, "error": text[:500]})
     log(f"ERRO em {section}: {text[:300]}")
 
@@ -304,16 +305,17 @@ def group(rows, keyfn):
 SCRUB_RULES: list[tuple[re.Pattern, str]] = [
     # JWT (3 partes) — anon/service_role keys do Supabase
     (re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{5,}"), "[REDACTED_JWT]"),
-    # chaves novas do Supabase
-    (re.compile(r"sb_(?:secret|publishable)_[A-Za-z0-9_-]{8,}"), "[REDACTED_KEY]"),
+    # chaves novas do Supabase (o guard do workflow reprova até o prefixo solto, então ele também é redigido)
+    (re.compile(r"sb_(?:secret|publishable)_[A-Za-z0-9_-]*"), "[REDACTED_KEY]"),
     # Authorization: Bearer <token>  /  apikey: <token>
     (re.compile(r"(?i)(bearer\s+)[A-Za-z0-9._~+/=-]{16,}"), r"\1[REDACTED]"),
     # valor precisa parecer token: >= 16 chars, sem espaço, com pelo menos um dígito (evita redigir prosa)
     (re.compile(r"""(?i)((?:apikey|api_key|x-api-key|authorization|token|secret|password|passwd|service_role_key|anon_key)\s*["']?\s*[:=]\s*["']?)(?=[^"'\s,;)}]*\d)[^"'\s,;)}]{16,}"""), r"\1[REDACTED]"),
     # PASSWORD 'x' em DDL de role
     (re.compile(r"(?i)(password\s+)'[^']*'"), r"\1'[REDACTED]'"),
-    # DSN com senha
-    (re.compile(r"(\w+://[^/\s:@]+:)[^@\s]+(@)"), r"\1[REDACTED]\2"),
+    # DSN com senha: usuário e senha saem. O espaço no marcador é proposital — o guard do workflow
+    # (`postgres(ql)?://[^ ]*:[^ @]+@`) reprovaria `usuario:[REDACTED]@` e derrubaria a publicação.
+    (re.compile(r"(\w+://)[^/\s:@]+:[^@\s]+(@)"), r"\1[REDACTED CREDENTIALS]\2"),
     # chaves de provedores comuns
     (re.compile(r"\b(?:sk-[A-Za-z0-9_-]{20,}|sk_live_[A-Za-z0-9]{10,}|sk_test_[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,})\b"), "[REDACTED_KEY]"),
 ]
@@ -324,6 +326,41 @@ def scrub(text: str) -> str:
     for rx, rep in SCRUB_RULES:
         text = rx.sub(rep, text)
     return text
+
+
+class DatabaseUnavailable(Exception):
+    """Conexão não abriu; a mensagem já vem sem a connection string."""
+
+
+def connection_error_text(err: Exception | str) -> str:
+    """Erro de conexão em uma linha, sem a URL nem pedaços da senha, com a correção provável.
+
+    Senha com `@ : / ?` sem percent-encoding faz o driver tratar parte dela como host/porta/banco
+    e devolvê-la na mensagem; o mascaramento do GitHub só cobre o secret inteiro.
+    """
+    text = " | ".join(line.strip() for line in str(err).splitlines() if line.strip()) or repr(err)
+    password = DB_URL.split("://", 1)[-1].rpartition("@")[0].partition(":")[2]
+    keyword = re.search(r"password\s*=\s*('(?:[^'\\]|\\.)*'|\S+)", DB_URL)
+    secrets = {DB_URL, DB_URL.strip("\"'"), password, keyword.group(1).strip("'") if keyword else ""}
+    secrets.update(re.split(r"[@:/?#&=\s]+", password))
+    for secret in sorted((s for s in secrets if len(s) >= 3), key=len, reverse=True):
+        text = text.replace(secret, "[REDACTED]")
+    text = scrub(text)[:600]
+    low = text.lower()
+    url_format = "SUPABASE_DB_URL deve ser postgresql://usuario:senha@host:porta/banco, sem aspas nem parâmetros extras"
+    if 'missing "="' in low or "invalid uri" in low or "invalid dsn" in low or "invalid connection option" in low:
+        hint = url_format
+    elif any(k in low for k in ("resolve host", "translate host", "name or service", "invalid integer value", "invalid port")):
+        hint = "host ou porta inválidos; senha com @ : / ? # precisa de percent-encoding (@ vira %40)"
+    elif "unreachable" in low or "no route" in low:
+        hint = "sem rota até o host; o host direto db.<ref>.supabase.co é só IPv6 — use o Session pooler"
+    elif "password authentication" in low or "tenant or user not found" in low:
+        hint = "usuário ou senha recusados; no pooler o usuário é postgres.<ref>"
+    elif "timeout" in low or "timed out" in low:
+        hint = "o host não respondeu em 30s; confira host, porta e restrições de rede do projeto"
+    else:
+        hint = "confira host, porta e banco" if "://" in DB_URL else url_format
+    return f"{text} — {hint} (formato exigido: scripts/supabase_snapshot/README.md)"
 
 
 def scrub_value(v: Any) -> Any:
@@ -427,11 +464,13 @@ def get_columns(conn):
                NOT a.attnotnull AS nullable, pg_get_expr(d.adbin, d.adrelid) AS "default",
                NULLIF(a.attidentity, '') AS identity, NULLIF(a.attgenerated, '') AS generated,
                col_description(c.oid, a.attnum) AS comment,
-               (t.typtype = 'e') AS is_enum
+               (t.typtype = 'e') AS is_enum,
+               CASE WHEN t.typtype = 'e' THEN tn.nspname || '.' || t.typname END AS enum_type
         FROM pg_attribute a
         JOIN pg_class c ON c.oid = a.attrelid
         JOIN pg_namespace n ON n.oid = c.relnamespace
         JOIN pg_type t ON t.oid = a.atttypid
+        JOIN pg_namespace tn ON tn.oid = t.typnamespace
         LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
         WHERE a.attnum > 0 AND NOT a.attisdropped AND c.relkind IN ('r','p','v','m','f') AND {excluded_sql()}
         ORDER BY 1, 2, 3""")
@@ -439,14 +478,17 @@ def get_columns(conn):
 
 @section("constraints")
 def get_constraints(conn):
+    # ORDER BY k.ord: sem ele a FK composta sai na ordem física das colunas e o par coluna -> referência fica trocado.
     return q(conn, f"""
         SELECT n.nspname AS schema, c.relname AS "table", con.conname AS name,
                CASE con.contype WHEN 'p' THEN 'PRIMARY KEY' WHEN 'f' THEN 'FOREIGN KEY' WHEN 'u' THEN 'UNIQUE'
                     WHEN 'c' THEN 'CHECK' WHEN 'x' THEN 'EXCLUDE' ELSE con.contype::text END AS type,
                pg_get_constraintdef(con.oid, true) AS definition,
-               ARRAY(SELECT a.attname FROM unnest(con.conkey) k JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k) AS columns,
+               ARRAY(SELECT a.attname FROM unnest(con.conkey) WITH ORDINALITY k(attnum, ord)
+                     JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum ORDER BY k.ord) AS columns,
                fn.nspname AS ref_schema, fc.relname AS ref_table,
-               ARRAY(SELECT a.attname FROM unnest(con.confkey) k JOIN pg_attribute a ON a.attrelid = con.confrelid AND a.attnum = k) AS ref_columns,
+               ARRAY(SELECT a.attname FROM unnest(con.confkey) WITH ORDINALITY k(attnum, ord)
+                     JOIN pg_attribute a ON a.attrelid = con.confrelid AND a.attnum = k.attnum ORDER BY k.ord) AS ref_columns,
                CASE con.confdeltype WHEN 'a' THEN 'NO ACTION' WHEN 'r' THEN 'RESTRICT' WHEN 'c' THEN 'CASCADE'
                     WHEN 'n' THEN 'SET NULL' WHEN 'd' THEN 'SET DEFAULT' END AS on_delete,
                CASE con.confupdtype WHEN 'a' THEN 'NO ACTION' WHEN 'r' THEN 'RESTRICT' WHEN 'c' THEN 'CASCADE'
@@ -479,6 +521,10 @@ def get_indexes(conn):
         ORDER BY 1, 2, 3""")
 
 
+# O Postgres guarda o valor como foi escrito: `security_invoker = on`, `= 1` e `= yes` valem o mesmo que `= true`.
+SECURITY_INVOKER_ON = "coalesce(array_to_string(c.reloptions, ','), '') ~* '(^|,)security_invoker=(t|tr|tru|true|y|ye|yes|on|1)(,|$)'"
+
+
 @section("views")
 def get_views(conn):
     return q(conn, f"""
@@ -488,7 +534,7 @@ def get_views(conn):
                c.reloptions AS options, pg_get_userbyid(c.relowner) AS owner,
                obj_description(c.oid, 'pg_class') AS comment,
                CASE WHEN c.relkind = 'm' THEN c.relispopulated END AS populated,
-               (c.relkind = 'v' AND coalesce(array_to_string(c.reloptions, ','), '') ILIKE '%security_invoker=true%') AS security_invoker,
+               (c.relkind = 'v' AND {SECURITY_INVOKER_ON}) AS security_invoker,
                ARRAY(SELECT DISTINCT dn.nspname || '.' || dc.relname
                      FROM pg_depend d JOIN pg_rewrite r ON r.oid = d.objid
                      JOIN pg_class dc ON dc.oid = d.refobjid JOIN pg_namespace dn ON dn.oid = dc.relnamespace
@@ -602,20 +648,27 @@ def get_sequences(conn):
 @section("grants")
 def get_grants(conn):
     sys_roles = ", ".join("'" + r + "'" for r in sorted(SYSTEM_ROLES))
+    # ACL direto do catálogo. information_schema.role_table_grants só mostra grants em que o usuário da
+    # conexão é grantor/grantee: com um role de leitura a seção saía vazia, sem erro. Também omite matviews.
+    grantee = "CASE WHEN a.grantee = 0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END"
+    table_acl = "COALESCE(c.relacl, acldefault('r', c.relowner))"
     tables = q(conn, f"""
-        SELECT table_schema AS schema, table_name AS "table", grantee,
-               string_agg(privilege_type, ', ' ORDER BY privilege_type) AS privileges
-        FROM information_schema.role_table_grants
-        WHERE grantee NOT IN ({sys_roles}) AND ({excluded_sql('table_schema')} OR table_schema IN ('storage'))
+        SELECT n.nspname AS schema, c.relname AS "table", {grantee} AS grantee,
+               string_agg(DISTINCT a.privilege_type, ', ' ORDER BY a.privilege_type) AS privileges
+        FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        CROSS JOIN LATERAL aclexplode({table_acl}) a
+        WHERE c.relkind IN ('r','p','v','m','f') AND {grantee} NOT IN ({sys_roles})
+          AND ({excluded_sql()} OR n.nspname IN ('storage'))
         GROUP BY 1, 2, 3 ORDER BY 1, 2, 3""")
     columns = q(conn, f"""
-        SELECT table_schema AS schema, table_name AS "table", column_name AS "column", grantee,
-               string_agg(privilege_type, ', ' ORDER BY privilege_type) AS privileges
-        FROM information_schema.column_privileges cp
-        WHERE grantee NOT IN ({sys_roles}) AND {excluded_sql('table_schema')}
-          AND NOT EXISTS (SELECT 1 FROM information_schema.role_table_grants g
-                          WHERE g.table_schema = cp.table_schema AND g.table_name = cp.table_name
-                            AND g.grantee = cp.grantee AND g.privilege_type = cp.privilege_type)
+        SELECT n.nspname AS schema, c.relname AS "table", att.attname AS "column", {grantee} AS grantee,
+               string_agg(DISTINCT a.privilege_type, ', ' ORDER BY a.privilege_type) AS privileges
+        FROM pg_attribute att JOIN pg_class c ON c.oid = att.attrelid JOIN pg_namespace n ON n.oid = c.relnamespace
+        CROSS JOIN LATERAL aclexplode(att.attacl) a
+        WHERE att.attnum > 0 AND NOT att.attisdropped AND c.relkind IN ('r','p','v','m','f')
+          AND {grantee} NOT IN ({sys_roles}) AND {excluded_sql()}
+          AND NOT EXISTS (SELECT 1 FROM aclexplode({table_acl}) t
+                          WHERE t.grantee = a.grantee AND t.privilege_type = a.privilege_type)
         GROUP BY 1, 2, 3, 4 ORDER BY 1, 2, 3, 4""")
     sequences = q(conn, f"""
         SELECT n.nspname AS schema, c.relname AS sequence, r.rolname AS grantee,
@@ -659,6 +712,11 @@ def get_realtime(conn):
 def get_cron(conn):
     if not has_ext(conn, "pg_cron"):
         return {"installed": False, "jobs": []}
+    # cron.job tem RLS `username = current_user`: sem BYPASSRLS a consulta devolve só os jobs do próprio
+    # usuário (em geral zero) sem erro algum. Avisa em errors.md em vez de publicar "0 jobs" como fato.
+    if q(conn, "SELECT row_security_active('cron.job') AS active")[0]["active"]:
+        record_error("cron.rls", "RLS de cron.job vale para o usuário da conexão: jobs de outros usuários ficam "
+                                 "invisíveis e a lista pode estar incompleta (use o usuário postgres)")
     return {"installed": True, "jobs": q(conn, """
         SELECT jobid, jobname, schedule, command, database, username, active FROM cron.job ORDER BY jobid""")}
 
@@ -667,12 +725,24 @@ def get_cron(conn):
 def get_cron_runs(conn):
     if not has_ext(conn, "pg_cron"):
         return []
-    return q(conn, """
+    runs = q(conn, """
         SELECT jobid, runid, status, start_time, end_time,
                EXTRACT(EPOCH FROM (end_time - start_time))::numeric(10,2) AS seconds, left(return_message, 300) AS return_message
         FROM (SELECT *, row_number() OVER (PARTITION BY jobid ORDER BY start_time DESC) AS rn
                 FROM cron.job_run_details WHERE start_time > now() - interval '7 days') t
         WHERE rn <= %s ORDER BY jobid, start_time DESC""", (CRON_RUNS_PER_JOB,))
+    for run in runs:
+        run["return_message"] = cron_message(run["return_message"])
+    return runs
+
+
+def cron_message(text: Any) -> Any:
+    """Só a linha principal do erro: DETAIL/CONTEXT do Postgres trazem valores de linhas (dado pessoal)."""
+    if not isinstance(text, str) or not text.strip():
+        return text
+    first = text.strip().splitlines()[0]
+    first = re.sub(r"(?i)(\bkey \([^)]*\))=\(.*\)", r"\1=(?)", first)
+    return re.sub(r"(?i)(failing row contains )\(.*\)", r"\1(?)", first)
 
 
 @section("queues")
@@ -750,7 +820,8 @@ def get_lints(conn):
                     "detail": "Sem chave primária: Realtime/replicação e updates por linha ficam frágeis."})
     for r in q(conn, f"""
         SELECT n.nspname AS schema, c.relname AS "table", con.conname,
-               ARRAY(SELECT a.attname FROM unnest(con.conkey) k JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k) AS cols
+               ARRAY(SELECT a.attname FROM unnest(con.conkey) WITH ORDINALITY k(attnum, ord)
+                     JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum ORDER BY k.ord) AS cols
         FROM pg_constraint con JOIN pg_class c ON c.oid = con.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace
         WHERE con.contype = 'f' AND {excluded_sql()}
           AND NOT EXISTS (SELECT 1 FROM pg_index ix WHERE ix.indrelid = con.conrelid
@@ -765,10 +836,9 @@ def get_lints(conn):
           AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.objid = p.oid AND d.deptype = 'e')"""):
         out.append({"severity": "ALTA", "code": "secdef_mutable_search_path", "object": f"{r['schema']}.{r['name']}({r['args']})",
                     "detail": "SECURITY DEFINER sem `SET search_path`: vulnerável a sequestro de search_path."})
-    for r in q(conn, """
+    for r in q(conn, f"""
         SELECT n.nspname AS schema, c.relname AS name FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-        WHERE c.relkind = 'v' AND n.nspname = 'public'
-          AND coalesce(array_to_string(c.reloptions, ','), '') NOT ILIKE '%security_invoker=true%'"""):
+        WHERE c.relkind = 'v' AND n.nspname = 'public' AND NOT {SECURITY_INVOKER_ON}"""):
         out.append({"severity": "ALTA", "code": "view_security_definer", "object": f"{r['schema']}.{r['name']}",
                     "detail": "View em public sem security_invoker: executa como owner e ignora RLS das tabelas base."})
     for r in q(conn, f"""
@@ -837,9 +907,14 @@ def get_db_stats(conn):
         SELECT n.nspname AS schema, sum(pg_total_relation_size(c.oid)) AS bytes
         FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
         WHERE c.relkind IN ('r','p','m') AND {excluded_sql()} GROUP BY 1 ORDER BY 2 DESC""")
-    out["storage"] = q(conn, """
-        SELECT bucket_id, count(*) AS objects, COALESCE(sum((metadata->>'size')::bigint), 0) AS bytes
-        FROM storage.objects GROUP BY 1 ORDER BY 1""")
+    # Mesmo cuidado do bloco de auth abaixo: storage ausente ou sem permissão não descarta o resto das métricas.
+    try:
+        out["storage"] = q(conn, """
+            SELECT bucket_id, count(*) AS objects, COALESCE(sum((metadata->>'size')::bigint), 0) AS bytes
+            FROM storage.objects GROUP BY 1 ORDER BY 1""")
+    except Exception as e:  # noqa: BLE001
+        record_error("db_stats.storage", e)
+        out["storage"] = []
     # Role sem SELECT em auth.* (ex.: role de leitura do workflow) nao pode derrubar a secao inteira:
     # em producao isso apagava tamanho do banco, conexoes, storage e filas de stats.md.
     try:
@@ -853,7 +928,11 @@ def get_db_stats(conn):
     except Exception as e:  # noqa: BLE001
         record_error("db_stats.auth", e)
         out["auth"] = {}
-    out["queues"] = q(conn, "SELECT queue_name, queue_length, newest_msg_age_sec, oldest_msg_age_sec, total_messages FROM pgmq.metrics_all() ORDER BY 1") if has_ext(conn, "pgmq") else []
+    try:
+        out["queues"] = q(conn, "SELECT queue_name, queue_length, newest_msg_age_sec, oldest_msg_age_sec, total_messages FROM pgmq.metrics_all() ORDER BY 1") if has_ext(conn, "pgmq") else []
+    except Exception as e:  # noqa: BLE001
+        record_error("db_stats.queues", e)
+        out["queues"] = []
     if STAT_STATEMENTS_TOP > 0:
         try:
             extension = q(conn, """
@@ -891,12 +970,19 @@ DB_SECTIONS: list[Callable] = [
 ]
 
 
+def connect_db():
+    # prepare_threshold=None: compatível com pooler em transaction mode (sem prepared statements).
+    try:
+        return psycopg.connect(DB_URL, connect_timeout=30, application_name="supabase-snapshot",
+                               prepare_threshold=None, autocommit=True)
+    except Exception as error:  # noqa: BLE001 — URL malformada, DNS, rede, TLS, senha: tudo vira uma linha sem segredo
+        raise DatabaseUnavailable(connection_error_text(error)) from None
+
+
 def introspect_db(previous_db: dict | None) -> tuple[dict[str, Any], dict[str, Any]]:
     db: dict[str, Any] = {}
     stats: dict[str, Any] = {}
-    # prepare_threshold=None: compatível com pooler em transaction mode (sem prepared statements).
-    with psycopg.connect(DB_URL, connect_timeout=30, application_name="supabase-snapshot",
-                         prepare_threshold=None, autocommit=True) as conn:
+    with connect_db() as conn:
         conn.execute("SET default_transaction_read_only = on")
         conn.execute("SET statement_timeout = '90s'")
         conn.execute("SET lock_timeout = '5s'")
@@ -921,7 +1007,9 @@ def api(path: str) -> Any:
     req = urllib.request.Request(f"{MGMT_API}{path}", headers={"Authorization": f"Bearer {ACCESS_TOKEN}", "User-Agent": "supabase-snapshot/2"})
     with urllib.request.urlopen(req, timeout=60) as resp:
         body = resp.read()
-        return json.loads(body.decode("utf-8")) if body else None
+        if not body.strip():
+            raise ValueError(f"resposta vazia em {path}")  # vazio não é "sem configuração": é falha
+        return json.loads(body.decode("utf-8"))
 
 
 def api_section(name: str, path: str, transform=lambda x: x, optional: bool = False):
@@ -947,6 +1035,7 @@ def introspect_api(previous_api: dict | None) -> tuple[dict[str, Any], dict[str,
     ref = PROJECT_REF
     out: dict[str, Any] = {"enabled": True, "ref": ref, "url": f"https://{ref}.supabase.co"}
     stats: dict[str, Any] = {}
+    first_error = len(ERRORS)
 
     def keep(d, keys):
         return {k: d.get(k) for k in keys} if isinstance(d, dict) else d
@@ -971,6 +1060,16 @@ def introspect_api(previous_api: dict | None) -> tuple[dict[str, Any], dict[str,
     stats["backups"] = backups
     stats["health"] = api_section("health", f"/projects/{ref}/health?services=auth,db,pooler,realtime,rest,storage", redact, optional=True)
 
+    # Mesma regra do banco: seção que falhou (HTTP 5xx/429/401, timeout, corpo inválido) mantém a coleta
+    # anterior com aviso; sem isso o CHANGELOG registrava "edge functions removido" e as pastas eram apagadas.
+    keys = {"secrets": "secrets_names", "backups": "backups_config"}
+    for name in [e["section"][len("api."):] for e in ERRORS[first_error:] if e["section"].startswith("api.")]:
+        key = keys.get(name, name)
+        if key in out and (previous_api or {}).get(key) is not None:
+            out[key] = previous_api[key]
+            CARRIED.append(f"api.{name}")
+            log(f"api {name}: reaproveitado da coleta anterior")
+
     # Edge functions: a API devolve bundle binário (eszip), não fonte. Guardamos só metadados por função;
     # o fonte canônico é supabase/functions/<slug>/ no repo.
     fn_dir = OUT / "edge-functions"
@@ -983,7 +1082,8 @@ def introspect_api(previous_api: dict | None) -> tuple[dict[str, Any], dict[str,
             ["verify_jwt", f.get("verify_jwt")], ["entrypoint", f.get("entrypoint_path")], ["import_map", f.get("import_map_path")],
             ["URL", f"https://{ref}.supabase.co/functions/v1/{s}"], ["fonte no repo", f"`supabase/functions/{s}/`"]])]
         write(fn_dir / slug(s) / "README.md", "\n".join(md))
-    if fn_dir.exists():
+    listed = not any(e["section"] == "api.edge_functions" for e in ERRORS[first_error:]) or "api.edge_functions" in CARRIED
+    if fn_dir.exists() and listed:
         for d in fn_dir.iterdir():
             if d.is_dir() and d.name not in {slug(s) for s in current}:
                 shutil.rmtree(d)
@@ -1015,7 +1115,8 @@ def run_pg_dump() -> str | None:
         return None
     lines = [ln for ln in res.stdout.splitlines()
              if not ln.startswith(("-- Dumped from", "-- Dumped by", "\\restrict", "\\unrestrict"))]
-    text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines))
+    # O dump não passa por q(): sem o scrub, token em argumento de trigger/webhook ou corpo de função ia cru para o arquivo.
+    text = scrub(re.sub(r"\n{3,}", "\n\n", "\n".join(lines)))
     log(f"pg_dump: ok ({len(text)} bytes)")
     return text
 
@@ -1430,10 +1531,13 @@ def render_simple(db: dict, api_: dict, caller_sources: dict[str, str] | None = 
     enum_usage: dict[str, list[str]] = {}
     for c in db.get("columns") or []:
         if c.get("is_enum"):
-            enum_usage.setdefault(c["type"].split(".")[-1].strip('"'), []).append(f"{c['schema']}.{c['table']}.{c['name']}")
+            # enum_type = schema.nome: enums homônimos em schemas diferentes não herdam o uso um do outro.
+            # Seção `columns` reaproveitada de coleta antiga não tem o campo e cai no nome solto.
+            enum_usage.setdefault(c.get("enum_type") or c["type"].split(".")[-1].strip('"'), []).append(f"{c['schema']}.{c['table']}.{c['name']}")
     write(OUT / "types-enums.md", "# Tipos customizados (enums, domains, composites)\n\n" + banner("types") + md_table(
         ["tipo", "kind", "valores / definição", "usado em"],
-        [[f"{t['schema']}.{t['name']}", t["kind"], t["values"] or t["definition"], sorted(enum_usage.get(t["name"], []))] for t in db.get("types") or []]))
+        [[f"{t['schema']}.{t['name']}", t["kind"], t["values"] or t["definition"],
+          sorted(enum_usage.get(f"{t['schema']}.{t['name']}") or enum_usage.get(t["name"], []))] for t in db.get("types") or []]))
 
     # Extensions / sequences / schemas
     write(OUT / "extensions.md", "# Extensões\n\n" + banner("extensions") + md_table(
@@ -1547,7 +1651,7 @@ def render_simple(db: dict, api_: dict, caller_sources: dict[str, str] | None = 
 
     # Edge functions + project config
     if api_.get("enabled"):
-        md = ["# Edge Functions\n", f"URL base: `{api_['url']}/functions/v1/<slug>`. Metadados por função em `edge-functions/<slug>/README.md`. "
+        md = ["# Edge Functions\n", banner("api.edge_functions"), f"URL base: `{api_['url']}/functions/v1/<slug>`. Metadados por função em `edge-functions/<slug>/README.md`. "
               "A Management API devolve só o bundle compilado; o fonte canônico é `supabase/functions/<slug>/` no repo.\n",
               md_table(["slug", "nome", "status", "versão", "verify_jwt", "entrypoint"],
                        [[f["slug"], f["name"], f["status"], f["version"], f["verify_jwt"], f["entrypoint_path"]] for f in api_.get("edge_functions") or []])]
@@ -1628,7 +1732,7 @@ def render_readme(snap: dict, api_: dict, caller_sources: dict[str, str] | None 
     server = db.get("server") or {}
     md = [
         "# Snapshot Supabase — contexto para agentes de IA\n",
-        os.environ.get("SUPABASE_SNAPSHOT_PUBLICACAO", "Gerado automaticamente a cada 10 min pelo workflow `contexto` (job `banco`). **Não edite manualmente.**") + "\n",
+        os.environ.get("SUPABASE_SNAPSHOT_PUBLICACAO", "Gerado automaticamente a cada 10 min pelo workflow `contexto-ia.yml` (job `banco`). **Não edite manualmente.**") + "\n",
         "Última coleta concluída publicada: `manifest.json` → `gerado_em` (UTC), com erros e seções reaproveitadas. "
         "Última publicação: `git log -1 --format=%cI -- docs/contexto/supabase`. Mudanças estruturais estão em `CHANGELOG.md`.\n",
         "## Protocolo para agentes\n",
@@ -1724,7 +1828,11 @@ def main() -> int:
         except Exception:  # noqa: BLE001
             previous = None
 
-    db, stats = introspect_db((previous or {}).get("db"))
+    try:
+        db, stats = introspect_db((previous or {}).get("db"))
+    except DatabaseUnavailable as error:
+        print(f"Banco inacessível — nada foi coletado nem sobrescrito. {error}", file=sys.stderr)
+        return 1
     if all(v is None for v in db.values()):
         log("Banco inteiro indisponível — nada será sobrescrito.")
         return 1
@@ -1786,5 +1894,15 @@ def main() -> int:
     return 0
 
 
+def cli(argv: list[str]) -> int:
+    """A configuração é toda por variável de ambiente; argumento não pode disparar uma coleta por engano."""
+    if argv:
+        known = argv[0] in ("-h", "--help")
+        print((__doc__ or "").strip() if known else f"Argumento não reconhecido: {argv[0]} (use --help; a configuração é por variável de ambiente)",
+              file=sys.stdout if known else sys.stderr)
+        return 0 if known else 2
+    return main()
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(cli(sys.argv[1:]))

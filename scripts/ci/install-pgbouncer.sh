@@ -2,8 +2,9 @@
 
 set -Eeuo pipefail
 
-if command -v pgbouncer >/dev/null 2>&1; then
-  pgbouncer --version
+# So pula a instalacao se o binario existe E roda: `pgbouncer` presente mas quebrado
+# (wrapper sem o pacote real, biblioteca faltando) tem de cair no apt, nao abortar aqui.
+if command -v pgbouncer >/dev/null 2>&1 && pgbouncer --version; then
   exit 0
 fi
 

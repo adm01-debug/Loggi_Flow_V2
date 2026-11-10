@@ -15,13 +15,16 @@ WITH
 -- messages = 1 com 53 mil linhas reais).
 base AS (
   SELECT c.oid, c.relname AS nome, c.relrowsecurity AS rls, c.relforcerowsecurity AS rls_forcado,
-         c.reltuples, pg_total_relation_size(c.oid)::bigint AS bytes
+         c.reltuples, pg_total_relation_size(c.oid)::bigint AS bytes,
+         -- Particao (ex.: audit_logs_y2026m11): nome da tabela-mae; NULL nas demais.
+         (SELECT pc.relname FROM pg_inherits i JOIN pg_class pc ON pc.oid = i.inhparent
+           WHERE c.relispartition AND i.inhrelid = c.oid LIMIT 1) AS particao_de
     FROM pg_class c
     JOIN pg_namespace n ON n.oid = c.relnamespace
    WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p')
 ),
 tabelas AS (
-  SELECT b.oid, b.nome, b.rls, b.rls_forcado, b.bytes,
+  SELECT b.oid, b.nome, b.rls, b.rls_forcado, b.bytes, b.particao_de,
          b.reltuples < 200000 AS linhas_exatas,
          CASE WHEN b.reltuples < 200000
               THEN (xpath('/row/n/text()',
@@ -95,7 +98,14 @@ SELECT jsonb_build_object(
              'linhas', t.linhas,
              'linhas_exatas', t.linhas_exatas,
              'bytes', t.bytes,
-             'citada_no_banco', EXISTS (SELECT 1 FROM corpos c WHERE c.txt ~ ('\m' || t.nome || '\M'))
+             'particao_de', t.particao_de,
+             -- O nome entra na regex escapado (\W -> \<char>): tabela com "(", "[" ou "." no nome
+             -- derrubava a consulta inteira ou casava errado. \m/\M so onde o nome comeca/termina em
+             -- caractere de palavra (senao a fronteira nunca casa).
+             'citada_no_banco', EXISTS (SELECT 1 FROM corpos c WHERE c.txt ~ (
+               CASE WHEN t.nome ~ '^\w' THEN '\m' ELSE '' END
+               || regexp_replace(t.nome, '(\W)', '\\\1', 'g')
+               || CASE WHEN t.nome ~ '\w$' THEN '\M' ELSE '' END))
            ) ORDER BY t.nome), '[]'::jsonb)
       FROM tabelas t
       LEFT JOIN policies p ON p.nome = t.nome

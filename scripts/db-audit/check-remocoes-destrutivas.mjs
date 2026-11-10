@@ -24,6 +24,7 @@ import { scan, walk } from './supabase-usage-guard.mjs';
 const ROOT = process.cwd();
 const ANTIGO = process.argv[2] || path.join(ROOT, 'supabase/schema-catalog.json');
 const NOVO = process.argv[3] || '/tmp/catalog.new.json';
+const TYPES_GERADO = 'src/integrations/supabase/types.ts';
 
 function ler(arquivo) {
   if (!fs.existsSync(arquivo)) {
@@ -31,7 +32,17 @@ function ler(arquivo) {
     process.exit(2);
   }
   try {
-    return JSON.parse(fs.readFileSync(arquivo, 'utf8'));
+    const catalogo = JSON.parse(fs.readFileSync(arquivo, 'utf8'));
+    if (!catalogo || typeof catalogo !== 'object' || Array.isArray(catalogo)) {
+      throw new Error('a raiz precisa ser um objeto JSON');
+    }
+    for (const secao of ['tables', 'views', 'functions', 'enums']) {
+      const nomes = catalogo[secao];
+      if (nomes !== undefined && !(Array.isArray(nomes) && nomes.every((n) => typeof n === 'string'))) {
+        throw new Error('secao [' + secao + '] precisa ser lista de nomes');
+      }
+    }
+    return catalogo;
   } catch (error) {
     console.error('ERRO: catalogo invalido (' + arquivo + '): ' + error.message);
     process.exit(2);
@@ -50,11 +61,13 @@ function objetos(catalogo) {
 function enumsCitados(removidos) {
   const citados = new Map();
   if (removidos.size === 0) return citados;
-  const arquivos = [...walk('src'), ...walk('supabase/functions')];
+  // O types.ts gerado lista todo enum do banco: nao e consumidor, e o proprio sync o regenera.
+  const arquivos = [...walk('src'), ...walk('supabase/functions')]
+    .filter((arquivo) => arquivo.split(path.sep).join('/') !== TYPES_GERADO);
   for (const arquivo of arquivos) {
     const texto = fs.readFileSync(arquivo, 'utf8');
     for (const alvo of removidos) {
-      const nome = alvo.slice('public.'.length);
+      const nome = alvo.slice('public.'.length).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       if (new RegExp('\\b' + nome + '\\b').test(texto)) {
         if (!citados.has(alvo)) citados.set(alvo, []);
         citados.get(alvo).push(arquivo.split(path.sep).join('/'));
@@ -78,7 +91,7 @@ function main() {
   const callSites = (alvo, kind) => consumidores.filter(
     (c) => c.kind === kind && c.schema + '.' + c.name === alvo,
   );
-  const enums = enumsCitados(new Set(removidas.flatMap(([, , alvos]) => alvos)));
+  const enums = enumsCitados(new Set(removidas[2][2]));
 
   console.log('Gate 3 — remocoes destrutivas (objetos, nao linhas)');
   console.log('  catalogo antigo: ' + ANTIGO);

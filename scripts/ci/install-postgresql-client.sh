@@ -2,8 +2,9 @@
 
 set -Eeuo pipefail
 
-if command -v psql >/dev/null 2>&1; then
-  psql --version
+# So pula a instalacao se o binario existe E roda: `psql` presente mas quebrado
+# (wrapper sem o pacote real, biblioteca faltando) tem de cair no apt, nao abortar aqui.
+if command -v psql >/dev/null 2>&1 && psql --version; then
   exit 0
 fi
 
