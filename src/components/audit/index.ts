@@ -1,4 +1,4 @@
 // Audit Components - barrel export
 // ============================================
 
-export { AuditTrailViewer } from './AuditTrailViewer';
+export { AuditTrailViewer } from "./AuditTrailViewer";

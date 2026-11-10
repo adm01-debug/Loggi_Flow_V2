@@ -1,5 +1,12 @@
-export type ColetaStatus = 'aguardando_liberacao' | 'solicitada' | 'em_transito' | 'chegou_expedicao' | 'conferencia_ok' | 'divergencia' | 'finalizada';
-export type ColetaTipo = 'lalamove' | 'transportadora';
+export type ColetaStatus =
+  | "aguardando_liberacao"
+  | "solicitada"
+  | "em_transito"
+  | "chegou_expedicao"
+  | "conferencia_ok"
+  | "divergencia"
+  | "finalizada";
+export type ColetaTipo = "lalamove" | "transportadora";
 
 export interface Coleta {
   id: string;

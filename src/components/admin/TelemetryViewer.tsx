@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  AlertTriangle, 
-  AlertCircle, 
-  Info, 
-  Bug, 
-  Clock, 
-  Filter, 
+import {
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  Bug,
+  Clock,
+  Filter,
   ChevronDown,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -33,7 +33,11 @@ import { useState } from "react";
 export function TelemetryViewer() {
   const [severityFilter, setSeverityFilter] = useState<string | null>(null);
 
-  const { data: logs, isLoading, refetch } = useQuery({
+  const {
+    data: logs,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["telemetry-logs", severityFilter],
     queryFn: async () => {
       let query = supabase
@@ -72,9 +76,20 @@ export function TelemetryViewer() {
       case "error":
         return <Badge className="bg-red-500 hover:bg-red-600">Erro</Badge>;
       case "warning":
-        return <Badge variant="secondary" className="bg-amber-100 text-amber-700">Aviso</Badge>;
+        return (
+          <Badge variant="secondary" className="bg-amber-100 text-amber-700">
+            Aviso
+          </Badge>
+        );
       default:
-        return <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">Info</Badge>;
+        return (
+          <Badge
+            variant="outline"
+            className="text-blue-600 border-blue-200 bg-blue-50"
+          >
+            Info
+          </Badge>
+        );
     }
   };
 
@@ -86,7 +101,9 @@ export function TelemetryViewer() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <Filter className="w-4 h-4 mr-2" />
-                {severityFilter ? `Severidade: ${severityFilter}` : "Todas Severidades"}
+                {severityFilter
+                  ? `Severidade: ${severityFilter}`
+                  : "Todas Severidades"}
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
@@ -145,13 +162,17 @@ export function TelemetryViewer() {
                 </TableCell>
               </TableRow>
             )}
-            {!isLoading && logs && logs.length > 0 && (
+            {!isLoading &&
+              logs &&
+              logs.length > 0 &&
               logs?.map((log) => (
                 <TableRow key={log.id} className="group">
                   <TableCell className="text-xs font-mono text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Clock className="w-3 h-3" />
-                      {format(new Date(log.created_at), "dd/MM HH:mm:ss", { locale: ptBR })}
+                      {format(new Date(log.created_at), "dd/MM HH:mm:ss", {
+                        locale: ptBR,
+                      })}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -161,7 +182,10 @@ export function TelemetryViewer() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="font-mono text-[10px] uppercase">
+                    <Badge
+                      variant="outline"
+                      className="font-mono text-[10px] uppercase"
+                    >
                       {log.category}
                     </Badge>
                   </TableCell>
@@ -177,13 +201,16 @@ export function TelemetryViewer() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
+              ))}
           </TableBody>
         </Table>
       </div>

@@ -16,11 +16,7 @@ import { cn } from "@/lib/utils";
 import { typeConfig } from "./ConfirmProvider";
 
 export type ConfirmType =
-  | "danger"
-  | "warning"
-  | "info"
-  | "success"
-  | "critical";
+  "danger" | "warning" | "info" | "success" | "critical";
 
 interface ConfirmDialogProps {
   open: boolean;
