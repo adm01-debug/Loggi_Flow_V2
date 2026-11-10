@@ -31,3 +31,7 @@ graphify-out/
 # Gerados por `graphify hook install` com o caminho do Python da máquina
 .husky/post-commit
 .husky/post-checkout
+
+# Estado local privado dos novos adaptadores de automação
+/.tools/repo-automation/
+/.tools/graphify/local-state/
