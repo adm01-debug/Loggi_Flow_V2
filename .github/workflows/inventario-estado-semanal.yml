@@ -3,8 +3,7 @@
 #   prova: inventario/estado (banco, rotas, edges) regerado do banco oficial e do codigo
 #   falha: o job fica vermelho e o inventario nao e atualizado
 #   avisa: PR automation/inventario-estado com o inventario novo
-# NOTA(loggi): Este workflow depende de scripts/inventario/{gerar-banco,gerar-rotas,gerar-repo,mudou-conteudo}.mjs
-# que ainda nao existem neste repositorio. Porte esses scripts do Zapp_Web_V2 antes de usar.
+# NOTA(loggi): scripts/inventario/{gerar-banco,gerar-rotas,gerar-repo,mudou-conteudo}.mjs existem neste repositorio.
 # Secret necessario: SUPABASE_ACCESS_TOKEN (ja existe para deploy-functions).
 name: Inventário do estado real (semanal)
 
@@ -53,7 +52,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: '.nvmrc'
+          node-version: '20'  # este repo nao tem .nvmrc; a CI usa Node 20
 
       - name: Instalar ripgrep (usado pelo gerar-repo.mjs)
         run: command -v rg || sudo apt-get install -y --no-install-recommends ripgrep

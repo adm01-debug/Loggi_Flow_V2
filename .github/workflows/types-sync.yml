@@ -3,11 +3,9 @@
 #   prova: os tipos gerados batem com o banco oficial (Gates 1 e 2)
 #   falha: PR em `automation/types-sync` ou issue `[types-sync]`; nunca passa com tipo divergente
 #   avisa: PR de types e issue de gate
-# NOTA(loggi): Este workflow depende de scripts/db-audit/ e scripts/ci/ (typecheck-ratchet,
-# install-postgresql-client, install-pgbouncer) que nao existem neste repositorio.
-# Requer secret DESTINO_URL (URL do banco Loggi: postgres://postgres.jvfhclubfpxrtrrazrgr:[senha]@...)
-# e environment banco-leitura. Porte os scripts do Zapp_Web_V2 e adapte database-identity.json
-# (fingerprint do banco jvfhclubfpxrtrrazrgr) antes de usar.
+# NOTA(loggi): depende de scripts/db-audit/ e scripts/ci/ (typecheck-ratchet, install-postgresql-client,
+# install-pgbouncer), que existem neste repositorio. Requer o secret DESTINO_URL (URL do banco Loggi:
+# postgres://postgres.jvfhclubfpxrtrrazrgr:[senha]@... — session pooler) no environment banco-leitura.
 # ==================================================================
 # LOGGI-FLOW · Sincronizacao assistida dos artefatos do banco
 # ==================================================================
@@ -348,6 +346,16 @@ jobs:
             cp "$found" "$dest"
           done
 
+      - name: Guardar o catalogo commitado (base do Gate 3)
+        # Tem de vir ANTES de "Aplicar candidatos": depois dele supabase/schema-catalog.json ja e o catalogo novo
+        # e o Gate 3 compararia o novo com ele mesmo (nunca bloquearia).
+        run: |
+          if [ -f supabase/schema-catalog.json ]; then
+            cp supabase/schema-catalog.json /tmp/catalog.old.json
+          else
+            echo '{}' > /tmp/catalog.old.json
+          fi
+
       - name: Aplicar candidatos no worktree
         run: |
           if [ "${{ needs.ler-banco.outputs.types_changed }}" = true ]; then cp /tmp/types.new.ts src/integrations/supabase/types.ts; fi
@@ -355,23 +363,18 @@ jobs:
           if [ "${{ needs.ler-banco.outputs.manifest_changed }}" = true ]; then cp /tmp/manifest.new.json supabase/schema-manifest.json; fi
           if [ "${{ needs.ler-banco.outputs.grants_changed }}" = true ]; then cp /tmp/grants.new.json scripts/db-audit/grants-baseline.json; fi
 
-      - name: Setup Bun
+      # npm, como o resto da CI: o bun.lock deste repo esta defasado do package.json e `bun install
+      # --frozen-lockfile` falha ("lockfile had changes, but lockfile is frozen").
+      - name: Setup Node
         if: needs.ler-banco.outputs.schema_changed == 'true'
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          bun-version: '1.4.0'
-
-      - name: 💾 Cache de dependências Bun
-        if: needs.ler-banco.outputs.schema_changed == 'true'
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.bun/install/cache
-          key: bun-${{ hashFiles('bun.lock') }}
-          restore-keys: bun-
+          node-version: '20'
+          cache: npm
 
       - name: Instalar dependencias
         if: needs.ler-banco.outputs.schema_changed == 'true'
-        run: bun install --frozen-lockfile --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Gate 1 — TypeScript nao piora
         id: gate1
@@ -409,7 +412,7 @@ jobs:
         if: needs.ler-banco.outputs.schema_changed == 'true' && steps.gate2.outputs.passed == 'true'
         run: |
           set -o pipefail
-          if node scripts/db-audit/check-remocoes-destrutivas.mjs supabase/schema-catalog.json /tmp/catalog.new.json 2>&1 | tee /tmp/gate3.log; then
+          if node scripts/db-audit/check-remocoes-destrutivas.mjs /tmp/catalog.old.json /tmp/catalog.new.json 2>&1 | tee /tmp/gate3.log; then
             echo "passed=true" >> "$GITHUB_OUTPUT"
           else
             echo "passed=false" >> "$GITHUB_OUTPUT"
