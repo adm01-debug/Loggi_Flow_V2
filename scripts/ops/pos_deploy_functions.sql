@@ -50,6 +50,17 @@
 --      WHERE created > now() - interval '1 hour' GROUP BY 1 ORDER BY 1;
 --     -> esperado: nenhuma linha com status_code 401.
 --
+-- ROLLBACK — se o deploy quebrou produção:
+-- - Deploy anterior: o Supabase mantém versões anteriores. Reverter = redeploy da versão boa. Pelo
+--   workflow, use o mesmo "Deploy Edge Functions" apontando `only` para a function afetada — mas o
+--   código que sobe é o do HEAD do branch, não uma versão anterior. Para reverter de verdade, faça
+--   checkout do commit anterior do index.ts afetado, suba em branch+PR, e rode o workflow. Não há
+--   comando nativo de rollback de function.
+-- - Secret errado: re-setar o valor CORRETO (mesmo fluxo do PASSO 2; só o nome que está errado é
+--   sobrescrito). Nunca apagar o secret sem ter o valor correto à mão — os crons param de autenticar.
+-- - Deploy quebrou produção: pare os crons afetados (cron.unschedule) até corrigir, para não gerar
+--   fila de erros. Os crons vivem na migration supabase/migrations/20260902120000_hardening_pos_auditoria.sql.
+--
 -- OPCIONAL (decisão do dono) — a service_role_key do vault é uma sb_secret de OUTRO projeto
 -- ("Unregistered API key"). Nenhum cron versionado no repo a usa (mandam anon_key + x-internal-secret).
 -- Para corrigir, o dono cola a chave do painel (Settings -> API) direto no SQL editor:
