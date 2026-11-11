@@ -139,7 +139,7 @@ jobs:
 
       - name: Cache do graphify (AST ja extraida)
         if: github.event_name != 'workflow_dispatch' || inputs.graphify
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: graphify-out/cache
           key: graphify-cache-${{ github.sha }}
