@@ -628,7 +628,9 @@
    "linhas": 273,
    "env": [],
    "npm_scripts": [],
-   "workflows": [],
+   "workflows": [
+    "sync-internal-secret.yml"
+   ],
    "orfao": false
   },
   {

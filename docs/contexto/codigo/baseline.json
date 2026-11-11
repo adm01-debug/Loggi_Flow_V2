@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "e2cc7bdec6cb9956b75dda9e684b860bbdf8b14a",
+  "commit": "60b8d2136b9d1d3a6daacb1fc727c87918866c96",
   "branch": "main",
-  "data_commit": "2026-11-11T18:23:33-03:00",
+  "data_commit": "2026-11-11T20:37:31-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "60b8d213",
+    "data": "2026-11-11",
+    "assunto": "feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)"
+   },
    {
     "sha": "e2cc7bde",
     "data": "2026-11-11",
@@ -126,14 +131,9 @@
     "sha": "d62cc113",
     "data": "2026-11-08",
     "assunto": "delete x"
-   },
-   {
-    "sha": "1ada5785",
-    "data": "2026-11-08",
-    "assunto": "delete x"
    }
   ],
-  "arquivos_mudados_7d": 180,
+  "arquivos_mudados_7d": 181,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "scripts/validate-csp.mjs",
@@ -301,12 +301,12 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 85
+    "commits": 86
    }
   ]
  },
  "contagens": {
-  "arquivos_total": 1276,
+  "arquivos_total": 1277,
   "arquivos_codigo": 863,
   "linhas_codigo": 165527,
   "rotas": 61,
@@ -321,7 +321,7 @@
   "migrations": 244,
   "cron_jobs": 28,
   "testes": 123,
-  "workflows": 15,
+  "workflows": 16,
   "scripts": 62,
   "docs_md": 82
  },

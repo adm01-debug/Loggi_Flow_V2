@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "e2cc7bdec6cb9956b75dda9e684b860bbdf8b14a",
+  "sha": "60b8d2136b9d1d3a6daacb1fc727c87918866c96",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-11 22:14 UTC",
-  "files_total": 1286,
+  "generated_at": "2026-11-11 23:48 UTC",
+  "files_total": 1287,
   "code_files": 1121,
   "code_lines": 181265,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "8c2a73683e4b1a42",
+ "facts_hash": "003c7b2a98eb3ba1",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -269,6 +269,13 @@
     "name": "Settings Guard",
     "triggers": [
      "schedule",
+     "workflow_dispatch"
+    ]
+   },
+   {
+    "file": ".github/workflows/sync-internal-secret.yml",
+    "name": "Sync Internal Secret",
+    "triggers": [
      "workflow_dispatch"
     ]
    },
@@ -87905,10 +87912,19 @@
   }
  },
  "git": {
-  "sha": "e2cc7bdec6cb9956b75dda9e684b860bbdf8b14a",
+  "sha": "60b8d2136b9d1d3a6daacb1fc727c87918866c96",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "60b8d21",
+    "date": "2026-11-11",
+    "author": "adm01-debug",
+    "subject": "feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)",
+    "files": [
+     ".github/workflows/sync-internal-secret.yml"
+    ]
+   },
    {
     "sha": "e2cc7bd",
     "date": "2026-11-11",
@@ -88363,13 +88379,6 @@
    },
    {
     "sha": "b6f6764",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "38fa76c",
     "date": "2026-11-08",
     "author": "adm01-debug",
     "subject": "delete x",

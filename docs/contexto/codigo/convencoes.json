@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)",
    "fix(ci): move gate de credencial do types-sync para antes dos installs (#134)",
    "docs: atualiza contagem de required checks para 10 no github-ci.md (#123)",
    "chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)",
-   "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)",
-   "fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)"
+   "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

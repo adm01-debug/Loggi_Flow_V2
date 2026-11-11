@@ -8,7 +8,7 @@
    "Markdown (82)",
    "JavaScript (80)",
    "JSON (27)",
-   "YAML (19)",
+   "YAML (20)",
    "Shell (9)",
    "Python (8)"
   ],
@@ -584,6 +584,34 @@
    ]
   },
   {
+   "arquivo": ".github/workflows/sync-internal-secret.yml",
+   "nome": "Sync Internal Secret",
+   "gatilhos": [
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [],
+   "jobs": [
+    "resync-secret"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/ops/set_missing_secrets.sh"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL",
+    "SUPABASE_ACCESS_TOKEN",
+    "sh"
+   ],
+   "actions": [
+    "actions/checkout",
+    "supabase/setup-cli"
+   ]
+  },
+  {
    "arquivo": ".github/workflows/types-sync.yml",
    "nome": "types-sync",
    "gatilhos": [
@@ -956,7 +984,8 @@
    "SETTINGS_GUARD_TOKEN",
    "SUPABASE_ACCESS_TOKEN",
    "SUPABASE_DB_URL",
-   "TYPES_SYNC_PR_TOKEN"
+   "TYPES_SYNC_PR_TOKEN",
+   "sh"
   ]
  },
  "deploy": {
