@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `9c2edff8cc` · branch `main` · 2026-11-10 10:22 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `04259107da` · branch `main` · 2026-11-11 13:08 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -2161,7 +2161,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | escalated abaixo do threshold | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
 | fuzz não gerou nenhum escalonamento | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
 | ignoredCount fora de faixa | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
-| … +138 linhas — lista completa em `context.json` | |
+| … +145 linhas — lista completa em `context.json` | |
 
 ## J. Controle de acesso no código (checagens de perfil/permissão)
 

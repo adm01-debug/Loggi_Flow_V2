@@ -42,6 +42,12 @@
   "scripts/db-audit/supabase-usage-guard.mjs": [
    "scripts/db-audit/sql-lexer.mjs"
   ],
+  "scripts/maintenance/run.mjs": [
+   "scripts/maintenance/lib.mjs"
+  ],
+  "scripts/maintenance/typecheck.mjs": [
+   "scripts/maintenance/lib.mjs"
+  ],
   "src/App.tsx": [
    "src/components/LazyProviders.tsx",
    "src/components/auth/ProtectedRoute.tsx",

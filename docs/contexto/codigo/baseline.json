@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "9c2edff8cc7f7f1a716030273948753d1a9247f5",
+  "commit": "04259107da619d0c45bb0093648282e09e465622",
   "branch": "main",
-  "data_commit": "2026-11-10T07:22:00-03:00",
+  "data_commit": "2026-11-11T09:44:24-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "04259107",
+    "data": "2026-11-11",
+    "assunto": "chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)"
+   },
+   {
+    "sha": "e31c16af",
+    "data": "2026-11-11",
+    "assunto": "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)"
+   },
    {
     "sha": "9c2edff8",
     "data": "2026-11-10",
@@ -121,23 +131,17 @@
     "sha": "aa987630",
     "data": "2026-11-08",
     "assunto": "delete x"
-   },
-   {
-    "sha": "45ecb658",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "b6f67642",
-    "data": "2026-11-08",
-    "assunto": "delete x"
    }
   ],
-  "arquivos_mudados_7d": 164,
+  "arquivos_mudados_7d": 180,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "scripts/validate-csp.mjs",
     "mudancas": 4
+   },
+   {
+    "pasta": ".gitignore",
+    "mudancas": 3
    },
    {
     "pasta": "AGENTS.md",
@@ -184,10 +188,6 @@
     "mudancas": 2
    },
    {
-    "pasta": ".gitignore",
-    "mudancas": 2
-   },
-   {
     "pasta": "docs/agentes/github-ci.md",
     "mudancas": 2
    },
@@ -203,7 +203,7 @@
    },
    {
     "arquivo": "package.json",
-    "mudancas": 39
+    "mudancas": 40
    },
    {
     "arquivo": "index.html",
@@ -301,14 +301,14 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 81
+    "commits": 83
    }
   ]
  },
  "contagens": {
-  "arquivos_total": 1260,
-  "arquivos_codigo": 855,
-  "linhas_codigo": 158800,
+  "arquivos_total": 1276,
+  "arquivos_codigo": 863,
+  "linhas_codigo": 165527,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -320,10 +320,10 @@
   "tabelas": 144,
   "migrations": 244,
   "cron_jobs": 28,
-  "testes": 120,
-  "workflows": 14,
-  "scripts": 56,
-  "docs_md": 80
+  "testes": 123,
+  "workflows": 15,
+  "scripts": 62,
+  "docs_md": 82
  },
  "por_pasta": {
   "eslint.config.js": {
@@ -354,6 +354,14 @@
    "arquivos": 1,
    "linhas": 76
   },
+  "scripts/automation.mjs": {
+   "arquivos": 1,
+   "linhas": 1170
+  },
+  "scripts/automation.unit.mjs": {
+   "arquivos": 1,
+   "linhas": 689
+  },
   "scripts/check-warning-budget.mjs": {
    "arquivos": 1,
    "linhas": 154
@@ -378,6 +386,14 @@
    "arquivos": 1,
    "linhas": 234
   },
+  "scripts/graphify-local.mjs": {
+   "arquivos": 1,
+   "linhas": 1247
+  },
+  "scripts/graphify-local.unit.mjs": {
+   "arquivos": 1,
+   "linhas": 577
+  },
   "scripts/inventario": {
    "arquivos": 8,
    "linhas": 2902
@@ -385,6 +401,10 @@
   "scripts/lib": {
    "arquivos": 2,
    "linhas": 411
+  },
+  "scripts/maintenance": {
+   "arquivos": 4,
+   "linhas": 3044
   },
   "scripts/ops": {
    "arquivos": 3,
@@ -529,12 +549,20 @@
    "linhas": 1354
   },
   {
+   "arquivo": "scripts/graphify-local.mjs",
+   "linhas": 1247
+  },
+  {
    "arquivo": "src/pages/Envios.tsx",
    "linhas": 1241
   },
   {
    "arquivo": "src/pages/Transportadoras.tsx",
    "linhas": 1209
+  },
+  {
+   "arquivo": "scripts/automation.mjs",
+   "linhas": 1170
   },
   {
    "arquivo": "src/components/dashboard/LogisticsMapWidget.tsx",
@@ -569,6 +597,14 @@
    "linhas": 945
   },
   {
+   "arquivo": "scripts/maintenance/lib.mjs",
+   "linhas": 937
+  },
+  {
+   "arquivo": "scripts/maintenance/run.mjs",
+   "linhas": 899
+  },
+  {
    "arquivo": "src/pages/Fornecedores.tsx",
    "linhas": 884
   },
@@ -595,31 +631,15 @@
   {
    "arquivo": "src/pages/RastreamentoRealTime.tsx",
    "linhas": 783
-  },
-  {
-   "arquivo": "src/components/ui/sidebar.tsx",
-   "linhas": 771
-  },
-  {
-   "arquivo": "src/components/map/MapboxMap.tsx",
-   "linhas": 731
-  },
-  {
-   "arquivo": "src/pages/InteligenciaFrete.tsx",
-   "linhas": 687
-  },
-  {
-   "arquivo": "src/pages/DashboardCotacoes.tsx",
-   "linhas": 640
   }
  ],
  "qualidade": {
   "any": 57,
-  "console_log": 139,
+  "console_log": 156,
   "ts_ignore": 0,
   "eslint_disable": 3,
   "todos": 2,
-  "arquivos_acima_500_linhas": 34
+  "arquivos_acima_500_linhas": 38
  },
  "todos": [
   {

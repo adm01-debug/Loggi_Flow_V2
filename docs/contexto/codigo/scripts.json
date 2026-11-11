@@ -1,7 +1,7 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 56,
+ "total": 62,
  "scripts": [
   {
    "arquivo": "scripts/ai-context/cenarios.mjs",
@@ -98,6 +98,29 @@
    "env": [],
    "npm_scripts": [],
    "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/automation.mjs",
+   "descricao": null,
+   "linhas": 1170,
+   "env": [
+    "REPO_AUTOMATION_CHAINING"
+   ],
+   "npm_scripts": [
+    "automation:doctor",
+    "automation:test",
+    "automation:check",
+    "automation:heal",
+    "automation:nightly",
+    "automation:graph",
+    "automation:status",
+    "automation:install-hooks",
+    "automation:uninstall-hooks"
+   ],
+   "workflows": [
+    "automation-local.yml"
+   ],
    "orfao": false
   },
   {
@@ -451,6 +474,15 @@
    "orfao": false
   },
   {
+   "arquivo": "scripts/graphify-local.mjs",
+   "descricao": null,
+   "linhas": 1247,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
    "arquivo": "scripts/graphify/setup.sh",
    "descricao": "Instala o graphify (grafo de conhecimento do código) e o configura neste clone. Uso: npm run graph:setup   (Linux, macOS ou WSL; precisa de uv ou pipx)",
    "linhas": 54,
@@ -531,6 +563,48 @@
    "orfao": false
   },
   {
+   "arquivo": "scripts/maintenance/lib.mjs",
+   "descricao": null,
+   "linhas": 937,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/maintenance/run.mjs",
+   "descricao": null,
+   "linhas": 899,
+   "env": [
+    "XDG_STATE_HOME"
+   ],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/maintenance/run.sh",
+   "descricao": null,
+   "linhas": 16,
+   "env": [],
+   "npm_scripts": [
+    "maintenance:doctor",
+    "maintenance:check",
+    "maintenance:heal"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/maintenance/typecheck.mjs",
+   "descricao": null,
+   "linhas": 110,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
    "arquivo": "scripts/ops/backup_origem.sh",
    "descricao": "Backup diario da ORIGEM (Lovable hgicfqjayrjurivtygqf) ate o descomissionamento. Roda no container claude-code da VPS. Segredo fora do repo: /workspace/.secrets/loggi-origem.pgpass (formato pgpass: ho",
    "linhas": 75,
@@ -542,7 +616,7 @@
   {
    "arquivo": "scripts/ops/pos_deploy_functions.sql",
    "descricao": "Runbook pós-deploy das edge functions (auditoria 2026-09-02) — projeto jvfhclubfpxrtrrazrgr Só comentários: colar este arquivo num SQL editor não executa nada.",
-   "linhas": 59,
+   "linhas": 70,
    "env": [],
    "npm_scripts": [],
    "workflows": [],
