@@ -57,3 +57,5 @@ verify_jwt = false
 
 [functions.secure-store]
 verify_jwt = true
+
+# teste gate: PR apenas supabase
