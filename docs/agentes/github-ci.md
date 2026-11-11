@@ -26,7 +26,7 @@ merge da #110). Qualquer mudança nesses campos atualiza **esta tabela no mesmo 
 
 | Campo | Estado canônico |
 |---|---|
-| Branch protection — required checks | **9**: `Security Scan` · `Lint` · `Type Check` · `Warning Budget Gate` · `Unit & Integration Tests` · `Build Artifact` · `quality-gate` · `Security Audits` · `Agents Docs Integrity` |
+| Branch protection — required checks | **10**: `Security Scan` · `Lint` · `Type Check` · `Warning Budget Gate` · `Unit & Integration Tests` · `Build Artifact` · `quality-gate` · `Security Audits` · `Agents Docs Integrity` · `Contratos da automação local` |
 | Branch protection — `strict` (branch atualizada) | **`false`** — PR atrasada da `main` mergeia sem atualizar |
 | Branch protection — `enforce_admins` | `false` |
 | Branch protection — histórico linear | `false` |
