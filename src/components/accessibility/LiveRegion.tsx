@@ -1,4 +1,10 @@
-import { useState, useCallback, createContext, useContext, ReactNode } from "react";
+import {
+  useState,
+  useCallback,
+  createContext,
+  useContext,
+  ReactNode,
+} from "react";
 
 type Politeness = "polite" | "assertive" | "off";
 
@@ -12,20 +18,23 @@ export function LiveRegionProvider({ children }: { children: ReactNode }) {
   const [politeMessage, setPoliteMessage] = useState("");
   const [assertiveMessage, setAssertiveMessage] = useState("");
 
-  const announce = useCallback((message: string, politeness: Politeness = "polite") => {
-    if (politeness === "assertive") {
-      setAssertiveMessage("");
-      setTimeout(() => setAssertiveMessage(message), 50);
-    } else if (politeness === "polite") {
-      setPoliteMessage("");
-      setTimeout(() => setPoliteMessage(message), 50);
-    }
-  }, []);
+  const announce = useCallback(
+    (message: string, politeness: Politeness = "polite") => {
+      if (politeness === "assertive") {
+        setAssertiveMessage("");
+        setTimeout(() => setAssertiveMessage(message), 50);
+      } else if (politeness === "polite") {
+        setPoliteMessage("");
+        setTimeout(() => setPoliteMessage(message), 50);
+      }
+    },
+    [],
+  );
 
   return (
     <LiveRegionContext.Provider value={{ announce }}>
       {children}
-      
+
       {/* Polite announcements */}
       <div
         role="status"
@@ -63,9 +72,12 @@ export function useLiveRegion() {
 export function useRouteAnnouncer() {
   const { announce } = useLiveRegion();
 
-  const announceRouteChange = useCallback((pageName: string) => {
-    announce(`Navegou para ${pageName}`, "polite");
-  }, [announce]);
+  const announceRouteChange = useCallback(
+    (pageName: string) => {
+      announce(`Navegou para ${pageName}`, "polite");
+    },
+    [announce],
+  );
 
   return { announceRouteChange };
 }

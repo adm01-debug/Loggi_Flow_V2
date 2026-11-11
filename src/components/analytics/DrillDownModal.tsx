@@ -1,6 +1,23 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
@@ -63,7 +80,12 @@ const statusLabels: Record<string, string> = {
   divergencia: "Divergência",
 };
 
-export function DrillDownModal({ open, onOpenChange, data, isLoading }: DrillDownModalProps) {
+export function DrillDownModal({
+  open,
+  onOpenChange,
+  data,
+  isLoading,
+}: DrillDownModalProps) {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const content = (
@@ -102,7 +124,10 @@ export function DrillDownModal({ open, onOpenChange, data, isLoading }: DrillDow
             </TableHeader>
             <TableBody>
               {data.items.map((item) => (
-                <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50">
+                <TableRow
+                  key={item.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                >
                   <TableCell className="font-medium">
                     {item.numero || item.id.slice(0, 8)}
                   </TableCell>
@@ -117,7 +142,9 @@ export function DrillDownModal({ open, onOpenChange, data, isLoading }: DrillDow
                   <TableCell className="hidden md:table-cell text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {format(new Date(item.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
+                      {format(new Date(item.created_at), "dd/MM/yy HH:mm", {
+                        locale: ptBR,
+                      })}
                     </div>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-muted-foreground max-w-[200px] truncate">

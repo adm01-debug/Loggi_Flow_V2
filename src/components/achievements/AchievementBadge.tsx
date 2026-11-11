@@ -56,19 +56,24 @@ interface AchievementBadgeProps {
   onClick?: () => void;
 }
 
-export function AchievementBadge({ achievement, compact, onClick }: AchievementBadgeProps) {
+export function AchievementBadge({
+  achievement,
+  compact,
+  onClick,
+}: AchievementBadgeProps) {
   const config = rarityConfig[achievement.rarity];
   const Icon = achievement.icon;
-  const progress = achievement.progress && achievement.maxProgress
-    ? (achievement.progress / achievement.maxProgress) * 100
-    : 0;
+  const progress =
+    achievement.progress && achievement.maxProgress
+      ? (achievement.progress / achievement.maxProgress) * 100
+      : 0;
 
   if (compact) {
     return (
-      <CompactAchievementBadge 
-        achievement={achievement} 
-        config={config} 
-        onClick={onClick} 
+      <CompactAchievementBadge
+        achievement={achievement}
+        config={config}
+        onClick={onClick}
       />
     );
   }
@@ -83,7 +88,7 @@ export function AchievementBadge({ achievement, compact, onClick }: AchievementB
         config.border,
         achievement.unlocked ? config.bg : "bg-card",
         achievement.unlocked && config.glow,
-        !achievement.unlocked && "opacity-70"
+        !achievement.unlocked && "opacity-70",
       )}
     >
       {/* Rarity Badge */}
@@ -91,7 +96,7 @@ export function AchievementBadge({ achievement, compact, onClick }: AchievementB
         className={cn(
           "absolute top-3 right-3 text-xs font-semibold px-2 py-0.5 rounded-full",
           config.bg,
-          config.labelColor
+          config.labelColor,
         )}
       >
         {config.label}
@@ -100,19 +105,23 @@ export function AchievementBadge({ achievement, compact, onClick }: AchievementB
       {/* Icon */}
       <div className="relative mb-4">
         <motion.div
-          animate={achievement.unlocked ? {
-            boxShadow: [
-              "0 0 0 0 hsl(var(--primary) / 0)",
-              "0 0 20px 10px hsl(var(--primary) / 0.2)",
-              "0 0 0 0 hsl(var(--primary) / 0)",
-            ],
-          } : {}}
+          animate={
+            achievement.unlocked
+              ? {
+                  boxShadow: [
+                    "0 0 0 0 hsl(var(--primary) / 0)",
+                    "0 0 20px 10px hsl(var(--primary) / 0.2)",
+                    "0 0 0 0 hsl(var(--primary) / 0)",
+                  ],
+                }
+              : {}
+          }
           transition={{ duration: 2, repeat: Infinity }}
           className={cn(
             "flex items-center justify-center w-16 h-16 rounded-2xl",
             achievement.unlocked
               ? `${config.bg} border-2 ${config.border}`
-              : "bg-muted border-2 border-muted-foreground/20"
+              : "bg-muted border-2 border-muted-foreground/20",
           )}
         >
           {achievement.unlocked ? (
@@ -138,7 +147,9 @@ export function AchievementBadge({ achievement, compact, onClick }: AchievementB
       </div>
 
       {/* Name & Description */}
-      <h4 className="font-display font-semibold text-lg mb-1">{achievement.name}</h4>
+      <h4 className="font-display font-semibold text-lg mb-1">
+        {achievement.name}
+      </h4>
       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
         {achievement.description}
       </p>
@@ -155,11 +166,15 @@ export function AchievementBadge({ achievement, compact, onClick }: AchievementB
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <Zap className="w-4 h-4 text-xp" />
-            <span className="text-sm font-semibold text-xp">+{achievement.xpReward}</span>
+            <span className="text-sm font-semibold text-xp">
+              +{achievement.xpReward}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <Coins className="w-4 h-4 text-coins" />
-            <span className="text-sm font-semibold text-coins">+{achievement.coinsReward}</span>
+            <span className="text-sm font-semibold text-coins">
+              +{achievement.coinsReward}
+            </span>
           </div>
         </div>
       )}

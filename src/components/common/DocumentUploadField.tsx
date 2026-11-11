@@ -42,7 +42,7 @@ export function DocumentUploadField({
       // Reset input
       if (inputRef.current) inputRef.current.value = "";
     },
-    [upload, folder, onChange]
+    [upload, folder, onChange],
   );
 
   const handleRemove = useCallback(async () => {
