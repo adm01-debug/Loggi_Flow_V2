@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "5182e5f62e5a5a2d4ce1ba8fda296c5cea782d8d",
+  "commit": "e2cc7bdec6cb9956b75dda9e684b860bbdf8b14a",
   "branch": "main",
-  "data_commit": "2026-11-11T11:30:38-03:00",
+  "data_commit": "2026-11-11T18:23:33-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "e2cc7bde",
+    "data": "2026-11-11",
+    "assunto": "fix(ci): move gate de credencial do types-sync para antes dos installs (#134)"
+   },
    {
     "sha": "5182e5f6",
     "data": "2026-11-11",
@@ -126,11 +131,6 @@
     "sha": "1ada5785",
     "data": "2026-11-08",
     "assunto": "delete x"
-   },
-   {
-    "sha": "3d9375cd",
-    "data": "2026-11-08",
-    "assunto": "delete x"
    }
   ],
   "arquivos_mudados_7d": 180,
@@ -138,6 +138,10 @@
    {
     "pasta": "scripts/validate-csp.mjs",
     "mudancas": 4
+   },
+   {
+    "pasta": ".github/workflows/types-sync.yml",
+    "mudancas": 3
    },
    {
     "pasta": ".gitignore",
@@ -185,10 +189,6 @@
    },
    {
     "pasta": ".github/workflows/settings-guard.yml",
-    "mudancas": 2
-   },
-   {
-    "pasta": ".github/workflows/types-sync.yml",
     "mudancas": 2
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 84
+    "commits": 85
    }
   ]
  },

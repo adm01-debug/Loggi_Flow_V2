@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "5182e5f62e5a5a2d4ce1ba8fda296c5cea782d8d",
+  "sha": "e2cc7bdec6cb9956b75dda9e684b860bbdf8b14a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-11 14:56 UTC",
+  "generated_at": "2026-11-11 22:14 UTC",
   "files_total": 1286,
   "code_files": 1121,
   "code_lines": 181265,
@@ -87905,10 +87905,19 @@
   }
  },
  "git": {
-  "sha": "5182e5f62e5a5a2d4ce1ba8fda296c5cea782d8d",
+  "sha": "e2cc7bdec6cb9956b75dda9e684b860bbdf8b14a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "e2cc7bd",
+    "date": "2026-11-11",
+    "author": "adm01-debug",
+    "subject": "fix(ci): move gate de credencial do types-sync para antes dos installs (#134)",
+    "files": [
+     ".github/workflows/types-sync.yml"
+    ]
+   },
    {
     "sha": "5182e5f",
     "date": "2026-11-11",
@@ -88365,16 +88374,13 @@
     "author": "adm01-debug",
     "subject": "delete x",
     "files": []
-   },
-   {
-    "sha": "8218f2b",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
    }
   ],
   "hot_files": [
+   [
+    ".github/workflows/types-sync.yml",
+    3
+   ],
    [
     "docs/agentes/github-ci.md",
     3
@@ -88405,10 +88411,6 @@
    ],
    [
     ".github/workflows/inventario-estado-semanal.yml",
-    2
-   ],
-   [
-    ".github/workflows/types-sync.yml",
     2
    ],
    [
