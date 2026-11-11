@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "04259107da619d0c45bb0093648282e09e465622",
+  "commit": "5182e5f62e5a5a2d4ce1ba8fda296c5cea782d8d",
   "branch": "main",
-  "data_commit": "2026-11-11T09:44:24-03:00",
+  "data_commit": "2026-11-11T11:30:38-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "5182e5f6",
+    "data": "2026-11-11",
+    "assunto": "docs: atualiza contagem de required checks para 10 no github-ci.md (#123)"
+   },
    {
     "sha": "04259107",
     "data": "2026-11-11",
@@ -126,11 +131,6 @@
     "sha": "3d9375cd",
     "data": "2026-11-08",
     "assunto": "delete x"
-   },
-   {
-    "sha": "aa987630",
-    "data": "2026-11-08",
-    "assunto": "delete x"
    }
   ],
   "arquivos_mudados_7d": 180,
@@ -145,6 +145,10 @@
    },
    {
     "pasta": "AGENTS.md",
+    "mudancas": 3
+   },
+   {
+    "pasta": "docs/agentes/github-ci.md",
     "mudancas": 3
    },
    {
@@ -185,10 +189,6 @@
    },
    {
     "pasta": ".github/workflows/types-sync.yml",
-    "mudancas": 2
-   },
-   {
-    "pasta": "docs/agentes/github-ci.md",
     "mudancas": 2
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 83
+    "commits": 84
    }
   ]
  },

@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "docs: atualiza contagem de required checks para 10 no github-ci.md (#123)",
    "chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)",
    "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)",
    "fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)",
-   "fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)",
-   "feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)"
+   "fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",
