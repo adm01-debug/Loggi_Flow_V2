@@ -111,23 +111,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup Supabase CLI ${{ env.SUPABASE_CLI_VERSION }}
-        uses: supabase/setup-cli@d239d1052f6f024a8d746d7e5aeddead63b9cb53 # v3.1.0
-        with:
-          version: ${{ env.SUPABASE_CLI_VERSION }}
-
-      - name: Instalar cliente PostgreSQL
-        run: bash scripts/ci/install-postgresql-client.sh
-
-      - name: Instalar pgbouncer (proxy local para credencial do gen types)
-        run: bash scripts/ci/install-pgbouncer.sh
-
       - name: Exigir credencial do banco oficial
         env:
           DESTINO_URL: ${{ secrets.DESTINO_URL }}
         run: |
           if [ -z "$DESTINO_URL" ]; then
-            echo "::error::DESTINO_URL nao configurado."
+            echo "::error::DESTINO_URL nao configurado no environment 'banco-leitura' (Settings > Environments > banco-leitura > Environment secrets). Sem ele o sync de types nao roda."
             exit 1
           fi
           node --input-type=module <<'NODE'
@@ -151,6 +140,17 @@ jobs:
           appendFileSync(process.env.GITHUB_ENV, 'PGSSLMODE=verify-full\n');
           console.log('OK: endpoint do banco oficial comprovado por fingerprint; TLS verify-full e CA Supabase pinada.');
           NODE
+
+      - name: Setup Supabase CLI ${{ env.SUPABASE_CLI_VERSION }}
+        uses: supabase/setup-cli@d239d1052f6f024a8d746d7e5aeddead63b9cb53 # v3.1.0
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Instalar cliente PostgreSQL
+        run: bash scripts/ci/install-postgresql-client.sh
+
+      - name: Instalar pgbouncer (proxy local para credencial do gen types)
+        run: bash scripts/ci/install-pgbouncer.sh
 
       - name: ghcr.io login (previne rate-limit no gen-types)
         env:
