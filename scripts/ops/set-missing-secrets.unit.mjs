@@ -61,7 +61,8 @@ function enviados(r) {
   const argv = r.chamadas[0];
   assert.deepEqual(argv.slice(0, 2), ['secrets', 'set']);
   assert.deepEqual(argv.slice(-2), ['--project-ref', PROJ]);
-  return Object.fromEntries(argv.slice(2, -2).map((p) => [p.slice(0, p.indexOf('=')), p.slice(p.indexOf('=') + 1)]));
+  assert.equal(argv[2], '--yes', 'precisa de --yes para rodar em CI sem TTY');
+  return Object.fromEntries(argv.slice(3, -2).map((p) => [p.slice(0, p.indexOf('=')), p.slice(p.indexOf('=') + 1)]));
 }
 const nomesDoScript = () => spawnSync('sh', [SCRIPT, '--list'], { encoding: 'utf8' }).stdout.trim().split('\n');
 
