@@ -2,11 +2,41 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "60b8d2136b9d1d3a6daacb1fc727c87918866c96",
+  "commit": "0c0d48cc62f4f7004b8e5b6d4cba75929672153b",
   "branch": "main",
-  "data_commit": "2026-11-11T20:37:31-03:00",
+  "data_commit": "2026-11-12T08:38:13-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "0c0d48cc",
+    "data": "2026-11-12",
+    "assunto": "chore(deps): bump actions/download-artifact from 7 to 8 (#128)"
+   },
+   {
+    "sha": "5f05479d",
+    "data": "2026-11-12",
+    "assunto": "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)"
+   },
+   {
+    "sha": "2e9137fa",
+    "data": "2026-11-12",
+    "assunto": "chore(deps): bump actions/cache from 4 to 6 (#126)"
+   },
+   {
+    "sha": "3d4fd588",
+    "data": "2026-11-12",
+    "assunto": "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)"
+   },
+   {
+    "sha": "02901100",
+    "data": "2026-11-12",
+    "assunto": "chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)"
+   },
+   {
+    "sha": "3fad225d",
+    "data": "2026-11-12",
+    "assunto": "style: aplica correcoes locais verificadas (#136)"
+   },
    {
     "sha": "60b8d213",
     "data": "2026-11-11",
@@ -101,46 +131,32 @@
     "sha": "770cfae2",
     "data": "2026-11-08",
     "assunto": "delete x"
-   },
-   {
-    "sha": "8464b793",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "96258876",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "716282ce",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "a4585991",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "cb4dd0ff",
-    "data": "2026-11-08",
-    "assunto": "delete x"
-   },
-   {
-    "sha": "d62cc113",
-    "data": "2026-11-08",
-    "assunto": "delete x"
    }
   ],
-  "arquivos_mudados_7d": 181,
+  "arquivos_mudados_7d": 201,
   "pastas_mais_mudadas_30d": [
+   {
+    "pasta": ".github/workflows/contexto-ia.yml",
+    "mudancas": 4
+   },
+   {
+    "pasta": ".github/workflows/types-sync.yml",
+    "mudancas": 4
+   },
    {
     "pasta": "scripts/validate-csp.mjs",
     "mudancas": 4
    },
    {
-    "pasta": ".github/workflows/types-sync.yml",
+    "pasta": "src/components/achievements",
+    "mudancas": 4
+   },
+   {
+    "pasta": ".github/workflows/codeql.yml",
+    "mudancas": 3
+   },
+   {
+    "pasta": ".github/workflows/inventario-estado-semanal.yml",
     "mudancas": 3
    },
    {
@@ -172,28 +188,12 @@
     "mudancas": 3
    },
    {
-    "pasta": ".github/workflows/auto-update-pr-branch.yml",
-    "mudancas": 2
+    "pasta": "src/components/accessibility",
+    "mudancas": 3
    },
    {
-    "pasta": ".github/workflows/contexto-ia.yml",
-    "mudancas": 2
-   },
-   {
-    "pasta": ".github/workflows/contexto.yml",
-    "mudancas": 2
-   },
-   {
-    "pasta": ".github/workflows/inventario-estado-semanal.yml",
-    "mudancas": 2
-   },
-   {
-    "pasta": ".github/workflows/settings-guard.yml",
-    "mudancas": 2
-   },
-   {
-    "pasta": "docs/contexto/regras",
-    "mudancas": 2
+    "pasta": "src/components/admin",
+    "mudancas": 3
    }
   ],
   "arquivos_mais_mudados_90d": [
@@ -223,6 +223,14 @@
    },
    {
     "arquivo": ".github/workflows/ci.yml",
+    "mudancas": 4
+   },
+   {
+    "arquivo": ".github/workflows/contexto-ia.yml",
+    "mudancas": 4
+   },
+   {
+    "arquivo": ".github/workflows/types-sync.yml",
     "mudancas": 4
    },
    {
@@ -288,27 +296,23 @@
    {
     "arquivo": ".github/workflows/ci-nexus.yml",
     "mudancas": 3
-   },
-   {
-    "arquivo": ".github/workflows/deploy-functions.yml",
-    "mudancas": 3
-   },
-   {
-    "arquivo": ".github/workflows/security.yml",
-    "mudancas": 3
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 86
+    "commits": 87
+   },
+   {
+    "autor": "dependabot[bot]",
+    "commits": 5
    }
   ]
  },
  "contagens": {
   "arquivos_total": 1277,
   "arquivos_codigo": 863,
-  "linhas_codigo": 165527,
+  "linhas_codigo": 165661,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -444,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 295,
-   "linhas": 48164
+   "linhas": 48298
   },
   "src/features": {
    "arquivos": 90,

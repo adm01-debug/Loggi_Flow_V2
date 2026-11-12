@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `60b8d2136b9d1d3a6daacb1fc727c87918866c96` (2026-11-11T20:37:31-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `0c0d48cc62f4f7004b8e5b6d4cba75929672153b` (2026-11-12T08:38:13-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1277 |
 | arquivos_codigo | 863 |
-| linhas_codigo | 165527 |
+| linhas_codigo | 165661 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `60b8d213`
+- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `0c0d48cc`
 - comunidades maiores: lucide-react (253), Envios.tsx (220), @tanstack/react-query (159), db-observability/index.ts (156), react (138), button.tsx (132), ui/index.ts (118), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (100), App.tsx (89), cn (89), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -287,14 +287,14 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - AGENTS.md (5)
 - scripts/validate-csp.mjs (5)
 - .github/workflows/ci.yml (4)
+- .github/workflows/contexto-ia.yml (4)
+- .github/workflows/types-sync.yml (4)
 - ESTADO_ATUAL.md (4)
 - ESTADO_ATUAL_EVIDENCIAS.md (4)
 - scripts/audit/manifest_detail.sql (4)
 - scripts/check-warning-budget.mjs (4)
 - scripts/generate-quality-report.mjs (4)
 - scripts/origem_remediacao_2026-08-31.sql (4)
-- scripts/ratchet-warning-budget.mjs (4)
-- scripts/seed-database.ts (4)
 
 ## Workflows
 - `auto-update-pr-branch.yml` — Auto Update PR Branches (push, schedule, workflow_dispatch, workflow_run; cron 7,37 * * * *)
@@ -397,6 +397,12 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-12 `0c0d48cc` chore(deps): bump actions/download-artifact from 7 to 8 (#128)
+- 2026-11-12 `5f05479d` chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)
+- 2026-11-12 `2e9137fa` chore(deps): bump actions/cache from 4 to 6 (#126)
+- 2026-11-12 `3d4fd588` chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)
+- 2026-11-12 `02901100` chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)
+- 2026-11-12 `3fad225d` style: aplica correcoes locais verificadas (#136)
 - 2026-11-11 `60b8d213` feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)
 - 2026-11-11 `e2cc7bde` fix(ci): move gate de credencial do types-sync para antes dos installs (#134)
 - 2026-11-11 `5182e5f6` docs: atualiza contagem de required checks para 10 no github-ci.md (#123)
@@ -406,12 +412,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-10 `f2dc8925` fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)
 - 2026-11-09 `6de3c961` feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)
 - 2026-11-08 `28c0f7e3` feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi
-- 2026-11-08 `b0a699a4` fix(ci): renomeia contexto.yml → contexto-ia.yml para forçar novo registro (#115)
-- 2026-11-08 `4b14063a` docs(agentes): atualiza contagem de required checks para 9 (#113)
-- 2026-11-08 `10d5df3a` feat(ci): porta 7 workflows autônomos genéricos do Zapp (#112)
-- 2026-11-08 `b74bb21c` chore: padrão de instruções para agentes (#110)
-- 2026-11-08 `ab4852bc` fix(ci): adiciona --force no push da branch contexto (#111)
-- 2026-11-08 `d6a824f7` fix(index): remover div oculto com textos de prompt internos
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

@@ -61,7 +61,7 @@
     "LiveRegionProvider"
    ],
    "export_default": null,
-   "linhas": 72,
+   "linhas": 84,
    "dominio": "components/accessibility",
    "hooks_locais": [
     "useLiveRegion",
@@ -78,7 +78,7 @@
     "ReducedMotionProvider"
    ],
    "export_default": null,
-   "linhas": 78,
+   "linhas": 92,
    "dominio": "components/accessibility",
    "hooks_locais": [
     "useReducedMotion"
@@ -109,7 +109,7 @@
     "AchievementBadgeData"
    ],
    "export_default": null,
-   "linhas": 176,
+   "linhas": 191,
    "dominio": "components/achievements",
    "hooks_locais": [],
    "tabelas": [],
@@ -123,7 +123,7 @@
     "AchievementNotificationContainer"
    ],
    "export_default": null,
-   "linhas": 184,
+   "linhas": 191,
    "dominio": "components/achievements",
    "hooks_locais": [
     "useAchievementNotifications"
@@ -139,7 +139,7 @@
     "CompactAchievementBadge"
    ],
    "export_default": null,
-   "linhas": 45,
+   "linhas": 49,
    "dominio": "components/achievements",
    "hooks_locais": [],
    "tabelas": [],
@@ -153,7 +153,7 @@
     "DORAMetrics"
    ],
    "export_default": null,
-   "linhas": 127,
+   "linhas": 144,
    "dominio": "components/admin",
    "hooks_locais": [],
    "tabelas": [],
@@ -197,7 +197,7 @@
     "TelemetryViewer"
    ],
    "export_default": null,
-   "linhas": 193,
+   "linhas": 220,
    "dominio": "components/admin",
    "hooks_locais": [],
    "tabelas": [
@@ -246,7 +246,7 @@
     "DrillDownModal"
    ],
    "export_default": null,
-   "linhas": 169,
+   "linhas": 196,
    "dominio": "components/analytics",
    "hooks_locais": [
     "useMediaQuery"
@@ -522,7 +522,7 @@
     "InlineConfirm"
    ],
    "export_default": null,
-   "linhas": 109,
+   "linhas": 105,
    "dominio": "components/common",
    "hooks_locais": [],
    "tabelas": [],

@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
-   "feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)",
-   "fix(ci): move gate de credencial do types-sync para antes dos installs (#134)",
-   "docs: atualiza contagem de required checks para 10 no github-ci.md (#123)",
-   "chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)",
-   "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)"
+   "chore(deps): bump actions/download-artifact from 7 to 8 (#128)",
+   "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)",
+   "chore(deps): bump actions/cache from 4 to 6 (#126)",
+   "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)",
+   "chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

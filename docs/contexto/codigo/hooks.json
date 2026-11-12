@@ -11,7 +11,7 @@
     "useReducedMotion",
     "useRouteAnnouncer"
    ],
-   "linhas": 7,
+   "linhas": 15,
    "dominio": "components/accessibility",
    "tabelas": [],
    "rpcs": [],
@@ -28,7 +28,7 @@
     "useLiveRegion",
     "useRouteAnnouncer"
    ],
-   "linhas": 72,
+   "linhas": 84,
    "dominio": "components/accessibility",
    "tabelas": [],
    "rpcs": [],
@@ -52,7 +52,7 @@
     "useMotionVariants",
     "useReducedMotion"
    ],
-   "linhas": 78,
+   "linhas": 92,
    "dominio": "components/accessibility",
    "tabelas": [],
    "rpcs": [],
@@ -75,7 +75,7 @@
    "hooks_exportados": [
     "useConfirm"
    ],
-   "linhas": 109,
+   "linhas": 105,
    "dominio": "components/common",
    "tabelas": [],
    "rpcs": [],

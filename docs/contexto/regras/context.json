@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "60b8d2136b9d1d3a6daacb1fc727c87918866c96",
+  "sha": "0c0d48cc62f4f7004b8e5b6d4cba75929672153b",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-11 23:48 UTC",
+  "generated_at": "2026-11-12 12:14 UTC",
   "files_total": 1287,
   "code_files": 1121,
-  "code_lines": 181265,
+  "code_lines": 181399,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "003c7b2a98eb3ba1",
+ "facts_hash": "d9b29e51de27075e",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29146,7 +29146,7 @@
   {
    "module": "src/components",
    "files": 295,
-   "lines": 48164,
+   "lines": 48298,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -68028,7 +68028,7 @@
   },
   "src/components/accessibility/LiveRegion.tsx": {
    "path": "src/components/accessibility/LiveRegion.tsx",
-   "lines": 72,
+   "lines": 84,
    "exports": [
     "function LiveRegionProvider",
     "function useLiveRegion",
@@ -68045,7 +68045,7 @@
   },
   "src/components/accessibility/ReducedMotion.tsx": {
    "path": "src/components/accessibility/ReducedMotion.tsx",
-   "lines": 78,
+   "lines": 92,
    "exports": [
     "function ReducedMotionProvider",
     "function useReducedMotion",
@@ -68065,12 +68065,12 @@
   },
   "src/components/accessibility/index.ts": {
    "path": "src/components/accessibility/index.ts",
-   "lines": 7,
+   "lines": 15,
    "doc": "Accessibility Components - barrel export ============================================"
   },
   "src/components/achievements/AchievementBadge.tsx": {
    "path": "src/components/achievements/AchievementBadge.tsx",
-   "lines": 176,
+   "lines": 191,
    "exports": [
     "interface AchievementBadgeData",
     "const rarityConfig",
@@ -68079,7 +68079,7 @@
   },
   "src/components/achievements/AchievementNotification.tsx": {
    "path": "src/components/achievements/AchievementNotification.tsx",
-   "lines": 184,
+   "lines": 191,
    "exports": [
     "function AchievementNotificationContainer"
    ],
@@ -68096,7 +68096,7 @@
   },
   "src/components/achievements/CompactAchievementBadge.tsx": {
    "path": "src/components/achievements/CompactAchievementBadge.tsx",
-   "lines": 45,
+   "lines": 49,
    "exports": [
     "function CompactAchievementBadge"
    ]
@@ -68108,7 +68108,7 @@
   },
   "src/components/admin/DORAMetrics.tsx": {
    "path": "src/components/admin/DORAMetrics.tsx",
-   "lines": 127,
+   "lines": 144,
    "exports": [
     "function DORAMetrics"
    ],
@@ -68122,7 +68122,7 @@
   },
   "src/components/admin/TelemetryViewer.tsx": {
    "path": "src/components/admin/TelemetryViewer.tsx",
-   "lines": 193,
+   "lines": 220,
    "exports": [
     "function TelemetryViewer"
    ],
@@ -68256,7 +68256,7 @@
   },
   "src/components/analytics/DrillDownModal.tsx": {
    "path": "src/components/analytics/DrillDownModal.tsx",
-   "lines": 169,
+   "lines": 196,
    "exports": [
     "function DrillDownModal"
    ]
@@ -68708,7 +68708,7 @@
   },
   "src/components/coletas/types.ts": {
    "path": "src/components/coletas/types.ts",
-   "lines": 34,
+   "lines": 41,
    "exports": [
     "type ColetaStatus",
     "type ColetaTipo",
@@ -68826,7 +68826,7 @@
   },
   "src/components/common/ConfirmDialog.tsx": {
    "path": "src/components/common/ConfirmDialog.tsx",
-   "lines": 109,
+   "lines": 105,
    "exports": [
     "type ConfirmType",
     "function ConfirmDialog"
@@ -87912,10 +87912,84 @@
   }
  },
  "git": {
-  "sha": "60b8d2136b9d1d3a6daacb1fc727c87918866c96",
+  "sha": "0c0d48cc62f4f7004b8e5b6d4cba75929672153b",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "0c0d48c",
+    "date": "2026-11-12",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump actions/download-artifact from 7 to 8 (#128)",
+    "files": [
+     ".github/workflows/contexto-ia.yml"
+    ]
+   },
+   {
+    "sha": "5f05479",
+    "date": "2026-11-12",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)",
+    "files": [
+     ".github/workflows/codeql.yml"
+    ]
+   },
+   {
+    "sha": "2e9137f",
+    "date": "2026-11-12",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump actions/cache from 4 to 6 (#126)",
+    "files": [
+     ".github/workflows/contexto-ia.yml"
+    ]
+   },
+   {
+    "sha": "3d4fd58",
+    "date": "2026-11-12",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)",
+    "files": [
+     ".github/workflows/inventario-estado-semanal.yml",
+     ".github/workflows/types-sync.yml"
+    ]
+   },
+   {
+    "sha": "0290110",
+    "date": "2026-11-12",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)",
+    "files": [
+     ".github/workflows/codeql.yml"
+    ]
+   },
+   {
+    "sha": "3fad225",
+    "date": "2026-11-12",
+    "author": "adm01-debug",
+    "subject": "style: aplica correcoes locais verificadas (#136)",
+    "files": [
+     "src/components/accessibility/LiveRegion.tsx",
+     "src/components/accessibility/ReducedMotion.tsx",
+     "src/components/accessibility/index.ts",
+     "src/components/achievements/AchievementBadge.tsx",
+     "src/components/achievements/AchievementNotification.tsx",
+     "src/components/achievements/CompactAchievementBadge.tsx",
+     "src/components/achievements/index.ts",
+     "src/components/admin/DORAMetrics.tsx",
+     "src/components/admin/TelemetryViewer.tsx",
+     "src/components/ai/index.ts",
+     "src/components/analytics/DrillDownModal.tsx",
+     "src/components/analytics/index.ts",
+     "src/components/audit/index.ts",
+     "src/components/auth/ProtectedRoute.tsx",
+     "src/components/auth/index.ts",
+     "src/components/automation/index.ts",
+     "src/components/box/index.ts",
+     "src/components/coletas/types.ts",
+     "src/components/common/ConfirmDialog.tsx",
+     "src/components/common/DocumentUploadField.tsx"
+    ]
+   },
    {
     "sha": "60b8d21",
     "date": "2026-11-11",
@@ -88341,53 +88415,23 @@
     "author": "adm01-debug",
     "subject": "delete x",
     "files": []
-   },
-   {
-    "sha": "d62cc11",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "1ada578",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "3d9375c",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "aa98763",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "45ecb65",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "b6f6764",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
    }
   ],
   "hot_files": [
    [
+    ".github/workflows/contexto-ia.yml",
+    4
+   ],
+   [
     ".github/workflows/types-sync.yml",
+    4
+   ],
+   [
+    ".github/workflows/codeql.yml",
+    3
+   ],
+   [
+    ".github/workflows/inventario-estado-semanal.yml",
     3
    ],
    [
@@ -88412,14 +88456,6 @@
    ],
    [
     ".github/workflows/auto-update-pr-branch.yml",
-    2
-   ],
-   [
-    ".github/workflows/contexto-ia.yml",
-    2
-   ],
-   [
-    ".github/workflows/inventario-estado-semanal.yml",
     2
    ],
    [
@@ -88460,10 +88496,6 @@
    ],
    [
     "scripts/ci/check-claude-md-integrity.mjs",
-    2
-   ],
-   [
-    "scripts/ci/fila-merge.mjs",
     2
    ]
   ]
