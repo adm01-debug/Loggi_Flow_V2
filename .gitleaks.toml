@@ -14,6 +14,10 @@ paths = [
   # Specs de RLS batem no PostgREST com a anon key hardcoded de propósito
   # (histórico inclui a key do projeto antigo, também anon/pública).
   '''tests/security/.*\.spec\.ts$''',
+  # schema-manifest.json é gerado por scripts/db-audit/manifest.sql com md5()
+  # das definições do schema (32 hex determinísticos) — snapshot, não credencial.
+  # O generic-api-key dispara por entropia + nomes de chave; nada a vazar aqui.
+  '''supabase/schema-manifest\.json$''',
 ]
 regexes = [
   # JWTs do Supabase com payload role=anon ("role":"anon" em base64url aparece
