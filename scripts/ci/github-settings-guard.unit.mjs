@@ -64,7 +64,7 @@ AbortSignal.timeout = (ms) => abortReal(Math.min(ms, 100));
 
 // ------------------------------------------------------------------ respostas da API (copia do real)
 
-const CHECKS = ['Security Scan', 'Lint', 'Type Check', 'Warning Budget Gate', 'Unit & Integration Tests', 'Build Artifact', 'quality-gate', 'Security Audits', 'Agents Docs Integrity'];
+const CHECKS = ['Security Scan', 'Lint', 'Type Check', 'Warning Budget Gate', 'Unit & Integration Tests', 'Build Artifact', 'quality-gate', 'Security Audits', 'Agents Docs Integrity', 'Contratos da automação local'];
 const protecaoViva = () => ({
   required_status_checks: { strict: false, contexts: [...CHECKS], checks: CHECKS.map((context) => ({ context, app_id: 15368 })) },
   required_signatures: { enabled: false },
@@ -97,7 +97,7 @@ const rotasAdmin = (por = {}) => ({
   [`GET ${P}/branches/main/protection`]: { body: protecaoViva() },
   [`GET ${P}`]: { body: repoVivo() },
   [`GET ${P}/actions/permissions`]: { body: { enabled: true, allowed_actions: 'all', sha_pinning_required: false } },
-  [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'read', can_approve_pull_request_reviews: false } },
+  [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'read', can_approve_pull_request_reviews: true } },
   [`GET ${P}/rulesets`]: { body: [] },
   [`GET ${P}/environments`]: { body: ambientes() },
   [`GET ${P}/issues`]: { body: [] },
@@ -175,7 +175,7 @@ test('baseline versionado bate com o perimetro canonico (docs/agentes/github-ci.
   const bl = baselineReal();
   assert.deepEqual(problemasDoBaseline(bl), { erros: [], avisos: [] });
   assert.deepEqual(bl.branch_protection_main.required_status_checks, CHECKS);
-  assert.equal(bl.branch_protection_main.required_status_checks.length, 9);
+  assert.equal(bl.branch_protection_main.required_status_checks.length, 10);
   assert.equal(bl.branch_protection_main.strict, false);
   assert.equal(bl.branch_protection_main.enforce_admins, false);
   assert.equal(bl.branch_protection_main.required_pull_request_reviews, null);
@@ -195,7 +195,7 @@ test('baseline versionado bate com o perimetro canonico (docs/agentes/github-ci.
   assert.match(bl.medido_em, /^\d{4}-\d{2}-\d{2}$/);
 });
 
-test('a tabela canonica da doc lista os mesmos 9 required checks do baseline', () => {
+test('a tabela canonica da doc lista os mesmos 10 required checks do baseline', () => {
   const doc = fs.readFileSync(new URL('../../docs/agentes/github-ci.md', import.meta.url), 'utf8');
   const linha = doc.split('\n').find((l) => l.includes('Branch protection — required checks'));
   assert.ok(linha, 'linha dos required checks nao encontrada na doc');
@@ -518,9 +518,9 @@ test('actions e workflow permissions: valor diferente e campo ausente no payload
   const a = divergindo(rotasAdmin({ [`GET ${P}/actions/permissions`]: { body: { enabled: true, allowed_actions: 'selected' } } }));
   assert.match(a.out, /actions\.allowed_actions esperado=all encontrado=selected/);
   assert.match(a.out, /actions\.sha_pinning_required esperado=false encontrado=null/);
-  const w = divergindo(rotasAdmin({ [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'write', can_approve_pull_request_reviews: true } } }));
+  const w = divergindo(rotasAdmin({ [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'write', can_approve_pull_request_reviews: false } } }));
   assert.match(w.out, /workflow_permissions\.default_workflow_permissions esperado=read encontrado=write/);
-  assert.match(w.out, /workflow_permissions\.can_approve_pull_request_reviews esperado=false encontrado=true/);
+  assert.match(w.out, /workflow_permissions\.can_approve_pull_request_reviews esperado=true encontrado=false/);
 });
 
 test('rulesets: um ruleset criado diverge; resposta 200 sem lista vira ponto cego (nao "zero rulesets")', () => {

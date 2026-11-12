@@ -147,7 +147,7 @@ describe('comandos de terminal do runbook, executados', () => {
       assert.equal(fs.statSync(path.join(tmp, 'loggi-internal.env')).mode & 0o077, 0, 'arquivo do segredo legível por outros');
       assert.match(fs.readFileSync(path.join(tmp, 'psql.sql'), 'utf8'), /FROM vault\.decrypted_secrets WHERE name = 'internal_fn_secret'/);
       const argv = fs.readFileSync(path.join(tmp, 'cli.argv'), 'utf8').split('\0').slice(0, -1);
-      assert.deepEqual(argv, ['secrets', 'set', `INTERNAL_FN_SECRET=${SEGREDO}`, '--project-ref', PROJ]);
+      assert.deepEqual(argv, ['secrets', 'set', '--yes', `INTERNAL_FN_SECRET=${SEGREDO}`, '--project-ref', PROJ]);
 
       const p4 = await rodar(PASSO_4);
       assert.equal(p4.status, 0, p4.saida);

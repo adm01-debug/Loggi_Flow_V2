@@ -262,8 +262,9 @@ if ! command -v supabase >/dev/null 2>&1; then
 fi
 
 # Uma chamada so': ou a CLI aceita o lote inteiro ou falha — nao sobra metade aplicada por este script.
+# --yes: em CI (Sem TTY) o CLI pede confirmacao e aborta sem ela.
 rc=0
-supabase secrets set "$@" --project-ref "$PROJ" || rc=$?
+supabase secrets set --yes "$@" --project-ref "$PROJ" || rc=$?
 if [ "$rc" -ne 0 ]; then
   erro "'supabase secrets set' falhou (codigo $rc). Confira o estado com: supabase secrets list --project-ref $PROJ"
   exit "$rc"
