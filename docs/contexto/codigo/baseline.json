@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "0c0d48cc62f4f7004b8e5b6d4cba75929672153b",
+  "commit": "e09821803f86bd161baabcfc9a04f488a0e4d714",
   "branch": "main",
-  "data_commit": "2026-11-12T08:38:13-03:00",
+  "data_commit": "2026-11-12T17:29:21-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "e0982180",
+    "data": "2026-11-12",
+    "assunto": "fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)"
+   },
    {
     "sha": "0c0d48cc",
     "data": "2026-11-12",
@@ -126,11 +131,6 @@
     "sha": "17bd3887",
     "data": "2026-11-08",
     "assunto": "fix: endurece manifest_detail e manifest_data com padrao idempotente (#103)"
-   },
-   {
-    "sha": "770cfae2",
-    "data": "2026-11-08",
-    "assunto": "delete x"
    }
   ],
   "arquivos_mudados_7d": 201,
@@ -180,6 +180,10 @@
     "mudancas": 3
    },
    {
+    "pasta": "scripts/ci/github-settings-baseline.json",
+    "mudancas": 3
+   },
+   {
     "pasta": "scripts/generate-quality-report.mjs",
     "mudancas": 3
    },
@@ -189,10 +193,6 @@
    },
    {
     "pasta": "src/components/accessibility",
-    "mudancas": 3
-   },
-   {
-    "pasta": "src/components/admin",
     "mudancas": 3
    }
   ],
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 87
+    "commits": 88
    },
    {
     "autor": "dependabot[bot]",
@@ -312,7 +312,7 @@
  "contagens": {
   "arquivos_total": 1277,
   "arquivos_codigo": 863,
-  "linhas_codigo": 165661,
+  "linhas_codigo": 165662,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -412,7 +412,7 @@
   },
   "scripts/ops": {
    "arquivos": 3,
-   "linhas": 748
+   "linhas": 749
   },
   "scripts/ratchet-warning-budget.mjs": {
    "arquivos": 1,

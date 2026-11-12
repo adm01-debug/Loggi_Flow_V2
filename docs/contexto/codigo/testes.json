@@ -346,7 +346,7 @@
   {
    "arquivo": "scripts/ops/set-missing-secrets.unit.mjs",
    "tipo": "unit",
-   "linhas": 331,
+   "linhas": 332,
    "testa": [],
    "casos": 37
   },

@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `0c0d48cc62f4f7004b8e5b6d4cba75929672153b` (2026-11-12T08:38:13-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e09821803f86bd161baabcfc9a04f488a0e4d714` (2026-11-12T17:29:21-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1277 |
 | arquivos_codigo | 863 |
-| linhas_codigo | 165661 |
+| linhas_codigo | 165662 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `0c0d48cc`
+- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `e0982180`
 - comunidades maiores: lucide-react (253), Envios.tsx (220), @tanstack/react-query (159), db-observability/index.ts (156), react (138), button.tsx (132), ui/index.ts (118), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (100), App.tsx (89), cn (89), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -397,6 +397,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-12 `e0982180` fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)
 - 2026-11-12 `0c0d48cc` chore(deps): bump actions/download-artifact from 7 to 8 (#128)
 - 2026-11-12 `5f05479d` chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)
 - 2026-11-12 `2e9137fa` chore(deps): bump actions/cache from 4 to 6 (#126)
@@ -411,7 +412,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-10 `9c2edff8` fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)
 - 2026-11-10 `f2dc8925` fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)
 - 2026-11-09 `6de3c961` feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)
-- 2026-11-08 `28c0f7e3` feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

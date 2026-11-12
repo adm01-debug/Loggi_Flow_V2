@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)",
    "chore(deps): bump actions/download-artifact from 7 to 8 (#128)",
    "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)",
    "chore(deps): bump actions/cache from 4 to 6 (#126)",
-   "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)",
-   "chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)"
+   "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

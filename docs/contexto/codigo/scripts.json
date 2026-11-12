@@ -625,7 +625,7 @@
   {
    "arquivo": "scripts/ops/set_missing_secrets.sh",
    "descricao": "Secrets das edge functions do projeto oficial — referencia dos NOMES esperados e envio dos que ainda estao com PLACEHOLDER_NEEDS_SETUP (cutover, etapa 83).",
-   "linhas": 273,
+   "linhas": 274,
    "env": [],
    "npm_scripts": [],
    "workflows": [
