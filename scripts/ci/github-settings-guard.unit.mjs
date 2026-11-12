@@ -97,7 +97,7 @@ const rotasAdmin = (por = {}) => ({
   [`GET ${P}/branches/main/protection`]: { body: protecaoViva() },
   [`GET ${P}`]: { body: repoVivo() },
   [`GET ${P}/actions/permissions`]: { body: { enabled: true, allowed_actions: 'all', sha_pinning_required: false } },
-  [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'read', can_approve_pull_request_reviews: false } },
+  [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'read', can_approve_pull_request_reviews: true } },
   [`GET ${P}/rulesets`]: { body: [] },
   [`GET ${P}/environments`]: { body: ambientes() },
   [`GET ${P}/issues`]: { body: [] },
@@ -518,9 +518,9 @@ test('actions e workflow permissions: valor diferente e campo ausente no payload
   const a = divergindo(rotasAdmin({ [`GET ${P}/actions/permissions`]: { body: { enabled: true, allowed_actions: 'selected' } } }));
   assert.match(a.out, /actions\.allowed_actions esperado=all encontrado=selected/);
   assert.match(a.out, /actions\.sha_pinning_required esperado=false encontrado=null/);
-  const w = divergindo(rotasAdmin({ [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'write', can_approve_pull_request_reviews: true } } }));
+  const w = divergindo(rotasAdmin({ [`GET ${P}/actions/permissions/workflow`]: { body: { default_workflow_permissions: 'write', can_approve_pull_request_reviews: false } } }));
   assert.match(w.out, /workflow_permissions\.default_workflow_permissions esperado=read encontrado=write/);
-  assert.match(w.out, /workflow_permissions\.can_approve_pull_request_reviews esperado=false encontrado=true/);
+  assert.match(w.out, /workflow_permissions\.can_approve_pull_request_reviews esperado=true encontrado=false/);
 });
 
 test('rulesets: um ruleset criado diverge; resposta 200 sem lista vira ponto cego (nao "zero rulesets")', () => {
