@@ -1,4 +1,4 @@
 // Automation Components - barrel export
 // ============================================
 
-export { BusinessRulesManager } from './BusinessRulesManager';
+export { BusinessRulesManager } from "./BusinessRulesManager";

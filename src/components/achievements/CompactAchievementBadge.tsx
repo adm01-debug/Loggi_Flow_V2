@@ -4,11 +4,15 @@ import { AchievementBadgeData, rarityConfig } from "./AchievementBadge";
 
 interface CompactAchievementBadgeProps {
   achievement: AchievementBadgeData;
-  config: typeof rarityConfig['common'];
+  config: (typeof rarityConfig)["common"];
   onClick?: () => void;
 }
 
-export function CompactAchievementBadge({ achievement, config, onClick }: CompactAchievementBadgeProps) {
+export function CompactAchievementBadge({
+  achievement,
+  config,
+  onClick,
+}: CompactAchievementBadgeProps) {
   const Icon = achievement.icon;
   return (
     <motion.button
@@ -19,19 +23,19 @@ export function CompactAchievementBadge({ achievement, config, onClick }: Compac
         "relative flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer min-w-[200px]",
         config.border,
         config.bg,
-        achievement.unlocked && config.glow
+        achievement.unlocked && config.glow,
       )}
     >
       <div
         className={cn(
           "flex items-center justify-center w-10 h-10 rounded-lg",
-          achievement.unlocked ? config.bg : "bg-muted"
+          achievement.unlocked ? config.bg : "bg-muted",
         )}
       >
         <Icon
           className={cn(
             "w-5 h-5",
-            achievement.unlocked ? config.labelColor : "text-muted-foreground"
+            achievement.unlocked ? config.labelColor : "text-muted-foreground",
           )}
         />
       </div>

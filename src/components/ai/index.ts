@@ -1,4 +1,4 @@
 // AI Components - barrel export
 // ============================================
 
-export { AIAssistant } from './AIAssistant';
+export { AIAssistant } from "./AIAssistant";

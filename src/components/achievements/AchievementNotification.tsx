@@ -31,20 +31,24 @@ const rarityConfig = {
   },
 };
 
-function RarityBadge({ rarity, label }: { rarity: string, label: string }) {
+function RarityBadge({ rarity, label }: { rarity: string; label: string }) {
   let classes = "bg-muted text-muted-foreground";
   if (rarity === "legendary") classes = "bg-xp/20 text-xp";
   else if (rarity === "epic") classes = "bg-primary/20 text-primary";
   else if (rarity === "rare") classes = "bg-info/20 text-info";
-  
-  return <span className={`text-xs px-2 py-0.5 rounded-full ${classes}`}>{label}</span>;
+
+  return (
+    <span className={`text-xs px-2 py-0.5 rounded-full ${classes}`}>
+      {label}
+    </span>
+  );
 }
 
 export function AchievementNotificationContainer() {
   const { notifications, dismissNotification } = useAchievementNotifications();
   const { width, height } = useWindowSize();
-  
-  const hasLegendary = notifications.some(n => n.rarity === "legendary");
+
+  const hasLegendary = notifications.some((n) => n.rarity === "legendary");
 
   return (
     <div className="fixed top-4 right-4 z-[100] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
@@ -55,13 +59,13 @@ export function AchievementNotificationContainer() {
           recycle={false}
           numberOfPieces={150}
           gravity={0.1}
-          colors={['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899']}
+          colors={["#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899"]}
         />
       )}
       <AnimatePresence mode="popLayout">
         {notifications.map((notification) => {
           const config = rarityConfig[notification.rarity];
-          
+
           return (
             <motion.div
               key={notification.timestamp}
@@ -80,12 +84,12 @@ export function AchievementNotificationContainer() {
                     <motion.div
                       key={i}
                       className="absolute w-1 h-1 rounded-full bg-xp/60"
-                      initial={{ 
-                        x: `${(i * 17) % 100}%`, 
+                      initial={{
+                        x: `${(i * 17) % 100}%`,
                         y: "100%",
-                        opacity: 0 
+                        opacity: 0,
                       }}
-                      animate={{ 
+                      animate={{
                         y: "-20%",
                         opacity: [0, 1, 0],
                       }}
@@ -161,7 +165,10 @@ export function AchievementNotificationContainer() {
                       </span>
                     </div>
                     <div className="ml-auto">
-                      <RarityBadge rarity={notification.rarity} label={config.label} />
+                      <RarityBadge
+                        rarity={notification.rarity}
+                        label={config.label}
+                      />
                     </div>
                   </motion.div>
                 </div>

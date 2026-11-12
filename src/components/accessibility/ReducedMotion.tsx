@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface ReducedMotionContextValue {
   prefersReducedMotion: boolean;
@@ -36,21 +42,29 @@ export function ReducedMotionProvider({ children }: { children: ReactNode }) {
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
-  const motionEnabled = userPreference !== null ? userPreference : !prefersReducedMotion;
+  const motionEnabled =
+    userPreference !== null ? userPreference : !prefersReducedMotion;
 
   const toggleMotion = () => {
     const newValue = !motionEnabled;
     setUserPreference(newValue);
-    localStorage.setItem("motion-preference", newValue ? "enabled" : "disabled");
+    localStorage.setItem(
+      "motion-preference",
+      newValue ? "enabled" : "disabled",
+    );
   };
 
   // Apply to document for CSS usage
   useEffect(() => {
-    document.documentElement.dataset.reduceMotion = motionEnabled ? "false" : "true";
+    document.documentElement.dataset.reduceMotion = motionEnabled
+      ? "false"
+      : "true";
   }, [motionEnabled]);
 
   return (
-    <ReducedMotionContext.Provider value={{ prefersReducedMotion, motionEnabled, toggleMotion }}>
+    <ReducedMotionContext.Provider
+      value={{ prefersReducedMotion, motionEnabled, toggleMotion }}
+    >
       {children}
     </ReducedMotionContext.Provider>
   );
@@ -65,13 +79,13 @@ export function useReducedMotion() {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useMotionVariants<T extends Record<string, unknown>>(
   animatedVariants: T,
-  reducedVariants?: T
+  reducedVariants?: T,
 ): T {
   const { motionEnabled } = useReducedMotion();
-  
+
   if (!motionEnabled && reducedVariants) {
     return reducedVariants;
   }
-  
+
   return animatedVariants;
 }
