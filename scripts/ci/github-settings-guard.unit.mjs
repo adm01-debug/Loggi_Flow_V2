@@ -64,7 +64,7 @@ AbortSignal.timeout = (ms) => abortReal(Math.min(ms, 100));
 
 // ------------------------------------------------------------------ respostas da API (copia do real)
 
-const CHECKS = ['Security Scan', 'Lint', 'Type Check', 'Warning Budget Gate', 'Unit & Integration Tests', 'Build Artifact', 'quality-gate', 'Security Audits', 'Agents Docs Integrity'];
+const CHECKS = ['Security Scan', 'Lint', 'Type Check', 'Warning Budget Gate', 'Unit & Integration Tests', 'Build Artifact', 'quality-gate', 'Security Audits', 'Agents Docs Integrity', 'Contratos da automação local'];
 const protecaoViva = () => ({
   required_status_checks: { strict: false, contexts: [...CHECKS], checks: CHECKS.map((context) => ({ context, app_id: 15368 })) },
   required_signatures: { enabled: false },
@@ -175,7 +175,7 @@ test('baseline versionado bate com o perimetro canonico (docs/agentes/github-ci.
   const bl = baselineReal();
   assert.deepEqual(problemasDoBaseline(bl), { erros: [], avisos: [] });
   assert.deepEqual(bl.branch_protection_main.required_status_checks, CHECKS);
-  assert.equal(bl.branch_protection_main.required_status_checks.length, 9);
+  assert.equal(bl.branch_protection_main.required_status_checks.length, 10);
   assert.equal(bl.branch_protection_main.strict, false);
   assert.equal(bl.branch_protection_main.enforce_admins, false);
   assert.equal(bl.branch_protection_main.required_pull_request_reviews, null);
@@ -195,7 +195,7 @@ test('baseline versionado bate com o perimetro canonico (docs/agentes/github-ci.
   assert.match(bl.medido_em, /^\d{4}-\d{2}-\d{2}$/);
 });
 
-test('a tabela canonica da doc lista os mesmos 9 required checks do baseline', () => {
+test('a tabela canonica da doc lista os mesmos 10 required checks do baseline', () => {
   const doc = fs.readFileSync(new URL('../../docs/agentes/github-ci.md', import.meta.url), 'utf8');
   const linha = doc.split('\n').find((l) => l.includes('Branch protection — required checks'));
   assert.ok(linha, 'linha dos required checks nao encontrada na doc');

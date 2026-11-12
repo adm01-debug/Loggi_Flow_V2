@@ -28,7 +28,8 @@
       "Build Artifact",
       "quality-gate",
       "Security Audits",
-      "Agents Docs Integrity"
+      "Agents Docs Integrity",
+      "Contratos da automação local"
     ]
   },
   "merge": {
