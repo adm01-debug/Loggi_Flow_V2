@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8ea891f44f9d3149a14c19f6d2937ecd70953072",
+  "commit": "bbb9bbc9bd489aa1e65cd68da81b4c5e0c7ec41c",
   "branch": "main",
-  "data_commit": "2026-11-13T10:35:15-03:00",
+  "data_commit": "2026-11-13T15:10:32-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "bbb9bbc9",
+    "data": "2026-11-13",
+    "assunto": "fix: corrige caminho import_map no config.toml para destravar deploy em lote (#145)"
+   },
    {
     "sha": "8ea891f4",
     "data": "2026-11-13",
@@ -126,14 +131,9 @@
     "sha": "d6a824f7",
     "data": "2026-11-08",
     "assunto": "fix(index): remover div oculto com textos de prompt internos"
-   },
-   {
-    "sha": "44ea285e",
-    "data": "2026-11-08",
-    "assunto": "chore(contexto): automação de contexto para agentes de IA (branch `contexto`) (#104)"
    }
   ],
-  "arquivos_mudados_7d": 209,
+  "arquivos_mudados_7d": 210,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -222,6 +222,10 @@
     "mudancas": 5
    },
    {
+    "arquivo": "supabase/config.toml",
+    "mudancas": 5
+   },
+   {
     "arquivo": ".github/workflows/ci.yml",
     "mudancas": 4
    },
@@ -274,10 +278,6 @@
     "mudancas": 4
    },
    {
-    "arquivo": "supabase/config.toml",
-    "mudancas": 4
-   },
-   {
     "arquivo": "supabase/functions/ai-logistics-assistant/index.ts",
     "mudancas": 4
    },
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 89
+    "commits": 90
    },
    {
     "autor": "dependabot[bot]",

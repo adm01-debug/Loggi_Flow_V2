@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "8ea891f44f9d3149a14c19f6d2937ecd70953072",
+  "sha": "bbb9bbc9bd489aa1e65cd68da81b4c5e0c7ec41c",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-13 14:15 UTC",
+  "generated_at": "2026-11-13 19:40 UTC",
   "files_total": 1289,
   "code_files": 1121,
   "code_lines": 181459,
@@ -88077,10 +88077,19 @@
   }
  },
  "git": {
-  "sha": "8ea891f44f9d3149a14c19f6d2937ecd70953072",
+  "sha": "bbb9bbc9bd489aa1e65cd68da81b4c5e0c7ec41c",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "bbb9bbc",
+    "date": "2026-11-13",
+    "author": "adm01-debug",
+    "subject": "fix: corrige caminho import_map no config.toml para destravar deploy em lote (#145)",
+    "files": [
+     "supabase/config.toml"
+    ]
+   },
    {
     "sha": "8ea891f",
     "date": "2026-11-13",
@@ -88586,13 +88595,6 @@
    },
    {
     "sha": "8464b79",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "9625887",
     "date": "2026-11-08",
     "author": "adm01-debug",
     "subject": "delete x",
