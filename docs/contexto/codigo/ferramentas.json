@@ -5,7 +5,7 @@
   "linguagens": [
    "TypeScript (776)",
    "SQL (257)",
-   "Markdown (82)",
+   "Markdown (83)",
    "JavaScript (80)",
    "JSON (29)",
    "YAML (20)",
@@ -863,6 +863,11 @@
    "arquivo": "docs/SRE_HANDBOOK.md",
    "titulo": "🚒 LOGIFLOW SRE & ON-CALL HANDBOOK",
    "linhas": 24
+  },
+  {
+   "arquivo": "docs/prod-readiness.md",
+   "titulo": null,
+   "linhas": 62
   }
  ],
  "docs_em_subpastas": [

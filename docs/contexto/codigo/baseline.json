@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "db8874999dab6fcd7c5ee6ea329d3de1de3e001f",
+  "commit": "a49bf31e5dacc70784aa584ff3b30fd57d388c88",
   "branch": "main",
-  "data_commit": "2026-11-13T16:58:33-03:00",
+  "data_commit": "2026-11-13T19:37:19-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "a49bf31e",
+    "data": "2026-11-13",
+    "assunto": "docs: fecha prod-readiness com inventario e evidencia (#147)"
+   },
    {
     "sha": "db887499",
     "data": "2026-11-13",
@@ -126,14 +131,9 @@
     "sha": "10d5df3a",
     "data": "2026-11-08",
     "assunto": "feat(ci): porta 7 workflows autônomos genéricos do Zapp (#112)"
-   },
-   {
-    "sha": "b74bb21c",
-    "data": "2026-11-08",
-    "assunto": "chore: padrão de instruções para agentes (#110)"
    }
   ],
-  "arquivos_mudados_7d": 211,
+  "arquivos_mudados_7d": 212,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 92
+    "commits": 93
    },
    {
     "autor": "dependabot[bot]",
@@ -314,7 +314,7 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1279,
+  "arquivos_total": 1280,
   "arquivos_codigo": 863,
   "linhas_codigo": 165721,
   "rotas": 61,
@@ -331,7 +331,7 @@
   "testes": 123,
   "workflows": 16,
   "scripts": 62,
-  "docs_md": 82
+  "docs_md": 83
  },
  "por_pasta": {
   "eslint.config.js": {

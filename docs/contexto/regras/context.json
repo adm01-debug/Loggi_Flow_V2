@@ -1,10 +1,10 @@
 {
  "meta": {
-  "sha": "db8874999dab6fcd7c5ee6ea329d3de1de3e001f",
+  "sha": "a49bf31e5dacc70784aa584ff3b30fd57d388c88",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-13 20:54 UTC",
-  "files_total": 1289,
+  "generated_at": "2026-11-13 23:13 UTC",
+  "files_total": 1290,
   "code_files": 1121,
   "code_lines": 181459,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
@@ -88077,10 +88077,19 @@
   }
  },
  "git": {
-  "sha": "db8874999dab6fcd7c5ee6ea329d3de1de3e001f",
+  "sha": "a49bf31e5dacc70784aa584ff3b30fd57d388c88",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "a49bf31",
+    "date": "2026-11-13",
+    "author": "adm01-debug",
+    "subject": "docs: fecha prod-readiness com inventario e evidencia (#147)",
+    "files": [
+     "docs/prod-readiness.md"
+    ]
+   },
    {
     "sha": "db88749",
     "date": "2026-11-13",
@@ -88593,15 +88602,6 @@
      "src/pages/InteligenciaFrete.tsx",
      "src/pages/PainelOTIF.tsx",
      "src/pages/Relatorios.tsx"
-    ]
-   },
-   {
-    "sha": "17bd388",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "fix: endurece manifest_detail e manifest_data com padrao idempotente (#103)",
-    "files": [
-     "scripts/audit/manifest_detail.sql"
     ]
    }
   ],

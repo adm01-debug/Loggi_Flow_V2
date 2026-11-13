@@ -33,7 +33,7 @@
    "scripts/audit (5)"
   ],
   "docs": [
-   "docs (27)",
+   "docs (28)",
    "(raiz) (9)",
    ".github (1)"
   ]
@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "docs: fecha prod-readiness com inventario e evidencia (#147)",
    "docs: registra quirk do cache do GET /secrets da Management API (RESEND_API_KEY) (#146)",
    "infra: adiciona --yes no deploy de edge functions (#144)",
    "fix: corrige caminho import_map no config.toml para destravar deploy em lote (#145)",
-   "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)",
-   "chore(db): sincronizar artefatos derivados do banco (#141)"
+   "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",
