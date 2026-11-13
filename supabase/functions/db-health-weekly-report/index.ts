@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: 'LogiFlow <notificacoes@resend.dev>',
+        from: 'LogiFlow <notificacoes@promobrindes.com.br>',
         to: emails,
         subject,
         html,

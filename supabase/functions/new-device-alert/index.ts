@@ -56,7 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Segurança <onboarding@resend.dev>",
+        from: "Segurança <seguranca@promobrindes.com.br>",
         to: [user_email],
         subject: "🔔 Novo login detectado em sua conta",
         html: `
