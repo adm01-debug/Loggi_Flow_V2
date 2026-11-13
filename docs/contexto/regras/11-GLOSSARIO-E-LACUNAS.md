@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e09821803f` · branch `main` · 2026-11-12 23:01 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `30eecc9a48` · branch `main` · 2026-11-13 02:11 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -27,6 +27,7 @@
 | `audit_logs_y2027m04` | _(sem COMMENT ON TABLE — significado não documentado)_ | 13 colunas | types.ts |
 | `audit_logs_y2027m05` | _(sem COMMENT ON TABLE — significado não documentado)_ | 13 colunas | types.ts |
 | `audit_logs_y2027m06` | _(sem COMMENT ON TABLE — significado não documentado)_ | 13 colunas | types.ts |
+| `audit_logs_y2027m07` | _(sem COMMENT ON TABLE — significado não documentado)_ | 13 colunas | types.ts |
 | `automation_audit_logs` | _(sem COMMENT ON TABLE — significado não documentado)_ | 10 colunas | migration |
 | `bio_sync_alert_rules` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | migration |
 | `bio_sync_telemetry` | _(sem COMMENT ON TABLE — significado não documentado)_ | 10 colunas | migration |
@@ -327,7 +328,7 @@
 - `delivery_receipt_audit.ocr_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `system_heartbeat.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `rte_gateway_health.http_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- 133/140 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `profiles`, `transportadoras`, `cotacoes_frete`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …
+- 134/141 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `profiles`, `transportadoras`, `cotacoes_frete`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …
 
 ## Regras manuais presentes
 

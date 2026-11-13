@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e09821803f` · branch `main` · 2026-11-12 23:01 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `30eecc9a48` · branch `main` · 2026-11-13 02:11 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -617,7 +617,7 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `rate_limit_logs` | `ip_address` | obrigatório |
 | `rate_limit_logs` | `endpoint` | obrigatório |
 | `rate_limit_logs` | `user_id` | FK → users.id ON DELETE SET NULL |
-| … +674 linhas — lista completa em `context.json` | | |
+| … +679 linhas — lista completa em `context.json` | | |
 
 ## D. Automações no banco (triggers e funções — regras que rodam sozinhas)
 

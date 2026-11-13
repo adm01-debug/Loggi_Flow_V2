@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "e09821803f86bd161baabcfc9a04f488a0e4d714",
+  "commit": "30eecc9a48c09955df8580e1dad8671664a7d2cf",
   "branch": "main",
-  "data_commit": "2026-11-12T17:29:21-03:00",
+  "data_commit": "2026-11-12T21:50:01-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "30eecc9a",
+    "data": "2026-11-12",
+    "assunto": "chore(db): sincronizar artefatos derivados do banco (#141)"
+   },
    {
     "sha": "e0982180",
     "data": "2026-11-12",
@@ -126,14 +131,9 @@
     "sha": "b43d84b2",
     "data": "2026-11-08",
     "assunto": "fix(deps): destrava a CI do repo — lockfile, tipos Recharts 3, ruleset do React Compiler e 4 CVEs (#108)"
-   },
-   {
-    "sha": "17bd3887",
-    "data": "2026-11-08",
-    "assunto": "fix: endurece manifest_detail e manifest_data com padrao idempotente (#103)"
    }
   ],
-  "arquivos_mudados_7d": 201,
+  "arquivos_mudados_7d": 205,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -306,13 +306,17 @@
    {
     "autor": "dependabot[bot]",
     "commits": 5
+   },
+   {
+    "autor": "github-actions[bot]",
+    "commits": 1
    }
   ]
  },
  "contagens": {
-  "arquivos_total": 1277,
+  "arquivos_total": 1279,
   "arquivos_codigo": 863,
-  "linhas_codigo": 165662,
+  "linhas_codigo": 165721,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -464,7 +468,7 @@
   },
   "src/integrations": {
    "arquivos": 4,
-   "linhas": 6643
+   "linhas": 6702
   },
   "src/lib": {
    "arquivos": 42,
@@ -538,7 +542,7 @@
  "maiores_arquivos": [
   {
    "arquivo": "src/integrations/supabase/types.ts",
-   "linhas": 6551
+   "linhas": 6610
   },
   {
    "arquivo": "scripts/regras_negocio/generate.py",

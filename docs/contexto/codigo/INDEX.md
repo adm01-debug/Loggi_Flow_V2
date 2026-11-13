@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e09821803f86bd161baabcfc9a04f488a0e4d714` (2026-11-12T17:29:21-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `30eecc9a48c09955df8580e1dad8671664a7d2cf` (2026-11-12T21:50:01-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (776), SQL (257), Markdown (82), JavaScript (80), JSON (27), YAML (20), Shell (9), Python (8)
+- linguagens: TypeScript (776), SQL (257), Markdown (82), JavaScript (80), JSON (29), YAML (20), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,9 +34,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1277 |
+| arquivos_total | 1279 |
 | arquivos_codigo | 863 |
-| linhas_codigo | 165662 |
+| linhas_codigo | 165721 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `e0982180`
+- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `30eecc9a`
 - comunidades maiores: lucide-react (253), Envios.tsx (220), @tanstack/react-query (159), db-observability/index.ts (156), react (138), button.tsx (132), ui/index.ts (118), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (100), App.tsx (89), cn (89), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -397,6 +397,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-12 `30eecc9a` chore(db): sincronizar artefatos derivados do banco (#141)
 - 2026-11-12 `e0982180` fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)
 - 2026-11-12 `0c0d48cc` chore(deps): bump actions/download-artifact from 7 to 8 (#128)
 - 2026-11-12 `5f05479d` chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)
@@ -411,7 +412,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-11 `e31c16af` chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)
 - 2026-11-10 `9c2edff8` fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)
 - 2026-11-10 `f2dc8925` fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)
-- 2026-11-09 `6de3c961` feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

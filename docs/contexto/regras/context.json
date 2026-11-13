@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "e09821803f86bd161baabcfc9a04f488a0e4d714",
+  "sha": "30eecc9a48c09955df8580e1dad8671664a7d2cf",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-12 23:01 UTC",
-  "files_total": 1287,
+  "generated_at": "2026-11-13 02:11 UTC",
+  "files_total": 1289,
   "code_files": 1121,
-  "code_lines": 181400,
+  "code_lines": 181459,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "2794e04157d3666e",
+ "facts_hash": "617dd20fa9ebf5ab",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -9742,6 +9742,105 @@
     "comment": "",
     "origin": "types.ts"
    },
+   "audit_logs_y2027m07": {
+    "columns": [
+     {
+      "name": "action",
+      "type": "string not null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "changed_fields",
+      "type": "string[] | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "created_at",
+      "type": "string not null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "id",
+      "type": "string not null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "ip_address",
+      "type": "string | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "new_data",
+      "type": "Json | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "old_data",
+      "type": "Json | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "record_id",
+      "type": "string not null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "table_name",
+      "type": "string not null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "user_agent",
+      "type": "string | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "user_email",
+      "type": "string | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "user_id",
+      "type": "string | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     },
+     {
+      "name": "user_name",
+      "type": "string | null",
+      "fk": "",
+      "generated": "",
+      "src": "src/integrations/supabase/types.ts"
+     }
+    ],
+    "constraints": [],
+    "src": "src/integrations/supabase/types.ts",
+    "comment": "",
+    "origin": "types.ts"
+   },
    "geo_blocking_settings": {
     "columns": [
      {
@@ -17279,7 +17378,18 @@
     "raises": [],
     "tables": []
    },
-   "exec_sql": {
+   "mcp_exec": {
+    "args": "",
+    "returns": "?",
+    "lang": "",
+    "src": "src/integrations/supabase/types.ts",
+    "security_definer": false,
+    "search_path": false,
+    "body": "",
+    "raises": [],
+    "tables": []
+   },
+   "mcp_exec_many": {
     "args": "",
     "returns": "?",
     "lang": "",
@@ -29810,7 +29920,7 @@
   {
    "module": "src/integrations",
    "files": 4,
-   "lines": 6643,
+   "lines": 6702,
    "tables": [],
    "exports": [
     "index.ts: lovable",
@@ -33387,6 +33497,7 @@
    "audit_logs_y2027m04",
    "audit_logs_y2027m05",
    "audit_logs_y2027m06",
+   "audit_logs_y2027m07",
    "business_rules_config",
    "carrier_rankings",
    "db_health_score_history",
@@ -40429,6 +40540,31 @@
    },
    {
     "table": "audit_logs_y2027m06",
+    "column": "table_name",
+    "rule": "obrigatório"
+   },
+   {
+    "table": "audit_logs_y2027m07",
+    "column": "action",
+    "rule": "obrigatório"
+   },
+   {
+    "table": "audit_logs_y2027m07",
+    "column": "created_at",
+    "rule": "obrigatório"
+   },
+   {
+    "table": "audit_logs_y2027m07",
+    "column": "id",
+    "rule": "obrigatório"
+   },
+   {
+    "table": "audit_logs_y2027m07",
+    "column": "record_id",
+    "rule": "obrigatório"
+   },
+   {
+    "table": "audit_logs_y2027m07",
     "column": "table_name",
     "rule": "obrigatório"
    },
@@ -54937,7 +55073,18 @@
     "raises": [],
     "tables": []
    },
-   "exec_sql": {
+   "mcp_exec": {
+    "args": "",
+    "returns": "?",
+    "lang": "",
+    "src": "src/integrations/supabase/types.ts",
+    "security_definer": false,
+    "search_path": false,
+    "body": "",
+    "raises": [],
+    "tables": []
+   },
+   "mcp_exec_many": {
     "args": "",
     "returns": "?",
     "lang": "",
@@ -57330,6 +57477,17 @@
     "rls": "não encontrado",
     "SELECT": [],
     "INSERT": [],
+    "UPDATE": [],
+    "DELETE": []
+   },
+   "audit_logs_y2027m07": {
+    "rls": "não encontrado",
+    "SELECT": [
+     "authenticated: has_role(auth.uid(), 'admin'::app_role)"
+    ],
+    "INSERT": [
+     "authenticated: auth.uid() IS NOT NULL"
+    ],
     "UPDATE": [],
     "DELETE": []
    },
@@ -63117,6 +63275,9 @@
    "audit_logs_y2027m06": [
     "created_at"
    ],
+   "audit_logs_y2027m07": [
+    "created_at"
+   ],
    "geo_blocking_settings": [
     "updated_at",
     "updated_by"
@@ -63331,6 +63492,10 @@
    ],
    [
     "audit_logs_y2027m06",
+    "ip_address"
+   ],
+   [
+    "audit_logs_y2027m07",
     "ip_address"
    ],
    [
@@ -64330,7 +64495,7 @@
    "`delivery_receipt_audit.ocr_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.",
    "`system_heartbeat.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.",
    "`rte_gateway_health.http_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.",
-   "133/140 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `profiles`, `transportadoras`, `cotacoes_frete`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …"
+   "134/141 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `profiles`, `transportadoras`, `cotacoes_frete`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …"
   ]
  },
  "manual": [],
@@ -78707,7 +78872,7 @@
   },
   "src/integrations/supabase/types.ts": {
    "path": "src/integrations/supabase/types.ts",
-   "lines": 6551,
+   "lines": 6610,
    "exports": [
     "type Json",
     "type Database",
@@ -87912,10 +88077,23 @@
   }
  },
  "git": {
-  "sha": "e09821803f86bd161baabcfc9a04f488a0e4d714",
+  "sha": "30eecc9a48c09955df8580e1dad8671664a7d2cf",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "30eecc9",
+    "date": "2026-11-12",
+    "author": "github-actions[bot]",
+    "subject": "chore(db): sincronizar artefatos derivados do banco (#141)",
+    "files": [
+     ".gitleaks.toml",
+     "scripts/db-audit/grants-baseline.json",
+     "src/integrations/supabase/types.ts",
+     "supabase/schema-catalog.json",
+     "supabase/schema-manifest.json"
+    ]
+   },
    {
     "sha": "e098218",
     "date": "2026-11-12",
@@ -88414,13 +88592,6 @@
     "author": "adm01-debug",
     "subject": "delete x",
     "files": []
-   },
-   {
-    "sha": "a458599",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
    }
   ],
   "hot_files": [
@@ -88455,6 +88626,10 @@
    [
     "AGENTS.md",
     3
+   ],
+   [
+    "scripts/db-audit/grants-baseline.json",
+    2
    ],
    [
     "scripts/ci/github-settings-guard.unit.mjs",
@@ -88498,10 +88673,6 @@
    ],
    [
     "scripts/ai-context/gerar.unit.mjs",
-    2
-   ],
-   [
-    "scripts/audit/manifest_detail.sql",
     2
    ]
   ]

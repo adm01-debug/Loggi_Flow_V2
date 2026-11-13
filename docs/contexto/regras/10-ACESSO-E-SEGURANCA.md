@@ -1,6 +1,6 @@
 # 10 · ACESSO E SEGURANÇA — quem pode o quê
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e09821803f` · branch `main` · 2026-11-12 23:01 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `30eecc9a48` · branch `main` · 2026-11-13 02:11 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Perfis / roles identificados
@@ -36,6 +36,7 @@
 | `audit_logs_y2027m04` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
 | `audit_logs_y2027m05` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
 | `audit_logs_y2027m06` | não encontrado | sem RLS | sem RLS | sem RLS | sem RLS |
+| `audit_logs_y2027m07` | não encontrado | authenticated: has_role(auth.uid(), 'admin'::app_role) | authenticated: auth.uid() IS NOT NULL | sem RLS | sem RLS |
 | `automation_audit_logs` | enabled | public: auth.role() = 'authenticated' | public: auth.role() = 'authenticated' | public: auth.role() = 'authenticated' | public: auth.role() = 'authenticated' |
 | `bio_sync_alert_rules` | enabled | public: true<br>authenticated: public.has_role(auth.uid(),'admin') | authenticated: public.has_role(auth.uid(),'admin') | authenticated: public.has_role(auth.uid(),'admin') | authenticated: public.has_role(auth.uid(),'admin') |
 | `bio_sync_telemetry` | enabled | authenticated: true | authenticated: public.has_role(auth.uid(), 'admin') | — | — |
@@ -660,6 +661,7 @@ Middleware matcher (Next.js): nenhum
 | `audit_logs_y2027m04` | `created_at` |
 | `audit_logs_y2027m05` | `created_at` |
 | `audit_logs_y2027m06` | `created_at` |
+| `audit_logs_y2027m07` | `created_at` |
 | `geo_blocking_settings` | `updated_at`, `updated_by` |
 | `rastreamento_historico_y2026m01` | `created_at` |
 | `rastreamento_historico_y2026m02` | `created_at` |
@@ -722,6 +724,7 @@ Middleware matcher (Next.js): nenhum
 | `audit_logs_y2027m04` | `ip_address` |
 | `audit_logs_y2027m05` | `ip_address` |
 | `audit_logs_y2027m06` | `ip_address` |
+| `audit_logs_y2027m07` | `ip_address` |
 | `rastreamento_historico_y2026m01` | `latitude` |
 | `rastreamento_historico_y2026m01` | `longitude` |
 | `rastreamento_historico_y2026m02` | `latitude` |
