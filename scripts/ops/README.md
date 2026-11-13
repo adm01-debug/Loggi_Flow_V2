@@ -1,5 +1,7 @@
 # scripts/ops — operação
 
+> **Quirk conhecido — `RESEND_API_KEY`:** o endpoint `GET /v1/projects/{ref}/secrets` da Management API tem cache/CDN e pode devolver o hash antigo mesmo depois de um `secrets set` aceito (201). **Não use o GET para validar segredo** aqui; a fonte de verdade é o comportamento da function — envio real de e-mail gera `resend_id` novo no Resend. (Visto em 2026-11-13: hash antigo `e7b8df57...` no GET, porém envio real `01a1d643-...` com a chave nova.)
+
 | Arquivo                    | O que é                                                                                                                               |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `backup_origem.sh`         | backup diário (`pg_dump -Fc`) do banco de **origem** (Lovable Cloud `hgicfqjayrjurivtygqf`, somente leitura) até o descomissionamento |
