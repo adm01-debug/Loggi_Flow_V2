@@ -35,7 +35,7 @@ jobs:
       - name: Deploy
         run: |
           if [ -n "${{ github.event.inputs.only }}" ]; then
-            supabase functions deploy "${{ github.event.inputs.only }}" --project-ref "$PROJECT_REF"
+            supabase functions deploy "${{ github.event.inputs.only }}" --project-ref "$PROJECT_REF" --yes
           else
-            supabase functions deploy --project-ref "$PROJECT_REF"
+            supabase functions deploy --project-ref "$PROJECT_REF" --yes
           fi
