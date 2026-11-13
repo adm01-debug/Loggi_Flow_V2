@@ -9,7 +9,11 @@ interface LoadingSpinnerProps {
 
 const sizes = { sm: "w-4 h-4", default: "w-6 h-6", lg: "w-8 h-8" };
 
-export function LoadingSpinner({ size = "default", className, text }: LoadingSpinnerProps) {
+export function LoadingSpinner({
+  size = "default",
+  className,
+  text,
+}: LoadingSpinnerProps) {
   return (
     <div className={cn("flex items-center justify-center gap-2", className)}>
       <Loader2 className={cn("animate-spin text-primary", sizes[size])} />

@@ -1,10 +1,26 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
-import { BarChart3, PieChart as PieIcon, TrendingUp, Timer, Database } from "lucide-react";
+import {
+  BarChart3,
+  PieChart as PieIcon,
+  TrendingUp,
+  Timer,
+  Database,
+} from "lucide-react";
 
 interface TelemetryRow {
   id: string;
@@ -24,10 +40,14 @@ interface TelemetryChartsProps {
 
 function getBucketMs(timeFilter: string): number {
   switch (timeFilter) {
-    case "1h": return 5 * 60 * 1000;
-    case "6h": return 30 * 60 * 1000;
-    case "24h": return 60 * 60 * 1000;
-    default: return 6 * 60 * 60 * 1000;
+    case "1h":
+      return 5 * 60 * 1000;
+    case "6h":
+      return 30 * 60 * 1000;
+    case "24h":
+      return 60 * 60 * 1000;
+    default:
+      return 6 * 60 * 60 * 1000;
   }
 }
 
@@ -44,7 +64,10 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
   const timelineData = useMemo(() => {
     if (rows.length === 0) return [];
     const bucketMs = getBucketMs(timeFilter);
-    const buckets = new Map<number, { muitoLentas: number; lentas: number; erros: number }>();
+    const buckets = new Map<
+      number,
+      { muitoLentas: number; lentas: number; erros: number }
+    >();
 
     for (const r of rows) {
       const ts = new Date(r.created_at).getTime();
@@ -68,7 +91,10 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
   const durationData = useMemo(() => {
     if (rows.length === 0) return [];
     const bucketMs = getBucketMs(timeFilter);
-    const buckets = new Map<number, { totalMs: number; maxMs: number; count: number }>();
+    const buckets = new Map<
+      number,
+      { totalMs: number; maxMs: number; count: number }
+    >();
 
     for (const r of rows) {
       const ts = new Date(r.created_at).getTime();
@@ -98,9 +124,13 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
     }
     return [
       { name: "Lenta", value: counts.slow, color: "hsl(45, 93%, 47%)" },
-      { name: "Muito Lenta", value: counts.very_slow, color: "hsl(var(--destructive))" },
+      {
+        name: "Muito Lenta",
+        value: counts.very_slow,
+        color: "hsl(var(--destructive))",
+      },
       { name: "Erro", value: counts.error, color: "hsl(0, 84%, 40%)" },
-    ].filter(d => d.value > 0);
+    ].filter((d) => d.value > 0);
   }, [rows]);
 
   // Top tables horizontal bar
@@ -152,13 +182,40 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
           <CardContent>
             <ResponsiveContainer width="100%" height={240}>
               <AreaChart data={timelineData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  className="stroke-border/30"
+                />
                 <XAxis dataKey="time" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip contentStyle={tooltipStyle} />
-                <Area type="monotone" dataKey="muitoLentas" stackId="1" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive))" fillOpacity={0.6} name="Muito Lentas" />
-                <Area type="monotone" dataKey="lentas" stackId="1" stroke="hsl(45, 93%, 47%)" fill="hsl(45, 93%, 47%)" fillOpacity={0.6} name="Lentas" />
-                <Area type="monotone" dataKey="erros" stackId="1" stroke="hsl(0, 84%, 60%)" fill="hsl(0, 84%, 60%)" fillOpacity={0.6} name="Erros" />
+                <Area
+                  type="monotone"
+                  dataKey="muitoLentas"
+                  stackId="1"
+                  stroke="hsl(var(--destructive))"
+                  fill="hsl(var(--destructive))"
+                  fillOpacity={0.6}
+                  name="Muito Lentas"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="lentas"
+                  stackId="1"
+                  stroke="hsl(45, 93%, 47%)"
+                  fill="hsl(45, 93%, 47%)"
+                  fillOpacity={0.6}
+                  name="Lentas"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="erros"
+                  stackId="1"
+                  stroke="hsl(0, 84%, 60%)"
+                  fill="hsl(0, 84%, 60%)"
+                  fillOpacity={0.6}
+                  name="Erros"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -175,12 +232,41 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
           <CardContent>
             <ResponsiveContainer width="100%" height={240}>
               <AreaChart data={durationData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  className="stroke-border/30"
+                />
                 <XAxis dataKey="time" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}s` : `${v}ms`} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(value) => (Number(value) >= 1000 ? `${(Number(value) / 1000).toFixed(1)}s` : `${value}ms`)} />
-                <Area type="monotone" dataKey="maxMs" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive))" fillOpacity={0.2} name="Máxima" />
-                <Area type="monotone" dataKey="mediaMs" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} name="Média" />
+                <YAxis
+                  tick={{ fontSize: 10 }}
+                  tickFormatter={(v) =>
+                    v >= 1000 ? `${(v / 1000).toFixed(0)}s` : `${v}ms`
+                  }
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(value) =>
+                    Number(value) >= 1000
+                      ? `${(Number(value) / 1000).toFixed(1)}s`
+                      : `${value}ms`
+                  }
+                />
+                <Area
+                  type="monotone"
+                  dataKey="maxMs"
+                  stroke="hsl(var(--destructive))"
+                  fill="hsl(var(--destructive))"
+                  fillOpacity={0.2}
+                  name="Máxima"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="mediaMs"
+                  stroke="hsl(var(--primary))"
+                  fill="hsl(var(--primary))"
+                  fillOpacity={0.3}
+                  name="Média"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -200,8 +286,17 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie data={severityData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value"
-                  label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
+                <Pie
+                  data={severityData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={45}
+                  outerRadius={75}
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+                  }
+                >
                   {severityData.map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}
@@ -224,11 +319,24 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
             <CardContent>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={tableData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    className="stroke-border/30"
+                  />
                   <XAxis type="number" tick={{ fontSize: 10 }} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 9 }} width={80} />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    tick={{ fontSize: 9 }}
+                    width={80}
+                  />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="alertas" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} name="Alertas" />
+                  <Bar
+                    dataKey="alertas"
+                    fill="hsl(var(--primary))"
+                    radius={[0, 4, 4, 0]}
+                    name="Alertas"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -247,11 +355,19 @@ export function TelemetryCharts({ rows, timeFilter }: TelemetryChartsProps) {
             <CardContent>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={operationData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    className="stroke-border/30"
+                  />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
+                  <Bar
+                    dataKey="value"
+                    fill="hsl(var(--primary))"
+                    radius={[4, 4, 0, 0]}
+                    name="Quantidade"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
