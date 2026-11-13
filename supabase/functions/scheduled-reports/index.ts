@@ -246,7 +246,7 @@ async function sendReportEmail(recipients: string[], report: any, apiKey: string
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: "LogiFlow Reports <notificacoes@resend.dev>",
+        from: "LogiFlow Reports <notificacoes@promobrindes.com.br>",
         to: recipients,
         subject,
         html,

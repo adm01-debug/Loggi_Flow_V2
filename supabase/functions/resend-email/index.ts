@@ -44,7 +44,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: from || "LogiFlow <notificacoes@resend.dev>",
+        from: from || "LogiFlow <notificacoes@promobrindes.com.br>",
         to: Array.isArray(to) ? to : [to],
         subject,
         html,
