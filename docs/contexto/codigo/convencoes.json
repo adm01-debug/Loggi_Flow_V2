@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)",
    "chore(db): sincronizar artefatos derivados do banco (#141)",
    "fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)",
    "chore(deps): bump actions/download-artifact from 7 to 8 (#128)",
-   "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)",
-   "chore(deps): bump actions/cache from 4 to 6 (#126)"
+   "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

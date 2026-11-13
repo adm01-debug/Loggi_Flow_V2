@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "30eecc9a48c09955df8580e1dad8671664a7d2cf",
+  "commit": "8ea891f44f9d3149a14c19f6d2937ecd70953072",
   "branch": "main",
-  "data_commit": "2026-11-12T21:50:01-03:00",
+  "data_commit": "2026-11-13T10:35:15-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "8ea891f4",
+    "data": "2026-11-13",
+    "assunto": "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)"
+   },
    {
     "sha": "30eecc9a",
     "data": "2026-11-12",
@@ -126,14 +131,9 @@
     "sha": "44ea285e",
     "data": "2026-11-08",
     "assunto": "chore(contexto): automação de contexto para agentes de IA (branch `contexto`) (#104)"
-   },
-   {
-    "sha": "b43d84b2",
-    "data": "2026-11-08",
-    "assunto": "fix(deps): destrava a CI do repo — lockfile, tipos Recharts 3, ruleset do React Compiler e 4 CVEs (#108)"
    }
   ],
-  "arquivos_mudados_7d": 205,
+  "arquivos_mudados_7d": 209,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 88
+    "commits": 89
    },
    {
     "autor": "dependabot[bot]",

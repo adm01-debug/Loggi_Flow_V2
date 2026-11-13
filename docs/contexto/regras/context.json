@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "30eecc9a48c09955df8580e1dad8671664a7d2cf",
+  "sha": "8ea891f44f9d3149a14c19f6d2937ecd70953072",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-13 02:11 UTC",
+  "generated_at": "2026-11-13 14:15 UTC",
   "files_total": 1289,
   "code_files": 1121,
   "code_lines": 181459,
@@ -88077,10 +88077,22 @@
   }
  },
  "git": {
-  "sha": "30eecc9a48c09955df8580e1dad8671664a7d2cf",
+  "sha": "8ea891f44f9d3149a14c19f6d2937ecd70953072",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "8ea891f",
+    "date": "2026-11-13",
+    "author": "adm01-debug",
+    "subject": "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)",
+    "files": [
+     "supabase/functions/db-health-weekly-report/index.ts",
+     "supabase/functions/new-device-alert/index.ts",
+     "supabase/functions/resend-email/index.ts",
+     "supabase/functions/scheduled-reports/index.ts"
+    ]
+   },
    {
     "sha": "30eecc9",
     "date": "2026-11-12",
@@ -88581,13 +88593,6 @@
    },
    {
     "sha": "9625887",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "716282c",
     "date": "2026-11-08",
     "author": "adm01-debug",
     "subject": "delete x",
