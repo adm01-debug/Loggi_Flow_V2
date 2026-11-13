@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "bbb9bbc9bd489aa1e65cd68da81b4c5e0c7ec41c",
+  "sha": "db8874999dab6fcd7c5ee6ea329d3de1de3e001f",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-13 19:40 UTC",
+  "generated_at": "2026-11-13 20:54 UTC",
   "files_total": 1289,
   "code_files": 1121,
   "code_lines": 181459,
@@ -88077,10 +88077,28 @@
   }
  },
  "git": {
-  "sha": "bbb9bbc9bd489aa1e65cd68da81b4c5e0c7ec41c",
+  "sha": "db8874999dab6fcd7c5ee6ea329d3de1de3e001f",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "db88749",
+    "date": "2026-11-13",
+    "author": "adm01-debug",
+    "subject": "docs: registra quirk do cache do GET /secrets da Management API (RESEND_API_KEY) (#146)",
+    "files": [
+     "scripts/ops/README.md"
+    ]
+   },
+   {
+    "sha": "926f549",
+    "date": "2026-11-13",
+    "author": "adm01-debug",
+    "subject": "infra: adiciona --yes no deploy de edge functions (#144)",
+    "files": [
+     ".github/workflows/deploy-functions.yml"
+    ]
+   },
    {
     "sha": "bbb9bbc",
     "date": "2026-11-13",
@@ -88585,20 +88603,6 @@
     "files": [
      "scripts/audit/manifest_detail.sql"
     ]
-   },
-   {
-    "sha": "770cfae",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
-   },
-   {
-    "sha": "8464b79",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "delete x",
-    "files": []
    }
   ],
   "hot_files": [
@@ -88633,6 +88637,10 @@
    [
     "AGENTS.md",
     3
+   ],
+   [
+    "scripts/ops/README.md",
+    2
    ],
    [
     "scripts/db-audit/grants-baseline.json",
@@ -88676,10 +88684,6 @@
    ],
    [
     "scripts/ai-context/gerar.mjs",
-    2
-   ],
-   [
-    "scripts/ai-context/gerar.unit.mjs",
     2
    ]
   ]

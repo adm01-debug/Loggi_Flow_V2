@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `bbb9bbc9bd489aa1e65cd68da81b4c5e0c7ec41c` (2026-11-13T15:10:32-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `db8874999dab6fcd7c5ee6ea329d3de1de3e001f` (2026-11-13T16:58:33-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `bbb9bbc9`
+- 7997 nós · 20262 arestas · 687 comunidades · grafo do commit `db887499`
 - comunidades maiores: lucide-react (253), Envios.tsx (220), @tanstack/react-query (159), db-observability/index.ts (156), react (138), button.tsx (132), ui/index.ts (118), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (100), App.tsx (89), cn (89), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -289,12 +289,12 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - supabase/config.toml (5)
 - .github/workflows/ci.yml (4)
 - .github/workflows/contexto-ia.yml (4)
+- .github/workflows/deploy-functions.yml (4)
 - .github/workflows/types-sync.yml (4)
 - ESTADO_ATUAL.md (4)
 - ESTADO_ATUAL_EVIDENCIAS.md (4)
 - scripts/audit/manifest_detail.sql (4)
 - scripts/check-warning-budget.mjs (4)
-- scripts/generate-quality-report.mjs (4)
 
 ## Workflows
 - `auto-update-pr-branch.yml` — Auto Update PR Branches (push, schedule, workflow_dispatch, workflow_run; cron 7,37 * * * *)
@@ -397,6 +397,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-13 `db887499` docs: registra quirk do cache do GET /secrets da Management API (RESEND_API_KEY) (#146)
+- 2026-11-13 `926f5496` infra: adiciona --yes no deploy de edge functions (#144)
 - 2026-11-13 `bbb9bbc9` fix: corrige caminho import_map no config.toml para destravar deploy em lote (#145)
 - 2026-11-13 `8ea891f4` fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)
 - 2026-11-12 `30eecc9a` chore(db): sincronizar artefatos derivados do banco (#141)
@@ -410,8 +412,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-11 `60b8d213` feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)
 - 2026-11-11 `e2cc7bde` fix(ci): move gate de credencial do types-sync para antes dos installs (#134)
 - 2026-11-11 `5182e5f6` docs: atualiza contagem de required checks para 10 no github-ci.md (#123)
-- 2026-11-11 `04259107` chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)
-- 2026-11-11 `e31c16af` chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

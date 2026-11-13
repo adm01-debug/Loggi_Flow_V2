@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "bbb9bbc9bd489aa1e65cd68da81b4c5e0c7ec41c",
+  "commit": "db8874999dab6fcd7c5ee6ea329d3de1de3e001f",
   "branch": "main",
-  "data_commit": "2026-11-13T15:10:32-03:00",
+  "data_commit": "2026-11-13T16:58:33-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "db887499",
+    "data": "2026-11-13",
+    "assunto": "docs: registra quirk do cache do GET /secrets da Management API (RESEND_API_KEY) (#146)"
+   },
+   {
+    "sha": "926f5496",
+    "data": "2026-11-13",
+    "assunto": "infra: adiciona --yes no deploy de edge functions (#144)"
+   },
    {
     "sha": "bbb9bbc9",
     "data": "2026-11-13",
@@ -121,19 +131,9 @@
     "sha": "b74bb21c",
     "data": "2026-11-08",
     "assunto": "chore: padrão de instruções para agentes (#110)"
-   },
-   {
-    "sha": "ab4852bc",
-    "data": "2026-11-08",
-    "assunto": "fix(ci): adiciona --force no push da branch contexto (#111)"
-   },
-   {
-    "sha": "d6a824f7",
-    "data": "2026-11-08",
-    "assunto": "fix(index): remover div oculto com textos de prompt internos"
    }
   ],
-  "arquivos_mudados_7d": 210,
+  "arquivos_mudados_7d": 211,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -234,6 +234,10 @@
     "mudancas": 4
    },
    {
+    "arquivo": ".github/workflows/deploy-functions.yml",
+    "mudancas": 4
+   },
+   {
     "arquivo": ".github/workflows/types-sync.yml",
     "mudancas": 4
    },
@@ -292,16 +296,12 @@
    {
     "arquivo": ".github/dependabot.yml",
     "mudancas": 3
-   },
-   {
-    "arquivo": ".github/workflows/ci-nexus.yml",
-    "mudancas": 3
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 90
+    "commits": 92
    },
    {
     "autor": "dependabot[bot]",

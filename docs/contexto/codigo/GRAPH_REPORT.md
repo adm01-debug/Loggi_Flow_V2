@@ -1,7 +1,7 @@
 # Graph Report - Loggi_Flow_V2  (2026-11-13)
 
 ## Corpus Check
-- 1246 files · ~753,948 words
+- 1246 files · ~754,021 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: .toml 6, (none) 6, .example 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bbb9bbc9`
+- Built from commit: `db887499`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
