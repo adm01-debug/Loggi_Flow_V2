@@ -1,4 +1,4 @@
-# Prod Readiness — Loggi_Flow_V2
+﻿# Prod Readiness — Loggi_Flow_V2
 
 Fechamento: 2026-11-13 (~21:55 UTC) · main `db88749` (igual origin/main) · zero PRs abertas.
 
