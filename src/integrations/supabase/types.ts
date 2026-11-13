@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
   public: {
     Tables: {
       account_lockouts: {
@@ -842,6 +837,54 @@ export type Database = {
         Relationships: []
       }
       audit_logs_y2027m06: {
+        Row: {
+          action: string
+          changed_fields: string[] | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string
+          table_name: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          action: string
+          changed_fields?: string[] | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id: string
+          table_name: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          action?: string
+          changed_fields?: string[] | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string
+          table_name?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_y2027m07: {
         Row: {
           action: string
           changed_fields: string[] | null
@@ -5668,7 +5711,19 @@ export type Database = {
         }
         Returns: undefined
       }
-      alert_slow_queries: { Args: { threshold_ms?: number }; Returns: number }
+      alert_slow_queries:
+        | {
+            Args: { threshold_ms?: number }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.alert_slow_queries(threshold_ms => int4), public.alert_slow_queries(threshold_ms => numeric). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
+        | {
+            Args: { threshold_ms?: number }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.alert_slow_queries(threshold_ms => int4), public.alert_slow_queries(threshold_ms => numeric). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
       apply_index_proposal: { Args: { p_id: string }; Returns: Json }
       auto_revert_ineffective_indexes: {
         Args: { p_min_hours?: number; p_min_improvement?: number }
@@ -5739,7 +5794,6 @@ export type Database = {
         Args: { p_month: number; p_parent: string; p_year: number }
         Returns: string
       }
-      exec_sql: { Args: { query: string }; Returns: Json }
       execute_nexus_protocol: {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
@@ -6315,6 +6369,11 @@ export type Database = {
         Returns: boolean
       }
       jsonb_recursive_merge: { Args: { a: Json; b: Json }; Returns: Json }
+      mcp_exec: { Args: { max_rows?: number; sql: string }; Returns: Json }
+      mcp_exec_many: {
+        Args: { max_rows?: number; statements: string[] }
+        Returns: Json
+      }
       measure_index_proposal_impact: { Args: { p_id: string }; Returns: Json }
       persist_db_health_snapshot: { Args: never; Returns: string }
       persist_global_health_score: { Args: never; Returns: string }
