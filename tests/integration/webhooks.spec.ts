@@ -1,6 +1,14 @@
 import { describe, it, expect } from "vitest";
+import {
+  requireString,
+  requireEnum,
+  ValidationError,
+} from "../../supabase/functions/_shared/validate";
 
-export const simulateWebhookPayload = (type: string, data: Record<string, unknown>) => {
+export const simulateWebhookPayload = (
+  type: string,
+  data: Record<string, unknown>,
+) => {
   return {
     type,
     payload: data,
@@ -9,32 +17,49 @@ export const simulateWebhookPayload = (type: string, data: Record<string, unknow
   };
 };
 
-describe("Webhook Simulation Suite", () => {
-  it("should validate carrier status updates", async () => {
+const ALLOWED_EVENTS = ["tracking.update", "tracking.created"] as const;
+
+describe("Webhook Simulation Suite (real _shared logic)", () => {
+  it("should validate carrier status updates through the production contract", async () => {
     const payload = simulateWebhookPayload("tracking.update", {
       tracking_number: "BR123456789",
       status: "DELIVERED",
-      location: "São Paulo, SP",
+      location: "Sao Paulo, SP",
     });
+
+    const body = {
+      tracking_number: String(payload.payload.tracking_number),
+      event_type: payload.type,
+      carrier_id: "RODONAVES",
+    };
 
     expect(payload.type).toBe("tracking.update");
-    expect(payload.payload.status).toBe("DELIVERED");
+    expect(() => {
+      requireString(body, "tracking_number", {
+        minLength: 9,
+        pattern: /^BR\d+$/,
+      });
+      requireString(body, "carrier_id", { minLength: 2 });
+      requireEnum(body, "event_type", ALLOWED_EVENTS);
+    }).not.toThrow();
   });
 
-  it("should handle malformed payloads (fuzzing)", () => {
-    const invalidPayloads = [
-      {},
-      { type: "test" },
-      { type: "test", payload: null },
-      { type: "test", payload: { id: "invalid-uuid" } },
-    ];
+  it("should refuse events outside the contract", () => {
+    expect(() =>
+      requireEnum(
+        { event_type: "tracking.undefined" },
+        "event_type",
+        ALLOWED_EVENTS,
+      ),
+    ).toThrow(ValidationError);
+  });
 
-    invalidPayloads.forEach((p) => {
-      // Simula a validação que seria feita na Edge Function
-      const isValid = p.type && p.payload && typeof p.payload === "object";
-      if (!p.type || !p.payload) {
-        expect(isValid).toBeFalsy();
-      }
-    });
+  it("should reject missing required fields (production fail-closed)", () => {
+    expect(() =>
+      requireString({ tracking_number: "" }, "tracking_number", {
+        minLength: 9,
+      }),
+    ).toThrow(ValidationError);
+    expect(() => requireString({}, "carrier_id")).toThrow(ValidationError);
   });
 });
