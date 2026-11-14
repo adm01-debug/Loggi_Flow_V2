@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "fee186d32896a106a2fc2220d157a4786317b7da",
+  "commit": "0b8692b671f6f64a0ee41445444ceb19289efb5a",
   "branch": "main",
-  "data_commit": "2026-11-14T09:02:27-03:00",
+  "data_commit": "2026-11-14T11:30:47-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "0b8692b6",
+    "data": "2026-11-14",
+    "assunto": "chore: inventario do estado real [auto] (#150)"
+   },
+   {
+    "sha": "fef7780f",
+    "data": "2026-11-14",
+    "assunto": "docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)"
+   },
    {
     "sha": "fee186d3",
     "data": "2026-11-14",
@@ -121,19 +131,9 @@
     "sha": "28c0f7e3",
     "data": "2026-11-08",
     "assunto": "feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi"
-   },
-   {
-    "sha": "b0a699a4",
-    "data": "2026-11-08",
-    "assunto": "fix(ci): renomeia contexto.yml → contexto-ia.yml para forçar novo registro (#115)"
-   },
-   {
-    "sha": "4b14063a",
-    "data": "2026-11-08",
-    "assunto": "docs(agentes): atualiza contagem de required checks para 9 (#113)"
    }
   ],
-  "arquivos_mudados_7d": 212,
+  "arquivos_mudados_7d": 215,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -172,6 +172,10 @@
     "mudancas": 3
    },
    {
+    "pasta": "docs/prod-readiness.md",
+    "mudancas": 3
+   },
+   {
     "pasta": "scripts/audit/manifest_detail.sql",
     "mudancas": 3
    },
@@ -189,10 +193,6 @@
    },
    {
     "pasta": "scripts/ratchet-warning-budget.mjs",
-    "mudancas": 3
-   },
-   {
-    "pasta": "src/components/accessibility",
     "mudancas": 3
    }
   ],
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 94
+    "commits": 95
    },
    {
     "autor": "dependabot[bot]",
@@ -309,12 +309,12 @@
    },
    {
     "autor": "github-actions[bot]",
-    "commits": 1
+    "commits": 2
    }
   ]
  },
  "contagens": {
-  "arquivos_total": 1280,
+  "arquivos_total": 1283,
   "arquivos_codigo": 863,
   "linhas_codigo": 165721,
   "rotas": 61,

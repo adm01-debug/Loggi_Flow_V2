@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `fee186d32896a106a2fc2220d157a4786317b7da` (2026-11-14T09:02:27-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `0b8692b671f6f64a0ee41445444ceb19289efb5a` (2026-11-14T11:30:47-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (776), SQL (257), Markdown (83), JavaScript (80), JSON (29), YAML (20), Shell (9), Python (8)
+- linguagens: TypeScript (776), SQL (257), Markdown (83), JavaScript (80), JSON (32), YAML (20), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,7 +34,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1280 |
+| arquivos_total | 1283 |
 | arquivos_codigo | 863 |
 | linhas_codigo | 165721 |
 | rotas | 61 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8009 nós · 20274 arestas · 686 comunidades · grafo do commit `fee186d3`
-- comunidades maiores: cn (213), lucide-react (207), sonner (190), button.tsx (170), ref_node_path (142), react (141), date-fns (130), db-observability/index.ts (130), @tanstack/react-query (121), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (97), gerar.mjs (81)
+- 8009 nós · 20273 arestas · 687 comunidades · grafo do commit `0b8692b6`
+- comunidades maiores: lucide-react (211), cn (186), db-observability/index.ts (159), input.tsx (145), ref_node_fs (131), @tanstack/react-query (127), Button (116), button.tsx (113), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), react (95), client.ts (86), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -393,11 +393,13 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `docs/SLO.md` — 📈 Service Level Objectives (SLOs) — LogiFlow (40 linhas)
 - `docs/SOFT_DELETE_POLICY.md` — Política de Soft Delete — LogiFlow (30 linhas)
 - `docs/SRE_HANDBOOK.md` — 🚒 LOGIFLOW SRE & ON-CALL HANDBOOK (24 linhas)
-- `docs/prod-readiness.md` — Prod Readiness — Loggi_Flow_V2 (67 linhas)
+- `docs/prod-readiness.md` — Prod Readiness — Loggi_Flow_V2 (73 linhas)
 - subpastas de docs/: docs/adr (20), docs/agentes (7), docs/audit (2), docs/contexto (2), docs/data (1)
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-14 `0b8692b6` chore: inventario do estado real [auto] (#150)
+- 2026-11-14 `fef7780f` docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)
 - 2026-11-14 `fee186d3` docs: prod-readiness — registra Data Integrity BLOQUEADO e status reais (#151)
 - 2026-11-13 `a49bf31e` docs: fecha prod-readiness com inventario e evidencia (#147)
 - 2026-11-13 `db887499` docs: registra quirk do cache do GET /secrets da Management API (RESEND_API_KEY) (#146)
@@ -411,8 +413,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-12 `2e9137fa` chore(deps): bump actions/cache from 4 to 6 (#126)
 - 2026-11-12 `3d4fd588` chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)
 - 2026-11-12 `02901100` chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)
-- 2026-11-12 `3fad225d` style: aplica correcoes locais verificadas (#136)
-- 2026-11-11 `60b8d213` feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

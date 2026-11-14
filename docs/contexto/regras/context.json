@@ -1,10 +1,10 @@
 {
  "meta": {
-  "sha": "fee186d32896a106a2fc2220d157a4786317b7da",
+  "sha": "0b8692b671f6f64a0ee41445444ceb19289efb5a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-14 12:42 UTC",
-  "files_total": 1290,
+  "generated_at": "2026-11-14 14:42 UTC",
+  "files_total": 1293,
   "code_files": 1121,
   "code_lines": 181459,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
@@ -88077,10 +88077,30 @@
   }
  },
  "git": {
-  "sha": "fee186d32896a106a2fc2220d157a4786317b7da",
+  "sha": "0b8692b671f6f64a0ee41445444ceb19289efb5a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "0b8692b",
+    "date": "2026-11-14",
+    "author": "github-actions[bot]",
+    "subject": "chore: inventario do estado real [auto] (#150)",
+    "files": [
+     "inventario/estado/banco.json",
+     "inventario/estado/edges.json",
+     "inventario/estado/rotas.json"
+    ]
+   },
+   {
+    "sha": "fef7780",
+    "date": "2026-11-14",
+    "author": "adm01-debug",
+    "subject": "docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)",
+    "files": [
+     "docs/prod-readiness.md"
+    ]
+   },
    {
     "sha": "fee186d",
     "date": "2026-11-14",
@@ -88554,43 +88574,6 @@
     "files": [
      ".github/workflows/contexto.yml"
     ]
-   },
-   {
-    "sha": "d6a824f",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "fix(index): remover div oculto com textos de prompt internos",
-    "files": [
-     "index.html"
-    ]
-   },
-   {
-    "sha": "44ea285",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "chore(contexto): automação de contexto para agentes de IA (branch `contexto`) (#104)",
-    "files": [
-     ".github/workflows/contexto.yml",
-     ".gitignore",
-     "AGENTS.md",
-     "ai-context.config.json",
-     "docs/agentes/contexto-ia.md",
-     "docs/contexto/regras/manual/README.md",
-     "docs/contexto/regras/manual/TEMPLATE-regras-de-negocio.md",
-     "scripts/ai-context/README.md",
-     "scripts/ai-context/cenarios.mjs",
-     "scripts/ai-context/gerar.mjs",
-     "scripts/ai-context/gerar.unit.mjs",
-     "scripts/regras_negocio/README.md",
-     "scripts/regras_negocio/generate.py",
-     "scripts/regras_negocio/indice.py",
-     "scripts/regras_negocio/publish.sh",
-     "scripts/regras_negocio/test_generate.py",
-     "scripts/supabase_snapshot/README.md",
-     "scripts/supabase_snapshot/requirements.txt",
-     "scripts/supabase_snapshot/snapshot.py",
-     "scripts/supabase_snapshot/test_snapshot.py"
-    ]
    }
   ],
   "hot_files": [
@@ -88601,6 +88584,10 @@
    [
     ".github/workflows/types-sync.yml",
     4
+   ],
+   [
+    "docs/prod-readiness.md",
+    3
    ],
    [
     "scripts/ci/github-settings-baseline.json",
@@ -88617,18 +88604,6 @@
    [
     "docs/agentes/github-ci.md",
     3
-   ],
-   [
-    ".gitignore",
-    3
-   ],
-   [
-    "AGENTS.md",
-    3
-   ],
-   [
-    "docs/prod-readiness.md",
-    2
    ],
    [
     "scripts/ops/README.md",
@@ -88659,6 +88634,10 @@
     2
    ],
    [
+    ".gitignore",
+    2
+   ],
+   [
     "package.json",
     2
    ],
@@ -88667,11 +88646,15 @@
     2
    ],
    [
-    "scripts/ai-context/README.md",
+    "scripts/ci/README.md",
     2
    ],
    [
-    "scripts/ai-context/cenarios.mjs",
+    "scripts/ci/actions-kpi.mjs",
+    2
+   ],
+   [
+    "scripts/ci/branch-podaveis.mjs",
     2
    ]
   ]

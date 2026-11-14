@@ -7,7 +7,7 @@
    "SQL (257)",
    "Markdown (83)",
    "JavaScript (80)",
-   "JSON (29)",
+   "JSON (32)",
    "YAML (20)",
    "Shell (9)",
    "Python (8)"
@@ -867,7 +867,7 @@
   {
    "arquivo": "docs/prod-readiness.md",
    "titulo": "Prod Readiness — Loggi_Flow_V2",
-   "linhas": 67
+   "linhas": 73
   }
  ],
  "docs_em_subpastas": [
