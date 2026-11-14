@@ -39,7 +39,7 @@ on:
       - 'tsconfig*.json'
       - '.github/workflows/contexto-ia.yml'
   schedule:
-    - cron: '7-59/10 * * * *' # minuto 7: fora do minuto 0 (fila do GitHub)
+    - cron: '7 * * * *' # minuto 7: fora do minuto 0 (fila do GitHub)
   workflow_dispatch:
     inputs:
       graphify:
