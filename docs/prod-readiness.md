@@ -1,6 +1,6 @@
-﻿# Prod Readiness — Loggi_Flow_V2
+# Prod Readiness — Loggi_Flow_V2
 
-Fechamento: 2026-11-13 (~21:55 UTC) · main `db88749` (igual origin/main) · zero PRs abertas.
+Fechamento: 2026-11-14 · main `a49bf31e` (igual origin/main) · PR abertas atuais: #150 (automation/inventario-estado, não relacionada).
 
 Regra: regressão = item que deixou de ser OK. Toda prova é de comando/query/request real deste documento.
 
@@ -35,12 +35,12 @@ contexto-ia, deploy-functions, e2e, inventario-estado-semanal, notifica-falha-ma
 scripts-tests, security, settings-guard, sync-internal-secret, types-sync.
 **OK (green)** CI/CD, automation-local, scripts-tests, security, ci-nexus,
 sync-internal-secret, types-sync, codeql (último run success).
-**BLOQUEADO/fila** deploy edge functions (43511750479) — fila de runners; workflow do main já contém `--yes` (causa do 3 faitnes pré-#144).
+**BLOQUEADO/fila** deploy edge functions (43511750479) — fila de runners; workflow do main já contém `--yes` (causa das 3 falhas pré-#144).
 
 ### Integrações/crons — 28 crons ativos
 **OK** 0 execuções com erro em 7 dias (`cron.job_run_details`).
 
-## 2. Qualidade (main db88749, local)
+## 2. Qualidade (main a49bf31e, local)
 **OK** exit 0: typecheck, lint (102≤105), lint:budget, test:coverage (257 testes/30 arquivos),
 build (32.41s, PWA 253 entries), validate:no-console. Nenhum teste removido/pulado.
 
@@ -54,9 +54,14 @@ build (32.41s, PWA 253 entries), validate:no-console. Nenhum teste removido/pula
 Não são removíveis sem fonte real de dados — exige decisão de negócio (evitar regressão).
 **OK** `.env` versionado: 4 chaves VITE_* publishable, não secretas.
 **BLOQUEADO (decisão dono)** remover `.env` do versionamento (higiene/segurança, regra 8).
+**BLOQUEADO (Data Integrity)** `ai_delay_predictions` = 0 registros: a previsão de atrasos roda
+(66x succeeded em 7d, 0 erro) mas gera 0 predições porque a fonte está vazia —
+`predict-delays/index.ts` lê de `entregas`, `coletas`, `ocorrencias`, todas com 0 linhas.
+Nenhuma tabela public de transporte tem dados (`manifest` fica em `audit_tmp`).
+Requer conectar a ingestão de transportes (decisão de negócio).
 
 ## 5. Aguardando / a decidir
-- Deploy edge functions: aguarda runner (run 43511750479); workflow já com `--yes`.
-- Re-disparados para prova no main atual: inventário semanal (43512924603), branch-hygiene
-  (43512924390), settings-guard (43512924384) — verificar conclusão.
+- Deploy edge functions: success (run 43511750479, main com --yes do #144) — 43 functions ACTIVE.
+- Re-disparados em main atual: inventário semanal (43512924603) = success; branch-hygiene
+  (43512924390) = success; settings-guard (43512924384) = failure por 403 (monitoramento agendado).
 - Preview "perimetro-leitura": projeto NÃO existe na conta Vercel (token vcp_); item sem efeito.
