@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "a49bf31e5dacc70784aa584ff3b30fd57d388c88",
+  "commit": "fee186d32896a106a2fc2220d157a4786317b7da",
   "branch": "main",
-  "data_commit": "2026-11-13T19:37:19-03:00",
+  "data_commit": "2026-11-14T09:02:27-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "fee186d3",
+    "data": "2026-11-14",
+    "assunto": "docs: prod-readiness — registra Data Integrity BLOQUEADO e status reais (#151)"
+   },
    {
     "sha": "a49bf31e",
     "data": "2026-11-13",
@@ -126,11 +131,6 @@
     "sha": "4b14063a",
     "data": "2026-11-08",
     "assunto": "docs(agentes): atualiza contagem de required checks para 9 (#113)"
-   },
-   {
-    "sha": "10d5df3a",
-    "data": "2026-11-08",
-    "assunto": "feat(ci): porta 7 workflows autônomos genéricos do Zapp (#112)"
    }
   ],
   "arquivos_mudados_7d": 212,
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 93
+    "commits": 94
    },
    {
     "autor": "dependabot[bot]",

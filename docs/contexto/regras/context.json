@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "a49bf31e5dacc70784aa584ff3b30fd57d388c88",
+  "sha": "fee186d32896a106a2fc2220d157a4786317b7da",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-13 23:13 UTC",
+  "generated_at": "2026-11-14 12:42 UTC",
   "files_total": 1290,
   "code_files": 1121,
   "code_lines": 181459,
@@ -88077,10 +88077,19 @@
   }
  },
  "git": {
-  "sha": "a49bf31e5dacc70784aa584ff3b30fd57d388c88",
+  "sha": "fee186d32896a106a2fc2220d157a4786317b7da",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "fee186d",
+    "date": "2026-11-14",
+    "author": "adm01-debug",
+    "subject": "docs: prod-readiness — registra Data Integrity BLOQUEADO e status reais (#151)",
+    "files": [
+     "docs/prod-readiness.md"
+    ]
+   },
    {
     "sha": "a49bf31",
     "date": "2026-11-13",
@@ -88582,27 +88591,6 @@
      "scripts/supabase_snapshot/snapshot.py",
      "scripts/supabase_snapshot/test_snapshot.py"
     ]
-   },
-   {
-    "sha": "b43d84b",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "fix(deps): destrava a CI do repo — lockfile, tipos Recharts 3, ruleset do React Compiler e 4 CVEs (#108)",
-    "files": [
-     ".warning-budget.json",
-     "eslint.config.js",
-     "package-lock.json",
-     "src/components/admin/telemetry/TelemetryCharts.tsx",
-     "src/components/freight/AIFreightForecasting.tsx",
-     "src/components/freight/StrategySimulator.tsx",
-     "src/components/predictions/PredictionAccuracyTimeline.tsx",
-     "src/components/rodonaves/RTELatencyTrendChart.tsx",
-     "src/components/ui/chart.tsx",
-     "src/pages/CustosDashboard.tsx",
-     "src/pages/InteligenciaFrete.tsx",
-     "src/pages/PainelOTIF.tsx",
-     "src/pages/Relatorios.tsx"
-    ]
    }
   ],
   "hot_files": [
@@ -88637,6 +88625,10 @@
    [
     "AGENTS.md",
     3
+   ],
+   [
+    "docs/prod-readiness.md",
+    2
    ],
    [
     "scripts/ops/README.md",
@@ -88680,10 +88672,6 @@
    ],
    [
     "scripts/ai-context/cenarios.mjs",
-    2
-   ],
-   [
-    "scripts/ai-context/gerar.mjs",
     2
    ]
   ]
