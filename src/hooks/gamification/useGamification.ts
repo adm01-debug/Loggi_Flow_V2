@@ -1,9 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/auth/useAuth";
 
-type ProfileWithXP = {
-  xp?: number | null;
+type UserLevelRow = {
+  current_xp?: number | null;
+  total_xp?: number | null;
+  level?: number | null;
   coins?: number | null;
+  streak_days?: number | null;
+  nexus_score?: number | null;
+  rank?: { name: string; color: string } | null;
   [key: string]: unknown;
 };
 
@@ -54,20 +60,26 @@ const tierToRarity = (tier: RankBadge["tier"]): RankBadge["rarity"] => {
   return "common";
 };
 
-export const useGamification = (userId?: string) => {
+export const useGamification = (userIdParam?: string) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  // P23: a maioria dos consumidores chama useGamification() sem argumento.
+  // Sem este fallback o `enabled: !!userId` desligava todas as queries e o
+  // saldo/XP/nivel apareciam zerados em toda a UI.
+  const userId = userIdParam ?? user?.id;
 
   const { data: profile, isLoading: loadingProfile } = useQuery({
-    queryKey: ["profile", userId],
+    queryKey: ["userLevel", userId],
     enabled: !!userId,
     queryFn: async () => {
+      // P23: XP e moedas vivem em user_levels; profiles nao tem xp/coins.
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId as string)
-        .single();
+        .from("user_levels")
+        .select("*, rank:user_ranks(*)")
+        .eq("user_id", userId as string)
+        .maybeSingle();
       if (error) throw error;
-      return data as unknown as ProfileWithXP;
+      return data as unknown as UserLevelRow | null;
     },
   });
 
@@ -156,14 +168,17 @@ export const useGamification = (userId?: string) => {
     },
   });
 
-  const xpValue = profile?.xp || 0;
-  const levelValue = Math.floor(Math.sqrt(xpValue / 100)) + 1;
-  const currentLevelXP = Math.pow(levelValue - 1, 2) * 100;
-  const nextLevelXP = Math.pow(levelValue, 2) * 100;
+  const xpValue = profile?.total_xp || 0;
+  const levelValue = profile?.level || Math.floor(Math.sqrt(xpValue / 100)) + 1;
+  const levelStartXP = Math.pow(levelValue - 1, 2) * 100;
+  const levelEndXP = Math.pow(levelValue, 2) * 100;
+  // XP relativo ao nivel atual: a sidebar exibe `currentLevelXP / nextLevelXP`
+  // como progresso dentro do nivel, e os valores absolutos nao variavam
+  // conforme o usuario ganhava XP.
+  const currentLevelXP = Math.max(0, xpValue - levelStartXP);
+  const nextLevelXP = Math.max(0, levelEndXP - levelStartXP);
   const progressPercent =
-    nextLevelXP > currentLevelXP
-      ? ((xpValue - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
-      : 100;
+    nextLevelXP > 0 ? Math.min(100, (currentLevelXP / nextLevelXP) * 100) : 100;
 
   const userLevel = {
     level: levelValue,
@@ -171,9 +186,9 @@ export const useGamification = (userId?: string) => {
     total_xp: xpValue,
     coins: profile?.coins || 0,
     progress: progressPercent,
-    rank: { name: "Novato", color: "#94a3b8" },
-    streak_days: 1,
-    current_xp: xpValue,
+    rank: profile?.rank ?? { name: "Novato", color: "#94a3b8" },
+    streak_days: profile?.streak_days ?? 0,
+    current_xp: profile?.current_xp ?? xpValue,
   };
 
   return {
@@ -204,10 +219,24 @@ export const useGamification = (userId?: string) => {
         .from("user_achievements")
         .insert({ user_id: userId, achievement_id: badgeId });
       if (error && (error as { code?: string }).code !== "23505") throw error;
+      // Concede a recompensa da conquista. Nao existe trigger no banco que
+      // pague `xp_reward`/`coins_reward` (o unico em user_achievements apenas
+      // notifica), entao sem este passo o usuario desbloqueava a conquista e
+      // nao recebia nada. So paga quando o insert foi novo (23505 = ja tinha).
+      if (!error) {
+        const badge = (badges || []).find(
+          (b) => (b as { id?: string }).id === badgeId,
+        ) as { xp_reward?: number; coins_reward?: number } | undefined;
+        const xp = badge?.xp_reward ?? 0;
+        const coins = badge?.coins_reward ?? 0;
+        if (xp > 0 || coins > 0) {
+          await awardPointsMutation.mutateAsync({ xp, coins });
+        }
+      }
       queryClient.invalidateQueries({
         queryKey: ["user_achievements", userId],
       });
     },
-    nexusScore: 85,
+    nexusScore: (profile?.nexus_score as number | null) ?? 85,
   };
 };

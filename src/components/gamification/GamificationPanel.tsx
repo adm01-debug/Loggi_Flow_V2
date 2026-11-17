@@ -44,7 +44,7 @@ export const GamificationPanel: React.FC = () => {
           </div>
           <div className="text-right">
             <div className="text-sm font-bold text-muted-foreground mb-1">
-              {userLevel.xp} / {levelProgress.nextLevelXP} XP
+              {levelProgress.currentLevelXP} / {levelProgress.nextLevelXP} XP
             </div>
             <div className="text-2xl font-black text-primary">
               {Math.round(levelProgress.progress)}%
