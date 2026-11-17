@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)",
+   "fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)",
    "fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)",
    "chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)",
-   "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)",
-   "chore(db): sincronizar artefatos com o banco [auto] (#166)",
-   "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)"
+   "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

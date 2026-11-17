@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `221e61e03f1544baac2325759ba1020d20e85933` (2026-11-17T14:10:41-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `1000cd96e53490bc601b16dec946b22194767aae` (2026-11-17T15:08:33-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1298 |
 | arquivos_codigo | 875 |
-| linhas_codigo | 167005 |
+| linhas_codigo | 167078 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,14 +274,14 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:74, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8104 nós · 20478 arestas · 691 comunidades · grafo do commit `221e61e0`
-- comunidades maiores: lucide-react (209), Button (205), react (202), cn (199), db-observability/index.ts (158), utils.ts (111), useAuth (104), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ref_node_path (102), client.ts (87), @tanstack/react-query (82), gerar.mjs (81)
+- 8109 nós · 20488 arestas · 699 comunidades · grafo do commit `1000cd96`
+- comunidades maiores: react (272), cn (254), lucide-react (218), db-observability/index.ts (150), Button (136), dialog.tsx (120), supabase (109), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ref_node_path (103), useAuth (102), button.tsx (94), GeoBlockingPanel.tsx (94)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
-- package-lock.json (41)
-- package.json (40)
+- package-lock.json (42)
+- package.json (41)
 - index.html (9)
 - src/hooks/gamification/useGamification.ts (9)
 - .github/workflows/contexto-ia.yml (6)
@@ -290,11 +290,11 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/validate-csp.mjs (5)
 - supabase/config.toml (5)
+- tests/security/integrations-access.spec.ts (5)
+- tests/security/rls-access.spec.ts (5)
 - .github/workflows/ci-nexus.yml (4)
 - .github/workflows/deploy-functions.yml (4)
 - .github/workflows/inventario-estado-semanal.yml (4)
-- AGENTS.md (4)
-- docs/agentes/github-ci.md (4)
 
 ## Workflows
 - `auto-update-pr-branch.yml` — Auto Update PR Branches (push, schedule, workflow_dispatch, workflow_run; cron 7,37 * * * *)
@@ -399,6 +399,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `1000cd96` chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)
+- 2026-11-17 `cf7f3983` fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)
 - 2026-11-17 `221e61e0` fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)
 - 2026-11-17 `f61ccee4` chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)
 - 2026-11-17 `4c167602` fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)
@@ -412,8 +414,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `8ea7b1f3` fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)
 - 2026-11-17 `5b14adc0` fix: previsao de frete deixa de ser numero inventado (#159)
 - 2026-11-17 `f680a648` fix: alertas de divergencia e falha de frete sumiam da home (#158)
-- 2026-11-17 `4496d9f3` fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)
-- 2026-11-17 `8071e4a5` docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

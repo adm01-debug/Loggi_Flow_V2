@@ -205,7 +205,7 @@
   {
    "arquivo": "scripts/gates/audit-gate.unit.mjs",
    "tipo": "unit",
-   "linhas": 92,
+   "linhas": 120,
    "testa": [
     "scripts/gates/helpers.mjs"
    ],

@@ -2374,7 +2374,7 @@
    "hooks_exportados": [
     "useImageUpload"
    ],
-   "linhas": 157,
+   "linhas": 156,
    "dominio": "hooks/data",
    "tabelas": [],
    "rpcs": [],
@@ -2445,7 +2445,7 @@
     "useMultiTableRealtime",
     "useRealtime"
    ],
-   "linhas": 257,
+   "linhas": 256,
    "dominio": "hooks/data",
    "tabelas": [],
    "rpcs": [],
@@ -2527,7 +2527,7 @@
    "hooks_exportados": [
     "useAchievementNotifications"
    ],
-   "linhas": 71,
+   "linhas": 70,
    "dominio": "hooks/gamification",
    "tabelas": [],
    "rpcs": [],

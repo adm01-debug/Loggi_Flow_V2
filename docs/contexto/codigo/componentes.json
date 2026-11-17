@@ -2490,7 +2490,7 @@
     "UpdatePrompt"
    ],
    "export_default": null,
-   "linhas": 104,
+   "linhas": 103,
    "dominio": "components/pwa",
    "hooks_locais": [],
    "tabelas": [],
@@ -3036,7 +3036,7 @@
     "PermissionMatrix"
    ],
    "export_default": null,
-   "linhas": 287,
+   "linhas": 286,
    "dominio": "components/security",
    "hooks_locais": [
     "useAuth"
@@ -3432,7 +3432,7 @@
     "ButtonProps"
    ],
    "export_default": null,
-   "linhas": 277,
+   "linhas": 276,
    "dominio": "components/ui",
    "hooks_locais": [],
    "tabelas": [],
@@ -4988,7 +4988,7 @@
     "AchievementProvider"
    ],
    "export_default": null,
-   "linhas": 71,
+   "linhas": 70,
    "dominio": "hooks/gamification",
    "hooks_locais": [
     "useAchievementNotifications"
