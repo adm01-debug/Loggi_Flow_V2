@@ -669,7 +669,8 @@
   "src/components/freight/AIFreightForecasting.tsx": [
    "src/components/ui/badge.tsx",
    "src/components/ui/card.tsx",
-   "src/lib/formatters.ts"
+   "src/lib/formatters.ts",
+   "src/lib/freightForecast.ts"
   ],
   "src/components/freight/CargoTemplates.tsx": [
    "src/components/common/ConfirmDialog.tsx",
@@ -3029,6 +3030,9 @@
   ],
   "src/lib/excelImporter.ts": [
    "src/lib/csvImporter.ts"
+  ],
+  "src/lib/freightForecast.ts": [
+   "src/lib/formatters.ts"
   ],
   "src/lib/index.ts": [
    "src/lib/constants.ts",

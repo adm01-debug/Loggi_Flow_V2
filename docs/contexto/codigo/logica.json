@@ -1,10 +1,10 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 44,
+ "total": 45,
  "por_camada": {
   "integrations": 4,
-  "lib": 26,
+  "lib": 27,
   "python": 3,
   "services": 5,
   "utils": 6
@@ -579,13 +579,47 @@
    "zod_schemas": 0,
    "flags": [],
    "papeis": [],
-   "usado_por": 16,
+   "usado_por": 17,
    "usado_por_modulos": [
     "components/freight",
     "components/transportadoras",
     "lib",
     "pages",
     "pages/conciliacao"
+   ],
+   "coberto_por_testes": 1,
+   "orfao": false
+  },
+  {
+   "arquivo": "src/lib/freightForecast.ts",
+   "camada": "lib",
+   "exports": [
+    "EntradaFrete",
+    "FonteInsights",
+    "InsightFrete",
+    "MESES_HISTORICO",
+    "MESES_PROJECAO",
+    "MINIMO_MESES_REAIS",
+    "PontoFrete",
+    "PrevisaoFrete",
+    "gerarInsightsFrete",
+    "montarPrevisaoFrete",
+    "projetarTendencia",
+    "serieHistoricaFrete"
+   ],
+   "export_default": null,
+   "linhas": 280,
+   "tabelas": [],
+   "rpcs": [],
+   "edges": [],
+   "env": [],
+   "externos": [],
+   "zod_schemas": 0,
+   "flags": [],
+   "papeis": [],
+   "usado_por": 1,
+   "usado_por_modulos": [
+    "components/freight"
    ],
    "coberto_por_testes": 1,
    "orfao": false

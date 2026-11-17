@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "f680a6482180b36e10542f2584c77ddf91c0adbc",
+  "sha": "5b14adc0d14397dfcdcfda118305c651563c907e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 14:11 UTC",
-  "files_total": 1297,
-  "code_files": 1124,
-  "code_lines": 181843,
+  "generated_at": "2026-11-17 14:22 UTC",
+  "files_total": 1299,
+  "code_files": 1126,
+  "code_lines": 182406,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "aa3bd4bc7e514cc2",
+ "facts_hash": "c449ebe8e2bdcb49",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -292,7 +292,7 @@
   "package_manager": "bun",
   "languages": {
    ".tsx": 453,
-   ".ts": 326,
+   ".ts": 328,
    ".sql": 257,
    ".mjs": 77,
    ".py": 8,
@@ -24492,7 +24492,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 172
+    "deps_count": 173
    },
    {
     "path": "/cotacao-multicanal",
@@ -24570,7 +24570,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 174
+    "deps_count": 175
    },
    {
     "path": "/custos",
@@ -25028,7 +25028,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 159
+    "deps_count": 160
    },
    {
     "path": "/kanban-entregas",
@@ -29260,7 +29260,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48396,
+   "lines": 48525,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29950,8 +29950,8 @@
   },
   {
    "module": "src/lib",
-   "files": 42,
-   "lines": 5794,
+   "files": 44,
+   "lines": 6222,
    "tables": [],
    "exports": [
     "conciliacaoImport.ts: ConciliacaoImportItem, readSheetRows, toISODate, parseImportRows",
@@ -29960,6 +29960,7 @@
     "excelImporter.ts: importExcel, exportToExcel, getSheetNames",
     "exportUtils.ts: exportToCSV, exportToPDF",
     "formatters.ts: formatDate, formatDateTime, formatRelativeTime, formatCurrency, formatNumber, formatPercent",
+    "freightForecast.ts: MESES_HISTORICO, MESES_PROJECAO, MINIMO_MESES_REAIS, EntradaFrete, PontoFrete, InsightFrete",
     "queryConfig.ts: QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL",
     "queryKeys.ts: QUERY_KEYS",
     "utils.ts: cn",
@@ -30008,6 +30009,8 @@
     "src/lib/exportUtils.ts",
     "src/lib/formatters.parse.test.ts",
     "src/lib/formatters.ts",
+    "src/lib/freightForecast.test.ts",
+    "src/lib/freightForecast.ts",
     "src/lib/index.ts",
     "src/lib/queryConfig.ts",
     "src/lib/queryKeys.ts",
@@ -30047,7 +30050,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30687,
+   "lines": 30693,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -41298,6 +41301,21 @@
     "value": "5000"
    },
    {
+    "file": "src/lib/freightForecast.ts",
+    "name": "MESES_HISTORICO",
+    "value": "6"
+   },
+   {
+    "file": "src/lib/freightForecast.ts",
+    "name": "MESES_PROJECAO",
+    "value": "3"
+   },
+   {
+    "file": "src/lib/freightForecast.ts",
+    "name": "MINIMO_MESES_REAIS",
+    "value": "3"
+   },
+   {
     "file": "src/lib/predictions/whatIfScenarios.ts",
     "name": "MAX_SCENARIOS",
     "value": "20"
@@ -42169,24 +42187,6 @@
     "file": "src/components/dashboard/TransportadoraRanking.tsx",
     "field": "type",
     "value": "spring",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/freight/AIFreightForecasting.tsx",
-    "field": "type",
-    "value": "warning",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/freight/AIFreightForecasting.tsx",
-    "field": "type",
-    "value": "success",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/freight/AIFreightForecasting.tsx",
-    "field": "type",
-    "value": "info",
     "kind": "escreve"
    },
    {
@@ -44305,6 +44305,30 @@
     "file": "src/lib/excelImporter.ts",
     "field": "type",
     "value": "array",
+    "kind": "escreve"
+   },
+   {
+    "file": "src/lib/freightForecast.ts",
+    "field": "type",
+    "value": "warning",
+    "kind": "escreve"
+   },
+   {
+    "file": "src/lib/freightForecast.ts",
+    "field": "type",
+    "value": "warning",
+    "kind": "escreve"
+   },
+   {
+    "file": "src/lib/freightForecast.ts",
+    "field": "type",
+    "value": "success",
+    "kind": "escreve"
+   },
+   {
+    "file": "src/lib/freightForecast.ts",
+    "field": "type",
+    "value": "info",
     "kind": "escreve"
    },
    {
@@ -46710,6 +46734,12 @@
     "body": "if (value === null || value === undefined) return \"-\"; return new Intl.NumberFormat(\"pt-BR\", { style: \"currency\", currency: \"BRL\", }).format(value);"
    },
    {
+    "file": "src/lib/freightForecast.ts",
+    "name": "gerarInsightsFrete",
+    "params": "fonte: FonteInsights",
+    "body": "return [ insightTendencia(fonte.variacaoProjetada), insightAbusivos(fonte.abusivos), insightConsolidacao(fonte.consolidacao), insightTransportadora(fonte.melhorTransportadora), ].filter((i): i is InsightFrete => i !== null);"
+   },
+   {
     "file": "src/lib/validations.ts",
     "name": "validateCNPJDigits",
     "params": "cnpj: string",
@@ -47552,14 +47582,6 @@
     "line": "<span>100% Evolução</span>"
    },
    {
-    "file": "src/components/freight/AIFreightForecasting.tsx",
-    "line": "{ name: \"Fev\", real: currentTotal * 0.9, pred: currentTotal * 0.88 },"
-   },
-   {
-    "file": "src/components/freight/AIFreightForecasting.tsx",
-    "line": "{ name: \"Jan\", real: currentTotal * 0.8, pred: currentTotal * 0.82 },"
-   },
-   {
     "file": "src/components/freight/NegotiationAssistant.tsx",
     "line": "({carrierName}) está 12% abaixo da sua média mensal para este"
    },
@@ -48052,6 +48074,78 @@
    {
     "file": "src/lib/formatters.parse.test.ts",
     "name": "returns null for empty / invalid / nullish input"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "serieHistoricaFrete"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "devolve vazio sem entrada"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "soma por mes e completa mes vazio dentro da janela com zero"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "nao recua alem de 6 meses mesmo com dado antigo"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "ignora data invalida"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "projetarTendencia"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "extrapola reta perfeita"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "nao projeta valor negativo"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "exige ao menos 2 pontos"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "montarPrevisaoFrete"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "nao projeta com menos de 3 meses de base"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "projeta 3 meses ancorados no ultimo real"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "devolve serie vazia quando nao ha frete"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "gerarInsightsFrete"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "nao inventa insight sem dado"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "ignora variacao irrelevante"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "deriva cada insight da sua fonte real"
+   },
+   {
+    "file": "src/lib/freightForecast.test.ts",
+    "name": "descarta transportadora sem economia"
    },
    {
     "file": "src/lib/predictions/mitigationROI.test.ts",
@@ -56264,8 +56358,8 @@
      ],
      "info": [
       "escreve:src/components/common/ConfirmProvider.tsx",
-      "escreve:src/components/freight/AIFreightForecasting.tsx",
       "escreve:src/hooks/notifications/useNotifications.tsx",
+      "escreve:src/lib/freightForecast.ts",
       "escreve:src/pages/MapaRotas.tsx",
       "escreve:supabase/functions/accuracy-weekly-digest/index.ts"
      ],
@@ -56325,16 +56419,6 @@
       "compara:src/components/dashboard/PerformanceChart.tsx",
       "compara:src/components/ui/skeletons.tsx"
      ],
-     "warning": [
-      "compara:src/components/notifications/UserNotificationCenter.tsx",
-      "escreve:src/components/freight/AIFreightForecasting.tsx",
-      "escreve:src/hooks/logistics/useSLANotifications.tsx",
-      "escreve:supabase/functions/accuracy-meta-monitor/index.ts"
-     ],
-     "success": [
-      "compara:src/components/notifications/UserNotificationCenter.tsx",
-      "escreve:src/components/freight/AIFreightForecasting.tsx"
-     ],
      "geojson": [
       "escreve:src/components/map/MapboxMap.tsx"
      ],
@@ -56372,6 +56456,16 @@
      "entrega_atrasada": [
       "compara:src/components/notifications/NotificationCenter.tsx",
       "escreve:src/hooks/logistics/useSmartAlerts.tsx"
+     ],
+     "success": [
+      "compara:src/components/notifications/UserNotificationCenter.tsx",
+      "escreve:src/lib/freightForecast.ts"
+     ],
+     "warning": [
+      "compara:src/components/notifications/UserNotificationCenter.tsx",
+      "escreve:src/hooks/logistics/useSLANotifications.tsx",
+      "escreve:src/lib/freightForecast.ts",
+      "escreve:supabase/functions/accuracy-meta-monitor/index.ts"
      ],
      "error": [
       "compara:src/components/notifications/UserNotificationCenter.tsx",
@@ -70003,30 +70097,9 @@
   },
   "src/components/freight/AIFreightForecasting.tsx": {
    "path": "src/components/freight/AIFreightForecasting.tsx",
-   "lines": 115,
+   "lines": 244,
    "exports": [
     "function AIFreightForecasting"
-   ],
-   "status_values": [
-    {
-     "field": "type",
-     "value": "warning",
-     "kind": "escreve"
-    },
-    {
-     "field": "type",
-     "value": "success",
-     "kind": "escreve"
-    },
-    {
-     "field": "type",
-     "value": "info",
-     "kind": "escreve"
-    }
-   ],
-   "percents": [
-    "{ name: \"Fev\", real: currentTotal * 0.9, pred: currentTotal * 0.88 },",
-    "{ name: \"Jan\", real: currentTotal * 0.8, pred: currentTotal * 0.82 },"
    ]
   },
   "src/components/freight/CargoTemplates.tsx": {
@@ -79178,6 +79251,92 @@
     }
    ]
   },
+  "src/lib/freightForecast.test.ts": {
+   "path": "src/lib/freightForecast.test.ts",
+   "lines": 148,
+   "is_test": true,
+   "tests": [
+    "serieHistoricaFrete",
+    "devolve vazio sem entrada",
+    "soma por mes e completa mes vazio dentro da janela com zero",
+    "nao recua alem de 6 meses mesmo com dado antigo",
+    "ignora data invalida",
+    "projetarTendencia",
+    "extrapola reta perfeita",
+    "nao projeta valor negativo",
+    "exige ao menos 2 pontos",
+    "montarPrevisaoFrete",
+    "nao projeta com menos de 3 meses de base",
+    "projeta 3 meses ancorados no ultimo real",
+    "devolve serie vazia quando nao ha frete",
+    "gerarInsightsFrete",
+    "nao inventa insight sem dado",
+    "ignora variacao irrelevante",
+    "deriva cada insight da sua fonte real",
+    "descarta transportadora sem economia"
+   ]
+  },
+  "src/lib/freightForecast.ts": {
+   "path": "src/lib/freightForecast.ts",
+   "lines": 280,
+   "exports": [
+    "const MESES_HISTORICO",
+    "const MESES_PROJECAO",
+    "const MINIMO_MESES_REAIS",
+    "interface EntradaFrete",
+    "interface PontoFrete",
+    "interface InsightFrete",
+    "function serieHistoricaFrete",
+    "function projetarTendencia",
+    "interface PrevisaoFrete",
+    "function montarPrevisaoFrete",
+    "interface FonteInsights",
+    "function gerarInsightsFrete"
+   ],
+   "params": [
+    {
+     "name": "MESES_HISTORICO",
+     "value": "6"
+    },
+    {
+     "name": "MESES_PROJECAO",
+     "value": "3"
+    },
+    {
+     "name": "MINIMO_MESES_REAIS",
+     "value": "3"
+    }
+   ],
+   "status_values": [
+    {
+     "field": "type",
+     "value": "warning",
+     "kind": "escreve"
+    },
+    {
+     "field": "type",
+     "value": "warning",
+     "kind": "escreve"
+    },
+    {
+     "field": "type",
+     "value": "success",
+     "kind": "escreve"
+    },
+    {
+     "field": "type",
+     "value": "info",
+     "kind": "escreve"
+    }
+   ],
+   "calc_fns": [
+    {
+     "name": "gerarInsightsFrete",
+     "params": "fonte: FonteInsights",
+     "body": "return [ insightTendencia(fonte.variacaoProjetada), insightAbusivos(fonte.abusivos), insightConsolidacao(fonte.consolidacao), insightTransportadora(fonte.melhorTransportadora), ].filter((i): i is InsightFrete => i !== null);"
+    }
+   ]
+  },
   "src/lib/index.ts": {
    "path": "src/lib/index.ts",
    "lines": 76,
@@ -82009,7 +82168,7 @@
   },
   "src/pages/InteligenciaFrete.tsx": {
    "path": "src/pages/InteligenciaFrete.tsx",
-   "lines": 687,
+   "lines": 693,
    "exports": [
     "function InteligenciaFrete"
    ],
@@ -88201,10 +88360,23 @@
   }
  },
  "git": {
-  "sha": "f680a6482180b36e10542f2584c77ddf91c0adbc",
+  "sha": "5b14adc0d14397dfcdcfda118305c651563c907e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "5b14adc",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "fix: previsao de frete deixa de ser numero inventado (#159)",
+    "files": [
+     "docs/auditoria-recuperacao-branches.md",
+     "src/components/freight/AIFreightForecasting.tsx",
+     "src/lib/freightForecast.test.ts",
+     "src/lib/freightForecast.ts",
+     "src/pages/InteligenciaFrete.tsx"
+    ]
+   },
    {
     "sha": "f680a64",
     "date": "2026-11-17",
@@ -88635,58 +88807,16 @@
      "scripts/validate-csp.mjs",
      "scripts/validate-no-console.mjs"
     ]
-   },
-   {
-    "sha": "6de3c96",
-    "date": "2026-11-09",
-    "author": "adm01-debug",
-    "subject": "feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)",
-    "files": [
-     ".github/toolchain.json",
-     "scripts/ci/actions-kpi.mjs",
-     "scripts/ci/branch-podaveis.mjs",
-     "scripts/ci/bump-toolchain.mjs",
-     "scripts/ci/fila-merge.mjs",
-     "scripts/ci/install-pgbouncer.sh",
-     "scripts/ci/install-postgresql-client.sh",
-     "scripts/ci/sla-code-scanning.mjs",
-     "scripts/ci/typecheck-baseline.json",
-     "scripts/ci/typecheck-ratchet.mjs",
-     "scripts/db-audit/catalog.sql",
-     "scripts/db-audit/certs/supabase-prod-ca-2021.crt",
-     "scripts/db-audit/check-catalog-fresh.mjs",
-     "scripts/db-audit/check-grants-fresh.mjs",
-     "scripts/db-audit/check-manifest-fresh.mjs",
-     "scripts/db-audit/check-remocoes-destrutivas.mjs",
-     "scripts/db-audit/database-identity.json",
-     "scripts/db-audit/database-identity.mjs",
-     "scripts/db-audit/grants-baseline.json",
-     "scripts/db-audit/grants-baseline.sql",
-     "scripts/db-audit/known-violations.json",
-     "scripts/db-audit/local-pg-proxy.mjs",
-     "scripts/db-audit/lote-pendente.mjs",
-     "scripts/db-audit/manifest-lib.mjs",
-     "scripts/db-audit/manifest.sql",
-     "scripts/db-audit/psql-environment.mjs",
-     "scripts/db-audit/sql-lexer.mjs",
-     "scripts/db-audit/supabase-usage-guard.mjs",
-     "scripts/inventario/banco.sql",
-     "scripts/inventario/gerar-banco.mjs",
-     "scripts/inventario/gerar-repo.mjs",
-     "scripts/inventario/gerar-rotas.mjs",
-     "scripts/inventario/mudou-conteudo.mjs",
-     "scripts/lib/seguranca-processo.mjs"
-    ]
    }
   ],
   "hot_files": [
    [
-    ".github/workflows/contexto-ia.yml",
+    "docs/auditoria-recuperacao-branches.md",
     4
    ],
    [
-    "docs/auditoria-recuperacao-branches.md",
-    3
+    ".github/workflows/contexto-ia.yml",
+    4
    ],
    [
     "scripts/ops/pos_deploy_functions.sql",
@@ -88706,10 +88836,6 @@
    ],
    [
     "scripts/ops/README.md",
-    2
-   ],
-   [
-    "scripts/db-audit/grants-baseline.json",
     2
    ],
    [
@@ -88741,24 +88867,28 @@
     2
    ],
    [
-    "scripts/ci/actions-kpi.mjs",
-    2
+    "src/components/freight/AIFreightForecasting.tsx",
+    1
    ],
    [
-    "scripts/ci/branch-podaveis.mjs",
-    2
+    "src/lib/freightForecast.test.ts",
+    1
    ],
    [
-    "scripts/ci/bump-toolchain.mjs",
-    2
+    "src/lib/freightForecast.ts",
+    1
    ],
    [
-    "scripts/ci/fila-merge.mjs",
-    2
+    "src/pages/InteligenciaFrete.tsx",
+    1
    ],
    [
-    "scripts/ci/install-pgbouncer.sh",
-    2
+    "src/components/dashboard/AlertsPanel.tsx",
+    1
+   ],
+   [
+    "src/components/dashboard/alertsFilter.test.ts",
+    1
    ]
   ]
  }

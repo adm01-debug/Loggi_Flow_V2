@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `f680a64821` · branch `main` · 2026-11-17 14:11 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `5b14adc0d1` · branch `main` · 2026-11-17 14:22 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -852,7 +852,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `type` | `fornecedor` | compara, escreve | `src/components/search/GlobalSearch.tsx`<br>`src/hooks/common/useGlobalSearch.tsx` |
 | `type` | `geojson` | escreve | `src/components/map/MapboxMap.tsx` |
 | `type` | `ia_previsao` | compara, escreve | `src/components/dashboard/AlertsPanel.tsx`<br>`src/hooks/analytics/useDashboardMetrics.tsx` |
-| `type` | `info` | escreve | `src/components/common/ConfirmProvider.tsx`<br>`src/components/freight/AIFreightForecasting.tsx`<br>`src/hooks/notifications/useNotifications.tsx`<br>`src/pages/MapaRotas.tsx`<br>`supabase/functions/accuracy-weekly-digest/index.ts` |
+| `type` | `info` | escreve | `src/components/common/ConfirmProvider.tsx`<br>`src/hooks/notifications/useNotifications.tsx`<br>`src/lib/freightForecast.ts`<br>`src/pages/MapaRotas.tsx`<br>`supabase/functions/accuracy-weekly-digest/index.ts` |
 | `type` | `integer` | escreve | `src/pages/ConfiguracoesFrete.tsx` |
 | `type` | `json_object` | escreve | `supabase/functions/normalize-freight-response/index.ts` |
 | `type` | `largest-contentful-paint` | escreve | `src/hooks/analytics/usePerformanceMonitor.ts` |
@@ -883,14 +883,14 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `type` | `servico` | compara | `src/components/melhorenvio/METransportadorasPanel.tsx` |
 | `type` | `sla` | escreve | `supabase/functions/scheduled-reports/index.ts` |
 | `type` | `spring` | escreve | `src/components/achievements/AchievementNotification.tsx`<br>`src/components/common/ConfirmProvider.tsx`<br>`src/components/common/StepProgress.tsx`<br>`src/components/dashboard/AlertsPanel.tsx`<br>`src/components/dashboard/FavoriteMetricsBar.tsx`<br>… +11 |
-| `type` | `success` | compara, escreve | `src/components/freight/AIFreightForecasting.tsx`<br>`src/components/notifications/UserNotificationCenter.tsx` |
+| `type` | `success` | compara, escreve | `src/components/notifications/UserNotificationCenter.tsx`<br>`src/lib/freightForecast.ts` |
 | `type` | `symbol` | escreve | `src/components/map/MapboxMap.tsx` |
 | `type` | `system` | escreve | `src/components/analytics/OperationalPulse.tsx` |
 | `type` | `text` | escreve | `src/hooks/logistics/useBusinessRules.tsx`<br>`src/pages/ConfiguracoesFrete.tsx` |
 | `type` | `transportadora` | compara, escreve | `src/components/melhorenvio/METransportadorasPanel.tsx`<br>`src/hooks/common/useGlobalSearch.tsx` |
 | `type` | `truck` | compara, escreve | `src/components/map/MapboxMap.tsx`<br>`src/pages/RastreamentoRealTime.tsx` |
 | `type` | `warn` | compara | `src/pages/MapaRotas.tsx` |
-| `type` | `warning` | compara, escreve | `src/components/freight/AIFreightForecasting.tsx`<br>`src/components/notifications/UserNotificationCenter.tsx`<br>`src/hooks/logistics/useSLANotifications.tsx`<br>`supabase/functions/accuracy-meta-monitor/index.ts` |
+| `type` | `warning` | compara, escreve | `src/components/notifications/UserNotificationCenter.tsx`<br>`src/hooks/logistics/useSLANotifications.tsx`<br>`src/lib/freightForecast.ts`<br>`supabase/functions/accuracy-meta-monitor/index.ts` |
 | `type` | `whatsapp` | compara, escreve | `src/pages/Transportadoras.tsx` |
 | `type` | `window` | escreve | `public/sw.js` |
 | `status` | `Ativo` | escreve | `src/pages/IntegracaoBitrix.tsx` |
@@ -1337,6 +1337,10 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
   ```
   if (value === null || value === undefined) return "-"; return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", }).format(value);
   ```
+- **gerarInsightsFrete(fonte: FonteInsights)** — `src/lib/freightForecast.ts`
+  ```
+  return [ insightTendencia(fonte.variacaoProjetada), insightAbusivos(fonte.abusivos), insightConsolidacao(fonte.consolidacao), insightTransportadora(fonte.melhorTransportadora), ].filter((i): i is InsightFrete => i !== null);
+  ```
 - **validateCNPJDigits(cnpj: string)** — `src/lib/validations.ts`
   ```
   const numbers = cnpj.replace(/\D/g, ""); if (numbers.length !== 14) return false; // Check for known invalid patterns if (/^(\d)\1+$/.test(numbers)) return false; // Calculate first check digit let sum = 0; let weight = 5; for (let i = 0; i < 12; i++) { sum += parseInt(numbers[i]) * weight; weight = weight === 2 ? 9 : weight - 1; } let remainder = sum % 11; const digit1 = remainder < 2 ? 0 : 11 - remainder; if (parseInt(numbers[12]) !== digit1) return false; // Calculate second check digit sum = …
@@ -1478,8 +1482,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `delay: index * 0.1,` | `src/components/dashboard/TransportadoraRanking.tsx` |
 | `<span>0% Estabilidade</span>` | `src/components/dashboard/XPProgressBar.tsx` |
 | `<span>100% Evolução</span>` | `src/components/dashboard/XPProgressBar.tsx` |
-| `{ name: "Fev", real: currentTotal * 0.9, pred: currentTotal * 0.88 },` | `src/components/freight/AIFreightForecasting.tsx` |
-| `{ name: "Jan", real: currentTotal * 0.8, pred: currentTotal * 0.82 },` | `src/components/freight/AIFreightForecasting.tsx` |
 | `({carrierName}) está 12% abaixo da sua média mensal para este` | `src/components/freight/NegotiationAssistant.tsx` |
 | `transition={{ delay: i * 0.05 }}` | `src/components/freight/QuotationResults.tsx` |
 | `transition={{ delay: index * 0.1 }}` | `src/components/freight/SmartCarrierSelector.tsx` |
@@ -1574,6 +1576,9 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `MOBILE_BREAKPOINT` | `768` | `src/hooks/ui/use-mobile.tsx` |
 | `TOAST_LIMIT` | `1` | `src/hooks/ui/use-toast.ts` |
 | `TOAST_REMOVE_DELAY` | `5000` | `src/hooks/ui/use-toast.ts` |
+| `MESES_HISTORICO` | `6` | `src/lib/freightForecast.ts` |
+| `MESES_PROJECAO` | `3` | `src/lib/freightForecast.ts` |
+| `MINIMO_MESES_REAIS` | `3` | `src/lib/freightForecast.ts` |
 | `MAX_SCENARIOS` | `20` | `src/lib/predictions/whatIfScenarios.ts` |
 | `WHATIF_MAX_CAP` | `25` | `src/lib/predictions/whatIfSimulator.ts` |
 | `DEFAULT_STALLED_HOURS` | `48` | `src/lib/rodonaves/freightHealth.ts` |
@@ -2197,13 +2202,14 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (313 testes em 33 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (331 testes em 34 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
 | `src/lib/rodonaves/eventCodes.test.ts` | 29 | normalizeCode · normaliza nulos e vazios · preserva subníveis decimais · mantém códigos não numéricos intactos … |
 | `src/lib/predictions/rootCauseAnalyzer.test.ts` | 21 | classifyMotivo · classifica %s corretamente · retorna  · normalizeMotivos … |
 | `src/lib/rodonaves/latencyTrend.test.ts` | 21 | buildLatencyTrend · retorna vazio para entrada vazia · agrupa amostras da mesma hora em um único bucket · separa buckets por hora e ordena cronologicamente … |
+| `src/lib/freightForecast.test.ts` | 18 | serieHistoricaFrete · devolve vazio sem entrada · soma por mes e completa mes vazio dentro da janela com zero · nao recua alem de 6 meses mesmo com dado antigo … |
 | `src/lib/rodonaves/freightHealth.test.ts` | 17 | businessDaysBetween · ignora fins de semana · ignora feriados nacionais fixos · aceita feriados customizados … |
 | `src/lib/rodonaves/gatewaySLO.test.ts` | 17 | normalizeTarget · usa padrões quando ausente · limita valores fora da faixa · tolera NaN … |
 | `src/lib/rodonaves/sloAlerts.test.ts` | 17 | severityForStatus · mapeia status para severidade · evaluateSLOAlerts · dispara alerta crítico sem histórico … |

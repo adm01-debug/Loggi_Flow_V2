@@ -16,12 +16,12 @@
    "src/components (14)"
   ],
   "servicos_logica": [
-   "src/lib (26)",
+   "src/lib (27)",
    "src/utils (6)",
    "src/services (5)"
   ],
   "testes": [
-   "co-localizado (*.test) (68)",
+   "co-localizado (*.test) (69)",
    "outro (45)",
    "tests/ (11)"
   ],
@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: previsao de frete deixa de ser numero inventado (#159)",
    "fix: alertas de divergencia e falha de frete sumiam da home (#158)",
    "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)",
    "docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)",
-   "chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)",
-   "test: conecta simulacao e fuzzing aos validadores reais (#153)"
+   "chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

@@ -1313,7 +1313,7 @@
     "AIFreightForecasting"
    ],
    "export_default": null,
-   "linhas": 115,
+   "linhas": 244,
    "dominio": "components/freight",
    "hooks_locais": [],
    "tabelas": [],
@@ -5952,7 +5952,7 @@
     "InteligenciaFrete"
    ],
    "export_default": "InteligenciaFrete",
-   "linhas": 687,
+   "linhas": 693,
    "dominio": "pages",
    "hooks_locais": [
     "useFreightIntelligence"

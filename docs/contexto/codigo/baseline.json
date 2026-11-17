@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "f680a6482180b36e10542f2584c77ddf91c0adbc",
+  "commit": "5b14adc0d14397dfcdcfda118305c651563c907e",
   "branch": "main",
-  "data_commit": "2026-11-17T11:10:48-03:00",
+  "data_commit": "2026-11-17T11:20:12-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "5b14adc0",
+    "data": "2026-11-17",
+    "assunto": "fix: previsao de frete deixa de ser numero inventado (#159)"
+   },
    {
     "sha": "f680a648",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "e2cc7bde",
     "data": "2026-11-11",
     "assunto": "fix(ci): move gate de credencial do types-sync para antes dos installs (#134)"
-   },
-   {
-    "sha": "5182e5f6",
-    "data": "2026-11-11",
-    "assunto": "docs: atualiza contagem de required checks para 10 no github-ci.md (#123)"
    }
   ],
-  "arquivos_mudados_7d": 76,
+  "arquivos_mudados_7d": 80,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -145,6 +145,10 @@
    },
    {
     "pasta": "docs/agentes/github-ci.md",
+    "mudancas": 4
+   },
+   {
+    "pasta": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 4
    },
    {
@@ -169,10 +173,6 @@
    },
    {
     "pasta": "AGENTS.md",
-    "mudancas": 3
-   },
-   {
-    "pasta": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 3
    },
    {
@@ -246,6 +246,10 @@
     "mudancas": 4
    },
    {
+    "arquivo": "docs/auditoria-recuperacao-branches.md",
+    "mudancas": 4
+   },
+   {
     "arquivo": "scripts/audit/manifest_detail.sql",
     "mudancas": 4
    },
@@ -292,16 +296,12 @@
    {
     "arquivo": "tests/security/rls-access.spec.ts",
     "mudancas": 4
-   },
-   {
-    "arquivo": ".github/dependabot.yml",
-    "mudancas": 3
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 101
+    "commits": 102
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1287,
-  "arquivos_codigo": 866,
-  "linhas_codigo": 166076,
+  "arquivos_total": 1289,
+  "arquivos_codigo": 868,
+  "linhas_codigo": 166639,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -328,7 +328,7 @@
   "tabelas": 144,
   "migrations": 244,
   "cron_jobs": 28,
-  "testes": 124,
+  "testes": 125,
   "workflows": 16,
   "scripts": 62,
   "docs_md": 84
@@ -452,7 +452,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48396
+   "linhas": 48525
   },
   "src/features": {
    "arquivos": 90,
@@ -471,8 +471,8 @@
    "linhas": 6702
   },
   "src/lib": {
-   "arquivos": 42,
-   "linhas": 5794
+   "arquivos": 44,
+   "linhas": 6222
   },
   "src/main.tsx": {
    "arquivos": 1,
@@ -480,7 +480,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30687
+   "linhas": 30693
   },
   "src/services": {
    "arquivos": 5,
