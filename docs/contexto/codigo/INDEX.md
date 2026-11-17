@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `5b14adc0d14397dfcdcfda118305c651563c907e` (2026-11-17T11:20:12-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8ea7b1f396080fc7cb366af4be67620f7fee9b0f` (2026-11-17T11:25:01-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (781), SQL (257), Markdown (84), JavaScript (80), JSON (32), YAML (20), Shell (9), Python (8)
+- linguagens: TypeScript (783), SQL (257), Markdown (84), JavaScript (80), JSON (32), YAML (20), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,9 +34,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1289 |
-| arquivos_codigo | 868 |
-| linhas_codigo | 166639 |
+| arquivos_total | 1291 |
+| arquivos_codigo | 870 |
+| linhas_codigo | 166726 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -48,7 +48,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | tabelas | 144 |
 | migrations | 244 |
 | cron_jobs | 28 |
-| testes | 125 |
+| testes | 126 |
 | workflows | 16 |
 | scripts | 62 |
 | docs_md | 84 |
@@ -57,8 +57,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - telas: src/pages (61)
 - componentes: src/components (256), src/pages (77), src/features (41)
 - hooks: src/hooks (120), src/features (41), src/components (14)
-- servicos_logica: src/lib (27), src/utils (6), src/services (5)
-- testes: co-localizado (*.test) (69), outro (45), tests/ (11)
+- servicos_logica: src/lib (28), src/utils (6), src/services (5)
+- testes: co-localizado (*.test) (70), outro (45), tests/ (11)
 - edge_functions: supabase/functions
 - migrations: supabase/migrations
 - scripts: scripts/db-audit (15), scripts/ci (10), scripts/audit (5)
@@ -92,7 +92,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | hooks/notifications | 0 | 0 | 6 | 7 | 1 | 7 |
 | hooks/security | 0 | 0 | 7 | 10 | 7 | 8 |
 | hooks/ui | 0 | 0 | 6 | 9 | 0 | 7 |
-| lib | 0 | 0 | 12 | 0 | 0 | 0 |
+| lib | 0 | 0 | 13 | 0 | 0 | 0 |
 | lib/predictions | 0 | 0 | 6 | 0 | 0 | 0 |
 | lib/rodonaves | 0 | 0 | 8 | 0 | 0 | 0 |
 | pages | 75 | 59 | 59 | 126 | 30 | 81 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8067 nós · 20409 arestas · 701 comunidades · grafo do commit `5b14adc0`
-- comunidades maiores: input.tsx (223), lucide-react (222), App.tsx (182), react (178), @tanstack/react-query (158), db-observability/index.ts (135), ui/index.ts (125), ref_node_fs (121), client.ts (105), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (102), gerar.mjs (81)
+- 8073 nós · 20422 arestas · 708 comunidades · grafo do commit `8ea7b1f3`
+- comunidades maiores: lucide-react (256), Envios.tsx (240), db-observability/index.ts (142), ref_node_path (138), client.ts (138), react (137), utils.ts (122), App.tsx (120), Button (110), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), useAuth (101), cn (99)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -399,6 +399,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `8ea7b1f3` fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)
 - 2026-11-17 `5b14adc0` fix: previsao de frete deixa de ser numero inventado (#159)
 - 2026-11-17 `f680a648` fix: alertas de divergencia e falha de frete sumiam da home (#158)
 - 2026-11-17 `4496d9f3` fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)
@@ -413,7 +414,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-13 `db887499` docs: registra quirk do cache do GET /secrets da Management API (RESEND_API_KEY) (#146)
 - 2026-11-13 `926f5496` infra: adiciona --yes no deploy de edge functions (#144)
 - 2026-11-13 `bbb9bbc9` fix: corrige caminho import_map no config.toml para destravar deploy em lote (#145)
-- 2026-11-13 `8ea891f4` fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

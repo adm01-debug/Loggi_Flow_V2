@@ -5,17 +5,17 @@
   "vitest",
   "playwright"
  ],
- "total": 125,
+ "total": 126,
  "por_tipo": {
   "contrato": 1,
   "e2e": 2,
   "pytest": 5,
-  "unit": 117
+  "unit": 118
  },
  "onde_ficam": [
   {
    "padrao": "co-localizado (*.test)",
-   "arquivos": 69
+   "arquivos": 70
   },
   {
    "padrao": "outro",
@@ -462,6 +462,15 @@
     "src/lib/freightForecast.ts"
    ],
    "casos": 14
+  },
+  {
+   "arquivo": "src/lib/mapFallback.test.ts",
+   "tipo": "unit",
+   "linhas": 52,
+   "testa": [
+    "src/lib/mapFallback.ts"
+   ],
+   "casos": 6
   },
   {
    "arquivo": "src/lib/predictions/mitigationRecommender.test.ts",
@@ -1078,6 +1087,7 @@
   "src/lib/conciliacaoImport.ts": 1,
   "src/lib/formatters.ts": 1,
   "src/lib/freightForecast.ts": 1,
+  "src/lib/mapFallback.ts": 1,
   "src/lib/predictions/mitigationROI.ts": 2,
   "src/lib/predictions/mitigationRecommender.ts": 4,
   "src/lib/predictions/rootCauseAnalyzer.ts": 6,

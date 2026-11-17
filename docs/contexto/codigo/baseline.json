@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "5b14adc0d14397dfcdcfda118305c651563c907e",
+  "commit": "8ea7b1f396080fc7cb366af4be67620f7fee9b0f",
   "branch": "main",
-  "data_commit": "2026-11-17T11:20:12-03:00",
+  "data_commit": "2026-11-17T11:25:01-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "8ea7b1f3",
+    "data": "2026-11-17",
+    "assunto": "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)"
+   },
    {
     "sha": "5b14adc0",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "60b8d213",
     "data": "2026-11-11",
     "assunto": "feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)"
-   },
-   {
-    "sha": "e2cc7bde",
-    "data": "2026-11-11",
-    "assunto": "fix(ci): move gate de credencial do types-sync para antes dos installs (#134)"
    }
   ],
-  "arquivos_mudados_7d": 80,
+  "arquivos_mudados_7d": 83,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 102
+    "commits": 103
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1289,
-  "arquivos_codigo": 868,
-  "linhas_codigo": 166639,
+  "arquivos_total": 1291,
+  "arquivos_codigo": 870,
+  "linhas_codigo": 166726,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -328,7 +328,7 @@
   "tabelas": 144,
   "migrations": 244,
   "cron_jobs": 28,
-  "testes": 125,
+  "testes": 126,
   "workflows": 16,
   "scripts": 62,
   "docs_md": 84
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19050
+   "linhas": 19043
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -471,8 +471,8 @@
    "linhas": 6702
   },
   "src/lib": {
-   "arquivos": 44,
-   "linhas": 6222
+   "arquivos": 46,
+   "linhas": 6316
   },
   "src/main.tsx": {
    "arquivos": 1,

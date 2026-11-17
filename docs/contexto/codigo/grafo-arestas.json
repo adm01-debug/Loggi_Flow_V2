@@ -2838,6 +2838,7 @@
   "src/hooks/logistics/useDeliveryRoutes.tsx": [
    "src/hooks/auth/useAuth.tsx",
    "src/integrations/supabase/client.ts",
+   "src/lib/mapFallback.ts",
    "src/lib/queryConfig.ts"
   ],
   "src/hooks/logistics/useFreightIntelligence.tsx": [

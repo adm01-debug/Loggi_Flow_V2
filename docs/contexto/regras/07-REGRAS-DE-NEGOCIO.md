@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `5b14adc0d1` · branch `main` · 2026-11-17 14:22 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8ea7b1f396` · branch `main` · 2026-11-17 14:27 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1499,8 +1499,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `Todas as tabelas monitoradas estão com cache-hit ≥ 99%.` | `src/features/db-observability/components/CacheHitRatioCard.tsx` |
 | `Queries com tempo médio {'>'} 50% acima do baseline diário.` | `src/features/db-observability/components/RegressionsCard.tsx` |
 | `? Math.floor(data.coletasPendentes * 0.1)` | `src/hooks/analytics/useDashboardMetrics.tsx` |
-| `lat: coords.lat + (Math.random() - 0.5) * 0.3,` | `src/hooks/logistics/useDeliveryRoutes.tsx` |
-| `lng: coords.lng + (Math.random() - 0.5) * 0.3,` | `src/hooks/logistics/useDeliveryRoutes.tsx` |
 | `// Abusive freight detection (>20% above state average)` | `src/hooks/logistics/useFreightIntelligence.tsx` |
 | `// Estimate 30% savings from consolidation` | `src/hooks/logistics/useFreightIntelligence.tsx` |
 | `const potentialSavings = totalCost * 0.3;` | `src/hooks/logistics/useFreightIntelligence.tsx` |
@@ -1579,6 +1577,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `MESES_HISTORICO` | `6` | `src/lib/freightForecast.ts` |
 | `MESES_PROJECAO` | `3` | `src/lib/freightForecast.ts` |
 | `MINIMO_MESES_REAIS` | `3` | `src/lib/freightForecast.ts` |
+| `RAIO_DISPERSAO_GRAUS` | `0.3` | `src/lib/mapFallback.ts` |
 | `MAX_SCENARIOS` | `20` | `src/lib/predictions/whatIfScenarios.ts` |
 | `WHATIF_MAX_CAP` | `25` | `src/lib/predictions/whatIfSimulator.ts` |
 | `DEFAULT_STALLED_HOURS` | `48` | `src/lib/rodonaves/freightHealth.ts` |
@@ -2202,7 +2201,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (331 testes em 34 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (339 testes em 35 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
@@ -2222,6 +2221,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `src/lib/predictions/whatIfCompare.test.ts` | 9 | compareScenarios — base · calcula deltas simples e vencedor por OTIF · empate em OTIF → desempata por confiança · empate total → tie … |
 | `src/lib/predictions/whatIfSimulator.test.ts` | 9 | simulateWhatIf — comportamento base · retorna projeção neutra sem seleção · usa Δ histórico quando measured>0 · usa estimativa conservadora quando sem histórico … |
 | `src/lib/conciliacaoImport.test.ts` | 8 | toISODate · formats Date objects · parses Brazilian dd/MM/yyyy strings · parses ISO strings … |
+| `src/lib/mapFallback.test.ts` | 8 | deslocamentoEstavel · devolve sempre o mesmo ponto para a mesma entrega · separa entregas diferentes no mesmo estado · mantem o marcador dentro do raio de dispersao … |
 | `src/lib/predictions/mitigationROI.test.ts` | 8 | mitigationROI · retorna relatório vazio sem registros · ignora ações não concluídas · calcula avg/best/worst e taxa de sucesso … |
 | `src/lib/predictions/whatIfScenarios.test.ts` | 8 | whatIfScenarios · retorna lista vazia quando storage está vazio ou corrompido · salva um cenário e recupera na lista · rejeita salvar sem nome ou sem seleção … |
 | `tests/contracts/nexus-contracts.spec.ts` | 8 | Nexus Contract Verification Suite · Carrier Webhook Contract · should validate a perfect payload · should reject payload with invalid status … |

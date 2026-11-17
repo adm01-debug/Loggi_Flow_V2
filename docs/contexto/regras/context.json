@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "5b14adc0d14397dfcdcfda118305c651563c907e",
+  "sha": "8ea7b1f396080fc7cb366af4be67620f7fee9b0f",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 14:22 UTC",
-  "files_total": 1299,
-  "code_files": 1126,
-  "code_lines": 182406,
+  "generated_at": "2026-11-17 14:27 UTC",
+  "files_total": 1301,
+  "code_files": 1128,
+  "code_lines": 182493,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "c449ebe8e2bdcb49",
+ "facts_hash": "5aa7924ceaae6962",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -292,7 +292,7 @@
   "package_manager": "bun",
   "languages": {
    ".tsx": 453,
-   ".ts": 328,
+   ".ts": 330,
    ".sql": 257,
    ".mjs": 77,
    ".py": 8,
@@ -24250,7 +24250,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 146
+    "deps_count": 147
    },
    {
     "path": "/conciliacao-automatica",
@@ -24386,7 +24386,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 145
+    "deps_count": 146
    },
    {
     "path": "/conquistas",
@@ -24492,7 +24492,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 173
+    "deps_count": 174
    },
    {
     "path": "/cotacao-multicanal",
@@ -24570,7 +24570,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 175
+    "deps_count": 176
    },
    {
     "path": "/custos",
@@ -24676,7 +24676,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 146
+    "deps_count": 147
    },
    {
     "path": "/dashboard-executivo",
@@ -25135,7 +25135,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 141
+    "deps_count": 142
    },
    {
     "path": "/loja",
@@ -25195,7 +25195,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 65
+    "deps_count": 66
    },
    {
     "path": "/melhor-envio",
@@ -29701,7 +29701,7 @@
   {
    "module": "src/hooks",
    "files": 123,
-   "lines": 19050,
+   "lines": 19043,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -29950,8 +29950,8 @@
   },
   {
    "module": "src/lib",
-   "files": 44,
-   "lines": 6222,
+   "files": 46,
+   "lines": 6316,
    "tables": [],
    "exports": [
     "conciliacaoImport.ts: ConciliacaoImportItem, readSheetRows, toISODate, parseImportRows",
@@ -29961,6 +29961,7 @@
     "exportUtils.ts: exportToCSV, exportToPDF",
     "formatters.ts: formatDate, formatDateTime, formatRelativeTime, formatCurrency, formatNumber, formatPercent",
     "freightForecast.ts: MESES_HISTORICO, MESES_PROJECAO, MINIMO_MESES_REAIS, EntradaFrete, PontoFrete, InsightFrete",
+    "mapFallback.ts: RAIO_DISPERSAO_GRAUS, hashEstavel, deslocamentoEstavel",
     "queryConfig.ts: QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL",
     "queryKeys.ts: QUERY_KEYS",
     "utils.ts: cn",
@@ -29984,9 +29985,9 @@
     "constants.ts: Application Constants",
     "excelImporter.ts: eslint-disable sonarjs/no-nested-functions",
     "index.ts: ============================================ LIB - UTILITY EXPORTS ============================================",
+    "mapFallback.ts: Deslocamento estavel para marcador de entrega sem coordenada geocodificada. O mapa cai no centro do estado quando a entrega ainda nao tem lat/lng no banco. Sem deslocamento, todas as entregas do mesmo estado empilham no mesmo ponto. O deslocamento precisa ser **deterministico**: com `Math.random()` …",
     "queryConfig.ts: ============================================ QUERY CONFIGURATION - Centralized staleTime ============================================",
-    "queryKeys.ts: QUERY KEYS FACTORY - Centralized query keys for precise cache invalidation.",
-    "validations.ts: eslint-disable sonarjs/slow-regex"
+    "queryKeys.ts: QUERY KEYS FACTORY - Centralized query keys for precise cache invalidation."
    ],
    "deps": [
     "clsx",
@@ -30012,6 +30013,8 @@
     "src/lib/freightForecast.test.ts",
     "src/lib/freightForecast.ts",
     "src/lib/index.ts",
+    "src/lib/mapFallback.test.ts",
+    "src/lib/mapFallback.ts",
     "src/lib/queryConfig.ts",
     "src/lib/queryKeys.ts",
     "src/lib/utils.ts",
@@ -41316,6 +41319,11 @@
     "value": "3"
    },
    {
+    "file": "src/lib/mapFallback.ts",
+    "name": "RAIO_DISPERSAO_GRAUS",
+    "value": "0.3"
+   },
+   {
     "file": "src/lib/predictions/whatIfScenarios.ts",
     "name": "MAX_SCENARIOS",
     "value": "20"
@@ -47650,14 +47658,6 @@
     "line": "? Math.floor(data.coletasPendentes * 0.1)"
    },
    {
-    "file": "src/hooks/logistics/useDeliveryRoutes.tsx",
-    "line": "lat: coords.lat + (Math.random() - 0.5) * 0.3,"
-   },
-   {
-    "file": "src/hooks/logistics/useDeliveryRoutes.tsx",
-    "line": "lng: coords.lng + (Math.random() - 0.5) * 0.3,"
-   },
-   {
     "file": "src/hooks/logistics/useFreightIntelligence.tsx",
     "line": "// Abusive freight detection (>20% above state average)"
    },
@@ -48146,6 +48146,38 @@
    {
     "file": "src/lib/freightForecast.test.ts",
     "name": "descarta transportadora sem economia"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "deslocamentoEstavel"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "devolve sempre o mesmo ponto para a mesma entrega"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "separa entregas diferentes no mesmo estado"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "mantem o marcador dentro do raio de dispersao"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "hashEstavel"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "e deterministico e inteiro sem sinal de 32 bits"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "distingue strings proximas"
+   },
+   {
+    "file": "src/lib/mapFallback.test.ts",
+    "name": "trata string vazia"
    },
    {
     "file": "src/lib/predictions/mitigationROI.test.ts",
@@ -76822,7 +76854,7 @@
   },
   "src/hooks/logistics/useDeliveryRoutes.tsx": {
    "path": "src/hooks/logistics/useDeliveryRoutes.tsx",
-   "lines": 394,
+   "lines": 387,
    "exports": [
     "interface DeliveryRoute",
     "const ORIGIN_COORDINATES",
@@ -76904,10 +76936,6 @@
    "doc": "eslint-disable sonarjs/prefer-single-boolean-return",
    "hooks": [
     "useDeliveryRoutes"
-   ],
-   "percents": [
-    "lat: coords.lat + (Math.random() - 0.5) * 0.3,",
-    "lng: coords.lng + (Math.random() - 0.5) * 0.3,"
    ],
    "side_effects": [
     "invoke("
@@ -79341,6 +79369,37 @@
    "path": "src/lib/index.ts",
    "lines": 76,
    "doc": "============================================ LIB - UTILITY EXPORTS ============================================"
+  },
+  "src/lib/mapFallback.test.ts": {
+   "path": "src/lib/mapFallback.test.ts",
+   "lines": 52,
+   "is_test": true,
+   "tests": [
+    "deslocamentoEstavel",
+    "devolve sempre o mesmo ponto para a mesma entrega",
+    "separa entregas diferentes no mesmo estado",
+    "mantem o marcador dentro do raio de dispersao",
+    "hashEstavel",
+    "e deterministico e inteiro sem sinal de 32 bits",
+    "distingue strings proximas",
+    "trata string vazia"
+   ]
+  },
+  "src/lib/mapFallback.ts": {
+   "path": "src/lib/mapFallback.ts",
+   "lines": 42,
+   "exports": [
+    "const RAIO_DISPERSAO_GRAUS",
+    "function hashEstavel",
+    "function deslocamentoEstavel"
+   ],
+   "params": [
+    {
+     "name": "RAIO_DISPERSAO_GRAUS",
+     "value": "0.3"
+    }
+   ],
+   "doc": "Deslocamento estavel para marcador de entrega sem coordenada geocodificada. O mapa cai no centro do estado quando a entrega ainda nao tem lat/lng no banco. Sem deslocamento, todas as entregas do mesmo estado empilham no mesmo ponto. O deslocamento precisa ser **deterministico**: com `Math.random()` …"
   },
   "src/lib/queryConfig.ts": {
    "path": "src/lib/queryConfig.ts",
@@ -88360,10 +88419,21 @@
   }
  },
  "git": {
-  "sha": "5b14adc0d14397dfcdcfda118305c651563c907e",
+  "sha": "8ea7b1f396080fc7cb366af4be67620f7fee9b0f",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "8ea7b1f",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)",
+    "files": [
+     "src/hooks/logistics/useDeliveryRoutes.tsx",
+     "src/lib/mapFallback.test.ts",
+     "src/lib/mapFallback.ts"
+    ]
+   },
    {
     "sha": "5b14adc",
     "date": "2026-11-17",
@@ -88691,122 +88761,6 @@
      ".github/workflows/scripts-tests.yml",
      ".github/workflows/types-sync.yml"
     ]
-   },
-   {
-    "sha": "f2dc892",
-    "date": "2026-11-10",
-    "author": "adm01-debug",
-    "subject": "fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)",
-    "files": [
-     ".gitattributes",
-     "scripts/ai-context/README.md",
-     "scripts/ai-context/cenarios.mjs",
-     "scripts/ai-context/gerar.mjs",
-     "scripts/ai-context/gerar.unit.mjs",
-     "scripts/audit-gate.mjs",
-     "scripts/audit/README.md",
-     "scripts/audit/content_hash.sql",
-     "scripts/audit/manifest-summary-content-hash.unit.mjs",
-     "scripts/audit/manifest_data.sql",
-     "scripts/audit/manifest_detail.sql",
-     "scripts/audit/manifest_full.sql",
-     "scripts/audit/manifest_summary.sql",
-     "scripts/audit/sql.unit.mjs",
-     "scripts/check-warning-budget.mjs",
-     "scripts/ci/README.md",
-     "scripts/ci/actions-kpi.mjs",
-     "scripts/ci/actions-kpi.unit.mjs",
-     "scripts/ci/branch-podaveis.mjs",
-     "scripts/ci/branch-podaveis.unit.mjs",
-     "scripts/ci/bump-toolchain.mjs",
-     "scripts/ci/bump-toolchain.unit.mjs",
-     "scripts/ci/check-claude-md-integrity.mjs",
-     "scripts/ci/check-claude-md-integrity.unit.mjs",
-     "scripts/ci/fila-merge.mjs",
-     "scripts/ci/fila-merge.unit.mjs",
-     "scripts/ci/github-settings-baseline.json",
-     "scripts/ci/github-settings-guard.mjs",
-     "scripts/ci/github-settings-guard.unit.mjs",
-     "scripts/ci/install-pgbouncer.sh",
-     "scripts/ci/install-postgresql-client.sh",
-     "scripts/ci/install-scripts.unit.mjs",
-     "scripts/ci/sla-code-scanning.mjs",
-     "scripts/ci/sla-code-scanning.unit.mjs",
-     "scripts/ci/typecheck-ratchet.mjs",
-     "scripts/ci/typecheck-ratchet.unit.mjs",
-     "scripts/cleanup_triggers_source.sql",
-     "scripts/db-audit/README.md",
-     "scripts/db-audit/catalog.sql",
-     "scripts/db-audit/check-catalog-fresh.mjs",
-     "scripts/db-audit/check-fresh.unit.mjs",
-     "scripts/db-audit/check-grants-fresh.mjs",
-     "scripts/db-audit/check-manifest-fresh.mjs",
-     "scripts/db-audit/check-remocoes-destrutivas.mjs",
-     "scripts/db-audit/database-identity.unit.mjs",
-     "scripts/db-audit/gen-types.sh",
-     "scripts/db-audit/gen-types.unit.mjs",
-     "scripts/db-audit/grants-baseline.sql",
-     "scripts/db-audit/known-violations.json",
-     "scripts/db-audit/local-pg-proxy.mjs",
-     "scripts/db-audit/lote-pendente.mjs",
-     "scripts/db-audit/lote-pendente.unit.mjs",
-     "scripts/db-audit/manifest.sql",
-     "scripts/db-audit/psql-environment.mjs",
-     "scripts/db-audit/psql-environment.unit.mjs",
-     "scripts/db-audit/sql-banco-local.unit.mjs",
-     "scripts/db-audit/sql-lexer.unit.mjs",
-     "scripts/db-audit/supabase-usage-guard.mjs",
-     "scripts/db-audit/supabase-usage-guard.unit.mjs",
-     "scripts/gates/README.md",
-     "scripts/gates/audit-gate.unit.mjs",
-     "scripts/gates/check-warning-budget.unit.mjs",
-     "scripts/gates/generate-quality-report.unit.mjs",
-     "scripts/gates/helpers.mjs",
-     "scripts/gates/ratchet-warning-budget.unit.mjs",
-     "scripts/gates/validate-csp.unit.mjs",
-     "scripts/gates/validate-no-console.unit.mjs",
-     "scripts/generate-quality-report.mjs",
-     "scripts/graphify/README.md",
-     "scripts/graphify/setup.sh",
-     "scripts/graphify/setup.unit.mjs",
-     "scripts/inventario/README.md",
-     "scripts/inventario/banco.sql",
-     "scripts/inventario/gerar-banco.mjs",
-     "scripts/inventario/gerar-banco.unit.mjs",
-     "scripts/inventario/gerar-repo.mjs",
-     "scripts/inventario/gerar-repo.unit.mjs",
-     "scripts/inventario/gerar-rotas.mjs",
-     "scripts/inventario/gerar-rotas.unit.mjs",
-     "scripts/inventario/mudou-conteudo.mjs",
-     "scripts/inventario/mudou-conteudo.unit.mjs",
-     "scripts/lib/seguranca-processo.mjs",
-     "scripts/lib/seguranca-processo.unit.mjs",
-     "scripts/ops/README.md",
-     "scripts/ops/backup_origem.sh",
-     "scripts/ops/backup_origem.unit.mjs",
-     "scripts/ops/pos-deploy-functions.unit.mjs",
-     "scripts/ops/pos_deploy_functions.sql",
-     "scripts/ops/set-missing-secrets.unit.mjs",
-     "scripts/ops/set_missing_secrets.sh",
-     "scripts/origem_remediacao_2026-08-31.sql",
-     "scripts/ratchet-warning-budget.mjs",
-     "scripts/regras_negocio/README.md",
-     "scripts/regras_negocio/generate.py",
-     "scripts/regras_negocio/indice.py",
-     "scripts/regras_negocio/publish.sh",
-     "scripts/regras_negocio/test_generate.py",
-     "scripts/regras_negocio/test_indice.py",
-     "scripts/regras_negocio/test_publish.py",
-     "scripts/seed-database.ts",
-     "scripts/seed/README.md",
-     "scripts/seed/seed-database.unit.mjs",
-     "scripts/supabase_snapshot/README.md",
-     "scripts/supabase_snapshot/snapshot.py",
-     "scripts/supabase_snapshot/test_snapshot.py",
-     "scripts/supabase_snapshot/test_snapshot_postgres.py",
-     "scripts/validate-csp.mjs",
-     "scripts/validate-no-console.mjs"
-    ]
    }
   ],
   "hot_files": [
@@ -88817,10 +88771,6 @@
    [
     ".github/workflows/contexto-ia.yml",
     4
-   ],
-   [
-    "scripts/ops/pos_deploy_functions.sql",
-    3
    ],
    [
     "docs/prod-readiness.md",
@@ -88835,27 +88785,7 @@
     2
    ],
    [
-    "scripts/ops/README.md",
-    2
-   ],
-   [
-    "scripts/ci/github-settings-baseline.json",
-    2
-   ],
-   [
-    "scripts/ci/github-settings-guard.unit.mjs",
-    2
-   ],
-   [
-    "scripts/ops/pos-deploy-functions.unit.mjs",
-    2
-   ],
-   [
-    "scripts/ops/set-missing-secrets.unit.mjs",
-    2
-   ],
-   [
-    "scripts/ops/set_missing_secrets.sh",
+    "scripts/ops/pos_deploy_functions.sql",
     2
    ],
    [
@@ -88865,6 +88795,18 @@
    [
     ".github/workflows/inventario-estado-semanal.yml",
     2
+   ],
+   [
+    "src/hooks/logistics/useDeliveryRoutes.tsx",
+    1
+   ],
+   [
+    "src/lib/mapFallback.test.ts",
+    1
+   ],
+   [
+    "src/lib/mapFallback.ts",
+    1
    ],
    [
     "src/components/freight/AIFreightForecasting.tsx",
@@ -88888,6 +88830,18 @@
    ],
    [
     "src/components/dashboard/alertsFilter.test.ts",
+    1
+   ],
+   [
+    "src/components/dashboard/alertsFilter.ts",
+    1
+   ],
+   [
+    "src/hooks/analytics/useDashboardMetrics.tsx",
+    1
+   ],
+   [
+    "src/components/map/MapIntelligenceOverlay.tsx",
     1
    ]
   ]

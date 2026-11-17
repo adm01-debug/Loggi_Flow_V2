@@ -1,10 +1,10 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 45,
+ "total": 46,
  "por_camada": {
   "integrations": 4,
-  "lib": 27,
+  "lib": 28,
   "python": 3,
   "services": 5,
   "utils": 6
@@ -692,6 +692,31 @@
    "usado_por": 0,
    "usado_por_modulos": [],
    "coberto_por_testes": 0,
+   "orfao": false
+  },
+  {
+   "arquivo": "src/lib/mapFallback.ts",
+   "camada": "lib",
+   "exports": [
+    "RAIO_DISPERSAO_GRAUS",
+    "deslocamentoEstavel",
+    "hashEstavel"
+   ],
+   "export_default": null,
+   "linhas": 42,
+   "tabelas": [],
+   "rpcs": [],
+   "edges": [],
+   "env": [],
+   "externos": [],
+   "zod_schemas": 0,
+   "flags": [],
+   "papeis": [],
+   "usado_por": 1,
+   "usado_por_modulos": [
+    "hooks/logistics"
+   ],
+   "coberto_por_testes": 1,
    "orfao": false
   },
   {
