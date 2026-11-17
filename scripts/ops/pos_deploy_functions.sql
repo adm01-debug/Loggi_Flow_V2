@@ -66,6 +66,18 @@
 --     SELECT status_code, count(*) FROM net._http_response
 --      WHERE created > now() - interval '1 hour' GROUP BY 1 ORDER BY 1;
 --     -> esperado: nenhuma linha com status_code 401.
+--   4.5 as 3 de usuário passam da auth com um Bearer real (recuperado da PR #98; aqui pelo arquivo de
+--       header, nunca por variável de ambiente, que ficaria no histórico do shell):
+--     umask 077
+--     printf 'Authorization: Bearer %s\n' "<access token de um usuário logado>" > ~/loggi-jwt.hdr
+--     for fn in evolution-whatsapp melhor-envio-api log-security-event; do
+--       printf '%s ' "$fn"; curl -s -o /dev/null -w '%{http_code}\n' -X POST \
+--         -H @"$HOME/loggi-jwt.hdr" "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn"; done
+--     rm -f ~/loggi-jwt.hdr
+--     -> esperado: qualquer código MENOS 401 (400/500 por corpo vazio já prova que a auth passou).
+--        401 aqui = token expirado ou inválido, gere outro. 429 = rate limit, espere 1 min.
+--   4.6 onde ver o erro: o CLI NÃO tem `supabase functions logs`. Use o Dashboard do projeto
+--       (Logs -> Edge Functions), filtre pelo nome da function, método POST e o intervalo do deploy.
 --
 -- ROLLBACK — se o deploy quebrou produção:
 -- - Deploy anterior: o Supabase mantém versões anteriores. Reverter = redeploy da versão boa. Pelo
