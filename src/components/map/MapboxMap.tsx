@@ -81,8 +81,10 @@ export function MapboxMap({
         canvasContextAttributes: { antialias: true },
       });
     } catch {
-      setError("Falha ao inicializar o mapa");
-      setLoading(false);
+      queueMicrotask(() => {
+        setError("Falha ao inicializar o mapa");
+        setLoading(false);
+      });
       return;
     }
 
