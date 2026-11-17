@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
-import { Json } from "@/integrations/supabase/types";
+import { Json, TablesUpdate } from "@/integrations/supabase/types";
 
 export type EntityType = "coleta" | "entrega" | "ocorrencia" | "frete";
 export type TriggerEvent =
@@ -200,7 +200,7 @@ export function useBusinessRules() {
       id,
       ...updates
     }: Partial<BusinessRule> & { id: string }) => {
-      const updateData: Record<string, unknown> = {};
+      const updateData: TablesUpdate<"business_rules"> = {};
       if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.description !== undefined)
         updateData.description = updates.description;

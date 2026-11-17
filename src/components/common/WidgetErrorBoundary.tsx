@@ -41,10 +41,11 @@ export class WidgetErrorBoundary extends Component<Props, State> {
         user_id: user?.id,
         error_message: error.message,
         stack_trace: error.stack || 'No stack trace',
-        component_name: this.props.widgetName || 'WidgetErrorBoundary',
-        url: window.location.href,
-        browser_info: navigator.userAgent,
-        metadata: {
+        severity: 'error',
+        context: {
+          component_name: this.props.widgetName || 'WidgetErrorBoundary',
+          url: window.location.href,
+          browser_info: navigator.userAgent,
           componentStack: errorInfo.componentStack,
           version: '1.0.0'
         }

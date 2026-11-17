@@ -207,7 +207,7 @@ export const useFreightQuotation = () => {
 
   // Update freight table entry
   const updateTabelaFrete = useMutation({
-    mutationFn: async ({ id, ...data }: Partial<TabelaFrete> & { id: string }) => {
+    mutationFn: async ({ id, ...data }: Omit<Partial<TabelaFrete>, 'transportadora'> & { id: string }) => {
       const { data: result, error } = await supabase
         .from('tabelas_frete')
         .update(data)

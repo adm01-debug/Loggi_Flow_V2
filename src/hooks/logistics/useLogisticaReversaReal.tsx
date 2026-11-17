@@ -40,7 +40,7 @@ export const useLogisticaReversaReal = () => {
   });
 
   const create = useMutation({
-    mutationFn: async (newItem: Partial<LogisticaReversa> & { motivo: string }) => {
+    mutationFn: async (newItem: Omit<Partial<LogisticaReversa>, 'entregas' | 'clientes'> & { motivo: string }) => {
       const { data, error } = await supabase
         .from("logistica_reversa")
         .insert([newItem])

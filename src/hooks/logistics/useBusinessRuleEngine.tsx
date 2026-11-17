@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useBusinessRules, BusinessRule, RuleCondition } from "@/hooks/logistics/useBusinessRules";
-import { Json } from "@/integrations/supabase/types";
+import { Database, Json } from "@/integrations/supabase/types";
 import { useTelemetry } from "@/hooks/analytics/useTelemetry";
 
 /**
@@ -112,7 +112,27 @@ export function useBusinessRuleEngine() {
     }
     if (action.type === "change_status" && action.config.new_status) {
       const table = resolveEntityTable(rule.entity_type);
-      await supabase.from(table).update({ status: action.config.new_status }).eq("id", entityId);
+      const novoStatus = action.config.new_status;
+      if (table === "coletas") {
+        await supabase
+          .from("coletas")
+          .update({ status: novoStatus as Database["public"]["Enums"]["coleta_status"] })
+          .eq("id", entityId);
+      } else if (table === "entregas") {
+        await supabase
+          .from("entregas")
+          .update({ status: novoStatus as Database["public"]["Enums"]["entrega_status"] })
+          .eq("id", entityId);
+      } else {
+        // ocorrencias nao tem coluna status: o estado e o booleano resolvida.
+        const resolvida = ["resolvida", "resolvido", "concluida", "concluido", "fechada", "fechado"].includes(
+          novoStatus.toLowerCase(),
+        );
+        await supabase
+          .from("ocorrencias")
+          .update({ resolvida, data_resolucao: resolvida ? new Date().toISOString() : null })
+          .eq("id", entityId);
+      }
     }
   }, [resolveActionUrl, resolveEntityTable]);
 

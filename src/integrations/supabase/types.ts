@@ -1358,6 +1358,7 @@ export type Database = {
           nf_fornecedor: string | null
           numero_coleta: string
           observacoes: string | null
+          peso_efetivo: number | null
           peso_estimado_kg: number | null
           qtd_recebida: number | null
           qtd_volumes: number | null
@@ -1390,6 +1391,7 @@ export type Database = {
           nf_fornecedor?: string | null
           numero_coleta: string
           observacoes?: string | null
+          peso_efetivo?: number | null
           peso_estimado_kg?: number | null
           qtd_recebida?: number | null
           qtd_volumes?: number | null
@@ -1422,6 +1424,7 @@ export type Database = {
           nf_fornecedor?: string | null
           numero_coleta?: string
           observacoes?: string | null
+          peso_efetivo?: number | null
           peso_estimado_kg?: number | null
           qtd_recebida?: number | null
           qtd_volumes?: number | null
