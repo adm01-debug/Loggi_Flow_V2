@@ -5,6 +5,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CENTRO_DISTRIBUICAO } from "@/lib/centroDistribuicao";
 
 export interface MapMarker {
   id: string;
@@ -44,7 +45,7 @@ interface MapboxMapProps {
 
 export function MapboxMap({
   markers = [],
-  center = [-46.6333, -23.5505], // São Paulo default
+  center = [CENTRO_DISTRIBUICAO.lng, CENTRO_DISTRIBUICAO.lat],
   zoom = 5,
   showRoute = false,
   showRouteLines = false,

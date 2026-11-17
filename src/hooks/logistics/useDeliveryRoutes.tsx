@@ -66,8 +66,6 @@ const estadoCoordenadas: Record<string, { lat: number; lng: number }> = {
   'RR': { lat: 2.8235, lng: -60.6758 },
 };
 
-// Origin point (empresa em São Paulo)
-export const ORIGIN_COORDINATES = { lat: -23.5505, lng: -46.6333 };
 
 const getCoordinatesFromEstado = (estado: string | null): { lat: number; lng: number } | null => {
   if (!estado) return null;
