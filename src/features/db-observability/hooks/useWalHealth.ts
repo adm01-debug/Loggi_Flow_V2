@@ -3,11 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface WalHealth {
   db_size_bytes: number;
-  wal_size_bytes: number;
-  wal_to_db_ratio: number;
+  wal_size_bytes: number | null;
+  wal_to_db_ratio: number | null;
   checkpoint_timeout_s: number | null;
   max_wal_size_mb: number | null;
-  severity: "critical" | "warning" | "ok";
+  severity: "critical" | "warning" | "ok" | "unknown";
   recommendation: string;
 }
 
