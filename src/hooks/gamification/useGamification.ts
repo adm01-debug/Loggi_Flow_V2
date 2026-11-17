@@ -1,9 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/auth/useAuth";
 
-type ProfileWithXP = {
-  xp?: number | null;
+type UserLevelRow = {
+  current_xp?: number | null;
+  total_xp?: number | null;
+  level?: number | null;
   coins?: number | null;
+  streak_days?: number | null;
+  nexus_score?: number | null;
+  rank?: { name: string; color: string } | null;
   [key: string]: unknown;
 };
 
@@ -54,20 +60,26 @@ const tierToRarity = (tier: RankBadge["tier"]): RankBadge["rarity"] => {
   return "common";
 };
 
-export const useGamification = (userId?: string) => {
+export const useGamification = (userIdParam?: string) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  // P23: a maioria dos consumidores chama useGamification() sem argumento.
+  // Sem este fallback o `enabled: !!userId` desligava todas as queries e o
+  // saldo/XP/nivel apareciam zerados em toda a UI.
+  const userId = userIdParam ?? user?.id;
 
   const { data: profile, isLoading: loadingProfile } = useQuery({
-    queryKey: ["profile", userId],
+    queryKey: ["userLevel", userId],
     enabled: !!userId,
     queryFn: async () => {
+      // P23: XP e moedas vivem em user_levels; profiles nao tem xp/coins.
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId as string)
-        .single();
+        .from("user_levels")
+        .select("*, rank:user_ranks(*)")
+        .eq("user_id", userId as string)
+        .maybeSingle();
       if (error) throw error;
-      return data as unknown as ProfileWithXP;
+      return data as unknown as UserLevelRow | null;
     },
   });
 
@@ -156,8 +168,8 @@ export const useGamification = (userId?: string) => {
     },
   });
 
-  const xpValue = profile?.xp || 0;
-  const levelValue = Math.floor(Math.sqrt(xpValue / 100)) + 1;
+  const xpValue = profile?.total_xp || 0;
+  const levelValue = profile?.level || Math.floor(Math.sqrt(xpValue / 100)) + 1;
   const currentLevelXP = Math.pow(levelValue - 1, 2) * 100;
   const nextLevelXP = Math.pow(levelValue, 2) * 100;
   const progressPercent =
@@ -171,9 +183,9 @@ export const useGamification = (userId?: string) => {
     total_xp: xpValue,
     coins: profile?.coins || 0,
     progress: progressPercent,
-    rank: { name: "Novato", color: "#94a3b8" },
-    streak_days: 1,
-    current_xp: xpValue,
+    rank: profile?.rank ?? { name: "Novato", color: "#94a3b8" },
+    streak_days: profile?.streak_days ?? 0,
+    current_xp: profile?.current_xp ?? xpValue,
   };
 
   return {
@@ -208,6 +220,6 @@ export const useGamification = (userId?: string) => {
         queryKey: ["user_achievements", userId],
       });
     },
-    nexusScore: 85,
+    nexusScore: (profile?.nexus_score as number | null) ?? 85,
   };
 };
