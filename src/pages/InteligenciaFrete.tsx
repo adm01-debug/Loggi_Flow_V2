@@ -53,6 +53,7 @@ const pieColors = [
 export default function InteligenciaFrete() {
   const {
     isLoading,
+    rawData,
     regionAnalysis,
     carrierRouteComparison,
     abusiveFreights,
@@ -235,7 +236,12 @@ export default function InteligenciaFrete() {
           </TabsList>
 
           <TabsContent value="previsao" className="space-y-4">
-            <AIFreightForecasting currentTotal={summary.totalFreight} />
+            <AIFreightForecasting
+              entregas={rawData}
+              abusivos={abusiveFreights}
+              consolidacao={consolidationOpportunities}
+              melhorTransportadora={bestCarrierPerState}
+            />
           </TabsContent>
 
           <TabsContent value="simulador" className="space-y-4">
