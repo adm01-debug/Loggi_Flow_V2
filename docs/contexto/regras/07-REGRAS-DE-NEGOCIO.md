@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `ba166365dc` · branch `main` · 2026-11-17 19:23 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e1f6935d44` · branch `main` · 2026-11-17 20:17 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -2412,6 +2412,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | @description Importação de CSV e Excel com validação Zod | `src/hooks/common/useImportData.ts` |
 | Includes magic-byte validation for security (Dimension 19). | `src/hooks/data/useDocumentUpload.ts` |
 | Magic byte validation for basic types | `src/hooks/data/useDocumentUpload.ts` |
+| pague `xp_reward`/`coins_reward` (o unico em user_achievements apenas | `src/hooks/gamification/useGamification.ts` |
 | Add urgency flag based on deadline | `src/hooks/logistics/useBoxManagement.tsx` |
 | Business Rule Engine — evaluates rules against entity data and executes actions. | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | Debounced Batch Logging for high-frequency rule execution | `src/hooks/logistics/useBusinessRuleEngine.tsx` |

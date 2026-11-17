@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "ba166365dc9a1c108e86025d5dffcf28abc1ba18",
+  "sha": "e1f6935d44a5dd0993647c054f86edc3c8630378",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 19:23 UTC",
+  "generated_at": "2026-11-17 20:17 UTC",
   "files_total": 1310,
   "code_files": 1135,
-  "code_lines": 183489,
+  "code_lines": 183518,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "03535f102125fd55",
+ "facts_hash": "56dd6d32453f7e56",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29722,7 +29722,7 @@
   {
    "module": "src/hooks",
    "files": 123,
-   "lines": 19068,
+   "lines": 19097,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -31475,7 +31475,6 @@
      "scripts/regras_negocio/test_generate.py",
      "src/hooks/auth/useWebAuthn.tsx",
      "src/hooks/common/useComments.tsx",
-     "src/hooks/gamification/useGamification.ts",
      "src/pages/GerenciamentoUsuarios.tsx",
      "src/pages/Relatorios.tsx",
      "src/services/api/authService.ts",
@@ -31805,6 +31804,7 @@
    },
    "user_levels": {
     "select": [
+     "src/hooks/gamification/useGamification.ts",
      "src/hooks/gamification/useGamification.tsx",
      "src/pages/Ranking.tsx",
      "src/pages/Relatorios.tsx"
@@ -36092,6 +36092,10 @@
    {
     "file": "src/hooks/data/useDocumentUpload.ts",
     "text": "Magic byte validation for basic types"
+   },
+   {
+    "file": "src/hooks/gamification/useGamification.ts",
+    "text": "pague `xp_reward`/`coins_reward` (o unico em user_achievements apenas"
    },
    {
     "file": "src/hooks/logistics/useBoxManagement.tsx",
@@ -75856,7 +75860,7 @@
   },
   "src/hooks/gamification/useGamification.ts": {
    "path": "src/hooks/gamification/useGamification.ts",
-   "lines": 214,
+   "lines": 243,
    "exports": [
     "type BadgeTier",
     "type BadgeRarity",
@@ -75866,7 +75870,7 @@
    ],
    "tables": [
     {
-     "table": "profiles",
+     "table": "user_levels",
      "op": "select"
     },
     {
@@ -75887,8 +75891,8 @@
     }
    ],
    "table_cols": {
-    "profiles": [
-     "id"
+    "user_levels": [
+     "user_id"
     ],
     "reward_items": [
      "available"
@@ -75913,6 +75917,9 @@
      "name": "BadgeRarity",
      "values": "common | rare | epic | legendary"
     }
+   ],
+   "rule_comments": [
+    "pague `xp_reward`/`coins_reward` (o unico em user_achievements apenas"
    ],
    "hooks": [
     "useGamification"
@@ -88729,10 +88736,20 @@
   }
  },
  "git": {
-  "sha": "ba166365dc9a1c108e86025d5dffcf28abc1ba18",
+  "sha": "e1f6935d44a5dd0993647c054f86edc3c8630378",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "e1f6935",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)",
+    "files": [
+     "src/components/gamification/GamificationPanel.tsx",
+     "src/hooks/gamification/useGamification.ts"
+    ]
+   },
    {
     "sha": "ba16636",
     "date": "2026-11-17",
@@ -89061,15 +89078,6 @@
     "files": [
      "scripts/ops/README.md"
     ]
-   },
-   {
-    "sha": "926f549",
-    "date": "2026-11-13",
-    "author": "adm01-debug",
-    "subject": "infra: adiciona --yes no deploy de edge functions (#144)",
-    "files": [
-     ".github/workflows/deploy-functions.yml"
-    ]
    }
   ],
   "hot_files": [
@@ -89122,6 +89130,14 @@
     2
    ],
    [
+    "src/components/gamification/GamificationPanel.tsx",
+    1
+   ],
+   [
+    "src/hooks/gamification/useGamification.ts",
+    1
+   ],
+   [
     "supabase/schema-catalog.json",
     1
    ],
@@ -89143,14 +89159,6 @@
    ],
    [
     "src/hooks/logistics/useConciliacao.tsx",
-    1
-   ],
-   [
-    "src/hooks/logistics/useCostAlerts.tsx",
-    1
-   ],
-   [
-    "src/hooks/logistics/useCotacoesMulticanal.tsx",
     1
    ]
   ]

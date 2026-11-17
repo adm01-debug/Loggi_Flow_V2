@@ -2653,6 +2653,7 @@
    "src/utils/celebrationSounds.ts"
   ],
   "src/hooks/gamification/useGamification.ts": [
+   "src/hooks/auth/useAuth.tsx",
    "src/integrations/supabase/client.ts"
   ],
   "src/hooks/gamification/useGamification.tsx": [

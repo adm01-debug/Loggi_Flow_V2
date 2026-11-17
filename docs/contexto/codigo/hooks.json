@@ -1593,7 +1593,7 @@
     "useState"
    ],
    "canais_realtime": [],
-   "usado_por": 76,
+   "usado_por": 77,
    "usado_por_arquivos": [
     "src/App.tsx",
     "src/components/ai/AIAssistant.tsx",
@@ -2551,19 +2551,20 @@
    "hooks_exportados": [
     "useGamification"
    ],
-   "linhas": 214,
+   "linhas": 243,
    "dominio": "hooks/gamification",
    "tabelas": [
     "achievements",
-    "profiles",
     "reward_items",
-    "user_achievements"
+    "user_achievements",
+    "user_levels"
    ],
    "rpcs": [
     "add_user_xp"
    ],
    "edges": [],
    "hooks_internos": [
+    "useAuth",
     "useMutation",
     "useQuery",
     "useQueryClient"

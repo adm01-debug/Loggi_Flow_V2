@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "ba166365dc9a1c108e86025d5dffcf28abc1ba18",
+  "commit": "e1f6935d44a5dd0993647c054f86edc3c8630378",
   "branch": "main",
-  "data_commit": "2026-11-17T16:22:27-03:00",
+  "data_commit": "2026-11-17T17:06:05-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "e1f6935d",
+    "data": "2026-11-17",
+    "assunto": "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)"
+   },
    {
     "sha": "ba166365",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "42774d84",
     "data": "2026-11-14",
     "assunto": "chore: contexto agendado de 10 min para 1x/hora (#154)"
-   },
-   {
-    "sha": "0b8692b6",
-    "data": "2026-11-14",
-    "assunto": "chore: inventario do estado real [auto] (#150)"
    }
   ],
-  "arquivos_mudados_7d": 132,
+  "arquivos_mudados_7d": 134,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -206,11 +206,11 @@
     "mudancas": 42
    },
    {
-    "arquivo": "index.html",
-    "mudancas": 9
+    "arquivo": "src/hooks/gamification/useGamification.ts",
+    "mudancas": 10
    },
    {
-    "arquivo": "src/hooks/gamification/useGamification.ts",
+    "arquivo": "index.html",
     "mudancas": 9
    },
    {
@@ -235,6 +235,10 @@
    },
    {
     "arquivo": "scripts/validate-csp.mjs",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "src/components/gamification/GamificationPanel.tsx",
     "mudancas": 5
    },
    {
@@ -292,16 +296,12 @@
    {
     "arquivo": "scripts/origem_remediacao_2026-08-31.sql",
     "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/ratchet-warning-budget.mjs",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 117
+    "commits": 118
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1300,
   "arquivos_codigo": 875,
-  "linhas_codigo": 167108,
+  "linhas_codigo": 167137,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19068
+   "linhas": 19097
   },
   "src/i18n.ts": {
    "arquivos": 1,
