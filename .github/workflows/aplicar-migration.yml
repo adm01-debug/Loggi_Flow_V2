@@ -1,0 +1,57 @@
+# Aplica um arquivo de supabase/migrations/ no banco oficial.
+# Gatilho: manual (workflow_dispatch). Pre-requisito: secret DESTINO_URL no environment banco-leitura.
+# Motivo: o repo nao tinha caminho automatizado para DDL; migrations ficavam so no git e o
+# types-sync quebrava por divergencia entre o schema real e src/integrations/supabase/types.ts.
+# Seguranca: exige digitar APLICAR, roda dentro de transacao com ON_ERROR_STOP=1 e so aceita
+# caminhos dentro de supabase/migrations/.
+name: Aplicar Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      arquivo:
+        description: "Caminho da migration (ex.: supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql)"
+        required: true
+      confirmacao:
+        description: 'Digite APLICAR para confirmar a escrita no banco oficial'
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  aplicar:
+    runs-on: ubuntu-latest
+    environment: banco-leitura
+    env:
+      DESTINO_URL: ${{ secrets.DESTINO_URL }}
+      ARQUIVO: ${{ inputs.arquivo }}
+      CONFIRMACAO: ${{ inputs.confirmacao }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validar confirmacao, credencial e caminho
+        run: |
+          if [ "$CONFIRMACAO" != "APLICAR" ]; then
+            echo "::error::Confirmacao ausente: digite APLICAR para escrever no banco oficial."
+            exit 1
+          fi
+          if [ -z "$DESTINO_URL" ]; then
+            echo "::error::DESTINO_URL nao configurado no environment 'banco-leitura'."
+            exit 1
+          fi
+          case "$ARQUIVO" in
+            supabase/migrations/*.sql) ;;
+            *) echo "::error::So aceito arquivos dentro de supabase/migrations/ terminados em .sql."; exit 1 ;;
+          esac
+          if [ ! -f "$ARQUIVO" ]; then
+            echo "::error::Arquivo $ARQUIVO nao existe na main."
+            exit 1
+          fi
+      - name: Instalar cliente PostgreSQL
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null
+      - name: Aplicar migration em transacao
+        run: |
+          echo "Aplicando $ARQUIVO"
+          psql "$DESTINO_URL" -v ON_ERROR_STOP=1 --single-transaction -f "$ARQUIVO"
+          echo "OK"
