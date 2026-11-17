@@ -24,18 +24,18 @@ workflow falhar de forma estranha.
 Lido da API em 2026-11-08 (atualizado no mesmo dia: `Agents Docs Integrity` passou a required check após o
 merge da #110). Qualquer mudança nesses campos atualiza **esta tabela no mesmo PR**.
 
-| Campo | Estado canônico |
-|---|---|
-| Branch protection — required checks | **10**: `Security Scan` · `Lint` · `Type Check` · `Warning Budget Gate` · `Unit & Integration Tests` · `Build Artifact` · `quality-gate` · `Security Audits` · `Agents Docs Integrity` · `Contratos da automação local` |
-| Branch protection — `strict` (branch atualizada) | **`false`** — PR atrasada da `main` mergeia sem atualizar |
-| Branch protection — `enforce_admins` | `false` |
-| Branch protection — histórico linear | `false` |
-| Branch protection — review obrigatório | **nenhum** (deliberado: vários agentes com merge próprio) |
-| Branch protection — force push / deleição da `main` | bloqueados |
-| Merge | `allow_squash_merge=true` · `allow_merge_commit=true` · `allow_rebase_merge=true` · `allow_auto_merge=false` · `delete_branch_on_merge=false` |
-| Squash | `squash_merge_commit_message=COMMIT_MESSAGES` · `squash_merge_commit_title=COMMIT_OR_PR_TITLE` |
-| Apps de review no PR | `Vercel` (deploy de preview), `Vercel Agent Review`, `Devin Review`, `Vercel Preview Comments` — **nenhum é required check** |
-| Dependabot | npm + github-actions, semanal, até 10 PRs; majors travados de `eslint`, `@eslint/js`, `vite`, `react`, `react-dom`, `@types/react*` (ver `.github/dependabot.yml` para o motivo de cada um) |
+| Campo                                              | Estado canônico                                                                                                                                                                                                         |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Branch protection — required checks                | **10**: `Security Scan` · `Lint` · `Type Check` · `Warning Budget Gate` · `Unit & Integration Tests` · `Build Artifact` · `quality-gate` · `Security Audits` · `Agents Docs Integrity` · `Contratos da automação local` |
+| Branch protection — `strict` (branch atualizada)   | **`false`** — PR atrasada da `main` mergeia sem atualizar                                                                                                                                                               |
+| Branch protection — `enforce_admins`               | `false`                                                                                                                                                                                                                 |
+| Branch protection — histórico linear               | `false`                                                                                                                                                                                                                 |
+| Branch protection — review obrigatório             | **nenhum** (deliberado: vários agentes com merge próprio)                                                                                                                                                               |
+| Branch protection — force push / deleção da `main` | bloqueados                                                                                                                                                                                                              |
+| Merge                                              | `allow_squash_merge=true` · `allow_merge_commit=true` · `allow_rebase_merge=true` · `allow_auto_merge=false` · `delete_branch_on_merge=false`                                                                           |
+| Squash                                             | `squash_merge_commit_message=COMMIT_MESSAGES` · `squash_merge_commit_title=COMMIT_OR_PR_TITLE`                                                                                                                          |
+| Apps de review no PR                               | `Vercel` (deploy de preview), `Vercel Agent Review`, `Devin Review`, `Vercel Preview Comments` — **nenhum é required check**                                                                                            |
+| Dependabot                                         | npm + github-actions, semanal, até 10 PRs; majors travados de `eslint`, `@eslint/js`, `vite`, `react`, `react-dom`, `@types/react*` (ver `.github/dependabot.yml` para o motivo de cada um)                             |
 
 Consequências práticas:
 
@@ -54,14 +54,14 @@ Consequências práticas:
 
 ## Workflows (6 arquivos em `.github/workflows/`)
 
-| Arquivo | Dispara | Entrega |
-|---|---|---|
-| `ci.yml` (`CI/CD Pipeline`) | push em `main`/`develop`, PR para `main` | `security` (npm audit via `scripts/audit-gate.mjs` + gitleaks), `lint`, `typecheck`, `warning-budget`, `test` (`test:coverage`, com pisos), `build` (build + teto de 8 MB em `dist/assets` + artefato) |
-| `ci-nexus.yml` (`CI Quality Gate Nexus`) | push/PR em `main`/`master`/`develop` | job único `quality-gate`: lint, typecheck, `validate:csp`, `validate:no-console`, `security-scan`, `test:rls`, smoke de edge com Deno, testes, fuzzing, cobertura |
-| `security.yml` (`Security Scan`) | push/PR em `main`/`master` + semanal (dom. 00:00 UTC) | `Security Audits`: npm audit + gitleaks |
-| `deploy-functions.yml` | **só `workflow_dispatch`** | deploy das edge functions no projeto `jvfhclubfpxrtrrazrgr` (input `only` = uma função); exige o secret `SUPABASE_ACCESS_TOKEN` |
-| `e2e.yml` | **só `workflow_dispatch`** | Playwright em chromium; manual até existir usuário de teste semeado + `E2E_EMAIL`/`E2E_PASSWORD` nos secrets |
-| `contexto.yml` | push em `main` que toque `src/`, `supabase/`, os scripts das automações ou `docs/contexto/regras/manual/` + a cada 10 min (minuto 7) + `workflow_dispatch` | regera o contexto para agentes e publica na branch gerada **`contexto`** (nunca na `main`); 5 jobs (`gate`, `codigo`, `banco`, `regras`, `publicar`), produtor que falha não derruba os outros. A fonte `supabase/` fica vazia até existir o secret `SUPABASE_DB_URL`. Detalhe: `docs/agentes/contexto-ia.md` |
+| Arquivo                                  | Dispara                                                                                                                                                    | Entrega                                                                                                                                                                                                                                                                                                       |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml` (`CI/CD Pipeline`)              | push em `main`/`develop`, PR para `main`                                                                                                                   | `security` (npm audit via `scripts/audit-gate.mjs` + gitleaks), `lint`, `typecheck`, `warning-budget`, `test` (`test:coverage`, com pisos), `build` (build + teto de 8 MB em `dist/assets` + artefato)                                                                                                        |
+| `ci-nexus.yml` (`CI Quality Gate Nexus`) | push/PR em `main`/`master`/`develop`                                                                                                                       | job único `quality-gate`: lint, typecheck, `validate:csp`, `validate:no-console`, `security-scan`, `test:rls`, smoke de edge com Deno, testes, fuzzing, cobertura                                                                                                                                             |
+| `security.yml` (`Security Scan`)         | push/PR em `main`/`master` + semanal (dom. 00:00 UTC)                                                                                                      | `Security Audits`: npm audit + gitleaks                                                                                                                                                                                                                                                                       |
+| `deploy-functions.yml`                   | **só `workflow_dispatch`**                                                                                                                                 | deploy das edge functions no projeto `jvfhclubfpxrtrrazrgr` (input `only` = uma função); exige o secret `SUPABASE_ACCESS_TOKEN`                                                                                                                                                                               |
+| `e2e.yml`                                | **só `workflow_dispatch`**                                                                                                                                 | Playwright em chromium; manual até existir usuário de teste semeado + `E2E_EMAIL`/`E2E_PASSWORD` nos secrets                                                                                                                                                                                                  |
+| `contexto.yml`                           | push em `main` que toque `src/`, `supabase/`, os scripts das automações ou `docs/contexto/regras/manual/` + a cada 10 min (minuto 7) + `workflow_dispatch` | regera o contexto para agentes e publica na branch gerada **`contexto`** (nunca na `main`); 5 jobs (`gate`, `codigo`, `banco`, `regras`, `publicar`), produtor que falha não derruba os outros. A fonte `supabase/` fica vazia até existir o secret `SUPABASE_DB_URL`. Detalhe: `docs/agentes/contexto-ia.md` |
 
 Fatos que já custaram retrabalho:
 

@@ -13,6 +13,23 @@
 -- Regra: valor de segredo nunca vai para tela, chat, agente/MCP, commit ou log. Por isso NÃO rode
 -- `SELECT decrypted_secret ...` no SQL editor: o passo 2 copia o valor direto para um arquivo.
 --
+-- PASSO 0 — pré-requisitos, antes de qualquer deploy (recuperado da PR #98):
+--   0.1 Credencial: SUPABASE_ACCESS_TOKEN precisa existir e ser da conta dona do projeto. Sem ele o
+--       deploy morre em 401/403 e não adianta seguir.
+--     [ -n "$SUPABASE_ACCESS_TOKEN" ] && echo "token presente" || echo "FALTA token"
+--   0.2 CLI instalada e apontando para o projeto certo:
+--     supabase --version
+--     supabase projects list      # a lista tem de conter o ref usado neste runbook
+--   0.3 As 5 functions fechadas já existem lá:
+--     supabase functions list --project-ref jvfhclubfpxrtrrazrgr
+--     -> esperado: resend-email, predict-delays-scheduled, evolution-whatsapp, melhor-envio-api e
+--        log-security-event na lista. Faltou alguma => pare e investigue antes de publicar.
+--   0.4 Envs já setadas (o comando mostra só o NOME, nunca o valor):
+--     supabase secrets list --project-ref jvfhclubfpxrtrrazrgr
+--     -> esperado no mínimo: INTERNAL_FN_SECRET e as específicas de cada function (RESEND_API_KEY,
+--        EVOLUTION_API_URL, EVOLUTION_API_KEY, MELHOR_ENVIO_TOKEN). Env ausente não dá 401: a
+--        function responde 500/400 em runtime (fail-closed).
+--
 -- PASSO 1 — conferir o vault, sem mostrar valor (SQL editor do projeto, só leitura):
 --   SELECT name, length(decrypted_secret) AS tamanho FROM vault.decrypted_secrets
 --    WHERE name IN ('internal_fn_secret', 'project_url', 'anon_key');
@@ -49,6 +66,18 @@
 --     SELECT status_code, count(*) FROM net._http_response
 --      WHERE created > now() - interval '1 hour' GROUP BY 1 ORDER BY 1;
 --     -> esperado: nenhuma linha com status_code 401.
+--   4.5 as 3 de usuário passam da auth com um Bearer real (recuperado da PR #98; aqui pelo arquivo de
+--       header, nunca por variável de ambiente, que ficaria no histórico do shell):
+--     umask 077
+--     printf 'Authorization: Bearer %s\n' "<access token de um usuário logado>" > ~/loggi-jwt.hdr
+--     for fn in evolution-whatsapp melhor-envio-api log-security-event; do
+--       printf '%s ' "$fn"; curl -s -o /dev/null -w '%{http_code}\n' -X POST \
+--         -H @"$HOME/loggi-jwt.hdr" "https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/$fn"; done
+--     rm -f ~/loggi-jwt.hdr
+--     -> esperado: qualquer código MENOS 401 (400/500 por corpo vazio já prova que a auth passou).
+--        401 aqui = token expirado ou inválido, gere outro. 429 = rate limit, espere 1 min.
+--   4.6 onde ver o erro: o CLI NÃO tem `supabase functions logs`. Use o Dashboard do projeto
+--       (Logs -> Edge Functions), filtre pelo nome da function, método POST e o intervalo do deploy.
 --
 -- ROLLBACK — se o deploy quebrou produção:
 -- - Deploy anterior: o Supabase mantém versões anteriores. Reverter = redeploy da versão boa. Pelo
