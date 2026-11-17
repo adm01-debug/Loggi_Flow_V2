@@ -14,12 +14,12 @@ import {
 } from "lucide-react";
 import {
   useDeliveryRoutes,
-  ORIGIN_COORDINATES,
   getStatusColor,
 } from "@/hooks/logistics/useDeliveryRoutes";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { cn } from "@/lib/utils";
+import { CENTRO_DISTRIBUICAO as ORIGIN_COORDINATES } from "@/lib/centroDistribuicao";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
