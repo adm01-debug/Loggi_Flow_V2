@@ -96,16 +96,14 @@ export function useImageUpload(bucket: string = "ocorrencias-fotos") {
       if (uploadError) throw uploadError;
       setProgress(80);
 
-      let url: string;
-      if (options.signed) {
-        const { data: signed, error: signErr } = await supabase.storage
-          .from(bucket)
-          .createSignedUrl(filePath, options.signedExpiresIn ?? 60 * 60 * 24 * 365);
-        if (signErr || !signed) throw signErr ?? new Error("Falha ao gerar URL assinada");
-        url = signed.signedUrl;
-      } else {
-        url = supabase.storage.from(bucket).getPublicUrl(filePath).data.publicUrl;
-      }
+      // Todos os buckets do projeto sao privados (migration 20260515134237
+      // forcou `public = false`), entao getPublicUrl devolve uma URL que
+      // responde 400 "Bucket not found". Sempre assinar.
+      const { data: signed, error: signErr } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(filePath, options.signedExpiresIn ?? 60 * 60 * 24 * 365);
+      if (signErr || !signed) throw signErr ?? new Error("Falha ao gerar URL assinada");
+      const url: string = signed.signedUrl;
       setProgress(100);
 
       return { url, path: filePath };

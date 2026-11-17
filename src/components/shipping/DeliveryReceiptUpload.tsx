@@ -11,6 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { getSignedDocumentUrl } from "@/services/api/storageService";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -69,9 +70,10 @@ export function DeliveryReceiptUpload({
         throw uploadError;
       }
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("documents").getPublicUrl(filePath);
+      // `documents` e bucket privado (migration 20260314181509): getPublicUrl
+      // gravava no banco uma URL que responde 400 e o comprovante nunca abria.
+      const publicUrl = await getSignedDocumentUrl(filePath, 60 * 60 * 24 * 365);
+      if (!publicUrl) throw new Error("Falha ao gerar URL do comprovante");
 
       // Audit log for success
       await supabase.from("delivery_receipt_audit").insert({
