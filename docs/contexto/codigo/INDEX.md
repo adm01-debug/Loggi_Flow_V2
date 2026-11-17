@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `09c9545882765ae30358fe9e6b477fea25a5c533` (2026-11-17T12:21:53-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `7931333c32e0f32483dbaa76fbcdeaec4a3687ec` (2026-11-17T12:56:09-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,13 +274,13 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:74, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8103 nós · 20471 arestas · 704 comunidades · grafo do commit `09c95458`
+- 8103 nós · 20471 arestas · 704 comunidades · grafo do commit `7931333c`
 - comunidades maiores: lucide-react (266), Envios.tsx (247), react (200), utils.ts (188), db-observability/index.ts (144), useAuth (118), ref_node_path (116), ui/index.ts (109), cn (104), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (86), celebrationSounds.ts (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
-- package-lock.json (40)
+- package-lock.json (41)
 - package.json (40)
 - index.html (9)
 - src/hooks/gamification/useGamification.ts (9)
@@ -399,6 +399,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `7931333c` chore(db): sincronizar artefatos com o banco [auto] (#166)
+- 2026-11-17 `0ead536e` chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)
 - 2026-11-17 `09c95458` fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)
 - 2026-11-17 `998f1683` fix: serve index.html em rota direta para a SPA nao dar 404 (#165)
 - 2026-11-17 `a6e18fc7` fix: painel de seguranca lia login_attempts por coluna inexistente (#164)
@@ -412,8 +414,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `7b46a982` chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)
 - 2026-11-17 `70f45b32` test: conecta simulacao e fuzzing aos validadores reais (#153)
 - 2026-11-14 `42774d84` chore: contexto agendado de 10 min para 1x/hora (#154)
-- 2026-11-14 `0b8692b6` chore: inventario do estado real [auto] (#150)
-- 2026-11-14 `fef7780f` docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

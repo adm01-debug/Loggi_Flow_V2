@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "09c9545882765ae30358fe9e6b477fea25a5c533",
+  "commit": "7931333c32e0f32483dbaa76fbcdeaec4a3687ec",
   "branch": "main",
-  "data_commit": "2026-11-17T12:21:53-03:00",
+  "data_commit": "2026-11-17T12:56:09-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "7931333c",
+    "data": "2026-11-17",
+    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#166)"
+   },
+   {
+    "sha": "0ead536e",
+    "data": "2026-11-17",
+    "assunto": "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)"
+   },
    {
     "sha": "09c95458",
     "data": "2026-11-17",
@@ -121,19 +131,9 @@
     "sha": "e0982180",
     "data": "2026-11-12",
     "assunto": "fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)"
-   },
-   {
-    "sha": "0c0d48cc",
-    "data": "2026-11-12",
-    "assunto": "chore(deps): bump actions/download-artifact from 7 to 8 (#128)"
-   },
-   {
-    "sha": "5f05479d",
-    "data": "2026-11-12",
-    "assunto": "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)"
    }
   ],
-  "arquivos_mudados_7d": 98,
+  "arquivos_mudados_7d": 99,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -199,7 +199,7 @@
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 40
+    "mudancas": 41
    },
    {
     "arquivo": "package.json",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 108
+    "commits": 109
    },
    {
     "autor": "dependabot[bot]",
@@ -309,7 +309,7 @@
    },
    {
     "autor": "github-actions[bot]",
-    "commits": 2
+    "commits": 3
    }
   ]
  },

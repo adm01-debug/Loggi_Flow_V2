@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "09c9545882765ae30358fe9e6b477fea25a5c533",
+  "sha": "7931333c32e0f32483dbaa76fbcdeaec4a3687ec",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 15:22 UTC",
+  "generated_at": "2026-11-17 15:56 UTC",
   "files_total": 1307,
   "code_files": 1133,
   "code_lines": 183327,
@@ -88675,10 +88675,28 @@
   }
  },
  "git": {
-  "sha": "09c9545882765ae30358fe9e6b477fea25a5c533",
+  "sha": "7931333c32e0f32483dbaa76fbcdeaec4a3687ec",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "7931333",
+    "date": "2026-11-17",
+    "author": "github-actions[bot]",
+    "subject": "chore(db): sincronizar artefatos com o banco [auto] (#166)",
+    "files": [
+     "supabase/schema-manifest.json"
+    ]
+   },
+   {
+    "sha": "0ead536",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)",
+    "files": [
+     "package-lock.json"
+    ]
+   },
    {
     "sha": "09c9545",
     "date": "2026-11-17",
@@ -88970,43 +88988,6 @@
     "files": [
      ".github/workflows/codeql.yml"
     ]
-   },
-   {
-    "sha": "3fad225",
-    "date": "2026-11-12",
-    "author": "adm01-debug",
-    "subject": "style: aplica correcoes locais verificadas (#136)",
-    "files": [
-     "src/components/accessibility/LiveRegion.tsx",
-     "src/components/accessibility/ReducedMotion.tsx",
-     "src/components/accessibility/index.ts",
-     "src/components/achievements/AchievementBadge.tsx",
-     "src/components/achievements/AchievementNotification.tsx",
-     "src/components/achievements/CompactAchievementBadge.tsx",
-     "src/components/achievements/index.ts",
-     "src/components/admin/DORAMetrics.tsx",
-     "src/components/admin/TelemetryViewer.tsx",
-     "src/components/ai/index.ts",
-     "src/components/analytics/DrillDownModal.tsx",
-     "src/components/analytics/index.ts",
-     "src/components/audit/index.ts",
-     "src/components/auth/ProtectedRoute.tsx",
-     "src/components/auth/index.ts",
-     "src/components/automation/index.ts",
-     "src/components/box/index.ts",
-     "src/components/coletas/types.ts",
-     "src/components/common/ConfirmDialog.tsx",
-     "src/components/common/DocumentUploadField.tsx"
-    ]
-   },
-   {
-    "sha": "60b8d21",
-    "date": "2026-11-11",
-    "author": "adm01-debug",
-    "subject": "feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)",
-    "files": [
-     ".github/workflows/sync-internal-secret.yml"
-    ]
    }
   ],
   "hot_files": [
@@ -89023,8 +89004,16 @@
     3
    ],
    [
+    "supabase/schema-manifest.json",
+    2
+   ],
+   [
     ".github/workflows/codeql.yml",
     2
+   ],
+   [
+    "package-lock.json",
+    1
    ],
    [
     "src/features/db-observability/components/WalHealthCard.tsx",
@@ -89080,14 +89069,6 @@
    ],
    [
     "src/lib/centroDistribuicao.test.ts",
-    1
-   ],
-   [
-    "src/lib/centroDistribuicao.ts",
-    1
-   ],
-   [
-    "src/hooks/logistics/useDeliveryRoutes.tsx",
     1
    ]
   ]
