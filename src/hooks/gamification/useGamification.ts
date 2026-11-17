@@ -170,12 +170,15 @@ export const useGamification = (userIdParam?: string) => {
 
   const xpValue = profile?.total_xp || 0;
   const levelValue = profile?.level || Math.floor(Math.sqrt(xpValue / 100)) + 1;
-  const currentLevelXP = Math.pow(levelValue - 1, 2) * 100;
-  const nextLevelXP = Math.pow(levelValue, 2) * 100;
+  const levelStartXP = Math.pow(levelValue - 1, 2) * 100;
+  const levelEndXP = Math.pow(levelValue, 2) * 100;
+  // XP relativo ao nivel atual: a sidebar exibe `currentLevelXP / nextLevelXP`
+  // como progresso dentro do nivel, e os valores absolutos nao variavam
+  // conforme o usuario ganhava XP.
+  const currentLevelXP = Math.max(0, xpValue - levelStartXP);
+  const nextLevelXP = Math.max(0, levelEndXP - levelStartXP);
   const progressPercent =
-    nextLevelXP > currentLevelXP
-      ? ((xpValue - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
-      : 100;
+    nextLevelXP > 0 ? Math.min(100, (currentLevelXP / nextLevelXP) * 100) : 100;
 
   const userLevel = {
     level: levelValue,
@@ -216,6 +219,20 @@ export const useGamification = (userIdParam?: string) => {
         .from("user_achievements")
         .insert({ user_id: userId, achievement_id: badgeId });
       if (error && (error as { code?: string }).code !== "23505") throw error;
+      // Concede a recompensa da conquista. Nao existe trigger no banco que
+      // pague `xp_reward`/`coins_reward` (o unico em user_achievements apenas
+      // notifica), entao sem este passo o usuario desbloqueava a conquista e
+      // nao recebia nada. So paga quando o insert foi novo (23505 = ja tinha).
+      if (!error) {
+        const badge = (badges || []).find(
+          (b) => (b as { id?: string }).id === badgeId,
+        ) as { xp_reward?: number; coins_reward?: number } | undefined;
+        const xp = badge?.xp_reward ?? 0;
+        const coins = badge?.coins_reward ?? 0;
+        if (xp > 0 || coins > 0) {
+          await awardPointsMutation.mutateAsync({ xp, coins });
+        }
+      }
       queryClient.invalidateQueries({
         queryKey: ["user_achievements", userId],
       });
