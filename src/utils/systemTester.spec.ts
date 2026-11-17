@@ -56,7 +56,7 @@ describe('System Integrity Tests', () => {
     const results = await runSystemSanityChecks();
     const failures = results.filter(r => r.status !== 'PASS');
     
-    expect(failures.length).toBe(0);
+    expect(failures).toHaveLength(0);
   });
 
   it('should detect database connectivity failure', async () => {
