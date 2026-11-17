@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { useLocalStorage } from "@/hooks/common/useLocalStorage";
+import { filtrarPorLimiar } from "./alertsFilter";
 
 interface AlertsPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   alerts: RecentAlert[];
@@ -51,17 +52,10 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
       "nexus-alert-threshold",
       5,
     );
-    
 
     // Delta Filter Logic
     const alerts = React.useMemo(() => {
-      return initialAlerts.filter((alert) => {
-        // Mocking delta calculation for demonstration if not present
-        // In a real scenario, this would come from the backend/hook
-        const delta =
-          alert.delta || Number(alert.id.charCodeAt(0)) % 20;
-        return delta >= threshold;
-      });
+      return filtrarPorLimiar(initialAlerts, threshold);
     }, [initialAlerts, threshold]);
 
     const getAlertIcon = (type: RecentAlert["type"]) => {
@@ -278,8 +272,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                     const Icon = getAlertIcon(alert.type);
                     const styles = getSeverityStyles(alert.severity);
                     const delta =
-                      alert.delta ||
-                      (Number(alert.id.charCodeAt(0)) % 20) + 5;
+                      alert.delta || (Number(alert.id.charCodeAt(0)) % 20) + 5;
 
                     return (
                       <motion.div
