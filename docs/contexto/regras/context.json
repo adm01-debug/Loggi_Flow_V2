@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "adb741b6629aef03f80fe36e9534d8ddf3edae67",
+  "sha": "63c4b8335bd11ccb711556d4a7685b634037d21a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 14:38 UTC",
-  "files_total": 1303,
-  "code_files": 1130,
-  "code_lines": 182582,
+  "generated_at": "2026-11-17 14:43 UTC",
+  "files_total": 1305,
+  "code_files": 1132,
+  "code_lines": 182712,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "a21a24282a6d6159",
+ "facts_hash": "1654d04d9c598459",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -292,7 +292,7 @@
   "package_manager": "bun",
   "languages": {
    ".tsx": 453,
-   ".ts": 332,
+   ".ts": 334,
    ".sql": 257,
    ".mjs": 77,
    ".py": 8,
@@ -23748,7 +23748,7 @@
      "validate-login"
     ],
     "rpc_transitive": [],
-    "deps_count": 23
+    "deps_count": 24
    },
    {
     "path": "/, /ch, /comentada-jsx, /comentada-linha, /h, /nova, /z, /ä",
@@ -23789,7 +23789,7 @@
      "add_user_xp",
      "get_dashboard_metrics"
     ],
-    "deps_count": 107
+    "deps_count": 108
    },
    {
     "path": "/admin/adr",
@@ -23818,7 +23818,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 61
+    "deps_count": 62
    },
    {
     "path": "/admin/telemetria",
@@ -23848,7 +23848,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 71
+    "deps_count": 72
    },
    {
     "path": "/alertas-custo",
@@ -23879,7 +23879,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 70
+    "deps_count": 71
    },
    {
     "path": "/analytics",
@@ -23911,7 +23911,7 @@
      "add_user_xp",
      "get_monthly_analytics"
     ],
-    "deps_count": 64
+    "deps_count": 65
    },
    {
     "path": "/api-docs",
@@ -23940,7 +23940,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/aprovacao-reset-senha",
@@ -23969,7 +23969,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 64
+    "deps_count": 65
    },
    {
     "path": "/audit-trail",
@@ -23998,7 +23998,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 76
+    "deps_count": 77
    },
    {
     "path": "/automacao-regras",
@@ -24028,7 +24028,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/bitrix24",
@@ -24057,7 +24057,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 58
+    "deps_count": 59
    },
    {
     "path": "/calendario",
@@ -24086,7 +24086,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 57
+    "deps_count": 58
    },
    {
     "path": "/central-rastreamento",
@@ -24116,7 +24116,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 66
+    "deps_count": 67
    },
    {
     "path": "/clientes",
@@ -24144,7 +24144,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 79
+    "deps_count": 80
    },
    {
     "path": "/coletas",
@@ -24173,7 +24173,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 79
+    "deps_count": 80
    },
    {
     "path": "/conciliacao",
@@ -24250,7 +24250,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 147
+    "deps_count": 148
    },
    {
     "path": "/conciliacao-automatica",
@@ -24278,7 +24278,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 60
+    "deps_count": 61
    },
    {
     "path": "/config-frete",
@@ -24307,7 +24307,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/configuracoes",
@@ -24386,7 +24386,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 146
+    "deps_count": 147
    },
    {
     "path": "/conquistas",
@@ -24415,7 +24415,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 65
+    "deps_count": 66
    },
    {
     "path": "/cotacao-frete",
@@ -24492,7 +24492,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 174
+    "deps_count": 175
    },
    {
     "path": "/cotacao-multicanal",
@@ -24570,7 +24570,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 176
+    "deps_count": 177
    },
    {
     "path": "/custos",
@@ -24599,7 +24599,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/dashboard-cotacoes",
@@ -24676,7 +24676,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 147
+    "deps_count": 148
    },
    {
     "path": "/dashboard-executivo",
@@ -24704,7 +24704,7 @@
      "add_user_xp",
      "get_monthly_analytics"
     ],
-    "deps_count": 65
+    "deps_count": 66
    },
    {
     "path": "/despachos",
@@ -24734,7 +24734,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 72
+    "deps_count": 73
    },
    {
     "path": "/envios",
@@ -24761,7 +24761,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 85
+    "deps_count": 86
    },
    {
     "path": "/exportacao",
@@ -24774,7 +24774,7 @@
     ],
     "invokes_transitive": [],
     "rpc_transitive": [],
-    "deps_count": 12
+    "deps_count": 13
    },
    {
     "path": "/fornecedores",
@@ -24802,7 +24802,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 72
+    "deps_count": 73
    },
    {
     "path": "/fretes-internos",
@@ -24831,7 +24831,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 75
+    "deps_count": 76
    },
    {
     "path": "/gerenciamento-usuarios",
@@ -24858,7 +24858,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 61
+    "deps_count": 62
    },
    {
     "path": "/gestao-box",
@@ -24888,7 +24888,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 73
+    "deps_count": 74
    },
    {
     "path": "/gestao-rodonaves",
@@ -24923,7 +24923,7 @@
      "rte_gateway_sustained_downtime",
      "rte_rollup_slo_daily"
     ],
-    "deps_count": 82
+    "deps_count": 83
    },
    {
     "path": "/importacao-massa",
@@ -24952,7 +24952,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 64
+    "deps_count": 65
    },
    {
     "path": "/inteligencia-frete",
@@ -25028,7 +25028,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 160
+    "deps_count": 161
    },
    {
     "path": "/kanban-entregas",
@@ -25058,7 +25058,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 61
+    "deps_count": 62
    },
    {
     "path": "/logistica-reversa",
@@ -25135,7 +25135,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 142
+    "deps_count": 143
    },
    {
     "path": "/loja",
@@ -25164,7 +25164,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 68
+    "deps_count": 69
    },
    {
     "path": "/mapa-rotas",
@@ -25195,7 +25195,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 66
+    "deps_count": 67
    },
    {
     "path": "/melhor-envio",
@@ -25225,7 +25225,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 95
+    "deps_count": 96
    },
    {
     "path": "/notificacoes",
@@ -25254,7 +25254,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 68
+    "deps_count": 69
    },
    {
     "path": "/ocorrencias",
@@ -25282,7 +25282,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 75
+    "deps_count": 76
    },
    {
     "path": "/painel-otif",
@@ -25310,7 +25310,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 59
+    "deps_count": 60
    },
    {
     "path": "/painel-sla",
@@ -25330,7 +25330,7 @@
     "rpc_transitive": [
      "count_prediction_breach_days"
     ],
-    "deps_count": 45
+    "deps_count": 46
    },
    {
     "path": "/perfil",
@@ -25358,7 +25358,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 59
+    "deps_count": 60
    },
    {
     "path": "/ranking",
@@ -25386,7 +25386,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 67
+    "deps_count": 68
    },
    {
     "path": "/rastreamento-motorista",
@@ -25417,7 +25417,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 58
+    "deps_count": 59
    },
    {
     "path": "/rastreamento/:id",
@@ -25449,7 +25449,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 65
+    "deps_count": 66
    },
    {
     "path": "/rastrear",
@@ -25458,7 +25458,7 @@
     "tables_transitive": [],
     "invokes_transitive": [],
     "rpc_transitive": [],
-    "deps_count": 8
+    "deps_count": 9
    },
    {
     "path": "/rate-limit",
@@ -25489,7 +25489,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/relatorio-pdf",
@@ -25517,7 +25517,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 58
+    "deps_count": 59
    },
    {
     "path": "/relatorios",
@@ -25543,7 +25543,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 66
+    "deps_count": 67
    },
    {
     "path": "/reset-password",
@@ -25552,7 +25552,7 @@
     "tables_transitive": [],
     "invokes_transitive": [],
     "rpc_transitive": [],
-    "deps_count": 9
+    "deps_count": 10
    },
    {
     "path": "/rotas-transportadoras",
@@ -25581,7 +25581,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 66
+    "deps_count": 67
    },
    {
     "path": "/seguranca",
@@ -25625,7 +25625,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 87
+    "deps_count": 88
    },
    {
     "path": "/sla-dashboard",
@@ -25656,7 +25656,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 61
+    "deps_count": 62
    },
    {
     "path": "/transportadoras",
@@ -25685,7 +25685,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 79
+    "deps_count": 80
    },
    {
     "path": "/webhooks",
@@ -25717,7 +25717,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    }
   ],
   "edge_functions": [
@@ -29260,7 +29260,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48526,
+   "lines": 48527,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29701,7 +29701,7 @@
   {
    "module": "src/hooks",
    "files": 123,
-   "lines": 19043,
+   "lines": 19044,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -29924,7 +29924,7 @@
   {
    "module": "src/integrations",
    "files": 4,
-   "lines": 6702,
+   "lines": 6703,
    "tables": [],
    "exports": [
     "index.ts: lovable",
@@ -29940,7 +29940,9 @@
     "@supabase/supabase-js",
     "zod"
    ],
-   "imports_modules": [],
+   "imports_modules": [
+    "src/lib"
+   ],
    "file_list": [
     "src/integrations/lovable/index.ts",
     "src/integrations/shared/api-schemas.ts",
@@ -29950,8 +29952,8 @@
   },
   {
    "module": "src/lib",
-   "files": 48,
-   "lines": 6404,
+   "files": 50,
+   "lines": 6530,
    "tables": [],
    "exports": [
     "centroDistribuicao.ts: CoordenadaCD, CD_PADRAO, resolverCentroDistribuicao, CENTRO_DISTRIBUICAO",
@@ -29965,6 +29967,7 @@
     "mapFallback.ts: RAIO_DISPERSAO_GRAUS, hashEstavel, deslocamentoEstavel",
     "queryConfig.ts: QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL",
     "queryKeys.ts: QUERY_KEYS",
+    "supabaseEnv.ts: limparValorEnv, sanitizarUrlSupabase, refDoProjeto",
     "utils.ts: cn",
     "validations.ts: validateCNPJDigits, clienteSchema, fornecedorSchema, transportadoraSchema, coletaSchema, entregaSchema",
     "mitigationROI.ts: MitigationRecord, CategoryROI, ROIReport, computeROI",
@@ -30020,6 +30023,8 @@
     "src/lib/mapFallback.ts",
     "src/lib/queryConfig.ts",
     "src/lib/queryKeys.ts",
+    "src/lib/supabaseEnv.test.ts",
+    "src/lib/supabaseEnv.ts",
     "src/lib/utils.ts",
     "src/lib/validations.ts",
     "src/lib/predictions/mitigationROI.test.ts",
@@ -30056,7 +30061,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30693,
+   "lines": 30694,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -36134,6 +36139,14 @@
    {
     "file": "src/hooks/ui/useQRScanner.tsx",
     "text": "Check for camera permission"
+   },
+   {
+    "file": "src/lib/supabaseEnv.ts",
+    "text": "`Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL` porque o valor"
+   },
+   {
+    "file": "src/lib/supabaseEnv.ts",
+    "text": "* Painel de env nao tem validacao; o codigo precisa ter."
    },
    {
     "file": "src/lib/validations.ts",
@@ -46783,6 +46796,12 @@
     "body": "return [ insightTendencia(fonte.variacaoProjetada), insightAbusivos(fonte.abusivos), insightConsolidacao(fonte.consolidacao), insightTransportadora(fonte.melhorTransportadora), ].filter((i): i is InsightFrete => i !== null);"
    },
    {
+    "file": "src/lib/supabaseEnv.ts",
+    "name": "limparValorEnv",
+    "params": "bruto: string | undefined | null",
+    "body": "if (bruto === undefined || bruto === null) return \"\"; let texto = String(bruto).trim(); // remove aspas simples ou duplas que envolvem o valor inteiro while ( texto.length >= 2 && ((texto.startsWith('\"') && texto.endsWith('\"')) || (texto.startsWith(\"'\") && texto.endsWith(\"'\"))) ) { texto = texto.slice(1, -1).trim(); } // barra final quebra a montagem de `${URL}/functions/v1/...` while (texto.endsWith(\"/\")) { texto = texto.slice(0, -1); } return texto;"
+   },
+   {
     "file": "src/lib/validations.ts",
     "name": "validateCNPJDigits",
     "params": "cnpj: string",
@@ -48241,6 +48260,66 @@
    {
     "file": "src/lib/mapFallback.test.ts",
     "name": "trata string vazia"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "limparValorEnv"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "remove as aspas duplas que a Vercel gravou dentro do valor"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "remove aspas simples e espacos em volta"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "remove barra final que duplicaria a barra das edge functions"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "devolve string vazia para ausente"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "nao altera valor que ja esta correto"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "sanitizarUrlSupabase"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "aceita a URL suja que derrubou a producao"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "recusa valor ausente"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "recusa texto que nao e URL"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "recusa protocolo que nao e http(s)"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "refDoProjeto"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "extrai o ref mesmo com a URL suja"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "extrai o ref da URL limpa"
+   },
+   {
+    "file": "src/lib/supabaseEnv.test.ts",
+    "name": "devolve vazio quando a URL e invalida"
    },
    {
     "file": "src/lib/predictions/mitigationROI.test.ts",
@@ -68582,7 +68661,7 @@
   },
   "src/components/ai/AIAssistant.tsx": {
    "path": "src/components/ai/AIAssistant.tsx",
-   "lines": 309,
+   "lines": 310,
    "exports": [
     "function AIAssistant"
    ],
@@ -74538,7 +74617,7 @@
   },
   "src/hooks/auth/useAuth.tsx": {
    "path": "src/hooks/auth/useAuth.tsx",
-   "lines": 264,
+   "lines": 265,
    "exports": [
     "function AuthProvider",
     "function useAuth"
@@ -79149,7 +79228,7 @@
   },
   "src/integrations/supabase/client.ts": {
    "path": "src/integrations/supabase/client.ts",
-   "lines": 23,
+   "lines": 24,
    "exports": [
     "const supabase"
    ],
@@ -79541,6 +79620,54 @@
     "const QUERY_KEYS"
    ],
    "doc": "QUERY KEYS FACTORY - Centralized query keys for precise cache invalidation."
+  },
+  "src/lib/supabaseEnv.test.ts": {
+   "path": "src/lib/supabaseEnv.test.ts",
+   "lines": 66,
+   "is_test": true,
+   "params": [
+    {
+     "name": "LIMPA",
+     "value": "\"https://jvfhclubfpxrtrrazrgr.supabase.co\""
+    }
+   ],
+   "tests": [
+    "limparValorEnv",
+    "remove as aspas duplas que a Vercel gravou dentro do valor",
+    "remove aspas simples e espacos em volta",
+    "remove barra final que duplicaria a barra das edge functions",
+    "devolve string vazia para ausente",
+    "nao altera valor que ja esta correto",
+    "sanitizarUrlSupabase",
+    "aceita a URL suja que derrubou a producao",
+    "recusa valor ausente",
+    "recusa texto que nao e URL",
+    "recusa protocolo que nao e http(s)",
+    "refDoProjeto",
+    "extrai o ref mesmo com a URL suja",
+    "extrai o ref da URL limpa",
+    "devolve vazio quando a URL e invalida"
+   ]
+  },
+  "src/lib/supabaseEnv.ts": {
+   "path": "src/lib/supabaseEnv.ts",
+   "lines": 60,
+   "exports": [
+    "function limparValorEnv",
+    "function sanitizarUrlSupabase",
+    "function refDoProjeto"
+   ],
+   "rule_comments": [
+    "`Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL` porque o valor",
+    "* Painel de env nao tem validacao; o codigo precisa ter."
+   ],
+   "calc_fns": [
+    {
+     "name": "limparValorEnv",
+     "params": "bruto: string | undefined | null",
+     "body": "if (bruto === undefined || bruto === null) return \"\"; let texto = String(bruto).trim(); // remove aspas simples ou duplas que envolvem o valor inteiro while ( texto.length >= 2 && ((texto.startsWith('\"') && texto.endsWith('\"')) || (texto.startsWith(\"'\") && texto.endsWith(\"'\"))) ) { texto = texto.slice(1, -1).trim(); } // barra final quebra a montagem de `${URL}/functions/v1/...` while (texto.endsWith(\"/\")) { texto = texto.slice(0, -1); } return texto;"
+    }
+   ]
   },
   "src/lib/utils.ts": {
    "path": "src/lib/utils.ts",
@@ -81334,7 +81461,7 @@
   },
   "src/pages/ConfiguracoesFrete.tsx": {
    "path": "src/pages/ConfiguracoesFrete.tsx",
-   "lines": 1071,
+   "lines": 1072,
    "exports": [
     "function FreightConfig"
    ],
@@ -88536,10 +88663,24 @@
   }
  },
  "git": {
-  "sha": "adb741b6629aef03f80fe36e9534d8ddf3edae67",
+  "sha": "63c4b8335bd11ccb711556d4a7685b634037d21a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "63c4b83",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "﻿fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)",
+    "files": [
+     "src/components/ai/AIAssistant.tsx",
+     "src/hooks/auth/useAuth.tsx",
+     "src/integrations/supabase/client.ts",
+     "src/lib/supabaseEnv.test.ts",
+     "src/lib/supabaseEnv.ts",
+     "src/pages/ConfiguracoesFrete.tsx"
+    ]
+   },
    {
     "sha": "adb741b",
     "date": "2026-11-17",
@@ -88852,32 +88993,6 @@
     "files": [
      "scripts/ops/pos_deploy_functions.sql"
     ]
-   },
-   {
-    "sha": "e31c16a",
-    "date": "2026-11-11",
-    "author": "adm01-debug",
-    "subject": "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)",
-    "files": [
-     ".github/workflows/automation-local.yml",
-     ".gitignore",
-     "docs/AUTOMACAO_LOCAL.md",
-     "graphify.local.json",
-     "package.json",
-     "scripts/automation.config.json",
-     "scripts/automation.mjs",
-     "scripts/automation.unit.mjs",
-     "scripts/graphify-local.mjs",
-     "scripts/graphify-local.unit.mjs",
-     "scripts/maintenance/README.md",
-     "scripts/maintenance/config.example.json",
-     "scripts/maintenance/config.json",
-     "scripts/maintenance/lib.mjs",
-     "scripts/maintenance/maintenance.unit.mjs",
-     "scripts/maintenance/run.mjs",
-     "scripts/maintenance/run.sh",
-     "scripts/maintenance/typecheck.mjs"
-    ]
    }
   ],
   "hot_files": [
@@ -88910,6 +89025,30 @@
     2
    ],
    [
+    "src/components/ai/AIAssistant.tsx",
+    1
+   ],
+   [
+    "src/hooks/auth/useAuth.tsx",
+    1
+   ],
+   [
+    "src/integrations/supabase/client.ts",
+    1
+   ],
+   [
+    "src/lib/supabaseEnv.test.ts",
+    1
+   ],
+   [
+    "src/lib/supabaseEnv.ts",
+    1
+   ],
+   [
+    "src/pages/ConfiguracoesFrete.tsx",
+    1
+   ],
+   [
     ".env.example",
     1
    ],
@@ -88935,30 +89074,6 @@
    ],
    [
     "src/lib/mapFallback.ts",
-    1
-   ],
-   [
-    "src/components/freight/AIFreightForecasting.tsx",
-    1
-   ],
-   [
-    "src/lib/freightForecast.test.ts",
-    1
-   ],
-   [
-    "src/lib/freightForecast.ts",
-    1
-   ],
-   [
-    "src/pages/InteligenciaFrete.tsx",
-    1
-   ],
-   [
-    "src/components/dashboard/AlertsPanel.tsx",
-    1
-   ],
-   [
-    "src/components/dashboard/alertsFilter.test.ts",
     1
    ]
   ]

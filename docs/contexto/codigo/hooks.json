@@ -1582,7 +1582,7 @@
    "hooks_exportados": [
     "useAuth"
    ],
-   "linhas": 264,
+   "linhas": 265,
    "dominio": "hooks/auth",
    "tabelas": [],
    "rpcs": [],

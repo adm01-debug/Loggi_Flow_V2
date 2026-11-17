@@ -16,12 +16,12 @@
    "src/components (14)"
   ],
   "servicos_logica": [
-   "src/lib (29)",
+   "src/lib (30)",
    "src/utils (6)",
    "src/services (5)"
   ],
   "testes": [
-   "co-localizado (*.test) (71)",
+   "co-localizado (*.test) (72)",
    "outro (45)",
    "tests/ (11)"
   ],
@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)",
    "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)",
    "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)",
    "fix: previsao de frete deixa de ser numero inventado (#159)",
-   "fix: alertas de divergencia e falha de frete sumiam da home (#158)",
-   "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)"
+   "fix: alertas de divergencia e falha de frete sumiam da home (#158)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

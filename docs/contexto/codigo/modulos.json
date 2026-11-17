@@ -202,7 +202,7 @@
    "modulo": "components/ai",
    "arquivos": 2,
    "testes": 0,
-   "linhas": 314,
+   "linhas": 315,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -3178,7 +3178,7 @@
    "modulo": "hooks/auth",
    "arquivos": 8,
    "testes": 0,
-   "linhas": 1525,
+   "linhas": 1526,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -4375,7 +4375,7 @@
    "modulo": "integrations/supabase",
    "arquivos": 2,
    "testes": 0,
-   "linhas": 6633,
+   "linhas": 6634,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -4436,16 +4436,18 @@
     "services/resilience",
     "utils"
    ],
-   "depende_de_modulos": [],
+   "depende_de_modulos": [
+    "lib"
+   ],
    "pacotes_externos": [
     "@supabase/supabase-js"
    ]
   },
   {
    "modulo": "lib",
-   "arquivos": 14,
-   "testes": 5,
-   "linhas": 1377,
+   "arquivos": 15,
+   "testes": 6,
+   "linhas": 1437,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -4501,6 +4503,7 @@
     "hooks/logistics",
     "hooks/notifications",
     "hooks/security",
+    "integrations/supabase",
     "pages",
     "pages/conciliacao",
     "pages/ranking"
@@ -4614,7 +4617,7 @@
    "modulo": "pages",
    "arquivos": 59,
    "testes": 0,
-   "linhas": 27800,
+   "linhas": 27801,
    "itens_menu": [
     "Administração",
     "Administração",

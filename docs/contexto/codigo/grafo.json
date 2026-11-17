@@ -1,8 +1,8 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "nos": 745,
- "arestas": 3063,
+ "nos": 746,
+ "arestas": 3067,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -245,13 +245,13 @@
   },
   {
    "modulo": "integrations/supabase",
-   "depende_de": 0,
+   "depende_de": 1,
    "importado_por": 36
   },
   {
    "modulo": "lib",
    "depende_de": 0,
-   "importado_por": 35
+   "importado_por": 36
   },
   {
    "modulo": "hooks/auth",

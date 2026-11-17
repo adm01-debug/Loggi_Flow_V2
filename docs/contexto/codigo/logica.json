@@ -1,10 +1,10 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 47,
+ "total": 48,
  "por_camada": {
   "integrations": 4,
-  "lib": 29,
+  "lib": 30,
   "python": 3,
   "services": 5,
   "utils": 6
@@ -300,7 +300,7 @@
     "supabase"
    ],
    "export_default": null,
-   "linhas": 23,
+   "linhas": 24,
    "tabelas": [],
    "rpcs": [],
    "edges": [],
@@ -1262,6 +1262,34 @@
    "usado_por_modulos": [],
    "coberto_por_testes": 0,
    "orfao": true
+  },
+  {
+   "arquivo": "src/lib/supabaseEnv.ts",
+   "camada": "lib",
+   "exports": [
+    "limparValorEnv",
+    "refDoProjeto",
+    "sanitizarUrlSupabase"
+   ],
+   "export_default": null,
+   "linhas": 60,
+   "tabelas": [],
+   "rpcs": [],
+   "edges": [],
+   "env": [],
+   "externos": [],
+   "zod_schemas": 0,
+   "flags": [],
+   "papeis": [],
+   "usado_por": 4,
+   "usado_por_modulos": [
+    "components/ai",
+    "hooks/auth",
+    "integrations/supabase",
+    "pages"
+   ],
+   "coberto_por_testes": 1,
+   "orfao": false
   },
   {
    "arquivo": "src/lib/utils.ts",

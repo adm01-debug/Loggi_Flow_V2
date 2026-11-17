@@ -184,6 +184,7 @@
    "src/components/ui/scroll-area.tsx",
    "src/components/ui/tooltip.tsx",
    "src/hooks/auth/useAuth.tsx",
+   "src/lib/supabaseEnv.ts",
    "src/lib/utils.ts"
   ],
   "src/components/ai/index.ts": [
@@ -2566,6 +2567,7 @@
   ],
   "src/hooks/auth/useAuth.tsx": [
    "src/integrations/supabase/client.ts",
+   "src/lib/supabaseEnv.ts",
    "src/services/api/authService.ts"
   ],
   "src/hooks/auth/useDeviceSessions.ts": [
@@ -3025,7 +3027,8 @@
    "src/integrations/supabase/client.ts"
   ],
   "src/integrations/supabase/client.ts": [
-   "src/integrations/supabase/types.ts"
+   "src/integrations/supabase/types.ts",
+   "src/lib/supabaseEnv.ts"
   ],
   "src/lib/conciliacaoImport.ts": [
    "src/lib/formatters.ts"
@@ -3322,7 +3325,8 @@
    "src/components/ui/switch.tsx",
    "src/components/ui/tabs.tsx",
    "src/components/ui/textarea.tsx",
-   "src/integrations/supabase/client.ts"
+   "src/integrations/supabase/client.ts",
+   "src/lib/supabaseEnv.ts"
   ],
   "src/pages/Conquistas.tsx": [
    "src/components/common/FilterBar.tsx",

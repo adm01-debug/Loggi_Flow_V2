@@ -213,7 +213,7 @@
     "AIAssistant"
    ],
    "export_default": null,
-   "linhas": 309,
+   "linhas": 310,
    "dominio": "components/ai",
    "hooks_locais": [
     "useAuth"
@@ -4935,7 +4935,7 @@
     "AuthProvider"
    ],
    "export_default": null,
-   "linhas": 264,
+   "linhas": 265,
    "dominio": "hooks/auth",
    "hooks_locais": [
     "useAuth"
@@ -5508,7 +5508,7 @@
     "FreightConfig"
    ],
    "export_default": "FreightConfig",
-   "linhas": 1071,
+   "linhas": 1072,
    "dominio": "pages",
    "hooks_locais": [],
    "tabelas": [

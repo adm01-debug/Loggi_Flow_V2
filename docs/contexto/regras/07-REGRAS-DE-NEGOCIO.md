@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `adb741b662` · branch `main` · 2026-11-17 14:38 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `63c4b8335b` · branch `main` · 2026-11-17 14:43 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1345,6 +1345,10 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
   ```
   return [ insightTendencia(fonte.variacaoProjetada), insightAbusivos(fonte.abusivos), insightConsolidacao(fonte.consolidacao), insightTransportadora(fonte.melhorTransportadora), ].filter((i): i is InsightFrete => i !== null);
   ```
+- **limparValorEnv(bruto: string | undefined | null)** — `src/lib/supabaseEnv.ts`
+  ```
+  if (bruto === undefined || bruto === null) return ""; let texto = String(bruto).trim(); // remove aspas simples ou duplas que envolvem o valor inteiro while ( texto.length >= 2 && ((texto.startsWith('"') && texto.endsWith('"')) || (texto.startsWith("'") && texto.endsWith("'"))) ) { texto = texto.slice(1, -1).trim(); } // barra final quebra a montagem de `${URL}/functions/v1/...` while (texto.endsWith("/")) { texto = texto.slice(0, -1); } return texto;
+  ```
 - **validateCNPJDigits(cnpj: string)** — `src/lib/validations.ts`
   ```
   const numbers = cnpj.replace(/\D/g, ""); if (numbers.length !== 14) return false; // Check for known invalid patterns if (/^(\d)\1+$/.test(numbers)) return false; // Calculate first check digit let sum = 0; let weight = 5; for (let i = 0; i < 12; i++) { sum += parseInt(numbers[i]) * weight; weight = weight === 2 ? 9 : weight - 1; } let remainder = sum % 11; const digit1 = remainder < 2 ? 0 : 11 - remainder; if (parseInt(numbers[12]) !== digit1) return false; // Calculate second check digit sum = …
@@ -2209,7 +2213,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (346 testes em 36 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (361 testes em 37 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
@@ -2221,6 +2225,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `src/lib/rodonaves/gatewaySLO.test.ts` | 17 | normalizeTarget · usa padrões quando ausente · limita valores fora da faixa · tolera NaN … |
 | `src/lib/rodonaves/sloAlerts.test.ts` | 17 | severityForStatus · mapeia status para severidade · evaluateSLOAlerts · dispara alerta crítico sem histórico … |
 | `src/lib/rodonaves/sloReport.test.ts` | 16 | buildSLOReport · retorna relatório vazio sem amostras · agrupa por dia e gateway · calcula uptime e falhas corretamente … |
+| `src/lib/supabaseEnv.test.ts` | 15 | limparValorEnv · remove as aspas duplas que a Vercel gravou dentro do valor · remove aspas simples e espacos em volta · remove barra final que duplicaria a barra das edge functions … |
 | `src/components/security/SecurityOverviewPanel.regression.test.ts` | 14 | SecurityOverviewPanel — score computation · baseline score is 50 with no signals and MFA disabled · MFA adds 20 points · trusted-devices ratio adds up to 10 rounded … |
 | `src/lib/rodonaves/capabilities.test.ts` | 14 | matriz de capacidades · não possui ações duplicadas · todo status possui rótulo · todo gateway referenciado possui perfil de latência … |
 | `src/lib/predictions/mitigationRecommender.test.ts` | 11 | scoreImpact / priorityFromScore · bucket dominante recebe score 100 · bucket vazio recebe score 0 · bordas de prioridade são estáveis … |
@@ -2420,6 +2425,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Fetch rate limit logs | `src/hooks/security/useRateLimitLogs.ts` |
 | Check rate limit status | `src/hooks/security/useSecurityEvents.ts` |
 | Check for camera permission | `src/hooks/ui/useQRScanner.tsx` |
+| `Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL` porque o valor | `src/lib/supabaseEnv.ts` |
+| * Painel de env nao tem validacao; o codigo precisa ter. | `src/lib/supabaseEnv.ts` |
 | Custom CNPJ validation with digit verification | `src/lib/validations.ts` |
 | * Implementa as três regras de negócio derivadas do mapa de EventCodes: | `src/lib/rodonaves/freightHealth.ts` |
 | - ATRASADO: dias úteis decorridos desde a emissão > prazo previsto, | `src/lib/rodonaves/freightHealth.ts` |
