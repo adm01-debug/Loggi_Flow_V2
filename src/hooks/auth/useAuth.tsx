@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import { User, Session } from "@supabase/supabase-js";
+import { sanitizarUrlSupabase, refDoProjeto } from "@/lib/supabaseEnv";
 import { supabase } from "@/integrations/supabase/client";
 import { authService, Profile } from "@/services/api/authService";
 
@@ -24,8 +25,8 @@ import { authService, Profile } from "@/services/api/authService";
 //
 // A chave usada no localStorage segue o padrão do supabase-js v2:
 // `sb-<project-ref>-auth-token`.
-const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL || "") as string;
-const PROJECT_REF = SUPABASE_URL.replace(/^https?:\/\//, "").split(".")[0];
+const SUPABASE_URL = sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? "";
+const PROJECT_REF = refDoProjeto(SUPABASE_URL);
 const TOKEN_STORAGE_KEY = `sb-${PROJECT_REF}-auth-token`;
 
 interface CachedSession {
