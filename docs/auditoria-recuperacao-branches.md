@@ -98,3 +98,53 @@ GET  -> {"enabled":true,"allowed_actions":"all","sha_pinning_required":false}
 ```
 
 Depois disso os workflows voltaram a criar jobs (`in_progress` em vez de `startup_failure` em 0s).
+
+## Branches deletadas (2026-11-17)
+
+Criterio aplicado antes de cada delecao, nas **26** branches avaliadas:
+
+1. `git diff --name-only $(git merge-base origin/main $b) $b` -> lista o que a branch mudou;
+2. para cada arquivo, `git cat-file -e origin/main:$f` -> **nenhum** arquivo estava ausente na `main`;
+3. os arquivos que ainda divergiam tiveram o diff lido a mao e foram classificados nas tabelas acima.
+
+Resultado da varredura final: `TOTAL A AVALIAR: 26` / zero linhas `AUSENTES NA MAIN`.
+
+25 branches apagadas via `DELETE /repos/.../git/refs/heads/<nome>`:
+
+- `claude/fix-content-hash-20261107-1223`
+- `claude/fix-manifest-summary-pgcron-20261107-1226`
+- `claude/infra-gitattributes-eol-20261107-1228`
+- `claude/fix-set-missing-secrets-guard-20261107-1424`
+- `claude/auditoria-tecnica-sistema-gs1hbc`
+- `claude/ci-workflows-scripts-261109-2339`
+- `claude/feat-port-scripts-automacao-261108-1520`
+- `claude/fix-scripts-robustez-261109-2304`
+- `claude/chore-manutencao-local-261110-0831`
+- `claude/system-status-roadmap-ncpven`
+- `claude/chore-recupera-passo0-runbook-261117-0945` (apagada no merge da #155)
+- `claude_04/elegant-hopper-ffoje5`
+- `Github_Copilotfix-seed-database-hardening`
+- `Github_Copilotchore-runbook-pos-deploy-functions-20261`
+- `cutover-config`
+- `ecc-tools/Loggi_Flow_V2-1788403262363`
+- `fix/lockfile-sync-esbuild`
+- `fix/security-tests-timeout`
+- `computador_local`
+- `dependabot/github_actions/github/codeql-action/init-4.39.3`
+- `dependabot/github_actions/peter-evans/create-pull-request-8.1.2`
+- `dependabot/npm_and_yarn/eslint-plugin-react-refresh-0.5.6`
+- `dependabot/npm_and_yarn/radix-ui/react-checkbox-1.3.11`
+- `dependabot/npm_and_yarn/radix-ui/react-toggle-group-1.1.19`
+- `dependabot/npm_and_yarn/types/node-26.5.1`
+- `dependabot/npm_and_yarn/zod-4.6.4`
+
+As duas branches do Dependabot de **github-actions** foram lidas antes de apagar e eram regressao,
+nao upgrade:
+
+- `codeql-action/init-4.39.3` bumpava so o `init`; o `analyze` voltava de
+  `v4.39.3` (estado da `main`) para `v4.39.1`.
+- `create-pull-request-8.1.2` reordenava os steps do `types-sync.yml` e truncava a mensagem de erro
+  de `DESTINO_URL`, que na `main` explica onde configurar o secret.
+
+Restaram so `main`, `contexto` (orfa, regerada pela automacao) e `master` (gatilho de
+`ci-nexus.yml` e `security.yml`).
