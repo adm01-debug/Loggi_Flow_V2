@@ -195,3 +195,89 @@ Sem base de calculo o painel mostra `--` / `SEM_BASE` - preferivel a um numero f
 O visual (classes, animacoes, icones) foi preservado integralmente.
 
 Validacao: `tsc --noEmit` exit 0 - `eslint` 0 erros e 0 warnings - `vitest run` 259/259 em 30 arquivos.
+
+---
+
+## Fase 2, item 2 - alertas reais invisiveis na home (PR #158)
+
+A varredura seguinte encontrou um bug de **perda de informacao**, nao so de aparencia.
+
+`src/components/dashboard/AlertsPanel.tsx:59` (antes):
+
+```ts
+// Mocking delta calculation for demonstration if not present
+const delta = alert.delta || Number(alert.id.charCodeAt(0)) % 20;
+return delta >= threshold;
+```
+
+Como os ids sao gerados com prefixo fixo em `useDashboardMetrics`, o "delta" era deterministico.
+Com o limiar padrao 5:
+
+| prefixo do id                          | letra | delta inventado | resultado no padrao |
+| -------------------------------------- | ----- | --------------- | ------------------- |
+| `divergencia-*`                        | `d`   | 0               | **nunca aparecia**  |
+| `falha-frete-*`                        | `f`   | 2               | **nunca aparecia**  |
+| `ia-pred-*`                            | `i`   | 5               | aparecia            |
+| `ocorrencia-*`                         | `o`   | 11              | aparecia            |
+| `sla-*`                                | `s`   | 15              | aparecia            |
+| `variacao-frete-*`                     | `v`   | 18              | aparecia            |
+| `coleta-atrasada-*` / `coleta-prazo-*` | `c`   | 19              | aparecia            |
+
+Ou seja, **toda divergencia de coleta e toda falha de integracao de cotacao estavam ocultas**
+na home (`src/pages/Index.tsx:282`).
+
+Correcao: `src/components/dashboard/alertsFilter.ts` com `filtrarPorLimiar` - o limiar vale so
+para alerta com `delta` medido; alerta sem delta nunca e escondido. A funcao ficou em modulo
+proprio porque exporta-la do `.tsx` gera `react-refresh/only-export-components`, que reprova no
+Warning Budget Gate.
+
+Segundo ponto, `src/hooks/analytics/useDashboardMetrics.tsx:262` (antes):
+
+```ts
+const delta = Math.abs((val % 50) - 25) * 2; // Simulated delta
+```
+
+`valor_cotado % 50` nao mede variacao: R$ 1.000,00 dava `delta 50` e disparava alerta de alta
+variacao; R$ 1.025,00 dava `delta 0` e nunca disparava. Passou a comparar o valor cotado com a
+**media das ultimas cotacoes**, com base minima de 3 cotacoes e disparo acima de 30% de desvio.
+
+Validacao: `tsc --noEmit` exit 0 - `eslint` 0/0 - `vitest run` 263/263 em 31 arquivos.
+
+---
+
+## Fase 2, item 3 - previsao de frete inventada (PR #159)
+
+`src/components/freight/AIFreightForecasting.tsx:12` era 100% fabricado e aparecia na aba
+"Previsao IA" de `src/pages/InteligenciaFrete.tsx:238` com o selo "IA Gemini":
+
+```ts
+// Mock data for AI Forecasting
+const data = [
+  { name: "Jan", real: currentTotal * 0.8, pred: currentTotal * 0.82 },
+  ...
+];
+```
+
+A curva inteira era o total atual multiplicado por constantes, e os 3 "insights" eram texto fixo:
+"Pico de Demanda Junho", "IA detectou oportunidade de reduzir 12% em SC/PR via transportadora
+local ABC" e "Frente fria prevista para Sudeste". Nao havia Gemini nem integracao de clima no
+projeto - `git grep -i gemini` nao retorna nada em `src`.
+
+Decisao: ligar a dados reais, preservando o visual.
+
+Criado `src/lib/freightForecast.ts` (puro e testavel):
+
+| Funcao                | O que faz                                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `serieHistoricaFrete` | soma `valor_frete` por mes de calendario, do primeiro mes com dado ate o mes atual, maximo 6 meses            |
+| `projetarTendencia`   | regressao linear por minimos quadrados; nunca devolve valor negativo                                          |
+| `montarPrevisaoFrete` | historico + 3 meses projetados, ancorados no ultimo ponto real; **sem projecao com menos de 3 meses de base** |
+| `gerarInsightsFrete`  | insights derivados de `abusiveFreights`, `consolidationOpportunities`, `bestCarrierPerState` e da tendencia   |
+
+O componente passou a receber `entregas`, `abusivos`, `consolidacao` e `melhorTransportadora` -
+todos ja calculados por `useFreightIntelligence`, sem query nova. Sem frete registrado, mostra
+estado vazio honesto; sem desvio relevante, diz que nao ha desvio em vez de inventar insight.
+O selo "IA Gemini" virou "Tendencia - N meses de base".
+
+Validacao: `tsc --noEmit` exit 0 - `eslint` 0/0 - `vitest run` 277/277 em 32 arquivos
+(14 testes novos em `src/lib/freightForecast.test.ts`).
