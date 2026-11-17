@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "4b5d4c9242cf2f00853306057b2125b118013d32",
+  "commit": "214f0cd1baddadccd2f81a9441fe07a9fe809ded",
   "branch": "main",
-  "data_commit": "2026-11-17T15:58:19-03:00",
+  "data_commit": "2026-11-17T16:10:49-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "214f0cd1",
+    "data": "2026-11-17",
+    "assunto": "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)"
+   },
+   {
+    "sha": "5bfae77a",
+    "data": "2026-11-17",
+    "assunto": "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)"
+   },
    {
     "sha": "4b5d4c92",
     "data": "2026-11-17",
@@ -121,19 +131,9 @@
     "sha": "fef7780f",
     "data": "2026-11-14",
     "assunto": "docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)"
-   },
-   {
-    "sha": "fee186d3",
-    "data": "2026-11-14",
-    "assunto": "docs: prod-readiness — registra Data Integrity BLOQUEADO e status reais (#151)"
-   },
-   {
-    "sha": "a49bf31e",
-    "data": "2026-11-13",
-    "assunto": "docs: fecha prod-readiness com inventario e evidencia (#147)"
    }
   ],
-  "arquivos_mudados_7d": 131,
+  "arquivos_mudados_7d": 132,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -168,6 +168,10 @@
     "mudancas": 4
    },
    {
+    "pasta": "scripts/audit-gate.mjs",
+    "mudancas": 4
+   },
+   {
     "pasta": "scripts/validate-csp.mjs",
     "mudancas": 4
    },
@@ -189,10 +193,6 @@
    },
    {
     "pasta": "AGENTS.md",
-    "mudancas": 3
-   },
-   {
-    "pasta": "docs/prod-readiness.md",
     "mudancas": 3
    }
   ],
@@ -227,6 +227,10 @@
    },
    {
     "arquivo": "docs/auditoria-recuperacao-branches.md",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "scripts/audit-gate.mjs",
     "mudancas": 5
    },
    {
@@ -270,10 +274,6 @@
     "mudancas": 4
    },
    {
-    "arquivo": "scripts/audit-gate.mjs",
-    "mudancas": 4
-   },
-   {
     "arquivo": "scripts/audit/manifest_detail.sql",
     "mudancas": 4
    },
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 115
+    "commits": 117
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1299,
+  "arquivos_total": 1300,
   "arquivos_codigo": 875,
-  "linhas_codigo": 167105,
+  "linhas_codigo": 167108,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -329,7 +329,7 @@
   "migrations": 246,
   "cron_jobs": 28,
   "testes": 129,
-  "workflows": 16,
+  "workflows": 17,
   "scripts": 62,
   "docs_md": 84
  },
@@ -360,7 +360,7 @@
   },
   "scripts/audit-gate.mjs": {
    "arquivos": 1,
-   "linhas": 119
+   "linhas": 122
   },
   "scripts/automation.mjs": {
    "arquivos": 1,

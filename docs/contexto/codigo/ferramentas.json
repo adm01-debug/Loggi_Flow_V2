@@ -8,7 +8,7 @@
    "Markdown (84)",
    "JavaScript (80)",
    "JSON (33)",
-   "YAML (20)",
+   "YAML (21)",
    "Shell (9)",
    "Python (8)"
   ],
@@ -139,6 +139,29 @@
   "vitest.config.ts"
  ],
  "workflows": [
+  {
+   "arquivo": ".github/workflows/aplicar-migration.yml",
+   "nome": "Aplicar Migration",
+   "gatilhos": [
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [],
+   "jobs": [
+    "aplicar"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL"
+   ],
+   "actions": [
+    "actions/checkout"
+   ]
+  },
   {
    "arquivo": ".github/workflows/auto-update-pr-branch.yml",
    "nome": "Auto Update PR Branches",

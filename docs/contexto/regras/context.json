@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "4b5d4c9242cf2f00853306057b2125b118013d32",
+  "sha": "214f0cd1baddadccd2f81a9441fe07a9fe809ded",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 18:58 UTC",
-  "files_total": 1309,
+  "generated_at": "2026-11-17 19:12 UTC",
+  "files_total": 1310,
   "code_files": 1135,
-  "code_lines": 183486,
+  "code_lines": 183489,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "9c719df730ec044e",
+ "facts_hash": "03535f102125fd55",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -164,6 +164,13 @@
    }
   ],
   "ci": [
+   {
+    "file": ".github/workflows/aplicar-migration.yml",
+    "name": "Aplicar Migration",
+    "triggers": [
+     "workflow_dispatch"
+    ]
+   },
    {
     "file": ".github/workflows/auto-update-pr-branch.yml",
     "name": "Auto Update PR Branches",
@@ -29016,7 +29023,7 @@
   {
    "module": "scripts",
    "files": 98,
-   "lines": 35333,
+   "lines": 35336,
    "tables": [
     "a",
     "apos_glob",
@@ -64904,7 +64911,7 @@
   },
   "scripts/audit-gate.mjs": {
    "path": "scripts/audit-gate.mjs",
-   "lines": 119,
+   "lines": 122,
    "env": [
     "AUDIT_TIMEOUT_MS"
    ],
@@ -88722,10 +88729,28 @@
   }
  },
  "git": {
-  "sha": "4b5d4c9242cf2f00853306057b2125b118013d32",
+  "sha": "214f0cd1baddadccd2f81a9441fe07a9fe809ded",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "214f0cd",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)",
+    "files": [
+     ".github/workflows/aplicar-migration.yml"
+    ]
+   },
+   {
+    "sha": "5bfae77",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)",
+    "files": [
+     "scripts/audit-gate.mjs"
+    ]
+   },
    {
     "sha": "4b5d4c9",
     "date": "2026-11-17",
@@ -89044,31 +89069,6 @@
     "files": [
      "supabase/config.toml"
     ]
-   },
-   {
-    "sha": "8ea891f",
-    "date": "2026-11-13",
-    "author": "adm01-debug",
-    "subject": "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)",
-    "files": [
-     "supabase/functions/db-health-weekly-report/index.ts",
-     "supabase/functions/new-device-alert/index.ts",
-     "supabase/functions/resend-email/index.ts",
-     "supabase/functions/scheduled-reports/index.ts"
-    ]
-   },
-   {
-    "sha": "30eecc9",
-    "date": "2026-11-12",
-    "author": "github-actions[bot]",
-    "subject": "chore(db): sincronizar artefatos derivados do banco (#141)",
-    "files": [
-     ".gitleaks.toml",
-     "scripts/db-audit/grants-baseline.json",
-     "src/integrations/supabase/types.ts",
-     "supabase/schema-catalog.json",
-     "supabase/schema-manifest.json"
-    ]
    }
   ],
   "hot_files": [
@@ -89085,11 +89085,11 @@
     3
    ],
    [
-    "package.json",
+    "scripts/audit-gate.mjs",
     2
    ],
    [
-    "src/integrations/supabase/types.ts",
+    "package.json",
     2
    ],
    [
@@ -89117,8 +89117,8 @@
     2
    ],
    [
-    "supabase/schema-manifest.json",
-    2
+    ".github/workflows/aplicar-migration.yml",
+    1
    ],
    [
     "src/components/common/WidgetErrorBoundary.tsx",

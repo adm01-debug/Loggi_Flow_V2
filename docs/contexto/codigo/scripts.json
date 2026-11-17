@@ -42,7 +42,7 @@
   {
    "arquivo": "scripts/audit-gate.mjs",
    "descricao": "Gate de vulnerabilidades: falha em qualquer CRITICAL/HIGH fora da allowlist. Allowlist só para pacotes SEM fix disponível no npm, com justificativa e revisão",
-   "linhas": 119,
+   "linhas": 122,
    "env": [
     "AUDIT_TIMEOUT_MS"
    ],
