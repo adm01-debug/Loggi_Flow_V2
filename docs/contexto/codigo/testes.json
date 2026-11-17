@@ -5,17 +5,17 @@
   "vitest",
   "playwright"
  ],
- "total": 128,
+ "total": 129,
  "por_tipo": {
   "contrato": 1,
   "e2e": 2,
   "pytest": 5,
-  "unit": 120
+  "unit": 121
  },
  "onde_ficam": [
   {
    "padrao": "co-localizado (*.test)",
-   "arquivos": 72
+   "arquivos": 73
   },
   {
    "padrao": "outro",
@@ -628,6 +628,15 @@
    "casos": 12
   },
   {
+   "arquivo": "src/lib/validations.test.ts",
+   "tipo": "unit",
+   "linhas": 40,
+   "testa": [
+    "src/lib/validations.ts"
+   ],
+   "casos": 4
+  },
+  {
    "arquivo": "src/test/setup.ts",
    "tipo": "unit",
    "linhas": 65,
@@ -1121,6 +1130,7 @@
   "src/lib/rodonaves/sloAlerts.ts": 1,
   "src/lib/rodonaves/sloReport.ts": 1,
   "src/lib/supabaseEnv.ts": 1,
+  "src/lib/validations.ts": 1,
   "src/utils/systemTester.ts": 1,
   "supabase/functions/_shared/circuitBreaker.ts": 1,
   "supabase/functions/_shared/crypto.ts": 1,

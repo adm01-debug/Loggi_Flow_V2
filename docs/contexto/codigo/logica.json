@@ -1372,7 +1372,7 @@
     "validateForm"
    ],
    "export_default": null,
-   "linhas": 217,
+   "linhas": 224,
    "tabelas": [],
    "rpcs": [],
    "edges": [],
@@ -1390,7 +1390,7 @@
     "components/ui",
     "lib"
    ],
-   "coberto_por_testes": 0,
+   "coberto_por_testes": 1,
    "orfao": false
   },
   {

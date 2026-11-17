@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `7931333c32` · branch `main` · 2026-11-17 15:56 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `4c167602c7` · branch `main` · 2026-11-17 16:28 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -2215,7 +2215,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (361 testes em 37 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (365 testes em 38 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
@@ -2248,6 +2248,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `tests/security/rls-access.spec.ts` | 6 | RLS · leitura anônima bloqueada em tabelas sensíveis · SELECT em ${table} retorna [] ou 401/403 · RLS · escrita anônima bloqueada em tabelas sensíveis · INSERT em ${table} é rejeitado … |
 | `src/components/dashboard/alertsFilter.test.ts` | 5 | filtrarPorLimiar · nunca esconde alerta sem delta medido · aplica o limiar so a quem tem delta · mantem alerta cujo delta empata com o limiar … |
 | `tests/unit/modules-integrity.spec.ts` | 5 | Freight-Quest Module Integrity · Logistics Engine · should correctly calculate delivery dates with margin · Financial Core … |
+| `src/lib/validations.test.ts` | 4 | isValidEmail · mantem o veredito da implementacao anterior · trata vazio como valido (campo opcional) · responde de imediato a entrada patologica que travava a regex |
 | `tests/integration/webhooks.spec.ts` | 4 | Webhook Simulation Suite (real _shared logic) · should validate carrier status updates through the production contract · should refuse events outside the contract · should reject missing required fields (production fail-closed) |
 | `src/utils/systemTester.spec.ts` | 3 | System Integrity Tests · should pass all checks when system is healthy · should detect database connectivity failure |
 | `tests/e2e/critical-paths.spec.ts` | 3 | Nexus Core E2E - Critical Path Validation · Complete login to dashboard and shipment creation flow · Responsiveness and Error State resilience |

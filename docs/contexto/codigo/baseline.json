@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "7931333c32e0f32483dbaa76fbcdeaec4a3687ec",
+  "commit": "4c167602c7fad28e9d2757fb077ee3cbf3e504ac",
   "branch": "main",
-  "data_commit": "2026-11-17T12:56:09-03:00",
+  "data_commit": "2026-11-17T13:28:15-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "4c167602",
+    "data": "2026-11-17",
+    "assunto": "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)"
+   },
    {
     "sha": "7931333c",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "30eecc9a",
     "data": "2026-11-12",
     "assunto": "chore(db): sincronizar artefatos derivados do banco (#141)"
-   },
-   {
-    "sha": "e0982180",
-    "data": "2026-11-12",
-    "assunto": "fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)"
    }
   ],
-  "arquivos_mudados_7d": 99,
+  "arquivos_mudados_7d": 102,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 109
+    "commits": 110
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1297,
-  "arquivos_codigo": 874,
-  "linhas_codigo": 166952,
+  "arquivos_total": 1298,
+  "arquivos_codigo": 875,
+  "linhas_codigo": 167006,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -328,7 +328,7 @@
   "tabelas": 144,
   "migrations": 245,
   "cron_jobs": 28,
-  "testes": 128,
+  "testes": 129,
   "workflows": 16,
   "scripts": 62,
   "docs_md": 84
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19044
+   "linhas": 19051
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -471,8 +471,8 @@
    "linhas": 6703
   },
   "src/lib": {
-   "arquivos": 50,
-   "linhas": 6530
+   "arquivos": 51,
+   "linhas": 6577
   },
   "src/main.tsx": {
    "arquivos": 1,
