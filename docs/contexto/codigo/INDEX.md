@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `4c167602c7fad28e9d2757fb077ee3cbf3e504ac` (2026-11-17T13:28:15-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `f61ccee4def0c23804d18b60b75e3662cd1c465e` (2026-11-17T13:28:41-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:74, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8105 nós · 20476 arestas · 711 comunidades · grafo do commit `4c167602`
+- 8105 nós · 20476 arestas · 711 comunidades · grafo do commit `f61ccee4`
 - comunidades maiores: utils.ts (205), input.tsx (182), lucide-react (180), react (159), client.ts (155), db-observability/index.ts (139), date-fns (127), useAuth (123), ref_node_path (119), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (85), ui/index.ts (82)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -284,17 +284,17 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - package.json (40)
 - index.html (9)
 - src/hooks/gamification/useGamification.ts (9)
-- .github/workflows/contexto-ia.yml (5)
+- .github/workflows/contexto-ia.yml (6)
+- .github/workflows/ci.yml (5)
+- .github/workflows/types-sync.yml (5)
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/validate-csp.mjs (5)
 - supabase/config.toml (5)
-- .github/workflows/ci.yml (4)
+- .github/workflows/ci-nexus.yml (4)
 - .github/workflows/deploy-functions.yml (4)
-- .github/workflows/types-sync.yml (4)
+- .github/workflows/inventario-estado-semanal.yml (4)
 - AGENTS.md (4)
 - docs/agentes/github-ci.md (4)
-- scripts/audit/manifest_detail.sql (4)
-- scripts/check-warning-budget.mjs (4)
 
 ## Workflows
 - `auto-update-pr-branch.yml` — Auto Update PR Branches (push, schedule, workflow_dispatch, workflow_run; cron 7,37 * * * *)
@@ -399,6 +399,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `f61ccee4` chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)
 - 2026-11-17 `4c167602` fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)
 - 2026-11-17 `7931333c` chore(db): sincronizar artefatos com o banco [auto] (#166)
 - 2026-11-17 `0ead536e` chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)
@@ -413,7 +414,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `4496d9f3` fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)
 - 2026-11-17 `8071e4a5` docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)
 - 2026-11-17 `7b46a982` chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)
-- 2026-11-17 `70f45b32` test: conecta simulacao e fuzzing aos validadores reais (#153)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

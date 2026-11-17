@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "4c167602c7fad28e9d2757fb077ee3cbf3e504ac",
+  "commit": "f61ccee4def0c23804d18b60b75e3662cd1c465e",
   "branch": "main",
-  "data_commit": "2026-11-17T13:28:15-03:00",
+  "data_commit": "2026-11-17T13:28:41-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "f61ccee4",
+    "data": "2026-11-17",
+    "assunto": "chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)"
+   },
    {
     "sha": "4c167602",
     "data": "2026-11-17",
@@ -126,17 +131,16 @@
     "sha": "8ea891f4",
     "data": "2026-11-13",
     "assunto": "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)"
-   },
-   {
-    "sha": "30eecc9a",
-    "data": "2026-11-12",
-    "assunto": "chore(db): sincronizar artefatos derivados do banco (#141)"
    }
   ],
-  "arquivos_mudados_7d": 102,
+  "arquivos_mudados_7d": 106,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
+    "mudancas": 6
+   },
+   {
+    "pasta": ".github/workflows/types-sync.yml",
     "mudancas": 5
    },
    {
@@ -144,7 +148,7 @@
     "mudancas": 5
    },
    {
-    "pasta": ".github/workflows/types-sync.yml",
+    "pasta": ".github/workflows/inventario-estado-semanal.yml",
     "mudancas": 4
    },
    {
@@ -165,10 +169,6 @@
    },
    {
     "pasta": ".github/workflows/codeql.yml",
-    "mudancas": 3
-   },
-   {
-    "pasta": ".github/workflows/inventario-estado-semanal.yml",
     "mudancas": 3
    },
    {
@@ -215,6 +215,14 @@
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
+    "mudancas": 6
+   },
+   {
+    "arquivo": ".github/workflows/ci.yml",
+    "mudancas": 5
+   },
+   {
+    "arquivo": ".github/workflows/types-sync.yml",
     "mudancas": 5
    },
    {
@@ -230,7 +238,7 @@
     "mudancas": 5
    },
    {
-    "arquivo": ".github/workflows/ci.yml",
+    "arquivo": ".github/workflows/ci-nexus.yml",
     "mudancas": 4
    },
    {
@@ -238,7 +246,7 @@
     "mudancas": 4
    },
    {
-    "arquivo": ".github/workflows/types-sync.yml",
+    "arquivo": ".github/workflows/inventario-estado-semanal.yml",
     "mudancas": 4
    },
    {
@@ -288,20 +296,12 @@
    {
     "arquivo": "supabase/functions/ai-logistics-assistant/index.ts",
     "mudancas": 4
-   },
-   {
-    "arquivo": "tests/security/integrations-access.spec.ts",
-    "mudancas": 4
-   },
-   {
-    "arquivo": "tests/security/rls-access.spec.ts",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 110
+    "commits": 111
    },
    {
     "autor": "dependabot[bot]",

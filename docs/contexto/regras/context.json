@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "4c167602c7fad28e9d2757fb077ee3cbf3e504ac",
+  "sha": "f61ccee4def0c23804d18b60b75e3662cd1c465e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 16:28 UTC",
+  "generated_at": "2026-11-17 16:29 UTC",
   "files_total": 1308,
   "code_files": 1134,
   "code_lines": 183381,
@@ -88702,10 +88702,25 @@
   }
  },
  "git": {
-  "sha": "4c167602c7fad28e9d2757fb077ee3cbf3e504ac",
+  "sha": "f61ccee4def0c23804d18b60b75e3662cd1c465e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "f61ccee",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)",
+    "files": [
+     ".github/workflows/ci-nexus.yml",
+     ".github/workflows/ci.yml",
+     ".github/workflows/contexto-ia.yml",
+     ".github/workflows/e2e.yml",
+     ".github/workflows/inventario-estado-semanal.yml",
+     ".github/workflows/scripts-tests.yml",
+     ".github/workflows/types-sync.yml"
+    ]
+   },
    {
     "sha": "4c16760",
     "date": "2026-11-17",
@@ -89007,16 +89022,6 @@
     "files": [
      ".github/workflows/contexto-ia.yml"
     ]
-   },
-   {
-    "sha": "3d4fd58",
-    "date": "2026-11-12",
-    "author": "dependabot[bot]",
-    "subject": "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)",
-    "files": [
-     ".github/workflows/inventario-estado-semanal.yml",
-     ".github/workflows/types-sync.yml"
-    ]
    }
   ],
   "hot_files": [
@@ -89026,7 +89031,7 @@
    ],
    [
     ".github/workflows/contexto-ia.yml",
-    3
+    4
    ],
    [
     "docs/prod-readiness.md",
@@ -89035,6 +89040,30 @@
    [
     "supabase/schema-manifest.json",
     2
+   ],
+   [
+    ".github/workflows/ci-nexus.yml",
+    1
+   ],
+   [
+    ".github/workflows/ci.yml",
+    1
+   ],
+   [
+    ".github/workflows/e2e.yml",
+    1
+   ],
+   [
+    ".github/workflows/inventario-estado-semanal.yml",
+    1
+   ],
+   [
+    ".github/workflows/scripts-tests.yml",
+    1
+   ],
+   [
+    ".github/workflows/types-sync.yml",
+    1
    ],
    [
     "src/hooks/data/useImageUpload.tsx",
@@ -89074,30 +89103,6 @@
    ],
    [
     "src/components/ai/AIAssistant.tsx",
-    1
-   ],
-   [
-    "src/hooks/auth/useAuth.tsx",
-    1
-   ],
-   [
-    "src/integrations/supabase/client.ts",
-    1
-   ],
-   [
-    "src/lib/supabaseEnv.test.ts",
-    1
-   ],
-   [
-    "src/lib/supabaseEnv.ts",
-    1
-   ],
-   [
-    "src/pages/ConfiguracoesFrete.tsx",
-    1
-   ],
-   [
-    ".env.example",
     1
    ]
   ]
