@@ -92,14 +92,17 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
 
         setProgress(80);
 
-        // Get public URL
-        const { data: urlData } = supabase.storage
+        // Buckets do projeto sao privados (migration 20260515134237), entao
+        // getPublicUrl devolveria uma URL que responde 400 "Bucket not found".
+        const { data: urlData, error: urlError } = await supabase.storage
           .from(bucket)
-          .getPublicUrl(data.path);
+          .createSignedUrl(data.path, 60 * 60 * 24 * 365);
+
+        if (urlError || !urlData) throw urlError ?? new Error("Falha ao gerar URL assinada");
 
         setProgress(100);
         toast.success("Arquivo enviado com sucesso!");
-        return urlData.publicUrl;
+        return urlData.signedUrl;
       } catch {
         toast.error("Erro ao enviar arquivo.");
         return null;
