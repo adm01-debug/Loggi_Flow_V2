@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import * as React from "react";
+import { CENTRO_DISTRIBUICAO } from "@/lib/centroDistribuicao";
 import Map, {
   Marker,
   NavigationControl,
@@ -954,7 +955,7 @@ export function LogisticsMapWidget() {
                     geometry: {
                       type: "LineString",
                       coordinates: [
-                        [-46.6333, -23.5505], // Mock origin (SP Central)
+                        [CENTRO_DISTRIBUICAO.lng, CENTRO_DISTRIBUICAO.lat],
                         [
                           selectedShipment.coordinates.lng,
                           selectedShipment.coordinates.lat,

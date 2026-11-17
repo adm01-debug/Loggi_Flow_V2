@@ -281,3 +281,55 @@ O selo "IA Gemini" virou "Tendencia - N meses de base".
 
 Validacao: `tsc --noEmit` exit 0 - `eslint` 0/0 - `vitest run` 277/277 em 32 arquivos
 (14 testes novos em `src/lib/freightForecast.test.ts`).
+
+### 2.4 Pino de entrega sem geocodificacao saltava no mapa (PR #160, mergeada em `8ea7b1f3`)
+
+`src/hooks/logistics/useDeliveryRoutes.tsx:78` espalhava com `Math.random()` as entregas sem
+`latitude`/`longitude`, para nao empilhar pinos no centro do estado. Como a query usa
+`QUERY_STALE_TIME.REALTIME`, cada refetch sorteava uma posicao nova: o pino andava ate ~16 km
+sozinho (0.3 grau de amplitude), parecendo movimentacao real da carga. `geocoded: false` nao era
+usado por nenhum componente (`git grep -n "geocoded" -- src/components` nao retorna nada), entao
+o operador nao tinha como saber que a posicao era aproximada.
+
+Criado `src/lib/mapFallback.ts`: `deslocamentoEstavel(coords, semente)` usa hash FNV-1a de 32 bits
+do id da entrega no lugar do sorteio. Mesma entrega sempre no mesmo ponto; dispersao entre
+entregas preservada; raio inalterado. Diff no hook: 2 insercoes, 9 remocoes.
+
+Validacao: `tsc --noEmit` exit 0 - `eslint` 0 erros (o unico warning em `useDeliveryRoutes.tsx:277`
+e pre-existente, comprovado rodando o lint na versao do `main` via `git stash`) - `vitest run`
+269/269 em 32 arquivos.
+
+### 2.5 Origem da rota no mapa era uma constante marcada como "Mock"
+
+`src/components/dashboard/LogisticsMapWidget.tsx:957` desenhava a linha tracejada partindo de
+`[-46.6333, -23.5505], // Mock origin (SP Central)`.
+
+Antes de mexer, conferi o modelo de dados: a Row de `entregas` em
+`src/integrations/supabase/types.ts` tem `endereco_entrega`, `latitude` e `longitude` - todos do
+**destino**. Nao existe `origem_*` nem `coleta_id` na tabela (`origem_cidade`/`origem_estado`
+existem, mas em `cotacoes_multicanal`). Ou seja, **nao ha origem por entrega no banco**; apagar a
+linha seria perder a visualizacao de rota, e inventar uma origem por entrega seria repetir o mock.
+
+Decisao: a origem passa a ser o centro de distribuicao de onde a operacao despacha, configuravel
+por ambiente em `src/lib/centroDistribuicao.ts` (`VITE_CD_ORIGEM_LAT` / `VITE_CD_ORIGEM_LNG`,
+documentadas em `.env.example`). Valor ausente, nao numerico ou fora da faixa geografica cai no
+padrao `CD_PADRAO` (SP Central) - nunca chega coordenada invalida ao Mapbox. Deixa de ser mock e
+passa a ser parametro de operacao.
+
+Validacao: `tsc --noEmit` exit 0 - `eslint` 0 erros (o warning em `LogisticsMapWidget.tsx:174` e
+pre-existente, comprovado via `git stash`) - `vitest run` 289/289 em 34 arquivos (6 testes novos).
+
+### Fase 2 - encerramento
+
+Varredura final do `main` por trabalho parcial de agente:
+
+```
+git grep -n -iE "mock|simulated|fake|placeholder|Math.random" -- src | grep -v test
+```
+
+Restam apenas ocorrencias ja analisadas e classificadas como falso positivo:
+
+| Local                     | Por que nao e mock                                                       |
+| ------------------------- | ------------------------------------------------------------------------ |
+| `MissionDetail.tsx:69-70` | `mockTimeline` e nome ruim, mas a timeline deriva dos dados reais da entrega |
+| `AnalyticsCharts.tsx:26`  | fallback com zeros quando nao ha dado - estado vazio, nao numero inventado   |
