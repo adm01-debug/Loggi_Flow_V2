@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "4496d9f3b901820d9a8a101051e2caaa606ebacf",
+  "commit": "f680a6482180b36e10542f2584c77ddf91c0adbc",
   "branch": "main",
-  "data_commit": "2026-11-17T10:52:25-03:00",
+  "data_commit": "2026-11-17T11:10:48-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "f680a648",
+    "data": "2026-11-17",
+    "assunto": "fix: alertas de divergencia e falha de frete sumiam da home (#158)"
+   },
    {
     "sha": "4496d9f3",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "5182e5f6",
     "data": "2026-11-11",
     "assunto": "docs: atualiza contagem de required checks para 10 no github-ci.md (#123)"
-   },
-   {
-    "sha": "04259107",
-    "data": "2026-11-11",
-    "assunto": "chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)"
    }
   ],
-  "arquivos_mudados_7d": 72,
+  "arquivos_mudados_7d": 76,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 100
+    "commits": 101
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1285,
-  "arquivos_codigo": 864,
-  "linhas_codigo": 166004,
+  "arquivos_total": 1287,
+  "arquivos_codigo": 866,
+  "linhas_codigo": 166076,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -328,7 +328,7 @@
   "tabelas": 144,
   "migrations": 244,
   "cron_jobs": 28,
-  "testes": 123,
+  "testes": 124,
   "workflows": 16,
   "scripts": 62,
   "docs_md": 84
@@ -451,8 +451,8 @@
    "linhas": 216
   },
   "src/components": {
-   "arquivos": 295,
-   "linhas": 48338
+   "arquivos": 297,
+   "linhas": 48396
   },
   "src/features": {
    "arquivos": 90,
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19036
+   "linhas": 19050
   },
   "src/i18n.ts": {
    "arquivos": 1,

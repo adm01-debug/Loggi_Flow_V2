@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `4496d9f3b9` · branch `main` · 2026-11-17 13:52 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `f680a64821` · branch `main` · 2026-11-17 14:11 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -2197,7 +2197,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (308 testes em 32 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (313 testes em 33 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
@@ -2224,6 +2224,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `src/lib/predictions/mitigationRerank.test.ts` | 7 | rerankByROI — comportamento base · retorna score original quando ROI é null · aplica boost para categorias com Δ OTIF positivo · penaliza categorias com Δ OTIF negativo … |
 | `src/hooks/rodonaves/useSLOSnapshots.test.ts` | 6 | aggregateSnapshots · retorna vazio sem linhas · agrupa por gateway e conta dias · conta dias violados e pior P95 … |
 | `tests/security/rls-access.spec.ts` | 6 | RLS · leitura anônima bloqueada em tabelas sensíveis · SELECT em ${table} retorna [] ou 401/403 · RLS · escrita anônima bloqueada em tabelas sensíveis · INSERT em ${table} é rejeitado … |
+| `src/components/dashboard/alertsFilter.test.ts` | 5 | filtrarPorLimiar · nunca esconde alerta sem delta medido · aplica o limiar so a quem tem delta · mantem alerta cujo delta empata com o limiar … |
 | `tests/unit/modules-integrity.spec.ts` | 5 | Freight-Quest Module Integrity · Logistics Engine · should correctly calculate delivery dates with margin · Financial Core … |
 | `tests/integration/webhooks.spec.ts` | 4 | Webhook Simulation Suite (real _shared logic) · should validate carrier status updates through the production contract · should refuse events outside the contract · should reject missing required fields (production fail-closed) |
 | `src/utils/systemTester.spec.ts` | 3 | System Integrity Tests · should pass all checks when system is healthy · should detect database connectivity failure |

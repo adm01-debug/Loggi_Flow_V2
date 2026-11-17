@@ -540,6 +540,7 @@
    "src/components/common/WidgetErrorBoundary.tsx"
   ],
   "src/components/dashboard/AlertsPanel.tsx": [
+   "src/components/dashboard/alertsFilter.ts",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
    "src/components/ui/popover.tsx",
@@ -644,6 +645,9 @@
   "src/components/dashboard/XPProgressBar.tsx": [
    "src/components/ui/badge.tsx",
    "src/lib/utils.ts"
+  ],
+  "src/components/dashboard/alertsFilter.ts": [
+   "src/hooks/analytics/useDashboardMetrics.tsx"
   ],
   "src/components/dashboard/index.ts": [
    "src/components/dashboard/AlertsPanel.tsx",

@@ -1077,7 +1077,7 @@
     "AlertsPanel"
    ],
    "export_default": null,
-   "linhas": 450,
+   "linhas": 443,
    "dominio": "components/dashboard",
    "hooks_locais": [
     "useLocalStorage"

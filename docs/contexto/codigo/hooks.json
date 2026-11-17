@@ -1342,7 +1342,7 @@
     "useRecentAlerts",
     "useTransportadoraPerformance"
    ],
-   "linhas": 334,
+   "linhas": 348,
    "dominio": "hooks/analytics",
    "tabelas": [
     "ai_delay_predictions",
@@ -1362,16 +1362,17 @@
     "useQuery"
    ],
    "canais_realtime": [],
-   "usado_por": 6,
+   "usado_por": 7,
    "usado_por_arquivos": [
     "src/components/dashboard/AlertsPanel.tsx",
     "src/components/dashboard/FavoriteMetricsBar.tsx",
     "src/components/dashboard/LiveStatusBar.tsx",
+    "src/components/dashboard/alertsFilter.ts",
     "src/hooks/index.ts",
     "src/hooks/logistics/useLogisticsIntelligence.tsx",
     "src/pages/Index.tsx"
    ],
-   "coberto_por_testes": 0
+   "coberto_por_testes": 1
   },
   {
    "arquivo": "src/hooks/analytics/useDashboardWidgets.tsx",

@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "4496d9f3b901820d9a8a101051e2caaa606ebacf",
+  "sha": "f680a6482180b36e10542f2584c77ddf91c0adbc",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 13:52 UTC",
-  "files_total": 1295,
-  "code_files": 1122,
-  "code_lines": 181771,
+  "generated_at": "2026-11-17 14:11 UTC",
+  "files_total": 1297,
+  "code_files": 1124,
+  "code_lines": 181843,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "c04b04964f12b2ec",
+ "facts_hash": "aa3bd4bc7e514cc2",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -292,7 +292,7 @@
   "package_manager": "bun",
   "languages": {
    ".tsx": 453,
-   ".ts": 324,
+   ".ts": 326,
    ".sql": 257,
    ".mjs": 77,
    ".py": 8,
@@ -23789,7 +23789,7 @@
      "add_user_xp",
      "get_dashboard_metrics"
     ],
-    "deps_count": 105
+    "deps_count": 106
    },
    {
     "path": "/admin/adr",
@@ -27872,7 +27872,7 @@
     "file": ".github/workflows/types-sync.yml"
    }
   ],
-  "components_count": 337,
+  "components_count": 339,
   "hooks": [
    {
     "name": "useContacts",
@@ -29259,8 +29259,8 @@
   },
   {
    "module": "src/components",
-   "files": 295,
-   "lines": 48338,
+   "files": 297,
+   "lines": 48396,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29701,7 +29701,7 @@
   {
    "module": "src/hooks",
    "files": 123,
-   "lines": 19036,
+   "lines": 19050,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -47821,6 +47821,26 @@
    }
   ],
   "tests": [
+   {
+    "file": "src/components/dashboard/alertsFilter.test.ts",
+    "name": "filtrarPorLimiar"
+   },
+   {
+    "file": "src/components/dashboard/alertsFilter.test.ts",
+    "name": "nunca esconde alerta sem delta medido"
+   },
+   {
+    "file": "src/components/dashboard/alertsFilter.test.ts",
+    "name": "aplica o limiar so a quem tem delta"
+   },
+   {
+    "file": "src/components/dashboard/alertsFilter.test.ts",
+    "name": "mantem alerta cujo delta empata com o limiar"
+   },
+   {
+    "file": "src/components/dashboard/alertsFilter.test.ts",
+    "name": "trata delta zero como medido e o esconde acima do limiar"
+   },
    {
     "file": "src/components/security/SecurityOverviewPanel.regression.test.ts",
     "name": "SecurityOverviewPanel — score computation"
@@ -69512,7 +69532,7 @@
   },
   "src/components/dashboard/AlertsPanel.tsx": {
    "path": "src/components/dashboard/AlertsPanel.tsx",
-   "lines": 450,
+   "lines": 443,
    "status_values": [
     {
      "field": "type",
@@ -69955,6 +69975,25 @@
    "percents": [
     "<span>0% Estabilidade</span>",
     "<span>100% Evolução</span>"
+   ]
+  },
+  "src/components/dashboard/alertsFilter.test.ts": {
+   "path": "src/components/dashboard/alertsFilter.test.ts",
+   "lines": 49,
+   "is_test": true,
+   "tests": [
+    "filtrarPorLimiar",
+    "nunca esconde alerta sem delta medido",
+    "aplica o limiar so a quem tem delta",
+    "mantem alerta cujo delta empata com o limiar",
+    "trata delta zero como medido e o esconde acima do limiar"
+   ]
+  },
+  "src/components/dashboard/alertsFilter.ts": {
+   "path": "src/components/dashboard/alertsFilter.ts",
+   "lines": 16,
+   "exports": [
+    "function filtrarPorLimiar"
    ]
   },
   "src/components/dashboard/index.ts": {
@@ -73862,7 +73901,7 @@
   },
   "src/hooks/analytics/useDashboardMetrics.tsx": {
    "path": "src/hooks/analytics/useDashboardMetrics.tsx",
-   "lines": 334,
+   "lines": 348,
    "exports": [
     "interface DashboardMetrics",
     "interface RecentAlert",
@@ -88162,10 +88201,22 @@
   }
  },
  "git": {
-  "sha": "4496d9f3b901820d9a8a101051e2caaa606ebacf",
+  "sha": "f680a6482180b36e10542f2584c77ddf91c0adbc",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "f680a64",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "fix: alertas de divergencia e falha de frete sumiam da home (#158)",
+    "files": [
+     "src/components/dashboard/AlertsPanel.tsx",
+     "src/components/dashboard/alertsFilter.test.ts",
+     "src/components/dashboard/alertsFilter.ts",
+     "src/hooks/analytics/useDashboardMetrics.tsx"
+    ]
+   },
    {
     "sha": "4496d9f",
     "date": "2026-11-17",
@@ -88626,17 +88677,6 @@
      "scripts/inventario/mudou-conteudo.mjs",
      "scripts/lib/seguranca-processo.mjs"
     ]
-   },
-   {
-    "sha": "28c0f7e",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi",
-    "files": [
-     ".github/workflows/settings-guard.yml",
-     "scripts/ci/github-settings-baseline.json",
-     "scripts/ci/github-settings-guard.mjs"
-    ]
    }
   ],
   "hot_files": [
@@ -88657,10 +88697,6 @@
     3
    ],
    [
-    "scripts/ci/github-settings-baseline.json",
-    3
-   ],
-   [
     ".github/workflows/types-sync.yml",
     3
    ],
@@ -88674,6 +88710,10 @@
    ],
    [
     "scripts/db-audit/grants-baseline.json",
+    2
+   ],
+   [
+    "scripts/ci/github-settings-baseline.json",
     2
    ],
    [
@@ -88717,7 +88757,7 @@
     2
    ],
    [
-    "scripts/ci/github-settings-guard.mjs",
+    "scripts/ci/install-pgbouncer.sh",
     2
    ]
   ]
