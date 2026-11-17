@@ -2901,10 +2901,13 @@
    "hooks_exportados": [
     "useBusinessRuleEngine"
    ],
-   "linhas": 172,
+   "linhas": 192,
    "dominio": "hooks/logistics",
    "tabelas": [
+    "coletas",
+    "entregas",
     "notifications",
+    "ocorrencias",
     "rule_execution_logs"
    ],
    "rpcs": [],
@@ -2999,7 +3002,7 @@
    "hooks_exportados": [
     "useConciliacao"
    ],
-   "linhas": 439,
+   "linhas": 440,
    "dominio": "hooks/logistics",
    "tabelas": [
     "conciliacao_itens_importados",
@@ -3083,7 +3086,7 @@
    "hooks_exportados": [
     "useCotacoesMulticanal"
    ],
-   "linhas": 182,
+   "linhas": 183,
    "dominio": "hooks/logistics",
    "tabelas": [
     "cotacoes_multicanal"

@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `1000cd96e5` · branch `main` · 2026-11-17 18:09 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `4b5d4c9242` · branch `main` · 2026-11-17 18:58 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -38,7 +38,7 @@
 | `carrier_rankings` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | migration |
 | `client_webhooks` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | migration |
 | `clientes` | Customer records with delivery preferences | 16 colunas | migration |
-| `coletas` | Pickup orders from suppliers | 30 colunas | migration |
+| `coletas` | Pickup orders from suppliers | 31 colunas | migration |
 | `comments` | Comentários em entidades (ocorrências, coletas, entregas, etc) | 7 colunas | migration |
 | `conciliacao_itens_importados` | _(sem COMMENT ON TABLE — significado não documentado)_ | 16 colunas | migration |
 | `conciliacoes` | _(sem COMMENT ON TABLE — significado não documentado)_ | 16 colunas | migration |
@@ -303,7 +303,6 @@
 | dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/data/useDocumentUpload.ts` |
 | dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/data/useImageUpload.tsx` |
 | dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/data/useSoftDelete.ts` |
-| dinâmico | 1 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | dinâmico | 1 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/pages/ImportacaoMassa.tsx` |
 | dinâmico | 4 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `supabase/functions/external-db-bridge/index.ts` |
 

@@ -1061,7 +1061,7 @@
     "WidgetErrorBoundary"
    ],
    "export_default": null,
-   "linhas": 93,
+   "linhas": 94,
    "dominio": "components/common",
    "hooks_locais": [],
    "tabelas": [
@@ -5508,7 +5508,7 @@
     "FreightConfig"
    ],
    "export_default": "FreightConfig",
-   "linhas": 1072,
+   "linhas": 1073,
    "dominio": "pages",
    "hooks_locais": [],
    "tabelas": [

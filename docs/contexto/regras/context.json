@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "1000cd96e53490bc601b16dec946b22194767aae",
+  "sha": "4b5d4c9242cf2f00853306057b2125b118013d32",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 18:09 UTC",
-  "files_total": 1308,
-  "code_files": 1134,
-  "code_lines": 183453,
+  "generated_at": "2026-11-17 18:58 UTC",
+  "files_total": 1309,
+  "code_files": 1135,
+  "code_lines": 183486,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "480eab23a1f3b183",
+ "facts_hash": "9c719df730ec044e",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -23,7 +23,7 @@
     "in": "package.json"
    },
    "@supabase/supabase-js": {
-    "version": "^2.87.1",
+    "version": "^2.119.0",
     "role": "Supabase (DB/Auth/Storage/Functions)",
     "in": "package.json"
    },
@@ -297,7 +297,7 @@
   "languages": {
    ".tsx": 453,
    ".ts": 335,
-   ".sql": 258,
+   ".sql": 259,
    ".mjs": 77,
    ".py": 8,
    ".js": 3
@@ -1034,6 +1034,13 @@
       "fk": "",
       "generated": "",
       "src": "supabase/migrations/20260520115002_1c3e2e68-3140-4b2d-a431-9e0791e6bf31.sql"
+     },
+     {
+      "name": "peso_efetivo",
+      "type": "numeric",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql"
      }
     ],
     "constraints": [
@@ -20572,6 +20579,7 @@
    "supabase/migrations/20260901000001_remediacao_destino.sql",
    "supabase/migrations/20260902120000_hardening_pos_auditoria.sql",
    "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
+   "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql",
    "supabase/seed.sql",
    "src/integrations/supabase/types.ts"
   ],
@@ -23722,7 +23730,8 @@
    "table:entregas": "Delivery orders to customers",
    "table:ocorrencias": "Incident reports for pickups and deliveries",
    "table:comments": "Comentários em entidades (ocorrências, coletas, entregas, etc)",
-   "column:user_levels.nexus_score": "Core Nexus Score (0-100): logistics performance composite metric used by useGamification hook"
+   "column:user_levels.nexus_score": "Core Nexus Score (0-100): logistics performance composite metric used by useGamification hook",
+   "column:coletas.peso_efetivo": "Peso aferido na conferencia de recebimento (kg)."
   },
   "types_file": "src/integrations/supabase/types.ts"
  },
@@ -29265,7 +29274,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48527,
+   "lines": 48528,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29706,7 +29715,7 @@
   {
    "module": "src/hooks",
    "files": 123,
-   "lines": 19046,
+   "lines": 19068,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -29929,7 +29938,7 @@
   {
    "module": "src/integrations",
    "files": 4,
-   "lines": 6703,
+   "lines": 6706,
    "tables": [],
    "exports": [
     "index.ts: lovable",
@@ -30067,7 +30076,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30694,
+   "lines": 30695,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -30537,8 +30546,8 @@
   },
   {
    "module": "supabase/migrations",
-   "files": 245,
-   "lines": 15028,
+   "files": 246,
+   "lines": 15034,
    "tables": [],
    "exports": [],
    "docs": [],
@@ -30876,6 +30885,7 @@
     "update": [
      "src/components/coletas/PickupDetailsDialog.tsx",
      "src/components/coletas/PickupDialog.tsx",
+     "src/hooks/logistics/useBusinessRuleEngine.tsx",
      "supabase/functions/lalamove-webhook/index.ts",
      "supabase/functions/nexus-auto-healing/index.ts"
     ]
@@ -31076,6 +31086,7 @@
      "src/components/shipping/ExpeditionDetailsDialog.tsx",
      "src/features/logistics/services/LogisticsService.ts",
      "src/hooks/logistics/useBoxManagement.tsx",
+     "src/hooks/logistics/useBusinessRuleEngine.tsx",
      "src/hooks/logistics/useDeliveryRoutes.tsx",
      "src/pages/Despachos.tsx",
      "src/pages/Envios.tsx",
@@ -31389,13 +31400,14 @@
      "supabase/functions/ai-logistics-assistant/index.ts",
      "supabase/functions/predict-delays/index.ts"
     ],
+    "update": [
+     "src/hooks/logistics/useBusinessRuleEngine.tsx",
+     "src/pages/Ocorrencias.tsx"
+    ],
     "insert": [
      "src/pages/Ocorrencias.tsx",
      "supabase/functions/rodonaves-api/index.ts",
      "supabase/functions/rodonaves-webhook/index.ts"
-    ],
-    "update": [
-     "src/pages/Ocorrencias.tsx"
     ]
    },
    "orfa_vazia": {
@@ -33402,10 +33414,6 @@
    {
     "file": "src/hooks/data/useSoftDelete.ts",
     "count": 2
-   },
-   {
-    "file": "src/hooks/logistics/useBusinessRuleEngine.tsx",
-    "count": 1
    },
    {
     "file": "src/pages/ImportacaoMassa.tsx",
@@ -64804,13 +64812,6 @@
     "kind": "dinâmico",
     "msg": "1 chamada(s) `.from(variável)` — tabela só conhecida em runtime",
     "where": [
-     "src/hooks/logistics/useBusinessRuleEngine.tsx"
-    ]
-   },
-   {
-    "kind": "dinâmico",
-    "msg": "1 chamada(s) `.from(variável)` — tabela só conhecida em runtime",
-    "where": [
      "src/pages/ImportacaoMassa.tsx"
     ]
    },
@@ -69786,7 +69787,7 @@
   },
   "src/components/common/WidgetErrorBoundary.tsx": {
    "path": "src/components/common/WidgetErrorBoundary.tsx",
-   "lines": 93,
+   "lines": 94,
    "exports": [
     "class WidgetErrorBoundary"
    ],
@@ -76315,7 +76316,7 @@
   },
   "src/hooks/logistics/useBusinessRuleEngine.tsx": {
    "path": "src/hooks/logistics/useBusinessRuleEngine.tsx",
-   "lines": 172,
+   "lines": 192,
    "exports": [
     "function useBusinessRuleEngine"
    ],
@@ -76327,9 +76328,31 @@
     {
      "table": "notifications",
      "op": "ref"
+    },
+    {
+     "table": "coletas",
+     "op": "update"
+    },
+    {
+     "table": "entregas",
+     "op": "update"
+    },
+    {
+     "table": "ocorrencias",
+     "op": "update"
     }
    ],
-   "dyn_from": 1,
+   "table_cols": {
+    "coletas": [
+     "id"
+    ],
+    "entregas": [
+     "id"
+    ],
+    "ocorrencias": [
+     "id"
+    ]
+   },
    "errors": [
     ") {\n      const { data: userData } = await supabase.auth.getUser();\n      if (!userData?.user) return;\n      const isAlert = action.type === ",
     ";\n      await supabase.from("
@@ -76562,7 +76585,7 @@
   },
   "src/hooks/logistics/useConciliacao.tsx": {
    "path": "src/hooks/logistics/useConciliacao.tsx",
-   "lines": 439,
+   "lines": 440,
    "exports": [
     "interface Conciliacao",
     "interface ItemImportado",
@@ -76887,7 +76910,7 @@
   },
   "src/hooks/logistics/useCotacoesMulticanal.tsx": {
    "path": "src/hooks/logistics/useCotacoesMulticanal.tsx",
-   "lines": 182,
+   "lines": 183,
    "exports": [
     "interface CotacaoMulticanal",
     "const useCotacoesMulticanal"
@@ -79255,7 +79278,7 @@
   },
   "src/integrations/supabase/types.ts": {
    "path": "src/integrations/supabase/types.ts",
-   "lines": 6610,
+   "lines": 6613,
    "exports": [
     "type Json",
     "type Database",
@@ -81485,7 +81508,7 @@
   },
   "src/pages/ConfiguracoesFrete.tsx": {
    "path": "src/pages/ConfiguracoesFrete.tsx",
-   "lines": 1072,
+   "lines": 1073,
    "exports": [
     "function FreightConfig"
    ],
@@ -88528,6 +88551,10 @@
     "WHERE s.created_at >= now() - interval '7 days'"
    ]
   },
+  "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql": {
+   "path": "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql",
+   "lines": 6
+  },
   "tests/contracts/nexus-contracts.spec.ts": {
    "path": "tests/contracts/nexus-contracts.spec.ts",
    "lines": 110,
@@ -88695,10 +88722,31 @@
   }
  },
  "git": {
-  "sha": "1000cd96e53490bc601b16dec946b22194767aae",
+  "sha": "4b5d4c9242cf2f00853306057b2125b118013d32",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "4b5d4c9",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)",
+    "files": [
+     "package-lock.json",
+     "package.json",
+     "src/components/common/WidgetErrorBoundary.tsx",
+     "src/hooks/logistics/useBusinessRuleEngine.tsx",
+     "src/hooks/logistics/useBusinessRules.tsx",
+     "src/hooks/logistics/useConciliacao.tsx",
+     "src/hooks/logistics/useCostAlerts.tsx",
+     "src/hooks/logistics/useCotacoesMulticanal.tsx",
+     "src/hooks/logistics/useFreightQuotation.tsx",
+     "src/hooks/logistics/useLogisticaReversaReal.tsx",
+     "src/integrations/supabase/types.ts",
+     "src/pages/ConfiguracoesFrete.tsx",
+     "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql"
+    ]
+   },
    {
     "sha": "1000cd9",
     "date": "2026-11-17",
@@ -89021,19 +89069,6 @@
      "supabase/schema-catalog.json",
      "supabase/schema-manifest.json"
     ]
-   },
-   {
-    "sha": "e098218",
-    "date": "2026-11-12",
-    "author": "adm01-debug",
-    "subject": "fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)",
-    "files": [
-     "scripts/ci/github-settings-baseline.json",
-     "scripts/ci/github-settings-guard.unit.mjs",
-     "scripts/ops/pos-deploy-functions.unit.mjs",
-     "scripts/ops/set-missing-secrets.unit.mjs",
-     "scripts/ops/set_missing_secrets.sh"
-    ]
    }
   ],
   "hot_files": [
@@ -89042,11 +89077,23 @@
     5
    ],
    [
+    "package-lock.json",
+    3
+   ],
+   [
     "docs/prod-readiness.md",
     3
    ],
    [
-    "package-lock.json",
+    "package.json",
+    2
+   ],
+   [
+    "src/integrations/supabase/types.ts",
+    2
+   ],
+   [
+    "src/pages/ConfiguracoesFrete.tsx",
     2
    ],
    [
@@ -89074,47 +89121,35 @@
     2
    ],
    [
-    "eslint.config.js",
+    "src/components/common/WidgetErrorBoundary.tsx",
     1
    ],
    [
-    "package.json",
+    "src/hooks/logistics/useBusinessRuleEngine.tsx",
     1
    ],
    [
-    "src/components/pwa/UpdatePrompt.tsx",
+    "src/hooks/logistics/useBusinessRules.tsx",
     1
    ],
    [
-    "src/components/security/PermissionMatrix.tsx",
+    "src/hooks/logistics/useConciliacao.tsx",
     1
    ],
    [
-    "src/components/ui/button.tsx",
+    "src/hooks/logistics/useCostAlerts.tsx",
     1
    ],
    [
-    "src/components/ui/micro-interactions.tsx",
+    "src/hooks/logistics/useCotacoesMulticanal.tsx",
     1
    ],
    [
-    "src/hooks/data/useRealtime.tsx",
+    "src/hooks/logistics/useFreightQuotation.tsx",
     1
    ],
    [
-    "src/hooks/gamification/useAchievementNotifications.tsx",
-    1
-   ],
-   [
-    "src/lib/excelImporter.ts",
-    1
-   ],
-   [
-    "src/pages/Transportadoras.tsx",
-    1
-   ],
-   [
-    "src/utils/systemTester.spec.ts",
+    "src/hooks/logistics/useLogisticaReversaReal.tsx",
     1
    ]
   ]

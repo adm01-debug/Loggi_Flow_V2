@@ -6,7 +6,7 @@
   "src/integrations/supabase/types.ts",
   "supabase/migrations"
  ],
- "migrations": 245,
+ "migrations": 246,
  "seeds": [
   "supabase/seed.sql"
  ],
@@ -3785,6 +3785,13 @@
      "default": null,
      "ref": null
     },
+    "peso_efetivo": {
+     "tipo": "numeric",
+     "nn": false,
+     "pk": false,
+     "default": null,
+     "ref": null
+    },
     "peso_estimado_kg": {
      "tipo": "decimal(10,2)",
      "nn": false,
@@ -3972,6 +3979,7 @@
     "nf_fornecedor": "string | null",
     "numero_coleta": "string",
     "observacoes": "string | null",
+    "peso_efetivo": "number | null",
     "peso_estimado_kg": "number | null",
     "qtd_recebida": "number | null",
     "qtd_volumes": "number | null",
@@ -3986,7 +3994,7 @@
     "so_na_migration": [],
     "so_no_types": []
    },
-   "usada_no_front": 21,
+   "usada_no_front": 22,
    "usada_em_edges": [
     "lalamove-webhook",
     "nexus-auto-healing",
@@ -6246,7 +6254,7 @@
     "so_na_migration": [],
     "so_no_types": []
    },
-   "usada_no_front": 37,
+   "usada_no_front": 38,
    "usada_em_edges": [
     "ai-logistics-assistant",
     "lgpd-erase-user",
@@ -9490,7 +9498,7 @@
     "so_na_migration": [],
     "so_no_types": []
    },
-   "usada_no_front": 5,
+   "usada_no_front": 6,
    "usada_em_edges": [
     "ai-logistics-assistant",
     "predict-delays",

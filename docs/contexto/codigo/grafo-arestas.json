@@ -2821,6 +2821,7 @@
   "src/hooks/logistics/useConciliacao.tsx": [
    "src/hooks/auth/useAuth.tsx",
    "src/integrations/supabase/client.ts",
+   "src/integrations/supabase/types.ts",
    "src/lib/conciliacaoImport.ts"
   ],
   "src/hooks/logistics/useCostAlerts.tsx": [
@@ -2833,7 +2834,8 @@
   ],
   "src/hooks/logistics/useCotacoesMulticanal.tsx": [
    "src/hooks/auth/useAuth.tsx",
-   "src/integrations/supabase/client.ts"
+   "src/integrations/supabase/client.ts",
+   "src/integrations/supabase/types.ts"
   ],
   "src/hooks/logistics/useDelayPrediction.tsx": [
    "src/hooks/analytics/useTelemetry.ts",
@@ -3327,6 +3329,7 @@
    "src/components/ui/tabs.tsx",
    "src/components/ui/textarea.tsx",
    "src/integrations/supabase/client.ts",
+   "src/integrations/supabase/types.ts",
    "src/lib/supabaseEnv.ts"
   ],
   "src/pages/Conquistas.tsx": [
