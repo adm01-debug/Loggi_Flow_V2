@@ -2,11 +2,31 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "0b8692b671f6f64a0ee41445444ceb19289efb5a",
+  "commit": "8071e4a52152655b1d83dffb274b0560ce97fb3a",
   "branch": "main",
-  "data_commit": "2026-11-14T11:30:47-03:00",
+  "data_commit": "2026-11-17T10:12:19-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "8071e4a5",
+    "data": "2026-11-17",
+    "assunto": "docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)"
+   },
+   {
+    "sha": "7b46a982",
+    "data": "2026-11-17",
+    "assunto": "chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)"
+   },
+   {
+    "sha": "70f45b32",
+    "data": "2026-11-17",
+    "assunto": "test: conecta simulacao e fuzzing aos validadores reais (#153)"
+   },
+   {
+    "sha": "42774d84",
+    "data": "2026-11-14",
+    "assunto": "chore: contexto agendado de 10 min para 1x/hora (#154)"
+   },
    {
     "sha": "0b8692b6",
     "data": "2026-11-14",
@@ -111,36 +131,20 @@
     "sha": "e31c16af",
     "data": "2026-11-11",
     "assunto": "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)"
-   },
-   {
-    "sha": "9c2edff8",
-    "data": "2026-11-10",
-    "assunto": "fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)"
-   },
-   {
-    "sha": "f2dc8925",
-    "data": "2026-11-10",
-    "assunto": "fix(scripts): corrige e testa todos os scripts de automação (scripts/) (#118)"
-   },
-   {
-    "sha": "6de3c961",
-    "data": "2026-11-09",
-    "assunto": "feat(ci): porta scripts/ci, scripts/inventario e scripts/db-audit do Zapp (#114)"
-   },
-   {
-    "sha": "28c0f7e3",
-    "data": "2026-11-08",
-    "assunto": "feat(ci): porta github-settings-guard.mjs do Zapp para o Loggi"
    }
   ],
-  "arquivos_mudados_7d": 215,
+  "arquivos_mudados_7d": 70,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
-    "mudancas": 4
+    "mudancas": 5
    },
    {
     "pasta": ".github/workflows/types-sync.yml",
+    "mudancas": 4
+   },
+   {
+    "pasta": "docs/agentes/github-ci.md",
     "mudancas": 4
    },
    {
@@ -168,10 +172,6 @@
     "mudancas": 3
    },
    {
-    "pasta": "docs/agentes/github-ci.md",
-    "mudancas": 3
-   },
-   {
     "pasta": "docs/prod-readiness.md",
     "mudancas": 3
    },
@@ -192,7 +192,7 @@
     "mudancas": 3
    },
    {
-    "pasta": "scripts/ratchet-warning-budget.mjs",
+    "pasta": "scripts/ops/pos_deploy_functions.sql",
     "mudancas": 3
    }
   ],
@@ -214,7 +214,7 @@
     "mudancas": 9
    },
    {
-    "arquivo": "AGENTS.md",
+    "arquivo": ".github/workflows/contexto-ia.yml",
     "mudancas": 5
    },
    {
@@ -230,10 +230,6 @@
     "mudancas": 4
    },
    {
-    "arquivo": ".github/workflows/contexto-ia.yml",
-    "mudancas": 4
-   },
-   {
     "arquivo": ".github/workflows/deploy-functions.yml",
     "mudancas": 4
    },
@@ -242,11 +238,11 @@
     "mudancas": 4
    },
    {
-    "arquivo": "ESTADO_ATUAL.md",
+    "arquivo": "AGENTS.md",
     "mudancas": 4
    },
    {
-    "arquivo": "ESTADO_ATUAL_EVIDENCIAS.md",
+    "arquivo": "docs/agentes/github-ci.md",
     "mudancas": 4
    },
    {
@@ -259,6 +255,10 @@
    },
    {
     "arquivo": "scripts/generate-quality-report.mjs",
+    "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/ops/pos_deploy_functions.sql",
     "mudancas": 4
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 95
+    "commits": 99
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1283,
+  "arquivos_total": 1284,
   "arquivos_codigo": 863,
-  "linhas_codigo": 165721,
+  "linhas_codigo": 165820,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -331,7 +331,7 @@
   "testes": 123,
   "workflows": 16,
   "scripts": 62,
-  "docs_md": 83
+  "docs_md": 84
  },
  "por_pasta": {
   "eslint.config.js": {
@@ -516,7 +516,7 @@
   },
   "tests/integration": {
    "arquivos": 3,
-   "linhas": 116
+   "linhas": 215
   },
   "tests/load": {
    "arquivos": 1,
@@ -643,7 +643,7 @@
  ],
  "qualidade": {
   "any": 57,
-  "console_log": 156,
+  "console_log": 155,
   "ts_ignore": 0,
   "eslint_disable": 3,
   "todos": 2,

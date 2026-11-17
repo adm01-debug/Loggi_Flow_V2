@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "0b8692b671f6f64a0ee41445444ceb19289efb5a",
+  "sha": "8071e4a52152655b1d83dffb274b0560ce97fb3a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-14 14:42 UTC",
-  "files_total": 1293,
+  "generated_at": "2026-11-17 13:16 UTC",
+  "files_total": 1294,
   "code_files": 1121,
-  "code_lines": 181459,
+  "code_lines": 181587,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "617dd20fa9ebf5ab",
+ "facts_hash": "0a9b45d0cee7d395",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -27848,7 +27848,7 @@
    },
    {
     "kind": "GitHub Actions cron",
-    "detail": "7-59/10 * * * *",
+    "detail": "7 * * * *",
     "file": ".github/workflows/contexto-ia.yml"
    },
    {
@@ -28998,7 +28998,7 @@
   {
    "module": "scripts",
    "files": 98,
-   "lines": 35233,
+   "lines": 35262,
    "tables": [
     "a",
     "apos_glob",
@@ -30606,7 +30606,7 @@
   {
    "module": "tests",
    "files": 11,
-   "lines": 601,
+   "lines": 700,
    "tables": [],
    "exports": [
     "massive-simulation.spec.ts: simulateWebhookPayload",
@@ -30622,7 +30622,9 @@
     "vitest",
     "zod"
    ],
-   "imports_modules": [],
+   "imports_modules": [
+    "supabase/functions"
+   ],
    "file_list": [
     "tests/contracts/nexus-contracts.spec.ts",
     "tests/e2e/critical-paths.spec.ts",
@@ -48903,15 +48905,15 @@
    },
    {
     "file": "tests/integration/fuzzing.spec.ts",
-    "name": "Edge Function Fuzzing Suite"
+    "name": "Edge Function Fuzzing Suite (real _shared validators)"
    },
    {
     "file": "tests/integration/fuzzing.spec.ts",
-    "name": "should reject invalid UUIDs in payloads"
+    "name": "should reject invalid UUIDs and malformed required strings"
    },
    {
     "file": "tests/integration/fuzzing.spec.ts",
-    "name": "should simulate malformed JSON processing"
+    "name": "should reject malformed JSON and non-numeric required fields via production logic"
    },
    {
     "file": "tests/integration/massive-simulation.spec.ts",
@@ -48919,19 +48921,27 @@
    },
    {
     "file": "tests/integration/massive-simulation.spec.ts",
-    "name": "should maintain 100% data consistency across 10,000 randomized tracking scenarios"
+    "name": "should exercise the real production validators across 10,000 randomized scenarios"
+   },
+   {
+    "file": "tests/integration/massive-simulation.spec.ts",
+    "name": "should normalize BR and US numeric formats via the shared parser"
    },
    {
     "file": "tests/integration/webhooks.spec.ts",
-    "name": "Webhook Simulation Suite"
+    "name": "Webhook Simulation Suite (real _shared logic)"
    },
    {
     "file": "tests/integration/webhooks.spec.ts",
-    "name": "should validate carrier status updates"
+    "name": "should validate carrier status updates through the production contract"
    },
    {
     "file": "tests/integration/webhooks.spec.ts",
-    "name": "should handle malformed payloads (fuzzing)"
+    "name": "should refuse events outside the contract"
+   },
+   {
+    "file": "tests/integration/webhooks.spec.ts",
+    "name": "should reject missing required fields (production fail-closed)"
    },
    {
     "file": "tests/load/backend-stress.spec.ts",
@@ -67152,7 +67162,7 @@
   },
   "scripts/ops/pos_deploy_functions.sql": {
    "path": "scripts/ops/pos_deploy_functions.sql",
-   "lines": 70,
+   "lines": 99,
    "temporal": [
     "-- WHERE created > now() - interval '1 hour' GROUP BY 1 ORDER BY 1;"
    ],
@@ -87976,40 +87986,39 @@
   },
   "tests/integration/fuzzing.spec.ts": {
    "path": "tests/integration/fuzzing.spec.ts",
-   "lines": 29,
+   "lines": 50,
    "is_test": true,
    "tests": [
-    "Edge Function Fuzzing Suite",
-    "should reject invalid UUIDs in payloads",
-    "should simulate malformed JSON processing"
+    "Edge Function Fuzzing Suite (real _shared validators)",
+    "should reject invalid UUIDs and malformed required strings",
+    "should reject malformed JSON and non-numeric required fields via production logic"
    ]
   },
   "tests/integration/massive-simulation.spec.ts": {
    "path": "tests/integration/massive-simulation.spec.ts",
-   "lines": 46,
+   "lines": 99,
    "is_test": true,
    "exports": [
     "const simulateWebhookPayload"
    ],
    "tests": [
     "Massive Webhook & Edge Function Simulation (10,000 scenarios)",
-    "should maintain 100% data consistency across 10,000 randomized tracking scenarios"
+    "should exercise the real production validators across 10,000 randomized scenarios",
+    "should normalize BR and US numeric formats via the shared parser"
    ]
   },
   "tests/integration/webhooks.spec.ts": {
    "path": "tests/integration/webhooks.spec.ts",
-   "lines": 41,
+   "lines": 66,
    "is_test": true,
    "exports": [
     "const simulateWebhookPayload"
    ],
-   "rule_comments": [
-    "Simula a validação que seria feita na Edge Function"
-   ],
    "tests": [
-    "Webhook Simulation Suite",
-    "should validate carrier status updates",
-    "should handle malformed payloads (fuzzing)"
+    "Webhook Simulation Suite (real _shared logic)",
+    "should validate carrier status updates through the production contract",
+    "should refuse events outside the contract",
+    "should reject missing required fields (production fail-closed)"
    ]
   },
   "tests/load/backend-stress.spec.ts": {
@@ -88077,10 +88086,50 @@
   }
  },
  "git": {
-  "sha": "0b8692b671f6f64a0ee41445444ceb19289efb5a",
+  "sha": "8071e4a52152655b1d83dffb274b0560ce97fb3a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "8071e4a",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)",
+    "files": [
+     "docs/auditoria-recuperacao-branches.md"
+    ]
+   },
+   {
+    "sha": "7b46a98",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)",
+    "files": [
+     "docs/agentes/github-ci.md",
+     "docs/auditoria-recuperacao-branches.md",
+     "scripts/ops/pos_deploy_functions.sql"
+    ]
+   },
+   {
+    "sha": "70f45b3",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "test: conecta simulacao e fuzzing aos validadores reais (#153)",
+    "files": [
+     "tests/integration/fuzzing.spec.ts",
+     "tests/integration/massive-simulation.spec.ts",
+     "tests/integration/webhooks.spec.ts"
+    ]
+   },
+   {
+    "sha": "42774d8",
+    "date": "2026-11-14",
+    "author": "adm01-debug",
+    "subject": "chore: contexto agendado de 10 min para 1x/hora (#154)",
+    "files": [
+     ".github/workflows/contexto-ia.yml"
+    ]
+   },
    {
     "sha": "0b8692b",
     "date": "2026-11-14",
@@ -88510,80 +88559,16 @@
     "files": [
      ".github/workflows/contexto-ia.yml"
     ]
-   },
-   {
-    "sha": "4b14063",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "docs(agentes): atualiza contagem de required checks para 9 (#113)",
-    "files": [
-     "AGENTS.md",
-     "docs/agentes/github-ci.md"
-    ]
-   },
-   {
-    "sha": "10d5df3",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "feat(ci): porta 7 workflows autônomos genéricos do Zapp (#112)",
-    "files": [
-     ".github/codeql/codeql-config.yml",
-     ".github/workflows/auto-update-pr-branch.yml",
-     ".github/workflows/branch-hygiene-audit.yml",
-     ".github/workflows/codeql.yml",
-     ".github/workflows/inventario-estado-semanal.yml",
-     ".github/workflows/notifica-falha-main.yml",
-     ".github/workflows/settings-guard.yml",
-     ".github/workflows/types-sync.yml"
-    ]
-   },
-   {
-    "sha": "b74bb21",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "chore: padrão de instruções para agentes (#110)",
-    "files": [
-     ".agents/skills/Loggi_Flow_V2/SKILL.md",
-     ".claude/hooks/session-start.sh",
-     ".claude/settings.json",
-     ".claude/skills/Loggi_Flow_V2/SKILL.md",
-     ".github/workflows/ci.yml",
-     ".gitignore",
-     ".graphifyignore",
-     ".hermes.md",
-     "AGENTS.md",
-     "CLAUDE.md",
-     "docs/agentes/banco.md",
-     "docs/agentes/deploy.md",
-     "docs/agentes/github-ci.md",
-     "docs/agentes/integracoes.md",
-     "docs/agentes/mapa-repo.md",
-     "docs/agentes/regras-dominio.md",
-     "package.json",
-     "scripts/ci/README.md",
-     "scripts/ci/check-claude-md-integrity.mjs",
-     "scripts/graphify/README.md",
-     "scripts/graphify/setup.sh"
-    ]
-   },
-   {
-    "sha": "ab4852b",
-    "date": "2026-11-08",
-    "author": "adm01-debug",
-    "subject": "fix(ci): adiciona --force no push da branch contexto (#111)",
-    "files": [
-     ".github/workflows/contexto.yml"
-    ]
    }
   ],
   "hot_files": [
    [
     ".github/workflows/contexto-ia.yml",
-    4
+    5
    ],
    [
-    ".github/workflows/types-sync.yml",
-    4
+    "scripts/ops/pos_deploy_functions.sql",
+    3
    ],
    [
     "docs/prod-readiness.md",
@@ -88594,16 +88579,16 @@
     3
    ],
    [
-    ".github/workflows/codeql.yml",
+    ".github/workflows/types-sync.yml",
     3
    ],
    [
-    ".github/workflows/inventario-estado-semanal.yml",
-    3
+    "docs/auditoria-recuperacao-branches.md",
+    2
    ],
    [
     "docs/agentes/github-ci.md",
-    3
+    2
    ],
    [
     "scripts/ops/README.md",
@@ -88630,23 +88615,11 @@
     2
    ],
    [
-    "scripts/ops/pos_deploy_functions.sql",
+    ".github/workflows/codeql.yml",
     2
    ],
    [
-    ".gitignore",
-    2
-   ],
-   [
-    "package.json",
-    2
-   ],
-   [
-    ".github/workflows/auto-update-pr-branch.yml",
-    2
-   ],
-   [
-    "scripts/ci/README.md",
+    ".github/workflows/inventario-estado-semanal.yml",
     2
    ],
    [
@@ -88655,6 +88628,18 @@
    ],
    [
     "scripts/ci/branch-podaveis.mjs",
+    2
+   ],
+   [
+    "scripts/ci/bump-toolchain.mjs",
+    2
+   ],
+   [
+    "scripts/ci/fila-merge.mjs",
+    2
+   ],
+   [
+    "scripts/ci/github-settings-guard.mjs",
     2
    ]
   ]

@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `0b8692b671` · branch `main` · 2026-11-14 14:42 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8071e4a521` · branch `main` · 2026-11-17 13:16 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -2194,7 +2194,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (306 testes em 32 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (308 testes em 32 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
@@ -2222,13 +2222,13 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `src/hooks/rodonaves/useSLOSnapshots.test.ts` | 6 | aggregateSnapshots · retorna vazio sem linhas · agrupa por gateway e conta dias · conta dias violados e pior P95 … |
 | `tests/security/rls-access.spec.ts` | 6 | RLS · leitura anônima bloqueada em tabelas sensíveis · SELECT em ${table} retorna [] ou 401/403 · RLS · escrita anônima bloqueada em tabelas sensíveis · INSERT em ${table} é rejeitado … |
 | `tests/unit/modules-integrity.spec.ts` | 5 | Freight-Quest Module Integrity · Logistics Engine · should correctly calculate delivery dates with margin · Financial Core … |
+| `tests/integration/webhooks.spec.ts` | 4 | Webhook Simulation Suite (real _shared logic) · should validate carrier status updates through the production contract · should refuse events outside the contract · should reject missing required fields (production fail-closed) |
 | `src/utils/systemTester.spec.ts` | 3 | System Integrity Tests · should pass all checks when system is healthy · should detect database connectivity failure |
 | `tests/e2e/critical-paths.spec.ts` | 3 | Nexus Core E2E - Critical Path Validation · Complete login to dashboard and shipment creation flow · Responsiveness and Error State resilience |
 | `tests/e2e/dashboard.spec.ts` | 3 | Dashboard E2E Flow · should navigate through main modules · should handle error states gracefully |
 | `tests/fuzzing/edge-functions.spec.ts` | 3 | Edge Function Fuzzing Suite · should reject invalid UUIDs in payloads · should simulate malformed JSON processing |
-| `tests/integration/fuzzing.spec.ts` | 3 | Edge Function Fuzzing Suite · should reject invalid UUIDs in payloads · should simulate malformed JSON processing |
-| `tests/integration/webhooks.spec.ts` | 3 | Webhook Simulation Suite · should validate carrier status updates · should handle malformed payloads (fuzzing) |
-| `tests/integration/massive-simulation.spec.ts` | 2 | Massive Webhook & Edge Function Simulation (10,000 scenarios) · should maintain 100% data consistency across 10,000 randomized tracking scenarios |
+| `tests/integration/fuzzing.spec.ts` | 3 | Edge Function Fuzzing Suite (real _shared validators) · should reject invalid UUIDs and malformed required strings · should reject malformed JSON and non-numeric required fields via production logic |
+| `tests/integration/massive-simulation.spec.ts` | 3 | Massive Webhook & Edge Function Simulation (10,000 scenarios) · should exercise the real production validators across 10,000 randomized scenarios · should normalize BR and US numeric formats via the shared parser |
 | `tests/load/backend-stress.spec.ts` | 2 | Load & Stress Performance Simulation · should measure response time for concurrent requests simulation |
 
 ## L. Eventos de webhook tratados (contratos com sistemas externos)

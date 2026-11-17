@@ -971,23 +971,30 @@
   {
    "arquivo": "tests/integration/fuzzing.spec.ts",
    "tipo": "unit",
-   "linhas": 29,
-   "testa": [],
+   "linhas": 50,
+   "testa": [
+    "supabase/functions/_shared/validate.ts"
+   ],
    "casos": 3
   },
   {
    "arquivo": "tests/integration/massive-simulation.spec.ts",
    "tipo": "unit",
-   "linhas": 46,
-   "testa": [],
-   "casos": 1
+   "linhas": 99,
+   "testa": [
+    "supabase/functions/_shared/number.ts",
+    "supabase/functions/_shared/validate.ts"
+   ],
+   "casos": 2
   },
   {
    "arquivo": "tests/integration/webhooks.spec.ts",
    "tipo": "unit",
-   "linhas": 41,
-   "testa": [],
-   "casos": 2
+   "linhas": 66,
+   "testa": [
+    "supabase/functions/_shared/validate.ts"
+   ],
+   "casos": 3
   },
   {
    "arquivo": "tests/load/backend-stress.spec.ts",
@@ -1065,6 +1072,8 @@
   "src/utils/systemTester.ts": 1,
   "supabase/functions/_shared/circuitBreaker.ts": 1,
   "supabase/functions/_shared/crypto.ts": 1,
+  "supabase/functions/_shared/number.ts": 1,
+  "supabase/functions/_shared/validate.ts": 3,
   "supabase/functions/accuracy-meta-monitor/channelHealth.ts": 1,
   "supabase/functions/accuracy-meta-monitor/escalation.ts": 1,
   "supabase/functions/accuracy-meta-monitor/index.ts": 1,

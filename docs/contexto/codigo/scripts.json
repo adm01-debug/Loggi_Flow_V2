@@ -616,7 +616,7 @@
   {
    "arquivo": "scripts/ops/pos_deploy_functions.sql",
    "descricao": "Runbook pós-deploy das edge functions (auditoria 2026-09-02) — projeto jvfhclubfpxrtrrazrgr Só comentários: colar este arquivo num SQL editor não executa nada.",
-   "linhas": 70,
+   "linhas": 99,
    "env": [],
    "npm_scripts": [],
    "workflows": [],

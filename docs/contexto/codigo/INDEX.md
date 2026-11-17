@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `0b8692b671f6f64a0ee41445444ceb19289efb5a` (2026-11-14T11:30:47-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8071e4a52152655b1d83dffb274b0560ce97fb3a` (2026-11-17T10:12:19-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (776), SQL (257), Markdown (83), JavaScript (80), JSON (32), YAML (20), Shell (9), Python (8)
+- linguagens: TypeScript (776), SQL (257), Markdown (84), JavaScript (80), JSON (32), YAML (20), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,9 +34,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1283 |
+| arquivos_total | 1284 |
 | arquivos_codigo | 863 |
-| linhas_codigo | 165721 |
+| linhas_codigo | 165820 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -51,7 +51,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | testes | 123 |
 | workflows | 16 |
 | scripts | 62 |
-| docs_md | 83 |
+| docs_md | 84 |
 
 ## Onde ficam as coisas
 - telas: src/pages (61)
@@ -62,7 +62,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - edge_functions: supabase/functions
 - migrations: supabase/migrations
 - scripts: scripts/db-audit (15), scripts/ci (10), scripts/audit (5)
-- docs: docs (28), (raiz) (9), .github (1)
+- docs: docs (29), (raiz) (9), .github (1)
 - nomenclatura: {"componentes":"PascalCase (86%)","hooks":"use + PascalCase","servicos":"camelCase (93%)","edge_functions":"kebab-case (98%)","tabelas":"snake_case (89%)"}
 - instruções para agentes no repo: AGENTS.md, CLAUDE.md
 
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:73, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8009 nós · 20273 arestas · 687 comunidades · grafo do commit `0b8692b6`
-- comunidades maiores: lucide-react (211), cn (186), db-observability/index.ts (159), input.tsx (145), ref_node_fs (131), @tanstack/react-query (127), Button (116), button.tsx (113), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), react (95), client.ts (86), gerar.mjs (81)
+- 8021 nós · 20302 arestas · 687 comunidades · grafo do commit `8071e4a5`
+- comunidades maiores: lucide-react (244), react (171), db-observability/index.ts (143), button.tsx (140), ui/index.ts (138), App.tsx (116), cn (115), sonner (104), useAuth (104), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ref_node_path (97), Header.tsx (88)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -284,17 +284,17 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - package.json (40)
 - index.html (9)
 - src/hooks/gamification/useGamification.ts (9)
-- AGENTS.md (5)
+- .github/workflows/contexto-ia.yml (5)
 - scripts/validate-csp.mjs (5)
 - supabase/config.toml (5)
 - .github/workflows/ci.yml (4)
-- .github/workflows/contexto-ia.yml (4)
 - .github/workflows/deploy-functions.yml (4)
 - .github/workflows/types-sync.yml (4)
-- ESTADO_ATUAL.md (4)
-- ESTADO_ATUAL_EVIDENCIAS.md (4)
+- AGENTS.md (4)
+- docs/agentes/github-ci.md (4)
 - scripts/audit/manifest_detail.sql (4)
 - scripts/check-warning-budget.mjs (4)
+- scripts/generate-quality-report.mjs (4)
 
 ## Workflows
 - `auto-update-pr-branch.yml` — Auto Update PR Branches (push, schedule, workflow_dispatch, workflow_run; cron 7,37 * * * *)
@@ -303,7 +303,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `ci-nexus.yml` — CI Quality Gate Nexus (pull_request, push)
 - `ci.yml` — CI/CD Pipeline (pull_request, push)
 - `codeql.yml` — CodeQL (schedule, workflow_dispatch; cron 30 9 * * *)
-- `contexto-ia.yml` — Contexto para agentes de IA (10 min) (push, schedule, workflow_dispatch; cron 7-59/10 * * * *)
+- `contexto-ia.yml` — Contexto para agentes de IA (10 min) (push, schedule, workflow_dispatch; cron 7 * * * *)
 - `deploy-functions.yml` — Deploy Edge Functions (workflow_dispatch)
 - `e2e.yml` — E2E (manual) (workflow_dispatch)
 - `inventario-estado-semanal.yml` — Inventário do estado real (semanal) (schedule, workflow_dispatch; cron 23 10 * * 1)
@@ -393,11 +393,16 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `docs/SLO.md` — 📈 Service Level Objectives (SLOs) — LogiFlow (40 linhas)
 - `docs/SOFT_DELETE_POLICY.md` — Política de Soft Delete — LogiFlow (30 linhas)
 - `docs/SRE_HANDBOOK.md` — 🚒 LOGIFLOW SRE & ON-CALL HANDBOOK (24 linhas)
+- `docs/auditoria-recuperacao-branches.md` (151 linhas)
 - `docs/prod-readiness.md` — Prod Readiness — Loggi_Flow_V2 (73 linhas)
 - subpastas de docs/: docs/adr (20), docs/agentes (7), docs/audit (2), docs/contexto (2), docs/data (1)
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `8071e4a5` docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)
+- 2026-11-17 `7b46a982` chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)
+- 2026-11-17 `70f45b32` test: conecta simulacao e fuzzing aos validadores reais (#153)
+- 2026-11-14 `42774d84` chore: contexto agendado de 10 min para 1x/hora (#154)
 - 2026-11-14 `0b8692b6` chore: inventario do estado real [auto] (#150)
 - 2026-11-14 `fef7780f` docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)
 - 2026-11-14 `fee186d3` docs: prod-readiness — registra Data Integrity BLOQUEADO e status reais (#151)
@@ -409,10 +414,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-12 `30eecc9a` chore(db): sincronizar artefatos derivados do banco (#141)
 - 2026-11-12 `e0982180` fix: adiciona --yes ao supabase secrets set para CI sem TTY (#140)
 - 2026-11-12 `0c0d48cc` chore(deps): bump actions/download-artifact from 7 to 8 (#128)
-- 2026-11-12 `5f05479d` chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)
-- 2026-11-12 `2e9137fa` chore(deps): bump actions/cache from 4 to 6 (#126)
-- 2026-11-12 `3d4fd588` chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)
-- 2026-11-12 `02901100` chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
