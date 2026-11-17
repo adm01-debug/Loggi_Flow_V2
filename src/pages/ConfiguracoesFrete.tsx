@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { TablesUpdate } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 import {
   Settings,
@@ -152,7 +153,7 @@ export default function FreightConfig() {
   });
 
   const updateCarrier = useMutation({
-    mutationFn: async ({ id, ...updates }: { id: string; [k: string]: unknown }) => {
+    mutationFn: async ({ id, ...updates }: TablesUpdate<"transportadoras"> & { id: string }) => {
       const { error } = await supabase
         .from("transportadoras")
         .update(updates)

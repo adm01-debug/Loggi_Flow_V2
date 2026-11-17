@@ -2,6 +2,7 @@
 import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { TablesUpdate } from "@/integrations/supabase/types";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { parseImportRows, readSheetRows } from "@/lib/conciliacaoImport";
@@ -326,7 +327,7 @@ export function useConciliacao() {
       status: "conciliado" | "divergencia" | "ignorado";
       observacoes?: string;
     }) => {
-      const updates: Record<string, unknown> = {
+      const updates: TablesUpdate<"conciliacao_itens_importados"> = {
         status,
         conciliado_em: new Date().toISOString(),
         conciliado_por: user?.id,

@@ -225,7 +225,7 @@ export const useCostAlerts = () => {
 
   // Update alert
   const updateAlerta = useMutation({
-    mutationFn: async ({ id, ...data }: Partial<AlertaCusto> & { id: string }) => {
+    mutationFn: async ({ id, ...data }: Omit<Partial<AlertaCusto>, 'transportadora'> & { id: string }) => {
       const { data: result, error } = await supabase
         .from('alertas_custo')
         .update(data)
