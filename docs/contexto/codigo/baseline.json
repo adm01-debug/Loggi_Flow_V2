@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "a6e18fc73757fe4b008d39f065918e4ac4843579",
+  "commit": "09c9545882765ae30358fe9e6b477fea25a5c533",
   "branch": "main",
-  "data_commit": "2026-11-17T12:14:38-03:00",
+  "data_commit": "2026-11-17T12:21:53-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "09c95458",
+    "data": "2026-11-17",
+    "assunto": "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)"
+   },
+   {
+    "sha": "998f1683",
+    "data": "2026-11-17",
+    "assunto": "fix: serve index.html em rota direta para a SPA nao dar 404 (#165)"
+   },
    {
     "sha": "a6e18fc7",
     "data": "2026-11-17",
@@ -121,19 +131,9 @@
     "sha": "5f05479d",
     "data": "2026-11-12",
     "assunto": "chore(deps): bump github/codeql-action/init from 4.39.1 to 4.39.3 (#127)"
-   },
-   {
-    "sha": "2e9137fa",
-    "data": "2026-11-12",
-    "assunto": "chore(deps): bump actions/cache from 4 to 6 (#126)"
-   },
-   {
-    "sha": "3d4fd588",
-    "data": "2026-11-12",
-    "assunto": "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)"
    }
   ],
-  "arquivos_mudados_7d": 94,
+  "arquivos_mudados_7d": 98,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 106
+    "commits": 108
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1295,
+  "arquivos_total": 1297,
   "arquivos_codigo": 874,
-  "linhas_codigo": 166947,
+  "linhas_codigo": 166952,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -326,7 +326,7 @@
   "hooks": 176,
   "edge_functions": 43,
   "tabelas": 144,
-  "migrations": 244,
+  "migrations": 245,
   "cron_jobs": 28,
   "testes": 128,
   "workflows": 16,
@@ -456,7 +456,7 @@
   },
   "src/features": {
    "arquivos": 90,
-   "linhas": 6345
+   "linhas": 6350
   },
   "src/hooks": {
    "arquivos": 123,

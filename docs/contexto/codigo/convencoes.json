@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)",
+   "fix: serve index.html em rota direta para a SPA nao dar 404 (#165)",
    "fix: painel de seguranca lia login_attempts por coluna inexistente (#164)",
    "﻿fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)",
-   "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)",
-   "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)",
-   "fix: previsao de frete deixa de ser numero inventado (#159)"
+   "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

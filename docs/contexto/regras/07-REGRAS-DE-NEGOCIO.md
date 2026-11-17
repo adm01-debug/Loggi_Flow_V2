@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a6e18fc737` · branch `main` · 2026-11-17 15:15 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `09c9545882` · branch `main` · 2026-11-17 15:22 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -715,7 +715,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `get_top_queries_fast` | access denied: admin role required | `supabase/migrations/20260712160921_964f0d7a-8cab-4349-9b12-89053b0d2b7b.sql` |
 | `get_cron_jobs_status` | access denied: admin role required | `supabase/migrations/20260712160921_964f0d7a-8cab-4349-9b12-89053b0d2b7b.sql` |
 | `get_health_anomalies_fast` | access denied: admin role required | `supabase/migrations/20260712183625_ed8a21e5-2aa1-4965-bdce-5831f0729248.sql` |
-| `get_capacity_forecast_fast` | forbidden | `supabase/migrations/20260712193601_8340c366-a412-4204-8577-eb6c922fe4a8.sql` |
 | `get_remediation_suggestions_fast` | forbidden | `supabase/migrations/20260712194141_8114c3a0-a949-4517-bf62-4c0a940d1c8c.sql` |
 | `get_remediation_mttr_fast` | access denied: admin role required | `supabase/migrations/20260712195313_c3bd1d37-3196-48a7-9203-a54dcef792ef.sql` |
 | `get_global_health_score_fast` | access denied: admin role required | `supabase/migrations/20260712195449_e5198bd8-8a64-488a-a2e4-26244e90c7e2.sql` |
@@ -739,23 +738,24 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `get_seq_scan_hotspots` | access denied: admin role required | `supabase/migrations/20260712202813_d620fe6b-6a1e-47f8-ae36-75403bdcf9d1.sql` |
 | `get_unused_indexes` | access denied: admin role required | `supabase/migrations/20260712202939_d519b1e9-7e7e-47c5-884b-767ea6196d6e.sql` |
 | `get_bloat_hotspots` | access denied: admin role required | `supabase/migrations/20260712203121_082005c4-c719-4e8a-a3e6-fbc1cbf44ecf.sql` |
-| `get_unindexed_foreign_keys` | access denied: admin role required | `supabase/migrations/20260712203302_61b8eb1b-160f-490a-8362-e5591dd64990.sql` |
 | `get_long_running_queries` | Access denied: admin role required | `supabase/migrations/20260712203444_9c648354-c882-49de-bc6a-9033bba167da.sql` |
 | `cancel_long_running_query` | Access denied: admin role required | `supabase/migrations/20260712203444_9c648354-c882-49de-bc6a-9033bba167da.sql` |
 | `cancel_long_running_query` | Invalid PID | `supabase/migrations/20260712203444_9c648354-c882-49de-bc6a-9033bba167da.sql` |
 | `get_lock_conflicts` | Access denied: admin role required | `supabase/migrations/20260712203614_d5304907-6636-4d5c-877e-f274d6c80792.sql` |
-| `get_cache_hit_ratios` | Access denied: admin role required | `supabase/migrations/20260712203729_7429f7d0-6e09-48b4-b643-5dea54396df8.sql` |
 | `get_replication_status` | Access denied: admin role required | `supabase/migrations/20260712203852_62af6721-5bfc-4a0a-999b-cb29357a3ebe.sql` |
-| `get_temp_file_stats` | Access denied: admin role required | `supabase/migrations/20260712204023_5c63ca48-e0e7-4598-a304-ac965b330109.sql` |
 | `get_duplicate_indexes` | Access denied: admin role required | `supabase/migrations/20260712204147_630b757b-480e-4da7-beb0-32b1e37ebae8.sql` |
 | `get_autovacuum_health` | access denied | `supabase/migrations/20260712205647_66a58041-9842-4f02-9fd1-9b7d1efe18f7.sql` |
 | `get_wraparound_status` | Access denied: admin role required | `supabase/migrations/20260712211720_cade28fc-94b3-4840-9df3-055f24ebdfc3.sql` |
-| `get_active_sessions_summary` | Access denied: admin role required | `supabase/migrations/20260712211835_7701eb94-4ac8-48ef-a952-865db0c8ca7d.sql` |
-| `get_top_tables_by_size` | Access denied: admin role required | `supabase/migrations/20260712212000_fa75330f-36b8-48b9-8290-db4898407f05.sql` |
 | `get_rls_audit` | Access denied: admin role required | `supabase/migrations/20260712212132_d59626e8-c3eb-438c-b158-67882acd95e8.sql` |
 | `get_extensions_audit` | Access denied: admin role required | `supabase/migrations/20260712212239_c00d0672-eb45-49c6-8e68-c0e0be52b2a4.sql` |
-| `get_transaction_health` | forbidden | `supabase/migrations/20260712214421_cd6c9b73-7831-4d22-98f2-ed5ed0faa79d.sql` |
-| `get_wal_health` | forbidden | `supabase/migrations/20260712214637_62050a93-e930-406b-a565-68db4825c7d5.sql` |
+| `get_active_sessions_summary` | Access denied: admin role required | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `get_temp_file_stats` | Access denied: admin role required | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `get_unindexed_foreign_keys` | access denied: admin role required | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `get_capacity_forecast_fast` | forbidden | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `get_cache_hit_ratios` | Access denied: admin role required | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `get_top_tables_by_size` | Access denied: admin role required | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `get_wal_health` | forbidden | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `get_transaction_health` | forbidden | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
 
 ## E. Estados, máquinas de estado e transições
 
@@ -1764,6 +1764,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `WHERE predicted_at > now() - interval '30 days'` | `supabase/migrations/20260723132902_65c49e6d-0ce3-4710-a72f-5711164da92e.sql` |
 | `SELECT cron.schedule('cleanup-cron-job-run-details', '30 2 * * *', $$ DELETE FROM cron.job_run_details WHERE end_time < now() - interval '7 days'; $$);` | `supabase/migrations/20260901000000_cron_jobs_canonical.sql` |
 | `SELECT cron.schedule('compute-db-slo-daily', '15 3 * * *', $$ SELECT public.compute_db_slo_for((now() - interval '1 day')::date); $$);` | `supabase/migrations/20260901000000_cron_jobs_canonical.sql` |
+| `EXTRACT(EPOCH FROM (s.created_at - (now() - interval '7 days'))) / 3600.0 AS x_hours,` | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
+| `WHERE s.created_at >= now() - interval '7 days'` | `supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql` |
 
 ### H.3 Limites de paginação
 

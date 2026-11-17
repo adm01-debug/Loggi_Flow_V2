@@ -4873,7 +4873,7 @@
     "WalHealthCard"
    ],
    "export_default": null,
-   "linhas": 107,
+   "linhas": 112,
    "dominio": "features/db-observability",
    "hooks_locais": [
     "useWalHealth"

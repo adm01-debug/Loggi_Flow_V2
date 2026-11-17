@@ -2450,7 +2450,7 @@
    "modulo": "features/db-observability",
    "arquivos": 80,
    "testes": 0,
-   "linhas": 5519,
+   "linhas": 5524,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],

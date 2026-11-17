@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "a6e18fc73757fe4b008d39f065918e4ac4843579",
+  "sha": "09c9545882765ae30358fe9e6b477fea25a5c533",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 15:15 UTC",
-  "files_total": 1305,
-  "code_files": 1132,
-  "code_lines": 182714,
+  "generated_at": "2026-11-17 15:22 UTC",
+  "files_total": 1307,
+  "code_files": 1133,
+  "code_lines": 183327,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "12ee333890e79ef8",
+ "facts_hash": "e9b1e8517ba6e0c2",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -155,6 +155,10 @@
     "role": "Template de variáveis (.env.example)"
    },
    {
+    "file": "vercel.json",
+    "role": "Vercel"
+   },
+   {
     "file": "supabase/config.toml",
     "role": "Supabase CLI"
    }
@@ -293,7 +297,7 @@
   "languages": {
    ".tsx": 453,
    ".ts": 334,
-   ".sql": 257,
+   ".sql": 258,
    ".mjs": 77,
    ".py": 8,
    ".js": 3
@@ -16573,10 +16577,10 @@
     "args": "p_hours_ahead integer DEFAULT 168",
     "returns": "TABLE(\n  metric text,\n  current_value numeric,\n  slope_per_hour numeric,\n  forecast_value numeric,\n  hours_ahead integer,\n  threshold numeric,\n  hours_until_threshold numeric,\n  severity text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712193601_8340c366-a412-4204-8577-eb6c922fe4a8.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_is_admin boolean; BEGIN SELECT public.has_role(auth.uid(), 'admin') INTO v_is_admin; IF NOT COALESCE(v_is_admin, false) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; RETURN QUERY WITH base AS ( SELECT EXTRACT(EPOCH FROM (created_at - (now() - interval '7 days'))) / 3600.0 AS x_hours, active_connections::numeric AS conn, db_size_bytes::numeric AS size_b, created_at FROM public.db_health_snapshots WHERE created_at >= now() - interval '7 days' AND active_connections IS NOT NULL AND db_size_bytes IS NOT NULL ), stats AS ( SELECT COUNT(*) AS n, regr_slope(conn, x_hours) AS slope_conn, regr_intercept(conn, x_hours) AS icpt_conn, regr_slope(size_b, x_hours) AS slope_si …",
+    "body": "DECLARE v_is_admin boolean; BEGIN SELECT public.has_role(auth.uid(), 'admin') INTO v_is_admin; IF NOT COALESCE(v_is_admin, false) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; RETURN QUERY WITH base AS ( SELECT EXTRACT(EPOCH FROM (s.created_at - (now() - interval '7 days'))) / 3600.0 AS x_hours, s.active_connections::numeric AS conn, s.db_size_bytes::numeric AS size_b, s.created_at FROM public.db_health_snapshots s WHERE s.created_at >= now() - interval '7 days' AND s.active_connections IS NOT NULL AND s.db_size_bytes IS NOT NULL ), stats AS ( SELECT COUNT(*) AS n, regr_slope(b.conn, b.x_hours)::numeric AS slope_conn, regr_intercept(b.conn, b.x_hours)::numeric AS icpt_con …",
     "raises": [
      "forbidden"
     ],
@@ -16954,10 +16958,10 @@
     "args": "",
     "returns": "TABLE(\n  table_name text,\n  constraint_name text,\n  fk_columns text[],\n  referenced_table text,\n  table_size_bytes bigint,\n  suggested_ddl text,\n  severity text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712203302_61b8eb1b-160f-490a-8362-e5591dd64990.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'access denied: admin role required'; END IF; RETURN QUERY WITH fks AS ( SELECT c.conrelid::regclass::text AS tbl, c.conname AS cname, c.conkey AS colnums, c.confrelid::regclass::text AS ref_tbl, c.conrelid, c.confrelid, n.nspname AS schema_name FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace WHERE c.contype = 'f' AND n.nspname = 'public' ), fk_cols AS ( SELECT f.tbl, f.cname, f.ref_tbl, f.conrelid, f.colnums, ARRAY( SELECT a.attname FROM unnest(f.colnums) WITH ORDINALITY AS u(attnum, ord) JOIN pg_attribute a ON a.attrelid = f.conrelid AND a.attnum = u.attnum ORDER BY u.ord ) AS col_names FROM …",
+    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'access denied: admin role required'; END IF; RETURN QUERY WITH fks AS ( SELECT c.conrelid::regclass::text AS tbl, c.conname AS cname, c.conkey AS colnums, c.confrelid::regclass::text AS ref_tbl, c.conrelid, c.confrelid, n.nspname AS nsp FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace WHERE c.contype = 'f' AND n.nspname = 'public' ), fk_cols AS ( SELECT f.tbl, f.cname, f.ref_tbl, f.conrelid, f.colnums, ARRAY( SELECT a.attname::text FROM unnest(f.colnums) WITH ORDINALITY AS u(attnum, ord) JOIN pg_attribute a ON a.attrelid = f.conrelid AND a.attnum = u.attnum ORDER BY u.ord )::text[] AS col_name …",
     "raises": [
      "access denied: admin role required"
     ],
@@ -17026,10 +17030,10 @@
     "args": "p_min_reads bigint DEFAULT 10000, p_max_ratio numeric DEFAULT 0.99, p_limit integer DEFAULT 30",
     "returns": "TABLE (\n  schema_name text,\n  table_name text,\n  heap_blks_read bigint,\n  heap_blks_hit bigint,\n  heap_hit_ratio numeric,\n  idx_blks_read bigint,\n  idx_blks_hit bigint,\n  idx_hit_ratio numeric,\n  combined_hit_ratio numeric,\n  table_size_bytes bigint,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712203729_7429f7d0-6e09-48b4-b643-5dea54396df8.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY WITH stats AS ( SELECT s.schemaname::text AS schema_name, s.relname::text AS table_name, s.heap_blks_read, s.heap_blks_hit, COALESCE(s.idx_blks_read, 0) AS idx_blks_read, COALESCE(s.idx_blks_hit, 0) AS idx_blks_hit, pg_total_relation_size(format('%I.%I', s.schemaname, s.relname)::regclass) AS table_size_bytes FROM pg_statio_user_tables s WHERE s.schemaname = 'public' ), ratios AS ( SELECT schema_name, table_name, heap_blks_read, heap_blks_hit, CASE WHEN (heap_blks_read + heap_blks_hit) > 0 THEN ROUND((heap_blks_hit::numeric / NULLIF(heap_blks_read + heap …",
+    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY WITH stats AS ( SELECT s.schemaname::text AS c_schema, s.relname::text AS c_table, s.heap_blks_read AS c_hbr, s.heap_blks_hit AS c_hbh, COALESCE(s.idx_blks_read, 0) AS c_ibr, COALESCE(s.idx_blks_hit, 0) AS c_ibh, pg_total_relation_size(format('%I.%I', s.schemaname, s.relname)::regclass) AS c_size FROM pg_statio_user_tables s WHERE s.schemaname = 'public' ), ratios AS ( SELECT st.c_schema, st.c_table, st.c_hbr, st.c_hbh, CASE WHEN (st.c_hbr + st.c_hbh) > 0 THEN ROUND((st.c_hbh::numeric / NULLIF(st.c_hbr + st.c_hbh, 0)), 4) ELSE 1 END AS c_heap_ratio, st.c …",
     "raises": [
      "Access denied: admin role required"
     ],
@@ -17059,10 +17063,10 @@
     "args": "p_limit integer DEFAULT 20",
     "returns": "TABLE (\n  scope text,\n  identifier text,\n  temp_files bigint,\n  temp_bytes bigint,\n  calls bigint,\n  mean_exec_ms numeric,\n  query_text text,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712204023_5c63ca48-e0e7-4598-a304-ac965b330109.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_db_files bigint; v_db_bytes bigint; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; SELECT COALESCE(temp_files, 0), COALESCE(temp_bytes, 0) INTO v_db_files, v_db_bytes FROM pg_stat_database WHERE datname = current_database(); RETURN QUERY SELECT 'database'::text, current_database()::text, v_db_files, v_db_bytes, NULL::bigint, NULL::numeric, NULL::text, CASE WHEN v_db_bytes >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN v_db_bytes >= 1::bigint * 1024 * 1024 * 1024 THEN 'warning' WHEN v_db_bytes >= 100 * 1024 * 1024 THEN 'info' ELSE 'ok' END::text, CASE WHEN v_db_bytes >= 1::bigint * 1024 * 1024 * …",
+    "body": "DECLARE v_db_files bigint; v_db_bytes bigint; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; SELECT COALESCE(d.temp_files, 0), COALESCE(d.temp_bytes, 0) INTO v_db_files, v_db_bytes FROM pg_stat_database d WHERE d.datname = current_database(); RETURN QUERY SELECT 'database'::text, current_database()::text, v_db_files, v_db_bytes, NULL::bigint, NULL::numeric, NULL::text, CASE WHEN v_db_bytes >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN v_db_bytes >= 1::bigint * 1024 * 1024 * 1024 THEN 'warning' WHEN v_db_bytes >= 100 * 1024 * 1024 THEN 'info' ELSE 'ok' END::text, CASE WHEN v_db_bytes >= 1::bigint * 1024 …",
     "raises": [
      "Access denied: admin role required"
     ],
@@ -17134,7 +17138,7 @@
     "args": "",
     "returns": "TABLE(\n  state text,\n  wait_event_type text,\n  session_count bigint,\n  oldest_session_seconds numeric,\n  longest_query_seconds numeric,\n  longest_xact_seconds numeric,\n  sample_query text,\n  severity text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712211835_7701eb94-4ac8-48ef-a952-865db0c8ca7d.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
     "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY SELECT COALESCE(a.state, 'unknown')::text, COALESCE(a.wait_event_type, 'none')::text, count(*)::bigint, ROUND(EXTRACT(EPOCH FROM (now() - min(a.backend_start)))::numeric, 1), ROUND(EXTRACT(EPOCH FROM (now() - min(a.query_start)))::numeric, 1), ROUND(EXTRACT(EPOCH FROM (now() - min(a.xact_start)))::numeric, 1), (array_agg(left(a.query, 200) ORDER BY a.query_start NULLS LAST))[1], CASE WHEN COALESCE(a.state,'') = 'idle in transaction' AND EXTRACT(EPOCH FROM (now() - min(a.xact_start))) > 300 THEN 'critical' WHEN COALESCE(a.state,'') = 'idle in transaction' …",
@@ -17149,10 +17153,10 @@
     "args": "p_limit integer DEFAULT 30",
     "returns": "TABLE(\n  schema_name text,\n  table_name text,\n  total_bytes bigint,\n  table_bytes bigint,\n  indexes_bytes bigint,\n  toast_bytes bigint,\n  estimated_rows bigint,\n  bytes_per_row numeric,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712212000_fa75330f-36b8-48b9-8290-db4898407f05.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY SELECT n.nspname::text, c.relname::text, pg_total_relation_size(c.oid)::bigint AS total_bytes, pg_relation_size(c.oid)::bigint AS table_bytes, COALESCE(pg_indexes_size(c.oid), 0)::bigint AS indexes_bytes, COALESCE(pg_total_relation_size(c.reltoastrelid), 0)::bigint AS toast_bytes, c.reltuples::bigint AS estimated_rows, CASE WHEN c.reltuples > 0 THEN ROUND((pg_relation_size(c.oid)::numeric / c.reltuples), 1) ELSE 0 END AS bytes_per_row, CASE WHEN pg_total_relation_size(c.oid) >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN pg_total_relation_size(c …",
+    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY SELECT n.nspname::text, c.relname::text, pg_total_relation_size(c.oid)::bigint, pg_relation_size(c.oid)::bigint, COALESCE(pg_indexes_size(c.oid), 0)::bigint, COALESCE(pg_total_relation_size(c.reltoastrelid), 0)::bigint, c.reltuples::bigint, CASE WHEN c.reltuples > 0 THEN ROUND((pg_relation_size(c.oid)::numeric / c.reltuples::numeric), 1) ELSE 0::numeric END, CASE WHEN pg_total_relation_size(c.oid) >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN pg_total_relation_size(c.oid) >= 1::bigint * 1024 * 1024 * 1024 THEN 'warning' WHEN pg_total_relation_s …",
     "raises": [
      "Access denied: admin role required"
     ],
@@ -17202,10 +17206,10 @@
     "args": "",
     "returns": "TABLE(\n  total_commits bigint,\n  total_rollbacks bigint,\n  rollback_ratio_pct numeric,\n  deadlocks bigint,\n  temp_files bigint,\n  temp_bytes bigint,\n  stats_since timestamptz,\n  hours_since_reset numeric,\n  rollbacks_per_hour numeric,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712214421_cd6c9b73-7831-4d22-98f2-ed5ed0faa79d.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_hours numeric; v_rate numeric; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; SELECT COALESCE(sum(xact_commit),0), COALESCE(sum(xact_rollback),0), COALESCE(sum(deadlocks),0), COALESCE(sum(temp_files),0), COALESCE(sum(temp_bytes),0), min(stats_reset) INTO total_commits, total_rollbacks, deadlocks, temp_files, temp_bytes, stats_since FROM pg_stat_database WHERE datname = current_database(); v_hours := GREATEST(EXTRACT(EPOCH FROM (now() - stats_since))/3600.0, 0.01); hours_since_reset := round(v_hours::numeric, 2); v_rate := total_rollbacks::numeric / v_hours; rollbacks_per_h …",
+    "body": "DECLARE v_hours numeric; v_rate numeric; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; SELECT COALESCE(sum(d.xact_commit),0), COALESCE(sum(d.xact_rollback),0), COALESCE(sum(d.deadlocks),0), COALESCE(sum(d.temp_files),0), COALESCE(sum(d.temp_bytes),0), min(d.stats_reset) INTO total_commits, total_rollbacks, deadlocks, temp_files, temp_bytes, stats_since FROM pg_stat_database d WHERE d.datname = current_database(); v_hours := GREATEST(EXTRACT(EPOCH FROM (now() - stats_since))/3600.0, 0.01); hours_since_reset := round(v_hours::numeric, 2); v_rate := total_rollbacks::numeric / v_hours; …",
     "raises": [
      "forbidden"
     ],
@@ -17218,10 +17222,10 @@
     "args": "",
     "returns": "TABLE(\n  db_size_bytes bigint,\n  wal_size_bytes bigint,\n  wal_to_db_ratio numeric,\n  checkpoint_timeout_s integer,\n  max_wal_size_mb integer,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712214637_62050a93-e930-406b-a565-68db4825c7d5.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_db bigint; v_wal bigint; v_ratio numeric; v_ckpt integer; v_maxwal integer; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; v_db := pg_database_size(current_database()); SELECT COALESCE(sum((pg_stat_file('pg_wal/'||name, true)).size),0)::bigint INTO v_wal FROM pg_ls_waldir(); v_ratio := CASE WHEN v_db>0 THEN round(v_wal::numeric / v_db, 2) ELSE 0 END; BEGIN v_ckpt := current_setting('checkpoint_timeout')::integer; EXCEPTION WHEN OTHERS THEN v_ckpt := NULL; END; BEGIN v_maxwal := (regexp_replace(current_setting('max_wal_size'),'[^0-9]','','g'))::integer; EXCEPTION WHEN OTHER …",
+    "body": "DECLARE v_db bigint; v_wal bigint; v_ratio numeric; v_ckpt integer; v_maxwal integer; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; v_db := pg_database_size(current_database()); BEGIN SELECT COALESCE(sum(w.size), 0)::bigint INTO v_wal FROM pg_ls_waldir() w; EXCEPTION WHEN OTHERS THEN v_wal := NULL; END; v_ratio := CASE WHEN v_wal IS NOT NULL AND v_db > 0 THEN round(v_wal::numeric / v_db, 2) ELSE NULL END; BEGIN v_ckpt := current_setting('checkpoint_timeout')::integer; EXCEPTION WHEN OTHERS THEN v_ckpt := NULL; END; BEGIN v_maxwal := (regexp_replace(current_setting('max_wal_size'),' …",
     "raises": [
      "forbidden"
     ],
@@ -20567,6 +20571,7 @@
    "supabase/migrations/20260901000000_cron_jobs_canonical.sql",
    "supabase/migrations/20260901000001_remediacao_destino.sql",
    "supabase/migrations/20260902120000_hardening_pos_auditoria.sql",
+   "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
    "supabase/seed.sql",
    "src/integrations/supabase/types.ts"
   ],
@@ -23453,11 +23458,6 @@
     "src": "supabase/migrations/20260712183625_ed8a21e5-2aa1-4965-bdce-5831f0729248.sql"
    },
    {
-    "function": "get_capacity_forecast_fast",
-    "msg": "forbidden",
-    "src": "supabase/migrations/20260712193601_8340c366-a412-4204-8577-eb6c922fe4a8.sql"
-   },
-   {
     "function": "get_remediation_suggestions_fast",
     "msg": "forbidden",
     "src": "supabase/migrations/20260712194141_8114c3a0-a949-4517-bf62-4c0a940d1c8c.sql"
@@ -23573,11 +23573,6 @@
     "src": "supabase/migrations/20260712203121_082005c4-c719-4e8a-a3e6-fbc1cbf44ecf.sql"
    },
    {
-    "function": "get_unindexed_foreign_keys",
-    "msg": "access denied: admin role required",
-    "src": "supabase/migrations/20260712203302_61b8eb1b-160f-490a-8362-e5591dd64990.sql"
-   },
-   {
     "function": "get_long_running_queries",
     "msg": "Access denied: admin role required",
     "src": "supabase/migrations/20260712203444_9c648354-c882-49de-bc6a-9033bba167da.sql"
@@ -23598,19 +23593,9 @@
     "src": "supabase/migrations/20260712203614_d5304907-6636-4d5c-877e-f274d6c80792.sql"
    },
    {
-    "function": "get_cache_hit_ratios",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712203729_7429f7d0-6e09-48b4-b643-5dea54396df8.sql"
-   },
-   {
     "function": "get_replication_status",
     "msg": "Access denied: admin role required",
     "src": "supabase/migrations/20260712203852_62af6721-5bfc-4a0a-999b-cb29357a3ebe.sql"
-   },
-   {
-    "function": "get_temp_file_stats",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712204023_5c63ca48-e0e7-4598-a304-ac965b330109.sql"
    },
    {
     "function": "get_duplicate_indexes",
@@ -23628,16 +23613,6 @@
     "src": "supabase/migrations/20260712211720_cade28fc-94b3-4840-9df3-055f24ebdfc3.sql"
    },
    {
-    "function": "get_active_sessions_summary",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712211835_7701eb94-4ac8-48ef-a952-865db0c8ca7d.sql"
-   },
-   {
-    "function": "get_top_tables_by_size",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712212000_fa75330f-36b8-48b9-8290-db4898407f05.sql"
-   },
-   {
     "function": "get_rls_audit",
     "msg": "Access denied: admin role required",
     "src": "supabase/migrations/20260712212132_d59626e8-c3eb-438c-b158-67882acd95e8.sql"
@@ -23648,14 +23623,44 @@
     "src": "supabase/migrations/20260712212239_c00d0672-eb45-49c6-8e68-c0e0be52b2a4.sql"
    },
    {
-    "function": "get_transaction_health",
+    "function": "get_active_sessions_summary",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_temp_file_stats",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_unindexed_foreign_keys",
+    "msg": "access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_capacity_forecast_fast",
     "msg": "forbidden",
-    "src": "supabase/migrations/20260712214421_cd6c9b73-7831-4d22-98f2-ed5ed0faa79d.sql"
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_cache_hit_ratios",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_top_tables_by_size",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
    },
    {
     "function": "get_wal_health",
     "msg": "forbidden",
-    "src": "supabase/migrations/20260712214637_62050a93-e930-406b-a565-68db4825c7d5.sql"
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_transaction_health",
+    "msg": "forbidden",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
    }
   ],
   "seed": [
@@ -29484,7 +29489,7 @@
   {
    "module": "src/features/db-observability",
    "files": 80,
-   "lines": 5519,
+   "lines": 5524,
    "tables": [],
    "exports": [
     "ActiveSessionsCard.tsx: ActiveSessionsCard",
@@ -30531,8 +30536,8 @@
   },
   {
    "module": "supabase/migrations",
-   "files": 244,
-   "lines": 14420,
+   "files": 245,
+   "lines": 15028,
    "tables": [],
    "exports": [],
    "docs": [],
@@ -47556,6 +47561,14 @@
    {
     "file": "supabase/migrations/20260901000000_cron_jobs_canonical.sql",
     "line": "SELECT cron.schedule('compute-db-slo-daily', '15 3 * * *', $$ SELECT public.compute_db_slo_for((now() - interval '1 day')::date); $$);"
+   },
+   {
+    "file": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
+    "line": "EXTRACT(EPOCH FROM (s.created_at - (now() - interval '7 days'))) / 3600.0 AS x_hours,"
+   },
+   {
+    "file": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
+    "line": "WHERE s.created_at >= now() - interval '7 days'"
    }
   ],
   "percents": [
@@ -54588,10 +54601,10 @@
     "args": "p_hours_ahead integer DEFAULT 168",
     "returns": "TABLE(\n  metric text,\n  current_value numeric,\n  slope_per_hour numeric,\n  forecast_value numeric,\n  hours_ahead integer,\n  threshold numeric,\n  hours_until_threshold numeric,\n  severity text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712193601_8340c366-a412-4204-8577-eb6c922fe4a8.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_is_admin boolean; BEGIN SELECT public.has_role(auth.uid(), 'admin') INTO v_is_admin; IF NOT COALESCE(v_is_admin, false) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; RETURN QUERY WITH base AS ( SELECT EXTRACT(EPOCH FROM (created_at - (now() - interval '7 days'))) / 3600.0 AS x_hours, active_connections::numeric AS conn, db_size_bytes::numeric AS size_b, created_at FROM public.db_health_snapshots WHERE created_at >= now() - interval '7 days' AND active_connections IS NOT NULL AND db_size_bytes IS NOT NULL ), stats AS ( SELECT COUNT(*) AS n, regr_slope(conn, x_hours) AS slope_conn, regr_intercept(conn, x_hours) AS icpt_conn, regr_slope(size_b, x_hours) AS slope_si …",
+    "body": "DECLARE v_is_admin boolean; BEGIN SELECT public.has_role(auth.uid(), 'admin') INTO v_is_admin; IF NOT COALESCE(v_is_admin, false) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; RETURN QUERY WITH base AS ( SELECT EXTRACT(EPOCH FROM (s.created_at - (now() - interval '7 days'))) / 3600.0 AS x_hours, s.active_connections::numeric AS conn, s.db_size_bytes::numeric AS size_b, s.created_at FROM public.db_health_snapshots s WHERE s.created_at >= now() - interval '7 days' AND s.active_connections IS NOT NULL AND s.db_size_bytes IS NOT NULL ), stats AS ( SELECT COUNT(*) AS n, regr_slope(b.conn, b.x_hours)::numeric AS slope_conn, regr_intercept(b.conn, b.x_hours)::numeric AS icpt_con …",
     "raises": [
      "forbidden"
     ],
@@ -54969,10 +54982,10 @@
     "args": "",
     "returns": "TABLE(\n  table_name text,\n  constraint_name text,\n  fk_columns text[],\n  referenced_table text,\n  table_size_bytes bigint,\n  suggested_ddl text,\n  severity text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712203302_61b8eb1b-160f-490a-8362-e5591dd64990.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'access denied: admin role required'; END IF; RETURN QUERY WITH fks AS ( SELECT c.conrelid::regclass::text AS tbl, c.conname AS cname, c.conkey AS colnums, c.confrelid::regclass::text AS ref_tbl, c.conrelid, c.confrelid, n.nspname AS schema_name FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace WHERE c.contype = 'f' AND n.nspname = 'public' ), fk_cols AS ( SELECT f.tbl, f.cname, f.ref_tbl, f.conrelid, f.colnums, ARRAY( SELECT a.attname FROM unnest(f.colnums) WITH ORDINALITY AS u(attnum, ord) JOIN pg_attribute a ON a.attrelid = f.conrelid AND a.attnum = u.attnum ORDER BY u.ord ) AS col_names FROM …",
+    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'access denied: admin role required'; END IF; RETURN QUERY WITH fks AS ( SELECT c.conrelid::regclass::text AS tbl, c.conname AS cname, c.conkey AS colnums, c.confrelid::regclass::text AS ref_tbl, c.conrelid, c.confrelid, n.nspname AS nsp FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace WHERE c.contype = 'f' AND n.nspname = 'public' ), fk_cols AS ( SELECT f.tbl, f.cname, f.ref_tbl, f.conrelid, f.colnums, ARRAY( SELECT a.attname::text FROM unnest(f.colnums) WITH ORDINALITY AS u(attnum, ord) JOIN pg_attribute a ON a.attrelid = f.conrelid AND a.attnum = u.attnum ORDER BY u.ord )::text[] AS col_name …",
     "raises": [
      "access denied: admin role required"
     ],
@@ -55041,10 +55054,10 @@
     "args": "p_min_reads bigint DEFAULT 10000, p_max_ratio numeric DEFAULT 0.99, p_limit integer DEFAULT 30",
     "returns": "TABLE (\n  schema_name text,\n  table_name text,\n  heap_blks_read bigint,\n  heap_blks_hit bigint,\n  heap_hit_ratio numeric,\n  idx_blks_read bigint,\n  idx_blks_hit bigint,\n  idx_hit_ratio numeric,\n  combined_hit_ratio numeric,\n  table_size_bytes bigint,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712203729_7429f7d0-6e09-48b4-b643-5dea54396df8.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY WITH stats AS ( SELECT s.schemaname::text AS schema_name, s.relname::text AS table_name, s.heap_blks_read, s.heap_blks_hit, COALESCE(s.idx_blks_read, 0) AS idx_blks_read, COALESCE(s.idx_blks_hit, 0) AS idx_blks_hit, pg_total_relation_size(format('%I.%I', s.schemaname, s.relname)::regclass) AS table_size_bytes FROM pg_statio_user_tables s WHERE s.schemaname = 'public' ), ratios AS ( SELECT schema_name, table_name, heap_blks_read, heap_blks_hit, CASE WHEN (heap_blks_read + heap_blks_hit) > 0 THEN ROUND((heap_blks_hit::numeric / NULLIF(heap_blks_read + heap …",
+    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY WITH stats AS ( SELECT s.schemaname::text AS c_schema, s.relname::text AS c_table, s.heap_blks_read AS c_hbr, s.heap_blks_hit AS c_hbh, COALESCE(s.idx_blks_read, 0) AS c_ibr, COALESCE(s.idx_blks_hit, 0) AS c_ibh, pg_total_relation_size(format('%I.%I', s.schemaname, s.relname)::regclass) AS c_size FROM pg_statio_user_tables s WHERE s.schemaname = 'public' ), ratios AS ( SELECT st.c_schema, st.c_table, st.c_hbr, st.c_hbh, CASE WHEN (st.c_hbr + st.c_hbh) > 0 THEN ROUND((st.c_hbh::numeric / NULLIF(st.c_hbr + st.c_hbh, 0)), 4) ELSE 1 END AS c_heap_ratio, st.c …",
     "raises": [
      "Access denied: admin role required"
     ],
@@ -55074,10 +55087,10 @@
     "args": "p_limit integer DEFAULT 20",
     "returns": "TABLE (\n  scope text,\n  identifier text,\n  temp_files bigint,\n  temp_bytes bigint,\n  calls bigint,\n  mean_exec_ms numeric,\n  query_text text,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712204023_5c63ca48-e0e7-4598-a304-ac965b330109.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_db_files bigint; v_db_bytes bigint; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; SELECT COALESCE(temp_files, 0), COALESCE(temp_bytes, 0) INTO v_db_files, v_db_bytes FROM pg_stat_database WHERE datname = current_database(); RETURN QUERY SELECT 'database'::text, current_database()::text, v_db_files, v_db_bytes, NULL::bigint, NULL::numeric, NULL::text, CASE WHEN v_db_bytes >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN v_db_bytes >= 1::bigint * 1024 * 1024 * 1024 THEN 'warning' WHEN v_db_bytes >= 100 * 1024 * 1024 THEN 'info' ELSE 'ok' END::text, CASE WHEN v_db_bytes >= 1::bigint * 1024 * 1024 * …",
+    "body": "DECLARE v_db_files bigint; v_db_bytes bigint; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; SELECT COALESCE(d.temp_files, 0), COALESCE(d.temp_bytes, 0) INTO v_db_files, v_db_bytes FROM pg_stat_database d WHERE d.datname = current_database(); RETURN QUERY SELECT 'database'::text, current_database()::text, v_db_files, v_db_bytes, NULL::bigint, NULL::numeric, NULL::text, CASE WHEN v_db_bytes >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN v_db_bytes >= 1::bigint * 1024 * 1024 * 1024 THEN 'warning' WHEN v_db_bytes >= 100 * 1024 * 1024 THEN 'info' ELSE 'ok' END::text, CASE WHEN v_db_bytes >= 1::bigint * 1024 …",
     "raises": [
      "Access denied: admin role required"
     ],
@@ -55149,7 +55162,7 @@
     "args": "",
     "returns": "TABLE(\n  state text,\n  wait_event_type text,\n  session_count bigint,\n  oldest_session_seconds numeric,\n  longest_query_seconds numeric,\n  longest_xact_seconds numeric,\n  sample_query text,\n  severity text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712211835_7701eb94-4ac8-48ef-a952-865db0c8ca7d.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
     "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY SELECT COALESCE(a.state, 'unknown')::text, COALESCE(a.wait_event_type, 'none')::text, count(*)::bigint, ROUND(EXTRACT(EPOCH FROM (now() - min(a.backend_start)))::numeric, 1), ROUND(EXTRACT(EPOCH FROM (now() - min(a.query_start)))::numeric, 1), ROUND(EXTRACT(EPOCH FROM (now() - min(a.xact_start)))::numeric, 1), (array_agg(left(a.query, 200) ORDER BY a.query_start NULLS LAST))[1], CASE WHEN COALESCE(a.state,'') = 'idle in transaction' AND EXTRACT(EPOCH FROM (now() - min(a.xact_start))) > 300 THEN 'critical' WHEN COALESCE(a.state,'') = 'idle in transaction' …",
@@ -55164,10 +55177,10 @@
     "args": "p_limit integer DEFAULT 30",
     "returns": "TABLE(\n  schema_name text,\n  table_name text,\n  total_bytes bigint,\n  table_bytes bigint,\n  indexes_bytes bigint,\n  toast_bytes bigint,\n  estimated_rows bigint,\n  bytes_per_row numeric,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712212000_fa75330f-36b8-48b9-8290-db4898407f05.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY SELECT n.nspname::text, c.relname::text, pg_total_relation_size(c.oid)::bigint AS total_bytes, pg_relation_size(c.oid)::bigint AS table_bytes, COALESCE(pg_indexes_size(c.oid), 0)::bigint AS indexes_bytes, COALESCE(pg_total_relation_size(c.reltoastrelid), 0)::bigint AS toast_bytes, c.reltuples::bigint AS estimated_rows, CASE WHEN c.reltuples > 0 THEN ROUND((pg_relation_size(c.oid)::numeric / c.reltuples), 1) ELSE 0 END AS bytes_per_row, CASE WHEN pg_total_relation_size(c.oid) >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN pg_total_relation_size(c …",
+    "body": "BEGIN IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Access denied: admin role required'; END IF; RETURN QUERY SELECT n.nspname::text, c.relname::text, pg_total_relation_size(c.oid)::bigint, pg_relation_size(c.oid)::bigint, COALESCE(pg_indexes_size(c.oid), 0)::bigint, COALESCE(pg_total_relation_size(c.reltoastrelid), 0)::bigint, c.reltuples::bigint, CASE WHEN c.reltuples > 0 THEN ROUND((pg_relation_size(c.oid)::numeric / c.reltuples::numeric), 1) ELSE 0::numeric END, CASE WHEN pg_total_relation_size(c.oid) >= 10::bigint * 1024 * 1024 * 1024 THEN 'critical' WHEN pg_total_relation_size(c.oid) >= 1::bigint * 1024 * 1024 * 1024 THEN 'warning' WHEN pg_total_relation_s …",
     "raises": [
      "Access denied: admin role required"
     ],
@@ -55217,10 +55230,10 @@
     "args": "",
     "returns": "TABLE(\n  total_commits bigint,\n  total_rollbacks bigint,\n  rollback_ratio_pct numeric,\n  deadlocks bigint,\n  temp_files bigint,\n  temp_bytes bigint,\n  stats_since timestamptz,\n  hours_since_reset numeric,\n  rollbacks_per_hour numeric,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712214421_cd6c9b73-7831-4d22-98f2-ed5ed0faa79d.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_hours numeric; v_rate numeric; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; SELECT COALESCE(sum(xact_commit),0), COALESCE(sum(xact_rollback),0), COALESCE(sum(deadlocks),0), COALESCE(sum(temp_files),0), COALESCE(sum(temp_bytes),0), min(stats_reset) INTO total_commits, total_rollbacks, deadlocks, temp_files, temp_bytes, stats_since FROM pg_stat_database WHERE datname = current_database(); v_hours := GREATEST(EXTRACT(EPOCH FROM (now() - stats_since))/3600.0, 0.01); hours_since_reset := round(v_hours::numeric, 2); v_rate := total_rollbacks::numeric / v_hours; rollbacks_per_h …",
+    "body": "DECLARE v_hours numeric; v_rate numeric; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; SELECT COALESCE(sum(d.xact_commit),0), COALESCE(sum(d.xact_rollback),0), COALESCE(sum(d.deadlocks),0), COALESCE(sum(d.temp_files),0), COALESCE(sum(d.temp_bytes),0), min(d.stats_reset) INTO total_commits, total_rollbacks, deadlocks, temp_files, temp_bytes, stats_since FROM pg_stat_database d WHERE d.datname = current_database(); v_hours := GREATEST(EXTRACT(EPOCH FROM (now() - stats_since))/3600.0, 0.01); hours_since_reset := round(v_hours::numeric, 2); v_rate := total_rollbacks::numeric / v_hours; …",
     "raises": [
      "forbidden"
     ],
@@ -55233,10 +55246,10 @@
     "args": "",
     "returns": "TABLE(\n  db_size_bytes bigint,\n  wal_size_bytes bigint,\n  wal_to_db_ratio numeric,\n  checkpoint_timeout_s integer,\n  max_wal_size_mb integer,\n  severity text,\n  recommendation text\n)",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260712214637_62050a93-e930-406b-a565-68db4825c7d5.sql",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_db bigint; v_wal bigint; v_ratio numeric; v_ckpt integer; v_maxwal integer; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; v_db := pg_database_size(current_database()); SELECT COALESCE(sum((pg_stat_file('pg_wal/'||name, true)).size),0)::bigint INTO v_wal FROM pg_ls_waldir(); v_ratio := CASE WHEN v_db>0 THEN round(v_wal::numeric / v_db, 2) ELSE 0 END; BEGIN v_ckpt := current_setting('checkpoint_timeout')::integer; EXCEPTION WHEN OTHERS THEN v_ckpt := NULL; END; BEGIN v_maxwal := (regexp_replace(current_setting('max_wal_size'),'[^0-9]','','g'))::integer; EXCEPTION WHEN OTHER …",
+    "body": "DECLARE v_db bigint; v_wal bigint; v_ratio numeric; v_ckpt integer; v_maxwal integer; v_sev text; v_reco text; BEGIN IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501'; END IF; v_db := pg_database_size(current_database()); BEGIN SELECT COALESCE(sum(w.size), 0)::bigint INTO v_wal FROM pg_ls_waldir() w; EXCEPTION WHEN OTHERS THEN v_wal := NULL; END; v_ratio := CASE WHEN v_wal IS NOT NULL AND v_db > 0 THEN round(v_wal::numeric / v_db, 2) ELSE NULL END; BEGIN v_ckpt := current_setting('checkpoint_timeout')::integer; EXCEPTION WHEN OTHERS THEN v_ckpt := NULL; END; BEGIN v_maxwal := (regexp_replace(current_setting('max_wal_size'),' …",
     "raises": [
      "forbidden"
     ],
@@ -55500,11 +55513,6 @@
     "src": "supabase/migrations/20260712183625_ed8a21e5-2aa1-4965-bdce-5831f0729248.sql"
    },
    {
-    "function": "get_capacity_forecast_fast",
-    "msg": "forbidden",
-    "src": "supabase/migrations/20260712193601_8340c366-a412-4204-8577-eb6c922fe4a8.sql"
-   },
-   {
     "function": "get_remediation_suggestions_fast",
     "msg": "forbidden",
     "src": "supabase/migrations/20260712194141_8114c3a0-a949-4517-bf62-4c0a940d1c8c.sql"
@@ -55620,11 +55628,6 @@
     "src": "supabase/migrations/20260712203121_082005c4-c719-4e8a-a3e6-fbc1cbf44ecf.sql"
    },
    {
-    "function": "get_unindexed_foreign_keys",
-    "msg": "access denied: admin role required",
-    "src": "supabase/migrations/20260712203302_61b8eb1b-160f-490a-8362-e5591dd64990.sql"
-   },
-   {
     "function": "get_long_running_queries",
     "msg": "Access denied: admin role required",
     "src": "supabase/migrations/20260712203444_9c648354-c882-49de-bc6a-9033bba167da.sql"
@@ -55645,19 +55648,9 @@
     "src": "supabase/migrations/20260712203614_d5304907-6636-4d5c-877e-f274d6c80792.sql"
    },
    {
-    "function": "get_cache_hit_ratios",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712203729_7429f7d0-6e09-48b4-b643-5dea54396df8.sql"
-   },
-   {
     "function": "get_replication_status",
     "msg": "Access denied: admin role required",
     "src": "supabase/migrations/20260712203852_62af6721-5bfc-4a0a-999b-cb29357a3ebe.sql"
-   },
-   {
-    "function": "get_temp_file_stats",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712204023_5c63ca48-e0e7-4598-a304-ac965b330109.sql"
    },
    {
     "function": "get_duplicate_indexes",
@@ -55675,16 +55668,6 @@
     "src": "supabase/migrations/20260712211720_cade28fc-94b3-4840-9df3-055f24ebdfc3.sql"
    },
    {
-    "function": "get_active_sessions_summary",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712211835_7701eb94-4ac8-48ef-a952-865db0c8ca7d.sql"
-   },
-   {
-    "function": "get_top_tables_by_size",
-    "msg": "Access denied: admin role required",
-    "src": "supabase/migrations/20260712212000_fa75330f-36b8-48b9-8290-db4898407f05.sql"
-   },
-   {
     "function": "get_rls_audit",
     "msg": "Access denied: admin role required",
     "src": "supabase/migrations/20260712212132_d59626e8-c3eb-438c-b158-67882acd95e8.sql"
@@ -55695,14 +55678,44 @@
     "src": "supabase/migrations/20260712212239_c00d0672-eb45-49c6-8e68-c0e0be52b2a4.sql"
    },
    {
-    "function": "get_transaction_health",
+    "function": "get_active_sessions_summary",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_temp_file_stats",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_unindexed_foreign_keys",
+    "msg": "access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_capacity_forecast_fast",
     "msg": "forbidden",
-    "src": "supabase/migrations/20260712214421_cd6c9b73-7831-4d22-98f2-ed5ed0faa79d.sql"
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_cache_hit_ratios",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_top_tables_by_size",
+    "msg": "Access denied: admin role required",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
    },
    {
     "function": "get_wal_health",
     "msg": "forbidden",
-    "src": "supabase/migrations/20260712214637_62050a93-e930-406b-a565-68db4825c7d5.sql"
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+   },
+   {
+    "function": "get_transaction_health",
+    "msg": "forbidden",
+    "src": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
    }
   ],
   "db_generated": [
@@ -73305,7 +73318,7 @@
   },
   "src/features/db-observability/components/WalHealthCard.tsx": {
    "path": "src/features/db-observability/components/WalHealthCard.tsx",
-   "lines": 107,
+   "lines": 112,
    "exports": [
     "function WalHealthCard"
    ],
@@ -88487,6 +88500,14 @@
    "lines": 127,
    "uses_service_role": true
   },
+  "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql": {
+   "path": "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
+   "lines": 608,
+   "temporal": [
+    "EXTRACT(EPOCH FROM (s.created_at - (now() - interval '7 days'))) / 3600.0 AS x_hours,",
+    "WHERE s.created_at >= now() - interval '7 days'"
+   ]
+  },
   "tests/contracts/nexus-contracts.spec.ts": {
    "path": "tests/contracts/nexus-contracts.spec.ts",
    "lines": 110,
@@ -88654,10 +88675,30 @@
   }
  },
  "git": {
-  "sha": "a6e18fc73757fe4b008d39f065918e4ac4843579",
+  "sha": "09c9545882765ae30358fe9e6b477fea25a5c533",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "09c9545",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)",
+    "files": [
+     "src/features/db-observability/components/WalHealthCard.tsx",
+     "src/features/db-observability/hooks/useWalHealth.ts",
+     "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
+    ]
+   },
+   {
+    "sha": "998f168",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "fix: serve index.html em rota direta para a SPA nao dar 404 (#165)",
+    "files": [
+     "vercel.json"
+    ]
+   },
    {
     "sha": "a6e18fc",
     "date": "2026-11-17",
@@ -88966,24 +89007,6 @@
     "files": [
      ".github/workflows/sync-internal-secret.yml"
     ]
-   },
-   {
-    "sha": "e2cc7bd",
-    "date": "2026-11-11",
-    "author": "adm01-debug",
-    "subject": "fix(ci): move gate de credencial do types-sync para antes dos installs (#134)",
-    "files": [
-     ".github/workflows/types-sync.yml"
-    ]
-   },
-   {
-    "sha": "5182e5f",
-    "date": "2026-11-11",
-    "author": "adm01-debug",
-    "subject": "docs: atualiza contagem de required checks para 10 no github-ci.md (#123)",
-    "files": [
-     "docs/agentes/github-ci.md"
-    ]
    }
   ],
   "hot_files": [
@@ -89000,16 +89023,24 @@
     3
    ],
    [
-    "docs/agentes/github-ci.md",
-    2
-   ],
-   [
     ".github/workflows/codeql.yml",
     2
    ],
    [
-    ".github/workflows/types-sync.yml",
-    2
+    "src/features/db-observability/components/WalHealthCard.tsx",
+    1
+   ],
+   [
+    "src/features/db-observability/hooks/useWalHealth.ts",
+    1
+   ],
+   [
+    "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
+    1
+   ],
+   [
+    "vercel.json",
+    1
    ],
    [
     "src/components/security/SecurityOverviewPanel.tsx",
@@ -89057,14 +89088,6 @@
    ],
    [
     "src/hooks/logistics/useDeliveryRoutes.tsx",
-    1
-   ],
-   [
-    "src/lib/mapFallback.test.ts",
-    1
-   ],
-   [
-    "src/lib/mapFallback.ts",
     1
    ]
   ]
