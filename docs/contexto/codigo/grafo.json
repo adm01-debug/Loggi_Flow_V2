@@ -2,7 +2,7 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "nos": 746,
- "arestas": 3073,
+ "arestas": 3074,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -226,7 +226,6 @@
   "src/lib/index.ts",
   "src/lib/rodonaves/index.ts",
   "src/lib/schemas/common.ts",
-  "src/services/api/storageService.ts",
   "src/utils/index.ts",
   "src/utils/logger.ts",
   "src/utils/performance.ts",

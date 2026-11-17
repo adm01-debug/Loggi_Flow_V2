@@ -4,13 +4,13 @@
  "presente": true,
  "como_gerar": "uvx --from \"graphifyy[sql]\" graphify update .  (ou: npm run graph:update); saída em graphify-out/ — graph.json e graph.html NÃO são versionados (dezenas de MB); use `graphify query/path/explain` localmente",
  "relatorio": null,
- "commit_do_grafo": "e1f6935d44a5dd0993647c054f86edc3c8630378",
+ "commit_do_grafo": "6e1ffcfb722c15a656b3685881f9de14e37b3e20",
  "grafo_atual": true,
  "nos": 8112,
- "arestas": 20499,
- "comunidades_total": 707,
+ "arestas": 20502,
+ "comunidades_total": 705,
  "relacoes": {
-  "calls": 2813,
+  "calls": 2814,
   "case_of": 7,
   "cites": 2,
   "contains": 5784,
@@ -18,8 +18,8 @@
   "dynamic_import": 111,
   "extends": 1,
   "implements": 1,
-  "imports": 4832,
-  "imports_from": 4600,
+  "imports": 4833,
+  "imports_from": 4601,
   "indexes": 351,
   "indirect_call": 105,
   "inherits": 25,
@@ -31,7 +31,7 @@
   "triggers": 101
  },
  "origem": {
-  "EXTRACTED": 20307,
+  "EXTRACTED": 20310,
   "INFERRED": 192
  },
  "comunidades": [
@@ -72,9 +72,9 @@
   {
    "id": 2,
    "nome": "db-observability/index.ts",
-   "nos": 155,
-   "callables": 123,
-   "arquivos": 67,
+   "nos": 153,
+   "callables": 126,
+   "arquivos": 70,
    "exemplos_arquivos": [
     "src/features/db-observability/components/ActiveSessionsCard.tsx",
     "src/features/db-observability/components/AnomaliesCard.tsx",
@@ -140,9 +140,9 @@
   {
    "id": 6,
    "nome": "client.ts",
-   "nos": 112,
-   "callables": 75,
-   "arquivos": 39,
+   "nos": 116,
+   "callables": 78,
+   "arquivos": 40,
    "exemplos_arquivos": [
     "docs/INVENTARIO_FUNCIONALIDADES.md",
     "package.json",
@@ -234,19 +234,19 @@
   },
   {
    "id": 12,
-   "nome": "@tanstack/react-query",
-   "nos": 81,
-   "callables": 44,
-   "arquivos": 28,
+   "nome": "supabase",
+   "nos": 87,
+   "callables": 51,
+   "arquivos": 36,
    "exemplos_arquivos": [
     "package.json",
-    "src/components/notifications/BrowserNotificationPrompt.tsx",
-    "src/hooks/analytics/useDashboardData.tsx",
-    "src/hooks/analytics/useDashboardMetrics.tsx",
-    "src/hooks/analytics/useExecutiveMetrics.tsx",
-    "src/hooks/auth/usePermissions.ts",
-    "src/hooks/data/useMemoizedQuery.ts",
-    "src/hooks/data/usePrefetch.ts"
+    "src/features/analytics/hooks/useAnalyticsFeature.ts",
+    "src/features/analytics/index.ts",
+    "src/features/analytics/types/index.ts",
+    "src/features/db-observability/components/RegressionsCard.tsx",
+    "src/features/db-observability/hooks/useCapacityForecast.ts",
+    "src/features/db-observability/hooks/useCronJobs.ts",
+    "src/features/db-observability/hooks/useDbRegressions.ts"
    ]
   },
   {
@@ -317,6 +317,23 @@
   },
   {
    "id": 18,
+   "nome": "hooks/index.ts",
+   "nos": 65,
+   "callables": 37,
+   "arquivos": 20,
+   "exemplos_arquivos": [
+    "src/components/notifications/BrowserNotificationPrompt.tsx",
+    "src/hooks/analytics/useDashboardData.tsx",
+    "src/hooks/analytics/useDashboardMetrics.tsx",
+    "src/hooks/analytics/useExecutiveMetrics.tsx",
+    "src/hooks/auth/usePermissions.ts",
+    "src/hooks/data/useMemoizedQuery.ts",
+    "src/hooks/data/usePrefetch.ts",
+    "src/hooks/index.ts"
+   ]
+  },
+  {
+   "id": 19,
    "nome": "App.tsx",
    "nos": 64,
    "callables": 2,
@@ -329,7 +346,7 @@
    ]
   },
   {
-   "id": 19,
+   "id": 20,
    "nome": "MainLayout.tsx",
    "nos": 63,
    "callables": 25,
@@ -346,7 +363,7 @@
    ]
   },
   {
-   "id": 20,
+   "id": 21,
    "nome": "package.json",
    "nos": 63,
    "callables": 0,
@@ -358,7 +375,7 @@
    ]
   },
   {
-   "id": 21,
+   "id": 22,
    "nome": "utils.ts",
    "nos": 62,
    "callables": 25,
@@ -375,7 +392,7 @@
    ]
   },
   {
-   "id": 22,
+   "id": 23,
    "nome": "database-identity.unit.mjs",
    "nos": 58,
    "callables": 27,
@@ -392,7 +409,7 @@
    ]
   },
   {
-   "id": 23,
+   "id": 24,
    "nome": "lib.mjs",
    "nos": 56,
    "callables": 45,
@@ -405,7 +422,7 @@
    ]
   },
   {
-   "id": 24,
+   "id": 25,
    "nome": "automation.mjs",
    "nos": 55,
    "callables": 36,
@@ -419,7 +436,7 @@
    ]
   },
   {
-   "id": 25,
+   "id": 26,
    "nome": "CotacaoFrete.tsx",
    "nos": 55,
    "callables": 35,
@@ -436,7 +453,7 @@
    ]
   },
   {
-   "id": 26,
+   "id": 27,
    "nome": "generate.py",
    "nos": 51,
    "callables": 45,
@@ -446,7 +463,7 @@
    ]
   },
   {
-   "id": 27,
+   "id": 28,
    "nome": "helpers.mjs",
    "nos": 51,
    "callables": 28,
@@ -462,7 +479,7 @@
    ]
   },
   {
-   "id": 28,
+   "id": 29,
    "nome": ".write",
    "nos": 50,
    "callables": 45,
@@ -473,7 +490,7 @@
    ]
   },
   {
-   "id": 29,
+   "id": 30,
    "nome": "📋 Documentação Técnica - Loggi-Flow",
    "nos": 47,
    "callables": 0,
@@ -483,7 +500,7 @@
    ]
   },
   {
-   "id": 30,
+   "id": 31,
    "nome": "METransportadorasPanel.tsx",
    "nos": 47,
    "callables": 34,
@@ -500,7 +517,7 @@
    ]
   },
   {
-   "id": 31,
+   "id": 32,
    "nome": "eventCodes.ts",
    "nos": 47,
    "callables": 33,
@@ -513,7 +530,7 @@
    ]
   },
   {
-   "id": 32,
+   "id": 33,
    "nome": "snapshot.py",
    "nos": 46,
    "callables": 34,
@@ -523,7 +540,7 @@
    ]
   },
   {
-   "id": 33,
+   "id": 34,
    "nome": "gerar-rotas.unit.mjs",
    "nos": 46,
    "callables": 24,
@@ -540,7 +557,7 @@
    ]
   },
   {
-   "id": 34,
+   "id": 35,
    "nome": ".publish",
    "nos": 46,
    "callables": 42,
@@ -550,7 +567,7 @@
    ]
   },
   {
-   "id": 35,
+   "id": 36,
    "nome": "gerar-banco.mjs",
    "nos": 44,
    "callables": 24,
@@ -558,23 +575,6 @@
    "exemplos_arquivos": [
     "scripts/inventario/gerar-banco.mjs",
     "scripts/inventario/gerar-banco.unit.mjs"
-   ]
-  },
-  {
-   "id": 36,
-   "nome": "supabase",
-   "nos": 44,
-   "callables": 29,
-   "arquivos": 14,
-   "exemplos_arquivos": [
-    "src/features/db-observability/components/ExportHealthReportButton.tsx",
-    "src/hooks/analytics/useDrillDown.tsx",
-    "src/hooks/data/useDocumentUpload.ts",
-    "src/hooks/logistics/useAccuracyMetaAudit.ts",
-    "src/hooks/logistics/useCarrierAccuracy.ts",
-    "src/hooks/notifications/usePushNotifications.tsx",
-    "src/hooks/notifications/useWhatsAppNotification.tsx",
-    "src/hooks/security/useSelfHealing.ts"
    ]
   },
   {
@@ -877,23 +877,6 @@
   },
   {
    "id": 58,
-   "nome": "db-observability/types/index.ts",
-   "nos": 33,
-   "callables": 22,
-   "arquivos": 13,
-   "exemplos_arquivos": [
-    "src/features/db-observability/components/RegressionsCard.tsx",
-    "src/features/db-observability/components/RemediationHistoryCard.tsx",
-    "src/features/db-observability/components/RemediationSuggestionsCard.tsx",
-    "src/features/db-observability/hooks/useCapacityForecast.ts",
-    "src/features/db-observability/hooks/useCronJobs.ts",
-    "src/features/db-observability/hooks/useDbRegressions.ts",
-    "src/features/db-observability/hooks/useHealthAnomalies.ts",
-    "src/features/db-observability/hooks/useHealthSnapshots.ts"
-   ]
-  },
-  {
-   "id": 59,
    "nome": "2. Detalhamento por Categoria",
    "nos": 32,
    "callables": 0,
@@ -903,7 +886,7 @@
    ]
   },
   {
-   "id": 60,
+   "id": 59,
    "nome": "check-fresh.unit.mjs",
    "nos": 32,
    "callables": 15,
@@ -917,7 +900,7 @@
    ]
   },
   {
-   "id": 61,
+   "id": 60,
    "nome": "Documentação de Hooks e Componentes Reutilizáveis",
    "nos": 31,
    "callables": 0,
@@ -927,7 +910,7 @@
    ]
   },
   {
-   "id": 62,
+   "id": 61,
    "nome": "Regras de domínio que o código não deixa óbvio — referência para agentes",
    "nos": 30,
    "callables": 6,
@@ -941,7 +924,7 @@
    ]
   },
   {
-   "id": 63,
+   "id": 62,
    "nome": "typecheck-ratchet.mjs",
    "nos": 30,
    "callables": 25,
@@ -952,7 +935,7 @@
    ]
   },
   {
-   "id": 64,
+   "id": 63,
    "nome": "Changelog",
    "nos": 29,
    "callables": 0,
@@ -962,7 +945,7 @@
    ]
   },
   {
-   "id": 65,
+   "id": 64,
    "nome": "ref_node_fs",
    "nos": 29,
    "callables": 12,
@@ -975,7 +958,7 @@
    ]
   },
   {
-   "id": 66,
+   "id": 65,
    "nome": "branch-podaveis.unit.mjs",
    "nos": 29,
    "callables": 18,
@@ -986,7 +969,7 @@
    ]
   },
   {
-   "id": 67,
+   "id": 66,
    "nome": "cenarios.mjs",
    "nos": 28,
    "callables": 10,
@@ -1003,7 +986,7 @@
    ]
   },
   {
-   "id": 68,
+   "id": 67,
    "nome": ".estado",
    "nos": 28,
    "callables": 28,
@@ -1013,7 +996,7 @@
    ]
   },
   {
-   "id": 69,
+   "id": 68,
    "nome": "Any",
    "nos": 27,
    "callables": 23,
@@ -1023,7 +1006,7 @@
    ]
   },
   {
-   "id": 70,
+   "id": 69,
    "nome": "test_snapshot.py",
    "nos": 27,
    "callables": 22,
@@ -1033,7 +1016,7 @@
    ]
   },
   {
-   "id": 71,
+   "id": 70,
    "nome": "freightForecast.ts",
    "nos": 27,
    "callables": 16,
@@ -1046,7 +1029,7 @@
    ]
   },
   {
-   "id": 72,
+   "id": 71,
    "nome": "ExcelImporter.tsx",
    "nos": 26,
    "callables": 12,
@@ -1063,7 +1046,7 @@
    ]
   },
   {
-   "id": 73,
+   "id": 72,
    "nome": "Configuração de Integrações - Loggi Flow",
    "nos": 26,
    "callables": 0,
@@ -1073,7 +1056,7 @@
    ]
   },
   {
-   "id": 74,
+   "id": 73,
    "nome": "20251220122500_notifications_table.sql",
    "nos": 26,
    "callables": 0,
@@ -1084,7 +1067,7 @@
    ]
   },
   {
-   "id": 75,
+   "id": 74,
    "nome": "GlobalSearch.tsx",
    "nos": 26,
    "callables": 10,
@@ -1101,7 +1084,7 @@
    ]
   },
   {
-   "id": 76,
+   "id": 75,
    "nome": "parse_sql_schema",
    "nos": 26,
    "callables": 21,
@@ -1111,7 +1094,7 @@
    ]
   },
   {
-   "id": 77,
+   "id": 76,
    "nome": "compilerOptions",
    "nos": 26,
    "callables": 0,
@@ -1121,7 +1104,7 @@
    ]
   },
   {
-   "id": 78,
+   "id": 77,
    "nome": "🧩 Componentes Disponíveis",
    "nos": 25,
    "callables": 0,
@@ -1131,7 +1114,7 @@
    ]
   },
   {
-   "id": 79,
+   "id": 78,
    "nome": "hooks/rodonaves/index.ts",
    "nos": 25,
    "callables": 18,
@@ -1144,6 +1127,19 @@
     "src/hooks/rodonaves/useGatewayHealth.ts",
     "src/hooks/rodonaves/useSLOSnapshots.test.ts",
     "src/hooks/rodonaves/useSLOSnapshots.ts"
+   ]
+  },
+  {
+   "id": 79,
+   "nome": "RTESLOReportPanel.tsx",
+   "nos": 25,
+   "callables": 18,
+   "arquivos": 4,
+   "exemplos_arquivos": [
+    "src/components/rodonaves/RTESLOReportPanel.tsx",
+    "src/lib/rodonaves/gatewaySLO.ts",
+    "src/lib/rodonaves/sloReport.test.ts",
+    "src/lib/rodonaves/sloReport.ts"
    ]
   }
  ],
@@ -1251,7 +1247,7 @@
    "rotulo": "@tanstack/react-query",
    "arquivo": "package.json",
    "grau": 153,
-   "comunidade": "@tanstack/react-query"
+   "comunidade": "supabase"
   },
   {
    "id": "src_hooks_auth_useauth_useauth",
@@ -1314,7 +1310,7 @@
    "rotulo": "hooks/index.ts",
    "arquivo": "src/hooks/index.ts",
    "grau": 122,
-   "comunidade": "@tanstack/react-query"
+   "comunidade": "hooks/index.ts"
   },
   {
    "id": "src_components_layout_mainlayout",
@@ -2362,7 +2358,7 @@
   "src/components/melhorenvio/MEWebhookPanel.tsx": "sonner",
   "src/components/melhorenvio/index.ts": "METransportadorasPanel.tsx",
   "src/components/melhorenvio/types.ts": "METransportadorasPanel.tsx",
-  "src/components/notifications/BrowserNotificationPrompt.tsx": "@tanstack/react-query",
+  "src/components/notifications/BrowserNotificationPrompt.tsx": "hooks/index.ts",
   "src/components/notifications/NotificationCenter.tsx": "utils.ts",
   "src/components/notifications/SLANotificationSettings.tsx": "utils.ts",
   "src/components/notifications/UserNotificationCenter.tsx": "utils.ts",
@@ -2504,9 +2500,9 @@
   "src/components/ui/toggle.tsx": "cn",
   "src/components/ui/tooltip.tsx": "utils.ts",
   "src/components/ui/use-toast.ts": "hooks/ui/use-toast.ts",
-  "src/features/analytics/hooks/useAnalyticsFeature.ts": "useAnalyticsFeature.ts",
-  "src/features/analytics/index.ts": "useAnalyticsFeature.ts",
-  "src/features/analytics/types/index.ts": "useAnalyticsFeature.ts",
+  "src/features/analytics/hooks/useAnalyticsFeature.ts": "supabase",
+  "src/features/analytics/index.ts": "supabase",
+  "src/features/analytics/types/index.ts": "supabase",
   "src/features/db-observability/components/ActiveSessionsCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/AnomaliesCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/AutovacuumHealthCard.tsx": "db-observability/index.ts",
@@ -2515,7 +2511,7 @@
   "src/features/db-observability/components/CapacityForecastCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/CronJobsCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/DuplicateIndexesCard.tsx": "db-observability/index.ts",
-  "src/features/db-observability/components/ExportHealthReportButton.tsx": "supabase",
+  "src/features/db-observability/components/ExportHealthReportButton.tsx": "LoadHeatmapCard.tsx",
   "src/features/db-observability/components/ExtensionsAuditCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/GlobalHealthScoreCard.tsx": "badge.tsx",
   "src/features/db-observability/components/HealthRegressionAlert.tsx": "db-observability/index.ts",
@@ -2523,16 +2519,16 @@
   "src/features/db-observability/components/HealthTrendChart.tsx": "ADR 0013: Real Metrics, Anomaly Detection & SLO (Sprints 37-39)",
   "src/features/db-observability/components/IndexProposalsCard.tsx": "date-fns",
   "src/features/db-observability/components/IndexRoiCard.tsx": "badge.tsx",
-  "src/features/db-observability/components/LoadHeatmapCard.tsx": "db-observability/index.ts",
+  "src/features/db-observability/components/LoadHeatmapCard.tsx": "LoadHeatmapCard.tsx",
   "src/features/db-observability/components/LockConflictsCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/LongRunningQueriesCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/MaintenanceWindowsCard.tsx": "db-observability/index.ts",
-  "src/features/db-observability/components/MttrMetricsCard.tsx": "useRemediationMttr.ts",
+  "src/features/db-observability/components/MttrMetricsCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/PerformanceRunbook.tsx": "badge.tsx",
   "src/features/db-observability/components/QueryDetailDialog.tsx": "sonner",
-  "src/features/db-observability/components/RegressionsCard.tsx": "db-observability/types/index.ts",
-  "src/features/db-observability/components/RemediationHistoryCard.tsx": "db-observability/types/index.ts",
-  "src/features/db-observability/components/RemediationSuggestionsCard.tsx": "db-observability/types/index.ts",
+  "src/features/db-observability/components/RegressionsCard.tsx": "supabase",
+  "src/features/db-observability/components/RemediationHistoryCard.tsx": "useRemediationActions.ts",
+  "src/features/db-observability/components/RemediationSuggestionsCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/ReplicationStatusCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/RlsAuditCard.tsx": "db-observability/index.ts",
   "src/features/db-observability/components/SeqScanHotspotsCard.tsx": "db-observability/index.ts",
@@ -2554,7 +2550,7 @@
   "src/features/db-observability/hooks/useCapacityForecast.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useCronJobs.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useDbRegressionAlerts.ts": "db-observability/index.ts",
-  "src/features/db-observability/hooks/useDbRegressions.ts": "db-observability/types/index.ts",
+  "src/features/db-observability/hooks/useDbRegressions.ts": "supabase",
   "src/features/db-observability/hooks/useDuplicateIndexes.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useExtensionsAudit.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useGlobalHealthScore.ts": "db-observability/index.ts",
@@ -2564,14 +2560,14 @@
   "src/features/db-observability/hooks/useHealthSnapshots.ts": "ADR 0013: Real Metrics, Anomaly Detection & SLO (Sprints 37-39)",
   "src/features/db-observability/hooks/useIndexProposals.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useIndexRoi.ts": "db-observability/index.ts",
-  "src/features/db-observability/hooks/useLoadHeatmap.ts": "db-observability/index.ts",
-  "src/features/db-observability/hooks/useLockConflicts.ts": "db-observability/index.ts",
+  "src/features/db-observability/hooks/useLoadHeatmap.ts": "LoadHeatmapCard.tsx",
+  "src/features/db-observability/hooks/useLockConflicts.ts": "supabase",
   "src/features/db-observability/hooks/useLongRunningQueries.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useMaintenanceWindows.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useQueryDetail.ts": "db-observability/index.ts",
-  "src/features/db-observability/hooks/useRemediationActions.ts": "db-observability/types/index.ts",
-  "src/features/db-observability/hooks/useRemediationMttr.ts": "useRemediationMttr.ts",
-  "src/features/db-observability/hooks/useRemediationSuggestions.ts": "db-observability/types/index.ts",
+  "src/features/db-observability/hooks/useRemediationActions.ts": "useRemediationActions.ts",
+  "src/features/db-observability/hooks/useRemediationMttr.ts": "db-observability/index.ts",
+  "src/features/db-observability/hooks/useRemediationSuggestions.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useReplicationStatus.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useRlsAudit.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useSeqScanHotspots.ts": "db-observability/index.ts",
@@ -2584,9 +2580,9 @@
   "src/features/db-observability/hooks/useUnindexedForeignKeys.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useUnusedIndexes.ts": "db-observability/index.ts",
   "src/features/db-observability/hooks/useWalHealth.ts": "db-observability/index.ts",
-  "src/features/db-observability/hooks/useWraparoundStatus.ts": "db-observability/index.ts",
+  "src/features/db-observability/hooks/useWraparoundStatus.ts": "supabase",
   "src/features/db-observability/index.ts": "db-observability/index.ts",
-  "src/features/db-observability/types/index.ts": "db-observability/types/index.ts",
+  "src/features/db-observability/types/index.ts": "supabase",
   "src/features/incidents/components/PostMortemDashboard.tsx": "AdminTelemetria.tsx",
   "src/features/incidents/types/index.ts": "CircuitBreaker",
   "src/features/logistics/services/LogisticsService.ts": "useDelayPrediction.tsx",
@@ -2597,10 +2593,10 @@
   "src/hooks/ai/useNexusSimulator.ts": "sonner",
   "src/hooks/analytics/useAnalytics.tsx": "react",
   "src/hooks/analytics/useDashboardData.tsx": "Index.tsx",
-  "src/hooks/analytics/useDashboardMetrics.tsx": "@tanstack/react-query",
+  "src/hooks/analytics/useDashboardMetrics.tsx": "hooks/index.ts",
   "src/hooks/analytics/useDashboardWidgets.tsx": "Envios.tsx",
   "src/hooks/analytics/useDrillDown.tsx": "supabase",
-  "src/hooks/analytics/useExecutiveMetrics.tsx": "@tanstack/react-query",
+  "src/hooks/analytics/useExecutiveMetrics.tsx": "hooks/index.ts",
   "src/hooks/analytics/useFavoriteMetrics.tsx": "Index.tsx",
   "src/hooks/analytics/useKPIBenchmark.tsx": "useTrackingAnalytics.tsx",
   "src/hooks/analytics/usePerformanceMonitor.ts": "Index.tsx",
@@ -2610,7 +2606,7 @@
   "src/hooks/auth/useDeviceSessions.ts": "client.ts",
   "src/hooks/auth/useMFA.ts": "client.ts",
   "src/hooks/auth/useNewDeviceDetection.tsx": "useNewDeviceDetection.tsx",
-  "src/hooks/auth/usePermissions.ts": "@tanstack/react-query",
+  "src/hooks/auth/usePermissions.ts": "hooks/index.ts",
   "src/hooks/auth/useRole.ts": "client.ts",
   "src/hooks/auth/useSessionTimeout.ts": "client.ts",
   "src/hooks/auth/useWebAuthn.tsx": "client.ts",
@@ -2636,7 +2632,7 @@
   "src/hooks/common/useTimezone.tsx": "LazyProviders.tsx",
   "src/hooks/data/useDocumentUpload.ts": "supabase",
   "src/hooks/data/useImageUpload.tsx": "common/index.ts",
-  "src/hooks/data/useMemoizedQuery.ts": "@tanstack/react-query",
+  "src/hooks/data/useMemoizedQuery.ts": "hooks/index.ts",
   "src/hooks/data/usePrefetch.ts": "MainLayout.tsx",
   "src/hooks/data/useRealtime.tsx": "Ocorrencias.tsx",
   "src/hooks/data/useResilientMutation.ts": "useDelayPrediction.tsx",
@@ -2645,16 +2641,16 @@
   "src/hooks/gamification/useGamification.ts": "Index.tsx",
   "src/hooks/gamification/useGamification.tsx": "useGamification.tsx",
   "src/hooks/gamification/useRewardPurchases.tsx": "client.ts",
-  "src/hooks/index.ts": "@tanstack/react-query",
-  "src/hooks/integrations/useBitrixEntregaSync.tsx": "@tanstack/react-query",
+  "src/hooks/index.ts": "hooks/index.ts",
+  "src/hooks/integrations/useBitrixEntregaSync.tsx": "supabase",
   "src/hooks/integrations/useClientWebhooks.tsx": "client.ts",
-  "src/hooks/integrations/useEvolutionWhatsApp.tsx": "@tanstack/react-query",
-  "src/hooks/integrations/useExternalDbBridge.tsx": "@tanstack/react-query",
+  "src/hooks/integrations/useEvolutionWhatsApp.tsx": "supabase",
+  "src/hooks/integrations/useExternalDbBridge.tsx": "supabase",
   "src/hooks/integrations/useGeocoding.tsx": "useDelayPrediction.tsx",
   "src/hooks/logistics/useAccuracyMetaAudit.ts": "supabase",
-  "src/hooks/logistics/useAccuracyMetaCycle.ts": "useAccuracyMetaCycle.ts",
-  "src/hooks/logistics/useBiometricAnomalies.ts": "@tanstack/react-query",
-  "src/hooks/logistics/useBoxManagement.tsx": "@tanstack/react-query",
+  "src/hooks/logistics/useAccuracyMetaCycle.ts": "supabase",
+  "src/hooks/logistics/useBiometricAnomalies.ts": "useUnifiedTracking.tsx",
+  "src/hooks/logistics/useBoxManagement.tsx": "hooks/index.ts",
   "src/hooks/logistics/useBusinessRuleEngine.tsx": "RuleEditor.tsx",
   "src/hooks/logistics/useBusinessRules.tsx": "RuleEditor.tsx",
   "src/hooks/logistics/useCarrierAccuracy.ts": "supabase",
@@ -2664,12 +2660,12 @@
   "src/hooks/logistics/useCotacoesFrete.tsx": "client.ts",
   "src/hooks/logistics/useCotacoesMulticanal.tsx": "lucide-react",
   "src/hooks/logistics/useDelayPrediction.tsx": "lucide-react",
-  "src/hooks/logistics/useDeliveryRoutes.tsx": "@tanstack/react-query",
-  "src/hooks/logistics/useFreightIntelligence.tsx": "@tanstack/react-query",
-  "src/hooks/logistics/useFreightQuotation.tsx": "@tanstack/react-query",
-  "src/hooks/logistics/useLalamoveOrders.tsx": "@tanstack/react-query",
+  "src/hooks/logistics/useDeliveryRoutes.tsx": "hooks/index.ts",
+  "src/hooks/logistics/useFreightIntelligence.tsx": "hooks/index.ts",
+  "src/hooks/logistics/useFreightQuotation.tsx": "hooks/index.ts",
+  "src/hooks/logistics/useLalamoveOrders.tsx": "supabase",
   "src/hooks/logistics/useLalamoveTracking.tsx": "useLalamoveTracking.tsx",
-  "src/hooks/logistics/useLogisticaReversaReal.tsx": "@tanstack/react-query",
+  "src/hooks/logistics/useLogisticaReversaReal.tsx": "supabase",
   "src/hooks/logistics/useLogisticsCalendar.tsx": "useLogisticsCalendar.tsx",
   "src/hooks/logistics/useLogisticsCosts.tsx": "client.ts",
   "src/hooks/logistics/useLogisticsIntelligence.tsx": "Index.tsx",
@@ -2677,11 +2673,11 @@
   "src/hooks/logistics/useMapWeatherSync.ts": "useUnifiedTracking.tsx",
   "src/hooks/logistics/useMelhorEnvio.tsx": "METransportadorasPanel.tsx",
   "src/hooks/logistics/usePredictionAccuracy.ts": "useDelayPrediction.tsx",
-  "src/hooks/logistics/usePredictionAccuracyDaily.ts": "@tanstack/react-query",
+  "src/hooks/logistics/usePredictionAccuracyDaily.ts": "supabase",
   "src/hooks/logistics/usePredictionAccuracySettings.ts": "PredictionExplainability.tsx",
   "src/hooks/logistics/useQuotationFlow.tsx": "CotacaoFrete.tsx",
   "src/hooks/logistics/useRodonavesTracking.tsx": "react",
-  "src/hooks/logistics/useRodonavesWebhook.tsx": "@tanstack/react-query",
+  "src/hooks/logistics/useRodonavesWebhook.tsx": "supabase",
   "src/hooks/logistics/useRootCauseAnalysis.ts": "rootCauseAnalyzer.ts",
   "src/hooks/logistics/useSLAAlerts.tsx": "client.ts",
   "src/hooks/logistics/useSLAMetrics.tsx": "Index.tsx",
@@ -2692,11 +2688,11 @@
   "src/hooks/logistics/useTransportadoraRotas.tsx": "RotaResultsList.tsx",
   "src/hooks/logistics/useUnifiedTracking.tsx": "useUnifiedTracking.tsx",
   "src/hooks/notifications/useAudioFeedback.tsx": "Ocorrencias.tsx",
-  "src/hooks/notifications/useNotificationPreferences.tsx": "@tanstack/react-query",
-  "src/hooks/notifications/useNotifications.tsx": "@tanstack/react-query",
-  "src/hooks/notifications/usePushNotifications.tsx": "supabase",
+  "src/hooks/notifications/useNotificationPreferences.tsx": "hooks/index.ts",
+  "src/hooks/notifications/useNotifications.tsx": "hooks/index.ts",
+  "src/hooks/notifications/usePushNotifications.tsx": "usePushNotifications.tsx",
   "src/hooks/notifications/useSecurityPushNotifications.tsx": "client.ts",
-  "src/hooks/notifications/useWhatsAppNotification.tsx": "supabase",
+  "src/hooks/notifications/useWhatsAppNotification.tsx": "hooks/index.ts",
   "src/hooks/predictions/useMitigationActions.ts": "RootCauseCategory",
   "src/hooks/rodonaves/index.ts": "hooks/rodonaves/index.ts",
   "src/hooks/rodonaves/useGatewayHealth.test.ts": "hooks/rodonaves/index.ts",
@@ -2704,10 +2700,10 @@
   "src/hooks/rodonaves/useSLOSnapshots.test.ts": "hooks/rodonaves/index.ts",
   "src/hooks/rodonaves/useSLOSnapshots.ts": "hooks/rodonaves/index.ts",
   "src/hooks/rodonaves/useSLOTargets.ts": "gatewaySLO.ts",
-  "src/hooks/security/useAuditLogs.tsx": "@tanstack/react-query",
+  "src/hooks/security/useAuditLogs.tsx": "hooks/index.ts",
   "src/hooks/security/useEntityHistory.tsx": "client.ts",
-  "src/hooks/security/useFeatureFlags.tsx": "@tanstack/react-query",
-  "src/hooks/security/useIntegrationValidation.tsx": "useIntegrationValidation.tsx",
+  "src/hooks/security/useFeatureFlags.tsx": "supabase",
+  "src/hooks/security/useIntegrationValidation.tsx": "hooks/index.ts",
   "src/hooks/security/useRateLimitLogs.ts": "client.ts",
   "src/hooks/security/useSecurityEvents.ts": "client.ts",
   "src/hooks/security/useSelfHealing.ts": "supabase",
@@ -2749,8 +2745,8 @@
   "src/lib/predictions/whatIfScenarios.ts": "whatIfScenarios.ts",
   "src/lib/predictions/whatIfSimulator.test.ts": "whatIfSimulator.ts",
   "src/lib/predictions/whatIfSimulator.ts": "whatIfScenarios.ts",
-  "src/lib/queryConfig.ts": "@tanstack/react-query",
-  "src/lib/queryKeys.ts": "@tanstack/react-query",
+  "src/lib/queryConfig.ts": "hooks/index.ts",
+  "src/lib/queryKeys.ts": "hooks/index.ts",
   "src/lib/rodonaves/capabilities.test.ts": "capabilities.ts",
   "src/lib/rodonaves/capabilities.ts": "capabilities.ts",
   "src/lib/rodonaves/eventCodes.test.ts": "eventCodes.ts",
@@ -2790,7 +2786,7 @@
   "src/pages/Coletas.tsx": "Ocorrencias.tsx",
   "src/pages/ConciliacaoAutomatica.tsx": "date-fns",
   "src/pages/ConciliacaoFinanceira.tsx": "ConciliacaoExport.tsx",
-  "src/pages/Configuracoes.tsx": "useIntegrationValidation.tsx",
+  "src/pages/Configuracoes.tsx": "hooks/index.ts",
   "src/pages/ConfiguracoesFrete.tsx": "sonner",
   "src/pages/Conquistas.tsx": "Ocorrencias.tsx",
   "src/pages/CotacaoFrete.tsx": "CotacaoFrete.tsx",
@@ -2858,7 +2854,7 @@
   "src/pages/ranking/RankingPodium.tsx": "cn",
   "src/services/api/authService.ts": "client.ts",
   "src/services/api/logisticsService.ts": "client.ts",
-  "src/services/api/storageService.ts": "supabase",
+  "src/services/api/storageService.ts": "client.ts",
   "src/services/base/BaseService.ts": "useDelayPrediction.tsx",
   "src/services/resilience/CircuitBreaker.ts": "CircuitBreaker",
   "src/test/setup.ts": "setup.ts",

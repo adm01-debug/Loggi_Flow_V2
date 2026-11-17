@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e1f6935d44` · branch `main` · 2026-11-17 20:17 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `6e1ffcfb72` · branch `main` · 2026-11-17 20:22 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1951,6 +1951,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Apenas imagens (JPG, PNG) ou PDFs são permitidos | `src/components/shipping/DeliveryReceiptUpload.tsx` |
 | Comprovante enviado, mas houve erro no processamento OCR. | `src/components/shipping/DeliveryReceiptUpload.tsx` |
 | Erro ao remover comprovante | `src/components/shipping/DeliveryReceiptUpload.tsx` |
+| Falha ao gerar URL do comprovante | `src/components/shipping/DeliveryReceiptUpload.tsx` |
 | Falha no protocolo de upload:  | `src/components/shipping/DeliveryReceiptUpload.tsx` |
 | Erro ao atualizar status:  | `src/components/shipping/ExpeditionDetailsDialog.tsx` |
 | Erro na importação: ${error instanceof Error ? error.message : String(error)} | `src/components/transportadoras/BulkRouteImport.tsx` |
@@ -2181,8 +2182,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | scheme ${parsed.protocol} | `supabase/functions/_shared/safeFetch.ts` |
 | escalated abaixo do threshold | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
 | fuzz não gerou nenhum escalonamento | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
-| ignoredCount fora de faixa | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
-| … +145 linhas — lista completa em `context.json` | |
+| … +146 linhas — lista completa em `context.json` | |
 
 ## J. Controle de acesso no código (checagens de perfil/permissão)
 

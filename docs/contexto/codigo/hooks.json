@@ -2352,7 +2352,7 @@
    "hooks_exportados": [
     "useDocumentUpload"
    ],
-   "linhas": 135,
+   "linhas": 138,
    "dominio": "hooks/data",
    "tabelas": [],
    "rpcs": [],
@@ -2374,7 +2374,7 @@
    "hooks_exportados": [
     "useImageUpload"
    ],
-   "linhas": 156,
+   "linhas": 154,
    "dominio": "hooks/data",
    "tabelas": [],
    "rpcs": [],

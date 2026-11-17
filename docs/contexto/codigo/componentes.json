@@ -3185,7 +3185,7 @@
     "DeliveryReceiptUpload"
    ],
    "export_default": null,
-   "linhas": 280,
+   "linhas": 282,
    "dominio": "components/shipping",
    "hooks_locais": [
     "useAuth"

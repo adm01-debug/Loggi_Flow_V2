@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)",
    "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)",
    "chore(db): sincronizar artefatos com o banco [auto] (#177)",
    "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)",
-   "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)",
-   "chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)"
+   "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

@@ -1389,6 +1389,7 @@
   "servicos": [
    "src/services/api/authService.ts",
    "src/services/api/logisticsService.ts",
+   "src/services/api/storageService.ts",
    "src/services/base/BaseService.ts",
    "src/services/resilience/CircuitBreaker.ts"
   ]

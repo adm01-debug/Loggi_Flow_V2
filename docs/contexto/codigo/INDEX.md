@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e1f6935d44a5dd0993647c054f86edc3c8630378` (2026-11-17T17:06:05-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `6e1ffcfb722c15a656b3685881f9de14e37b3e20` (2026-11-17T17:09:06-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1300 |
 | arquivos_codigo | 875 |
-| linhas_codigo | 167137 |
+| linhas_codigo | 167140 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:74, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8112 nós · 20499 arestas · 707 comunidades · grafo do commit `e1f6935d`
-- comunidades maiores: cn (289), badge.tsx (177), db-observability/index.ts (155), sonner (139), ref_node_path (138), Ocorrencias.tsx (131), client.ts (112), Envios.tsx (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Index.tsx (96), date-fns (95), react (88)
+- 8112 nós · 20502 arestas · 705 comunidades · grafo do commit `6e1ffcfb`
+- comunidades maiores: cn (289), badge.tsx (177), db-observability/index.ts (153), sonner (139), ref_node_path (138), Ocorrencias.tsx (131), client.ts (116), Envios.tsx (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Index.tsx (96), date-fns (95), react (88)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `6e1ffcfb` fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)
 - 2026-11-17 `e1f6935d` fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)
 - 2026-11-17 `ba166365` chore(db): sincronizar artefatos com o banco [auto] (#177)
 - 2026-11-17 `214f0cd1` infra: adiciona workflow manual para aplicar migration no banco oficial (#176)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `0ead536e` chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)
 - 2026-11-17 `09c95458` fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)
 - 2026-11-17 `998f1683` fix: serve index.html em rota direta para a SPA nao dar 404 (#165)
-- 2026-11-17 `a6e18fc7` fix: painel de seguranca lia login_attempts por coluna inexistente (#164)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "e1f6935d44a5dd0993647c054f86edc3c8630378",
+  "commit": "6e1ffcfb722c15a656b3685881f9de14e37b3e20",
   "branch": "main",
-  "data_commit": "2026-11-17T17:06:05-03:00",
+  "data_commit": "2026-11-17T17:09:06-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "6e1ffcfb",
+    "data": "2026-11-17",
+    "assunto": "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)"
+   },
    {
     "sha": "e1f6935d",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "70f45b32",
     "data": "2026-11-17",
     "assunto": "test: conecta simulacao e fuzzing aos validadores reais (#153)"
-   },
-   {
-    "sha": "42774d84",
-    "data": "2026-11-14",
-    "assunto": "chore: contexto agendado de 10 min para 1x/hora (#154)"
    }
   ],
-  "arquivos_mudados_7d": 134,
+  "arquivos_mudados_7d": 136,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -149,6 +149,10 @@
    },
    {
     "pasta": "docs/auditoria-recuperacao-branches.md",
+    "mudancas": 5
+   },
+   {
+    "pasta": "src/hooks/data",
     "mudancas": 5
    },
    {
@@ -189,10 +193,6 @@
    },
    {
     "pasta": ".gitignore",
-    "mudancas": 3
-   },
-   {
-    "pasta": "AGENTS.md",
     "mudancas": 3
    }
   ],
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 118
+    "commits": 119
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1300,
   "arquivos_codigo": 875,
-  "linhas_codigo": 167137,
+  "linhas_codigo": 167140,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -452,7 +452,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48528
+   "linhas": 48530
   },
   "src/features": {
    "arquivos": 90,
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19097
+   "linhas": 19098
   },
   "src/i18n.ts": {
    "arquivos": 1,

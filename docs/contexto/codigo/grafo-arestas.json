@@ -1742,7 +1742,8 @@
    "src/components/ui/button.tsx",
    "src/hooks/auth/useAuth.tsx",
    "src/integrations/supabase/client.ts",
-   "src/lib/utils.ts"
+   "src/lib/utils.ts",
+   "src/services/api/storageService.ts"
   ],
   "src/components/shipping/ExpeditionDetailsDialog.tsx": [
    "src/components/shipping/DeliveryReceiptUpload.tsx",

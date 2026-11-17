@@ -2158,7 +2158,7 @@
    "modulo": "components/shipping",
    "arquivos": 3,
    "testes": 0,
-   "linhas": 686,
+   "linhas": 688,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -2181,6 +2181,7 @@
    ],
    "rpcs": [],
    "buckets": [
+    "avatars",
     "documents"
    ],
    "canais_realtime": [],
@@ -2211,7 +2212,8 @@
     "hooks/auth",
     "hooks/notifications",
     "integrations/supabase",
-    "lib"
+    "lib",
+    "services/api"
    ],
    "pacotes_externos": [
     "date-fns",
@@ -3431,7 +3433,7 @@
    "modulo": "hooks/data",
    "arquivos": 7,
    "testes": 0,
-   "linhas": 794,
+   "linhas": 795,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -5017,6 +5019,7 @@
     "rte_rollup_slo_daily"
    ],
    "buckets": [
+    "avatars",
     "documents"
    ],
    "canais_realtime": [
@@ -6183,6 +6186,7 @@
     "rpcs": []
    },
    "importado_por_outros_modulos": [
+    "components/shipping",
     "hooks/auth",
     "hooks/logistics"
    ],
