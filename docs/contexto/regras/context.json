@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "214f0cd1baddadccd2f81a9441fe07a9fe809ded",
+  "sha": "ba166365dc9a1c108e86025d5dffcf28abc1ba18",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 19:12 UTC",
+  "generated_at": "2026-11-17 19:23 UTC",
   "files_total": 1310,
   "code_files": 1135,
   "code_lines": 183489,
@@ -88729,10 +88729,20 @@
   }
  },
  "git": {
-  "sha": "214f0cd1baddadccd2f81a9441fe07a9fe809ded",
+  "sha": "ba166365dc9a1c108e86025d5dffcf28abc1ba18",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "ba16636",
+    "date": "2026-11-17",
+    "author": "github-actions[bot]",
+    "subject": "chore(db): sincronizar artefatos com o banco [auto] (#177)",
+    "files": [
+     "supabase/schema-catalog.json",
+     "supabase/schema-manifest.json"
+    ]
+   },
    {
     "sha": "214f0cd",
     "date": "2026-11-17",
@@ -89060,15 +89070,6 @@
     "files": [
      ".github/workflows/deploy-functions.yml"
     ]
-   },
-   {
-    "sha": "bbb9bbc",
-    "date": "2026-11-13",
-    "author": "adm01-debug",
-    "subject": "fix: corrige caminho import_map no config.toml para destravar deploy em lote (#145)",
-    "files": [
-     "supabase/config.toml"
-    ]
    }
   ],
   "hot_files": [
@@ -89083,6 +89084,10 @@
    [
     "docs/prod-readiness.md",
     3
+   ],
+   [
+    "supabase/schema-manifest.json",
+    2
    ],
    [
     "scripts/audit-gate.mjs",
@@ -89117,6 +89122,10 @@
     2
    ],
    [
+    "supabase/schema-catalog.json",
+    1
+   ],
+   [
     ".github/workflows/aplicar-migration.yml",
     1
    ],
@@ -89142,14 +89151,6 @@
    ],
    [
     "src/hooks/logistics/useCotacoesMulticanal.tsx",
-    1
-   ],
-   [
-    "src/hooks/logistics/useFreightQuotation.tsx",
-    1
-   ],
-   [
-    "src/hooks/logistics/useLogisticaReversaReal.tsx",
     1
    ]
   ]

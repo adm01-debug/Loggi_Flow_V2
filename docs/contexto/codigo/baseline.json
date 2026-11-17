@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "214f0cd1baddadccd2f81a9441fe07a9fe809ded",
+  "commit": "ba166365dc9a1c108e86025d5dffcf28abc1ba18",
   "branch": "main",
-  "data_commit": "2026-11-17T16:10:49-03:00",
+  "data_commit": "2026-11-17T16:22:27-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "ba166365",
+    "data": "2026-11-17",
+    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#177)"
+   },
    {
     "sha": "214f0cd1",
     "data": "2026-11-17",
@@ -126,11 +131,6 @@
     "sha": "0b8692b6",
     "data": "2026-11-14",
     "assunto": "chore: inventario do estado real [auto] (#150)"
-   },
-   {
-    "sha": "fef7780f",
-    "data": "2026-11-14",
-    "assunto": "docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)"
    }
   ],
   "arquivos_mudados_7d": 132,
@@ -309,7 +309,7 @@
    },
    {
     "autor": "github-actions[bot]",
-    "commits": 3
+    "commits": 4
    }
   ]
  },

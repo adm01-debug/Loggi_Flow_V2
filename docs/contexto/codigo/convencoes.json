@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore(db): sincronizar artefatos com o banco [auto] (#177)",
    "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)",
    "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)",
    "chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)",
-   "chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)",
-   "fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)"
+   "chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

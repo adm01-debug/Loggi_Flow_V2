@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `214f0cd1baddadccd2f81a9441fe07a9fe809ded` (2026-11-17T16:10:49-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `ba166365dc9a1c108e86025d5dffcf28abc1ba18` (2026-11-17T16:22:27-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:74, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8112 nós · 20496 arestas · 714 comunidades · grafo do commit `214f0cd1`
+- 8112 nós · 20496 arestas · 714 comunidades · grafo do commit `ba166365`
 - comunidades maiores: cn (253), lucide-react (195), sonner (187), db-observability/index.ts (164), Envios.tsx (146), ref_node_path (125), client.ts (122), date-fns (107), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), react (96), utils.ts (87), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `ba166365` chore(db): sincronizar artefatos com o banco [auto] (#177)
 - 2026-11-17 `214f0cd1` infra: adiciona workflow manual para aplicar migration no banco oficial (#176)
 - 2026-11-17 `5bfae77a` chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)
 - 2026-11-17 `4b5d4c92` chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `998f1683` fix: serve index.html em rota direta para a SPA nao dar 404 (#165)
 - 2026-11-17 `a6e18fc7` fix: painel de seguranca lia login_attempts por coluna inexistente (#164)
 - 2026-11-17 `63c4b833` ﻿fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)
-- 2026-11-17 `adb741b6` chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
