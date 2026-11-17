@@ -1421,7 +1421,7 @@
    "modulo": "components/map",
    "arquivos": 6,
    "testes": 0,
-   "linhas": 1381,
+   "linhas": 1382,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -1449,6 +1449,8 @@
     "tactical-logs"
    ],
    "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG",
     "VITE_SUPABASE_PUBLISHABLE_KEY",
     "VITE_SUPABASE_URL"
    ],
@@ -3670,7 +3672,7 @@
    "modulo": "hooks/logistics",
    "arquivos": 40,
    "testes": 0,
-   "linhas": 7600,
+   "linhas": 7598,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],

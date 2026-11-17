@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "f61ccee4def0c23804d18b60b75e3662cd1c465e",
+  "commit": "221e61e03f1544baac2325759ba1020d20e85933",
   "branch": "main",
-  "data_commit": "2026-11-17T13:28:41-03:00",
+  "data_commit": "2026-11-17T14:10:41-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "221e61e0",
+    "data": "2026-11-17",
+    "assunto": "fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)"
+   },
    {
     "sha": "f61ccee4",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "bbb9bbc9",
     "data": "2026-11-13",
     "assunto": "fix: corrige caminho import_map no config.toml para destravar deploy em lote (#145)"
-   },
-   {
-    "sha": "8ea891f4",
-    "data": "2026-11-13",
-    "assunto": "fix: usa dominio verificado no remetente dos emails (promobrindes.com.br) (#142)"
    }
   ],
-  "arquivos_mudados_7d": 106,
+  "arquivos_mudados_7d": 108,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 111
+    "commits": 112
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1298,
   "arquivos_codigo": 875,
-  "linhas_codigo": 167006,
+  "linhas_codigo": 167005,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -452,7 +452,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48529
+   "linhas": 48530
   },
   "src/features": {
    "arquivos": 90,
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19051
+   "linhas": 19049
   },
   "src/i18n.ts": {
    "arquivos": 1,

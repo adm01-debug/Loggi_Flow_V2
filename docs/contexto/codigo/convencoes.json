@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)",
    "chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)",
    "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)",
    "chore(db): sincronizar artefatos com o banco [auto] (#166)",
-   "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)",
-   "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)"
+   "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

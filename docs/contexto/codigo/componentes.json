@@ -1843,7 +1843,7 @@
     "MapboxMap"
    ],
    "export_default": null,
-   "linhas": 731,
+   "linhas": 732,
    "dominio": "components/map",
    "hooks_locais": [],
    "tabelas": [],

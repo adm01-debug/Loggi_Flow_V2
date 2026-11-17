@@ -3140,7 +3140,7 @@
    "hooks_exportados": [
     "useDeliveryRoutes"
    ],
-   "linhas": 387,
+   "linhas": 385,
    "dominio": "hooks/logistics",
    "tabelas": [
     "entregas"
