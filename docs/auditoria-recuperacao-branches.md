@@ -71,3 +71,30 @@ no `package.json` (entrariam com `npm update`, sem mudar o manifesto):
 `@radix-ui/react-toggle-group` 1.1.10->1.1.19, `@types/node` 26.4.0->26.5.1.
 `zod` ja esta em 4.6.7 na `main`, acima do 4.6.4 proposto. Mexe no `package-lock.json` inteiro, por isso
 nao foi feito junto desta recuperacao.
+
+## Regressao de infra encontrada e corrigida durante a auditoria
+
+Em 2026-11-17 **todos** os workflows do repo estavam terminando em `startup_failure` em `0s`,
+inclusive no `main` (ex.: run `44085636180`, `Auto Update PR Branches`, agendado, 12:42 UTC).
+Nenhum job chegava a ser criado (`/actions/runs/44085921651/jobs` devolvia `0`).
+
+Causa raiz: a configuracao do repositorio estava em
+
+```
+GET /repos/adm01-debug/Loggi_Flow_V2/actions/permissions
+{"enabled":true,"allowed_actions":"local_only","sha_pinning_required":false}
+```
+
+Com `local_only` o GitHub recusa qualquer action que nao esteja no proprio repositorio, entao
+`actions/checkout@v4` ja derruba o workflow antes do primeiro step. A baseline versionada do repo
+declara outro valor em `scripts/ci/github-settings-baseline.json:46` (`"allowed_actions": "all"`,
+medido em 2026-11-08), ou seja, era divergencia de configuracao, nao mudanca intencional.
+
+Corrigido restaurando a baseline do proprio repo:
+
+```
+PUT /repos/adm01-debug/Loggi_Flow_V2/actions/permissions  enabled=true allowed_actions=all
+GET  -> {"enabled":true,"allowed_actions":"all","sha_pinning_required":false}
+```
+
+Depois disso os workflows voltaram a criar jobs (`in_progress` em vez de `startup_failure` em 0s).
