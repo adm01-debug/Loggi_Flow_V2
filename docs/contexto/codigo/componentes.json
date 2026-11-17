@@ -1191,7 +1191,7 @@
     "LogisticsMapWidget"
    ],
    "export_default": null,
-   "linhas": 1129,
+   "linhas": 1089,
    "dominio": "components/dashboard",
    "hooks_locais": [
     "useBiometricAnomalies",
@@ -1843,13 +1843,11 @@
     "MapboxMap"
    ],
    "export_default": null,
-   "linhas": 732,
+   "linhas": 717,
    "dominio": "components/map",
    "hooks_locais": [],
    "tabelas": [],
-   "edges": [
-    "get-mapbox-token"
-   ],
+   "edges": [],
    "usado_por": 2,
    "orfao": false
   },
@@ -6202,7 +6200,7 @@
     "RastreamentoMotorista"
    ],
    "export_default": "RastreamentoMotorista",
-   "linhas": 337,
+   "linhas": 336,
    "dominio": "pages",
    "hooks_locais": [
     "useLalamoveTracking",

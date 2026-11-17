@@ -193,7 +193,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 128
+   "arquivos_puxados": 129
   },
   {
    "protegida": false,
@@ -2513,7 +2513,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -3073,7 +3072,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -3528,7 +3526,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -3865,7 +3862,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -4312,7 +4308,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -5827,7 +5822,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -6276,7 +6270,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -6555,7 +6548,6 @@
    "edges": [
     "ai-logistics-assistant",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "nexus-auto-healing"
    ],
@@ -6571,7 +6563,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 91
+   "arquivos_puxados": 92
   },
   {
    "protegida": true,
@@ -7533,7 +7525,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 83
+   "arquivos_puxados": 84
   },
   {
    "protegida": true,
@@ -7648,7 +7640,6 @@
    "edges": [
     "ai-logistics-assistant",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "nexus-auto-healing",
     "predict-delays"
@@ -7666,7 +7657,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 90
+   "arquivos_puxados": 91
   },
   {
    "protegida": false,

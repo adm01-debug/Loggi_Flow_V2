@@ -3,7 +3,7 @@
  "format_version": 2,
  "stack": {
   "linguagens": [
-   "TypeScript (788)",
+   "TypeScript (789)",
    "SQL (259)",
    "Markdown (84)",
    "JavaScript (80)",
@@ -951,7 +951,6 @@
    "NODE_ENV",
    "VITE_CD_ORIGEM_LAT",
    "VITE_CD_ORIGEM_LNG",
-   "VITE_MAPBOX_TOKEN",
    "VITE_SENTRY_DSN",
    "VITE_SUPABASE_ANON_KEY",
    "VITE_SUPABASE_PUBLISHABLE_KEY",
@@ -1088,11 +1087,11 @@
     "arquivos": 5
    },
    {
-    "host": "api.ipify.org",
-    "arquivos": 3
+    "host": "viacep.com.br",
+    "arquivos": 4
    },
    {
-    "host": "viacep.com.br",
+    "host": "api.ipify.org",
     "arquivos": 3
    },
    {
@@ -1100,15 +1099,15 @@
     "arquivos": 3
    },
    {
-    "host": "api.mapbox.com",
-    "arquivos": 2
-   },
-   {
     "host": "generativelanguage.googleapis.com",
     "arquivos": 2
    },
    {
     "host": "rest.lalamove.com",
+    "arquivos": 2
+   },
+   {
+    "host": "s3.amazonaws.com",
     "arquivos": 2
    },
    {
@@ -1137,6 +1136,10 @@
    },
    {
     "host": "api.transportadora.com",
+    "arquivos": 1
+   },
+   {
+    "host": "basemaps.cartocdn.com",
     "arquivos": 1
    },
    {
@@ -1172,7 +1175,15 @@
     "arquivos": 1
    },
    {
+    "host": "nominatim.openstreetmap.org",
+    "arquivos": 1
+   },
+   {
     "host": "payments-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "photon.komoot.io",
     "arquivos": 1
    },
    {
@@ -1189,6 +1200,10 @@
    },
    {
     "host": "sandbox.melhorenvio.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "server.arcgisonline.com",
     "arquivos": 1
    },
    {
@@ -1209,6 +1224,10 @@
    },
    {
     "host": "uwbpzfcysppwikfpnzok.lovableproject.com",
+    "arquivos": 1
+   },
+   {
+    "host": "www.openstreetmap.org",
     "arquivos": 1
    }
   ],

@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `6e1ffcfb72` · branch `main` · 2026-11-17 20:22 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8530be9647` · branch `main` · 2026-11-17 21:20 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -872,6 +872,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `type` | `prazo_critico` | compara, escreve | `src/components/dashboard/AlertsPanel.tsx`<br>`src/components/notifications/NotificationCenter.tsx`<br>`src/hooks/analytics/useDashboardMetrics.tsx`<br>`src/hooks/logistics/useSmartAlerts.tsx` |
 | `type` | `process` | escreve | `src/hooks/logistics/useLogisticsIntelligence.tsx` |
 | `type` | `public-key` | escreve | `src/hooks/auth/useWebAuthn.tsx` |
+| `type` | `raster` | escreve | `src/lib/mapStyles.ts` |
+| `type` | `raster-dem` | escreve | `src/lib/mapStyles.ts` |
 | `type` | `recovery` | escreve | `supabase/functions/send-password-reset/index.ts` |
 | `type` | `registration` | escreve | `src/hooks/auth/useWebAuthn.tsx` |
 | `type` | `resource` | escreve | `src/hooks/logistics/useLogisticsIntelligence.tsx` |
@@ -1735,6 +1737,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `now.getTime() - 7 * 24 * 60 * 60 * 1000,` | `supabase/functions/accuracy-weekly-digest/index.ts` |
 | `supabase.from('entregas').select('valor_frete, created_at').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),` | `supabase/functions/ai-logistics-assistant/index.ts` |
 | `const BLOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutes block` | `supabase/functions/check-rate-limit/index.ts` |
+| `timeout: 6000,` | `supabase/functions/geocode-address/index.ts` |
 | `timeout: 8000,` | `supabase/functions/geocode-address/index.ts` |
 | `{ timeout: 8000, allowedHosts: ["api.openweathermap.org"] },` | `supabase/functions/get-weather-data/index.ts` |
 | `await new Promise(resolve => setTimeout(resolve, 2000));` | `supabase/functions/ocr-receipt-processor/index.ts` |
@@ -2274,7 +2277,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `invoke(` | `src/components/common/RealtimeStatus.tsx` |
 | `invoke(` | `src/components/dashboard/LogisticsMapWidget.tsx` |
 | `invoke(` | `src/components/freight/ResponseConsole.tsx` |
-| `invoke(` | `src/components/map/MapboxMap.tsx` |
 | `invoke(` | `src/components/predictions/DigestPreviewPanel.tsx` |
 | `notify` | `src/components/predictions/PredictionAccuracyTimeline.tsx` |
 | `notify_email` | `src/components/predictions/PredictionAccuracyTimeline.tsx` |
@@ -2450,6 +2452,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | P15: smoke test — check-rate-limit | `supabase/functions/check-rate-limit/index_test.ts` |
 | Persiste quando ?persist=true (cron horário) OU retorna somente snapshot atual (painel admin). | `supabase/functions/db-health-snapshot/index.ts` |
 | Persist to local DB (fire-and-forget) only if not ok | `supabase/functions/external-db-bridge/index.ts` |
+| Mesma base de dados (OSM), sem token e sem limite de faturamento. | `supabase/functions/geocode-address/index.ts` |
+| A politica de uso do Nominatim pede no maximo 1 consulta por segundo. | `supabase/functions/geocode-address/index.ts` |
 | P15: smoke test — get-mapbox-token must not leak secret token | `supabase/functions/get-mapbox-token/index_test.ts` |
 | P15: smoke test — health endpoint must always respond and never leak secrets | `supabase/functions/health/index_test.ts` |
 | P13: rate limit per IP (100 req/min for webhooks) | `supabase/functions/lalamove-webhook/index.ts` |

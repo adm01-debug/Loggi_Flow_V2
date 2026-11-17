@@ -724,7 +724,7 @@
    "modulo": "components/dashboard",
    "arquivos": 17,
    "testes": 1,
-   "linhas": 5297,
+   "linhas": 5257,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -801,7 +801,6 @@
    "env": [
     "VITE_CD_ORIGEM_LAT",
     "VITE_CD_ORIGEM_LNG",
-    "VITE_MAPBOX_TOKEN",
     "VITE_SUPABASE_PUBLISHABLE_KEY",
     "VITE_SUPABASE_URL"
    ],
@@ -840,7 +839,7 @@
     "date-fns",
     "framer-motion",
     "lucide-react",
-    "mapbox-gl",
+    "maplibre-gl",
     "react-map-gl",
     "react-router-dom",
     "recharts",
@@ -961,7 +960,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "lalamove-api",
     "lalamove-tracking",
     "log-security-event",
@@ -1421,7 +1419,7 @@
    "modulo": "components/map",
    "arquivos": 6,
    "testes": 0,
-   "linhas": 1382,
+   "linhas": 1367,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -1436,9 +1434,7 @@
     "usePrefersReducedMotion"
    ],
    "hooks_definidos": [],
-   "edges": [
-    "get-mapbox-token"
-   ],
+   "edges": [],
    "tabelas": [
     "entregas",
     "nexus_tactical_logs"
@@ -1457,9 +1453,7 @@
    "flags": [],
    "papeis": [],
    "diretos": {
-    "edges": [
-     "get-mapbox-token"
-    ],
+    "edges": [],
     "tabelas": [
      "nexus_tactical_logs"
     ],
@@ -1479,7 +1473,7 @@
    "pacotes_externos": [
     "framer-motion",
     "lucide-react",
-    "mapbox-gl",
+    "maplibre-gl",
     "recharts"
    ]
   },
@@ -2914,7 +2908,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "lalamove-api",
     "lalamove-tracking",
     "log-security-event",
@@ -4126,7 +4119,7 @@
    "modulo": "hooks/security",
    "arquivos": 7,
    "testes": 0,
-   "linhas": 836,
+   "linhas": 835,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -4157,7 +4150,7 @@
    "edges": [
     "bitrix24-integration",
     "check-rate-limit",
-    "get-mapbox-token",
+    "geocode-address",
     "lalamove-tracking",
     "log-security-event",
     "melhor-envio-api",
@@ -4190,7 +4183,7 @@
     "edges": [
      "bitrix24-integration",
      "check-rate-limit",
-     "get-mapbox-token",
+     "geocode-address",
      "lalamove-tracking",
      "log-security-event",
      "melhor-envio-api",
@@ -4449,9 +4442,9 @@
   },
   {
    "modulo": "lib",
-   "arquivos": 15,
+   "arquivos": 16,
    "testes": 7,
-   "linhas": 1443,
+   "linhas": 1505,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -4518,6 +4511,7 @@
     "date-fns",
     "jspdf",
     "jspdf-autotable",
+    "maplibre-gl",
     "papaparse",
     "tailwind-merge",
     "xlsx",
@@ -4621,7 +4615,7 @@
    "modulo": "pages",
    "arquivos": 59,
    "testes": 0,
-   "linhas": 27802,
+   "linhas": 27801,
    "itens_menu": [
     "Administração",
     "Administração",
@@ -4901,7 +4895,6 @@
     "execute-protocol",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "health-check",
     "lalamove-api",
     "lalamove-tracking",
@@ -5037,7 +5030,6 @@
    "env": [
     "VITE_CD_ORIGEM_LAT",
     "VITE_CD_ORIGEM_LNG",
-    "VITE_MAPBOX_TOKEN",
     "VITE_SUPABASE_ANON_KEY",
     "VITE_SUPABASE_PUBLISHABLE_KEY",
     "VITE_SUPABASE_URL"
@@ -5151,7 +5143,7 @@
     "jspdf",
     "jspdf-autotable",
     "lucide-react",
-    "mapbox-gl",
+    "maplibre-gl",
     "qrcode.react",
     "react-confetti",
     "react-day-picker",
@@ -5564,7 +5556,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "lalamove-api",
     "lalamove-tracking",
     "log-security-event",
@@ -5785,7 +5776,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "lalamove-api",
     "lalamove-tracking",
     "log-security-event",
@@ -6002,7 +5992,6 @@
     "evolution-whatsapp",
     "external-db-bridge",
     "geocode-address",
-    "get-mapbox-token",
     "lalamove-api",
     "lalamove-tracking",
     "log-security-event",

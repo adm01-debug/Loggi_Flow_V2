@@ -16,7 +16,7 @@
    "src/components (14)"
   ],
   "servicos_logica": [
-   "src/lib (30)",
+   "src/lib (31)",
    "src/utils (6)",
    "src/services (5)"
   ],
@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)",
    "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)",
    "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)",
    "chore(db): sincronizar artefatos com o banco [auto] (#177)",
-   "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)",
-   "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)"
+   "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

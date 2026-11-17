@@ -509,21 +509,21 @@
    "nome": "geocode-address",
    "entrada": "supabase/functions/geocode-address/index.ts",
    "arquivos": 1,
-   "linhas": 103,
+   "linhas": 182,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
    ],
    "tabelas": [],
    "rpcs": [],
-   "env": [
-    "MAPBOX_PUBLIC_TOKEN"
-   ],
+   "env": [],
    "env_via_shared": [],
    "buckets": [],
    "chama_edges": [],
    "hosts_externos": [
-    "api.mapbox.com"
+    "nominatim.openstreetmap.org",
+    "photon.komoot.io",
+    "viacep.com.br"
    ],
    "usa_shared": [
     "logger.ts",
@@ -531,7 +531,8 @@
    ],
    "chamada_pelo_front": [
     "src/hooks/integrations/useGeocoding.tsx",
-    "src/hooks/logistics/useDeliveryRoutes.tsx"
+    "src/hooks/logistics/useDeliveryRoutes.tsx",
+    "src/hooks/security/useIntegrationValidation.tsx"
    ],
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
@@ -557,13 +558,10 @@
    "chama_edges": [],
    "hosts_externos": [],
    "usa_shared": [],
-   "chamada_pelo_front": [
-    "src/components/map/MapboxMap.tsx",
-    "src/hooks/security/useIntegrationValidation.tsx"
-   ],
+   "chamada_pelo_front": [],
    "chamada_por_edges": [],
    "chamada_por_sql_ou_cron": false,
-   "orfa": false,
+   "orfa": true,
    "testes": 1
   },
   {

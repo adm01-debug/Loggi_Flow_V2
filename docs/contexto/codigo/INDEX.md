@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `6e1ffcfb722c15a656b3685881f9de14e37b3e20` (2026-11-17T17:09:06-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8530be9647a93f4718086e90f24c61072da84959` (2026-11-17T18:16:06-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (788), SQL (259), Markdown (84), JavaScript (80), JSON (33), YAML (21), Shell (9), Python (8)
+- linguagens: TypeScript (789), SQL (259), Markdown (84), JavaScript (80), JSON (33), YAML (21), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,9 +34,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1300 |
-| arquivos_codigo | 875 |
-| linhas_codigo | 167140 |
+| arquivos_total | 1301 |
+| arquivos_codigo | 876 |
+| linhas_codigo | 167224 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -57,7 +57,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - telas: src/pages (61)
 - componentes: src/components (256), src/pages (77), src/features (41)
 - hooks: src/hooks (120), src/features (41), src/components (14)
-- servicos_logica: src/lib (30), src/utils (6), src/services (5)
+- servicos_logica: src/lib (31), src/utils (6), src/services (5)
 - testes: co-localizado (*.test) (73), outro (45), tests/ (11)
 - edge_functions: supabase/functions
 - migrations: supabase/migrations
@@ -71,9 +71,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|---|---|---|---|---|
 | components/common | 0 | 0 | 45 | 16 | 2 | 11 |
 | components/dashboard | 0 | 0 | 17 | 28 | 2 | 21 |
-| components/freight | 0 | 0 | 18 | 96 | 19 | 53 |
+| components/freight | 0 | 0 | 18 | 96 | 18 | 53 |
 | components/layout | 0 | 0 | 7 | 21 | 3 | 17 |
-| components/map | 0 | 0 | 6 | 7 | 1 | 2 |
+| components/map | 0 | 0 | 6 | 7 | 0 | 2 |
 | components/melhorenvio | 0 | 0 | 18 | 6 | 1 | 3 |
 | components/notifications | 0 | 0 | 5 | 6 | 0 | 6 |
 | components/onboarding | 0 | 0 | 6 | 4 | 0 | 7 |
@@ -92,10 +92,10 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | hooks/notifications | 0 | 0 | 6 | 7 | 1 | 7 |
 | hooks/security | 0 | 0 | 7 | 10 | 7 | 8 |
 | hooks/ui | 0 | 0 | 6 | 9 | 0 | 7 |
-| lib | 0 | 0 | 15 | 0 | 0 | 0 |
+| lib | 0 | 0 | 16 | 0 | 0 | 0 |
 | lib/predictions | 0 | 0 | 6 | 0 | 0 | 0 |
 | lib/rodonaves | 0 | 0 | 8 | 0 | 0 | 0 |
-| pages | 75 | 59 | 59 | 126 | 30 | 81 |
+| pages | 75 | 59 | 59 | 126 | 29 | 81 |
 | pages/admin | 1 | 2 | 2 | 67 | 3 | 20 |
 | pages/auth | 0 | 0 | 5 | 2 | 3 | 1 |
 | utils | 0 | 0 | 6 | 0 | 1 | 3 |
@@ -183,8 +183,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `evolution-whatsapp` (verify_jwt=false) — tabelas: -; chamada por 1 arquivo(s) do front
 - `execute-protocol` — tabelas: -; chamada por 1 arquivo(s) do front
 - `external-db-bridge` — tabelas: query_telemetry; chamada por 1 arquivo(s) do front
-- `geocode-address` — tabelas: -; chamada por 2 arquivo(s) do front
-- `get-mapbox-token` — tabelas: -; chamada por 2 arquivo(s) do front
+- `geocode-address` — tabelas: -; chamada por 3 arquivo(s) do front
+- `get-mapbox-token` — tabelas: -; chamada por 0 arquivo(s) do front — **ÓRFÃ**
 - `get-weather-data` — tabelas: -; chamada por 0 arquivo(s) do front — **ÓRFÃ**
 - `health` (verify_jwt=false) — tabelas: profiles; chamada por 0 arquivo(s) do front
 - `health-check` (verify_jwt=false) — tabelas: profiles; chamada por 1 arquivo(s) do front
@@ -246,7 +246,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 
 ## Integrações externas
 - SDKs: Sentry, Supabase, Upstash, i18next, react-query, zod
-- hosts mais citados: api.resend.com, api.ipify.org, viacep.com.br, wa.me, api.mapbox.com, generativelanguage.googleapis.com, rest.lalamove.com, 01wapi.rte.com.br, api.a-ticket.com.br, api.loggi-flow.com, api.openai.com, api.openweathermap.org, api.pwnedpasswords.com, api.transportadora.com, bitrix24.com
+- hosts mais citados: api.resend.com, viacep.com.br, api.ipify.org, wa.me, generativelanguage.googleapis.com, rest.lalamove.com, s3.amazonaws.com, 01wapi.rte.com.br, api.a-ticket.com.br, api.loggi-flow.com, api.openai.com, api.openweathermap.org, api.pwnedpasswords.com, api.transportadora.com, basemaps.cartocdn.com
 - webhooks recebidos: carrier-webhook-receiver, evolution-whatsapp, health, health-check, lalamove-webhook, log-security-event, melhor-envio-api, nexus-webhook-receiver, predict-delays-scheduled, resend-email, rodonaves-webhook, webhook-status
 - env de integração (só nomes): ATICKET_API_KEY, BITRIX24_WEBHOOK_URL, EVOLUTION_API_KEY, EVOLUTION_API_URL, GOOGLE_API_KEY, INTERNAL_FN_SECRET, LALAMOVE_API_KEY, LALAMOVE_API_SECRET, MAPBOX_PUBLIC_TOKEN, MELHOR_ENVIO_TOKEN, NEXUS_WEBHOOK_SECRET, OPENAI_API_KEY, OPENWEATHER_API_KEY, RESEND_API_KEY, SECURITY_SLACK_WEBHOOK_URL, UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL, VITE_BITRIX24_WEBHOOK, VITE_GOOGLE_MAPS_API_KEY, VITE_MAPBOX_TOKEN, VITE_N8N_WEBHOOK_URL, VITE_SENTRY_DSN
 
@@ -260,7 +260,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - rotas_sem_arquivo: 0
 - componentes_ambiguos: 0
 - menu_sem_destino: 1 — ex.: Integrações -> /gestao-melhor-envio
-- edges_orfas: 4 — ex.: get-weather-data, ingest-biosync, lgpd-erase-user
+- edges_orfas: 5 — ex.: get-mapbox-token, get-weather-data, ingest-biosync
 - edges_chamadas_sem_pasta: 0
 - tabelas_sem_rls: 12 — ex.: audit_logs_y2026m01, audit_logs_y2026m02, audit_logs_y2026m03
 - tabelas_usadas_sem_definicao: 1 — ex.: integracoes_bitrix
@@ -271,25 +271,25 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - scripts_orfaos: 0
 - env_usadas_nao_declaradas: 4 — ex.: DEV, MODE, NODE_ENV
 - ciclos_de_import: 3
-- possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:74, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
+- possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8112 nós · 20502 arestas · 705 comunidades · grafo do commit `6e1ffcfb`
-- comunidades maiores: cn (289), badge.tsx (177), db-observability/index.ts (153), sonner (139), ref_node_path (138), Ocorrencias.tsx (131), client.ts (116), Envios.tsx (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Index.tsx (96), date-fns (95), react (88)
+- 8123 nós · 20522 arestas · 692 comunidades · grafo do commit `8530be96`
+- comunidades maiores: lucide-react (245), Envios.tsx (230), react (220), ref_node_path (131), Button (129), db-observability/index.ts (127), ui/index.ts (105), date-fns (104), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Index.tsx (100), cn (95), useAuth (94)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
-- package-lock.json (43)
-- package.json (42)
+- package-lock.json (44)
+- package.json (43)
+- index.html (10)
 - src/hooks/gamification/useGamification.ts (10)
-- index.html (9)
 - .github/workflows/contexto-ia.yml (6)
+- scripts/validate-csp.mjs (6)
 - .github/workflows/ci.yml (5)
 - .github/workflows/types-sync.yml (5)
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/audit-gate.mjs (5)
-- scripts/validate-csp.mjs (5)
 - src/components/gamification/GamificationPanel.tsx (5)
 - supabase/config.toml (5)
 - tests/security/integrations-access.spec.ts (5)
@@ -400,21 +400,21 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
-- 2026-11-17 `6e1ffcfb` fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)
-- 2026-11-17 `e1f6935d` fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)
-- 2026-11-17 `ba166365` chore(db): sincronizar artefatos com o banco [auto] (#177)
-- 2026-11-17 `214f0cd1` infra: adiciona workflow manual para aplicar migration no banco oficial (#176)
-- 2026-11-17 `5bfae77a` chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)
-- 2026-11-17 `4b5d4c92` chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)
-- 2026-11-17 `1000cd96` chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)
-- 2026-11-17 `cf7f3983` fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)
-- 2026-11-17 `221e61e0` fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)
-- 2026-11-17 `f61ccee4` chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)
-- 2026-11-17 `4c167602` fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)
-- 2026-11-17 `7931333c` chore(db): sincronizar artefatos com o banco [auto] (#166)
-- 2026-11-17 `0ead536e` chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)
-- 2026-11-17 `09c95458` fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)
-- 2026-11-17 `998f1683` fix: serve index.html em rota direta para a SPA nao dar 404 (#165)
+- 2026-11-17 `8530be9` feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)
+- 2026-11-17 `6e1ffcf` fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)
+- 2026-11-17 `e1f6935` fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)
+- 2026-11-17 `ba16636` chore(db): sincronizar artefatos com o banco [auto] (#177)
+- 2026-11-17 `214f0cd` infra: adiciona workflow manual para aplicar migration no banco oficial (#176)
+- 2026-11-17 `5bfae77` chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)
+- 2026-11-17 `4b5d4c9` chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)
+- 2026-11-17 `1000cd9` chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)
+- 2026-11-17 `cf7f398` fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)
+- 2026-11-17 `221e61e` fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)
+- 2026-11-17 `f61ccee` chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)
+- 2026-11-17 `4c16760` fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)
+- 2026-11-17 `7931333` chore(db): sincronizar artefatos com o banco [auto] (#166)
+- 2026-11-17 `0ead536` chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)
+- 2026-11-17 `09c9545` fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

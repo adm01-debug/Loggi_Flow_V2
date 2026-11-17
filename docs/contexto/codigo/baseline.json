@@ -2,138 +2,138 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "6e1ffcfb722c15a656b3685881f9de14e37b3e20",
+  "commit": "8530be9647a93f4718086e90f24c61072da84959",
   "branch": "main",
-  "data_commit": "2026-11-17T17:09:06-03:00",
+  "data_commit": "2026-11-17T18:16:06-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
    {
-    "sha": "6e1ffcfb",
+    "sha": "8530be9",
+    "data": "2026-11-17",
+    "assunto": "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)"
+   },
+   {
+    "sha": "6e1ffcf",
     "data": "2026-11-17",
     "assunto": "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)"
    },
    {
-    "sha": "e1f6935d",
+    "sha": "e1f6935",
     "data": "2026-11-17",
     "assunto": "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)"
    },
    {
-    "sha": "ba166365",
+    "sha": "ba16636",
     "data": "2026-11-17",
     "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#177)"
    },
    {
-    "sha": "214f0cd1",
+    "sha": "214f0cd",
     "data": "2026-11-17",
     "assunto": "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)"
    },
    {
-    "sha": "5bfae77a",
+    "sha": "5bfae77",
     "data": "2026-11-17",
     "assunto": "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)"
    },
    {
-    "sha": "4b5d4c92",
+    "sha": "4b5d4c9",
     "data": "2026-11-17",
     "assunto": "chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)"
    },
    {
-    "sha": "1000cd96",
+    "sha": "1000cd9",
     "data": "2026-11-17",
     "assunto": "chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)"
    },
    {
-    "sha": "cf7f3983",
+    "sha": "cf7f398",
     "data": "2026-11-17",
     "assunto": "fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)"
    },
    {
-    "sha": "221e61e0",
+    "sha": "221e61e",
     "data": "2026-11-17",
     "assunto": "fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)"
    },
    {
-    "sha": "f61ccee4",
+    "sha": "f61ccee",
     "data": "2026-11-17",
     "assunto": "chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)"
    },
    {
-    "sha": "4c167602",
+    "sha": "4c16760",
     "data": "2026-11-17",
     "assunto": "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)"
    },
    {
-    "sha": "7931333c",
+    "sha": "7931333",
     "data": "2026-11-17",
     "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#166)"
    },
    {
-    "sha": "0ead536e",
+    "sha": "0ead536",
     "data": "2026-11-17",
     "assunto": "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)"
    },
    {
-    "sha": "09c95458",
+    "sha": "09c9545",
     "data": "2026-11-17",
     "assunto": "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)"
    },
    {
-    "sha": "998f1683",
+    "sha": "998f168",
     "data": "2026-11-17",
     "assunto": "fix: serve index.html em rota direta para a SPA nao dar 404 (#165)"
    },
    {
-    "sha": "a6e18fc7",
+    "sha": "a6e18fc",
     "data": "2026-11-17",
     "assunto": "fix: painel de seguranca lia login_attempts por coluna inexistente (#164)"
    },
    {
-    "sha": "63c4b833",
+    "sha": "63c4b83",
     "data": "2026-11-17",
     "assunto": "﻿fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)"
    },
    {
-    "sha": "adb741b6",
+    "sha": "adb741b",
     "data": "2026-11-17",
     "assunto": "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)"
    },
    {
-    "sha": "8ea7b1f3",
+    "sha": "8ea7b1f",
     "data": "2026-11-17",
     "assunto": "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)"
    },
    {
-    "sha": "5b14adc0",
+    "sha": "5b14adc",
     "data": "2026-11-17",
     "assunto": "fix: previsao de frete deixa de ser numero inventado (#159)"
    },
    {
-    "sha": "f680a648",
+    "sha": "f680a64",
     "data": "2026-11-17",
     "assunto": "fix: alertas de divergencia e falha de frete sumiam da home (#158)"
    },
    {
-    "sha": "4496d9f3",
+    "sha": "4496d9f",
     "data": "2026-11-17",
     "assunto": "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)"
    },
    {
-    "sha": "8071e4a5",
+    "sha": "8071e4a",
     "data": "2026-11-17",
     "assunto": "docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)"
    },
    {
-    "sha": "7b46a982",
+    "sha": "7b46a98",
     "data": "2026-11-17",
     "assunto": "chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)"
-   },
-   {
-    "sha": "70f45b32",
-    "data": "2026-11-17",
-    "assunto": "test: conecta simulacao e fuzzing aos validadores reais (#153)"
    }
   ],
-  "arquivos_mudados_7d": 136,
+  "arquivos_mudados_7d": 144,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -152,6 +152,22 @@
     "mudancas": 5
    },
    {
+    "pasta": "package-lock.json",
+    "mudancas": 5
+   },
+   {
+    "pasta": "package.json",
+    "mudancas": 5
+   },
+   {
+    "pasta": "scripts/validate-csp.mjs",
+    "mudancas": 5
+   },
+   {
+    "pasta": "src/components/dashboard",
+    "mudancas": 5
+   },
+   {
     "pasta": "src/hooks/data",
     "mudancas": 5
    },
@@ -164,19 +180,7 @@
     "mudancas": 4
    },
    {
-    "pasta": "package-lock.json",
-    "mudancas": 4
-   },
-   {
-    "pasta": "package.json",
-    "mudancas": 4
-   },
-   {
     "pasta": "scripts/audit-gate.mjs",
-    "mudancas": 4
-   },
-   {
-    "pasta": "scripts/validate-csp.mjs",
     "mudancas": 4
    },
    {
@@ -184,37 +188,37 @@
     "mudancas": 4
    },
    {
-    "pasta": "src/components/dashboard",
+    "pasta": "src/components/map",
     "mudancas": 4
    },
    {
     "pasta": ".github/workflows/codeql.yml",
-    "mudancas": 3
-   },
-   {
-    "pasta": ".gitignore",
     "mudancas": 3
    }
   ],
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 43
+    "mudancas": 44
    },
    {
     "arquivo": "package.json",
-    "mudancas": 42
+    "mudancas": 43
+   },
+   {
+    "arquivo": "index.html",
+    "mudancas": 10
    },
    {
     "arquivo": "src/hooks/gamification/useGamification.ts",
     "mudancas": 10
    },
    {
-    "arquivo": "index.html",
-    "mudancas": 9
+    "arquivo": ".github/workflows/contexto-ia.yml",
+    "mudancas": 6
    },
    {
-    "arquivo": ".github/workflows/contexto-ia.yml",
+    "arquivo": "scripts/validate-csp.mjs",
     "mudancas": 6
    },
    {
@@ -231,10 +235,6 @@
    },
    {
     "arquivo": "scripts/audit-gate.mjs",
-    "mudancas": 5
-   },
-   {
-    "arquivo": "scripts/validate-csp.mjs",
     "mudancas": 5
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 119
+    "commits": 120
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1300,
-  "arquivos_codigo": 875,
-  "linhas_codigo": 167140,
+  "arquivos_total": 1301,
+  "arquivos_codigo": 876,
+  "linhas_codigo": 167224,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -452,7 +452,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48530
+   "linhas": 48475
   },
   "src/features": {
    "arquivos": 90,
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19098
+   "linhas": 19097
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -471,8 +471,8 @@
    "linhas": 6706
   },
   "src/lib": {
-   "arquivos": 51,
-   "linhas": 6576
+   "arquivos": 52,
+   "linhas": 6638
   },
   "src/main.tsx": {
    "arquivos": 1,
@@ -480,7 +480,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30695
+   "linhas": 30694
   },
   "src/services": {
    "arquivos": 5,
@@ -496,7 +496,7 @@
   },
   "supabase/functions": {
    "arquivos": 110,
-   "linhas": 12196
+   "linhas": 12275
   },
   "tailwind.config.ts": {
    "arquivos": 1,
@@ -573,12 +573,12 @@
    "linhas": 1170
   },
   {
-   "arquivo": "src/components/dashboard/LogisticsMapWidget.tsx",
-   "linhas": 1129
-  },
-  {
    "arquivo": "src/pages/Clientes.tsx",
    "linhas": 1102
+  },
+  {
+   "arquivo": "src/components/dashboard/LogisticsMapWidget.tsx",
+   "linhas": 1089
   },
   {
    "arquivo": "src/pages/ConfiguracoesFrete.tsx",
@@ -670,6 +670,7 @@
    "Integrações -> /gestao-melhor-envio"
   ],
   "edges_orfas": [
+   "get-mapbox-token",
    "get-weather-data",
    "ingest-biosync",
    "lgpd-erase-user",
@@ -724,7 +725,6 @@
   ],
   "ciclos_de_import": 3,
   "possiveis_segredos_no_codigo": [
-   "src/components/dashboard/LogisticsMapWidget.tsx:74",
    "tests/security/integrations-access.spec.ts:12",
    "tests/security/rls-access.spec.ts:13"
   ]

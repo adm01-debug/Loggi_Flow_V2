@@ -4215,13 +4215,13 @@
    "hooks_exportados": [
     "useIntegrationValidation"
    ],
-   "linhas": 205,
+   "linhas": 204,
    "dominio": "hooks/security",
    "tabelas": [],
    "rpcs": [],
    "edges": [
     "bitrix24-integration",
-    "get-mapbox-token",
+    "geocode-address",
     "lalamove-tracking",
     "melhor-envio-api",
     "rodonaves-api"

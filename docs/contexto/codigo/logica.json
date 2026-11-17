@@ -1,10 +1,10 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 48,
+ "total": 49,
  "por_camada": {
   "integrations": 4,
-  "lib": 30,
+  "lib": 31,
   "python": 3,
   "services": 5,
   "utils": 6
@@ -314,7 +314,7 @@
    "zod_schemas": 0,
    "flags": [],
    "papeis": [],
-   "usado_por": 205,
+   "usado_por": 204,
    "usado_por_modulos": [
     "components/admin",
     "components/analytics",
@@ -748,6 +748,38 @@
     "hooks/logistics"
    ],
    "coberto_por_testes": 1,
+   "orfao": false
+  },
+  {
+   "arquivo": "src/lib/mapStyles.ts",
+   "camada": "lib",
+   "exports": [
+    "MAP_STYLE_DARK",
+    "MAP_STYLE_LIGHT",
+    "MAP_STYLE_SATELLITE",
+    "TERRAIN_SOURCE",
+    "TERRAIN_SOURCE_ID",
+    "resolveMapStyle"
+   ],
+   "export_default": null,
+   "linhas": 62,
+   "tabelas": [],
+   "rpcs": [],
+   "edges": [],
+   "env": [],
+   "externos": [
+    "maplibre-gl"
+   ],
+   "zod_schemas": 0,
+   "flags": [],
+   "papeis": [],
+   "usado_por": 3,
+   "usado_por_modulos": [
+    "components/dashboard",
+    "components/map",
+    "pages"
+   ],
+   "coberto_por_testes": 0,
    "orfao": false
   },
   {
