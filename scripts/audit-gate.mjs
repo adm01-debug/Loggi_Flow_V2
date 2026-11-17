@@ -88,6 +88,13 @@ const isCovered = (vuln) => {
   return roots.length > 0 && roots.every((r) => ALLOWLIST.has(r));
 };
 
+// Quais entradas da allowlist justificam esta vulnerabilidade (direta ou transitiva).
+const coveringRoots = (vuln) => {
+  const roots = [...rootsOf(vuln)].filter((r) => ALLOWLIST.has(r));
+  if (ALLOWLIST.has(vuln.name)) roots.push(vuln.name);
+  return roots;
+};
+
 const offenders = Object.values(report.vulnerabilities).filter(
   (v) => ["critical", "high"].includes(v.severity) && !isCovered(v),
 );
@@ -100,7 +107,7 @@ if (offenders.length > 0) {
 const ignored = Object.values(report.vulnerabilities).filter(
   (v) => ["critical", "high"].includes(v.severity) && isCovered(v),
 );
-const activeRoots = new Set(ignored.flatMap((v) => [...rootsOf(v)]).filter((r) => ALLOWLIST.has(r)));
+const activeRoots = new Set(ignored.flatMap((v) => coveringRoots(v)));
 console.log(
   `✅ Sem critical/high fora da allowlist${activeRoots.size ? ` (allowlist ativa: ${[...activeRoots].join(", ")})` : ""}`,
 );

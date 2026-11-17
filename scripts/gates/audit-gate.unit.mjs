@@ -85,7 +85,35 @@ test('avisa quando uma entrada da allowlist não tem mais vulnerabilidade', () =
 });
 
 test('sem aviso de allowlist quando todas as entradas ainda cobrem algo', () => {
-  const r = audit(relatorio(vuln('xlsx', 'high'), vuln('vite', 'high')), 1);
+  const r = audit(relatorio(vuln('xlsx', 'high'), vuln('vite', 'high'), vuln('picomatch', 'high')), 1);
   assert.equal(r.status, 0, r.saida);
   assert.equal(r.stderr, '');
 });
+
+// Advisory que atinge dezenas de pacotes transitivamente (caso picomatch
+// GHSA-fc5q-39xc-vjpf): allowlistar so o nome direto deixava o gate vermelho.
+const advisory = (name, severity) => ({ name, severity, title: `falha em ${name}`, url: 'https://exemplo', range: '*' });
+
+passa(
+  'high so por dependencia transitiva de pacote da allowlist',
+  relatorio(
+    vuln('picomatch', 'high', { via: [advisory('picomatch', 'high')] }),
+    vuln('chokidar', 'high', { via: ['picomatch'] }),
+    vuln('vitest', 'high', { via: ['chokidar'] }),
+    vuln('xlsx', 'high', { via: [advisory('xlsx', 'high')] }),
+    vuln('vite', 'high', { via: [advisory('vite', 'high')] }),
+  ),
+  1,
+  /allowlist ativa: .*picomatch/,
+);
+
+falha(
+  'transitivo com uma raiz fora da allowlist continua bloqueando',
+  relatorio(
+    vuln('picomatch', 'high', { via: [advisory('picomatch', 'high')] }),
+    vuln('foo', 'high', { via: [advisory('foo', 'high')] }),
+    vuln('chokidar', 'high', { via: ['picomatch', 'foo'] }),
+  ),
+  1,
+  /- chokidar \(high\)/,
+);
