@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-nested-functions */
 import { useState, useCallback, createContext, useContext, ReactNode } from "react";
 import { playCelebrationSound } from "@/utils/celebrationSounds";
 

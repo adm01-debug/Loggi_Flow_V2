@@ -1,4 +1,4 @@
-/* eslint-disable max-lines, sonarjs/no-nested-functions */
+/* eslint-disable max-lines */
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";

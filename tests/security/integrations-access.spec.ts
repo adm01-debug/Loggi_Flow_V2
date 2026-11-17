@@ -33,8 +33,8 @@ beforeAll(async () => {
 });
 
 describe('Integração: freight_webhooks — RLS', () => {
-  it('SELECT anônimo é vazio (secret_key protegido)', async () => {
-    if (!online) return;
+  it('SELECT anônimo é vazio (secret_key protegido)', async (ctx) => {
+    if (!online) ctx.skip();
     const r = await fetch(`${SUPABASE_URL}/rest/v1/freight_webhooks?select=id,secret_key&limit=1`, {
       headers: restHeaders,
     });
@@ -47,8 +47,8 @@ describe('Integração: freight_webhooks — RLS', () => {
     }
   });
 
-  it('INSERT anônimo é rejeitado', async () => {
-    if (!online) return;
+  it('INSERT anônimo é rejeitado', async (ctx) => {
+    if (!online) ctx.skip();
     const r = await fetch(`${SUPABASE_URL}/rest/v1/freight_webhooks`, {
       method: 'POST',
       headers: restHeaders,
@@ -60,8 +60,8 @@ describe('Integração: freight_webhooks — RLS', () => {
 });
 
 describe('Integração: bitrix_sync_config — RLS', () => {
-  it('SELECT anônimo não vaza webhook_url', async () => {
-    if (!online) return;
+  it('SELECT anônimo não vaza webhook_url', async (ctx) => {
+    if (!online) ctx.skip();
     const r = await fetch(`${SUPABASE_URL}/rest/v1/bitrix_sync_config?select=*&limit=1`, {
       headers: restHeaders,
     });
@@ -73,8 +73,8 @@ describe('Integração: bitrix_sync_config — RLS', () => {
     }
   });
 
-  it('UPDATE anônimo é rejeitado', async () => {
-    if (!online) return;
+  it('UPDATE anônimo é rejeitado', async (ctx) => {
+    if (!online) ctx.skip();
     const r = await fetch(
       `${SUPABASE_URL}/rest/v1/bitrix_sync_config?id=eq.00000000-0000-0000-0000-000000000000`,
       {
@@ -102,8 +102,8 @@ describe('Integração: chamadas simuladas de webhook público', () => {
 
   for (const fn of endpoints) {
     // timeout alto: Edge Functions têm cold-start de ~5-8s em runners CI
-    it(`${fn} rejeita payload inválido sem 5xx`, { timeout: 15000 }, async () => {
-      if (!online) return;
+    it(`${fn} rejeita payload inválido sem 5xx`, { timeout: 15000 }, async (ctx) => {
+      if (!online) ctx.skip();
       const r = await fetch(`${SUPABASE_URL}/functions/v1/${fn}`, {
         method: 'POST',
         headers: {

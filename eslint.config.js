@@ -73,7 +73,7 @@ export default tseslint.config(
       "sonarjs/pseudo-random": "off",
       "sonarjs/constructor-for-side-effects": "warn",
       "sonarjs/prefer-single-boolean-return": "warn",
-      "sonarjs/slow-regex": "warn",
+      "sonarjs/super-linear-regex": "warn",
       "sonarjs/no-ignored-exceptions": "warn",
       "sonarjs/no-useless-catch": "warn",
       "no-useless-catch": "warn",
@@ -95,6 +95,15 @@ export default tseslint.config(
     files: ["src/components/ui/**"],
     rules: {
       "react-refresh/only-export-components": "off",
+    },
+  },
+  {
+    // Arquivos de teste: comparar float exato e passar protocolo inseguro sao o
+    // proprio objeto do teste (parsing deterministico e entrada rejeitada).
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+    rules: {
+      "sonarjs/no-floating-point-equality": "off",
+      "sonarjs/no-clear-text-protocols": "off",
     },
   },
 );

@@ -67,8 +67,8 @@ const SENSITIVE = [
 
 describe('RLS · leitura anônima bloqueada em tabelas sensíveis', () => {
   for (const table of SENSITIVE) {
-    it(`SELECT em ${table} retorna [] ou 401/403`, async () => {
-      if (!online) return;
+    it(`SELECT em ${table} retorna [] ou 401/403`, async (ctx) => {
+      if (!online) ctx.skip();
       const { status, json } = await readTable(table);
       const denied = status === 401 || status === 403 || (Array.isArray(json) && json.length === 0);
       expect(denied).toBe(true);
@@ -78,8 +78,8 @@ describe('RLS · leitura anônima bloqueada em tabelas sensíveis', () => {
 
 describe('RLS · escrita anônima bloqueada em tabelas sensíveis', () => {
   for (const table of ['bitrix_sync_config', 'freight_webhooks', 'delivery_receipt_audit'] as const) {
-    it(`INSERT em ${table} é rejeitado`, async () => {
-      if (!online) return;
+    it(`INSERT em ${table} é rejeitado`, async (ctx) => {
+      if (!online) ctx.skip();
       const { status } = await insertRow(table, { dummy: 'x' });
       // Esperado: 401/403 (RLS/permission) ou 400 (schema) — nunca 201
       expect(status).not.toBe(201);
@@ -89,8 +89,8 @@ describe('RLS · escrita anônima bloqueada em tabelas sensíveis', () => {
 });
 
 describe('RLS · endpoint público continua acessível', () => {
-  it('RPC get_public_tracking não devolve permission denied', async () => {
-    if (!online) return;
+  it('RPC get_public_tracking não devolve permission denied', async (ctx) => {
+    if (!online) ctx.skip();
     const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_public_tracking`, {
       method: 'POST',
       headers,

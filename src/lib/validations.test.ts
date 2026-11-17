@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { isValidEmail } from "./validations";
 
 /** Regex anterior, mantida so para provar equivalencia de comportamento. */
-// eslint-disable-next-line sonarjs/slow-regex -- e exatamente o defeito sob teste
+// eslint-disable-next-line sonarjs/super-linear-regex -- e exatamente o defeito sob teste
 const REGEX_ANTIGA = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 describe("isValidEmail", () => {
