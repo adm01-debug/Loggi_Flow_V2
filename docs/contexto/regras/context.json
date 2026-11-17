@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "63c4b8335bd11ccb711556d4a7685b634037d21a",
+  "sha": "a6e18fc73757fe4b008d39f065918e4ac4843579",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 14:43 UTC",
+  "generated_at": "2026-11-17 15:15 UTC",
   "files_total": 1305,
   "code_files": 1132,
-  "code_lines": 182712,
+  "code_lines": 182714,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "1654d04d9c598459",
+ "facts_hash": "12ee333890e79ef8",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29260,7 +29260,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48527,
+   "lines": 48529,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -32114,10 +32114,10 @@
    ],
    "login_attempts": [
     "created_at",
+    "email",
     "id",
     "ip_address",
-    "success",
-    "user_id"
+    "success"
    ],
    "logistica_reversa": [
     "id"
@@ -33591,10 +33591,6 @@
    {
     "table": "transportadoras",
     "column": "score_pontualidade"
-   },
-   {
-    "table": "login_attempts",
-    "column": "user_id"
    },
    {
     "table": "fretes_internos",
@@ -64710,11 +64706,6 @@
    },
    {
     "kind": "coluna",
-    "msg": "coluna `user_id` usada no código não existe no schema de `login_attempts`",
-    "where": []
-   },
-   {
-    "kind": "coluna",
     "msg": "coluna `deleted_at` usada no código não existe no schema de `fretes_internos`",
     "where": []
    },
@@ -72203,7 +72194,7 @@
   },
   "src/components/security/SecurityOverviewPanel.tsx": {
    "path": "src/components/security/SecurityOverviewPanel.tsx",
-   "lines": 155,
+   "lines": 157,
    "exports": [
     "function SecurityOverviewPanel"
    ],
@@ -72238,7 +72229,7 @@
     ],
     "login_attempts": [
      "created_at",
-     "user_id"
+     "email"
     ],
     "security_events": [
      "created_at",
@@ -88663,10 +88654,19 @@
   }
  },
  "git": {
-  "sha": "63c4b8335bd11ccb711556d4a7685b634037d21a",
+  "sha": "a6e18fc73757fe4b008d39f065918e4ac4843579",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "a6e18fc",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "fix: painel de seguranca lia login_attempts por coluna inexistente (#164)",
+    "files": [
+     "src/components/security/SecurityOverviewPanel.tsx"
+    ]
+   },
    {
     "sha": "63c4b83",
     "date": "2026-11-17",
@@ -88984,15 +88984,6 @@
     "files": [
      "docs/agentes/github-ci.md"
     ]
-   },
-   {
-    "sha": "0425910",
-    "date": "2026-11-11",
-    "author": "adm01-debug",
-    "subject": "chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)",
-    "files": [
-     "scripts/ops/pos_deploy_functions.sql"
-    ]
    }
   ],
   "hot_files": [
@@ -89013,16 +89004,16 @@
     2
    ],
    [
-    "scripts/ops/pos_deploy_functions.sql",
-    2
-   ],
-   [
     ".github/workflows/codeql.yml",
     2
    ],
    [
     ".github/workflows/types-sync.yml",
     2
+   ],
+   [
+    "src/components/security/SecurityOverviewPanel.tsx",
+    1
    ],
    [
     "src/components/ai/AIAssistant.tsx",

@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `63c4b8335bd11ccb711556d4a7685b634037d21a` (2026-11-17T11:43:15-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `a6e18fc73757fe4b008d39f065918e4ac4843579` (2026-11-17T12:14:38-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1295 |
 | arquivos_codigo | 874 |
-| linhas_codigo | 166945 |
+| linhas_codigo | 166947 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 3 — ex.: src/components/dashboard/LogisticsMapWidget.tsx:74, tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8089 nós · 20459 arestas · 690 comunidades · grafo do commit `63c4b833`
+- 8089 nós · 20459 arestas · 690 comunidades · grafo do commit `a6e18fc7`
 - comunidades maiores: Envios.tsx (179), ref_node_path (155), dialog.tsx (116), client.ts (111), react (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), button.tsx (103), db-observability/index.ts (103), card.tsx (102), input.tsx (94), badge.tsx (90), celebrationSounds.ts (90)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -399,6 +399,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-17 `a6e18fc7` fix: painel de seguranca lia login_attempts por coluna inexistente (#164)
 - 2026-11-17 `63c4b833` ﻿fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)
 - 2026-11-17 `adb741b6` chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)
 - 2026-11-17 `8ea7b1f3` fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)
@@ -413,7 +414,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-14 `fef7780f` docs: fecha causa raiz de Data Integrity e atualiza fechamento (fee186d3)
 - 2026-11-14 `fee186d3` docs: prod-readiness — registra Data Integrity BLOQUEADO e status reais (#151)
 - 2026-11-13 `a49bf31e` docs: fecha prod-readiness com inventario e evidencia (#147)
-- 2026-11-13 `db887499` docs: registra quirk do cache do GET /secrets da Management API (RESEND_API_KEY) (#146)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

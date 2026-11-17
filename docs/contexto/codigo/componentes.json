@@ -3103,7 +3103,7 @@
     "SecurityOverviewPanel"
    ],
    "export_default": null,
-   "linhas": 155,
+   "linhas": 157,
    "dominio": "components/security",
    "hooks_locais": [
     "useAuth"

@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "63c4b8335bd11ccb711556d4a7685b634037d21a",
+  "commit": "a6e18fc73757fe4b008d39f065918e4ac4843579",
   "branch": "main",
-  "data_commit": "2026-11-17T11:43:15-03:00",
+  "data_commit": "2026-11-17T12:14:38-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "a6e18fc7",
+    "data": "2026-11-17",
+    "assunto": "fix: painel de seguranca lia login_attempts por coluna inexistente (#164)"
+   },
    {
     "sha": "63c4b833",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "3d4fd588",
     "data": "2026-11-12",
     "assunto": "chore(deps): bump peter-evans/create-pull-request from 8.1.1 to 8.1.2 (#125)"
-   },
-   {
-    "sha": "02901100",
-    "data": "2026-11-12",
-    "assunto": "chore(deps): bump github/codeql-action/analyze from 4.39.1 to 4.39.3 (#124)"
    }
   ],
-  "arquivos_mudados_7d": 93,
+  "arquivos_mudados_7d": 94,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 105
+    "commits": 106
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1295,
   "arquivos_codigo": 874,
-  "linhas_codigo": 166945,
+  "linhas_codigo": 166947,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -452,7 +452,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48527
+   "linhas": 48529
   },
   "src/features": {
    "arquivos": 90,

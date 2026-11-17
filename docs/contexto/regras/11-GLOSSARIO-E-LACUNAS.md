@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `63c4b8335b` · branch `main` · 2026-11-17 14:43 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a6e18fc737` · branch `main` · 2026-11-17 15:15 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -293,7 +293,6 @@
 | coluna | coluna `status` usada no código não existe no schema de `ocorrencias` |  |
 | coluna | coluna `score_frete` usada no código não existe no schema de `transportadoras` |  |
 | coluna | coluna `score_pontualidade` usada no código não existe no schema de `transportadoras` |  |
-| coluna | coluna `user_id` usada no código não existe no schema de `login_attempts` |  |
 | coluna | coluna `deleted_at` usada no código não existe no schema de `fretes_internos` |  |
 | rls | `geo_blocking_rules`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | rls | `geo_blocking_settings`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
