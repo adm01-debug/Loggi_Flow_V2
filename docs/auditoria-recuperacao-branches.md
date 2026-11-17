@@ -148,3 +148,50 @@ nao upgrade:
 
 Restaram so `main`, `contexto` (orfa, regerada pela automacao) e `master` (gatilho de
 `ci-nexus.yml` e `security.yml`).
+
+## Fase 2 - trabalho inacabado dentro da `main`
+
+A fase 1 cobriu "nao perder trabalho de branch". Faltava a outra metade do pedido:
+**terminar o que outro agente comecou** - inclusive o que ja esta mergeado na `main` pela metade.
+
+Varredura no commit `8071e4a5`:
+
+```
+git grep -nI -E "TODO|FIXME|WIP|XXX|HACK|@ts-ignore|placeholder-|mock" -- src supabase/functions
+```
+
+A maioria dos resultados e mock legitimo de teste (`*.test.ts`, `*.spec.ts`, `setup.ts`) ou a palavra
+`TODOS` em portugues. Sobraram 3 candidatos em codigo de producao:
+
+| Arquivo                                                          | Veredito                                                                                                                                                                                      |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/components/dashboard/MissionDetail.tsx:70` (`mockTimeline`) | **Falso positivo.** Apesar do nome, deriva de dados reais (`shipment.events[0].timestamp`, `previsao`, `dataEfetiva`, `status`). Nome ruim, comportamento correto - nao mexido (diff minimo). |
+| `src/components/analytics/AnalyticsCharts.tsx:26`                | **Aceitavel.** O fallback usa zeros (`entregas: 0, slaAtingido: 0`); nao inventa numero.                                                                                                      |
+| `src/components/map/MapIntelligenceOverlay.tsx`                  | **Trabalho parcial real - terminado nesta fase.**                                                                                                                                             |
+
+### `MapIntelligenceOverlay` - telemetria inventada apresentada como real
+
+O painel era renderizado **sempre** sobre o mapa real (`LogisticsMapWidget.tsx:1078`) e exibia
+valores fixos no codigo: `Grid_Efficiency 98.4%`, latencia `12ms`, `mockSystemLoad` com array
+constante, `Atencao em Rota B-12 / 04:12m`, `Bio_Sync ACTIVE`, `DEEP_ENCRYPTION_ON`,
+`SLA_Integrity PROTECTED_MODE / OK`. Nada vinha do banco.
+
+Decisao: **ligar a dados reais em vez de remover** (remover seria perda de funcionalidade).
+
+Criado `src/hooks/logistics/useMapIntelligence.ts`, que le `entregas` dos ultimos 30 dias
+(`deleted_at is null`) e calcula:
+
+| Campo exibido antes                     | Passa a mostrar                                                                                       |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `Grid_Efficiency 98.4%`                 | `SLA_30d` = % de finalizadas (`entregue`/`finalizado`) com `data_entrega_efetiva <= previsao_entrega` |
+| `mockSystemLoad` (sparkline fixa)       | 10 buckets diarios reais de `created_at`                                                              |
+| `Latencia 12ms`                         | latencia real da consulta ao Supabase (`performance.now()`)                                           |
+| `Bio_Sync ACTIVE`                       | `Em rota: N` (`despachado`/`em_transito`/`saiu_entrega`)                                              |
+| `Atencao em Rota B-12 / 04:12m`         | entrega em rota com maior atraso, ou "Nenhuma rota em atraso"                                         |
+| `Security_Integrity DEEP_ENCRYPTION_ON` | `Ocorrencias abertas: N`                                                                              |
+| `SLA_Integrity PROTECTED_MODE / OK`     | `OK` >=95, `ATENCAO` >=85, `CRITICO` abaixo, `SEM_BASE` sem dados                                     |
+
+Sem base de calculo o painel mostra `--` / `SEM_BASE` - preferivel a um numero falso.
+O visual (classes, animacoes, icones) foi preservado integralmente.
+
+Validacao: `tsc --noEmit` exit 0 - `eslint` 0 erros e 0 warnings - `vitest run` 259/259 em 30 arquivos.
