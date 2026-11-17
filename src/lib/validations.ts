@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/slow-regex */
 import { z } from "zod";
 
 // Validadores comuns
@@ -205,7 +204,15 @@ export function formatCEP(value: string): string {
 // Helper para validar email
 export function isValidEmail(email: string): boolean {
   if (!email || email.trim() === '') return true; // empty is ok (optional)
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  // Varredura linear: a regex anterior (/^[^\s@]+@[^\s@]+\.[^\s@]+$/) tinha
+  // backtracking super-linear e podia travar a UI com texto longo.
+  const valor = email.trim();
+  if (/\s/.test(valor)) return false;
+  const arroba = valor.indexOf('@');
+  if (arroba <= 0 || arroba !== valor.lastIndexOf('@')) return false;
+  const dominio = valor.slice(arroba + 1);
+  const ponto = dominio.indexOf('.');
+  return ponto > 0 && ponto < dominio.length - 1;
 }
 
 // Helper para validar telefone
