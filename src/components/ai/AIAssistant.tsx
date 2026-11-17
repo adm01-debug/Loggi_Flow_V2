@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { sanitizarUrlSupabase } from "@/lib/supabaseEnv";
 import { Bot, Send, Trash2, Sparkles, AlertCircle, TrendingUp, Zap, MessageSquare, PanelRightClose, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +16,7 @@ interface Message {
   content: string;
 }
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-logistics-assistant`;
+const CHAT_URL = `${sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? ""}/functions/v1/ai-logistics-assistant`;
 
 export function AIAssistant() {
   const { user } = useAuth();

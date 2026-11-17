@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { sanitizarUrlSupabase } from "@/lib/supabaseEnv";
 import { MainLayout } from "@/components/layout/MainLayout";
 import {
   Card,
@@ -866,7 +867,7 @@ export default function FreightConfig() {
                             className="h-6 px-2 text-[8px] uppercase font-black"
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nexus-webhook-receiver`,
+                                `${sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? ""}/functions/v1/nexus-webhook-receiver`,
                               );
                               toast.success("URL do Nexus Receiver Copiada");
                             }}
