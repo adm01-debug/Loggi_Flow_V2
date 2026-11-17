@@ -304,6 +304,7 @@
         "audit_logs.record_id": "39c66b4057962691166304f428d0a1a2",
         "audit_logs.user_name": "2a2cfca688ff6a504270d0e8ae144de8",
         "coletas.nf_anexo_url": "2a2cfca688ff6a504270d0e8ae144de8",
+        "coletas.peso_efetivo": "bcda9cb55f721e01d67f8d691d32093d",
         "coletas.qtd_recebida": "440d47639197fb240f5ed049e6c5f155",
         "comments.entity_type": "39c66b4057962691166304f428d0a1a2",
         "cotacoes_frete.valor": "c68c893f2e3b518003e5ec2360c647be",
@@ -3531,7 +3532,7 @@
         "e:public.frete_interno_status|PUBLIC|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "e:public.frete_interno_status|postgres|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327"
     },
-    "generated_at": "2026-11-17T15:22:54Z",
+    "generated_at": "2026-11-17T19:15:51Z",
     "column_grants": {
     },
     "schema_grants": {

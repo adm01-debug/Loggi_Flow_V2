@@ -520,6 +520,7 @@
         "coletas.is_urgent:boolean:nullable",
         "coletas.custo_estimado:numeric(10,2):nullable",
         "coletas.custo_real:numeric(10,2):nullable",
+        "coletas.peso_efetivo:numeric:nullable",
         "comments.id:uuid:not-null",
         "comments.content:text:not-null",
         "comments.entity_type:text:not-null",
@@ -1659,7 +1660,7 @@
         "validate_payload_schema",
         "xp_for_level"
     ],
-    "generated_at": "2026-11-12",
+    "generated_at": "2026-11-17",
     "format_version": 2,
     "check_constraints": [
         "achievements.achievements_rarity_check:CHECK ((rarity = ANY (ARRAY['common'::text, 'rare'::text, 'epic'::text, 'legendary'::text])))",
