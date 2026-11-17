@@ -48,6 +48,7 @@ export function SecurityOverviewPanel() {
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const currentUserId = user.id;
+      const emailUsuario = user.email ?? '';
 
       // Tabelas security ainda não geradas nos tipos; usa cast único para a fluent API do supabase.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +57,8 @@ export function SecurityOverviewPanel() {
 
       const sessionsResult = await sb.from('user_sessions').select('*', { count: 'exact' }).eq('user_id', currentUserId);
       const devicesResult = await sb.from('known_devices').select('*', { count: 'exact' }).eq('user_id', currentUserId);
-      const loginAttemptsResult = await sb.from('login_attempts').select('*').eq('user_id', currentUserId).gte('created_at', last7d.toISOString());
+      // login_attempts registra a tentativa por e-mail (nao ha coluna user_id: o login pode falhar antes de existir sessao).
+      const loginAttemptsResult = await sb.from('login_attempts').select('*').eq('email', emailUsuario).gte('created_at', last7d.toISOString());
       const securityEventsResult = await sb.from('security_events').select('*').eq('user_id', currentUserId).gte('created_at', today.toISOString());
       const blockedIPsResult = await sb.from('rate_limit_logs').select('*', { count: 'exact' }).eq('user_id', currentUserId).eq('blocked', true).gte('created_at', last24h.toISOString());
 
@@ -96,7 +98,7 @@ export function SecurityOverviewPanel() {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, user?.email]);
 
   useEffect(() => {
     if (user?.id) fetchSecurityStats();
