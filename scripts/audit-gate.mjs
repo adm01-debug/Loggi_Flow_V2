@@ -9,7 +9,11 @@ import { execSync } from "node:child_process";
 // vite 5.4.x: CVEs exclusivas do DEV SERVER (path traversal em .map, fs.deny no
 // Windows, launch-editor NTLM) — não afetam o bundle de produção; fix exige o
 // major vite 8 (upgrade dedicado com validação de plugin-pwa/swc/Lovable).
-const ALLOWLIST = new Set(["xlsx", "vite"]);
+// picomatch: GHSA-fc5q-39xc-vjpf (ReDoS em extglob) cobre <=4.0.7 e 4.0.7 é a
+// última publicada — não há fix instalável. Atinge só o grafo de build/teste
+// (vite, vitest, tailwind, lint-staged, workbox) com padrões do próprio repo,
+// nunca entrada de usuário. Remover assim que sair 4.0.8.
+const ALLOWLIST = new Set(["xlsx", "vite", "picomatch"]);
 
 // Registry pendurado não pode segurar o job até o timeout do runner (6h).
 const AUDIT_TIMEOUT_MS = Number(process.env.AUDIT_TIMEOUT_MS) || 5 * 60 * 1000;
@@ -53,8 +57,39 @@ if (!isPlainObject(report) || !isPlainObject(report.vulnerabilities)) {
   process.exit(1);
 }
 
+// Um pacote só aparece no audit porque algum advisory o alcança. Allowlistar
+// apenas o nome direto não bastava: o advisory de picomatch marcou 31 pacotes
+// que só o carregam transitivamente. Resolve-se a cadeia `via` até os pacotes
+// que de fato têm advisory; se todos estiverem na allowlist, a entrada é
+// coberta. Qualquer raiz nova fora da allowlist volta a derrubar o gate.
+const rootsOf = (vuln) => {
+  const roots = new Set();
+  const seen = new Set();
+  const stack = [vuln];
+  while (stack.length > 0) {
+    const cur = stack.pop();
+    if (!cur || seen.has(cur.name)) continue;
+    seen.add(cur.name);
+    for (const via of cur.via ?? []) {
+      if (typeof via === "string") {
+        const parent = report.vulnerabilities[via];
+        if (parent) stack.push(parent);
+      } else if (via?.name && ["critical", "high"].includes(via.severity)) {
+        roots.add(via.name);
+      }
+    }
+  }
+  return roots;
+};
+
+const isCovered = (vuln) => {
+  if (ALLOWLIST.has(vuln.name)) return true;
+  const roots = [...rootsOf(vuln)];
+  return roots.length > 0 && roots.every((r) => ALLOWLIST.has(r));
+};
+
 const offenders = Object.values(report.vulnerabilities).filter(
-  (v) => ["critical", "high"].includes(v.severity) && !ALLOWLIST.has(v.name),
+  (v) => ["critical", "high"].includes(v.severity) && !isCovered(v),
 );
 
 if (offenders.length > 0) {
@@ -63,13 +98,14 @@ if (offenders.length > 0) {
   process.exit(1);
 }
 const ignored = Object.values(report.vulnerabilities).filter(
-  (v) => ["critical", "high"].includes(v.severity) && ALLOWLIST.has(v.name),
+  (v) => ["critical", "high"].includes(v.severity) && isCovered(v),
 );
+const activeRoots = new Set(ignored.flatMap((v) => [...rootsOf(v)]).filter((r) => ALLOWLIST.has(r)));
 console.log(
-  `✅ Sem critical/high fora da allowlist${ignored.length ? ` (allowlist ativa: ${[...new Set(ignored.map((v) => v.name))].join(", ")})` : ""}`,
+  `✅ Sem critical/high fora da allowlist${activeRoots.size ? ` (allowlist ativa: ${[...activeRoots].join(", ")})` : ""}`,
 );
 // Entrada que não cobre mais nada é só risco: a próxima vulnerabilidade do pacote passaria calada.
-const stale = [...ALLOWLIST].filter((name) => !ignored.some((v) => v.name === name));
+const stale = [...ALLOWLIST].filter((name) => !activeRoots.has(name));
 if (stale.length > 0) {
   console.error(`⚠️  Allowlist sem efeito para: ${stale.join(", ")} — remova a entrada em scripts/audit-gate.mjs.`);
 }
