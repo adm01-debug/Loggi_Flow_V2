@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8ea7b1f396` · branch `main` · 2026-11-17 14:27 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `adb741b662` · branch `main` · 2026-11-17 14:38 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1329,6 +1329,10 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
   ```
   if (!previsao || ["entregue", "finalizado", "cancelado"].includes(status)) return 0; const diff = Math.ceil( (Date.now() - new Date(previsao).getTime()) / (1000 * 60 * 60 * 24), ); return Math.max(0, diff);
   ```
+- **numeroValido(bruto: string | undefined, min: number, max: number)** — `src/lib/centroDistribuicao.ts`
+  ```
+  if (bruto === undefined || bruto === null) return null; const texto = String(bruto).trim(); if (texto === "") return null; const valor = Number(texto); if (!Number.isFinite(valor)) return null; if (valor < min || valor > max) return null; return valor;
+  ```
 - **generateCSVTemplate(columns: { key: string; label: string; example?: string }[],)** — `src/lib/csvImporter.ts`
   ```
   const headers = columns.map((c) => c.label).join(","); const examples = columns.map((c) => c.example || "").join(","); return `${headers}\n${examples}`;
@@ -1574,6 +1578,10 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `MOBILE_BREAKPOINT` | `768` | `src/hooks/ui/use-mobile.tsx` |
 | `TOAST_LIMIT` | `1` | `src/hooks/ui/use-toast.ts` |
 | `TOAST_REMOVE_DELAY` | `5000` | `src/hooks/ui/use-toast.ts` |
+| `LAT_MIN` | `-90` | `src/lib/centroDistribuicao.ts` |
+| `LAT_MAX` | `90` | `src/lib/centroDistribuicao.ts` |
+| `LNG_MIN` | `-180` | `src/lib/centroDistribuicao.ts` |
+| `LNG_MAX` | `180` | `src/lib/centroDistribuicao.ts` |
 | `MESES_HISTORICO` | `6` | `src/lib/freightForecast.ts` |
 | `MESES_PROJECAO` | `3` | `src/lib/freightForecast.ts` |
 | `MINIMO_MESES_REAIS` | `3` | `src/lib/freightForecast.ts` |
@@ -2201,7 +2209,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (339 testes em 35 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (346 testes em 36 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
@@ -2226,6 +2234,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `src/lib/predictions/whatIfScenarios.test.ts` | 8 | whatIfScenarios · retorna lista vazia quando storage está vazio ou corrompido · salva um cenário e recupera na lista · rejeita salvar sem nome ou sem seleção … |
 | `tests/contracts/nexus-contracts.spec.ts` | 8 | Nexus Contract Verification Suite · Carrier Webhook Contract · should validate a perfect payload · should reject payload with invalid status … |
 | `tests/security/integrations-access.spec.ts` | 8 | Integração: freight_webhooks — RLS · SELECT anônimo é vazio (secret_key protegido) · INSERT anônimo é rejeitado · Integração: bitrix_sync_config — RLS … |
+| `src/lib/centroDistribuicao.test.ts` | 7 | resolverCentroDistribuicao · usa o CD padrao quando o ambiente nao define nada · usa as coordenadas configuradas quando sao validas · ignora configuracao pela metade … |
 | `src/lib/formatters.parse.test.ts` | 7 | parseLocaleNumber · parses Brazilian format with thousands separator · parses US format when both separators are present · treats a lone comma as the decimal separator (BR-first) … |
 | `src/lib/predictions/mitigationRerank.test.ts` | 7 | rerankByROI — comportamento base · retorna score original quando ROI é null · aplica boost para categorias com Δ OTIF positivo · penaliza categorias com Δ OTIF negativo … |
 | `src/hooks/rodonaves/useSLOSnapshots.test.ts` | 6 | aggregateSnapshots · retorna vazio sem linhas · agrupa por gateway e conta dias · conta dias violados e pior P95 … |

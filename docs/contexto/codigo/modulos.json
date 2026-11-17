@@ -724,7 +724,7 @@
    "modulo": "components/dashboard",
    "arquivos": 17,
    "testes": 1,
-   "linhas": 5296,
+   "linhas": 5297,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -799,6 +799,8 @@
     "tactical-logs"
    ],
    "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG",
     "VITE_MAPBOX_TOKEN",
     "VITE_SUPABASE_PUBLISHABLE_KEY",
     "VITE_SUPABASE_URL"
@@ -4441,9 +4443,9 @@
   },
   {
    "modulo": "lib",
-   "arquivos": 13,
-   "testes": 4,
-   "linhas": 1324,
+   "arquivos": 14,
+   "testes": 5,
+   "linhas": 1377,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -4455,7 +4457,10 @@
    "rpcs": [],
    "buckets": [],
    "canais_realtime": [],
-   "env": [],
+   "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG"
+   ],
    "flags": [],
    "papeis": [],
    "diretos": {
@@ -5022,6 +5027,8 @@
     "tactical-logs"
    ],
    "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG",
     "VITE_MAPBOX_TOKEN",
     "VITE_SUPABASE_ANON_KEY",
     "VITE_SUPABASE_PUBLISHABLE_KEY",

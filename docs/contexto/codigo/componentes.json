@@ -1191,7 +1191,7 @@
     "LogisticsMapWidget"
    ],
    "export_default": null,
-   "linhas": 1128,
+   "linhas": 1129,
    "dominio": "components/dashboard",
    "hooks_locais": [
     "useBiometricAnomalies",

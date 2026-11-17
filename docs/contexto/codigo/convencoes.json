@@ -16,12 +16,12 @@
    "src/components (14)"
   ],
   "servicos_logica": [
-   "src/lib (28)",
+   "src/lib (29)",
    "src/utils (6)",
    "src/services (5)"
   ],
   "testes": [
-   "co-localizado (*.test) (70)",
+   "co-localizado (*.test) (71)",
    "outro (45)",
    "tests/ (11)"
   ],
@@ -41,7 +41,7 @@
  "nomenclatura": {
   "componentes": "PascalCase (86%)",
   "hooks": "use + PascalCase",
-  "servicos": "camelCase (93%)",
+  "servicos": "camelCase (94%)",
   "edge_functions": "kebab-case (98%)",
   "tabelas": "snake_case (89%)"
  },
@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)",
    "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)",
    "fix: previsao de frete deixa de ser numero inventado (#159)",
    "fix: alertas de divergencia e falha de frete sumiam da home (#158)",
-   "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)",
-   "docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)"
+   "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

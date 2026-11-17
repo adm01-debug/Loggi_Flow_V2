@@ -3,7 +3,7 @@
  "format_version": 2,
  "stack": {
   "linguagens": [
-   "TypeScript (783)",
+   "TypeScript (785)",
    "SQL (257)",
    "Markdown (84)",
    "JavaScript (80)",
@@ -867,7 +867,7 @@
   {
    "arquivo": "docs/auditoria-recuperacao-branches.md",
    "titulo": null,
-   "linhas": 284
+   "linhas": 336
   },
   {
    "arquivo": "docs/prod-readiness.md",
@@ -907,6 +907,8 @@
    "VITE_APP_ENV",
    "VITE_APP_NAME",
    "VITE_BITRIX24_WEBHOOK",
+   "VITE_CD_ORIGEM_LAT",
+   "VITE_CD_ORIGEM_LNG",
    "VITE_ENABLE_BITRIX24_SYNC",
    "VITE_ENABLE_GAMIFICATION",
    "VITE_ENABLE_LALAMOVE",
@@ -921,6 +923,8 @@
    "DEV",
    "MODE",
    "NODE_ENV",
+   "VITE_CD_ORIGEM_LAT",
+   "VITE_CD_ORIGEM_LNG",
    "VITE_MAPBOX_TOKEN",
    "VITE_SENTRY_DSN",
    "VITE_SUPABASE_ANON_KEY",

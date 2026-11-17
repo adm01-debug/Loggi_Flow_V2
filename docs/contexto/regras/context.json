@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "8ea7b1f396080fc7cb366af4be67620f7fee9b0f",
+  "sha": "adb741b6629aef03f80fe36e9534d8ddf3edae67",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 14:27 UTC",
-  "files_total": 1301,
-  "code_files": 1128,
-  "code_lines": 182493,
+  "generated_at": "2026-11-17 14:38 UTC",
+  "files_total": 1303,
+  "code_files": 1130,
+  "code_lines": 182582,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "5aa7924ceaae6962",
+ "facts_hash": "a21a24282a6d6159",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -292,7 +292,7 @@
   "package_manager": "bun",
   "languages": {
    ".tsx": 453,
-   ".ts": 330,
+   ".ts": 332,
    ".sql": 257,
    ".mjs": 77,
    ".py": 8,
@@ -23789,7 +23789,7 @@
      "add_user_xp",
      "get_dashboard_metrics"
     ],
-    "deps_count": 106
+    "deps_count": 107
    },
    {
     "path": "/admin/adr",
@@ -29260,7 +29260,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48525,
+   "lines": 48526,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29950,10 +29950,11 @@
   },
   {
    "module": "src/lib",
-   "files": 46,
-   "lines": 6316,
+   "files": 48,
+   "lines": 6404,
    "tables": [],
    "exports": [
+    "centroDistribuicao.ts: CoordenadaCD, CD_PADRAO, resolverCentroDistribuicao, CENTRO_DISTRIBUICAO",
     "conciliacaoImport.ts: ConciliacaoImportItem, readSheetRows, toISODate, parseImportRows",
     "constants.ts: ESTADOS_BR, UFS, TIPOS_FRETE, TIPOS_OCORRENCIA, XP_REWARDS, LEVEL_CONFIG",
     "csvImporter.ts: ImportError, ImportResult, importCSV, generateCSVTemplate, downloadCSV",
@@ -29982,12 +29983,12 @@
     "common.ts: addressSchema, carrierSchema, deliverySchema"
    ],
    "docs": [
+    "centroDistribuicao.ts: Origem das rotas desenhadas no mapa. A tabela `entregas` nao possui campo de origem (ver src/integrations/supabase/types.ts, Row de `entregas`): so ha `endereco_entrega`, `latitude` e `longitude`, todos do destino. A linha tracejada do mapa sai, portanto, do centro de distribuicao de onde a operacao …",
     "constants.ts: Application Constants",
     "excelImporter.ts: eslint-disable sonarjs/no-nested-functions",
     "index.ts: ============================================ LIB - UTILITY EXPORTS ============================================",
     "mapFallback.ts: Deslocamento estavel para marcador de entrega sem coordenada geocodificada. O mapa cai no centro do estado quando a entrega ainda nao tem lat/lng no banco. Sem deslocamento, todas as entregas do mesmo estado empilham no mesmo ponto. O deslocamento precisa ser **deterministico**: com `Math.random()` …",
-    "queryConfig.ts: ============================================ QUERY CONFIGURATION - Centralized staleTime ============================================",
-    "queryKeys.ts: QUERY KEYS FACTORY - Centralized query keys for precise cache invalidation."
+    "queryConfig.ts: ============================================ QUERY CONFIGURATION - Centralized staleTime ============================================"
    ],
    "deps": [
     "clsx",
@@ -30002,6 +30003,8 @@
    ],
    "imports_modules": [],
    "file_list": [
+    "src/lib/centroDistribuicao.test.ts",
+    "src/lib/centroDistribuicao.ts",
     "src/lib/conciliacaoImport.test.ts",
     "src/lib/conciliacaoImport.ts",
     "src/lib/constants.ts",
@@ -32793,6 +32796,12 @@
    ],
    "VITE_C": [
     "scripts/ai-context/cenarios.mjs"
+   ],
+   "VITE_CD_ORIGEM_LAT": [
+    "src/lib/centroDistribuicao.ts"
+   ],
+   "VITE_CD_ORIGEM_LNG": [
+    "src/lib/centroDistribuicao.ts"
    ],
    "VITE_FEATURE_X": [
     "scripts/ai-context/cenarios.mjs"
@@ -41304,6 +41313,26 @@
     "value": "5000"
    },
    {
+    "file": "src/lib/centroDistribuicao.ts",
+    "name": "LAT_MIN",
+    "value": "-90"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.ts",
+    "name": "LAT_MAX",
+    "value": "90"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.ts",
+    "name": "LNG_MIN",
+    "value": "-180"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.ts",
+    "name": "LNG_MAX",
+    "value": "180"
+   },
+   {
     "file": "src/lib/freightForecast.ts",
     "name": "MESES_HISTORICO",
     "value": "6"
@@ -46730,6 +46759,12 @@
     "body": "if (!previsao || [\"entregue\", \"finalizado\", \"cancelado\"].includes(status)) return 0; const diff = Math.ceil( (Date.now() - new Date(previsao).getTime()) / (1000 * 60 * 60 * 24), ); return Math.max(0, diff);"
    },
    {
+    "file": "src/lib/centroDistribuicao.ts",
+    "name": "numeroValido",
+    "params": "bruto: string | undefined, min: number, max: number",
+    "body": "if (bruto === undefined || bruto === null) return null; const texto = String(bruto).trim(); if (texto === \"\") return null; const valor = Number(texto); if (!Number.isFinite(valor)) return null; if (valor < min || valor > max) return null; return valor;"
+   },
+   {
     "file": "src/lib/csvImporter.ts",
     "name": "generateCSVTemplate",
     "params": "columns: { key: string; label: string; example?: string }[],",
@@ -48014,6 +48049,34 @@
    {
     "file": "src/hooks/rodonaves/useSLOSnapshots.test.ts",
     "name": "mantém invariantes em 500 cenários de fuzz"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.test.ts",
+    "name": "resolverCentroDistribuicao"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.test.ts",
+    "name": "usa o CD padrao quando o ambiente nao define nada"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.test.ts",
+    "name": "usa as coordenadas configuradas quando sao validas"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.test.ts",
+    "name": "ignora configuracao pela metade"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.test.ts",
+    "name": "ignora texto que nao e numero"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.test.ts",
+    "name": "ignora coordenada fora da faixa geografica"
+   },
+   {
+    "file": "src/lib/centroDistribuicao.test.ts",
+    "name": "aceita a origem zero zero sem confundir com ausencia"
    },
    {
     "file": "src/lib/conciliacaoImport.test.ts",
@@ -69860,7 +69923,7 @@
   },
   "src/components/dashboard/LogisticsMapWidget.tsx": {
    "path": "src/components/dashboard/LogisticsMapWidget.tsx",
-   "lines": 1128,
+   "lines": 1129,
    "exports": [
     "function LogisticsMapWidget"
    ],
@@ -79112,6 +79175,60 @@
    "side_effects": [
     "notify_email",
     "notify_whatsapp"
+   ]
+  },
+  "src/lib/centroDistribuicao.test.ts": {
+   "path": "src/lib/centroDistribuicao.test.ts",
+   "lines": 35,
+   "is_test": true,
+   "tests": [
+    "resolverCentroDistribuicao",
+    "usa o CD padrao quando o ambiente nao define nada",
+    "usa as coordenadas configuradas quando sao validas",
+    "ignora configuracao pela metade",
+    "ignora texto que nao e numero",
+    "ignora coordenada fora da faixa geografica",
+    "aceita a origem zero zero sem confundir com ausencia"
+   ]
+  },
+  "src/lib/centroDistribuicao.ts": {
+   "path": "src/lib/centroDistribuicao.ts",
+   "lines": 53,
+   "exports": [
+    "interface CoordenadaCD",
+    "const CD_PADRAO",
+    "function resolverCentroDistribuicao",
+    "const CENTRO_DISTRIBUICAO"
+   ],
+   "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG"
+   ],
+   "params": [
+    {
+     "name": "LAT_MIN",
+     "value": "-90"
+    },
+    {
+     "name": "LAT_MAX",
+     "value": "90"
+    },
+    {
+     "name": "LNG_MIN",
+     "value": "-180"
+    },
+    {
+     "name": "LNG_MAX",
+     "value": "180"
+    }
+   ],
+   "doc": "Origem das rotas desenhadas no mapa. A tabela `entregas` nao possui campo de origem (ver src/integrations/supabase/types.ts, Row de `entregas`): so ha `endereco_entrega`, `latitude` e `longitude`, todos do destino. A linha tracejada do mapa sai, portanto, do centro de distribuicao de onde a operacao …",
+   "calc_fns": [
+    {
+     "name": "numeroValido",
+     "params": "bruto: string | undefined, min: number, max: number",
+     "body": "if (bruto === undefined || bruto === null) return null; const texto = String(bruto).trim(); if (texto === \"\") return null; const valor = Number(texto); if (!Number.isFinite(valor)) return null; if (valor < min || valor > max) return null; return valor;"
+    }
    ]
   },
   "src/lib/conciliacaoImport.test.ts": {
@@ -88419,10 +88536,23 @@
   }
  },
  "git": {
-  "sha": "8ea7b1f396080fc7cb366af4be67620f7fee9b0f",
+  "sha": "adb741b6629aef03f80fe36e9534d8ddf3edae67",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "adb741b",
+    "date": "2026-11-17",
+    "author": "adm01-debug",
+    "subject": "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)",
+    "files": [
+     ".env.example",
+     "docs/auditoria-recuperacao-branches.md",
+     "src/components/dashboard/LogisticsMapWidget.tsx",
+     "src/lib/centroDistribuicao.test.ts",
+     "src/lib/centroDistribuicao.ts"
+    ]
+   },
    {
     "sha": "8ea7b1f",
     "date": "2026-11-17",
@@ -88748,36 +88878,19 @@
      "scripts/maintenance/run.sh",
      "scripts/maintenance/typecheck.mjs"
     ]
-   },
-   {
-    "sha": "9c2edff",
-    "date": "2026-11-10",
-    "author": "adm01-debug",
-    "subject": "fix(ci): destrava contexto-ia, types-sync, auto-update e inventário; roda testes dos scripts em Node 20 (#119)",
-    "files": [
-     ".github/workflows/auto-update-pr-branch.yml",
-     ".github/workflows/contexto-ia.yml",
-     ".github/workflows/inventario-estado-semanal.yml",
-     ".github/workflows/scripts-tests.yml",
-     ".github/workflows/types-sync.yml"
-    ]
    }
   ],
   "hot_files": [
    [
     "docs/auditoria-recuperacao-branches.md",
-    4
+    5
    ],
    [
     ".github/workflows/contexto-ia.yml",
-    4
-   ],
-   [
-    "docs/prod-readiness.md",
     3
    ],
    [
-    ".github/workflows/types-sync.yml",
+    "docs/prod-readiness.md",
     3
    ],
    [
@@ -88793,8 +88906,24 @@
     2
    ],
    [
-    ".github/workflows/inventario-estado-semanal.yml",
+    ".github/workflows/types-sync.yml",
     2
+   ],
+   [
+    ".env.example",
+    1
+   ],
+   [
+    "src/components/dashboard/LogisticsMapWidget.tsx",
+    1
+   ],
+   [
+    "src/lib/centroDistribuicao.test.ts",
+    1
+   ],
+   [
+    "src/lib/centroDistribuicao.ts",
+    1
    ],
    [
     "src/hooks/logistics/useDeliveryRoutes.tsx",
@@ -88830,18 +88959,6 @@
    ],
    [
     "src/components/dashboard/alertsFilter.test.ts",
-    1
-   ],
-   [
-    "src/components/dashboard/alertsFilter.ts",
-    1
-   ],
-   [
-    "src/hooks/analytics/useDashboardMetrics.tsx",
-    1
-   ],
-   [
-    "src/components/map/MapIntelligenceOverlay.tsx",
     1
    ]
   ]

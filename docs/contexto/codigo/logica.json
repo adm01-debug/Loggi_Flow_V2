@@ -1,10 +1,10 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 46,
+ "total": 47,
  "por_camada": {
   "integrations": 4,
-  "lib": 28,
+  "lib": 29,
   "python": 3,
   "services": 5,
   "utils": 6
@@ -391,6 +391,35 @@
     "pages"
    ],
    "coberto_por_testes": 0,
+   "orfao": false
+  },
+  {
+   "arquivo": "src/lib/centroDistribuicao.ts",
+   "camada": "lib",
+   "exports": [
+    "CD_PADRAO",
+    "CENTRO_DISTRIBUICAO",
+    "CoordenadaCD",
+    "resolverCentroDistribuicao"
+   ],
+   "export_default": null,
+   "linhas": 53,
+   "tabelas": [],
+   "rpcs": [],
+   "edges": [],
+   "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG"
+   ],
+   "externos": [],
+   "zod_schemas": 0,
+   "flags": [],
+   "papeis": [],
+   "usado_por": 1,
+   "usado_por_modulos": [
+    "components/dashboard"
+   ],
+   "coberto_por_testes": 1,
    "orfao": false
   },
   {

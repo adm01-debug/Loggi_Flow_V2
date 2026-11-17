@@ -5,17 +5,17 @@
   "vitest",
   "playwright"
  ],
- "total": 126,
+ "total": 127,
  "por_tipo": {
   "contrato": 1,
   "e2e": 2,
   "pytest": 5,
-  "unit": 118
+  "unit": 119
  },
  "onde_ficam": [
   {
    "padrao": "co-localizado (*.test)",
-   "arquivos": 70
+   "arquivos": 71
   },
   {
    "padrao": "outro",
@@ -435,6 +435,15 @@
     "src/hooks/rodonaves/useSLOSnapshots.ts"
    ],
    "casos": 5
+  },
+  {
+   "arquivo": "src/lib/centroDistribuicao.test.ts",
+   "tipo": "unit",
+   "linhas": 35,
+   "testa": [
+    "src/lib/centroDistribuicao.ts"
+   ],
+   "casos": 6
   },
   {
    "arquivo": "src/lib/conciliacaoImport.test.ts",
@@ -1084,6 +1093,7 @@
   "src/hooks/rodonaves/useGatewayHealth.ts": 1,
   "src/hooks/rodonaves/useSLOSnapshots.ts": 1,
   "src/integrations/supabase/client.ts": 2,
+  "src/lib/centroDistribuicao.ts": 1,
   "src/lib/conciliacaoImport.ts": 1,
   "src/lib/formatters.ts": 1,
   "src/lib/freightForecast.ts": 1,

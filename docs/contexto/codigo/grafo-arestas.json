@@ -612,6 +612,7 @@
    "src/hooks/logistics/useMapWeatherSync.ts",
    "src/hooks/logistics/useUnifiedTracking.tsx",
    "src/integrations/supabase/client.ts",
+   "src/lib/centroDistribuicao.ts",
    "src/lib/utils.ts"
   ],
   "src/components/dashboard/MissionDetail.tsx": [

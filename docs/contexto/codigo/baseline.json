@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8ea7b1f396080fc7cb366af4be67620f7fee9b0f",
+  "commit": "adb741b6629aef03f80fe36e9534d8ddf3edae67",
   "branch": "main",
-  "data_commit": "2026-11-17T11:25:01-03:00",
+  "data_commit": "2026-11-17T11:38:06-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "adb741b6",
+    "data": "2026-11-17",
+    "assunto": "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)"
+   },
    {
     "sha": "8ea7b1f3",
     "data": "2026-11-17",
@@ -126,17 +131,16 @@
     "sha": "3fad225d",
     "data": "2026-11-12",
     "assunto": "style: aplica correcoes locais verificadas (#136)"
-   },
-   {
-    "sha": "60b8d213",
-    "data": "2026-11-11",
-    "assunto": "feat(ci): workflow ressincroniza INTERNAL_FN_SECRET do vault nas functions (#138)"
    }
   ],
-  "arquivos_mudados_7d": 83,
+  "arquivos_mudados_7d": 87,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
+    "mudancas": 5
+   },
+   {
+    "pasta": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 5
    },
    {
@@ -148,15 +152,15 @@
     "mudancas": 4
    },
    {
-    "pasta": "docs/auditoria-recuperacao-branches.md",
-    "mudancas": 4
-   },
-   {
     "pasta": "scripts/validate-csp.mjs",
     "mudancas": 4
    },
    {
     "pasta": "src/components/achievements",
+    "mudancas": 4
+   },
+   {
+    "pasta": "src/components/dashboard",
     "mudancas": 4
    },
    {
@@ -190,10 +194,6 @@
    {
     "pasta": "scripts/ci/github-settings-baseline.json",
     "mudancas": 3
-   },
-   {
-    "pasta": "scripts/generate-quality-report.mjs",
-    "mudancas": 3
    }
   ],
   "arquivos_mais_mudados_90d": [
@@ -215,6 +215,10 @@
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 5
    },
    {
@@ -243,10 +247,6 @@
    },
    {
     "arquivo": "docs/agentes/github-ci.md",
-    "mudancas": 4
-   },
-   {
-    "arquivo": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 4
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 103
+    "commits": 104
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1291,
-  "arquivos_codigo": 870,
-  "linhas_codigo": 166726,
+  "arquivos_total": 1293,
+  "arquivos_codigo": 872,
+  "linhas_codigo": 166815,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -328,7 +328,7 @@
   "tabelas": 144,
   "migrations": 244,
   "cron_jobs": 28,
-  "testes": 126,
+  "testes": 127,
   "workflows": 16,
   "scripts": 62,
   "docs_md": 84
@@ -452,7 +452,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48525
+   "linhas": 48526
   },
   "src/features": {
    "arquivos": 90,
@@ -471,8 +471,8 @@
    "linhas": 6702
   },
   "src/lib": {
-   "arquivos": 46,
-   "linhas": 6316
+   "arquivos": 48,
+   "linhas": 6404
   },
   "src/main.tsx": {
    "arquivos": 1,
@@ -574,7 +574,7 @@
   },
   {
    "arquivo": "src/components/dashboard/LogisticsMapWidget.tsx",
-   "linhas": 1128
+   "linhas": 1129
   },
   {
    "arquivo": "src/pages/Clientes.tsx",
@@ -724,7 +724,7 @@
   ],
   "ciclos_de_import": 3,
   "possiveis_segredos_no_codigo": [
-   "src/components/dashboard/LogisticsMapWidget.tsx:73",
+   "src/components/dashboard/LogisticsMapWidget.tsx:74",
    "tests/security/integrations-access.spec.ts:12",
    "tests/security/rls-access.spec.ts:13"
   ]
