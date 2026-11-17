@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8071e4a521` · branch `main` · 2026-11-17 13:16 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `4496d9f3b9` · branch `main` · 2026-11-17 13:52 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -969,7 +969,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `no_options` | escreve | `supabase/functions/smart-carrier-selection/index.ts` |
 | `status` | `none` | compara, escreve | `src/components/ui/avatar.tsx` |
 | `status` | `not_configured` | escreve | `src/hooks/security/useIntegrationValidation.tsx` |
-| `status` | `ocorrencia` | compara, filtra | `src/components/common/ActivityTimeline.tsx`<br>`src/components/dashboard/LogisticsMapWidget.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/analytics/useDashboardMetrics.tsx`<br>`src/hooks/logistics/useDeliveryRoutes.tsx`<br>… +3 |
+| `status` | `ocorrencia` | compara, filtra | `src/components/common/ActivityTimeline.tsx`<br>`src/components/dashboard/LogisticsMapWidget.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/analytics/useDashboardMetrics.tsx`<br>`src/hooks/logistics/useDeliveryRoutes.tsx`<br>… +4 |
 | `status` | `ok` | compara, escreve | `src/components/rodonaves/RTEGatewaySLOPanel.tsx`<br>`src/components/rodonaves/RTESLOHistoryPanel.tsx`<br>`src/hooks/logistics/useCostAlerts.tsx`<br>`src/hooks/rodonaves/useSLOSnapshots.ts`<br>`src/lib/rodonaves/gatewaySLO.ts`<br>… +3 |
 | `status` | `online` | compara, escreve | `src/components/layout/SystemPulse.tsx`<br>`src/components/ui/badge.tsx` |
 | `status` | `operational` | compara, escreve | `src/components/dashboard/SystemHealthWidget.tsx`<br>`supabase/functions/nexus-auto-healing/index.ts` |
@@ -1564,6 +1564,9 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `MAX_CACHE_SIZE` | `50` | `src/hooks/data/useRealtime.tsx` |
 | `TOTAL_BOXES` | `16` | `src/hooks/logistics/useBoxManagement.tsx` |
 | `CACHE_TTL` | `1000 * 60 * 5` | `src/hooks/logistics/useDelayPrediction.tsx` |
+| `JANELA_DIAS` | `30` | `src/hooks/logistics/useMapIntelligence.ts` |
+| `PONTOS_TENDENCIA` | `10` | `src/hooks/logistics/useMapIntelligence.ts` |
+| `DIA_MS` | `86_400_000` | `src/hooks/logistics/useMapIntelligence.ts` |
 | `CACHE_TTL` | `1000 * 60 * 10` | `src/hooks/logistics/useSmartCarrierSelection.tsx` |
 | `STOP_THRESHOLD_METERS` | `50` | `src/hooks/logistics/useTrackingAnalytics.tsx` |
 | `STOP_TIME_THRESHOLD_SECONDS` | `120` | `src/hooks/logistics/useTrackingAnalytics.tsx` |

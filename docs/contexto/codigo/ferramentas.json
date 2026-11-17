@@ -3,7 +3,7 @@
  "format_version": 2,
  "stack": {
   "linguagens": [
-   "TypeScript (776)",
+   "TypeScript (777)",
    "SQL (257)",
    "Markdown (84)",
    "JavaScript (80)",
@@ -867,7 +867,7 @@
   {
    "arquivo": "docs/auditoria-recuperacao-branches.md",
    "titulo": null,
-   "linhas": 151
+   "linhas": 198
   },
   {
    "arquivo": "docs/prod-readiness.md",

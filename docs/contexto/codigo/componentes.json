@@ -1859,9 +1859,11 @@
     "MapIntelligenceOverlay"
    ],
    "export_default": null,
-   "linhas": 183,
+   "linhas": 223,
    "dominio": "components/map",
-   "hooks_locais": [],
+   "hooks_locais": [
+    "useMapIntelligence"
+   ],
    "tabelas": [],
    "edges": [],
    "usado_por": 1,

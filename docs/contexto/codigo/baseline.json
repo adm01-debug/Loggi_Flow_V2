@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8071e4a52152655b1d83dffb274b0560ce97fb3a",
+  "commit": "4496d9f3b901820d9a8a101051e2caaa606ebacf",
   "branch": "main",
-  "data_commit": "2026-11-17T10:12:19-03:00",
+  "data_commit": "2026-11-17T10:52:25-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "4496d9f3",
+    "data": "2026-11-17",
+    "assunto": "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)"
+   },
    {
     "sha": "8071e4a5",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "04259107",
     "data": "2026-11-11",
     "assunto": "chore(runbook): completa pos_deploy_functions com seção ROLLBACK (#121)"
-   },
-   {
-    "sha": "e31c16af",
-    "data": "2026-11-11",
-    "assunto": "chore(automacao): conecta testes, grafo e manutenção aos gatilhos (#120)"
    }
   ],
-  "arquivos_mudados_7d": 70,
+  "arquivos_mudados_7d": 72,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -172,6 +172,10 @@
     "mudancas": 3
    },
    {
+    "pasta": "docs/auditoria-recuperacao-branches.md",
+    "mudancas": 3
+   },
+   {
     "pasta": "docs/prod-readiness.md",
     "mudancas": 3
    },
@@ -189,10 +193,6 @@
    },
    {
     "pasta": "scripts/generate-quality-report.mjs",
-    "mudancas": 3
-   },
-   {
-    "pasta": "scripts/ops/pos_deploy_functions.sql",
     "mudancas": 3
    }
   ],
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 99
+    "commits": 100
    },
    {
     "autor": "dependabot[bot]",
@@ -314,16 +314,16 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1284,
-  "arquivos_codigo": 863,
-  "linhas_codigo": 165820,
+  "arquivos_total": 1285,
+  "arquivos_codigo": 864,
+  "linhas_codigo": 166004,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
   "itens_menu": 77,
   "modulos": 74,
   "componentes": 380,
-  "hooks": 175,
+  "hooks": 176,
   "edge_functions": 43,
   "tabelas": 144,
   "migrations": 244,
@@ -452,15 +452,15 @@
   },
   "src/components": {
    "arquivos": 295,
-   "linhas": 48298
+   "linhas": 48338
   },
   "src/features": {
    "arquivos": 90,
    "linhas": 6345
   },
   "src/hooks": {
-   "arquivos": 122,
-   "linhas": 18892
+   "arquivos": 123,
+   "linhas": 19036
   },
   "src/i18n.ts": {
    "arquivos": 1,

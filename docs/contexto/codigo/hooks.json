@@ -1,7 +1,7 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 175,
+ "total": 176,
  "hooks": [
   {
    "arquivo": "src/components/accessibility/index.ts",
@@ -3365,6 +3365,26 @@
    "usado_por_arquivos": [
     "src/components/dashboard/IntelligentLogisticsWidget.tsx",
     "src/hooks/index.ts"
+   ],
+   "coberto_por_testes": 0
+  },
+  {
+   "arquivo": "src/hooks/logistics/useMapIntelligence.ts",
+   "hooks_exportados": [
+    "useMapIntelligence"
+   ],
+   "linhas": 144,
+   "dominio": "hooks/logistics",
+   "tabelas": [
+    "entregas"
+   ],
+   "rpcs": [],
+   "edges": [],
+   "hooks_internos": [],
+   "canais_realtime": [],
+   "usado_por": 1,
+   "usado_por_arquivos": [
+    "src/components/map/MapIntelligenceOverlay.tsx"
    ],
    "coberto_por_testes": 0
   },

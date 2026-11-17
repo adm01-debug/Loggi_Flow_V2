@@ -1,8 +1,8 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "nos": 740,
- "arestas": 3055,
+ "nos": 741,
+ "arestas": 3057,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -10,7 +10,7 @@
   },
   {
    "arquivo": "src/integrations/supabase/client.ts",
-   "importado_por": 206
+   "importado_por": 207
   },
   {
    "arquivo": "src/components/ui/badge.tsx",
@@ -264,14 +264,14 @@
    "importado_por": 2
   },
   {
+   "modulo": "hooks/logistics",
+   "depende_de": 9,
+   "importado_por": 13
+  },
+  {
    "modulo": "hooks/common",
    "depende_de": 4,
    "importado_por": 17
-  },
-  {
-   "modulo": "hooks/logistics",
-   "depende_de": 9,
-   "importado_por": 12
   },
   {
    "modulo": "components/common",

@@ -959,7 +959,8 @@
   ],
   "src/components/map/MapIntelligenceOverlay.tsx": [
    "src/components/ui/badge.tsx",
-   "src/components/ui/card.tsx"
+   "src/components/ui/card.tsx",
+   "src/hooks/logistics/useMapIntelligence.ts"
   ],
   "src/components/map/MapboxMap.tsx": [
    "src/integrations/supabase/client.ts",
@@ -2863,6 +2864,9 @@
   "src/hooks/logistics/useLogisticsIntelligence.tsx": [
    "src/hooks/analytics/useDashboardMetrics.tsx",
    "src/hooks/logistics/useDelayPrediction.tsx"
+  ],
+  "src/hooks/logistics/useMapIntelligence.ts": [
+   "src/integrations/supabase/client.ts"
   ],
   "src/hooks/logistics/useMapWeatherSync.ts": [
    "src/integrations/supabase/client.ts"

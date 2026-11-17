@@ -1279,6 +1279,7 @@
    "src/hooks/logistics/useLogisticsCalendar.tsx",
    "src/hooks/logistics/useLogisticsCosts.tsx",
    "src/hooks/logistics/useLogisticsIntelligence.tsx",
+   "src/hooks/logistics/useMapIntelligence.ts",
    "src/hooks/logistics/useMapWeatherSync.ts",
    "src/hooks/logistics/useMelhorEnvio.tsx",
    "src/hooks/logistics/usePredictionAccuracy.ts",
