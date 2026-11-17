@@ -13,6 +13,9 @@ import { execSync } from "node:child_process";
 // última publicada — não há fix instalável. Atinge só o grafo de build/teste
 // (vite, vitest, tailwind, lint-staged, workbox) com padrões do próprio repo,
 // nunca entrada de usuário. Remover assim que sair 4.0.8.
+// Revisão 2026-11-17: subir para vite 8 NÃO apaga este advisory — lint-staged,
+// tinyglobby, @rollup/pluginutils, vitest e a cadeia micromatch/anymatch/readdirp
+// puxam picomatch por conta própria. A allowlist só sai com picomatch 4.0.8+.
 const ALLOWLIST = new Set(["xlsx", "vite", "picomatch"]);
 
 // Registry pendurado não pode segurar o job até o timeout do runner (6h).
