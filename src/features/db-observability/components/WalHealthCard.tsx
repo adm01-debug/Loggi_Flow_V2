@@ -9,6 +9,7 @@ const severityConfig = {
   critical: { icon: ShieldAlert, variant: "destructive" as const, label: "Crítico" },
   warning: { icon: AlertTriangle, variant: "default" as const, label: "Alerta" },
   ok: { icon: CheckCircle2, variant: "secondary" as const, label: "OK" },
+  unknown: { icon: AlertTriangle, variant: "outline" as const, label: "Indisponível" },
 };
 
 function formatBytes(bytes: number): string {
@@ -81,11 +82,15 @@ export function WalHealthCard() {
           </div>
           <div>
             <p className="text-xs text-muted-foreground">WAL</p>
-            <p className="text-lg font-semibold">{formatBytes(data.wal_size_bytes)}</p>
+            <p className="text-lg font-semibold">
+              {data.wal_size_bytes === null ? "—" : formatBytes(data.wal_size_bytes)}
+            </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Razão WAL/DB</p>
-            <p className="text-lg font-semibold">{data.wal_to_db_ratio}x</p>
+            <p className="text-lg font-semibold">
+              {data.wal_to_db_ratio === null ? "—" : `${data.wal_to_db_ratio}x`}
+            </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">max_wal_size</p>
