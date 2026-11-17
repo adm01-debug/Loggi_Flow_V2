@@ -22,10 +22,10 @@ import { useRealtime } from "@/hooks/data/useRealtime";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
-import "mapbox-gl/dist/mapbox-gl.css";
+import Map, { Marker, NavigationControl } from "react-map-gl/maplibre";
+import "maplibre-gl/dist/maplibre-gl.css";
+import { MAP_STYLE_DARK } from "@/lib/mapStyles";
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "";
 
 export default function RastreamentoMotorista() {
   const [selectedOrder, setSelectedOrder] = useState<string>("");
@@ -188,8 +188,7 @@ export default function RastreamentoMotorista() {
                     zoom: 14,
                   }}
                   style={{ width: "100%", height: "100%" }}
-                  mapStyle="mapbox://styles/mapbox/dark-v11"
-                  mapboxAccessToken={MAPBOX_TOKEN}
+                  mapStyle={MAP_STYLE_DARK}
                 >
                   <Marker
                     latitude={location.lat}

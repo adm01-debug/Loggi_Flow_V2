@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
 import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { supabase } from "@/integrations/supabase/client";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+import { resolveMapStyle } from "@/lib/mapStyles";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CENTRO_DISTRIBUICAO } from "@/lib/centroDistribuicao";
@@ -61,59 +61,39 @@ export function MapboxMap({
   riskZones = [],
 }: MapboxMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [token, setToken] = useState<string | null>(null);
+  const map = useRef<maplibregl.Map | null>(null);
+  const markersRef = useRef<maplibregl.Marker[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch Mapbox token from edge function
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const { data, error: fnError } =
-          await supabase.functions.invoke("get-mapbox-token");
-        if (fnError || !data?.token) {
-          setError("Token Mapbox não configurado");
-          setLoading(false);
-          return;
-        }
-        setToken(data.token);
-      } catch {
-        setError("Erro ao obter token Mapbox");
-        setLoading(false);
-      }
-    };
-    fetchToken();
-  }, []);
-
   // Initialize map
   useEffect(() => {
-    if (!token || !mapContainer.current || map.current) return;
+    if (!mapContainer.current || map.current) return;
 
-    mapboxgl.accessToken = token;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style:
-        mapStyle === "satellite"
-          ? "mapbox://styles/mapbox/satellite-v9"
-          : "mapbox://styles/mapbox/dark-v11",
-      center,
-      zoom,
-      pitch,
-      attributionControl: false,
-      antialias: true,
-    });
+    try {
+      map.current = new maplibregl.Map({
+        container: mapContainer.current,
+        style: resolveMapStyle(mapStyle === "satellite" ? "satellite" : "dark"),
+        center,
+        zoom,
+        pitch,
+        attributionControl: false,
+        canvasContextAttributes: { antialias: true },
+      });
+    } catch {
+      setError("Falha ao inicializar o mapa");
+      setLoading(false);
+      return;
+    }
 
     map.current.addControl(
-      new mapboxgl.NavigationControl({ showCompass: true }),
+      new maplibregl.NavigationControl({ showCompass: true }),
       "top-right",
     );
-    map.current.addControl(new mapboxgl.FullscreenControl(), "top-right");
-    map.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+    map.current.addControl(new maplibregl.FullscreenControl(), "top-right");
+    map.current.addControl(new maplibregl.ScaleControl(), "bottom-right");
     map.current.addControl(
-      new mapboxgl.AttributionControl({ compact: true }),
+      new maplibregl.AttributionControl({ compact: true }),
       "bottom-left",
     );
 
@@ -180,11 +160,15 @@ export function MapboxMap({
           pixelRatio: 2,
         });
 
-        map.current.setFog({
-          range: [0.5, 10],
-          color: "#000",
-          "horizon-blend": 0.1,
-          "star-intensity": 0.15,
+        // Equivalente ao antigo setFog do Mapbox: horizonte escuro com neblina sutil.
+        map.current.setSky({
+          "sky-color": "#000000",
+          "horizon-color": "#000000",
+          "fog-color": "#000000",
+          "fog-ground-blend": 0.5,
+          "horizon-fog-blend": 0.1,
+          "sky-horizon-blend": 0.8,
+          "atmosphere-blend": 0.8,
         });
       }
     });
@@ -194,16 +178,15 @@ export function MapboxMap({
       map.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, center, zoom, riskZones]); // Re-init if core props change significantly
+  }, [center, zoom, riskZones]); // Re-init if core props change significantly
 
   // Handle Style, Pitch and Traffic changes
   useEffect(() => {
     if (!map.current) return;
 
-    const newStyle =
-      mapStyle === "satellite"
-        ? "mapbox://styles/mapbox/satellite-v9"
-        : "mapbox://styles/mapbox/dark-v11";
+    const newStyle = resolveMapStyle(
+      mapStyle === "satellite" ? "satellite" : "dark",
+    );
 
     // Smooth transition between styles
     map.current.setStyle(newStyle, { diff: true } as Parameters<typeof map.current.setStyle>[1]);
@@ -455,10 +438,10 @@ export function MapboxMap({
       el.innerHTML =
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
 
-      const m = new mapboxgl.Marker({ element: el })
+      const m = new maplibregl.Marker({ element: el })
         .setLngLat([originMarker.lng, originMarker.lat])
         .setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(
+          new maplibregl.Popup({ offset: 25 }).setHTML(
             `<div style="padding:8px;font-size:12px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:1px">${originMarker.label || "Nexus CD Central"}</div>`,
           ),
         )
@@ -496,7 +479,7 @@ export function MapboxMap({
         el.style.zIndex = mk.type === "truck" ? "10" : "1";
       });
 
-      const popup = new mapboxgl.Popup({
+      const popup = new maplibregl.Popup({
         offset: mk.type === "truck" ? 35 : 20,
         closeButton: false,
         className: "nexus-map-popup",
@@ -519,7 +502,7 @@ export function MapboxMap({
         `,
       );
 
-      const marker = new mapboxgl.Marker({ element: el })
+      const marker = new maplibregl.Marker({ element: el })
         .setLngLat([mk.lng, mk.lat])
         .setPopup(popup)
         .addTo(map.current!);
@@ -533,7 +516,7 @@ export function MapboxMap({
 
     // Fit bounds if we have markers
     if (markers.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
+      const bounds = new maplibregl.LngLatBounds();
       if (originMarker) bounds.extend([originMarker.lng, originMarker.lat]);
       markers.forEach((mk) => bounds.extend([mk.lng, mk.lat]));
       map.current.fitBounds(bounds, { padding: 60, maxZoom: 12 });
@@ -712,7 +695,7 @@ export function MapboxMap({
       >
         <div className="text-center text-muted-foreground p-8">
           <p className="text-sm font-medium">{error}</p>
-          <p className="text-xs mt-1">Verifique a configuração do Mapbox</p>
+          <p className="text-xs mt-1">Verifique sua conexão com a internet</p>
         </div>
       </div>
     );

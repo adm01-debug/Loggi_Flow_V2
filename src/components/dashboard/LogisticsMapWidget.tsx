@@ -9,8 +9,9 @@ import Map, {
   GeolocateControl,
   Source,
   Layer,
-} from "react-map-gl/mapbox";
-import "mapbox-gl/dist/mapbox-gl.css";
+} from "react-map-gl/maplibre";
+import "maplibre-gl/dist/maplibre-gl.css";
+import { resolveMapStyle } from "@/lib/mapStyles";
 import {
   Card,
   CardContent,
@@ -66,26 +67,6 @@ import { TacticalTerminal } from "../map/TacticalTerminal";
 import { CinematicHUD } from "../map/CinematicHUD";
 import { MapIntelligenceOverlay } from "../map/MapIntelligenceOverlay";
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "";
-
-// Tokens revogados/inválidos conhecidos — substituídos pelo token do Lovable template.
-// Quando um desses for detectado, o mapa mostra fallback em vez de 401 no console.
-const KNOWN_INVALID_TOKENS = new Set([
-  "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.XN3N_uX8p6T9G0Q_5vO9XQ",
-  "pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdidzFhNmEwMG5qMmtxZ2ZidXlybHlyIn0.soY", // parcial
-]);
-
-function isValidMapboxToken(token: string): boolean {
-  if (!token || token.length < 10) return false;
-  if (!token.startsWith("pk.")) return false;
-  for (const invalid of KNOWN_INVALID_TOKENS) {
-    if (token.includes(invalid.slice(0, 40))) return false;
-  }
-  return true;
-}
-
-const mapboxAvailable = isValidMapboxToken(MAPBOX_TOKEN);
-
 export function LogisticsMapWidget() {
   const { allShipments: shipments, isLoading } = useUnifiedTracking();
   useMapWeatherSync();
@@ -114,9 +95,7 @@ export function LogisticsMapWidget() {
     zoom: 4,
   });
 
-  const [mapStyle, setMapStyle] = React.useState<string>(
-    "mapbox://styles/mapbox/dark-v11",
-  );
+  const [mapStyle, setMapStyle] = React.useState<"dark" | "satellite">("dark");
 
   const filteredShipments = React.useMemo(() => {
     return shipments.filter((s) => {
@@ -247,20 +226,16 @@ export function LogisticsMapWidget() {
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  setMapStyle((prev) =>
-                    prev.includes("dark")
-                      ? "mapbox://styles/mapbox/satellite-v9"
-                      : "mapbox://styles/mapbox/dark-v11",
-                  )
+                  setMapStyle((prev) => (prev === "dark" ? "satellite" : "dark"))
                 }
                 className="h-9 rounded-full bg-white/5 border-white/10 text-white hover:bg-white/10 gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2"
               >
-                {mapStyle.includes("dark") ? (
+                {mapStyle === "dark" ? (
                   <Satellite className="w-3 h-3 text-primary" />
                 ) : (
                   <Activity className="w-3 h-3 text-primary" />
                 )}
-                {mapStyle.includes("dark") ? "Satélite" : "Tático"}
+                {mapStyle === "dark" ? "Satélite" : "Tático"}
               </Button>
 
               <Button
@@ -680,21 +655,22 @@ export function LogisticsMapWidget() {
 
           {/* Map Area */}
           <div className="flex-1 rounded-[1.5rem] overflow-hidden border border-white/10 relative shadow-inner group/map">
-            {mapboxAvailable ? (
             <Map
               {...viewState}
               onMove={(evt) => setViewState(evt.viewState)}
-              mapStyle={mapStyle}
-              mapboxAccessToken={MAPBOX_TOKEN}
+              mapStyle={resolveMapStyle(mapStyle)}
               style={{ width: "100%", height: "100%" }}
-              terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
+              terrain={{ source: "terrain-dem", exaggeration: 1.5 }}
             >
               <Source
-                id="mapbox-dem"
+                id="terrain-dem"
                 type="raster-dem"
-                url="mapbox://mapbox.mapbox-terrain-dem-v1"
-                tileSize={512}
-                maxzoom={14}
+                tiles={[
+                  "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
+                ]}
+                encoding="terrarium"
+                tileSize={256}
+                maxzoom={15}
               />
 
               <GeolocateControl position="top-right" />
@@ -979,22 +955,6 @@ export function LogisticsMapWidget() {
                 </Source>
               )}
             </Map>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-black/60 text-white/60">
-                <div className="text-center space-y-3 max-w-sm">
-                  <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto">
-                    <Navigation2 className="w-7 h-7 text-white/30" />
-                  </div>
-                  <p className="font-semibold text-white/80 text-sm">Mapa indisponível</p>
-                  <p className="text-xs text-white/40 leading-relaxed">
-                    O token Mapbox expirou ou é inválido. Gere um novo em{" "}
-                    <span className="text-primary/80">account.mapbox.com/access-tokens</span>{" "}
-                    e substitua o valor de <code className="text-white/60 bg-white/5 px-1 rounded text-[10px]">VITE_MAPBOX_TOKEN</code>{" "}
-                    no arquivo <code className="text-white/60 bg-white/5 px-1 rounded text-[10px]">.env</code>.
-                  </p>
-                </div>
-              </div>
-            )}
 
             {/* Float Info Overlay */}
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between z-10 pointer-events-none">
