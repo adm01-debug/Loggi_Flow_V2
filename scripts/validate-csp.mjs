@@ -14,9 +14,9 @@ const REQUIRED = {
   'style-src': ['https://fonts.googleapis.com', "'self'", "'unsafe-inline'"],
   'font-src': ['https://fonts.gstatic.com', "'self'"],
   'script-src': ["'self'"],
-  // wss: Supabase Realtime (`.channel(...)`); api.mapbox.com: estilos/tiles do mapbox-gl.
-  'connect-src': ["'self'", 'https://*.supabase.co', 'wss://*.supabase.co', 'https://api.mapbox.com'],
-  'img-src': ["'self'", 'data:', 'blob:', 'https://*.supabase.co', 'https://api.mapbox.com'],
+  // wss: Supabase Realtime (`.channel(...)`); cartocdn/arcgisonline/s3: estilos, tiles e relevo do maplibre-gl.
+  'connect-src': ["'self'", 'https://*.supabase.co', 'wss://*.supabase.co', 'https://*.cartocdn.com'],
+  'img-src': ["'self'", 'data:', 'blob:', 'https://*.supabase.co', 'https://*.cartocdn.com'],
   'worker-src': ["'self'", 'blob:'],
 };
 

@@ -14,7 +14,7 @@ const VENDOR_CHUNKS: ReadonlyArray<readonly [string, readonly string[]]> = [
   ['vendor-ui', ['@radix-ui']],
   ['vendor-charts', ['recharts', 'd3-']],
   ['vendor-motion', ['framer-motion']],
-  ['vendor-mapbox', ['mapbox-gl']],
+  ['vendor-maplibre', ['maplibre-gl']],
   ['vendor-pdf', ['jspdf', 'jspdf-autotable']],
   ['vendor-html2canvas', ['html2canvas']],
   ['vendor-xlsx', ['xlsx']],
@@ -91,7 +91,7 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     cssMinify: true,
     reportCompressedSize: true,
-    // Vendor chunks like mapbox are large but lazy-loaded; suppress warnings
+    // Vendor chunks like maplibre are large but lazy-loaded; suppress warnings
     chunkSizeWarningLimit: 700,
   },
 

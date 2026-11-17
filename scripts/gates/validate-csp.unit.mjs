@@ -16,8 +16,8 @@ after(() => limpa(root));
 const BOA = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://*.supabase.co",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://*.sentry.io",
-  "img-src 'self' data: blob: https://*.supabase.co https://api.mapbox.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.cartocdn.com https://*.sentry.io",
+  "img-src 'self' data: blob: https://*.supabase.co https://*.cartocdn.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "worker-src 'self' blob:",
@@ -70,10 +70,10 @@ for (const [diretiva, token] of [
   ['font-src', 'https://fonts.gstatic.com'],
   ['connect-src', 'https://*.supabase.co'],
   ['connect-src', 'wss://*.supabase.co'],
-  ['connect-src', 'https://api.mapbox.com'],
+  ['connect-src', 'https://*.cartocdn.com'],
   ['img-src', 'data:'],
   ['img-src', 'blob:'],
-  ['img-src', 'https://api.mapbox.com'],
+  ['img-src', 'https://*.cartocdn.com'],
   ['worker-src', 'blob:'],
 ]) {
   const semToken = BOA.split('; ').map((d) => (d.startsWith(`${diretiva} `) ? d.split(' ').filter((t) => t !== token).join(' ') : d)).join('; ');

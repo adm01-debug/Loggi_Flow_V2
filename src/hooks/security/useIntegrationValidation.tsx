@@ -13,7 +13,7 @@ export function useIntegrationValidation() {
   const [isValidating, setIsValidating] = useState(false);
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([
     { name: 'Lalamove', status: 'not_configured' },
-    { name: 'Mapbox', status: 'not_configured' },
+    { name: 'Mapa', status: 'not_configured' },
     { name: 'Bitrix24', status: 'not_configured' },
     { name: 'Rodonaves', status: 'not_configured' },
     { name: 'Melhor Envio', status: 'not_configured' },
@@ -39,25 +39,24 @@ export function useIntegrationValidation() {
     }
   }, []);
 
-  const validateMapbox = useCallback(async (): Promise<IntegrationStatus> => {
+  const validateMapa = useCallback(async (): Promise<IntegrationStatus> => {
     try {
-      const { data, error } = await supabase.functions.invoke('get-mapbox-token');
-      
-      if (error || !data?.token) {
-        return { name: 'Mapbox', status: 'not_configured', message: 'Token não encontrado' };
+      // Geocodificacao por OpenStreetMap: sem token, validada por uma busca real.
+      const { data, error } = await supabase.functions.invoke('geocode-address', {
+        body: { address: 'Avenida Paulista, 1000, São Paulo, SP' },
+      });
+
+      if (error) {
+        return { name: 'Mapa', status: 'error', message: error.message };
       }
-      
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/test.json?access_token=${data.token}&limit=1`
-      );
-      
-      if (!response.ok) {
-        return { name: 'Mapbox', status: 'error', message: 'Token inválido' };
+
+      if (!data?.coordinates) {
+        return { name: 'Mapa', status: 'error', message: 'Geocodificação sem resultado' };
       }
-      
-      return { name: 'Mapbox', status: 'connected', lastCheck: new Date() };
+
+      return { name: 'Mapa', status: 'connected', lastCheck: new Date() };
     } catch (e) {
-      return { name: 'Mapbox', status: 'error', message: (e as Error).message };
+      return { name: 'Mapa', status: 'error', message: (e as Error).message };
     }
   }, []);
 
@@ -103,7 +102,7 @@ export function useIntegrationValidation() {
     try {
       const results = await Promise.all([
         validateLalamove(),
-        validateMapbox(),
+        validateMapa(),
         validateBitrix24(),
         validateRodonaves(),
         validateMelhorEnvio(),
@@ -124,7 +123,7 @@ export function useIntegrationValidation() {
     } finally {
       setIsValidating(false);
     }
-  }, [validateLalamove, validateMapbox, validateBitrix24, validateRodonaves, validateMelhorEnvio]);
+  }, [validateLalamove, validateMapa, validateBitrix24, validateRodonaves, validateMelhorEnvio]);
 
   const validateSingle = useCallback(async (name: string) => {
     setIsValidating(true);
@@ -136,8 +135,8 @@ export function useIntegrationValidation() {
         case 'lalamove':
           result = await validateLalamove();
           break;
-        case 'mapbox':
-          result = await validateMapbox();
+        case 'mapa':
+          result = await validateMapa();
           break;
         case 'bitrix24':
           result = await validateBitrix24();
@@ -167,7 +166,7 @@ export function useIntegrationValidation() {
     } finally {
       setIsValidating(false);
     }
-  }, [validateLalamove, validateMapbox, validateBitrix24, validateRodonaves, validateMelhorEnvio]);
+  }, [validateLalamove, validateMapa, validateBitrix24, validateRodonaves, validateMelhorEnvio]);
 
   return {
     integrations,
