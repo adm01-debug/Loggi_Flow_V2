@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
 import { useCallback, useEffect, useState } from 'react';
 import { QUERY_STALE_TIME } from '@/lib/queryConfig';
+import { deslocamentoEstavel } from '@/lib/mapFallback';
 
 export interface DeliveryRoute {
   id: string;
@@ -72,14 +73,6 @@ const getCoordinatesFromEstado = (estado: string | null): { lat: number; lng: nu
   if (!estado) return null;
   const uf = estado.toUpperCase().trim();
   return estadoCoordenadas[uf] || null;
-};
-
-// Add some randomness to avoid overlapping markers when using fallback
-const addRandomOffset = (coords: { lat: number; lng: number }): { lat: number; lng: number } => {
-  return {
-    lat: coords.lat + (Math.random() - 0.5) * 0.3,
-    lng: coords.lng + (Math.random() - 0.5) * 0.3,
-  };
 };
 
 // Geocode a single address using the edge function
@@ -185,7 +178,7 @@ export const useDeliveryRoutes = (enableGeocoding = true) => {
         
         return {
           ...entrega,
-          coordinates: baseCoords ? addRandomOffset(baseCoords) : undefined,
+          coordinates: baseCoords ? deslocamentoEstavel(baseCoords, entrega.id) : undefined,
           geocoded: false,
         };
       });
