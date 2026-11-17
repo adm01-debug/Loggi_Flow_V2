@@ -52,7 +52,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '20'  # este repo nao tem .nvmrc; a CI usa Node 20
+          node-version: '22'  # este repo nao tem .nvmrc; a CI usa Node 22
 
       - name: Instalar ripgrep (usado pelo gerar-repo.mjs)
         run: command -v rg || sudo apt-get install -y --no-install-recommends ripgrep

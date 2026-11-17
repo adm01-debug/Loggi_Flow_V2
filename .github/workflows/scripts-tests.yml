@@ -1,6 +1,6 @@
 # docs:
 #   gatilho: PR ou push na main que toque scripts/** (ou este arquivo) e dispatch
-#   prova: os testes de scripts/ (gates, CI, banco, inventario, contexto, snapshot) passam em Node 20, o runtime da CI
+#   prova: os testes de scripts/ (gates, CI, banco, inventario, contexto, snapshot) passam em Node 22, o runtime da CI
 #   falha: o job fica vermelho com o teste que quebrou; nao e required check
 #   avisa: resultado do node --test / pytest no log do job
 name: Scripts Tests
@@ -32,7 +32,7 @@ defaults:
 
 jobs:
   testes:
-    name: Scripts Tests (Node 20)
+    name: Scripts Tests (Node 22)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -63,7 +63,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
 
       - name: Instalar dependencias (o teste do seed roda o script com tsx)
