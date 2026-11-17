@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/no-nested-functions, sonarjs/slow-regex */
+/* eslint-disable sonarjs/no-nested-functions */
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -15,6 +15,13 @@ interface UploadOptions {
   signed?: boolean;
   /** TTL of the signed URL in seconds (default 1 year). */
   signedExpiresIn?: number;
+}
+
+// Varredura linear: /\/+$/ tinha backtracking super-linear e podia travar a UI.
+function removerBarrasFinais(valor: string): string {
+  let fim = valor.length;
+  while (fim > 0 && valor[fim - 1] === "/") fim--;
+  return valor.slice(0, fim);
 }
 
 async function resizeImage(file: File, maxWidth: number = 1200): Promise<Blob> {
@@ -74,7 +81,7 @@ export function useImageUpload(bucket: string = "ocorrencias-fotos") {
       const resizedBlob = await resizeImage(file);
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
       const filePath = options.pathPrefix
-        ? `${options.pathPrefix.replace(/\/+$/, "")}/${fileName}`
+        ? `${removerBarrasFinais(options.pathPrefix)}/${fileName}`
         : fileName;
 
       setProgress(40);
