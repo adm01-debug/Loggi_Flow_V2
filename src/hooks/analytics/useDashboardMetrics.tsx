@@ -255,21 +255,35 @@ export function useRecentAlerts() {
         .order("created_at", { ascending: false })
         .limit(10);
 
+      // Variacao real: desvio percentual do valor cotado contra a media das
+      // ultimas cotacoes. Sem base minima (3 valores) nao da para afirmar
+      // variacao, entao nenhum alerta e gerado.
+      const valoresCotados = (cotacoesVariacao ?? [])
+        .map((c) => c.valor_cotado || 0)
+        .filter((v) => v > 0);
+      const mediaCotacoes =
+        valoresCotados.length >= 3
+          ? valoresCotados.reduce((s, v) => s + v, 0) / valoresCotados.length
+          : null;
+
       cotacoesVariacao?.forEach((c) => {
-        // High variation alert if price is very high/low compared to others
-        // Simplified detection for UI demonstration
         const val = c.valor_cotado || 0;
-        const delta = Math.abs((val % 50) - 25) * 2; // Simulated delta
-        if (delta > 30) {
-          alerts.push({
-            id: `variacao-frete-${c.id}`,
-            type: "divergencia",
-            message: `Alta variação detectada no frete da ${c.transportadora?.nome_fantasia || "Transp."}`,
-            severity: "warning",
-            createdAt: c.created_at,
-            entityId: c.id,
-            delta: delta,
-          });
+        if (mediaCotacoes !== null && val > 0) {
+          const desvio = Math.round(
+            (Math.abs(val - mediaCotacoes) / mediaCotacoes) * 100,
+          );
+          if (desvio > 30) {
+            const lado = val > mediaCotacoes ? "acima" : "abaixo";
+            alerts.push({
+              id: `variacao-frete-${c.id}`,
+              type: "divergencia",
+              message: `Frete da ${c.transportadora?.nome_fantasia || "Transp."} ${desvio}% ${lado} da média das últimas cotações`,
+              severity: "warning",
+              createdAt: c.created_at,
+              entityId: c.id,
+              delta: desvio,
+            });
+          }
         }
 
         // Monitoring failures
@@ -325,7 +339,7 @@ export function useTransportadoraPerformance() {
 
       if (error) throw error;
 
-      return (data || []);
+      return data || [];
     },
     staleTime: QUERY_STALE_TIME.STATIC,
     enabled: !!user?.id,
