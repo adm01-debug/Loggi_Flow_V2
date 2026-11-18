@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `094b33b0e500b562ff7257e9ca86e73d7921cbf5` (2026-11-18T13:21:00-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `bfd7215e30eb685f67a825248373486bbb998ff7` (2026-11-18T13:21:48-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8127 nós · 20531 arestas · 716 comunidades · grafo do commit `094b33b0`
+- 8127 nós · 20531 arestas · 716 comunidades · grafo do commit `bfd7215e`
 - comunidades maiores: lucide-react (211), react (180), Button (154), input.tsx (117), Envios.tsx (109), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Transportadoras.tsx (102), ref_node_path (97), cn (94), button.tsx (91), ui/index.ts (87), MainLayout.tsx (85)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -284,17 +284,17 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - package.json (45)
 - index.html (10)
 - src/hooks/gamification/useGamification.ts (10)
-- .github/workflows/contexto-ia.yml (6)
+- .github/workflows/contexto-ia.yml (7)
+- .github/workflows/ci.yml (6)
 - scripts/validate-csp.mjs (6)
-- .github/workflows/ci.yml (5)
+- .github/workflows/ci-nexus.yml (5)
+- .github/workflows/deploy-functions.yml (5)
 - .github/workflows/types-sync.yml (5)
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/audit-gate.mjs (5)
 - src/components/gamification/GamificationPanel.tsx (5)
 - supabase/config.toml (5)
 - tests/security/integrations-access.spec.ts (5)
-- tests/security/rls-access.spec.ts (5)
-- .github/workflows/ci-nexus.yml (4)
 
 ## Workflows
 - `aplicar-migration.yml` — Aplicar Migration (workflow_dispatch)
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-18 `bfd7215` chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)
 - 2026-11-18 `094b33b` chore(deps): bump vaul from 0.9.9 to 1.1.2 (#191)
 - 2026-11-18 `9c1c505` chore(deps): bump @remix-run/router and react-router-dom (#185)
 - 2026-11-18 `67c87ec` ci(seguranca): recupera dependency review nos PRs da branch claude/seguranca-workflows-261112 (#182)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `1000cd9` chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)
 - 2026-11-17 `cf7f398` fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)
 - 2026-11-17 `221e61e` fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)
-- 2026-11-17 `f61ccee` chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

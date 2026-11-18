@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "094b33b0e500b562ff7257e9ca86e73d7921cbf5",
+  "commit": "bfd7215e30eb685f67a825248373486bbb998ff7",
   "branch": "main",
-  "data_commit": "2026-11-18T13:21:00-03:00",
+  "data_commit": "2026-11-18T13:21:48-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "bfd7215",
+    "data": "2026-11-18",
+    "assunto": "chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)"
+   },
    {
     "sha": "094b33b",
     "data": "2026-11-18",
@@ -126,18 +131,17 @@
     "sha": "8ea7b1f",
     "data": "2026-11-17",
     "assunto": "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)"
-   },
-   {
-    "sha": "5b14adc",
-    "data": "2026-11-17",
-    "assunto": "fix: previsao de frete deixa de ser numero inventado (#159)"
    }
   ],
-  "arquivos_mudados_7d": 128,
+  "arquivos_mudados_7d": 130,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
     "mudancas": 10
+   },
+   {
+    "pasta": ".github/workflows/contexto-ia.yml",
+    "mudancas": 7
    },
    {
     "pasta": "package-lock.json",
@@ -146,10 +150,6 @@
    {
     "pasta": "package.json",
     "mudancas": 7
-   },
-   {
-    "pasta": ".github/workflows/contexto-ia.yml",
-    "mudancas": 6
    },
    {
     "pasta": "src/hooks/data",
@@ -192,7 +192,7 @@
     "mudancas": 4
    },
    {
-    "pasta": ".github/workflows/codeql.yml",
+    "pasta": ".github/workflows/ci.yml",
     "mudancas": 3
    }
   ],
@@ -215,6 +215,10 @@
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
+    "mudancas": 7
+   },
+   {
+    "arquivo": ".github/workflows/ci.yml",
     "mudancas": 6
    },
    {
@@ -222,7 +226,11 @@
     "mudancas": 6
    },
    {
-    "arquivo": ".github/workflows/ci.yml",
+    "arquivo": ".github/workflows/ci-nexus.yml",
+    "mudancas": 5
+   },
+   {
+    "arquivo": ".github/workflows/deploy-functions.yml",
     "mudancas": 5
    },
    {
@@ -254,15 +262,15 @@
     "mudancas": 5
    },
    {
-    "arquivo": ".github/workflows/ci-nexus.yml",
-    "mudancas": 4
-   },
-   {
-    "arquivo": ".github/workflows/deploy-functions.yml",
+    "arquivo": ".github/workflows/e2e.yml",
     "mudancas": 4
    },
    {
     "arquivo": ".github/workflows/inventario-estado-semanal.yml",
+    "mudancas": 4
+   },
+   {
+    "arquivo": ".github/workflows/security.yml",
     "mudancas": 4
    },
    {
@@ -288,14 +296,6 @@
    {
     "arquivo": "scripts/generate-quality-report.mjs",
     "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/ops/pos_deploy_functions.sql",
-    "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/origem_remediacao_2026-08-31.sql",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
@@ -305,7 +305,7 @@
    },
    {
     "autor": "dependabot[bot]",
-    "commits": 7
+    "commits": 8
    },
    {
     "autor": "github-actions[bot]",

@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "094b33b0e500b562ff7257e9ca86e73d7921cbf5",
+  "sha": "bfd7215e30eb685f67a825248373486bbb998ff7",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-18 16:21 UTC",
+  "generated_at": "2026-11-18 16:22 UTC",
   "files_total": 1312,
   "code_files": 1136,
   "code_lines": 183641,
@@ -88780,10 +88780,27 @@
   }
  },
  "git": {
-  "sha": "094b33b0e500b562ff7257e9ca86e73d7921cbf5",
+  "sha": "bfd7215e30eb685f67a825248373486bbb998ff7",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "bfd7215",
+    "date": "2026-11-18",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)",
+    "files": [
+     ".github/workflows/aplicar-migration.yml",
+     ".github/workflows/automation-local.yml",
+     ".github/workflows/ci-nexus.yml",
+     ".github/workflows/ci.yml",
+     ".github/workflows/contexto-ia.yml",
+     ".github/workflows/deploy-functions.yml",
+     ".github/workflows/e2e.yml",
+     ".github/workflows/security.yml",
+     ".github/workflows/sync-internal-secret.yml"
+    ]
+   },
    {
     "sha": "094b33b",
     "date": "2026-11-18",
@@ -89124,17 +89141,6 @@
      "docs/auditoria-recuperacao-branches.md",
      "scripts/ops/pos_deploy_functions.sql"
     ]
-   },
-   {
-    "sha": "70f45b3",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "test: conecta simulacao e fuzzing aos validadores reais (#153)",
-    "files": [
-     "tests/integration/fuzzing.spec.ts",
-     "tests/integration/massive-simulation.spec.ts",
-     "tests/integration/webhooks.spec.ts"
-    ]
    }
   ],
   "hot_files": [
@@ -89157,6 +89163,26 @@
    [
     "src/hooks/data/useImageUpload.tsx",
     3
+   ],
+   [
+    ".github/workflows/aplicar-migration.yml",
+    2
+   ],
+   [
+    ".github/workflows/ci-nexus.yml",
+    2
+   ],
+   [
+    ".github/workflows/ci.yml",
+    2
+   ],
+   [
+    ".github/workflows/contexto-ia.yml",
+    2
+   ],
+   [
+    ".github/workflows/e2e.yml",
+    2
    ],
    [
     "src/hooks/data/useRealtime.tsx",
@@ -89187,35 +89213,15 @@
     2
    ],
    [
-    ".github/workflows/dependency-review.yml",
+    ".github/workflows/automation-local.yml",
     1
    ],
    [
-    "index.html",
+    ".github/workflows/deploy-functions.yml",
     1
    ],
    [
-    "scripts/gates/validate-csp.unit.mjs",
-    1
-   ],
-   [
-    "scripts/validate-csp.mjs",
-    1
-   ],
-   [
-    "src/hooks/security/useIntegrationValidation.tsx",
-    1
-   ],
-   [
-    "src/lib/mapStyles.ts",
-    1
-   ],
-   [
-    "src/pages/RastreamentoMotorista.tsx",
-    1
-   ],
-   [
-    "supabase/functions/geocode-address/index.ts",
+    ".github/workflows/security.yml",
     1
    ]
   ]
