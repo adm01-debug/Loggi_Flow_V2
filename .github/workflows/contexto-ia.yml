@@ -80,7 +80,7 @@ jobs:
       banco: ${{ steps.g.outputs.banco }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -124,7 +124,7 @@ jobs:
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 300 # baseline.json usa git log dos ultimos 90 dias
@@ -186,7 +186,7 @@ jobs:
       GEN_TYPES: 'false'
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -279,7 +279,7 @@ jobs:
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 60 # o ultimo commit nao-bot vira o `commit` do manifest
@@ -310,7 +310,7 @@ jobs:
       contents: write # push na branch gerada contexto
     steps:
       - name: Checkout (main - indice.py e manual/ vem daqui)
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 1
