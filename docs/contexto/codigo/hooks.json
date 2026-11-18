@@ -2445,7 +2445,7 @@
     "useMultiTableRealtime",
     "useRealtime"
    ],
-   "linhas": 256,
+   "linhas": 292,
    "dominio": "hooks/data",
    "tabelas": [],
    "rpcs": [],
@@ -2457,8 +2457,7 @@
     "useRef"
    ],
    "canais_realtime": [
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}"
+    "realtime:${config.table}:${multiTopicId}"
    ],
    "usado_por": 13,
    "usado_por_arquivos": [

@@ -1276,8 +1276,7 @@
    "nexus-tactical-realtime-alerts",
    "presence-health",
    "raw_responses",
-   "realtime:${config.table}",
-   "realtime:${table}:${attempt}",
+   "realtime:${config.table}:${multiTopicId}",
    "risk-zones-changes",
    "system-health-check",
    "tactical-logs"

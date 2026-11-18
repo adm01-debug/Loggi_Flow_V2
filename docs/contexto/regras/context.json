@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "8530be9647a93f4718086e90f24c61072da84959",
+  "sha": "e73975be7270dd0b6241d72929205a4bcd9e4a78",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-17 21:20 UTC",
+  "generated_at": "2026-11-18 12:47 UTC",
   "files_total": 1311,
   "code_files": 1136,
-  "code_lines": 183605,
+  "code_lines": 183641,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "26d6901514f48392",
+ "facts_hash": "71164ac7c8570336",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29718,7 +29718,7 @@
   {
    "module": "src/hooks",
    "files": 123,
-   "lines": 19097,
+   "lines": 19133,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -33298,10 +33298,7 @@
    "raw_responses": [
     "src/components/freight/ResponseConsole.tsx"
    ],
-   "realtime:${config.table}": [
-    "src/hooks/data/useRealtime.tsx"
-   ],
-   "realtime:${table}:${attempt}": [
+   "realtime:${config.table}:${multiTopicId}": [
     "src/hooks/data/useRealtime.tsx"
    ],
    "ri[REDACTED]": [
@@ -75773,14 +75770,13 @@
   },
   "src/hooks/data/useRealtime.tsx": {
    "path": "src/hooks/data/useRealtime.tsx",
-   "lines": 256,
+   "lines": 292,
    "exports": [
     "function useRealtime",
     "function useMultiTableRealtime"
    ],
    "channels": [
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}"
+    "realtime:${config.table}:${multiTopicId}"
    ],
    "params": [
     {
@@ -88777,10 +88773,19 @@
   }
  },
  "git": {
-  "sha": "8530be9647a93f4718086e90f24c61072da84959",
+  "sha": "e73975be7270dd0b6241d72929205a4bcd9e4a78",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "e73975b",
+    "date": "2026-11-18",
+    "author": "adm01-debug",
+    "subject": "﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)",
+    "files": [
+     "src/hooks/data/useRealtime.tsx"
+    ]
+   },
    {
     "sha": "8530be9",
     "date": "2026-11-17",
@@ -89123,15 +89128,6 @@
     "files": [
      "docs/prod-readiness.md"
     ]
-   },
-   {
-    "sha": "fee186d",
-    "date": "2026-11-14",
-    "author": "adm01-debug",
-    "subject": "docs: prod-readiness — registra Data Integrity BLOQUEADO e status reais (#151)",
-    "files": [
-     "docs/prod-readiness.md"
-    ]
    }
   ],
   "hot_files": [
@@ -89154,6 +89150,10 @@
    [
     "src/hooks/data/useImageUpload.tsx",
     3
+   ],
+   [
+    "src/hooks/data/useRealtime.tsx",
+    2
    ],
    [
     "src/components/dashboard/LogisticsMapWidget.tsx",
@@ -89181,10 +89181,6 @@
    ],
    [
     ".github/workflows/contexto-ia.yml",
-    2
-   ],
-   [
-    "docs/prod-readiness.md",
     2
    ],
    [

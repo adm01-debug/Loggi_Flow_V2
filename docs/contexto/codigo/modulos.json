@@ -353,8 +353,7 @@
    "rpcs": [],
    "buckets": [],
    "canais_realtime": [
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}"
+    "realtime:${config.table}:${multiTopicId}"
    ],
    "env": [
     "VITE_SUPABASE_PUBLISHABLE_KEY",
@@ -793,8 +792,7 @@
    ],
    "buckets": [],
    "canais_realtime": [
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "tactical-logs"
    ],
@@ -1040,8 +1038,7 @@
     "box-realtime",
     "nexus-tactical-realtime-alerts",
     "raw_responses",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes"
    ],
    "env": [
@@ -2985,8 +2982,7 @@
    "canais_realtime": [
     "box-realtime",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes"
    ],
    "env": [
@@ -3426,7 +3422,7 @@
    "modulo": "hooks/data",
    "arquivos": 7,
    "testes": 0,
-   "linhas": 795,
+   "linhas": 831,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -3466,8 +3462,7 @@
    "rpcs": [],
    "buckets": [],
    "canais_realtime": [
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}"
+    "realtime:${config.table}:${multiTopicId}"
    ],
    "env": [
     "VITE_SUPABASE_PUBLISHABLE_KEY",
@@ -3814,8 +3809,7 @@
    "canais_realtime": [
     "box-realtime",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes"
    ],
    "env": [
@@ -5021,8 +5015,7 @@
     "nexus-tactical-realtime-alerts",
     "presence-health",
     "raw_responses",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check",
     "tactical-logs"
@@ -5633,8 +5626,7 @@
    "canais_realtime": [
     "box-realtime",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes"
    ],
    "env": [
@@ -5853,8 +5845,7 @@
    "canais_realtime": [
     "box-realtime",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes"
    ],
    "env": [
@@ -6069,8 +6060,7 @@
    "canais_realtime": [
     "box-realtime",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes"
    ],
    "env": [

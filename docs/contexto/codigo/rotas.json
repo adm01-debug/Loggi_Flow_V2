@@ -181,8 +181,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check",
     "tactical-logs"
@@ -1416,8 +1415,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -1951,8 +1949,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -2211,8 +2208,7 @@
     "health-ping",
     "nexus-tactical-realtime-alerts",
     "presence-health",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -2532,8 +2528,7 @@
     "box-realtime",
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check"
    ],
@@ -3091,8 +3086,7 @@
     "box-realtime",
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check"
    ],
@@ -3545,8 +3539,7 @@
     "box-realtime",
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check"
    ],
@@ -3881,8 +3874,7 @@
     "box-realtime",
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check"
    ],
@@ -4004,8 +3996,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -4329,8 +4320,7 @@
     "health-ping",
     "nexus-tactical-realtime-alerts",
     "raw_responses",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check"
    ],
@@ -4581,8 +4571,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -4716,8 +4705,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -5841,8 +5829,7 @@
     "box-realtime",
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check"
    ],
@@ -5966,8 +5953,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -6289,8 +6275,7 @@
     "box-realtime",
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "system-health-check"
    ],
@@ -6815,8 +6800,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -7390,8 +7374,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -7515,8 +7498,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -7647,8 +7629,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],
@@ -8471,8 +8452,7 @@
    "canais_realtime": [
     "health-ping",
     "nexus-tactical-realtime-alerts",
-    "realtime:${config.table}",
-    "realtime:${table}:${attempt}",
+    "realtime:${config.table}:${multiTopicId}",
     "system-health-check"
    ],
    "flags": [],

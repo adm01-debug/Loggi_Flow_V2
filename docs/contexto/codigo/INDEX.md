@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8530be9647a93f4718086e90f24c61072da84959` (2026-11-17T18:16:06-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e73975be7270dd0b6241d72929205a4bcd9e4a78` (2026-11-18T09:46:31-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1301 |
 | arquivos_codigo | 876 |
-| linhas_codigo | 167224 |
+| linhas_codigo | 167260 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8123 nós · 20522 arestas · 692 comunidades · grafo do commit `8530be96`
-- comunidades maiores: lucide-react (245), Envios.tsx (230), react (220), ref_node_path (131), Button (129), db-observability/index.ts (127), ui/index.ts (105), date-fns (104), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Index.tsx (100), cn (95), useAuth (94)
+- 8127 nós · 20531 arestas · 716 comunidades · grafo do commit `e73975be`
+- comunidades maiores: lucide-react (211), react (180), Button (154), input.tsx (117), Envios.tsx (109), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Transportadoras.tsx (102), ref_node_path (97), cn (94), button.tsx (91), ui/index.ts (87), MainLayout.tsx (85)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-18 `e73975b` ﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)
 - 2026-11-17 `8530be9` feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)
 - 2026-11-17 `6e1ffcf` fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)
 - 2026-11-17 `e1f6935` fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `4c16760` fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)
 - 2026-11-17 `7931333` chore(db): sincronizar artefatos com o banco [auto] (#166)
 - 2026-11-17 `0ead536` chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)
-- 2026-11-17 `09c9545` fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

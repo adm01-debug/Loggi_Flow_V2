@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8530be9647a93f4718086e90f24c61072da84959",
+  "commit": "e73975be7270dd0b6241d72929205a4bcd9e4a78",
   "branch": "main",
-  "data_commit": "2026-11-17T18:16:06-03:00",
+  "data_commit": "2026-11-18T09:46:31-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "e73975b",
+    "data": "2026-11-18",
+    "assunto": "﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)"
+   },
    {
     "sha": "8530be9",
     "data": "2026-11-17",
@@ -126,14 +131,9 @@
     "sha": "8071e4a",
     "data": "2026-11-17",
     "assunto": "docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)"
-   },
-   {
-    "sha": "7b46a98",
-    "data": "2026-11-17",
-    "assunto": "chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)"
    }
   ],
-  "arquivos_mudados_7d": 144,
+  "arquivos_mudados_7d": 127,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -141,6 +141,10 @@
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
+    "mudancas": 6
+   },
+   {
+    "pasta": "src/hooks/data",
     "mudancas": 6
    },
    {
@@ -165,10 +169,6 @@
    },
    {
     "pasta": "src/components/dashboard",
-    "mudancas": 5
-   },
-   {
-    "pasta": "src/hooks/data",
     "mudancas": 5
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 120
+    "commits": 121
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1301,
   "arquivos_codigo": 876,
-  "linhas_codigo": 167224,
+  "linhas_codigo": 167260,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -460,7 +460,7 @@
   },
   "src/hooks": {
    "arquivos": 123,
-   "linhas": 19097
+   "linhas": 19133
   },
   "src/i18n.ts": {
    "arquivos": 1,
