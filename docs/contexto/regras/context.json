@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "9c1c505199ff0e252af81d14b9dcf6bd0db19281",
+  "sha": "094b33b0e500b562ff7257e9ca86e73d7921cbf5",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-18 16:18 UTC",
+  "generated_at": "2026-11-18 16:21 UTC",
   "files_total": 1312,
   "code_files": 1136,
   "code_lines": 183641,
@@ -88780,10 +88780,20 @@
   }
  },
  "git": {
-  "sha": "9c1c505199ff0e252af81d14b9dcf6bd0db19281",
+  "sha": "094b33b0e500b562ff7257e9ca86e73d7921cbf5",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "094b33b",
+    "date": "2026-11-18",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump vaul from 0.9.9 to 1.1.2 (#191)",
+    "files": [
+     "package-lock.json",
+     "package.json"
+    ]
+   },
    {
     "sha": "9c1c505",
     "date": "2026-11-18",
@@ -89125,29 +89135,20 @@
      "tests/integration/massive-simulation.spec.ts",
      "tests/integration/webhooks.spec.ts"
     ]
-   },
-   {
-    "sha": "42774d8",
-    "date": "2026-11-14",
-    "author": "adm01-debug",
-    "subject": "chore: contexto agendado de 10 min para 1x/hora (#154)",
-    "files": [
-     ".github/workflows/contexto-ia.yml"
-    ]
    }
   ],
   "hot_files": [
    [
     "package-lock.json",
+    6
+   ],
+   [
+    "package.json",
     5
    ],
    [
     "docs/auditoria-recuperacao-branches.md",
     5
-   ],
-   [
-    "package.json",
-    4
    ],
    [
     "src/components/map/MapboxMap.tsx",
@@ -89186,10 +89187,6 @@
     2
    ],
    [
-    ".github/workflows/contexto-ia.yml",
-    2
-   ],
-   [
     ".github/workflows/dependency-review.yml",
     1
    ],
@@ -89215,6 +89212,10 @@
    ],
    [
     "src/pages/RastreamentoMotorista.tsx",
+    1
+   ],
+   [
+    "supabase/functions/geocode-address/index.ts",
     1
    ]
   ]

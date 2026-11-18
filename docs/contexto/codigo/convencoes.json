@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore(deps): bump vaul from 0.9.9 to 1.1.2 (#191)",
    "chore(deps): bump @remix-run/router and react-router-dom (#185)",
    "ci(seguranca): recupera dependency review nos PRs da branch claude/seguranca-workflows-261112 (#182)",
    "﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)",
-   "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)",
-   "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)"
+   "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",
