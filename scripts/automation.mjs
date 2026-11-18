@@ -382,7 +382,7 @@ export async function execute(
       forced = setTimeout(() => {
         kill("SIGKILL");
         finish(130, "interrompido");
-      }, 500);
+      }, Number(process.env.REPO_AUTOMATION_GRACE_MS) || 500);
     };
     process.once("SIGTERM", terminate);
     process.once("SIGINT", terminate);
@@ -392,7 +392,7 @@ export async function execute(
       forced = setTimeout(() => {
         kill("SIGKILL");
         finish(124, "timeout");
-      }, 500);
+      }, Number(process.env.REPO_AUTOMATION_GRACE_MS) || 500);
     }, timeout);
     child.stdout?.on("data", (x) => {
       if (chunks.reduce((a, b) => a + b.length, 0) < 4 * 1024 * 1024)
