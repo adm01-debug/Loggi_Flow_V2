@@ -19,6 +19,33 @@ function debounce<T extends (...args: never[]) => void>(
   };
 }
 
+// Memória de canais já registrados no cliente para evitar colisão de tópicos.
+// O supabase-js reusa o canal pelo "topic": dois hooks ouvindo a mesma tabela
+// com o mesmo tópico fazem `.on()` após `.subscribe()` e estouram a página.
+const channelTopicRegistry = new Set<string>();
+
+function isChannelTopicTaken(topic: string): boolean {
+  return channelTopicRegistry.has(topic);
+}
+
+// contador global para gerar um id de tópico único por invocação do hook
+let hookInstanceCounter = 0;
+const hookInstanceId = (): string => {
+  let candidate: string;
+  // Pular ids ainda registrados evita colisão mesmo quando o contador for
+  // zerado (ex.: reload de módulo em HMR) com registros ainda vivos.
+  do {
+    hookInstanceCounter += 1;
+    candidate = `hook-${hookInstanceCounter}`;
+  } while (isChannelTopicTaken(candidate));
+  channelTopicRegistry.add(candidate);
+  return candidate;
+};
+
+function releaseChannelTopic(topic: string): void {
+  channelTopicRegistry.delete(topic);
+}
+
 // Memory-efficient LRU cache for realtime payloads
 const payloadCache = new Map<string, string>();
 const MAX_CACHE_SIZE = 50;
@@ -62,6 +89,9 @@ export function useRealtime<T = Record<string, unknown>>({
 }: UseRealtimeOptions<T>) {
   const queryClient = useQueryClient();
   const channelRef = useRef<RealtimeChannel | null>(null);
+  // Tópico único por invocação: evita que dois hooks na mesma tabela colidam
+  // no mesmo canal do supabase-js (que reusa canal por topic).
+  const topicRef = useRef(hookInstanceId());
 
   // Optimized invalidation with debounce to prevent rapid-fire refetches
   const debouncedInvalidate = useRef(
@@ -135,6 +165,8 @@ export function useRealtime<T = Record<string, unknown>>({
     let cleanup: (() => void) | null = null;
     let cancelled = false;
     let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    const topic = `realtime:${table}:${topicRef.current}`;
+    const topicId = topicRef.current;
 
     const connect = () => {
       const channelConfig = {
@@ -145,7 +177,7 @@ export function useRealtime<T = Record<string, unknown>>({
       } as { event: "*"; schema: "public"; table: string; filter?: string };
 
       const channel = supabase
-        .channel(`realtime:${table}:${attempt}`)
+        .channel(attempt !== 0 ? `${topic}:${attempt}` : topic)
         .on("postgres_changes", channelConfig, handleChange)
         .subscribe((status) => {
           if (status === "SUBSCRIBED") {
@@ -177,6 +209,7 @@ export function useRealtime<T = Record<string, unknown>>({
       cancelled = true;
       cleanup?.();
       channelRef.current = null;
+      releaseChannelTopic(topicId);
     };
   }, [table, schema, event, filter, enabled, handleChange]);
 
@@ -196,6 +229,8 @@ export function useMultiTableRealtime<T = Record<string, unknown>>(
   const queryClient = useQueryClient();
   const channelsRef = useRef<RealtimeChannel[]>([]);
   const tablesKey = JSON.stringify(tables.map((t) => t.table));
+  const multiTopicRef = useRef(hookInstanceId());
+  const multiTopicId = multiTopicRef.current;
 
   useEffect(() => {
     if (!enabled) return;
@@ -209,7 +244,7 @@ export function useMultiTableRealtime<T = Record<string, unknown>>(
       } as { event: "*"; schema: "public"; table: string; filter?: string };
 
       const channel = supabase
-        .channel(`realtime:${config.table}`)
+        .channel(`realtime:${config.table}:${multiTopicId}`)
         .on(
           "postgres_changes",
           channelConfig,
@@ -246,6 +281,7 @@ export function useMultiTableRealtime<T = Record<string, unknown>>(
         supabase.removeChannel(channel);
       });
       channelsRef.current = [];
+      releaseChannelTopic(multiTopicId);
     };
     // tablesKey is the stable serialized form of the tables array
     // eslint-disable-next-line react-hooks/exhaustive-deps
