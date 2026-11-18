@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "67c87ec3c04f3137efa9b02a3b81105e76133fbb",
+  "commit": "9c1c505199ff0e252af81d14b9dcf6bd0db19281",
   "branch": "main",
-  "data_commit": "2026-11-18T12:21:51-03:00",
+  "data_commit": "2026-11-18T13:18:07-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "9c1c505",
+    "data": "2026-11-18",
+    "assunto": "chore(deps): bump @remix-run/router and react-router-dom (#185)"
+   },
    {
     "sha": "67c87ec",
     "data": "2026-11-18",
@@ -126,11 +131,6 @@
     "sha": "f680a64",
     "data": "2026-11-17",
     "assunto": "fix: alertas de divergencia e falha de frete sumiam da home (#158)"
-   },
-   {
-    "sha": "4496d9f",
-    "data": "2026-11-17",
-    "assunto": "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)"
    }
   ],
   "arquivos_mudados_7d": 128,
@@ -144,6 +144,14 @@
     "mudancas": 6
    },
    {
+    "pasta": "package-lock.json",
+    "mudancas": 6
+   },
+   {
+    "pasta": "package.json",
+    "mudancas": 6
+   },
+   {
     "pasta": "src/hooks/data",
     "mudancas": 6
    },
@@ -153,14 +161,6 @@
    },
    {
     "pasta": "docs/auditoria-recuperacao-branches.md",
-    "mudancas": 5
-   },
-   {
-    "pasta": "package-lock.json",
-    "mudancas": 5
-   },
-   {
-    "pasta": "package.json",
     "mudancas": 5
    },
    {
@@ -199,11 +199,11 @@
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 44
+    "mudancas": 45
    },
    {
     "arquivo": "package.json",
-    "mudancas": 43
+    "mudancas": 44
    },
    {
     "arquivo": "index.html",
@@ -305,7 +305,7 @@
    },
    {
     "autor": "dependabot[bot]",
-    "commits": 5
+    "commits": 6
    },
    {
     "autor": "github-actions[bot]",
