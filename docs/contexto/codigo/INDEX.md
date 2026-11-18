@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `f3db2b850211c896ddec8f4885bf6d9b010f4afb` (2026-11-18T13:53:01-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `554aaad726285536c41ef622a7b816e09e46b26a` (2026-11-18T13:53:16-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8127 nós · 20531 arestas · 716 comunidades · grafo do commit `f3db2b85`
+- 8127 nós · 20531 arestas · 716 comunidades · grafo do commit `554aaad7`
 - comunidades maiores: lucide-react (211), react (180), Button (154), input.tsx (117), Envios.tsx (109), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Transportadoras.tsx (102), ref_node_path (97), cn (94), button.tsx (91), ui/index.ts (87), MainLayout.tsx (85)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -287,14 +287,14 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci.yml (7)
 - .github/workflows/ci-nexus.yml (6)
+- .github/workflows/types-sync.yml (6)
 - scripts/validate-csp.mjs (6)
 - .github/workflows/deploy-functions.yml (5)
 - .github/workflows/e2e.yml (5)
-- .github/workflows/types-sync.yml (5)
+- .github/workflows/inventario-estado-semanal.yml (5)
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/audit-gate.mjs (5)
 - src/components/gamification/GamificationPanel.tsx (5)
-- supabase/config.toml (5)
 
 ## Workflows
 - `aplicar-migration.yml` — Aplicar Migration (workflow_dispatch)
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-18 `554aaad` chore(deps): bump peter-evans/create-pull-request from 8.1.2 to 8.1.3 (#189)
 - 2026-11-18 `f3db2b8` chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)
 - 2026-11-18 `bfd7215` chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)
 - 2026-11-18 `094b33b` chore(deps): bump vaul from 0.9.9 to 1.1.2 (#191)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `5bfae77` chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)
 - 2026-11-17 `4b5d4c9` chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)
 - 2026-11-17 `1000cd9` chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)
-- 2026-11-17 `cf7f398` fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

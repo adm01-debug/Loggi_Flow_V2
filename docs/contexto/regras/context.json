@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "f3db2b850211c896ddec8f4885bf6d9b010f4afb",
+  "sha": "554aaad726285536c41ef622a7b816e09e46b26a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-18 16:53 UTC",
+  "generated_at": "2026-11-18 17:13 UTC",
   "files_total": 1312,
   "code_files": 1136,
   "code_lines": 183641,
@@ -88780,10 +88780,20 @@
   }
  },
  "git": {
-  "sha": "f3db2b850211c896ddec8f4885bf6d9b010f4afb",
+  "sha": "554aaad726285536c41ef622a7b816e09e46b26a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "554aaad",
+    "date": "2026-11-18",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump peter-evans/create-pull-request from 8.1.2 to 8.1.3 (#189)",
+    "files": [
+     ".github/workflows/inventario-estado-semanal.yml",
+     ".github/workflows/types-sync.yml"
+    ]
+   },
    {
     "sha": "f3db2b8",
     "date": "2026-11-18",
@@ -89134,15 +89144,6 @@
      "src/components/map/MapIntelligenceOverlay.tsx",
      "src/hooks/logistics/useMapIntelligence.ts"
     ]
-   },
-   {
-    "sha": "8071e4a",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "docs: fecha auditoria com as 25 branches apagadas e o criterio usado (#156)",
-    "files": [
-     "docs/auditoria-recuperacao-branches.md"
-    ]
    }
   ],
   "hot_files": [
@@ -89153,10 +89154,6 @@
    [
     "package.json",
     5
-   ],
-   [
-    "docs/auditoria-recuperacao-branches.md",
-    4
    ],
    [
     ".github/workflows/ci-nexus.yml",
@@ -89181,6 +89178,18 @@
    [
     "src/hooks/data/useImageUpload.tsx",
     3
+   ],
+   [
+    "docs/auditoria-recuperacao-branches.md",
+    3
+   ],
+   [
+    ".github/workflows/inventario-estado-semanal.yml",
+    2
+   ],
+   [
+    ".github/workflows/types-sync.yml",
+    2
    ],
    [
     ".github/workflows/automation-local.yml",
@@ -89217,14 +89226,6 @@
    [
     "src/hooks/logistics/useDeliveryRoutes.tsx",
     2
-   ],
-   [
-    ".github/workflows/deploy-functions.yml",
-    1
-   ],
-   [
-    ".github/workflows/security.yml",
-    1
    ]
   ]
  }
