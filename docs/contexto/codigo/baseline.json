@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "554aaad726285536c41ef622a7b816e09e46b26a",
+  "commit": "55ec52fbd32de522dcf1ef3aa5a79563ff390769",
   "branch": "main",
-  "data_commit": "2026-11-18T13:53:16-03:00",
+  "data_commit": "2026-11-18T15:30:24-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "55ec52f",
+    "data": "2026-11-18",
+    "assunto": "fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)"
+   },
    {
     "sha": "554aaad",
     "data": "2026-11-18",
@@ -126,14 +131,9 @@
     "sha": "a6e18fc",
     "data": "2026-11-17",
     "assunto": "fix: painel de seguranca lia login_attempts por coluna inexistente (#164)"
-   },
-   {
-    "sha": "63c4b83",
-    "data": "2026-11-17",
-    "assunto": "﻿fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)"
    }
   ],
-  "arquivos_mudados_7d": 130,
+  "arquivos_mudados_7d": 131,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 122
+    "commits": 123
    },
    {
     "autor": "dependabot[bot]",

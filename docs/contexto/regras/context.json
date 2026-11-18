@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "554aaad726285536c41ef622a7b816e09e46b26a",
+  "sha": "55ec52fbd32de522dcf1ef3aa5a79563ff390769",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-18 17:13 UTC",
+  "generated_at": "2026-11-18 19:11 UTC",
   "files_total": 1312,
   "code_files": 1136,
   "code_lines": 183641,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "41ea80d4e0b132f0",
+ "facts_hash": "c62d1a1c4e511a9a",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -32637,6 +32637,9 @@
    "REPO_AUTOMATION_CHAINING": [
     "scripts/automation.mjs"
    ],
+   "REPO_AUTOMATION_GRACE_MS": [
+    "scripts/automation.mjs"
+   ],
    "REPO_ROOT": [
     "scripts/supabase_snapshot/snapshot.py"
    ],
@@ -64969,7 +64972,8 @@
     "function main"
    ],
    "env": [
-    "REPO_AUTOMATION_CHAINING"
+    "REPO_AUTOMATION_CHAINING",
+    "REPO_AUTOMATION_GRACE_MS"
    ],
    "rule_comments": [
     "Não trunque: um append concorrente deve sobreviver à reversão.",
@@ -88780,10 +88784,19 @@
   }
  },
  "git": {
-  "sha": "554aaad726285536c41ef622a7b816e09e46b26a",
+  "sha": "55ec52fbd32de522dcf1ef3aa5a79563ff390769",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "55ec52f",
+    "date": "2026-11-18",
+    "author": "adm01-debug",
+    "subject": "fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)",
+    "files": [
+     "scripts/automation.mjs"
+    ]
+   },
    {
     "sha": "554aaad",
     "date": "2026-11-18",
@@ -89133,17 +89146,6 @@
      "src/components/dashboard/alertsFilter.ts",
      "src/hooks/analytics/useDashboardMetrics.tsx"
     ]
-   },
-   {
-    "sha": "4496d9f",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "fix: liga painel de inteligencia do mapa a dados reais de entregas (#157)",
-    "files": [
-     "docs/auditoria-recuperacao-branches.md",
-     "src/components/map/MapIntelligenceOverlay.tsx",
-     "src/hooks/logistics/useMapIntelligence.ts"
-    ]
    }
   ],
   "hot_files": [
@@ -89177,10 +89179,6 @@
    ],
    [
     "src/hooks/data/useImageUpload.tsx",
-    3
-   ],
-   [
-    "docs/auditoria-recuperacao-branches.md",
     3
    ],
    [
@@ -89225,6 +89223,10 @@
    ],
    [
     "src/hooks/logistics/useDeliveryRoutes.tsx",
+    2
+   ],
+   [
+    "docs/auditoria-recuperacao-branches.md",
     2
    ]
   ]

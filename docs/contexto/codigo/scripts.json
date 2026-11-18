@@ -105,7 +105,8 @@
    "descricao": null,
    "linhas": 1170,
    "env": [
-    "REPO_AUTOMATION_CHAINING"
+    "REPO_AUTOMATION_CHAINING",
+    "REPO_AUTOMATION_GRACE_MS"
    ],
    "npm_scripts": [
     "automation:doctor",
