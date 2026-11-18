@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e73975be7270dd0b6241d72929205a4bcd9e4a78` (2026-11-18T09:46:31-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `67c87ec3c04f3137efa9b02a3b81105e76133fbb` (2026-11-18T12:21:51-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (789), SQL (259), Markdown (84), JavaScript (80), JSON (33), YAML (21), Shell (9), Python (8)
+- linguagens: TypeScript (789), SQL (259), Markdown (84), JavaScript (80), JSON (33), YAML (22), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,7 +34,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1301 |
+| arquivos_total | 1302 |
 | arquivos_codigo | 876 |
 | linhas_codigo | 167260 |
 | rotas | 61 |
@@ -49,7 +49,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | migrations | 246 |
 | cron_jobs | 28 |
 | testes | 129 |
-| workflows | 17 |
+| workflows | 18 |
 | scripts | 62 |
 | docs_md | 84 |
 
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8127 nós · 20531 arestas · 716 comunidades · grafo do commit `e73975be`
+- 8127 nós · 20531 arestas · 716 comunidades · grafo do commit `67c87ec3`
 - comunidades maiores: lucide-react (211), react (180), Button (154), input.tsx (117), Envios.tsx (109), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), Transportadoras.tsx (102), ref_node_path (97), cn (94), button.tsx (91), ui/index.ts (87), MainLayout.tsx (85)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -305,6 +305,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `ci.yml` — CI/CD Pipeline (pull_request, push)
 - `codeql.yml` — CodeQL (schedule, workflow_dispatch; cron 30 9 * * *)
 - `contexto-ia.yml` — Contexto para agentes de IA (10 min) (push, schedule, workflow_dispatch; cron 7 * * * *)
+- `dependency-review.yml` — Dependency Review (pull_request)
 - `deploy-functions.yml` — Deploy Edge Functions (workflow_dispatch)
 - `e2e.yml` — E2E (manual) (workflow_dispatch)
 - `inventario-estado-semanal.yml` — Inventário do estado real (semanal) (schedule, workflow_dispatch; cron 23 10 * * 1)
@@ -400,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-18 `67c87ec` ci(seguranca): recupera dependency review nos PRs da branch claude/seguranca-workflows-261112 (#182)
 - 2026-11-18 `e73975b` ﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)
 - 2026-11-17 `8530be9` feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)
 - 2026-11-17 `6e1ffcf` fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)
@@ -414,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-17 `f61ccee` chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)
 - 2026-11-17 `4c16760` fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)
 - 2026-11-17 `7931333` chore(db): sincronizar artefatos com o banco [auto] (#166)
-- 2026-11-17 `0ead536` chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

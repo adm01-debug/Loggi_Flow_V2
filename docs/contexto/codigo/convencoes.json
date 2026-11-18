@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
-   "fix: realtime usa topic unico por hook para nao estourar a pagina (#181)",
+   "ci(seguranca): recupera dependency review nos PRs da branch claude/seguranca-workflows-261112 (#182)",
+   "﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)",
    "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)",
    "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)",
-   "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)",
-   "chore(db): sincronizar artefatos com o banco [auto] (#177)"
+   "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",
