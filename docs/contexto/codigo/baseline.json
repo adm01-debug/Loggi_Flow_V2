@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "bfd7215e30eb685f67a825248373486bbb998ff7",
+  "commit": "f3db2b850211c896ddec8f4885bf6d9b010f4afb",
   "branch": "main",
-  "data_commit": "2026-11-18T13:21:48-03:00",
+  "data_commit": "2026-11-18T13:53:01-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "f3db2b8",
+    "data": "2026-11-18",
+    "assunto": "chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)"
+   },
    {
     "sha": "bfd7215",
     "data": "2026-11-18",
@@ -126,11 +131,6 @@
     "sha": "adb741b",
     "data": "2026-11-17",
     "assunto": "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)"
-   },
-   {
-    "sha": "8ea7b1f",
-    "data": "2026-11-17",
-    "assunto": "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)"
    }
   ],
   "arquivos_mudados_7d": 130,
@@ -141,7 +141,7 @@
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
-    "mudancas": 7
+    "mudancas": 8
    },
    {
     "pasta": "package-lock.json",
@@ -172,6 +172,10 @@
     "mudancas": 5
    },
    {
+    "pasta": ".github/workflows/ci.yml",
+    "mudancas": 4
+   },
+   {
     "pasta": ".github/workflows/inventario-estado-semanal.yml",
     "mudancas": 4
    },
@@ -190,10 +194,6 @@
    {
     "pasta": "src/components/map",
     "mudancas": 4
-   },
-   {
-    "pasta": ".github/workflows/ci.yml",
-    "mudancas": 3
    }
   ],
   "arquivos_mais_mudados_90d": [
@@ -215,10 +215,14 @@
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
-    "mudancas": 7
+    "mudancas": 8
    },
    {
     "arquivo": ".github/workflows/ci.yml",
+    "mudancas": 7
+   },
+   {
+    "arquivo": ".github/workflows/ci-nexus.yml",
     "mudancas": 6
    },
    {
@@ -226,11 +230,11 @@
     "mudancas": 6
    },
    {
-    "arquivo": ".github/workflows/ci-nexus.yml",
+    "arquivo": ".github/workflows/deploy-functions.yml",
     "mudancas": 5
    },
    {
-    "arquivo": ".github/workflows/deploy-functions.yml",
+    "arquivo": ".github/workflows/e2e.yml",
     "mudancas": 5
    },
    {
@@ -260,10 +264,6 @@
    {
     "arquivo": "tests/security/rls-access.spec.ts",
     "mudancas": 5
-   },
-   {
-    "arquivo": ".github/workflows/e2e.yml",
-    "mudancas": 4
    },
    {
     "arquivo": ".github/workflows/inventario-estado-semanal.yml",
@@ -305,7 +305,7 @@
    },
    {
     "autor": "dependabot[bot]",
-    "commits": 8
+    "commits": 9
    },
    {
     "autor": "github-actions[bot]",

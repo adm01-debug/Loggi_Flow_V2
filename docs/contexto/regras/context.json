@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "bfd7215e30eb685f67a825248373486bbb998ff7",
+  "sha": "f3db2b850211c896ddec8f4885bf6d9b010f4afb",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-18 16:22 UTC",
+  "generated_at": "2026-11-18 16:53 UTC",
   "files_total": 1312,
   "code_files": 1136,
   "code_lines": 183641,
@@ -88780,10 +88780,23 @@
   }
  },
  "git": {
-  "sha": "bfd7215e30eb685f67a825248373486bbb998ff7",
+  "sha": "f3db2b850211c896ddec8f4885bf6d9b010f4afb",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "f3db2b8",
+    "date": "2026-11-18",
+    "author": "dependabot[bot]",
+    "subject": "chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)",
+    "files": [
+     ".github/workflows/automation-local.yml",
+     ".github/workflows/ci-nexus.yml",
+     ".github/workflows/ci.yml",
+     ".github/workflows/contexto-ia.yml",
+     ".github/workflows/e2e.yml"
+    ]
+   },
    {
     "sha": "bfd7215",
     "date": "2026-11-18",
@@ -89130,17 +89143,6 @@
     "files": [
      "docs/auditoria-recuperacao-branches.md"
     ]
-   },
-   {
-    "sha": "7b46a98",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "chore(ops): recupera PASSO 0 de pre-requisitos no runbook pos-deploy (#155)",
-    "files": [
-     "docs/agentes/github-ci.md",
-     "docs/auditoria-recuperacao-branches.md",
-     "scripts/ops/pos_deploy_functions.sql"
-    ]
    }
   ],
   "hot_files": [
@@ -89154,7 +89156,23 @@
    ],
    [
     "docs/auditoria-recuperacao-branches.md",
-    5
+    4
+   ],
+   [
+    ".github/workflows/ci-nexus.yml",
+    3
+   ],
+   [
+    ".github/workflows/ci.yml",
+    3
+   ],
+   [
+    ".github/workflows/contexto-ia.yml",
+    3
+   ],
+   [
+    ".github/workflows/e2e.yml",
+    3
    ],
    [
     "src/components/map/MapboxMap.tsx",
@@ -89165,23 +89183,11 @@
     3
    ],
    [
+    ".github/workflows/automation-local.yml",
+    2
+   ],
+   [
     ".github/workflows/aplicar-migration.yml",
-    2
-   ],
-   [
-    ".github/workflows/ci-nexus.yml",
-    2
-   ],
-   [
-    ".github/workflows/ci.yml",
-    2
-   ],
-   [
-    ".github/workflows/contexto-ia.yml",
-    2
-   ],
-   [
-    ".github/workflows/e2e.yml",
     2
    ],
    [
@@ -89211,10 +89217,6 @@
    [
     "src/hooks/logistics/useDeliveryRoutes.tsx",
     2
-   ],
-   [
-    ".github/workflows/automation-local.yml",
-    1
    ],
    [
     ".github/workflows/deploy-functions.yml",
