@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "f93a675ce471328e17fb3f313bebaaba6958174e",
+  "sha": "a2979e06cb400e7fe7abe806a5feb7302d19246c",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-19 10:27 UTC",
-  "files_total": 1315,
+  "generated_at": "2026-11-19 11:13 UTC",
+  "files_total": 1313,
   "code_files": 1137,
   "code_lines": 183765,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "5b762ccf2777aed1",
+ "facts_hash": "5989c7e2f33ef9ca",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -245,13 +245,6 @@
     ]
    },
    {
-    "file": ".github/workflows/diag-schema-prod.yml",
-    "name": "Diag Schema Prod",
-    "triggers": [
-     "workflow_dispatch"
-    ]
-   },
-   {
     "file": ".github/workflows/e2e.yml",
     "name": "E2E (manual)",
     "triggers": [
@@ -270,13 +263,6 @@
     "file": ".github/workflows/notifica-falha-main.yml",
     "name": "Notifica falha na main",
     "triggers": []
-   },
-   {
-    "file": ".github/workflows/revela-seed-prod.yml",
-    "name": "Revela Seed Prod",
-    "triggers": [
-     "workflow_dispatch"
-    ]
    },
    {
     "file": ".github/workflows/scripts-tests.yml",
@@ -88835,10 +88821,20 @@
   }
  },
  "git": {
-  "sha": "f93a675ce471328e17fb3f313bebaaba6958174e",
+  "sha": "a2979e06cb400e7fe7abe806a5feb7302d19246c",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "a2979e0",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)",
+    "files": [
+     ".github/workflows/diag-schema-prod.yml",
+     ".github/workflows/revela-seed-prod.yml"
+    ]
+   },
    {
     "sha": "f93a675",
     "date": "2026-11-19",
@@ -89175,19 +89171,6 @@
      "src/lib/supabaseEnv.ts",
      "src/pages/ConfiguracoesFrete.tsx"
     ]
-   },
-   {
-    "sha": "adb741b",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "chore: origem da rota no mapa deixa de ser mock e vira CD configuravel (#161)",
-    "files": [
-     ".env.example",
-     "docs/auditoria-recuperacao-branches.md",
-     "src/components/dashboard/LogisticsMapWidget.tsx",
-     "src/lib/centroDistribuicao.test.ts",
-     "src/lib/centroDistribuicao.ts"
-    ]
    }
   ],
   "hot_files": [
@@ -89224,6 +89207,14 @@
     3
    ],
    [
+    ".github/workflows/diag-schema-prod.yml",
+    2
+   ],
+   [
+    ".github/workflows/revela-seed-prod.yml",
+    2
+   ],
+   [
     ".github/workflows/inventario-estado-semanal.yml",
     2
    ],
@@ -89244,10 +89235,6 @@
     2
    ],
    [
-    "src/components/dashboard/LogisticsMapWidget.tsx",
-    2
-   ],
-   [
     "supabase/schema-manifest.json",
     2
    ],
@@ -89265,10 +89252,6 @@
    ],
    [
     "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
-    1
-   ],
-   [
-    ".github/workflows/diag-schema-prod.yml",
     1
    ]
   ]
