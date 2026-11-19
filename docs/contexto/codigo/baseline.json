@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "ed9aa79737c7f6a6a1cedf59de56cb5836beea5d",
+  "commit": "13eb1a108133cfc5acf9aa085897b0c31e985db2",
   "branch": "main",
-  "data_commit": "2026-11-19T13:11:42-03:00",
+  "data_commit": "2026-11-19T13:54:49-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "13eb1a1",
+    "data": "2026-11-19",
+    "assunto": "chore: arquiva mapa de integracao 20261112 como registro historico (#200)"
+   },
    {
     "sha": "ed9aa79",
     "data": "2026-11-19",
@@ -126,14 +131,9 @@
     "sha": "cf7f398",
     "data": "2026-11-17",
     "assunto": "fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)"
-   },
-   {
-    "sha": "221e61e",
-    "data": "2026-11-17",
-    "assunto": "fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)"
    }
   ],
-  "arquivos_mudados_7d": 120,
+  "arquivos_mudados_7d": 121,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 129
+    "commits": 130
    },
    {
     "autor": "dependabot[bot]",
@@ -314,7 +314,7 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1302,
+  "arquivos_total": 1303,
   "arquivos_codigo": 875,
   "linhas_codigo": 167282,
   "rotas": 61,
@@ -331,7 +331,7 @@
   "testes": 129,
   "workflows": 18,
   "scripts": 62,
-  "docs_md": 84
+  "docs_md": 85
  },
  "por_pasta": {
   "eslint.config.js": {

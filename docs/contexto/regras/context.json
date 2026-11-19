@@ -1,10 +1,10 @@
 {
  "meta": {
-  "sha": "ed9aa79737c7f6a6a1cedf59de56cb5836beea5d",
+  "sha": "13eb1a108133cfc5acf9aa085897b0c31e985db2",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-19 16:12 UTC",
-  "files_total": 1312,
+  "generated_at": "2026-11-19 17:12 UTC",
+  "files_total": 1313,
   "code_files": 1136,
   "code_lines": 183787,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
@@ -88788,10 +88788,19 @@
   }
  },
  "git": {
-  "sha": "ed9aa79737c7f6a6a1cedf59de56cb5836beea5d",
+  "sha": "13eb1a108133cfc5acf9aa085897b0c31e985db2",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "13eb1a1",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "chore: arquiva mapa de integracao 20261112 como registro historico (#200)",
+    "files": [
+     "docs/agentes/mapa-integracao-20261112.md"
+    ]
+   },
    {
     "sha": "ed9aa79",
     "date": "2026-11-19",
@@ -89128,17 +89137,6 @@
     "files": [
      "package-lock.json"
     ]
-   },
-   {
-    "sha": "09c9545",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)",
-    "files": [
-     "src/features/db-observability/components/WalHealthCard.tsx",
-     "src/features/db-observability/hooks/useWalHealth.ts",
-     "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
-    ]
    }
   ],
   "hot_files": [
@@ -89219,7 +89217,7 @@
     2
    ],
    [
-    "src/components/admin/telemetry/TelemetryCharts.tsx",
+    "docs/agentes/mapa-integracao-20261112.md",
     1
    ]
   ]
