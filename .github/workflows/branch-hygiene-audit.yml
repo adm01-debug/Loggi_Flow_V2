@@ -3,8 +3,8 @@
 #   prova: branches podaveis, PRs paradas ha mais de 7 dias e SLA dos alertas de code scanning
 #   falha: SLA vencido deixa o job vermelho e publica o diagnostico se o relatorio foi gerado
 #   avisa: issue `[branch-hygiene]` no repositorio
-# NOTA(loggi): Este workflow depende de scripts/ci/{bump-toolchain,actions-kpi,branch-podaveis,sla-code-scanning}.mjs
-# que ainda nao existem neste repositorio. Porte esses scripts do Zapp_Web_V2 antes de usar.
+# NOTA(loggi): Requer scripts/ci/{bump-toolchain,actions-kpi,branch-podaveis,sla-code-scanning}.mjs,
+# portados do Zapp_Web_V2 (#140) e validados em CI real (run 43512924390, 2026-11-13).
 # ==================================================================
 # Auditoria semanal de higiene de branches (somente leitura)
 # ==================================================================
