@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "7ab44e75be35fd4e186f7e29128faf27781bde85",
+  "commit": "ed9aa79737c7f6a6a1cedf59de56cb5836beea5d",
   "branch": "main",
-  "data_commit": "2026-11-19T13:08:21-03:00",
+  "data_commit": "2026-11-19T13:11:42-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "ed9aa79",
+    "data": "2026-11-19",
+    "assunto": "chore(db): sincronizar artefatos derivados do banco [auto]"
+   },
    {
     "sha": "7ab44e7",
     "data": "2026-11-19",
@@ -126,11 +131,6 @@
     "sha": "221e61e",
     "data": "2026-11-17",
     "assunto": "fix: faz a pagina de rotas e o mapa partirem do centro de distribuicao (#170)"
-   },
-   {
-    "sha": "f61ccee",
-    "data": "2026-11-17",
-    "assunto": "chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)"
    }
   ],
   "arquivos_mudados_7d": 120,
@@ -309,7 +309,7 @@
    },
    {
     "autor": "github-actions[bot]",
-    "commits": 4
+    "commits": 5
    }
   ]
  },

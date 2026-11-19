@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "7ab44e75be35fd4e186f7e29128faf27781bde85",
+  "sha": "ed9aa79737c7f6a6a1cedf59de56cb5836beea5d",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-19 16:08 UTC",
+  "generated_at": "2026-11-19 16:12 UTC",
   "files_total": 1312,
   "code_files": 1136,
   "code_lines": 183787,
@@ -88788,10 +88788,19 @@
   }
  },
  "git": {
-  "sha": "7ab44e75be35fd4e186f7e29128faf27781bde85",
+  "sha": "ed9aa79737c7f6a6a1cedf59de56cb5836beea5d",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "ed9aa79",
+    "date": "2026-11-19",
+    "author": "github-actions[bot]",
+    "subject": "chore(db): sincronizar artefatos derivados do banco [auto]",
+    "files": [
+     "supabase/schema-manifest.json"
+    ]
+   },
    {
     "sha": "7ab44e7",
     "date": "2026-11-19",
@@ -89130,15 +89139,6 @@
      "src/features/db-observability/hooks/useWalHealth.ts",
      "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql"
     ]
-   },
-   {
-    "sha": "998f168",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "fix: serve index.html em rota direta para a SPA nao dar 404 (#165)",
-    "files": [
-     "vercel.json"
-    ]
    }
   ],
   "hot_files": [
@@ -89149,6 +89149,10 @@
    [
     "package.json",
     5
+   ],
+   [
+    "supabase/schema-manifest.json",
+    3
    ],
    [
     ".github/workflows/ci-nexus.yml",
@@ -89204,10 +89208,6 @@
    ],
    [
     "src/hooks/data/useRealtime.tsx",
-    2
-   ],
-   [
-    "supabase/schema-manifest.json",
     2
    ],
    [
