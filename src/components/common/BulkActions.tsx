@@ -1,7 +1,13 @@
 import * as React from "react";
 import { X, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 interface BulkAction {
@@ -35,7 +41,7 @@ export function BulkActions({
     <div
       className={cn(
         "flex items-center gap-4 p-4 bg-primary/5 border rounded-lg",
-        className
+        className,
       )}
     >
       <div className="flex items-center gap-2">
@@ -47,7 +53,12 @@ export function BulkActions({
 
       <div className="flex items-center gap-2 ml-auto">
         {onSelectAll && selectedIds.length < totalCount && (
-          <Button variant="ghost" size="sm" onClick={onSelectAll} className="text-xs">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onSelectAll}
+            className="text-xs"
+          >
             Selecionar todos
           </Button>
         )}
@@ -56,7 +67,9 @@ export function BulkActions({
           actions.map((action) => (
             <Button
               key={action.id}
-              variant={action.variant === "destructive" ? "destructive" : "outline"}
+              variant={
+                action.variant === "destructive" ? "destructive" : "outline"
+              }
               size="sm"
               onClick={() => action.onClick(selectedIds)}
               className="text-xs h-8"
@@ -82,10 +95,12 @@ export function BulkActions({
                     onClick={() => action.onClick(selectedIds)}
                     className={cn(
                       "text-xs",
-                      action.variant === "destructive" && "text-destructive"
+                      action.variant === "destructive" && "text-destructive",
                     )}
                   >
-                    {action.icon && <action.icon className="h-3.5 w-3.5 mr-1.5" />}
+                    {action.icon && (
+                      <action.icon className="h-3.5 w-3.5 mr-1.5" />
+                    )}
                     {action.label}
                   </DropdownMenuItem>
                 </React.Fragment>
@@ -94,7 +109,12 @@ export function BulkActions({
           </DropdownMenu>
         )}
 
-        <Button variant="ghost" size="icon" onClick={onClearSelection} className="h-8 w-8">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClearSelection}
+          className="h-8 w-8"
+        >
           <X className="h-4 w-4" />
         </Button>
       </div>

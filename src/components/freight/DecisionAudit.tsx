@@ -192,7 +192,10 @@ export function DecisionAudit() {
                       </h4>
                       <div className="max-h-[150px] overflow-y-auto pr-2 space-y-1">
                         {decision.recommendations?.map(
-                          (rec: FreightDecision["recommendations"][number], idx: number) => (
+                          (
+                            rec: FreightDecision["recommendations"][number],
+                            idx: number,
+                          ) => (
                             <div
                               key={idx}
                               className={`flex items-center justify-between text-xs p-2 rounded ${idx === 0 ? "bg-primary/5 border border-primary/20" : "bg-muted/30"}`}
