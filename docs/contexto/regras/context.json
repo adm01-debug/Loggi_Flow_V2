@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "7b4672c4133e3dc65eeff3a5673ea3caab84ca84",
+  "sha": "f93a675ce471328e17fb3f313bebaaba6958174e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-19 00:38 UTC",
-  "files_total": 1314,
-  "code_files": 1136,
-  "code_lines": 183641,
+  "generated_at": "2026-11-19 10:27 UTC",
+  "files_total": 1315,
+  "code_files": 1137,
+  "code_lines": 183765,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "e3f769fee3fda5b3",
+ "facts_hash": "5b762ccf2777aed1",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -325,7 +325,7 @@
   "languages": {
    ".tsx": 453,
    ".ts": 336,
-   ".sql": 259,
+   ".sql": 260,
    ".mjs": 77,
    ".py": 8,
    ".js": 3
@@ -15834,10 +15834,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id, 'Entrega Concluída! 🎉', 'A entrega ' || NEW.numero_entrega || ' foi concluída com sucesso.', 'success','/envios', jsonb_build_object('entrega_id',NEW.id,'numero_entrega',NEW.numero_entrega,'event','entrega_concluida') FROM user_roles ur; END IF; RETURN NEW; END;",
+    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id, 'Entrega Concluída! 🎉', 'A entrega ' || NEW.numero_entrega || ' foi concluída com sucesso.', 'success'::public.notification_type,'/envios', jsonb_build_object('entrega_id',NEW.id,'numero_entrega',NEW.numero_entrega,'event','entrega_concluida') FROM user_roles ur; END IF; RETURN NEW; END;",
     "raises": [],
     "tables": [
      "notifications",
@@ -15848,10 +15848,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status IN ('solicitada','em_transito') AND NEW.data_prevista_coleta IS NOT NULL AND NEW.data_prevista_coleta < NOW() AND NEW.data_efetiva_coleta IS NULL THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Coleta Atrasada ⚠️', 'A coleta ' || NEW.numero_coleta || ' está atrasada. Previsão era ' || TO_CHAR(NEW.data_prevista_coleta,'DD/MM/YYYY'), 'warning','/coletas', jsonb_build_object('coleta_id',NEW.id,'numero_coleta',NEW.numero_coleta,'event','coleta_atrasada') FROM user_roles ur; END IF; RETURN NEW; END;",
+    "body": "BEGIN IF NEW.status IN ('solicitada','em_transito') AND NEW.data_prevista_coleta IS NOT NULL AND NEW.data_prevista_coleta < NOW() AND NEW.data_efetiva_coleta IS NULL THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Coleta Atrasada ⚠️', 'A coleta ' || NEW.numero_coleta || ' está atrasada. Previsão era ' || TO_CHAR(NEW.data_prevista_coleta,'DD/MM/YYYY'), 'warning'::public.notification_type,'/coletas', jsonb_build_object('coleta_id',NEW.id,'numero_coleta',NEW.numero_coleta,'event','coleta_atrasada') FROM user_roles ur; END IF; RETURN NEW; END;",
     "raises": [],
     "tables": [
      "notifications",
@@ -15862,10 +15862,10 @@
     "args": "",
     "returns": "TRIGGER",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20251220131539_fa5f8650-9dcb-4a17-bd00-f7ee9de61e27.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_achievement RECORD; BEGIN SELECT * INTO v_achievement FROM achievements WHERE id = NEW.achievement_id; IF FOUND THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) VALUES ( NEW.user_id, 'Conquista Desbloqueada! 🏆', 'Você desbloqueou a conquista \"' || v_achievement.name || '\" e ganhou ' || v_achievement.xp_reward || ' XP e ' || v_achievement.coins_reward || ' moedas!', 'achievement', '/conquistas', jsonb_build_object( 'achievement_id', NEW.achievement_id, 'achievement_name', v_achievement.name, 'xp_reward', v_achievement.xp_reward, 'coins_reward', v_achievement.coins_reward, 'rarity', v_achievement.rarity, 'event', 'conquista_desbloqueada' ) ); END I …",
+    "body": "DECLARE v_achievement RECORD; BEGIN SELECT * INTO v_achievement FROM achievements WHERE id = NEW.achievement_id; IF FOUND THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) VALUES ( NEW.user_id, 'Conquista Desbloqueada! 🏆', 'Você desbloqueou a conquista \"' || v_achievement.name || '\" e ganhou ' || v_achievement.xp_reward || ' XP e ' || v_achievement.coins_reward || ' moedas!', 'achievement'::public.notification_type, '/conquistas', jsonb_build_object( 'achievement_id', NEW.achievement_id, 'achievement_name', v_achievement.name, 'xp_reward', v_achievement.xp_reward, 'coins_reward', v_achievement.coins_reward, 'rarity', v_achievement.rarity, 'event', 'conquist …",
     "raises": [],
     "tables": [
      "achievements",
@@ -15877,10 +15877,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_ref_numero text; BEGIN IF NEW.entrega_id IS NOT NULL THEN SELECT numero_entrega INTO v_ref_numero FROM entregas WHERE id = NEW.entrega_id; ELSIF NEW.coleta_id IS NOT NULL THEN SELECT numero_coleta INTO v_ref_numero FROM coletas WHERE id = NEW.coleta_id; ELSE v_ref_numero := 'N/A'; END IF; INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Nova Ocorrência Registrada 🚨', 'Uma ocorrência do tipo \"' || NEW.tipo_ocorrencia || '\" foi registrada para ' || v_ref_numero, 'error','/ocorrencias', jsonb_build_object('ocorrencia_id',NEW.id,'tipo_ocorrencia',NEW.tipo_ocorrencia, 'entrega_id',NEW.entrega_id,'coleta_id',NEW.coleta_id,'event' …",
+    "body": "DECLARE v_ref_numero text; BEGIN IF NEW.entrega_id IS NOT NULL THEN SELECT numero_entrega INTO v_ref_numero FROM entregas WHERE id = NEW.entrega_id; ELSIF NEW.coleta_id IS NOT NULL THEN SELECT numero_coleta INTO v_ref_numero FROM coletas WHERE id = NEW.coleta_id; ELSE v_ref_numero := 'N/A'; END IF; INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Nova Ocorrência Registrada 🚨', 'Uma ocorrência do tipo \"' || NEW.tipo_ocorrencia || '\" foi registrada para ' || v_ref_numero, 'error'::public.notification_type,'/ocorrencias', jsonb_build_object('ocorrencia_id',NEW.id,'tipo_ocorrencia',NEW.tipo_ocorrencia, 'entrega_id',NEW.entrega_id,'coleta …",
     "raises": [],
     "tables": [
      "coletas",
@@ -15894,10 +15894,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Frete Interno Concluído! ✅', 'Frete de ' || NEW.origem || ' para ' || NEW.destino || ' foi entregue. +' || NEW.xp_reward || ' XP!', 'success','/fretes-internos', jsonb_build_object('frete_id',NEW.id,'origem',NEW.origem,'destino',NEW.destino, 'xp_reward',NEW.xp_reward,'event','frete_interno_concluido') FROM user_roles ur; END IF; RETURN NEW; END;",
+    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Frete Interno Concluído! ✅', 'Frete de ' || NEW.origem || ' para ' || NEW.destino || ' foi entregue. +' || NEW.xp_reward || ' XP!', 'success'::public.notification_type,'/fretes-internos', jsonb_build_object('frete_id',NEW.id,'origem',NEW.origem,'destino',NEW.destino, 'xp_reward',NEW.xp_reward,'event','frete_interno_concluido') FROM user_roles ur; END IF; RETURN NEW; END;",
     "raises": [],
     "tables": [
      "notifications",
@@ -15908,10 +15908,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status IN ('despachado','em_transito','saiu_entrega') AND NEW.previsao_entrega IS NOT NULL AND NEW.previsao_entrega < NOW() AND NEW.data_entrega_efetiva IS NULL AND NOT EXISTS ( SELECT 1 FROM notifications WHERE metadata->>'entrega_id' = NEW.id::text AND metadata->>'event' = 'entrega_atrasada' AND created_at > NOW() - INTERVAL '24 hours' ) THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Entrega Atrasada ⚠️', 'A entrega ' || NEW.numero_entrega || ' está atrasada. Previsão era ' || TO_CHAR(NEW.previsao_entrega,'DD/MM/YYYY'), 'warning','/envios', jsonb_build_object('entrega_id',NEW.id,'numero_entrega',NEW.numero_entre …",
+    "body": "BEGIN IF NEW.status IN ('despachado','em_transito','saiu_entrega') AND NEW.previsao_entrega IS NOT NULL AND NEW.previsao_entrega < NOW() AND NEW.data_entrega_efetiva IS NULL AND NOT EXISTS ( SELECT 1 FROM notifications WHERE metadata->>'entrega_id' = NEW.id::text AND metadata->>'event' = 'entrega_atrasada' AND created_at > NOW() - INTERVAL '24 hours' ) THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Entrega Atrasada ⚠️', 'A entrega ' || NEW.numero_entrega || ' está atrasada. Previsão era ' || TO_CHAR(NEW.previsao_entrega,'DD/MM/YYYY'), 'warning'::public.notification_type,'/envios', jsonb_build_object('entrega_id',NEW.id,'numero …",
     "raises": [],
     "tables": [
      "notifications",
@@ -20608,6 +20608,7 @@
    "supabase/migrations/20260902120000_hardening_pos_auditoria.sql",
    "supabase/migrations/20261117120000_fix_rpcs_observabilidade.sql",
    "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql",
+   "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
    "supabase/seed.sql",
    "src/integrations/supabase/types.ts"
   ],
@@ -30573,8 +30574,8 @@
   },
   {
    "module": "supabase/migrations",
-   "files": 246,
-   "lines": 15034,
+   "files": 247,
+   "lines": 15158,
    "tables": [],
    "exports": [],
    "docs": [],
@@ -49948,6 +49949,30 @@
    {
     "file": "supabase/migrations/20260901000001_remediacao_destino.sql",
     "call": "notify_ocorrencia_trigger"
+   },
+   {
+    "file": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    "call": "notify_coleta_atrasada"
+   },
+   {
+    "file": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    "call": "notify_conquista_desbloqueada"
+   },
+   {
+    "file": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    "call": "notify_entrega_atrasada"
+   },
+   {
+    "file": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    "call": "notify_entrega_concluida"
+   },
+   {
+    "file": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    "call": "notify_frete_interno_concluido"
+   },
+   {
+    "file": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    "call": "notify_ocorrencia_registrada"
    }
   ],
   "db_policies": [
@@ -53898,10 +53923,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id, 'Entrega Concluída! 🎉', 'A entrega ' || NEW.numero_entrega || ' foi concluída com sucesso.', 'success','/envios', jsonb_build_object('entrega_id',NEW.id,'numero_entrega',NEW.numero_entrega,'event','entrega_concluida') FROM user_roles ur; END IF; RETURN NEW; END;",
+    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id, 'Entrega Concluída! 🎉', 'A entrega ' || NEW.numero_entrega || ' foi concluída com sucesso.', 'success'::public.notification_type,'/envios', jsonb_build_object('entrega_id',NEW.id,'numero_entrega',NEW.numero_entrega,'event','entrega_concluida') FROM user_roles ur; END IF; RETURN NEW; END;",
     "raises": [],
     "tables": [
      "notifications",
@@ -53912,10 +53937,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status IN ('solicitada','em_transito') AND NEW.data_prevista_coleta IS NOT NULL AND NEW.data_prevista_coleta < NOW() AND NEW.data_efetiva_coleta IS NULL THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Coleta Atrasada ⚠️', 'A coleta ' || NEW.numero_coleta || ' está atrasada. Previsão era ' || TO_CHAR(NEW.data_prevista_coleta,'DD/MM/YYYY'), 'warning','/coletas', jsonb_build_object('coleta_id',NEW.id,'numero_coleta',NEW.numero_coleta,'event','coleta_atrasada') FROM user_roles ur; END IF; RETURN NEW; END;",
+    "body": "BEGIN IF NEW.status IN ('solicitada','em_transito') AND NEW.data_prevista_coleta IS NOT NULL AND NEW.data_prevista_coleta < NOW() AND NEW.data_efetiva_coleta IS NULL THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Coleta Atrasada ⚠️', 'A coleta ' || NEW.numero_coleta || ' está atrasada. Previsão era ' || TO_CHAR(NEW.data_prevista_coleta,'DD/MM/YYYY'), 'warning'::public.notification_type,'/coletas', jsonb_build_object('coleta_id',NEW.id,'numero_coleta',NEW.numero_coleta,'event','coleta_atrasada') FROM user_roles ur; END IF; RETURN NEW; END;",
     "raises": [],
     "tables": [
      "notifications",
@@ -53926,10 +53951,10 @@
     "args": "",
     "returns": "TRIGGER",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20251220131539_fa5f8650-9dcb-4a17-bd00-f7ee9de61e27.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_achievement RECORD; BEGIN SELECT * INTO v_achievement FROM achievements WHERE id = NEW.achievement_id; IF FOUND THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) VALUES ( NEW.user_id, 'Conquista Desbloqueada! 🏆', 'Você desbloqueou a conquista \"' || v_achievement.name || '\" e ganhou ' || v_achievement.xp_reward || ' XP e ' || v_achievement.coins_reward || ' moedas!', 'achievement', '/conquistas', jsonb_build_object( 'achievement_id', NEW.achievement_id, 'achievement_name', v_achievement.name, 'xp_reward', v_achievement.xp_reward, 'coins_reward', v_achievement.coins_reward, 'rarity', v_achievement.rarity, 'event', 'conquista_desbloqueada' ) ); END I …",
+    "body": "DECLARE v_achievement RECORD; BEGIN SELECT * INTO v_achievement FROM achievements WHERE id = NEW.achievement_id; IF FOUND THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) VALUES ( NEW.user_id, 'Conquista Desbloqueada! 🏆', 'Você desbloqueou a conquista \"' || v_achievement.name || '\" e ganhou ' || v_achievement.xp_reward || ' XP e ' || v_achievement.coins_reward || ' moedas!', 'achievement'::public.notification_type, '/conquistas', jsonb_build_object( 'achievement_id', NEW.achievement_id, 'achievement_name', v_achievement.name, 'xp_reward', v_achievement.xp_reward, 'coins_reward', v_achievement.coins_reward, 'rarity', v_achievement.rarity, 'event', 'conquist …",
     "raises": [],
     "tables": [
      "achievements",
@@ -53941,10 +53966,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "DECLARE v_ref_numero text; BEGIN IF NEW.entrega_id IS NOT NULL THEN SELECT numero_entrega INTO v_ref_numero FROM entregas WHERE id = NEW.entrega_id; ELSIF NEW.coleta_id IS NOT NULL THEN SELECT numero_coleta INTO v_ref_numero FROM coletas WHERE id = NEW.coleta_id; ELSE v_ref_numero := 'N/A'; END IF; INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Nova Ocorrência Registrada 🚨', 'Uma ocorrência do tipo \"' || NEW.tipo_ocorrencia || '\" foi registrada para ' || v_ref_numero, 'error','/ocorrencias', jsonb_build_object('ocorrencia_id',NEW.id,'tipo_ocorrencia',NEW.tipo_ocorrencia, 'entrega_id',NEW.entrega_id,'coleta_id',NEW.coleta_id,'event' …",
+    "body": "DECLARE v_ref_numero text; BEGIN IF NEW.entrega_id IS NOT NULL THEN SELECT numero_entrega INTO v_ref_numero FROM entregas WHERE id = NEW.entrega_id; ELSIF NEW.coleta_id IS NOT NULL THEN SELECT numero_coleta INTO v_ref_numero FROM coletas WHERE id = NEW.coleta_id; ELSE v_ref_numero := 'N/A'; END IF; INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Nova Ocorrência Registrada 🚨', 'Uma ocorrência do tipo \"' || NEW.tipo_ocorrencia || '\" foi registrada para ' || v_ref_numero, 'error'::public.notification_type,'/ocorrencias', jsonb_build_object('ocorrencia_id',NEW.id,'tipo_ocorrencia',NEW.tipo_ocorrencia, 'entrega_id',NEW.entrega_id,'coleta …",
     "raises": [],
     "tables": [
      "coletas",
@@ -53958,10 +53983,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Frete Interno Concluído! ✅', 'Frete de ' || NEW.origem || ' para ' || NEW.destino || ' foi entregue. +' || NEW.xp_reward || ' XP!', 'success','/fretes-internos', jsonb_build_object('frete_id',NEW.id,'origem',NEW.origem,'destino',NEW.destino, 'xp_reward',NEW.xp_reward,'event','frete_interno_concluido') FROM user_roles ur; END IF; RETURN NEW; END;",
+    "body": "BEGIN IF NEW.status = 'entregue' AND (OLD.status IS NULL OR OLD.status <> 'entregue') THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Frete Interno Concluído! ✅', 'Frete de ' || NEW.origem || ' para ' || NEW.destino || ' foi entregue. +' || NEW.xp_reward || ' XP!', 'success'::public.notification_type,'/fretes-internos', jsonb_build_object('frete_id',NEW.id,'origem',NEW.origem,'destino',NEW.destino, 'xp_reward',NEW.xp_reward,'event','frete_interno_concluido') FROM user_roles ur; END IF; RETURN NEW; END;",
     "raises": [],
     "tables": [
      "notifications",
@@ -53972,10 +53997,10 @@
     "args": "",
     "returns": "trigger",
     "lang": "plpgsql",
-    "src": "supabase/migrations/20260711153045_42d1824a-1b6a-485d-bb4f-0b19e2064e9b.sql",
+    "src": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
     "security_definer": true,
     "search_path": true,
-    "body": "BEGIN IF NEW.status IN ('despachado','em_transito','saiu_entrega') AND NEW.previsao_entrega IS NOT NULL AND NEW.previsao_entrega < NOW() AND NEW.data_entrega_efetiva IS NULL AND NOT EXISTS ( SELECT 1 FROM notifications WHERE metadata->>'entrega_id' = NEW.id::text AND metadata->>'event' = 'entrega_atrasada' AND created_at > NOW() - INTERVAL '24 hours' ) THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Entrega Atrasada ⚠️', 'A entrega ' || NEW.numero_entrega || ' está atrasada. Previsão era ' || TO_CHAR(NEW.previsao_entrega,'DD/MM/YYYY'), 'warning','/envios', jsonb_build_object('entrega_id',NEW.id,'numero_entrega',NEW.numero_entre …",
+    "body": "BEGIN IF NEW.status IN ('despachado','em_transito','saiu_entrega') AND NEW.previsao_entrega IS NOT NULL AND NEW.previsao_entrega < NOW() AND NEW.data_entrega_efetiva IS NULL AND NOT EXISTS ( SELECT 1 FROM notifications WHERE metadata->>'entrega_id' = NEW.id::text AND metadata->>'event' = 'entrega_atrasada' AND created_at > NOW() - INTERVAL '24 hours' ) THEN INSERT INTO notifications (user_id, title, message, type, action_url, metadata) SELECT DISTINCT ur.user_id,'Entrega Atrasada ⚠️', 'A entrega ' || NEW.numero_entrega || ' está atrasada. Previsão era ' || TO_CHAR(NEW.previsao_entrega,'DD/MM/YYYY'), 'warning'::public.notification_type,'/envios', jsonb_build_object('entrega_id',NEW.id,'numero …",
     "raises": [],
     "tables": [
      "notifications",
@@ -88631,6 +88656,18 @@
    "path": "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql",
    "lines": 6
   },
+  "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql": {
+   "path": "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+   "lines": 124,
+   "side_effects": [
+    "notify_coleta_atrasada",
+    "notify_conquista_desbloqueada",
+    "notify_entrega_atrasada",
+    "notify_entrega_concluida",
+    "notify_frete_interno_concluido",
+    "notify_ocorrencia_registrada"
+   ]
+  },
   "tests/contracts/nexus-contracts.spec.ts": {
    "path": "tests/contracts/nexus-contracts.spec.ts",
    "lines": 110,
@@ -88798,10 +88835,19 @@
   }
  },
  "git": {
-  "sha": "7b4672c4133e3dc65eeff3a5673ea3caab84ca84",
+  "sha": "f93a675ce471328e17fb3f313bebaaba6958174e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "f93a675",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)",
+    "files": [
+     "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql"
+    ]
+   },
    {
     "sha": "7b4672c",
     "date": "2026-11-18",
@@ -89142,17 +89188,6 @@
      "src/lib/centroDistribuicao.test.ts",
      "src/lib/centroDistribuicao.ts"
     ]
-   },
-   {
-    "sha": "8ea7b1f",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "fix: marcador de entrega sem geocodificacao parava de saltar no mapa (#160)",
-    "files": [
-     "src/hooks/logistics/useDeliveryRoutes.tsx",
-     "src/lib/mapFallback.test.ts",
-     "src/lib/mapFallback.ts"
-    ]
    }
   ],
   "hot_files": [
@@ -89229,8 +89264,8 @@
     2
    ],
    [
-    "src/hooks/logistics/useDeliveryRoutes.tsx",
-    2
+    "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    1
    ],
    [
     ".github/workflows/diag-schema-prod.yml",

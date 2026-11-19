@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `7b4672c413` · branch `main` · 2026-11-19 00:38 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `f93a675ce4` · branch `main` · 2026-11-19 10:27 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -2399,6 +2399,12 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `notify_on_ocorrencia` | `supabase/migrations/20260831120100_drop_legacy_objects_d2.sql` |
 | `notify_on_sla_violation` | `supabase/migrations/20260831120100_drop_legacy_objects_d2.sql` |
 | `notify_ocorrencia_trigger` | `supabase/migrations/20260901000001_remediacao_destino.sql` |
+| `notify_coleta_atrasada` | `supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql` |
+| `notify_conquista_desbloqueada` | `supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql` |
+| `notify_entrega_atrasada` | `supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql` |
+| `notify_entrega_concluida` | `supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql` |
+| `notify_frete_interno_concluido` | `supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql` |
+| `notify_ocorrencia_registrada` | `supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql` |
 
 ## N. Regras citadas em comentários do código
 

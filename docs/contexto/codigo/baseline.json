@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "7b4672c4133e3dc65eeff3a5673ea3caab84ca84",
+  "commit": "f93a675ce471328e17fb3f313bebaaba6958174e",
   "branch": "main",
-  "data_commit": "2026-11-18T21:17:24-03:00",
+  "data_commit": "2026-11-19T07:26:55-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "f93a675",
+    "data": "2026-11-19",
+    "assunto": "fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)"
+   },
    {
     "sha": "7b4672c",
     "data": "2026-11-18",
@@ -126,14 +131,9 @@
     "sha": "0ead536",
     "data": "2026-11-17",
     "assunto": "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)"
-   },
-   {
-    "sha": "09c9545",
-    "data": "2026-11-17",
-    "assunto": "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)"
    }
   ],
-  "arquivos_mudados_7d": 133,
+  "arquivos_mudados_7d": 134,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 125
+    "commits": 126
    },
    {
     "autor": "dependabot[bot]",
@@ -314,7 +314,7 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1304,
+  "arquivos_total": 1305,
   "arquivos_codigo": 876,
   "linhas_codigo": 167260,
   "rotas": 61,
@@ -326,7 +326,7 @@
   "hooks": 176,
   "edge_functions": 43,
   "tabelas": 144,
-  "migrations": 246,
+  "migrations": 247,
   "cron_jobs": 28,
   "testes": 129,
   "workflows": 20,
