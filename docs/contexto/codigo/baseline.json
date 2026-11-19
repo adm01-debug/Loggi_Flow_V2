@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8a358432f1f23b39f21f1440b308ffdf5bbf1cde",
+  "commit": "7ab44e75be35fd4e186f7e29128faf27781bde85",
   "branch": "main",
-  "data_commit": "2026-11-19T11:50:38-03:00",
+  "data_commit": "2026-11-19T13:08:21-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "7ab44e7",
+    "data": "2026-11-19",
+    "assunto": "style(manutencao): aplica correcoes locais verificadas (#199)"
+   },
    {
     "sha": "8a35843",
     "data": "2026-11-19",
@@ -126,14 +131,9 @@
     "sha": "f61ccee",
     "data": "2026-11-17",
     "assunto": "chore: sobe o Node da CI de 20 para 22 em 7 workflows (#168)"
-   },
-   {
-    "sha": "4c16760",
-    "data": "2026-11-17",
-    "assunto": "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)"
    }
   ],
-  "arquivos_mudados_7d": 114,
+  "arquivos_mudados_7d": 120,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -172,6 +172,10 @@
     "mudancas": 5
    },
    {
+    "pasta": "src/components/common",
+    "mudancas": 5
+   },
+   {
     "pasta": "src/components/dashboard",
     "mudancas": 5
    },
@@ -189,10 +193,6 @@
    },
    {
     "pasta": "src/components/achievements",
-    "mudancas": 4
-   },
-   {
-    "pasta": "src/components/map",
     "mudancas": 4
    }
   ],
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 128
+    "commits": 129
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1302,
   "arquivos_codigo": 875,
-  "linhas_codigo": 167060,
+  "linhas_codigo": 167282,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48475
+   "linhas": 48697
   },
   "src/features": {
    "arquivos": 90,

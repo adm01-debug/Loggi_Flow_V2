@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "8a358432f1f23b39f21f1440b308ffdf5bbf1cde",
+  "sha": "7ab44e75be35fd4e186f7e29128faf27781bde85",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-19 15:15 UTC",
+  "generated_at": "2026-11-19 16:08 UTC",
   "files_total": 1312,
   "code_files": 1136,
-  "code_lines": 183565,
+  "code_lines": 183787,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "8c4b5001147d43a0",
+ "facts_hash": "1faa31cedb7b7d75",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29271,7 +29271,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48475,
+   "lines": 48697,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -47015,19 +47015,19 @@
    },
    {
     "file": "src/components/admin/telemetry/TelemetryCharts.tsx",
-    "line": "case \"1h\": return 5 * 60 * 1000;"
+    "line": "return 30 * 60 * 1000;"
    },
    {
     "file": "src/components/admin/telemetry/TelemetryCharts.tsx",
-    "line": "case \"24h\": return 60 * 60 * 1000;"
+    "line": "return 5 * 60 * 1000;"
    },
    {
     "file": "src/components/admin/telemetry/TelemetryCharts.tsx",
-    "line": "case \"6h\": return 30 * 60 * 1000;"
+    "line": "return 6 * 60 * 60 * 1000;"
    },
    {
     "file": "src/components/admin/telemetry/TelemetryCharts.tsx",
-    "line": "default: return 6 * 60 * 60 * 1000;"
+    "line": "return 60 * 60 * 1000;"
    },
    {
     "file": "src/components/common/Breadcrumbs.tsx",
@@ -68706,15 +68706,15 @@
   },
   "src/components/admin/telemetry/TelemetryCharts.tsx": {
    "path": "src/components/admin/telemetry/TelemetryCharts.tsx",
-   "lines": 264,
+   "lines": 380,
    "exports": [
     "function TelemetryCharts"
    ],
    "temporal": [
-    "case \"1h\": return 5 * 60 * 1000;",
-    "case \"24h\": return 60 * 60 * 1000;",
-    "case \"6h\": return 30 * 60 * 1000;",
-    "default: return 6 * 60 * 60 * 1000;"
+    "return 30 * 60 * 1000;",
+    "return 5 * 60 * 1000;",
+    "return 6 * 60 * 60 * 1000;",
+    "return 60 * 60 * 1000;"
    ]
   },
   "src/components/ai/AIAssistant.tsx": {
@@ -68935,7 +68935,7 @@
   },
   "src/components/auth/PasswordStrengthIndicator.tsx": {
    "path": "src/components/auth/PasswordStrengthIndicator.tsx",
-   "lines": 204,
+   "lines": 232,
    "exports": [
     "function PasswordStrengthIndicator"
    ],
@@ -68960,7 +68960,7 @@
   },
   "src/components/automation/BusinessRulesManager.tsx": {
    "path": "src/components/automation/BusinessRulesManager.tsx",
-   "lines": 81,
+   "lines": 132,
    "exports": [
     "function BusinessRulesManager"
    ]
@@ -69332,7 +69332,7 @@
   },
   "src/components/common/BulkActions.tsx": {
    "path": "src/components/common/BulkActions.tsx",
-   "lines": 106,
+   "lines": 126,
    "exports": [
     "function BulkActions"
    ]
@@ -69566,7 +69566,7 @@
   },
   "src/components/common/LoadingSpinner.tsx": {
    "path": "src/components/common/LoadingSpinner.tsx",
-   "lines": 33,
+   "lines": 37,
    "exports": [
     "function LoadingSpinner",
     "function PageLoader",
@@ -70347,7 +70347,7 @@
   },
   "src/components/freight/DecisionAudit.tsx": {
    "path": "src/components/freight/DecisionAudit.tsx",
-   "lines": 242,
+   "lines": 245,
    "exports": [
     "function DecisionAudit"
    ],
@@ -88788,10 +88788,24 @@
   }
  },
  "git": {
-  "sha": "8a358432f1f23b39f21f1440b308ffdf5bbf1cde",
+  "sha": "7ab44e75be35fd4e186f7e29128faf27781bde85",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "7ab44e7",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "style(manutencao): aplica correcoes locais verificadas (#199)",
+    "files": [
+     "src/components/admin/telemetry/TelemetryCharts.tsx",
+     "src/components/auth/PasswordStrengthIndicator.tsx",
+     "src/components/automation/BusinessRulesManager.tsx",
+     "src/components/common/BulkActions.tsx",
+     "src/components/common/LoadingSpinner.tsx",
+     "src/components/freight/DecisionAudit.tsx"
+    ]
+   },
    {
     "sha": "8a35843",
     "date": "2026-11-19",
@@ -89125,15 +89139,6 @@
     "files": [
      "vercel.json"
     ]
-   },
-   {
-    "sha": "a6e18fc",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "fix: painel de seguranca lia login_attempts por coluna inexistente (#164)",
-    "files": [
-     "src/components/security/SecurityOverviewPanel.tsx"
-    ]
    }
   ],
   "hot_files": [
@@ -89214,7 +89219,7 @@
     2
    ],
    [
-    "public/sw.js",
+    "src/components/admin/telemetry/TelemetryCharts.tsx",
     1
    ]
   ]

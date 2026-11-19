@@ -183,7 +183,7 @@
     "TelemetryCharts"
    ],
    "export_default": null,
-   "linhas": 264,
+   "linhas": 380,
    "dominio": "components/admin",
    "hooks_locais": [],
    "tabelas": [],
@@ -302,7 +302,7 @@
     "PasswordStrengthIndicator"
    ],
    "export_default": null,
-   "linhas": 204,
+   "linhas": 232,
    "dominio": "components/auth",
    "hooks_locais": [
     "useDebounce"
@@ -336,7 +336,7 @@
     "BusinessRulesManager"
    ],
    "export_default": null,
-   "linhas": 81,
+   "linhas": 132,
    "dominio": "components/automation",
    "hooks_locais": [
     "useBusinessRules"
@@ -488,7 +488,7 @@
     "BulkActions"
    ],
    "export_default": "BulkActions",
-   "linhas": 106,
+   "linhas": 126,
    "dominio": "components/common",
    "hooks_locais": [],
    "tabelas": [],
@@ -790,7 +790,7 @@
     "PageLoader"
    ],
    "export_default": null,
-   "linhas": 33,
+   "linhas": 37,
    "dominio": "components/common",
    "hooks_locais": [],
    "tabelas": [],
@@ -1357,7 +1357,7 @@
     "DecisionAudit"
    ],
    "export_default": null,
-   "linhas": 242,
+   "linhas": 245,
    "dominio": "components/freight",
    "hooks_locais": [],
    "tabelas": [

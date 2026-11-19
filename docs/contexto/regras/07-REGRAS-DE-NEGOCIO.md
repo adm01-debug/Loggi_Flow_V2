@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8a358432f1` · branch `main` · 2026-11-19 15:15 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `7ab44e75be` · branch `main` · 2026-11-19 16:08 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1621,10 +1621,10 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 |---|---|
 | `gcTime: 5 * 60 * 1000,` | `src/App.tsx` |
 | `window.setTimeout(hideSplash, 5000);` | `src/main.tsx` |
-| `case "1h": return 5 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
-| `case "24h": return 60 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
-| `case "6h": return 30 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
-| `default: return 6 * 60 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
+| `return 30 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
+| `return 5 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
+| `return 6 * 60 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
+| `return 60 * 60 * 1000;` | `src/components/admin/telemetry/TelemetryCharts.tsx` |
 | `setTimeout(() => setCopied(false), 2000);` | `src/components/common/Breadcrumbs.tsx` |
 | `setTimeout(() => { setResult(null); setProgress(0); }, 2000);` | `src/components/common/CSVImporter.tsx` |
 | `(1000 * 60 * 60 * 24),` | `src/components/common/DateRangePicker.tsx` |
