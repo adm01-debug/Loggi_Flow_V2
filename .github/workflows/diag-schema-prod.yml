@@ -1,0 +1,26 @@
+﻿name: Diag Schema Prod
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    environment: banco-leitura
+    env:
+      DESTINO_URL: ${{ secrets.DESTINO_URL }}
+    steps:
+      - name: Instalar cliente PostgreSQL
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null
+      - name: Schema ocorrencias e notifications
+        run: |
+          psql "$DESTINO_URL" -v ON_ERROR_STOP=1 -c "SELECT table_name, column_name, data_type, udt_name FROM information_schema.columns WHERE table_schema='public' AND table_name IN ('ocorrencias','notifications') ORDER BY table_name, ordinal_position;"
+          psql "$DESTINO_URL" -v ON_ERROR_STOP=1 -c "SELECT tgname, pg_get_triggerdef(oid) FROM pg_trigger WHERE tgrelid='public.ocorrencias'::regclass AND NOT tgisinternal;"
+          psql "$DESTINO_URL" -v ON_ERROR_STOP=1 -c "SELECT pg_get_functiondef(oid) FROM pg_proc WHERE proname='notify_ocorrencia_registrada';"
+      - name: Registros existentes
+        run: |
+          psql "$DESTINO_URL" -v ON_ERROR_STOP=1 -c "SELECT count(*) AS ocorrencias FROM public.ocorrencias;"
+          psql "$DESTINO_URL" -v ON_ERROR_STOP=1 -c "SELECT count(*) AS notifications FROM public.notifications;"
