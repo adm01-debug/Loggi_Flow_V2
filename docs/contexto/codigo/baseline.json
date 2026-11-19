@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "55ec52fbd32de522dcf1ef3aa5a79563ff390769",
+  "commit": "7b4672c4133e3dc65eeff3a5673ea3caab84ca84",
   "branch": "main",
-  "data_commit": "2026-11-18T15:30:24-03:00",
+  "data_commit": "2026-11-18T21:17:24-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "7b4672c",
+    "data": "2026-11-18",
+    "assunto": "chore: workflow temporario de diagnostico de schema prod (diag) (#194)"
+   },
+   {
+    "sha": "1136900",
+    "data": "2026-11-18",
+    "assunto": "chore: workflow temporário de destravamento do seed prod (service-role key) (#193)"
+   },
    {
     "sha": "55ec52f",
     "data": "2026-11-18",
@@ -121,19 +131,9 @@
     "sha": "09c9545",
     "data": "2026-11-17",
     "assunto": "fix: corrige as 8 RPCs de observabilidade de banco que nunca executaram (#163)"
-   },
-   {
-    "sha": "998f168",
-    "data": "2026-11-17",
-    "assunto": "fix: serve index.html em rota direta para a SPA nao dar 404 (#165)"
-   },
-   {
-    "sha": "a6e18fc",
-    "data": "2026-11-17",
-    "assunto": "fix: painel de seguranca lia login_attempts por coluna inexistente (#164)"
    }
   ],
-  "arquivos_mudados_7d": 131,
+  "arquivos_mudados_7d": 133,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 123
+    "commits": 125
    },
    {
     "autor": "dependabot[bot]",
@@ -314,7 +314,7 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1302,
+  "arquivos_total": 1304,
   "arquivos_codigo": 876,
   "linhas_codigo": 167260,
   "rotas": 61,
@@ -329,7 +329,7 @@
   "migrations": 246,
   "cron_jobs": 28,
   "testes": 129,
-  "workflows": 18,
+  "workflows": 20,
   "scripts": 62,
   "docs_md": 84
  },

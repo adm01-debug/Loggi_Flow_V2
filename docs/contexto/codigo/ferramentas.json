@@ -8,7 +8,7 @@
    "Markdown (84)",
    "JavaScript (80)",
    "JSON (33)",
-   "YAML (22)",
+   "YAML (24)",
    "Shell (9)",
    "Python (8)"
   ],
@@ -456,6 +456,27 @@
    ]
   },
   {
+   "arquivo": ".github/workflows/diag-schema-prod.yml",
+   "nome": "diag-schema-prod.yml",
+   "gatilhos": [
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [],
+   "jobs": [
+    "diag"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL"
+   ],
+   "actions": []
+  },
+  {
    "arquivo": ".github/workflows/e2e.yml",
    "nome": "E2E (manual)",
    "gatilhos": [
@@ -533,6 +554,33 @@
    "secrets": [],
    "actions": [
     "actions/github-script"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/revela-seed-prod.yml",
+   "nome": "Revela Seed Prod",
+   "gatilhos": [
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [],
+   "jobs": [
+    "revela-e-seeda"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [
+    "seed"
+   ],
+   "secrets": [
+    "SEED_PASSWORD",
+    "SUPABASE_ACCESS_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "supabase/setup-cli"
    ]
   },
   {
@@ -1044,6 +1092,7 @@
   "secrets_em_workflows": [
    "DESTINO_URL",
    "GITHUB_TOKEN",
+   "SEED_PASSWORD",
    "SETTINGS_GUARD_TOKEN",
    "SUPABASE_ACCESS_TOKEN",
    "SUPABASE_DB_URL",
