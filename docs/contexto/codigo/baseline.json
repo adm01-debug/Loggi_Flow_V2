@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "a2979e06cb400e7fe7abe806a5feb7302d19246c",
+  "commit": "8a358432f1f23b39f21f1440b308ffdf5bbf1cde",
   "branch": "main",
-  "data_commit": "2026-11-19T07:26:59-03:00",
+  "data_commit": "2026-11-19T11:50:38-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "8a35843",
+    "data": "2026-11-19",
+    "assunto": "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)"
+   },
    {
     "sha": "a2979e0",
     "data": "2026-11-19",
@@ -126,14 +131,9 @@
     "sha": "4c16760",
     "data": "2026-11-17",
     "assunto": "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)"
-   },
-   {
-    "sha": "7931333",
-    "data": "2026-11-17",
-    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#166)"
    }
   ],
-  "arquivos_mudados_7d": 134,
+  "arquivos_mudados_7d": 114,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -207,7 +207,7 @@
    },
    {
     "arquivo": "index.html",
-    "mudancas": 10
+    "mudancas": 11
    },
    {
     "arquivo": "src/hooks/gamification/useGamification.ts",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 127
+    "commits": 128
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1303,
-  "arquivos_codigo": 876,
-  "linhas_codigo": 167260,
+  "arquivos_total": 1302,
+  "arquivos_codigo": 875,
+  "linhas_codigo": 167060,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -345,10 +345,6 @@
   "postcss.config.js": {
    "arquivos": 1,
    "linhas": 7
-  },
-  "public/sw.js": {
-   "arquivos": 1,
-   "linhas": 200
   },
   "scripts/ai-context": {
    "arquivos": 3,
@@ -643,7 +639,7 @@
  ],
  "qualidade": {
   "any": 57,
-  "console_log": 155,
+  "console_log": 152,
   "ts_ignore": 0,
   "eslint_disable": 3,
   "todos": 2,

@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)",
    "chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)",
    "fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)",
    "chore: workflow temporario de diagnostico de schema prod (diag) (#194)",
-   "chore: workflow temporário de destravamento do seed prod (service-role key) (#193)",
-   "fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)"
+   "chore: workflow temporário de destravamento do seed prod (service-role key) (#193)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

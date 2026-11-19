@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a2979e06cb` · branch `main` · 2026-11-19 11:13 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8a358432f1` · branch `main` · 2026-11-19 15:15 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -894,7 +894,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `type` | `warn` | compara | `src/pages/MapaRotas.tsx` |
 | `type` | `warning` | compara, escreve | `src/components/notifications/UserNotificationCenter.tsx`<br>`src/hooks/logistics/useSLANotifications.tsx`<br>`src/lib/freightForecast.ts`<br>`supabase/functions/accuracy-meta-monitor/index.ts` |
 | `type` | `whatsapp` | compara, escreve | `src/pages/Transportadoras.tsx` |
-| `type` | `window` | escreve | `public/sw.js` |
 | `status` | `Ativo` | escreve | `src/pages/IntegracaoBitrix.tsx` |
 | `status` | `CHANNEL_ERROR` | compara | `src/hooks/data/useRealtime.tsx` |
 | `status` | `CLOSED` | compara | `src/hooks/data/useRealtime.tsx` |

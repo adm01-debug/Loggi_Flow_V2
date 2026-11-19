@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "a2979e06cb400e7fe7abe806a5feb7302d19246c",
+  "sha": "8a358432f1f23b39f21f1440b308ffdf5bbf1cde",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-19 11:13 UTC",
-  "files_total": 1313,
-  "code_files": 1137,
-  "code_lines": 183765,
+  "generated_at": "2026-11-19 15:15 UTC",
+  "files_total": 1312,
+  "code_files": 1136,
+  "code_lines": 183565,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "5989c7e2f33ef9ca",
+ "facts_hash": "8c4b5001147d43a0",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -314,7 +314,7 @@
    ".sql": 260,
    ".mjs": 77,
    ".py": 8,
-   ".js": 3
+   ".js": 2
   },
   "monorepo_packages": [],
   "supabase_config": {
@@ -29011,19 +29011,6 @@
    ]
   },
   {
-   "module": "public",
-   "files": 1,
-   "lines": 200,
-   "tables": [],
-   "exports": [],
-   "docs": [],
-   "deps": [],
-   "imports_modules": [],
-   "file_list": [
-    "public/sw.js"
-   ]
-  },
-  {
    "module": "scripts",
    "files": 98,
    "lines": 35336,
@@ -41518,12 +41505,6 @@
    }
   ],
   "status_values": [
-   {
-    "file": "public/sw.js",
-    "field": "type",
-    "value": "window",
-    "kind": "escreve"
-   },
    {
     "file": "src/components/achievements/AchievementNotification.tsx",
     "field": "type",
@@ -56557,9 +56538,6 @@
    ],
    "usage": {
     "type": {
-     "window": [
-      "escreve:public/sw.js"
-     ],
      "spring": [
       "escreve:src/components/achievements/AchievementNotification.tsx",
       "escreve:src/components/common/ConfirmProvider.tsx",
@@ -64956,17 +64934,6 @@
    "lines": 46,
    "exports": [
     "default defineConfig"
-   ]
-  },
-  "public/sw.js": {
-   "path": "public/sw.js",
-   "lines": 200,
-   "status_values": [
-    {
-     "field": "type",
-     "value": "window",
-     "kind": "escreve"
-    }
    ]
   },
   "scripts/audit-gate.mjs": {
@@ -88821,10 +88788,20 @@
   }
  },
  "git": {
-  "sha": "a2979e06cb400e7fe7abe806a5feb7302d19246c",
+  "sha": "8a358432f1f23b39f21f1440b308ffdf5bbf1cde",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "8a35843",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)",
+    "files": [
+     "index.html",
+     "public/sw.js"
+    ]
+   },
    {
     "sha": "a2979e0",
     "date": "2026-11-19",
@@ -89157,20 +89134,6 @@
     "files": [
      "src/components/security/SecurityOverviewPanel.tsx"
     ]
-   },
-   {
-    "sha": "63c4b83",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "﻿fix: producao quebrava com Invalid supabaseUrl por aspas na env da Vercel (#162)",
-    "files": [
-     "src/components/ai/AIAssistant.tsx",
-     "src/hooks/auth/useAuth.tsx",
-     "src/integrations/supabase/client.ts",
-     "src/lib/supabaseEnv.test.ts",
-     "src/lib/supabaseEnv.ts",
-     "src/pages/ConfiguracoesFrete.tsx"
-    ]
    }
   ],
   "hot_files": [
@@ -89205,6 +89168,10 @@
    [
     "src/hooks/data/useImageUpload.tsx",
     3
+   ],
+   [
+    "index.html",
+    2
    ],
    [
     ".github/workflows/diag-schema-prod.yml",
@@ -89243,15 +89210,11 @@
     2
    ],
    [
-    "src/pages/ConfiguracoesFrete.tsx",
-    2
-   ],
-   [
     "src/lib/validations.test.ts",
     2
    ],
    [
-    "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
+    "public/sw.js",
     1
    ]
   ]

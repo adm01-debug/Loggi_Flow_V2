@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `a2979e06cb400e7fe7abe806a5feb7302d19246c` (2026-11-19T07:26:59-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8a358432f1f23b39f21f1440b308ffdf5bbf1cde` (2026-11-19T11:50:38-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (789), SQL (260), Markdown (84), JavaScript (80), JSON (33), YAML (22), Shell (9), Python (8)
+- linguagens: TypeScript (789), SQL (260), Markdown (84), JavaScript (79), JSON (33), YAML (22), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,9 +34,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1303 |
-| arquivos_codigo | 876 |
-| linhas_codigo | 167260 |
+| arquivos_total | 1302 |
+| arquivos_codigo | 875 |
+| linhas_codigo | 167060 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,15 +274,15 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8137 nós · 20546 arestas · 724 comunidades · grafo do commit `a2979e06`
-- comunidades maiores: lucide-react (241), button.tsx (170), utils.ts (158), db-observability/index.ts (149), react (137), Transportadoras.tsx (130), ref_node_path (114), ui/index.ts (107), useAuth (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (103), @tanstack/react-query (87)
+- 8132 nós · 20540 arestas · 712 comunidades · grafo do commit `8a358432`
+- comunidades maiores: lucide-react (233), Envios.tsx (180), db-observability/index.ts (166), useAuth (120), ui/index.ts (120), react (113), CotacaoMultiCanal.tsx (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (103), ref_node_url (98), @tanstack/react-query (98), label.tsx (92)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
 - package-lock.json (46)
 - package.json (45)
-- index.html (10)
+- index.html (11)
 - src/hooks/gamification/useGamification.ts (10)
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci.yml (7)
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-19 `8a35843` chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)
 - 2026-11-19 `a2979e0` chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)
 - 2026-11-19 `f93a675` fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)
 - 2026-11-18 `7b4672c` chore: workflow temporario de diagnostico de schema prod (diag) (#194)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-18 `e73975b` ﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)
 - 2026-11-17 `8530be9` feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)
 - 2026-11-17 `6e1ffcf` fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)
-- 2026-11-17 `e1f6935` fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
