@@ -108,13 +108,5 @@
     </style>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator && !location.hostname.includes('lovableproject')) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
-        });
-      }
-    </script>
-  </body>
+    </body>
 </html>
