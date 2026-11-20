@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,122 @@ function extractRows(data: { data?: unknown }): Row[] {
 
 const str = (v: unknown) => (v == null ? "" : String(v));
 
+interface NewAddressFormData {
+  street: string;
+  number: string;
+  complement: string;
+  neighborhood: string;
+  cityName: string;
+  stateAbbreviation: string;
+  zipCode: string;
+}
+
+function NewAddressForm({
+  loading,
+  onSave,
+  onCancel,
+}: {
+  loading: boolean;
+  onSave: (address: NewAddressFormData) => Promise<void>;
+  onCancel: () => void;
+}) {
+  const [street, setStreet] = useState("");
+  const [number, setNumber] = useState("");
+  const [complement, setComplement] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [cityName, setCityName] = useState("");
+  const [stateAbbreviation, setStateAbbreviation] = useState("");
+  const [zipCode, setZipCode] = useState("");
+
+  const submit = async () => {
+    if (!street.trim() || !cityName.trim()) {
+      toast.error("Logradouro e cidade são obrigatórios");
+      return;
+    }
+    await onSave({
+      street,
+      number,
+      complement,
+      neighborhood,
+      cityName,
+      stateAbbreviation,
+      zipCode,
+    });
+  };
+
+  return (
+    <div className="p-3 rounded-lg border bg-muted/20 space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">Novo endereço de entrega</Label>
+        <Button variant="ghost" size="sm" onClick={onCancel}>
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="col-span-2">
+          <Label>Logradouro *</Label>
+          <Input
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
+            placeholder="Rua, Avenida..."
+          />
+        </div>
+        <div>
+          <Label>Número</Label>
+          <Input
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+            placeholder="S/N"
+          />
+        </div>
+        <div>
+          <Label>Complemento</Label>
+          <Input
+            value={complement}
+            onChange={(e) => setComplement(e.target.value)}
+            placeholder="Sala, andar..."
+          />
+        </div>
+        <div>
+          <Label>Bairro</Label>
+          <Input
+            value={neighborhood}
+            onChange={(e) => setNeighborhood(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label>Cidade *</Label>
+          <Input
+            value={cityName}
+            onChange={(e) => setCityName(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label>UF</Label>
+          <Input
+            value={stateAbbreviation}
+            onChange={(e) => setStateAbbreviation(e.target.value.toUpperCase())}
+            maxLength={2}
+            placeholder="SP"
+          />
+        </div>
+        <div>
+          <Label>CEP</Label>
+          <Input
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value)}
+            placeholder="00000-000"
+          />
+        </div>
+      </div>
+      <Button onClick={submit} disabled={loading} className="w-full">
+        <Plus className="w-4 h-4 mr-2" />
+        Salvar Endereço
+      </Button>
+    </div>
+  );
+}
+
 export function RTECustomerManager() {
   const [searchKey, setSearchKey] = useState("");
   const [searchTaxId, setSearchTaxId] = useState("");
@@ -32,15 +149,6 @@ export function RTECustomerManager() {
   const [listPage, setListPage] = useState(1);
   const [addressTaxId, setAddressTaxId] = useState("");
   const [showNewAddress, setShowNewAddress] = useState(false);
-  const [newAddress, setNewAddress] = useState({
-    street: "",
-    number: "",
-    complement: "",
-    neighborhood: "",
-    cityName: "",
-    stateAbbreviation: "",
-    zipCode: "",
-  });
 
   const [customers, setCustomers] = useState<Row[]>([]);
   const [addresses, setAddresses] = useState<Row[]>([]);
@@ -132,41 +240,28 @@ export function RTECustomerManager() {
     }
   };
 
-  const handleCreateAddress = async () => {
+  const handleSaveAddress = async (address: Omit<NewAddressFormData, "">) => {
     const taxId = addressTaxId.replace(/\D/g, "");
     if (taxId.length < 11) {
       toast.error("Informe um CNPJ/CPF válido");
-      return;
-    }
-    if (!newAddress.street.trim() || !newAddress.cityName.trim()) {
-      toast.error("Logradouro e cidade são obrigatórios");
       return;
     }
     const data = await invoke("address-create", {
       body: {
         TaxIdRegistration: taxId,
         AddressType: "ENTRG",
-        Street: newAddress.street.trim(),
-        Number: newAddress.number.trim(),
-        Complement: newAddress.complement.trim(),
-        Neighborhood: newAddress.neighborhood.trim(),
-        CityName: newAddress.cityName.trim(),
-        StateAbbreviation: newAddress.stateAbbreviation.trim().toUpperCase(),
-        ZipCode: newAddress.zipCode.replace(/\D/g, ""),
+        Street: address.street.trim(),
+        Number: address.number.trim(),
+        Complement: address.complement.trim(),
+        Neighborhood: address.neighborhood.trim(),
+        CityName: address.cityName.trim(),
+        StateAbbreviation: address.stateAbbreviation.trim().toUpperCase(),
+        ZipCode: address.zipCode.replace(/\D/g, ""),
       },
     });
     if (data) {
       toast.success("Endereço criado na RTE!");
       setShowNewAddress(false);
-      setNewAddress({
-        street: "",
-        number: "",
-        complement: "",
-        neighborhood: "",
-        cityName: "",
-        stateAbbreviation: "",
-        zipCode: "",
-      });
       handleListAddresses();
     }
   };
@@ -331,114 +426,11 @@ export function RTECustomerManager() {
             </div>
 
             {showNewAddress && (
-              <div className="p-3 rounded-lg border bg-muted/20 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-medium">
-                    Novo endereço de entrega
-                  </Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowNewAddress(false)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="col-span-2">
-                    <Label>Logradouro *</Label>
-                    <Input
-                      value={newAddress.street}
-                      onChange={(e) =>
-                        setNewAddress({ ...newAddress, street: e.target.value })
-                      }
-                      placeholder="Rua, Avenida..."
-                    />
-                  </div>
-                  <div>
-                    <Label>Número</Label>
-                    <Input
-                      value={newAddress.number}
-                      onChange={(e) =>
-                        setNewAddress({ ...newAddress, number: e.target.value })
-                      }
-                      placeholder="S/N"
-                    />
-                  </div>
-                  <div>
-                    <Label>Complemento</Label>
-                    <Input
-                      value={newAddress.complement}
-                      onChange={(e) =>
-                        setNewAddress({
-                          ...newAddress,
-                          complement: e.target.value,
-                        })
-                      }
-                      placeholder="Sala, andar..."
-                    />
-                  </div>
-                  <div>
-                    <Label>Bairro</Label>
-                    <Input
-                      value={newAddress.neighborhood}
-                      onChange={(e) =>
-                        setNewAddress({
-                          ...newAddress,
-                          neighborhood: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>Cidade *</Label>
-                    <Input
-                      value={newAddress.cityName}
-                      onChange={(e) =>
-                        setNewAddress({
-                          ...newAddress,
-                          cityName: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>UF</Label>
-                    <Input
-                      value={newAddress.stateAbbreviation}
-                      onChange={(e) =>
-                        setNewAddress({
-                          ...newAddress,
-                          stateAbbreviation: e.target.value.toUpperCase(),
-                        })
-                      }
-                      maxLength={2}
-                      placeholder="SP"
-                    />
-                  </div>
-                  <div>
-                    <Label>CEP</Label>
-                    <Input
-                      value={newAddress.zipCode}
-                      onChange={(e) =>
-                        setNewAddress({
-                          ...newAddress,
-                          zipCode: e.target.value,
-                        })
-                      }
-                      placeholder="00000-000"
-                    />
-                  </div>
-                </div>
-                <Button
-                  onClick={handleCreateAddress}
-                  disabled={loading}
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Salvar Endereço
-                </Button>
-              </div>
+              <NewAddressForm
+                loading={loading}
+                onSave={handleSaveAddress}
+                onCancel={() => setShowNewAddress(false)}
+              />
             )}
 
             {addresses.length > 0 && (
