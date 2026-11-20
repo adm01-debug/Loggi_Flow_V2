@@ -8,12 +8,12 @@ Backlog completo (164 itens) consolidado na PR #225 (Fase 1 do GOAL).
 
 ENCERRADA. Feitos via #207/#208 (2.1-2.4), #211/#212 (2.5-2.10, 2.12, 2.14, 2.16), #215 (2.11, 2.13, 2.15). 02-05/02-06 atualizados como resolvidos com evidência.
 
-## Fase B — Simulações exibidas como dado real (seção 3) — PRÓXIMA
+## Fase B — Simulações exibidas como dado real (seção 3) — EM ANDAMENTO
 
 Maior impacto ao usuário: a UI mostra como real algo que é simulado localmente.
 
-1. 03-19 cotacao-api-simulada (CotacaoMultiCanal insert local)
-2. 03-20 dashboard-cotacoes-simula (botao "Simular Resposta WA" + retentativa fake)
+1. ~~03-19 cotacao-api-simulada~~ — CONCLUÍDO via PR #226 (`e4392b7d`)
+2. ~~03-20 dashboard-cotacoes-simula~~ — CONCLUÍDO via PR #226 (`e4392b7d`)
 3. 03-13 cinematichud-telemetria-fixa (SAT_LOCK/HDOP/coords fixas)
 4. 03-01 dora-metrics-literal / 03-02 postmortem-literal / 03-03 systempulse-fixo / 03-04 livestatusbar-ping / 03-05 logisticsmapwidget-kpis
 5. 03-06 missiondetail-timeline / 03-07 biometric-scan / 03-08 alertspanel-latencia / 03-09 nexuscoverage-fixo / 03-10 negotiation-fixo
