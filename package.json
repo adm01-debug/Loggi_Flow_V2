@@ -164,6 +164,7 @@
     "zod-to-json-schema": "^3.25.2"
   },
   "overrides": {
-    "postcss-selector-parser": "6.1.5"
+    "postcss-selector-parser": "6.1.5",
+    "minimatch": "11.0.9"
   }
 }
