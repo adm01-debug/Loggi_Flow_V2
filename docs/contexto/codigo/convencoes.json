@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore(db): sincronizar artefatos com o banco [auto] (#216)",
    "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)",
    "fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)",
    "docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)",
-   "fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)",
-   "fix(audit): corrige 7 quebras da seção 2 (#211)"
+   "fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

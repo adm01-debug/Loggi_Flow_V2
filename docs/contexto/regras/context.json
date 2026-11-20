@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "9654eed487c3cd76026f8d17f565836fbea5b302",
+  "sha": "eaecf14859b6525a2e5b4f94fa9d9fa4f4801da6",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 15:14 UTC",
+  "generated_at": "2026-11-20 16:32 UTC",
   "files_total": 1331,
   "code_files": 1139,
   "code_lines": 185031,
@@ -88858,10 +88858,21 @@
   }
  },
  "git": {
-  "sha": "9654eed487c3cd76026f8d17f565836fbea5b302",
+  "sha": "eaecf14859b6525a2e5b4f94fa9d9fa4f4801da6",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "eaecf14",
+    "date": "2026-11-20",
+    "author": "github-actions[bot]",
+    "subject": "chore(db): sincronizar artefatos com o banco [auto] (#216)",
+    "files": [
+     "scripts/db-audit/grants-baseline.json",
+     "scripts/db-audit/known-violations.json",
+     "supabase/schema-manifest.json"
+    ]
+   },
    {
     "sha": "9654eed",
     "date": "2026-11-20",
@@ -89195,15 +89206,6 @@
     "files": [
      ".github/workflows/dependency-review.yml"
     ]
-   },
-   {
-    "sha": "e73975b",
-    "date": "2026-11-18",
-    "author": "adm01-debug",
-    "subject": "﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)",
-    "files": [
-     "src/hooks/data/useRealtime.tsx"
-    ]
    }
   ],
   "hot_files": [
@@ -89222,6 +89224,10 @@
    [
     "package.json",
     3
+   ],
+   [
+    "supabase/schema-manifest.json",
+    2
    ],
    [
     "docs/pendencias/02-09-ai-assistant-colunas.md",
@@ -89282,10 +89288,6 @@
    [
     ".github/workflows/e2e.yml",
     2
-   ],
-   [
-    "docs/pendencias/02-11-rodonaves-clientes.md",
-    1
    ]
   ]
  }

@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "9654eed487c3cd76026f8d17f565836fbea5b302",
+  "commit": "eaecf14859b6525a2e5b4f94fa9d9fa4f4801da6",
   "branch": "main",
-  "data_commit": "2026-11-20T11:53:02-03:00",
+  "data_commit": "2026-11-20T13:32:15-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "eaecf14",
+    "data": "2026-11-20",
+    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#216)"
+   },
    {
     "sha": "9654eed",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "554aaad",
     "data": "2026-11-18",
     "assunto": "chore(deps): bump peter-evans/create-pull-request from 8.1.2 to 8.1.3 (#189)"
-   },
-   {
-    "sha": "f3db2b8",
-    "data": "2026-11-18",
-    "assunto": "chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)"
    }
   ],
-  "arquivos_mudados_7d": 160,
+  "arquivos_mudados_7d": 162,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -180,6 +180,10 @@
     "mudancas": 5
    },
    {
+    "pasta": "supabase/schema-manifest.json",
+    "mudancas": 5
+   },
+   {
     "pasta": ".github/workflows/ci.yml",
     "mudancas": 4
    },
@@ -189,10 +193,6 @@
    },
    {
     "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    "mudancas": 4
-   },
-   {
-    "pasta": "scripts/audit-gate.mjs",
     "mudancas": 4
    }
   ],
@@ -254,6 +254,10 @@
     "mudancas": 5
    },
    {
+    "arquivo": "supabase/schema-manifest.json",
+    "mudancas": 5
+   },
+   {
     "arquivo": "tests/security/integrations-access.spec.ts",
     "mudancas": 5
    },
@@ -292,10 +296,6 @@
    {
     "arquivo": "scripts/check-warning-budget.mjs",
     "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/generate-quality-report.mjs",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
@@ -309,7 +309,7 @@
    },
    {
     "autor": "github-actions[bot]",
-    "commits": 5
+    "commits": 6
    }
   ]
  },
