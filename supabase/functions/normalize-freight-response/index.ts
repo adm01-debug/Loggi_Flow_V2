@@ -173,12 +173,23 @@ serve(async (req) => {
 
       const { data: usersToNotify } = await supabaseClient
         .from("user_notification_preferences")
-        .select("user_id, profiles(phone)")
+        .select("user_id")
         .eq("notifications_whatsapp", true);
 
       if (usersToNotify) {
+        const userIds = usersToNotify.map((u: any) => u.user_id);
+        const { data: settings } = await supabaseClient
+          .from("prediction_accuracy_settings")
+          .select("user_id, whatsapp_phone")
+          .in("user_id", userIds)
+          .eq("notify_whatsapp", true);
+        const phoneByUser = new Map<string, string>();
+        for (const s of settings ?? []) {
+          if (s.whatsapp_phone) phoneByUser.set(s.user_id, s.whatsapp_phone);
+        }
+
         for (const user of usersToNotify) {
-          const phone = (user.profiles as any)?.phone;
+          const phone = phoneByUser.get(user.user_id);
           if (phone) {
             await fetch(`${supabaseUrl}/functions/v1/whatsapp-notification`, {
               method: "POST",

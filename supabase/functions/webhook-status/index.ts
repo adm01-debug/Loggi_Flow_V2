@@ -130,10 +130,7 @@ serve(async (req) => {
               payload,
               response_status: response.status,
               success: response.ok,
-              metadata: {
-                duration_ms: 0, // Could measure this
-                endpoint: webhook.url,
-              },
+              error_message: response.ok ? null : `HTTP ${response.status}`,
             });
           } catch (err) {
             log.error(`Failed to deliver webhook ${webhook.id}:`, err);
