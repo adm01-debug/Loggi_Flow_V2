@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
+import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
 import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -242,6 +243,7 @@ export default function KanbanEntregas() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const { playSuccess, playError } = useAudioFeedback();
+  const { onStatusChange } = useRuleTriggers();
 
   useRealtime({
     table: "entregas",
@@ -309,6 +311,8 @@ export default function KanbanEntregas() {
         throw new Error(
           "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
         );
+
+      await onStatusChange("entrega", id, { status });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["kanban-entregas"] });

@@ -33,6 +33,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetailsDialog";
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
 
 interface Despacho {
   id: string;
@@ -99,6 +100,7 @@ const validTransitions: Record<string, string> = {
 
 export default function Despachos() {
   const { user } = useAuth();
+  const { onStatusChange } = useRuleTriggers();
   const [confirmItem, setConfirmItem] = useState<Despacho | null>(null);
   const [selectedItem, setSelectedItem] = useState<Despacho | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -205,6 +207,8 @@ export default function Despachos() {
         .eq("version", item.version);
       if (error) throw error;
 
+      await onStatusChange("entrega", item.id, { status: nextStatus });
+
       const { error: histError } = await supabase
         .from("kanban_history")
         .insert({
@@ -259,6 +263,8 @@ export default function Despachos() {
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
+
+      await onStatusChange("entrega", item.id, { status: "despachado" });
 
       const { error: histError } = await supabase
         .from("kanban_history")

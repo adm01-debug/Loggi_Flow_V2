@@ -122,6 +122,7 @@ export * from './logistics/useSLAAlerts';
 export * from './logistics/useLalamoveTracking';
 export * from './logistics/useLalamoveOrders';
 export * from './logistics/useBusinessRuleEngine';
+export * from './logistics/useRuleTriggers';
 export * from './logistics/useTrackingAnalytics';
 export * from './logistics/useUnifiedTracking';
 export * from './logistics/useBiometricAnomalies';

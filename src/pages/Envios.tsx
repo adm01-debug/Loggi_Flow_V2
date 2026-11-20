@@ -83,6 +83,7 @@ import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
+import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 
@@ -327,6 +328,7 @@ const emptyForm = {
 
 export default function Envios() {
   const qc = useQueryClient();
+  const { onStatusChange } = useRuleTriggers();
   const [dlgCreate, setDlgCreate] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
   const [dlgView, setDlgView] = useState(false);
@@ -468,6 +470,8 @@ export default function Envios() {
         .update(update)
         .eq("id", id);
       if (error) throw error;
+
+      await onStatusChange("entrega", id, { status });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["entregas"] });
@@ -502,6 +506,9 @@ export default function Envios() {
       qc.invalidateQueries({ queryKey: ["entregas"] });
       clearSelection();
       toast.success(`${ids.length} entrega(s) atualizada(s)!`);
+      for (const id of ids) {
+        await onStatusChange("entrega", id, { status });
+      }
     }
   };
 
