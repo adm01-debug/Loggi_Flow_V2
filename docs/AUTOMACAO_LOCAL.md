@@ -147,7 +147,6 @@ Workflows anteriores preservados: 14. Os gatilhos e condições de cada arquivo 
 - `.github/workflows/codeql.yml`
 - `.github/workflows/contexto-ia.yml`
 - `.github/workflows/deploy-functions.yml`
-- `.github/workflows/e2e.yml`
 - `.github/workflows/inventario-estado-semanal.yml`
 - `.github/workflows/notifica-falha-main.yml`
 - `.github/workflows/scripts-tests.yml`

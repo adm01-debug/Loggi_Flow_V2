@@ -60,7 +60,6 @@ Consequências práticas:
 | `ci-nexus.yml` (`CI Quality Gate Nexus`) | push/PR em `main`/`master`/`develop`                                                                                                                       | job único `quality-gate`: lint, typecheck, `validate:csp`, `validate:no-console`, `security-scan`, `test:rls`, smoke de edge com Deno, testes, fuzzing, cobertura                                                                                                                                             |
 | `security.yml` (`Security Scan`)         | push/PR em `main`/`master` + semanal (dom. 00:00 UTC)                                                                                                      | `Security Audits`: npm audit + gitleaks                                                                                                                                                                                                                                                                       |
 | `deploy-functions.yml`                   | **só `workflow_dispatch`**                                                                                                                                 | deploy das edge functions no projeto `jvfhclubfpxrtrrazrgr` (input `only` = uma função); exige o secret `SUPABASE_ACCESS_TOKEN`                                                                                                                                                                               |
-| `e2e.yml`                                | **só `workflow_dispatch`**                                                                                                                                 | Playwright em chromium; manual até existir usuário de teste semeado + `E2E_EMAIL`/`E2E_PASSWORD` nos secrets                                                                                                                                                                                                  |
 | `contexto.yml`                           | push em `main` que toque `src/`, `supabase/`, os scripts das automações ou `docs/contexto/regras/manual/` + a cada 10 min (minuto 7) + `workflow_dispatch` | regera o contexto para agentes e publica na branch gerada **`contexto`** (nunca na `main`); 5 jobs (`gate`, `codigo`, `banco`, `regras`, `publicar`), produtor que falha não derruba os outros. A fonte `supabase/` fica vazia até existir o secret `SUPABASE_DB_URL`. Detalhe: `docs/agentes/contexto-ia.md` |
 
 Fatos que já custaram retrabalho:
@@ -75,8 +74,9 @@ Fatos que já custaram retrabalho:
 - **Allowlist do gitleaks (`.gitleaks.toml`) cobre só credencial pública por design**: anon key do Supabase
   (JWT com `role=anon`) e token `pk.` do Mapbox, em `.env`, `.env.example` e `tests/security/*.spec.ts`.
   Nunca adicione `service_role`, `sb_secret_`, senha ou token privado ali.
-- **E2E não é gate.** Nenhum workflow de PR roda Playwright; "passou o E2E" só vale com run manual do
-  `e2e.yml` citado.
+- **E2E não é gate.** Nenhum workflow de PR roda Playwright; "passou o E2E" so vale com run manual.
+  Os specs em tests/e2e seguem no repo (credenciais ficticias, sem webServer), sem workflow.
+  O workflow e2e.yml foi removido em 20/11/2026 por nao haver usuario de teste em producao.
 - **`contexto.yml` publica numa branch, não na `main`.** Não edite a branch `contexto` nem abra PR dela: o
   próximo run sobrescreve. O push dela usa `GITHUB_TOKEN`, que não dispara outros workflows.
 
