@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)",
    "fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)",
    "fix(audit): corrige 7 quebras da seção 2 (#211)",
    "docs: aponta docs aspiracionais para a auditoria autoritativa (#210)",
-   "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)",
-   "fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)"
+   "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "db8f658a9964c0dfd72acff24a2271b9acb54317",
+  "sha": "f1d13b631d952c2637e1827edd6f6d869d848075",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 13:54 UTC",
+  "generated_at": "2026-11-20 14:14 UTC",
   "files_total": 1327,
   "code_files": 1138,
   "code_lines": 184350,
@@ -88817,10 +88817,19 @@
   }
  },
  "git": {
-  "sha": "db8f658a9964c0dfd72acff24a2271b9acb54317",
+  "sha": "f1d13b631d952c2637e1827edd6f6d869d848075",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "f1d13b6",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)",
+    "files": [
+     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md"
+    ]
+   },
    {
     "sha": "db8f658",
     "date": "2026-11-20",
@@ -89156,16 +89165,6 @@
      "src/hooks/data/useDocumentUpload.ts",
      "src/hooks/data/useImageUpload.tsx"
     ]
-   },
-   {
-    "sha": "e1f6935",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)",
-    "files": [
-     "src/components/gamification/GamificationPanel.tsx",
-     "src/hooks/gamification/useGamification.ts"
-    ]
    }
   ],
   "hot_files": [
@@ -89176,6 +89175,10 @@
    [
     "package.json",
     4
+   ],
+   [
+    "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+    2
    ],
    [
     "docs/pendencias/02-07-fretes-internos-deleted-at.md",
@@ -89243,10 +89246,6 @@
    ],
    [
     "src/pages/Ranking.tsx",
-    1
-   ],
-   [
-    "src/pages/Relatorios.tsx",
     1
    ]
   ]

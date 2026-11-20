@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `db8f658a9964c0dfd72acff24a2271b9acb54317` (2026-11-20T10:53:51-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `f1d13b631d952c2637e1827edd6f6d869d848075` (2026-11-20T11:05:30-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8195 nós · 20770 arestas · 698 comunidades · grafo do commit `db8f658a`
+- 8195 nós · 20770 arestas · 698 comunidades · grafo do commit `f1d13b63`
 - comunidades maiores: cn (301), lucide-react (197), Envios.tsx (195), react (149), useAuth (136), db-observability/index.ts (128), client.ts (112), utils.ts (109), ref_node_path (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), MainLayout.tsx (99), sonner (92)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `f1d13b6` docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)
 - 2026-11-20 `db8f658` fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)
 - 2026-11-20 `35d65b9` fix(audit): corrige 7 quebras da seção 2 (#211)
 - 2026-11-20 `08d5a13` docs: aponta docs aspiracionais para a auditoria autoritativa (#210)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-19 `13eb1a1` chore: arquiva mapa de integracao 20261112 como registro historico (#200)
 - 2026-11-19 `ed9aa79` chore(db): sincronizar artefatos derivados do banco [auto]
 - 2026-11-19 `7ab44e7` style(manutencao): aplica correcoes locais verificadas (#199)
-- 2026-11-19 `8a35843` chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
