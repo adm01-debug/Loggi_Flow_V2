@@ -1,10 +1,10 @@
 {
  "meta": {
-  "sha": "190f724e9a1dee1b4ae0db93be84473090579b93",
+  "sha": "5d31fbc9e6dc02890c8a49620d3278d19137aff7",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 18:46 UTC",
-  "files_total": 1330,
+  "generated_at": "2026-11-20 19:12 UTC",
+  "files_total": 1481,
   "code_files": 1139,
   "code_lines": 185029,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
@@ -88434,10 +88434,172 @@
   }
  },
  "git": {
-  "sha": "190f724e9a1dee1b4ae0db93be84473090579b93",
+  "sha": "5d31fbc9e6dc02890c8a49620d3278d19137aff7",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "5d31fbc",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)",
+    "files": [
+     "docs/pendencias/01-01-hooks-real-ausentes.md",
+     "docs/pendencias/01-02-hooks-crud-ausentes.md",
+     "docs/pendencias/01-03-componentes-ausentes.md",
+     "docs/pendencias/01-04-tabelas-ausentes.md",
+     "docs/pendencias/01-05-edicao-concorrente.md",
+     "docs/pendencias/01-06-n8n-integration.md",
+     "docs/pendencias/01-07-public-api.md",
+     "docs/pendencias/01-08-i18n.md",
+     "docs/pendencias/01-09-mobilecard-loading.md",
+     "docs/pendencias/01-10-testes-src.md",
+     "docs/pendencias/01-11-testes-hooks.md",
+     "docs/pendencias/01-12-sw-manual.md",
+     "docs/pendencias/01-13-componentes-analytics.md",
+     "docs/pendencias/01-14-hooks-ai-rodonaves.md",
+     "docs/pendencias/01-15-atalhos-teclado.md",
+     "docs/pendencias/01-16-roteirizacao-mapbox.md",
+     "docs/pendencias/01-17-prazo-rodonaves-calendario.md",
+     "docs/pendencias/01-18-views-ativas-purge.md",
+     "docs/pendencias/01-19-force-logout-admin.md",
+     "docs/pendencias/01-20-lgpd-logs.md",
+     "docs/pendencias/01-21-monitor-uptime.md",
+     "docs/pendencias/01-22-contexto-supabase.md",
+     "docs/pendencias/01-23-mapbox-lalamove-secrets.md",
+     "docs/pendencias/01-24-diagramas-er-c4.md",
+     "docs/pendencias/02-05-predict-delays-whatsapp.md",
+     "docs/pendencias/02-06-nexus-auto-healing-coluna.md",
+     "docs/pendencias/03-01-dora-metrics-literal.md",
+     "docs/pendencias/03-02-postmortem-literal.md",
+     "docs/pendencias/03-03-systempulse-fixo.md",
+     "docs/pendencias/03-04-livestatusbar-ping.md",
+     "docs/pendencias/03-05-logisticsmapwidget-kpis.md",
+     "docs/pendencias/03-06-missiondetail-timeline.md",
+     "docs/pendencias/03-07-biometric-scan.md",
+     "docs/pendencias/03-08-alertspanel-latencia.md",
+     "docs/pendencias/03-09-nexuscoverage-fixo.md",
+     "docs/pendencias/03-10-negotiation-fixo.md",
+     "docs/pendencias/03-11-pickupconference-ocr.md",
+     "docs/pendencias/03-12-pickupdetails-custo.md",
+     "docs/pendencias/03-13-cinemathic-hud.md",
+     "docs/pendencias/03-14-label-qrcode.md",
+     "docs/pendencias/03-15-dashboard-executivo.md",
+     "docs/pendencias/03-16-cotacaofrete-economia.md",
+     "docs/pendencias/03-17-coletas-otif.md",
+     "docs/pendencias/03-18-inteligenciafrete-acoes.md",
+     "docs/pendencias/03-19-cotacao-api-simulada.md",
+     "docs/pendencias/03-20-dashboard-cotacoes-simula.md",
+     "docs/pendencias/03-21-rastreamento-interpolado.md",
+     "docs/pendencias/03-22-mapa-rotas-time-travel.md",
+     "docs/pendencias/03-23-uselogisticsintelligence.md",
+     "docs/pendencias/03-24-ai-assistant-clima-fixo.md",
+     "docs/pendencias/03-25-predict-delays-clima.md",
+     "docs/pendencias/03-26-estatisticas-fixas.md",
+     "docs/pendencias/03-27-authhero-depoimentos.md",
+     "docs/pendencias/03-28-painelsla-localstorage.md",
+     "docs/pendencias/03-29-qualitygate-estatico.md",
+     "docs/pendencias/03-30-analyticscharts-fallback.md",
+     "docs/pendencias/04-01-configuracoes-frete-estatico.md",
+     "docs/pendencias/04-02-configuracoes-security.md",
+     "docs/pendencias/04-03-profile-statico.md",
+     "docs/pendencias/04-04-api-documentation.md",
+     "docs/pendencias/04-05-botoes-sem-handler.md",
+     "docs/pendencias/04-06-rotas-404.md",
+     "docs/pendencias/04-07-mapas-sem-markers.md",
+     "docs/pendencias/04-08-deep-link.md",
+     "docs/pendencias/04-09-estados-erro-ausentes.md",
+     "docs/pendencias/04-SECAO4-geral.md",
+     "docs/pendencias/05-01-bitrix24.md",
+     "docs/pendencias/05-02-lalamove.md",
+     "docs/pendencias/05-03-rodonaves.md",
+     "docs/pendencias/05-04-melhor-envio.md",
+     "docs/pendencias/05-05-whatsapp.md",
+     "docs/pendencias/05-06-push-notifications.md",
+     "docs/pendencias/05-07-email-resend.md",
+     "docs/pendencias/05-08-mapbox-mapas.md",
+     "docs/pendencias/05-09-openweather.md",
+     "docs/pendencias/05-10-external-db-bridge.md",
+     "docs/pendencias/05-11-carrier-webhook-receiver.md",
+     "docs/pendencias/05-12-ingestao-entregas-coletas.md",
+     "docs/pendencias/05-13-secrets.md",
+     "docs/pendencias/05-14-vite-bitrix24-webhook.md",
+     "docs/pendencias/06-01-motor-regras.md",
+     "docs/pendencias/06-02-webhooks-saida.md",
+     "docs/pendencias/06-03-relatorios-agendados.md",
+     "docs/pendencias/06-04-feature-flags.md",
+     "docs/pendencias/06-05-alerta-regressao.md",
+     "docs/pendencias/06-06-auto-cura.md",
+     "docs/pendencias/06-07-preferencias-notificacao.md",
+     "docs/pendencias/06-08-agendamento-cache.md",
+     "docs/pendencias/06-09-contexto-ia.md",
+     "docs/pendencias/07-01-mfa-2fa.md",
+     "docs/pendencias/07-02-passkeys.md",
+     "docs/pendencias/07-03-matriz-permissoes.md",
+     "docs/pendencias/07-05-gestao-sessoes.md",
+     "docs/pendencias/07-06-functions-sem-auth.md",
+     "docs/pendencias/07-07-hmac-opcional.md",
+     "docs/pendencias/07-08-cors-prod.md",
+     "docs/pendencias/07-09-rate-limiting.md",
+     "docs/pendencias/07-10-timeout-circuit-breaker.md",
+     "docs/pendencias/07-11-check-password-breach.md",
+     "docs/pendencias/07-12-health-sem-auth.md",
+     "docs/pendencias/07-13-heartbeat.md",
+     "docs/pendencias/07-14-mcp-exec.md",
+     "docs/pendencias/07-15-sec-definer.md",
+     "docs/pendencias/07-16-user-ranks-anon.md",
+     "docs/pendencias/07-17-validacao-payload.md",
+     "docs/pendencias/07-18-env-versionado.md",
+     "docs/pendencias/07-19-csp.md",
+     "docs/pendencias/07-20-login-social.md",
+     "docs/pendencias/08-01-streak.md",
+     "docs/pendencias/08-02-conquistas-ranking.md",
+     "docs/pendencias/08-04-loja-recompensas.md",
+     "docs/pendencias/08-05-hook-duplicado.md",
+     "docs/pendencias/08-06-componentes-gamificacao.md",
+     "docs/pendencias/08-07-notificacao-conquista.md",
+     "docs/pendencias/09-01-rpcs-sem-consumidor.md",
+     "docs/pendencias/09-02-tabelas-sem-ref.md",
+     "docs/pendencias/09-03-performance-metrics.md",
+     "docs/pendencias/09-04-realtime-sem-publication.md",
+     "docs/pendencias/09-05-maquina-estados.md",
+     "docs/pendencias/09-06-soft-delete.md",
+     "docs/pendencias/09-07-migrations-sem-rollback.md",
+     "docs/pendencias/09-08-crons-duplicados.md",
+     "docs/pendencias/09-09-carrier-performance.md",
+     "docs/pendencias/09-10-freight-mappings.md",
+     "docs/pendencias/09-11-zod-compartilhado.md",
+     "docs/pendencias/09-12-query-keys.md",
+     "docs/pendencias/09-13-seed.md",
+     "docs/pendencias/09-14-dicionario-dados.md",
+     "docs/pendencias/09-15-aplicacao-migration.md",
+     "docs/pendencias/10-01-slos.md",
+     "docs/pendencias/10-02-sentry-webvitals.md",
+     "docs/pendencias/10-03-error-events.md",
+     "docs/pendencias/10-04-alerta-rollback.md",
+     "docs/pendencias/10-05-runbooks-infra.md",
+     "docs/pendencias/10-06-restore-drill.md",
+     "docs/pendencias/10-07-staging.md",
+     "docs/pendencias/10-08-functions-obs.md",
+     "docs/pendencias/10-09-logging-estruturado.md",
+     "docs/pendencias/10-10-densidade.md",
+     "docs/pendencias/11-01-testes-espelho.md",
+     "docs/pendencias/11-02-teste-rls.md",
+     "docs/pendencias/11-03-smoke-deno.md",
+     "docs/pendencias/11-04-size-limit.md",
+     "docs/pendencias/11-05-deps-circulares.md",
+     "docs/pendencias/11-06-max-lines.md",
+     "docs/pendencias/11-07-warning-budget.md",
+     "docs/pendencias/11-08-e2e.md",
+     "docs/pendencias/11-09-codeowners.md",
+     "docs/pendencias/11-10-config-morta.md",
+     "docs/pendencias/11-11-functions-sem-teste.md",
+     "docs/pendencias/11-12-magic-bytes.md",
+     "docs/pendencias/12-SEcoes-12a16-contexto.md",
+     "docs/pendencias/_ordem.md",
+     "docs/pendencias/_regras-de-negocio.md"
+    ]
+   },
    {
     "sha": "190f724",
     "date": "2026-11-20",
@@ -88769,15 +88931,6 @@
     "files": [
      "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql"
     ]
-   },
-   {
-    "sha": "7b4672c",
-    "date": "2026-11-18",
-    "author": "adm01-debug",
-    "subject": "chore: workflow temporario de diagnostico de schema prod (diag) (#194)",
-    "files": [
-     ".github/workflows/diag-schema-prod.yml"
-    ]
    }
   ],
   "hot_files": [
@@ -88790,12 +88943,20 @@
     6
    ],
    [
+    "docs/pendencias/_ordem.md",
+    4
+   ],
+   [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     4
    ],
    [
-    "docs/pendencias/_ordem.md",
-    3
+    "docs/pendencias/02-05-predict-delays-whatsapp.md",
+    2
+   ],
+   [
+    "docs/pendencias/02-06-nexus-auto-healing-coluna.md",
+    2
    ],
    [
     "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
@@ -88838,27 +88999,19 @@
     2
    ],
    [
-    ".github/workflows/diag-schema-prod.yml",
-    2
-   ],
-   [
-    "supabase/migrations/20240822_gamification_system.sql",
+    "docs/pendencias/01-01-hooks-real-ausentes.md",
     1
    ],
    [
-    ".github/workflows/aplicar-migration.yml",
+    "docs/pendencias/01-02-hooks-crud-ausentes.md",
     1
    ],
    [
-    ".github/workflows/ci-nexus.yml",
+    "docs/pendencias/01-03-componentes-ausentes.md",
     1
    ],
    [
-    ".github/workflows/e2e.yml",
-    1
-   ],
-   [
-    "docs/AUTOMACAO_LOCAL.md",
+    "docs/pendencias/01-04-tabelas-ausentes.md",
     1
    ]
   ]

@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "190f724e9a1dee1b4ae0db93be84473090579b93",
+  "commit": "5d31fbc9e6dc02890c8a49620d3278d19137aff7",
   "branch": "main",
-  "data_commit": "2026-11-20T15:46:05-03:00",
+  "data_commit": "2026-11-20T16:05:59-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "5d31fbc",
+    "data": "2026-11-20",
+    "assunto": "docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)"
+   },
    {
     "sha": "190f724",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "13eb1a1",
     "data": "2026-11-19",
     "assunto": "chore: arquiva mapa de integracao 20261112 como registro historico (#200)"
-   },
-   {
-    "sha": "ed9aa79",
-    "data": "2026-11-19",
-    "assunto": "chore(db): sincronizar artefatos derivados do banco [auto]"
    }
   ],
-  "arquivos_mudados_7d": 164,
+  "arquivos_mudados_7d": 315,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -278,6 +278,10 @@
     "mudancas": 4
    },
    {
+    "arquivo": "docs/pendencias/_ordem.md",
+    "mudancas": 4
+   },
+   {
     "arquivo": "eslint.config.js",
     "mudancas": 4
    },
@@ -292,16 +296,12 @@
    {
     "arquivo": "scripts/check-warning-budget.mjs",
     "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/generate-quality-report.mjs",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 152
+    "commits": 153
    },
    {
     "autor": "dependabot[bot]",
@@ -314,7 +314,7 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1320,
+  "arquivos_total": 1471,
   "arquivos_codigo": 877,
   "linhas_codigo": 168517,
   "rotas": 61,
@@ -331,7 +331,7 @@
   "testes": 130,
   "workflows": 17,
   "scripts": 62,
-  "docs_md": 100
+  "docs_md": 251
  },
  "por_pasta": {
   "eslint.config.js": {

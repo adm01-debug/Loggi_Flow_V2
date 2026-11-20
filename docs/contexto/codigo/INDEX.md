@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `190f724e9a1dee1b4ae0db93be84473090579b93` (2026-11-20T15:46:05-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `5d31fbc9e6dc02890c8a49620d3278d19137aff7` (2026-11-20T16:05:59-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (791), SQL (261), Markdown (100), JavaScript (79), JSON (33), YAML (21), Shell (9), Python (8)
+- linguagens: TypeScript (791), SQL (261), Markdown (251), JavaScript (79), JSON (33), YAML (21), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,7 +34,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1320 |
+| arquivos_total | 1471 |
 | arquivos_codigo | 877 |
 | linhas_codigo | 168517 |
 | rotas | 61 |
@@ -51,7 +51,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | testes | 130 |
 | workflows | 17 |
 | scripts | 62 |
-| docs_md | 100 |
+| docs_md | 251 |
 
 ## Onde ficam as coisas
 - telas: src/pages (61)
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8206 nós · 20779 arestas · 715 comunidades · grafo do commit `190f724e`
-- comunidades maiores: db-observability/index.ts (159), react (127), ref_node_path (119), lucide-react (116), Envios.tsx (112), button.tsx (110), ui/index.ts (110), Clientes.tsx (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), utils.ts (96), client.ts (94), cn (92)
+- 8513 nós · 20937 arestas · 869 comunidades · grafo do commit `5d31fbc9`
+- comunidades maiores: client.ts (210), badge.tsx (201), Envios.tsx (164), db-observability/index.ts (162), react (155), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ref_node_path (103), Coletas.tsx (100), ui/index.ts (100), utils.ts (97), cn (91), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -396,10 +396,11 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `docs/SRE_HANDBOOK.md` — 🚒 LOGIFLOW SRE & ON-CALL HANDBOOK (24 linhas)
 - `docs/auditoria-recuperacao-branches.md` (336 linhas)
 - `docs/prod-readiness.md` — Prod Readiness — Loggi_Flow_V2 (73 linhas)
-- subpastas de docs/: docs/adr (20), docs/pendencias (14), docs/agentes (8), docs/audit (3), docs/contexto (2), docs/data (1)
+- subpastas de docs/: docs/pendencias (165), docs/adr (20), docs/agentes (8), docs/audit (3), docs/contexto (2), docs/data (1)
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `5d31fbc` docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)
 - 2026-11-20 `190f724` chore: remove migration legada 20240822_gamification_system.sql (#224)
 - 2026-11-20 `e2fd132` chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)
 - 2026-11-20 `a1da74b` fix: reconcilia target dos inserts de schema_migrations em prod (#222)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `f1d13b6` docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)
 - 2026-11-20 `db8f658` fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)
 - 2026-11-20 `35d65b9` fix(audit): corrige 7 quebras da seção 2 (#211)
-- 2026-11-20 `08d5a13` docs: aponta docs aspiracionais para a auditoria autoritativa (#210)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
