@@ -12,4 +12,9 @@
 - **Aceite**: "Cotar via API" dispara um request a uma edge/API de verdade OU rótulo deixa de
   afirmar "API" quando é cálculo local. Decisão de negócio: se não há API agregadora contratada,
   renomear UX ("Cotar padrão") mantendo o cálculo atual é a opção sem custo.
-- **Status**: inventariado (aguarda decisão/código).
+- **Status**: CONCLUÍDO em 2026-11-20 via PR #226 (commit `e4392b7d`).
+- **Resolução**: `handleCotarAPI` agora grava `status:"pendente"` com observação "Cotação via
+  Nexus Blast (API) — aguardando resposta da transportadora" em vez de `"respondido"` calculado
+  localmente (mesmo comportamento no estado local via `addCotacao`). A resposta real continua
+  entrando pelo fluxo existente (`handleRespond`/Registrar Resposta). Nenhuma migration necessária.
+- **Evidência**: `npm run typecheck` limpo; eslint 0 erros; PR mergeada sem bloqueio.
