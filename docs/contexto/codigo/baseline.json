@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "817700d7b82978d4db7853db8bdbb8d2da157f74",
+  "commit": "9654eed487c3cd76026f8d17f565836fbea5b302",
   "branch": "main",
-  "data_commit": "2026-11-20T11:46:24-03:00",
+  "data_commit": "2026-11-20T11:53:02-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "9654eed",
+    "data": "2026-11-20",
+    "assunto": "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)"
+   },
    {
     "sha": "817700d",
     "data": "2026-11-20",
@@ -126,11 +131,6 @@
     "sha": "f3db2b8",
     "data": "2026-11-18",
     "assunto": "chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)"
-   },
-   {
-    "sha": "bfd7215",
-    "data": "2026-11-18",
-    "assunto": "chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)"
    }
   ],
   "arquivos_mudados_7d": 160,
@@ -188,11 +188,11 @@
     "mudancas": 4
    },
    {
-    "pasta": "scripts/audit-gate.mjs",
+    "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     "mudancas": 4
    },
    {
-    "pasta": "src/components/achievements",
+    "pasta": "scripts/audit-gate.mjs",
     "mudancas": 4
    }
   ],
@@ -274,6 +274,10 @@
     "mudancas": 4
    },
    {
+    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+    "mudancas": 4
+   },
+   {
     "arquivo": "eslint.config.js",
     "mudancas": 4
    },
@@ -292,16 +296,12 @@
    {
     "arquivo": "scripts/generate-quality-report.mjs",
     "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/ops/pos_deploy_functions.sql",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 143
+    "commits": 144
    },
    {
     "autor": "dependabot[bot]",

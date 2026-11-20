@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "817700d7b82978d4db7853db8bdbb8d2da157f74",
+  "sha": "9654eed487c3cd76026f8d17f565836fbea5b302",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 14:46 UTC",
+  "generated_at": "2026-11-20 15:14 UTC",
   "files_total": 1331,
   "code_files": 1139,
   "code_lines": 185031,
@@ -88858,10 +88858,19 @@
   }
  },
  "git": {
-  "sha": "817700d7b82978d4db7853db8bdbb8d2da157f74",
+  "sha": "9654eed487c3cd76026f8d17f565836fbea5b302",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "9654eed",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)",
+    "files": [
+     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md"
+    ]
+   },
    {
     "sha": "817700d",
     "date": "2026-11-20",
@@ -89195,43 +89204,23 @@
     "files": [
      "src/hooks/data/useRealtime.tsx"
     ]
-   },
-   {
-    "sha": "8530be9",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)",
-    "files": [
-     "index.html",
-     "package-lock.json",
-     "package.json",
-     "scripts/gates/validate-csp.unit.mjs",
-     "scripts/validate-csp.mjs",
-     "src/components/dashboard/LogisticsMapWidget.tsx",
-     "src/components/map/MapboxMap.tsx",
-     "src/hooks/security/useIntegrationValidation.tsx",
-     "src/lib/mapStyles.ts",
-     "src/pages/RastreamentoMotorista.tsx",
-     "supabase/functions/geocode-address/index.ts",
-     "vite.config.ts"
-    ]
    }
   ],
   "hot_files": [
    [
-    "package-lock.json",
-    4
-   ],
-   [
-    "package.json",
-    4
-   ],
-   [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    3
+    4
    ],
    [
     "docs/pendencias/_ordem.md",
+    3
+   ],
+   [
+    "package-lock.json",
+    3
+   ],
+   [
+    "package.json",
     3
    ],
    [
@@ -89267,10 +89256,6 @@
     2
    ],
    [
-    "index.html",
-    2
-   ],
-   [
     ".github/workflows/diag-schema-prod.yml",
     2
    ],
@@ -89297,6 +89282,10 @@
    [
     ".github/workflows/e2e.yml",
     2
+   ],
+   [
+    "docs/pendencias/02-11-rodonaves-clientes.md",
+    1
    ]
   ]
  }
