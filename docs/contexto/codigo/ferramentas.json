@@ -837,7 +837,7 @@
   {
    "arquivo": "docs/INVENTARIO_FUNCIONALIDADES.md",
    "titulo": "🛡️ INVENTÁRIO DE FUNCIONALIDADES LOGIFLOW — 10/10",
-   "linhas": 123
+   "linhas": 132
   },
   {
    "arquivo": "docs/LGPD_COMPLIANCE.md",
@@ -847,12 +847,12 @@
   {
    "arquivo": "docs/MELHORIAS.md",
    "titulo": "✅ MELHORIAS IMPLEMENTADAS - LOGGI-FLOW v4.0",
-   "linhas": 162
+   "linhas": 165
   },
   {
    "arquivo": "docs/MIGRATION-GUIDE.md",
    "titulo": "🚀 Guia de Migração Mock → Produção",
-   "linhas": 134
+   "linhas": 139
   },
   {
    "arquivo": "docs/ONBOARDING.md",
@@ -867,7 +867,7 @@
   {
    "arquivo": "docs/PLANO_MELHORIAS_2026.md",
    "titulo": "📋 PLANO EXAUSTIVO DE MELHORIAS — LogiFlow 2026",
-   "linhas": 105
+   "linhas": 116
   },
   {
    "arquivo": "docs/POSTMORTEM_TEMPLATE.md",

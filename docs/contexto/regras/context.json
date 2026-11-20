@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "8a2894459bbb6a6f4bca97628b9ed4f634e215cc",
+  "sha": "08d5a1380977fafbd0191ab2e24c62b8f9cea696",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 12:08 UTC",
+  "generated_at": "2026-11-20 13:15 UTC",
   "files_total": 1316,
   "code_files": 1138,
   "code_lines": 184057,
@@ -88851,10 +88851,22 @@
   }
  },
  "git": {
-  "sha": "8a2894459bbb6a6f4bca97628b9ed4f634e215cc",
+  "sha": "08d5a1380977fafbd0191ab2e24c62b8f9cea696",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "08d5a13",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "docs: aponta docs aspiracionais para a auditoria autoritativa (#210)",
+    "files": [
+     "docs/INVENTARIO_FUNCIONALIDADES.md",
+     "docs/MELHORIAS.md",
+     "docs/MIGRATION-GUIDE.md",
+     "docs/PLANO_MELHORIAS_2026.md"
+    ]
+   },
    {
     "sha": "8a28944",
     "date": "2026-11-20",
@@ -89164,15 +89176,6 @@
     "files": [
      ".github/workflows/aplicar-migration.yml"
     ]
-   },
-   {
-    "sha": "5bfae77",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)",
-    "files": [
-     "scripts/audit-gate.mjs"
-    ]
    }
   ],
   "hot_files": [
@@ -89183,6 +89186,10 @@
    [
     "package.json",
     4
+   ],
+   [
+    "docs/INVENTARIO_FUNCIONALIDADES.md",
+    2
    ],
    [
     "supabase/schema-manifest.json",
@@ -89225,6 +89232,18 @@
     2
    ],
    [
+    "docs/MELHORIAS.md",
+    1
+   ],
+   [
+    "docs/MIGRATION-GUIDE.md",
+    1
+   ],
+   [
+    "docs/PLANO_MELHORIAS_2026.md",
+    1
+   ],
+   [
     "src/pages/Auth.tsx",
     1
    ],
@@ -89238,22 +89257,6 @@
    ],
    [
     "supabase/functions/ocr-receipt-processor/index.ts",
-    1
-   ],
-   [
-    "supabase/functions/send-password-reset/index.ts",
-    1
-   ],
-   [
-    "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    1
-   ],
-   [
-    "src/App.tsx",
-    1
-   ],
-   [
-    "docs/INVENTARIO_FUNCIONALIDADES.md",
     1
    ]
   ]

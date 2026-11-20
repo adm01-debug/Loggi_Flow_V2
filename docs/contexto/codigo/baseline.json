@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8a2894459bbb6a6f4bca97628b9ed4f634e215cc",
+  "commit": "08d5a1380977fafbd0191ab2e24c62b8f9cea696",
   "branch": "main",
-  "data_commit": "2026-11-20T09:07:53-03:00",
+  "data_commit": "2026-11-20T09:26:41-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "08d5a13",
+    "data": "2026-11-20",
+    "assunto": "docs: aponta docs aspiracionais para a auditoria autoritativa (#210)"
+   },
    {
     "sha": "8a28944",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "e73975b",
     "data": "2026-11-18",
     "assunto": "﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)"
-   },
-   {
-    "sha": "8530be9",
-    "data": "2026-11-17",
-    "assunto": "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)"
    }
   ],
-  "arquivos_mudados_7d": 132,
+  "arquivos_mudados_7d": 135,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 138
+    "commits": 139
    },
    {
     "autor": "dependabot[bot]",

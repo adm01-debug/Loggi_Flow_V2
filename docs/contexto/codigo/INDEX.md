@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8a2894459bbb6a6f4bca97628b9ed4f634e215cc` (2026-11-20T09:07:53-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `08d5a1380977fafbd0191ab2e24c62b8f9cea696` (2026-11-20T09:26:41-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8160 nós · 20748 arestas · 702 comunidades · grafo do commit `8a289445`
+- 8160 nós · 20748 arestas · 702 comunidades · grafo do commit `08d5a138`
 - comunidades maiores: lucide-react (181), client.ts (180), db-observability/index.ts (166), react (146), ref_node_path (131), Button (123), GeoBlockingPanel.tsx (118), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (90), ui/index.ts (86), App.tsx (86), celebrationSounds.ts (83)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -379,13 +379,13 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `docs/INCIDENT_PLAYBOOK.md` — 🛠️ LogiFlow Incident Playbook (33 linhas)
 - `docs/INCIDENT_RESPONSE.md` — 🚑 Plano de Resposta a Incidentes (IRP) (25 linhas)
 - `docs/INTEGRACAO_CONFIG.md` — Configuração de Integrações - Loggi Flow (193 linhas)
-- `docs/INVENTARIO_FUNCIONALIDADES.md` — 🛡️ INVENTÁRIO DE FUNCIONALIDADES LOGIFLOW — 10/10 (123 linhas)
+- `docs/INVENTARIO_FUNCIONALIDADES.md` — 🛡️ INVENTÁRIO DE FUNCIONALIDADES LOGIFLOW — 10/10 (132 linhas)
 - `docs/LGPD_COMPLIANCE.md` — 🛡️ LGPD COMPLIANCE & PRIVACY POLICY (18 linhas)
-- `docs/MELHORIAS.md` — ✅ MELHORIAS IMPLEMENTADAS - LOGGI-FLOW v4.0 (162 linhas)
-- `docs/MIGRATION-GUIDE.md` — 🚀 Guia de Migração Mock → Produção (134 linhas)
+- `docs/MELHORIAS.md` — ✅ MELHORIAS IMPLEMENTADAS - LOGGI-FLOW v4.0 (165 linhas)
+- `docs/MIGRATION-GUIDE.md` — 🚀 Guia de Migração Mock → Produção (139 linhas)
 - `docs/ONBOARDING.md` — Onboarding do Desenvolvedor (LogiFlow 10/10) (15 linhas)
 - `docs/PERFEICAO_10_10.md` — CERTIFICADO DE PERFEIÇÃO 10/10 — LOGIFLOW (45 linhas)
-- `docs/PLANO_MELHORIAS_2026.md` — 📋 PLANO EXAUSTIVO DE MELHORIAS — LogiFlow 2026 (105 linhas)
+- `docs/PLANO_MELHORIAS_2026.md` — 📋 PLANO EXAUSTIVO DE MELHORIAS — LogiFlow 2026 (116 linhas)
 - `docs/POSTMORTEM_TEMPLATE.md` — 📓 Post-Mortem de Incidentes (31 linhas)
 - `docs/README-CRUD.md` — 📚 Documentação CRUD - Loggi-Flow (120 linhas)
 - `docs/RELATORIO_PERFEICAO_FINAL.md` — 🏆 RELATÓRIO DE PERFEIÇÃO 10/10 — LogiFlow (38 linhas)
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `08d5a13` docs: aponta docs aspiracionais para a auditoria autoritativa (#210)
 - 2026-11-20 `8a28944` feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)
 - 2026-11-20 `1716939` fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)
 - 2026-11-20 `99ca866` fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-19 `8a35843` chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)
 - 2026-11-19 `a2979e0` chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)
 - 2026-11-19 `f93a675` fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)
-- 2026-11-18 `7b4672c` chore: workflow temporario de diagnostico de schema prod (diag) (#194)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
