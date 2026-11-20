@@ -61,22 +61,22 @@ WHERE version = '20260902120000';
 
 -- 2/3 — Registra migrations ja aplicadas (efeito comprovado no schema) ausentes do tracking.
 -- Usado o formato do CLI (version coincidindo com o arquivo no repo).
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name)
+INSERT INTO supabase_migrations.schema_migrations (version, statements)
 SELECT '20261117120000_fix_rpcs_observabilidade', '{}'
   WHERE NOT EXISTS (SELECT 1 FROM supabase_migrations.schema_migrations
                     WHERE version = '20261117120000_fix_rpcs_observabilidade');
 
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name)
+INSERT INTO supabase_migrations.schema_migrations (version, statements)
 SELECT '20261117150000_add_peso_efetivo_coletas', '{}'
   WHERE NOT EXISTS (SELECT 1 FROM supabase_migrations.schema_migrations
                     WHERE version = '20261117150000_add_peso_efetivo_coletas');
 
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name)
+INSERT INTO supabase_migrations.schema_migrations (version, statements)
 SELECT '20261118220000_fix_notif_type_enum_cast', '{}'
   WHERE NOT EXISTS (SELECT 1 FROM supabase_migrations.schema_migrations
                     WHERE version = '20261118220000_fix_notif_type_enum_cast');
 
-INSERT INTO supabase_migrations.schema_migrations (version, statements, name)
+INSERT INTO supabase_migrations.schema_migrations (version, statements)
 SELECT '20261120120000_restore_grant_execute_add_user_xp', '{}'
   WHERE NOT EXISTS (SELECT 1 FROM supabase_migrations.schema_migrations
                     WHERE version = '20261120120000_restore_grant_execute_add_user_xp');
