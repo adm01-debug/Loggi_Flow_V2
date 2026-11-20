@@ -1,0 +1,5 @@
+# 9.3 — performance_metrics e sla_alerts sem produtor
+
+- **Origem**: seção 9 (BANCO) da auditoria 2026-11-20.
+- **Estado real**: verificar na execução.
+- **Status**: inventariado
