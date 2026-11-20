@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `f1d13b631d` · branch `main` · 2026-11-20 14:14 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `817700d7b8` · branch `main` · 2026-11-20 14:46 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1447,15 +1447,15 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
   ```
 - **generateFirstQuotation(p: Record<string, unknown>)** — `supabase/functions/rodonaves-api/index.ts`
   ```
-  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/gera-primeira-cotacao", p.body);
+  return apiMutate( QUOTATION_GATEWAY, "POST", "/api/v1/gera-primeira-cotacao", p.body, );
   ```
 - **generateDigitalCarrierQuotation(p: Record<string, unknown>)** — `supabase/functions/rodonaves-api/index.ts`
   ```
-  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/gera-cotacao-transp-digital", p.body);
+  return apiMutate( QUOTATION_GATEWAY, "POST", "/api/v1/gera-cotacao-transp-digital", p.body, );
   ```
 - **generateAutomaticPickup(p: Record<string, unknown>)** — `supabase/functions/rodonaves-api/index.ts`
   ```
-  return apiMutate(PICKUP_GATEWAY, "POST", "/webapi/automaticpickup/generateautomaticpickup", p.body);
+  return apiMutate( PICKUP_GATEWAY, "POST", "/webapi/automaticpickup/generateautomaticpickup", p.body, );
   ```
 - **validateCustomerForQuotation(p: Record<string, unknown>)** — `supabase/functions/rodonaves-api/index.ts`
   ```
@@ -1925,10 +1925,12 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Armazenamento local indisponível | `src/components/predictions/WhatIfPanel.tsx` |
 | Adicione pelo menos um destinatário | `src/components/reports/ScheduledReportsManager.tsx` |
 | Erro ao gerar relatório | `src/components/reports/ScheduledReportsManager.tsx` |
-| Erro ao buscar clientes | `src/components/rodonaves/RTECustomerManager.tsx` |
-| Erro ao buscar endereços | `src/components/rodonaves/RTECustomerManager.tsx` |
-| Erro ao listar clientes | `src/components/rodonaves/RTECustomerManager.tsx` |
-| Erro na busca completa | `src/components/rodonaves/RTECustomerManager.tsx` |
+| Informe a data de alteração | `src/components/rodonaves/RTECustomerManager.tsx` |
+| Informe nome/razão social | `src/components/rodonaves/RTECustomerManager.tsx` |
+| Informe nome/razão social ou CNPJ/CPF | `src/components/rodonaves/RTECustomerManager.tsx` |
+| Informe o ID do cliente | `src/components/rodonaves/RTECustomerManager.tsx` |
+| Informe um CNPJ/CPF válido | `src/components/rodonaves/RTECustomerManager.tsx` |
+| Logradouro e cidade são obrigatórios | `src/components/rodonaves/RTECustomerManager.tsx` |
 | Informe o CNPJ | `src/components/rodonaves/RTECustomerSync.tsx` |
 |              className= | `src/components/rodonaves/RTEGatewayHealthPanel.tsx` |
 |  className= | `src/components/rodonaves/RTEGatewaySLOPanel.tsx` |
@@ -2180,9 +2182,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | private IPv4 ${host} | `supabase/functions/_shared/safeFetch.ts` |
 | private IPv6 ${host} | `supabase/functions/_shared/safeFetch.ts` |
 | scheme ${parsed.protocol} | `supabase/functions/_shared/safeFetch.ts` |
-| escalated abaixo do threshold | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
-| fuzz não gerou nenhum escalonamento | `supabase/functions/accuracy-meta-monitor/escalation_test.ts` |
-| … +146 linhas — lista completa em `context.json` | |
+| … +149 linhas — lista completa em `context.json` | |
 
 ## J. Controle de acesso no código (checagens de perfil/permissão)
 

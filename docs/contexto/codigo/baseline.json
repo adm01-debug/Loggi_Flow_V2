@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "f1d13b631d952c2637e1827edd6f6d869d848075",
+  "commit": "817700d7b82978d4db7853db8bdbb8d2da157f74",
   "branch": "main",
-  "data_commit": "2026-11-20T11:05:30-03:00",
+  "data_commit": "2026-11-20T11:46:24-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "817700d",
+    "data": "2026-11-20",
+    "assunto": "fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)"
+   },
    {
     "sha": "f1d13b6",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "bfd7215",
     "data": "2026-11-18",
     "assunto": "chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)"
-   },
-   {
-    "sha": "094b33b",
-    "data": "2026-11-18",
-    "assunto": "chore(deps): bump vaul from 0.9.9 to 1.1.2 (#191)"
    }
   ],
-  "arquivos_mudados_7d": 154,
+  "arquivos_mudados_7d": 160,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 142
+    "commits": 143
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1317,
+  "arquivos_total": 1321,
   "arquivos_codigo": 877,
-  "linhas_codigo": 167845,
+  "linhas_codigo": 168517,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -326,12 +326,12 @@
   "hooks": 177,
   "edge_functions": 43,
   "tabelas": 144,
-  "migrations": 247,
+  "migrations": 248,
   "cron_jobs": 28,
   "testes": 130,
   "workflows": 18,
   "scripts": 62,
-  "docs_md": 97
+  "docs_md": 100
  },
  "por_pasta": {
   "eslint.config.js": {
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48746
+   "linhas": 49027
   },
   "src/features": {
    "arquivos": 90,
@@ -492,7 +492,7 @@
   },
   "supabase/functions": {
    "arquivos": 110,
-   "linhas": 12540
+   "linhas": 12931
   },
   "tailwind.config.ts": {
    "arquivos": 1,
@@ -550,7 +550,7 @@
   },
   {
    "arquivo": "supabase/functions/rodonaves-api/index.ts",
-   "linhas": 1354
+   "linhas": 1745
   },
   {
    "arquivo": "src/pages/Envios.tsx",

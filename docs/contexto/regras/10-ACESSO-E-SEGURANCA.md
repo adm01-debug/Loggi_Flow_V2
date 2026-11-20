@@ -1,6 +1,6 @@
 # 10 · ACESSO E SEGURANÇA — quem pode o quê
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `f1d13b631d` · branch `main` · 2026-11-20 14:14 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `817700d7b8` · branch `main` · 2026-11-20 14:46 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Perfis / roles identificados
@@ -488,7 +488,7 @@ Middleware matcher (Next.js): nenhum
 |---|---|---|---|
 | grant | anon, authenticated | execute | `get_public_tracking`, `get_public_tracking`, `get_public_tracking` |
 | grant | anon, authenticated, service_role | execute | `get_public_tracking`, `xp_for_level`, `calculate_level` |
-| grant | authenticated | execute | `add_user_xp`, `create_notification`, `broadcast_notification`, `get_leaderboard`, `add_user_xp`, `update_user_streak`, `add_user_xp`, `calculate_level`, `get_carrier_performance_stats`, `get_leaderboard`, `get_user_permissions`, `purchase_reward`, `update_user_streak`, `xp_for_level`, `system_health_check` … +34 |
+| grant | authenticated | execute | `add_user_xp`, `create_notification`, `broadcast_notification`, `get_leaderboard`, `add_user_xp`, `update_user_streak`, `add_user_xp`, `calculate_level`, `get_carrier_performance_stats`, `get_leaderboard`, `get_user_permissions`, `purchase_reward`, `update_user_streak`, `xp_for_level`, `system_health_check` … +35 |
 | grant | authenticated | select | `rank_badges`, `task_gifts`, `mv_dashboard_metrics`, `mv_carrier_performance`, `db_health_snapshots`, `db_slo_daily`, `db_health_score_history`, `delay_predictions_history`, `v_prediction_accuracy`, `v_prediction_accuracy`, `rte_gateway_health` |
 | grant | authenticated | select, insert | `user_achievements` |
 | grant | authenticated | select, insert, update | `index_proposals` |

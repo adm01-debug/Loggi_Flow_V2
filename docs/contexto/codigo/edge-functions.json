@@ -1296,7 +1296,7 @@
    "nome": "rodonaves-api",
    "entrada": "supabase/functions/rodonaves-api/index.ts",
    "arquivos": 1,
-   "linhas": 1354,
+   "linhas": 1745,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
