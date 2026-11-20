@@ -2,11 +2,15 @@ import { safeFetch } from "../_shared/safeFetch.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
-import { requireString, requireNumber, ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import {
+  requireString,
+  requireNumber,
+  ValidationError,
+  validationErrorResponse,
+} from "../_shared/validate.ts";
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
-
 
 // Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
@@ -44,7 +48,12 @@ function timeoutFor(gateway: string): number {
 class RTEError extends Error {
   constructor(
     message: string,
-    readonly code: "RTE_SCOPE_BLOCKED" | "RTE_UPSTREAM_ERROR" | "RTE_TIMEOUT" | "RTE_AUTH_FAILED" | "RTE_BAD_REQUEST",
+    readonly code:
+      | "RTE_SCOPE_BLOCKED"
+      | "RTE_UPSTREAM_ERROR"
+      | "RTE_TIMEOUT"
+      | "RTE_AUTH_FAILED"
+      | "RTE_BAD_REQUEST",
     readonly httpStatus: number,
     readonly gateway: string,
   ) {
@@ -86,12 +95,10 @@ async function fetchWithTimeout(
   }
 }
 
-
-const rodonavesBreaker = getCircuitBreaker('rodonaves', {
+const rodonavesBreaker = getCircuitBreaker("rodonaves", {
   failureThreshold: 10,
   resetTimeout: 60000, // 1 minute
 });
-
 
 // Token cache (in-memory per isolate)
 const tokenCache: Record<string, { token: string; expiresAt: number }> = {};
@@ -102,42 +109,96 @@ async function getToken(gateway: string): Promise<string> {
 
   const username = Deno.env.get("RODONAVES_USERNAME");
   const password = Deno.env.get("RODONAVES_PASSWORD");
-  if (!username || !password) throw new Error("RODONAVES credentials not configured");
+  if (!username || !password)
+    throw new Error("RODONAVES credentials not configured");
 
   const response = await fetchWithTimeout(gateway, `${gateway}/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ auth_type: "DEV", grant_type: "password", username, password }).toString(),
+    body: new URLSearchParams({
+      auth_type: "DEV",
+      grant_type: "password",
+      username,
+      password,
+    }).toString(),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new RTEError(`Auth failed [${response.status}]: ${text}`, "RTE_AUTH_FAILED", 502, gateway);
+    throw new RTEError(
+      `Auth failed [${response.status}]: ${text}`,
+      "RTE_AUTH_FAILED",
+      502,
+      gateway,
+    );
   }
   const data = await response.json();
   // Cache por gateway: cada gateway emite seu próprio token OAuth.
-  tokenCache[gateway] = { token: data.access_token, expiresAt: Date.now() + 25 * 60_000 };
+  tokenCache[gateway] = {
+    token: data.access_token,
+    expiresAt: Date.now() + 25 * 60_000,
+  };
   return data.access_token;
 }
 
 function mapTrackingCodeToStatus(code: number): string {
   switch (code) {
-    case 0: return "em_transito";
-    case 1: case 2: case 24: case 29: case 31: return "entregue";
-    case 37: case 43: return "saiu_entrega";
-    case 44: case 45: case 46: return "despachado";
-    case 38: case 39: case 47: case 58: return "em_transito";
-    case 25: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
-    case 10: case 11: case 12: case 13: case 14: case 15:
-    case 16: case 17: case 18: case 19: case 20: case 21:
-    case 22: case 23: case 26: case 27: case 28: case 30:
+    case 0:
+      return "em_transito";
+    case 1:
+    case 2:
+    case 24:
+    case 29:
+    case 31:
+      return "entregue";
+    case 37:
+    case 43:
+      return "saiu_entrega";
+    case 44:
+    case 45:
+    case 46:
+      return "despachado";
+    case 38:
+    case 39:
+    case 47:
+    case 58:
+      return "em_transito";
+    case 25:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 26:
+    case 27:
+    case 28:
+    case 30:
       return "ocorrencia";
-    default: return "em_transito";
+    default:
+      return "em_transito";
   }
 }
 
 // Helper: build query string from params object
-function buildQS(params: Record<string, string | number | boolean | undefined>): URLSearchParams {
+function buildQS(
+  params: Record<string, string | number | boolean | undefined>,
+): URLSearchParams {
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
     if (v !== undefined && v !== null && v !== "") qs.set(k, String(v));
@@ -146,12 +207,18 @@ function buildQS(params: Record<string, string | number | boolean | undefined>):
 }
 
 // Helper: authenticated GET
-async function apiGet(gateway: string, path: string, params: Record<string, string | number | boolean | undefined> = {}) {
+async function apiGet(
+  gateway: string,
+  path: string,
+  params: Record<string, string | number | boolean | undefined> = {},
+) {
   return await rodonavesBreaker.execute(async () => {
     const token = await getToken(gateway);
     const qs = buildQS(params);
     const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-    const res = await fetchWithTimeout(gateway, url, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetchWithTimeout(gateway, url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     if (!res.ok) {
       throw new RTEError(
         `GET ${path} failed [${res.status}]: ${await res.text()}`,
@@ -165,12 +232,20 @@ async function apiGet(gateway: string, path: string, params: Record<string, stri
 }
 
 // Helper: authenticated POST/PUT/DELETE
-async function apiMutate(gateway: string, method: string, path: string, body?: unknown, queryParams?: Record<string, string | number | boolean | undefined>) {
+async function apiMutate(
+  gateway: string,
+  method: string,
+  path: string,
+  body?: unknown,
+  queryParams?: Record<string, string | number | boolean | undefined>,
+) {
   return await rodonavesBreaker.execute(async () => {
     const token = await getToken(gateway);
     const qs = queryParams ? buildQS(queryParams) : new URLSearchParams();
     const url = `${gateway}${path}${qs.toString() ? `?${qs}` : ""}`;
-    const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+    };
     const opts: RequestInit = { method, headers };
     if (body) {
       headers["Content-Type"] = "application/json";
@@ -186,7 +261,11 @@ async function apiMutate(gateway: string, method: string, path: string, body?: u
       );
     }
     const text = await res.text();
-    try { return JSON.parse(text); } catch { return { raw: text }; }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return { raw: text };
+    }
   });
 }
 
@@ -203,7 +282,10 @@ interface ResolvedAddress {
   source: "rte_selfattendance" | "viacep" | "brasilapi";
 }
 
-async function fetchJson(url: string, timeoutMs: number): Promise<Record<string, unknown>> {
+async function fetchJson(
+  url: string,
+  timeoutMs: number,
+): Promise<Record<string, unknown>> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -227,12 +309,21 @@ function str(value: unknown): string {
 async function resolveAddressByZip(rawZip: string): Promise<ResolvedAddress> {
   const zip = rawZip.replace(/\D/g, "");
   if (zip.length !== 8) {
-    throw new RTEError("CEP inválido: informe 8 dígitos", "RTE_BAD_REQUEST", 422, SELFATTENDANCE_GATEWAY);
+    throw new RTEError(
+      "CEP inválido: informe 8 dígitos",
+      "RTE_BAD_REQUEST",
+      422,
+      SELFATTENDANCE_GATEWAY,
+    );
   }
 
   const attempts: Array<() => Promise<ResolvedAddress>> = [
     async () => {
-      const data = await apiGet(SELFATTENDANCE_GATEWAY, "/webapi/address/zipcode", { zipCode: zip });
+      const data = await apiGet(
+        SELFATTENDANCE_GATEWAY,
+        "/webapi/address/zipcode",
+        { zipCode: zip },
+      );
       const record = (data ?? {}) as Record<string, unknown>;
       const city = str(record.CityName) || str(record.City);
       if (!city) throw new Error("Resposta RTE sem cidade");
@@ -246,7 +337,10 @@ async function resolveAddressByZip(rawZip: string): Promise<ResolvedAddress> {
       };
     },
     async () => {
-      const data = await fetchJson(`https://viacep.com.br/ws/${zip}/json/`, 6_000);
+      const data = await fetchJson(
+        `https://viacep.com.br/ws/${zip}/json/`,
+        6_000,
+      );
       if (data.erro) throw new Error("CEP não encontrado no ViaCEP");
       return {
         zipCode: zip,
@@ -258,7 +352,10 @@ async function resolveAddressByZip(rawZip: string): Promise<ResolvedAddress> {
       };
     },
     async () => {
-      const data = await fetchJson(`https://brasilapi.com.br/api/cep/v2/${zip}`, 6_000);
+      const data = await fetchJson(
+        `https://brasilapi.com.br/api/cep/v2/${zip}`,
+        6_000,
+      );
       return {
         zipCode: zip,
         street: str(data.street),
@@ -304,7 +401,12 @@ async function unitToCity(p: Record<string, unknown>) {
 async function checkCoverage(rawZip: string) {
   const zip = String(rawZip ?? "").replace(/\D/g, "");
   if (zip.length !== 8) {
-    throw new RTEError("CEP inválido: informe 8 dígitos", "RTE_BAD_REQUEST", 422, UNITTOCITY_GATEWAY);
+    throw new RTEError(
+      "CEP inválido: informe 8 dígitos",
+      "RTE_BAD_REQUEST",
+      422,
+      UNITTOCITY_GATEWAY,
+    );
   }
   try {
     const data = await unitToCity({ zipCode: zip });
@@ -314,7 +416,13 @@ async function checkCoverage(rawZip: string) {
   } catch (error) {
     // Malha indisponível não deve impedir a cotação — retorna indeterminado.
     const message = error instanceof Error ? error.message : String(error);
-    return { zipCode: zip, covered: null, unit: null, source: "indisponivel" as const, reason: message };
+    return {
+      zipCode: zip,
+      covered: null,
+      unit: null,
+      source: "indisponivel" as const,
+      reason: message,
+    };
   }
 }
 
@@ -327,7 +435,11 @@ const HEALTH_TARGETS: Array<{ name: string; base: string; path: string }> = [
   { name: "quotation", base: QUOTATION_GATEWAY, path: "/api/healthcheck" },
   { name: "pickup", base: PICKUP_GATEWAY, path: "/api/healthcheck" },
   { name: "customer", base: CUSTOMER_GATEWAY, path: "/api/healthcheck" },
-  { name: "selfattendance", base: SELFATTENDANCE_GATEWAY, path: "/webapi/healthcheck" },
+  {
+    name: "selfattendance",
+    base: SELFATTENDANCE_GATEWAY,
+    path: "/webapi/healthcheck",
+  },
   { name: "unittocity", base: UNITTOCITY_GATEWAY, path: "/api/healthcheck" },
   { name: "payments", base: PAYMENTS_GATEWAY, path: "/api/healthcheck" },
   { name: "dne", base: DNE_GATEWAY, path: "/api/healthcheck" },
@@ -338,7 +450,13 @@ const HEALTH_TARGETS: Array<{ name: string; base: string; path: string }> = [
  * derrubar o health-check em si — são apenas logadas.
  */
 async function persistHealth(
-  checks: Array<{ gateway: string; online: boolean; httpStatus: number; latencyMs: number; error?: string }>,
+  checks: Array<{
+    gateway: string;
+    online: boolean;
+    httpStatus: number;
+    latencyMs: number;
+    error?: string;
+  }>,
   checkedAt: string,
 ): Promise<boolean> {
   try {
@@ -373,7 +491,11 @@ async function healthAll(persist = false) {
     HEALTH_TARGETS.map(async (target) => {
       const startedAt = Date.now();
       try {
-        const res = await fetchWithTimeout(target.base, `${target.base}${target.path}`, { method: "GET" });
+        const res = await fetchWithTimeout(
+          target.base,
+          `${target.base}${target.path}`,
+          { method: "GET" },
+        );
         await res.text();
         return {
           gateway: target.name,
@@ -408,7 +530,6 @@ async function healthAll(persist = false) {
     gateways: checks,
   };
 }
-
 
 // ==========================================
 // TRACKING GATEWAY ACTIONS
@@ -497,40 +618,59 @@ async function getDeliveryProof(p: Record<string, unknown>) {
 
 // NEW: High-quality delivery receipt (without image compression)
 async function getDeliveryProofHQ(p: Record<string, unknown>) {
-  return apiGet(TRACKING_GATEWAY, "/api/v1/deliveryreceipt/withoutImageCompression", {
-    TaxIdRegistration: p.taxIdRegistration as string,
-    InvoiceNumber: p.invoiceNumber as string,
-    InvoiceKey: p.invoiceKey as string,
-    ProtocolNumber: p.protocolNumber as string,
-    CTeNumber: p.cTeNumber as number,
-  });
+  return apiGet(
+    TRACKING_GATEWAY,
+    "/api/v1/deliveryreceipt/withoutImageCompression",
+    {
+      TaxIdRegistration: p.taxIdRegistration as string,
+      InvoiceNumber: p.invoiceNumber as string,
+      InvoiceKey: p.invoiceKey as string,
+      ProtocolNumber: p.protocolNumber as string,
+      CTeNumber: p.cTeNumber as number,
+    },
+  );
 }
 
 async function getDeliveryInfo(p: Record<string, unknown>) {
-  return apiGet(TRACKING_GATEWAY, "/api/v1/deliveryreceipt/deliveryInformation", {
-    TaxIdRegistration: p.taxIdRegistration as string,
-    InvoiceNumber: p.invoiceNumber as string,
-    InvoiceKey: p.invoiceKey as string,
-    ProtocolNumber: p.protocolNumber as string,
-    CTeNumber: p.cTeNumber as number,
-  });
+  return apiGet(
+    TRACKING_GATEWAY,
+    "/api/v1/deliveryreceipt/deliveryInformation",
+    {
+      TaxIdRegistration: p.taxIdRegistration as string,
+      InvoiceNumber: p.invoiceNumber as string,
+      InvoiceKey: p.invoiceKey as string,
+      ProtocolNumber: p.protocolNumber as string,
+      CTeNumber: p.cTeNumber as number,
+    },
+  );
 }
 
 // NEW: Batch delivery receipts → returns S3 zip URL
 async function getDeliveryReceiptBatch(p: Record<string, unknown>) {
-  return apiMutate(TRACKING_GATEWAY, "POST", "/api/v1/deliveryreceipt/receipt-key-list", p.body);
+  return apiMutate(
+    TRACKING_GATEWAY,
+    "POST",
+    "/api/v1/deliveryreceipt/receipt-key-list",
+    p.body,
+  );
 }
 
 // NEW: Batch delivery receipts by protocols array
 async function getDeliveryReceiptByProtocols(p: Record<string, unknown>) {
   const protocols = p.protocols as string[];
   const qs = new URLSearchParams();
-  protocols?.forEach(proto => qs.append("requestProtocols", proto));
+  protocols?.forEach((proto) => qs.append("requestProtocols", proto));
   const token = await getToken(TRACKING_GATEWAY);
-  const res = await safeFetch(`${TRACKING_GATEWAY}/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(`Batch receipts by protocols failed [${res.status}]: ${await res.text()}`);
+  const res = await safeFetch(
+    `${TRACKING_GATEWAY}/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols?${qs}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  if (!res.ok)
+    throw new Error(
+      `Batch receipts by protocols failed [${res.status}]: ${await res.text()}`,
+    );
   return res.json();
 }
 
@@ -561,16 +701,20 @@ async function getOccurrenceReceiptImageUrl(p: Record<string, unknown>) {
 
 // ORDERS
 async function getOrders(p: Record<string, unknown>) {
-  return apiGet(TRACKING_GATEWAY, "/api/v1/orders/ordersbydaterangepagination", {
-    TaxIdRegistration: p.taxIdRegistration as string,
-    CustomerType: p.customerType as number,
-    StartDate: p.startDate as string,
-    EndDate: p.endDate as string,
-    Page: p.page as number,
-    AmountByPage: p.amountByPage as number,
-    InvoiceNumber: p.invoiceNumber as string,
-    CTeNumber: p.cTeNumber as number,
-  });
+  return apiGet(
+    TRACKING_GATEWAY,
+    "/api/v1/orders/ordersbydaterangepagination",
+    {
+      TaxIdRegistration: p.taxIdRegistration as string,
+      CustomerType: p.customerType as number,
+      StartDate: p.startDate as string,
+      EndDate: p.endDate as string,
+      Page: p.page as number,
+      AmountByPage: p.amountByPage as number,
+      InvoiceNumber: p.invoiceNumber as string,
+      CTeNumber: p.cTeNumber as number,
+    },
+  );
 }
 
 // ==========================================
@@ -579,8 +723,12 @@ async function getOrders(p: Record<string, unknown>) {
 
 async function simulateQuotation(p: Record<string, unknown>) {
   return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/simula-cotacao", {
-    CepOrigem: p.cepOrigem, CepDestino: p.cepDestino, Peso: p.peso,
-    Volumes: p.volumes, ValorMercadoria: p.valorMercadoria, CnpjRemetente: p.cnpjRemetente,
+    CepOrigem: p.cepOrigem,
+    CepDestino: p.cepDestino,
+    Peso: p.peso,
+    Volumes: p.volumes,
+    ValorMercadoria: p.valorMercadoria,
+    CnpjRemetente: p.cnpjRemetente,
   });
 }
 
@@ -591,30 +739,56 @@ async function generateQuotation(p: Record<string, unknown>) {
 
 // NEW: Generate first quotation
 async function generateFirstQuotation(p: Record<string, unknown>) {
-  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/gera-primeira-cotacao", p.body);
+  return apiMutate(
+    QUOTATION_GATEWAY,
+    "POST",
+    "/api/v1/gera-primeira-cotacao",
+    p.body,
+  );
 }
 
 // NEW: Update quotation contact after creation
 async function updateQuotationContact(p: Record<string, unknown>) {
-  return apiMutate(QUOTATION_GATEWAY, "PUT", "/api/v1/atualiza-contato-cotacao", p.body);
+  return apiMutate(
+    QUOTATION_GATEWAY,
+    "PUT",
+    "/api/v1/atualiza-contato-cotacao",
+    p.body,
+  );
 }
 
 // NEW: Digital carrier quotation
 async function generateDigitalCarrierQuotation(p: Record<string, unknown>) {
-  return apiMutate(QUOTATION_GATEWAY, "POST", "/api/v1/gera-cotacao-transp-digital", p.body);
+  return apiMutate(
+    QUOTATION_GATEWAY,
+    "POST",
+    "/api/v1/gera-cotacao-transp-digital",
+    p.body,
+  );
 }
 
 // NEW: Update NF-e key for quotation
 async function updateQuotationInvoiceKey(p: Record<string, unknown>) {
-  return apiMutate(QUOTATION_GATEWAY, "PUT", "/api/v1/atualiza-nfe-cotacao", p.body);
+  return apiMutate(
+    QUOTATION_GATEWAY,
+    "PUT",
+    "/api/v1/atualiza-nfe-cotacao",
+    p.body,
+  );
 }
 
 async function getCubageFactor(taxId: string, companyId?: string) {
-  return apiGet(QUOTATION_GATEWAY, "/api/v1/peso-cubado", { taxIdRegistration: taxId, companyId: companyId as string });
+  return apiGet(QUOTATION_GATEWAY, "/api/v1/peso-cubado", {
+    taxIdRegistration: taxId,
+    companyId: companyId as string,
+  });
 }
 
 async function getDeadline(cepOrigem: string, cepDestino: string) {
-  return apiMutate(DEADLINE_GATEWAY, "POST", "/api/v1/busca-prazo", { CepOrigem: cepOrigem, CepDestino: cepDestino });
+  return apiMutate(DEADLINE_GATEWAY, "POST", "/api/v1/busca-prazo", {
+    CepOrigem: cepOrigem,
+    CepDestino: cepDestino,
+  });
 }
 
 // ==========================================
@@ -622,7 +796,12 @@ async function getDeadline(cepOrigem: string, cepDestino: string) {
 // ==========================================
 
 async function saveCustomer(p: Record<string, unknown>) {
-  return apiMutate(CUSTOMER_GATEWAY, "POST", "/api/v1/customer/savecustomer", p.body);
+  return apiMutate(
+    CUSTOMER_GATEWAY,
+    "POST",
+    "/api/v1/customer/savecustomer",
+    p.body,
+  );
 }
 
 async function getCustomerById(id: number) {
@@ -664,7 +843,11 @@ async function getCustomerFullByDescription(p: Record<string, unknown>) {
 }
 
 async function getAddressesByTaxId(taxId: string) {
-  return apiGet(CUSTOMER_GATEWAY, `/api/v1/address/getbytaxidregistration/${taxId}`, {});
+  return apiGet(
+    CUSTOMER_GATEWAY,
+    `/api/v1/address/getbytaxidregistration/${taxId}`,
+    {},
+  );
 }
 
 async function createAddress(p: Record<string, unknown>) {
@@ -696,54 +879,96 @@ async function createPickup(p: Record<string, unknown>) {
 }
 
 async function createPickupByQuotation(p: Record<string, unknown>) {
-  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/pickupbyquotationprotocol", p.body);
+  return apiMutate(
+    PICKUP_GATEWAY,
+    "POST",
+    "/api/v1/pickup/pickupbyquotationprotocol",
+    p.body,
+  );
 }
 
 async function getAvailablePickupDates(protocol: number) {
-  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getavaliablepickupdate", { protocol });
+  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getavaliablepickupdate", {
+    protocol,
+  });
 }
 
 async function getAvailablePickupDatesByParams(p: Record<string, unknown>) {
-  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getavaliablepickupdatebyparms", {
-    OriginUnit: p.originUnit as number,
-    PersonId: p.personId as number,
-    Cep: p.cep as string,
-    Address: p.address as string,
-    Number: p.number as string,
-    Supplement: p.supplement as string,
-    District: p.district as string,
-    City: p.city as string,
-    UnitFederationCode: p.unitFederationCode as string,
-  });
+  return apiGet(
+    PICKUP_GATEWAY,
+    "/api/v1/pickup/getavaliablepickupdatebyparms",
+    {
+      OriginUnit: p.originUnit as number,
+      PersonId: p.personId as number,
+      Cep: p.cep as string,
+      Address: p.address as string,
+      Number: p.number as string,
+      Supplement: p.supplement as string,
+      District: p.district as string,
+      City: p.city as string,
+      UnitFederationCode: p.unitFederationCode as string,
+    },
+  );
 }
 
 async function getPickupByProtocol(protocol: number) {
-  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getpickupbyprotocol", { protocol });
-}
-
-async function reschedulePickup(protocol: number, pickupDate: string) {
-  return apiMutate(PICKUP_GATEWAY, "PUT", "/api/v1/pickup/updatepickupdatebyprotocol", undefined, { protocol, pickupDate });
-}
-
-async function cancelPickup(protocol: number) {
-  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/cancelpickupbyprotocol", undefined, { protocol });
-}
-
-async function resendExpressPickup(id: number) {
-  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/resendrodonavesexpresspickup", undefined, { id });
-}
-
-async function pickupRescheduleOrFinalize(p: Record<string, unknown>) {
-  return apiMutate(PICKUP_GATEWAY, "POST", "/api/v1/pickup/pickupreschedulingorfinalizingoccurrence", undefined, {
-    pickupId: p.pickupId as number,
-    writeoffId: p.writeoffId as number,
-    writeoffObservation: p.writeoffObservation as string,
-    finalizingOccurrence: p.finalizingOccurrence as boolean,
+  return apiGet(PICKUP_GATEWAY, "/api/v1/pickup/getpickupbyprotocol", {
+    protocol,
   });
 }
 
+async function reschedulePickup(protocol: number, pickupDate: string) {
+  return apiMutate(
+    PICKUP_GATEWAY,
+    "PUT",
+    "/api/v1/pickup/updatepickupdatebyprotocol",
+    undefined,
+    { protocol, pickupDate },
+  );
+}
+
+async function cancelPickup(protocol: number) {
+  return apiMutate(
+    PICKUP_GATEWAY,
+    "POST",
+    "/api/v1/pickup/cancelpickupbyprotocol",
+    undefined,
+    { protocol },
+  );
+}
+
+async function resendExpressPickup(id: number) {
+  return apiMutate(
+    PICKUP_GATEWAY,
+    "POST",
+    "/api/v1/pickup/resendrodonavesexpresspickup",
+    undefined,
+    { id },
+  );
+}
+
+async function pickupRescheduleOrFinalize(p: Record<string, unknown>) {
+  return apiMutate(
+    PICKUP_GATEWAY,
+    "POST",
+    "/api/v1/pickup/pickupreschedulingorfinalizingoccurrence",
+    undefined,
+    {
+      pickupId: p.pickupId as number,
+      writeoffId: p.writeoffId as number,
+      writeoffObservation: p.writeoffObservation as string,
+      finalizingOccurrence: p.finalizingOccurrence as boolean,
+    },
+  );
+}
+
 async function generateAutomaticPickup(p: Record<string, unknown>) {
-  return apiMutate(PICKUP_GATEWAY, "POST", "/webapi/automaticpickup/generateautomaticpickup", p.body);
+  return apiMutate(
+    PICKUP_GATEWAY,
+    "POST",
+    "/webapi/automaticpickup/generateautomaticpickup",
+    p.body,
+  );
 }
 
 // ==========================================
@@ -751,7 +976,10 @@ async function generateAutomaticPickup(p: Record<string, unknown>) {
 // ==========================================
 
 async function searchCityByDescription(description: string, uf?: string) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/description", { description, uf: uf as string });
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/description", {
+    description,
+    uf: uf as string,
+  });
 }
 
 async function searchCityByZipCode(zipCode: string) {
@@ -759,33 +987,49 @@ async function searchCityByZipCode(zipCode: string) {
 }
 
 async function getAddressByZipCode(zipCode: string) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/zipcodeaddress", { zipCode });
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/zipcodeaddress", {
+    zipCode,
+  });
 }
 
 async function trackingStepsBot(p: Record<string, unknown>) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/tracking/v1/tracking-steps-bot", {
-    TaxIdRegistration: p.taxIdRegistration as string,
-    InvoiceNumber: p.invoiceNumber as string,
-    InvoiceKey: p.invoiceKey as string,
-    ProtocolNumber: p.protocolNumber as string,
-  });
+  return apiGet(
+    SELFATTENDANCE_GATEWAY,
+    "/webapi/tracking/v1/tracking-steps-bot",
+    {
+      TaxIdRegistration: p.taxIdRegistration as string,
+      InvoiceNumber: p.invoiceNumber as string,
+      InvoiceKey: p.invoiceKey as string,
+      ProtocolNumber: p.protocolNumber as string,
+    },
+  );
 }
 
 async function trackingLastStepsBot(p: Record<string, unknown>) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/tracking/v1/tracking-last-steps-bot", {
-    TaxIdRegistration: p.taxIdRegistration as string,
-    InvoiceNumber: p.invoiceNumber as string,
-    InvoiceKey: p.invoiceKey as string,
-    ProtocolNumber: p.protocolNumber as string,
-  });
+  return apiGet(
+    SELFATTENDANCE_GATEWAY,
+    "/webapi/tracking/v1/tracking-last-steps-bot",
+    {
+      TaxIdRegistration: p.taxIdRegistration as string,
+      InvoiceNumber: p.invoiceNumber as string,
+      InvoiceKey: p.invoiceKey as string,
+      ProtocolNumber: p.protocolNumber as string,
+    },
+  );
 }
 
 async function getUnitData(unitId?: number) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/unit/v1", { unitId: unitId as number });
+  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/unit/v1", {
+    unitId: unitId as number,
+  });
 }
 
 async function getUnitCalendarByProtocol(protocol: number) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/unit/v1/calenderunitbyprotocol", { protocol });
+  return apiGet(
+    SELFATTENDANCE_GATEWAY,
+    "/webapi/unit/v1/calenderunitbyprotocol",
+    { protocol },
+  );
 }
 
 async function selfAttendanceQuotation(p: Record<string, unknown>) {
@@ -793,7 +1037,12 @@ async function selfAttendanceQuotation(p: Record<string, unknown>) {
 }
 
 async function selfAttendanceDeliveryTime(p: Record<string, unknown>) {
-  return apiMutate(SELFATTENDANCE_GATEWAY, "POST", "/webapi/deliverytime", p.body);
+  return apiMutate(
+    SELFATTENDANCE_GATEWAY,
+    "POST",
+    "/webapi/deliverytime",
+    p.body,
+  );
 }
 
 async function validateCustomerForQuotation(p: Record<string, unknown>) {
@@ -819,7 +1068,10 @@ Deno.serve(async (req) => {
     if (!rl.allowed) {
       return new Response(
         JSON.stringify({ error: "Too many requests", retry_after: 900 }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -828,13 +1080,34 @@ Deno.serve(async (req) => {
 
     if (!action || typeof action !== "string") {
       return new Response(
-        JSON.stringify({ error: "Validation error", message: "action is required" }),
-        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: "Validation error",
+          message: "action is required",
+        }),
+        {
+          status: 422,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
     let result: unknown;
     const cnpjDefault = Deno.env.get("RODONAVES_CNPJ_REMETENTE") || "";
+
+    // Fallback para RODONAVES_CNPJ_REMETENTE quando o cliente nao envia cnpjRemetente.
+    // Valida so quando nem o parametro nem o default existem (2.15).
+    function resolveCnpj(params: Record<string, unknown>): string {
+      const val = params.cnpjRemetente;
+      const resolved =
+        typeof val === "string" && val.trim() ? val.trim() : cnpjDefault;
+      if (resolved.length < 11) {
+        throw new ValidationError(
+          "cnpjRemetente",
+          "cnpjRemetente is required and must have at least 11 characters",
+        );
+      }
+      return resolved;
+    }
 
     switch (action) {
       // ===== TRACKING =====
@@ -850,32 +1123,37 @@ Deno.serve(async (req) => {
       }
 
       case "track-batch": {
-        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const taxId = resolveCnpj(params);
         const startDate = requireString(params, "startDate");
         const endDate = requireString(params, "endDate");
         result = await trackBatch({
           taxIdRegistration: taxId || cnpjDefault,
-          startDate, endDate,
-          page: params.page, amountByPage: params.amountByPage || 50,
+          startDate,
+          endDate,
+          page: params.page,
+          amountByPage: params.amountByPage || 50,
         });
         break;
       }
 
       case "track-batch-paginated": {
-        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const taxId = resolveCnpj(params);
         const startDate = requireString(params, "startDate");
         const endDate = requireString(params, "endDate");
         result = await trackBatchPagination({
           taxIdRegistration: taxId || cnpjDefault,
-          startDate, endDate,
-          page: params.page, amountByPage: params.amountByPage || 50,
-          operationType: params.operationType, cTeNumber: params.cTeNumber,
+          startDate,
+          endDate,
+          page: params.page,
+          amountByPage: params.amountByPage || 50,
+          operationType: params.operationType,
+          cTeNumber: params.cTeNumber,
         });
         break;
       }
 
       case "track-batch-by-params": {
-        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const taxId = resolveCnpj(params);
         result = await trackBatchByParams({
           taxIdRegistration: taxId || cnpjDefault,
           cTeNumber: params.cTeNumber,
@@ -897,14 +1175,17 @@ Deno.serve(async (req) => {
       }
 
       case "track-batch-by-occurrence": {
-        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const taxId = resolveCnpj(params);
         const startDate = requireString(params, "startDate");
         const endDate = requireString(params, "endDate");
         result = await trackBatchByOccurrenceDate({
           taxIdRegistration: taxId || cnpjDefault,
-          startDate, endDate,
-          page: params.page, amountByPage: params.amountByPage || 50,
-          operationType: params.operationType, cTeNumber: params.cTeNumber,
+          startDate,
+          endDate,
+          page: params.page,
+          amountByPage: params.amountByPage || 50,
+          operationType: params.operationType,
+          cTeNumber: params.cTeNumber,
         });
         break;
       }
@@ -945,7 +1226,9 @@ Deno.serve(async (req) => {
       }
 
       case "delivery-receipt-by-protocols": {
-        result = await getDeliveryReceiptByProtocols({ protocols: params.protocols });
+        result = await getDeliveryReceiptByProtocols({
+          protocols: params.protocols,
+        });
         break;
       }
 
@@ -953,47 +1236,71 @@ Deno.serve(async (req) => {
       case "occurrence-receipt": {
         const billId = requireNumber(params, "billOfLadingId", { min: 1 });
         const code = requireString(params, "occurrenceCode");
-        result = await getOccurrenceReceipt({ billOfLadingId: billId, occurrenceCode: code, loadImageContent: params.loadImageContent });
+        result = await getOccurrenceReceipt({
+          billOfLadingId: billId,
+          occurrenceCode: code,
+          loadImageContent: params.loadImageContent,
+        });
         break;
       }
 
       case "occurrence-receipt-list": {
         const billId = requireNumber(params, "billOfLadingId", { min: 1 });
         const code = requireString(params, "occurrenceCode");
-        result = await getOccurrenceReceiptList({ billOfLadingId: billId, occurrenceCode: code, loadImageContent: params.loadImageContent });
+        result = await getOccurrenceReceiptList({
+          billOfLadingId: billId,
+          occurrenceCode: code,
+          loadImageContent: params.loadImageContent,
+        });
         break;
       }
 
       case "occurrence-receipt-image": {
         const billId = requireNumber(params, "billOfLadingId", { min: 1 });
         const code = requireString(params, "occurrenceCode");
-        result = await getOccurrenceReceiptImageUrl({ billOfLadingId: billId, occurrenceCode: code, removeImageUrlExpire: params.removeImageUrlExpire });
+        result = await getOccurrenceReceiptImageUrl({
+          billOfLadingId: billId,
+          occurrenceCode: code,
+          removeImageUrlExpire: params.removeImageUrlExpire,
+        });
         break;
       }
 
       // ===== ORDERS =====
       case "orders": {
-        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const taxId = resolveCnpj(params);
         const startDate = requireString(params, "startDate");
         const endDate = requireString(params, "endDate");
         result = await getOrders({
           taxIdRegistration: taxId || cnpjDefault,
           customerType: params.customerType ?? 1,
-          startDate, endDate,
-          page: params.page, amountByPage: params.amountByPage || 20,
-          invoiceNumber: params.invoiceNumber, cTeNumber: params.cTeNumber,
+          startDate,
+          endDate,
+          page: params.page,
+          amountByPage: params.amountByPage || 20,
+          invoiceNumber: params.invoiceNumber,
+          cTeNumber: params.cTeNumber,
         });
         break;
       }
 
       // ===== QUOTATION =====
       case "quotation": {
-        const cepOrigem = requireString(params, "cepOrigem", { pattern: /^\d{5}-?\d{3}$/ });
-        const cepDestino = requireString(params, "cepDestino", { pattern: /^\d{5}-?\d{3}$/ });
+        const cepOrigem = requireString(params, "cepOrigem", {
+          pattern: /^\d{5}-?\d{3}$/,
+        });
+        const cepDestino = requireString(params, "cepDestino", {
+          pattern: /^\d{5}-?\d{3}$/,
+        });
         const peso = requireNumber(params, "peso", { min: 0.01, max: 100000 });
-        const volumes = requireNumber(params, "volumes", { min: 1, max: 10000 });
-        const valorMercadoria = requireNumber(params, "valorMercadoria", { min: 0 });
-        
+        const volumes = requireNumber(params, "volumes", {
+          min: 1,
+          max: 10000,
+        });
+        const valorMercadoria = requireNumber(params, "valorMercadoria", {
+          min: 0,
+        });
+
         // Try cache first
         const redis = getRedisClient();
         const cacheKey = `rodonaves_quote_${cepOrigem}_${cepDestino}_${peso}_${volumes}_${valorMercadoria}`;
@@ -1001,12 +1308,16 @@ Deno.serve(async (req) => {
           const cached = await redis.get(cacheKey);
           if (cached) {
             log.info(`[Cache] Cache hit for ${cacheKey}`);
-            return corsResponse(cached, { 'X-Cache': 'HIT' });
+            return corsResponse(cached, { "X-Cache": "HIT" });
           }
         }
 
         result = await simulateQuotation({
-          cepOrigem, cepDestino, peso, volumes, valorMercadoria,
+          cepOrigem,
+          cepDestino,
+          peso,
+          volumes,
+          valorMercadoria,
           cnpjRemetente: params.cnpjRemetente || cnpjDefault,
         });
 
@@ -1014,14 +1325,13 @@ Deno.serve(async (req) => {
         if (redis) {
           await redis.set(cacheKey, result, { ex: 600 }); // 10 minutes
         }
-        
+
         // Return with cache miss header if we have result
         if (result) {
-          return corsResponse(result, { 'X-Cache': 'MISS' });
+          return corsResponse(result, { "X-Cache": "MISS" });
         }
         break;
       }
-
 
       case "generate-quotation": {
         result = await generateQuotation({ body: params.body });
@@ -1049,14 +1359,18 @@ Deno.serve(async (req) => {
       }
 
       case "cubage-factor": {
-        const taxId = requireString(params, "cnpjRemetente", { minLength: 11 });
+        const taxId = resolveCnpj(params);
         result = await getCubageFactor(taxId || cnpjDefault, params.companyId);
         break;
       }
 
       case "deadline": {
-        const cepOrigem = requireString(params, "cepOrigem", { pattern: /^\d{5}-?\d{3}$/ });
-        const cepDestino = requireString(params, "cepDestino", { pattern: /^\d{5}-?\d{3}$/ });
+        const cepOrigem = requireString(params, "cepOrigem", {
+          pattern: /^\d{5}-?\d{3}$/,
+        });
+        const cepDestino = requireString(params, "cepDestino", {
+          pattern: /^\d{5}-?\d{3}$/,
+        });
         result = await getDeadline(cepOrigem, cepDestino);
         break;
       }
@@ -1075,28 +1389,50 @@ Deno.serve(async (req) => {
 
       case "customer-list": {
         const lastDate = requireString(params, "lastChangedDate");
-        result = await getCustomersByDate({ lastChangedDate: lastDate, page: params.page, amountByPage: params.amountByPage || 20 });
+        result = await getCustomersByDate({
+          lastChangedDate: lastDate,
+          page: params.page,
+          amountByPage: params.amountByPage || 20,
+        });
         break;
       }
 
       case "customer-get-by-taxid": {
-        const taxId = requireString(params, "taxIdRegistration", { minLength: 11 });
-        result = await getCustomerByTaxId({ taxIdRegistration: taxId, page: params.page, amountByPage: params.amountByPage || 20 });
+        const taxId = requireString(params, "taxIdRegistration", {
+          minLength: 11,
+        });
+        result = await getCustomerByTaxId({
+          taxIdRegistration: taxId,
+          page: params.page,
+          amountByPage: params.amountByPage || 20,
+        });
         break;
       }
 
       case "customer-search": {
-        result = await getCustomerByDescription({ key: params.key, description: params.description, page: params.page, amountByPage: params.amountByPage || 20 });
+        result = await getCustomerByDescription({
+          key: params.key,
+          description: params.description,
+          page: params.page,
+          amountByPage: params.amountByPage || 20,
+        });
         break;
       }
 
       case "customer-search-full": {
-        result = await getCustomerFullByDescription({ key: params.key, description: params.description, page: params.page, amountByPage: params.amountByPage || 20 });
+        result = await getCustomerFullByDescription({
+          key: params.key,
+          description: params.description,
+          page: params.page,
+          amountByPage: params.amountByPage || 20,
+        });
         break;
       }
 
       case "address-list": {
-        const taxId = requireString(params, "taxIdRegistration", { minLength: 11 });
+        const taxId = requireString(params, "taxIdRegistration", {
+          minLength: 11,
+        });
         result = await getAddressesByTaxId(taxId);
         break;
       }
@@ -1246,7 +1582,10 @@ Deno.serve(async (req) => {
       }
 
       case "validate-customer-quotation": {
-        result = await validateCustomerForQuotation({ taxId: params.taxId, origin: params.origin });
+        result = await validateCustomerForQuotation({
+          taxId: params.taxId,
+          origin: params.origin,
+        });
         break;
       }
 
@@ -1258,15 +1597,23 @@ Deno.serve(async (req) => {
 
         const { data: entregas, error: fetchError } = await supabase
           .from("entregas")
-          .select("id, nf_remessa, codigo_rastreamento, status, transportadora_id, transportadoras!inner(nome_fantasia)")
-          .or("nome_fantasia.ilike.%rodonaves%,nome_fantasia.ilike.%rte%", { referencedTable: "transportadoras" })
+          .select(
+            "id, nf_remessa, codigo_rastreamento, status, transportadora_id, transportadoras!inner(nome_fantasia)",
+          )
+          .or("nome_fantasia.ilike.%rodonaves%,nome_fantasia.ilike.%rte%", {
+            referencedTable: "transportadoras",
+          })
           .not("status", "in", '("entregue","finalizado")')
           .not("nf_remessa", "is", null);
 
         if (fetchError) throw fetchError;
 
         const cnpjRemetente = params.cnpjRemetente || cnpjDefault;
-        const updates: Array<{ id: string; status: string; lastEvent: string }> = [];
+        const updates: Array<{
+          id: string;
+          status: string;
+          lastEvent: string;
+        }> = [];
 
         for (const entrega of entregas || []) {
           try {
@@ -1277,13 +1624,24 @@ Deno.serve(async (req) => {
 
             if (trackingData?.Tracking?.length > 0) {
               const latestEvent = trackingData.Tracking[0];
-              const newStatus = mapTrackingCodeToStatus(latestEvent.CodigoOcorrencia);
+              const newStatus = mapTrackingCodeToStatus(
+                latestEvent.CodigoOcorrencia,
+              );
               if (newStatus !== "ocorrencia" && newStatus !== entrega.status) {
-                await supabase.from("entregas").update({
+                await supabase
+                  .from("entregas")
+                  .update({
+                    status: newStatus,
+                    ...(newStatus === "entregue"
+                      ? { data_entrega_efetiva: new Date().toISOString() }
+                      : {}),
+                  })
+                  .eq("id", entrega.id);
+                updates.push({
+                  id: entrega.id,
                   status: newStatus,
-                  ...(newStatus === "entregue" ? { data_entrega_efetiva: new Date().toISOString() } : {}),
-                }).eq("id", entrega.id);
-                updates.push({ id: entrega.id, status: newStatus, lastEvent: latestEvent.DescricaoOcorrencia });
+                  lastEvent: latestEvent.DescricaoOcorrencia,
+                });
               }
               if (newStatus === "ocorrencia") {
                 await supabase.from("ocorrencias").insert({
@@ -1294,7 +1652,10 @@ Deno.serve(async (req) => {
               }
             }
           } catch (trackErr) {
-            log.error(`[rodonaves-api] Error tracking entrega ${entrega.id}:`, trackErr);
+            log.error(
+              `[rodonaves-api] Error tracking entrega ${entrega.id}:`,
+              trackErr,
+            );
           }
         }
         result = { synced: updates.length, updates };
@@ -1303,17 +1664,24 @@ Deno.serve(async (req) => {
 
       // ===== R5: ENDEREÇO COM FALLBACK (DNE offline) =====
       case "resolve-address": {
-        result = await resolveAddressByZip(String(params.cep ?? params.zipCode ?? ""));
+        result = await resolveAddressByZip(
+          String(params.cep ?? params.zipCode ?? ""),
+        );
         break;
       }
 
       // ===== R6: MALHA DE ATENDIMENTO =====
       case "unit-to-city": {
-        result = await unitToCity({ zipCode: params.cep ?? params.zipCode, cityId: params.cityId });
+        result = await unitToCity({
+          zipCode: params.cep ?? params.zipCode,
+          cityId: params.cityId,
+        });
         break;
       }
       case "check-coverage": {
-        result = await checkCoverage(String(params.cep ?? params.zipCode ?? ""));
+        result = await checkCoverage(
+          String(params.cep ?? params.zipCode ?? ""),
+        );
         break;
       }
 
@@ -1324,30 +1692,53 @@ Deno.serve(async (req) => {
       }
 
       default:
-        return new Response(JSON.stringify({ error: `Unknown action: ${action}` }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(
+          JSON.stringify({ error: `Unknown action: ${action}` }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
     }
 
-    return new Response(JSON.stringify({ success: true, data: result }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ success: true, data: result }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return validationErrorResponse(error, corsHeaders);
     }
     if (error instanceof RTEError) {
-      log.error(`[rodonaves-api] ${error.code} @ ${error.gateway}:`, error.message);
-      const status = error.code === "RTE_SCOPE_BLOCKED" ? 403
-        : error.code === "RTE_TIMEOUT" ? 504
-        : error.code === "RTE_BAD_REQUEST" ? 422
-        : 502;
+      log.error(
+        `[rodonaves-api] ${error.code} @ ${error.gateway}:`,
+        error.message,
+      );
+      const status =
+        error.code === "RTE_SCOPE_BLOCKED"
+          ? 403
+          : error.code === "RTE_TIMEOUT"
+            ? 504
+            : error.code === "RTE_BAD_REQUEST"
+              ? 422
+              : 502;
       return new Response(
-        JSON.stringify({ success: false, code: error.code, gateway: error.gateway, error: error.message }),
-        { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({
+          success: false,
+          code: error.code,
+          gateway: error.gateway,
+          error: error.message,
+        }),
+        {
+          status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
     log.error("[rodonaves-api] Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ success: false, error: message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ success: false, error: message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
