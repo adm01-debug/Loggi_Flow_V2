@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "546017663eaceb4f077dddced049b61c448224d0",
+  "sha": "b7a7b5f7039536415ee27b48b030c3cee8b8e56e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 16:42 UTC",
+  "generated_at": "2026-11-20 16:54 UTC",
   "files_total": 1331,
   "code_files": 1139,
   "code_lines": 185031,
@@ -88858,10 +88858,20 @@
   }
  },
  "git": {
-  "sha": "546017663eaceb4f077dddced049b61c448224d0",
+  "sha": "b7a7b5f7039536415ee27b48b030c3cee8b8e56e",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "b7a7b5f",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)",
+    "files": [
+     "package-lock.json",
+     "package.json"
+    ]
+   },
    {
     "sha": "5460176",
     "date": "2026-11-20",
@@ -89193,16 +89203,6 @@
     "date": "2026-11-18",
     "author": "dependabot[bot]",
     "subject": "chore(deps): bump vaul from 0.9.9 to 1.1.2 (#191)",
-    "files": [
-     "package-lock.json",
-     "package.json"
-    ]
-   },
-   {
-    "sha": "9c1c505",
-    "date": "2026-11-18",
-    "author": "dependabot[bot]",
-    "subject": "chore(deps): bump @remix-run/router and react-router-dom (#185)",
     "files": [
      "package-lock.json",
      "package.json"

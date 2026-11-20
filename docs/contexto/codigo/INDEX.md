@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `546017663eaceb4f077dddced049b61c448224d0` (2026-11-20T13:41:49-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `b7a7b5f7039536415ee27b48b030c3cee8b8e56e` (2026-11-20T13:54:06-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,14 +274,14 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8208 nós · 20781 arestas · 732 comunidades · grafo do commit `54601766`
-- comunidades maiores: lucide-react (233), react (224), sonner (218), db-observability/index.ts (153), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), useAuth (96), utils.ts (94), cn (93), supabase (92), ui/index.ts (90), celebrationSounds.ts (82), gerar.mjs (81)
+- 8210 nós · 20783 arestas · 717 comunidades · grafo do commit `b7a7b5f7`
+- comunidades maiores: cn (176), Badge (148), ref_node_path (138), db-observability/index.ts (131), utils.ts (127), AlertasCusto.tsx (119), react (110), dialog.tsx (105), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), CotacaoMultiCanal.tsx (93), client.ts (90), badge.tsx (89)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
-- package-lock.json (48)
-- package.json (47)
+- package-lock.json (49)
+- package.json (48)
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci.yml (7)
 - .github/workflows/ci-nexus.yml (6)
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `b7a7b5f` fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)
 - 2026-11-20 `5460176` fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)
 - 2026-11-20 `eaecf14` chore(db): sincronizar artefatos com o banco [auto] (#216)
 - 2026-11-20 `9654eed` docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `c2e148b` docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)
 - 2026-11-20 `8028999` bump react-router 6 -> 7 e resolve 4 vulnerabilidades
 - 2026-11-19 `3a9fa6a` chore: atualiza inventario com nomes reais de componentes (#203)
-- 2026-11-19 `8f75c44` feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

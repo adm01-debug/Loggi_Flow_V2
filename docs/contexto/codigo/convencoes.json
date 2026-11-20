@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)",
    "fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)",
    "chore(db): sincronizar artefatos com o banco [auto] (#216)",
    "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)",
-   "fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)",
-   "docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)"
+   "fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

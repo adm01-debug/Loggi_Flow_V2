@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "546017663eaceb4f077dddced049b61c448224d0",
+  "commit": "b7a7b5f7039536415ee27b48b030c3cee8b8e56e",
   "branch": "main",
-  "data_commit": "2026-11-20T13:41:49-03:00",
+  "data_commit": "2026-11-20T13:54:06-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "b7a7b5f",
+    "data": "2026-11-20",
+    "assunto": "fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)"
+   },
    {
     "sha": "5460176",
     "data": "2026-11-20",
@@ -126,11 +131,6 @@
     "sha": "1136900",
     "data": "2026-11-18",
     "assunto": "chore: workflow temporário de destravamento do seed prod (service-role key) (#193)"
-   },
-   {
-    "sha": "55ec52f",
-    "data": "2026-11-18",
-    "assunto": "fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)"
    }
   ],
   "arquivos_mudados_7d": 162,
@@ -141,11 +141,11 @@
    },
    {
     "pasta": "package-lock.json",
-    "mudancas": 9
+    "mudancas": 10
    },
    {
     "pasta": "package.json",
-    "mudancas": 9
+    "mudancas": 10
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -199,11 +199,11 @@
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 48
+    "mudancas": 49
    },
    {
     "arquivo": "package.json",
-    "mudancas": 47
+    "mudancas": 48
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 145
+    "commits": 146
    },
    {
     "autor": "dependabot[bot]",
