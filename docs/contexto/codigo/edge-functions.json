@@ -820,14 +820,13 @@
    "nome": "lgpd-erase-user",
    "entrada": "supabase/functions/lgpd-erase-user/index.ts",
    "arquivos": 1,
-   "linhas": 107,
+   "linhas": 108,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
    ],
    "tabelas": [
     "audit_logs",
-    "entregas",
     "profiles",
     "user_roles"
    ],

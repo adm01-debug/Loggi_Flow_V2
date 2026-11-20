@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "99ca8662c017ace8bbd1c91b8962d4d327af96ad",
+  "sha": "171693962fa5f5adc1866939e5634610cac6e246",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 11:41 UTC",
+  "generated_at": "2026-11-20 11:54 UTC",
   "files_total": 1316,
   "code_files": 1138,
-  "code_lines": 183948,
+  "code_lines": 183949,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "30534daa2ca73f93",
+ "facts_hash": "8816afb60b129735",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -26316,7 +26316,6 @@
     "auth": "service_role (ignora RLS) + valida JWT do usuário",
     "tables": [
      "audit_logs",
-     "entregas",
      "profiles",
      "user_roles"
     ],
@@ -30396,7 +30395,7 @@
   {
    "module": "supabase/functions",
    "files": 110,
-   "lines": 12303,
+   "lines": 12304,
    "tables": [
     "ai_delay_predictions",
     "audit_logs",
@@ -31113,7 +31112,6 @@
      "src/hooks/logistics/useDeliveryRoutes.tsx",
      "src/pages/Despachos.tsx",
      "src/pages/Envios.tsx",
-     "supabase/functions/lgpd-erase-user/index.ts",
      "supabase/functions/nexus-auto-healing/index.ts",
      "supabase/functions/rodonaves-webhook/index.ts"
     ],
@@ -32094,7 +32092,6 @@
     "tipo_frete",
     "transportadora_id",
     "updated_at",
-    "user_id",
     "valor_frete",
     "version"
    ],
@@ -33597,10 +33594,6 @@
    {
     "table": "coletas",
     "column": "data_coleta_efetiva"
-   },
-   {
-    "table": "entregas",
-    "column": "user_id"
    },
    {
     "table": "ocorrencias",
@@ -64809,11 +64802,6 @@
    },
    {
     "kind": "coluna",
-    "msg": "coluna `user_id` usada no código não existe no schema de `entregas`",
-    "where": []
-   },
-   {
-    "kind": "coluna",
     "msg": "coluna `gravidade` usada no código não existe no schema de `ocorrencias`",
     "where": []
    },
@@ -86014,7 +86002,7 @@
   },
   "supabase/functions/lgpd-erase-user/index.ts": {
    "path": "supabase/functions/lgpd-erase-user/index.ts",
-   "lines": 107,
+   "lines": 108,
    "tables": [
     {
      "table": "user_roles",
@@ -86023,10 +86011,6 @@
     {
      "table": "profiles",
      "op": "delete"
-    },
-    {
-     "table": "entregas",
-     "op": "update"
     },
     {
      "table": "audit_logs",
@@ -86040,9 +86024,6 @@
     ],
     "profiles": [
      "id"
-    ],
-    "entregas": [
-     "user_id"
     ]
    },
    "env": [
@@ -88856,10 +88837,19 @@
   }
  },
  "git": {
-  "sha": "99ca8662c017ace8bbd1c91b8962d4d327af96ad",
+  "sha": "171693962fa5f5adc1866939e5634610cac6e246",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "1716939",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)",
+    "files": [
+     "supabase/functions/lgpd-erase-user/index.ts"
+    ]
+   },
    {
     "sha": "99ca866",
     "date": "2026-11-20",
@@ -89181,41 +89171,16 @@
      "src/pages/ConfiguracoesFrete.tsx",
      "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql"
     ]
-   },
-   {
-    "sha": "1000cd9",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)",
-    "files": [
-     "eslint.config.js",
-     "package-lock.json",
-     "package.json",
-     "src/components/map/MapboxMap.tsx",
-     "src/components/pwa/UpdatePrompt.tsx",
-     "src/components/security/PermissionMatrix.tsx",
-     "src/components/ui/button.tsx",
-     "src/components/ui/micro-interactions.tsx",
-     "src/hooks/data/useImageUpload.tsx",
-     "src/hooks/data/useRealtime.tsx",
-     "src/hooks/gamification/useAchievementNotifications.tsx",
-     "src/lib/excelImporter.ts",
-     "src/lib/validations.test.ts",
-     "src/pages/Transportadoras.tsx",
-     "src/utils/systemTester.spec.ts",
-     "tests/security/integrations-access.spec.ts",
-     "tests/security/rls-access.spec.ts"
-    ]
    }
   ],
   "hot_files": [
    [
     "package-lock.json",
-    6
+    5
    ],
    [
     "package.json",
-    6
+    5
    ],
    [
     "supabase/schema-manifest.json",
@@ -89258,16 +89223,8 @@
     2
    ],
    [
-    "src/hooks/data/useRealtime.tsx",
-    2
-   ],
-   [
-    "src/components/map/MapboxMap.tsx",
-    2
-   ],
-   [
-    "src/hooks/data/useImageUpload.tsx",
-    2
+    "supabase/functions/lgpd-erase-user/index.ts",
+    1
    ],
    [
     "supabase/functions/lalamove-api/index.ts",
@@ -89287,6 +89244,14 @@
    ],
    [
     "src/App.tsx",
+    1
+   ],
+   [
+    "docs/INVENTARIO_FUNCIONALIDADES.md",
+    1
+   ],
+   [
+    "src/components/coletas/PickupConference.tsx",
     1
    ]
   ]

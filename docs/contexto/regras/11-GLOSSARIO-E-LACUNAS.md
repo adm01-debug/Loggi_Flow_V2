@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `99ca8662c0` · branch `main` · 2026-11-20 11:41 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `171693962f` · branch `main` · 2026-11-20 11:54 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -288,7 +288,6 @@
 | status | valor `RJ` para `destino_estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/DashboardCotacoes.tsx` |
 | status | valor `motorista_alocado` para `order_status` usado no código não existe em nenhum enum do banco/TS | `escreve:supabase/functions/lalamove-webhook/index.ts` |
 | coluna | coluna `data_coleta_efetiva` usada no código não existe no schema de `coletas` |  |
-| coluna | coluna `user_id` usada no código não existe no schema de `entregas` |  |
 | coluna | coluna `gravidade` usada no código não existe no schema de `ocorrencias` |  |
 | coluna | coluna `status` usada no código não existe no schema de `ocorrencias` |  |
 | coluna | coluna `score_frete` usada no código não existe no schema de `transportadoras` |  |

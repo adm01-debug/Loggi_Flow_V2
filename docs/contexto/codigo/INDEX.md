@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `99ca8662c017ace8bbd1c91b8962d4d327af96ad` (2026-11-20T08:36:26-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `171693962fa5f5adc1866939e5634610cac6e246` (2026-11-20T08:53:43-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1306 |
 | arquivos_codigo | 877 |
-| linhas_codigo | 167443 |
+| linhas_codigo | 167444 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -192,7 +192,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `lalamove-api` — tabelas: -; chamada por 1 arquivo(s) do front
 - `lalamove-tracking` — tabelas: -; chamada por 2 arquivo(s) do front
 - `lalamove-webhook` (verify_jwt=false) — tabelas: coletas, rastreamento_alertas, rastreamento_historico, webhook_events_processed; chamada por 0 arquivo(s) do front
-- `lgpd-erase-user` — tabelas: audit_logs, entregas, profiles, user_roles; chamada por 0 arquivo(s) do front — **ÓRFÃ**
+- `lgpd-erase-user` — tabelas: audit_logs, profiles, user_roles; chamada por 0 arquivo(s) do front — **ÓRFÃ**
 - `log-login-attempt` — tabelas: login_attempts; chamada por 1 arquivo(s) do front
 - `log-security-event` (verify_jwt=false) — tabelas: security_events; chamada por 1 arquivo(s) do front
 - `melhor-envio-api` (verify_jwt=false) — tabelas: -; chamada por 2 arquivo(s) do front
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8160 nós · 20744 arestas · 702 comunidades · grafo do commit `99ca8662`
+- 8160 nós · 20744 arestas · 702 comunidades · grafo do commit `17169396`
 - comunidades maiores: lucide-react (181), client.ts (180), db-observability/index.ts (166), react (146), ref_node_path (131), Button (123), GeoBlockingPanel.tsx (118), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (90), ui/index.ts (86), App.tsx (86), celebrationSounds.ts (83)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `1716939` fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)
 - 2026-11-20 `99ca866` fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)
 - 2026-11-20 `c2e148b` docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)
 - 2026-11-20 `8028999` bump react-router 6 -> 7 e resolve 4 vulnerabilidades
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-19 `f93a675` fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)
 - 2026-11-18 `7b4672c` chore: workflow temporario de diagnostico de schema prod (diag) (#194)
 - 2026-11-18 `1136900` chore: workflow temporário de destravamento do seed prod (service-role key) (#193)
-- 2026-11-18 `55ec52f` fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

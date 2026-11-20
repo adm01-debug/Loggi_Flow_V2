@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "99ca8662c017ace8bbd1c91b8962d4d327af96ad",
+  "commit": "171693962fa5f5adc1866939e5634610cac6e246",
   "branch": "main",
-  "data_commit": "2026-11-20T08:36:26-03:00",
+  "data_commit": "2026-11-20T08:53:43-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "1716939",
+    "data": "2026-11-20",
+    "assunto": "fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)"
+   },
    {
     "sha": "99ca866",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "6e1ffcf",
     "data": "2026-11-17",
     "assunto": "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)"
-   },
-   {
-    "sha": "e1f6935",
-    "data": "2026-11-17",
-    "assunto": "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)"
    }
   ],
-  "arquivos_mudados_7d": 130,
+  "arquivos_mudados_7d": 131,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 136
+    "commits": 137
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1306,
   "arquivos_codigo": 877,
-  "linhas_codigo": 167443,
+  "linhas_codigo": 167444,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -492,7 +492,7 @@
   },
   "supabase/functions": {
    "arquivos": 110,
-   "linhas": 12303
+   "linhas": 12304
   },
   "tailwind.config.ts": {
    "arquivos": 1,
