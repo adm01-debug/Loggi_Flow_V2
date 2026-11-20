@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { TablesUpdate } from "@/integrations/supabase/types";
+import { Json, TablesUpdate } from "@/integrations/supabase/types";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 
@@ -107,6 +107,7 @@ export const useCotacoesMulticanal = () => {
   const updateCotacao = useMutation({
     mutationFn: async ({
       id,
+      workflow_logs,
       ...data
     }: {
       id: string;
@@ -114,10 +115,13 @@ export const useCotacoesMulticanal = () => {
       prazo_dias?: number;
       observacoes?: string;
       status?: string;
+      retry_count?: number;
+      workflow_logs?: Array<Record<string, unknown>> | Json;
     }) => {
       const updateData: TablesUpdate<"cotacoes_multicanal"> = {
         ...data,
         updated_at: new Date().toISOString(),
+        workflow_logs: workflow_logs as Json,
       };
       if (data.status === "respondido") {
         updateData.responded_at = new Date().toISOString();

@@ -102,7 +102,13 @@ export default function CotacaoMultiCanal() {
         destinoCidade || undefined,
       );
       const enriched: TransportadoraComCanal[] = localResults.map((rota) => {
-        const t = rota.transportadora as { api_disponivel?: boolean; whatsapp_operacional?: string; email_comercial?: string } | undefined;
+        const t = rota.transportadora as
+          | {
+              api_disponivel?: boolean;
+              whatsapp_operacional?: string;
+              email_comercial?: string;
+            }
+          | undefined;
         const hasApi = t?.api_disponivel === true;
         const hasWhatsapp = !!t?.whatsapp_operacional;
         let canal: "api" | "whatsapp" | "email" = "email";
@@ -180,7 +186,9 @@ export default function CotacaoMultiCanal() {
                     canal: "api",
                     valor: parseFloat(String(option.price ?? "0")),
                     prazo_dias:
-                      option.delivery_range?.max ?? option.delivery_time ?? null,
+                      option.delivery_range?.max ??
+                      option.delivery_time ??
+                      null,
 
                     status: "respondido",
                     observacoes: `Serviço: ${option.name}`,
@@ -347,8 +355,9 @@ export default function CotacaoMultiCanal() {
         : undefined,
       valor_cotado: valorCalculado,
       prazo_dias: carrier.prazo_dias,
-      observacoes: "Cotação via Nexus Blast (API)",
-      status: "respondido",
+      observacoes:
+        "Cotação via Nexus Blast (API) — aguardando resposta da transportadora",
+      status: "pendente",
     });
     addCotacao({
       id: crypto.randomUUID(),
@@ -357,8 +366,8 @@ export default function CotacaoMultiCanal() {
       canal: "api",
       valor: valorCalculado,
       prazo_dias: carrier.prazo_dias,
-      status: "respondido",
-      observacoes: "Nexus Blast API",
+      status: "pendente",
+      observacoes: "Nexus Blast API — aguardando resposta",
       created_at: new Date().toISOString(),
     });
   };
@@ -491,9 +500,14 @@ export default function CotacaoMultiCanal() {
             </AlertTitle>
             <AlertDescription className="text-xs text-white/70 space-y-2">
               <p>
-                O token <code className="text-white/80 bg-white/5 px-1 rounded">MELHOR_ENVIO_TOKEN</code> não está configurado no Supabase.
-                Configure em <strong>Edge Functions → Secrets</strong> para ativar cotações via Melhor Envio.
-                Outras fontes (Rodonaves, Lalamove, transportadoras locais) continuam funcionando.
+                O token{" "}
+                <code className="text-white/80 bg-white/5 px-1 rounded">
+                  MELHOR_ENVIO_TOKEN
+                </code>{" "}
+                não está configurado no Supabase. Configure em{" "}
+                <strong>Edge Functions → Secrets</strong> para ativar cotações
+                via Melhor Envio. Outras fontes (Rodonaves, Lalamove,
+                transportadoras locais) continuam funcionando.
               </p>
               <p className="text-white/50">
                 Já configurou?{" "}
@@ -501,7 +515,7 @@ export default function CotacaoMultiCanal() {
                   type="button"
                   onClick={() => {
                     try {
-                      window.sessionStorage.removeItem('me-available');
+                      window.sessionStorage.removeItem("me-available");
                     } catch {
                       // ignore
                     }

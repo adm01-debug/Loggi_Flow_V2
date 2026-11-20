@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import { useState, useMemo, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,6 @@ import {
   History,
   RotateCcw,
 } from "lucide-react";
-import { toast } from "sonner";
 import { useCotacoesMulticanal } from "@/hooks/logistics/useCotacoesMulticanal";
 import { type CotacaoMulticanal } from "@/hooks";
 import { isPast, differenceInHours, differenceInMinutes } from "date-fns";
@@ -269,37 +267,6 @@ export default function DashboardCotacoes() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              onClick={async () => {
-                const {
-                  data: { user },
-                } = await supabase.auth.getUser();
-                if (!user) return;
-                const { error } = await supabase
-                  .from("cotacoes_multicanal")
-                  .insert([
-                    {
-                      user_id: user.id,
-                      transportadora_id: "86815340-4107-4286-9a29-798858348981",
-                      canal: "whatsapp",
-                      status: "pendente",
-                      origem_estado: "SP",
-                      destino_estado: "RJ",
-                      observacoes:
-                        "Olá! O valor para esse frete SP-RJ é de R$ 145,00 com entrega em 3 dias úteis.",
-                      expires_at: new Date(Date.now() + 86400000).toISOString(),
-                    } as never,
-                  ]);
-                if (!error)
-                  toast.success("Resposta simulada recebida via WhatsApp!");
-                refetch();
-              }}
-              variant="outline"
-              size="sm"
-              className="gap-2 bg-success/5 text-success border-success/20 hover:bg-success/10"
-            >
-              <MessageCircle className="w-4 h-4" /> Simular Resposta WA
-            </Button>
             <Button
               onClick={() => refetch()}
               variant="outline"
@@ -576,7 +543,13 @@ export default function DashboardCotacoes() {
                 <div className="border rounded-lg divide-y bg-black/5">
                   {selectedCotacao?.workflow_logs &&
                   selectedCotacao.workflow_logs.length > 0 ? (
-                    selectedCotacao.workflow_logs.map((log: { action?: string; timestamp?: string; details?: string }, i: number) => (
+                    (
+                      selectedCotacao.workflow_logs as Array<{
+                        action?: string;
+                        timestamp?: string;
+                        details?: string;
+                      }>
+                    ).map((log, i) => (
                       <div
                         key={i}
                         className="p-3 text-xs flex items-start gap-3"
@@ -599,8 +572,8 @@ export default function DashboardCotacoes() {
                     ))
                   ) : (
                     <div className="p-8 text-center text-muted-foreground italic text-xs">
-                      [Simulado] Cotação enviada via {selectedCotacao?.canal}.
-                      Aguardando gateway.
+                      Cotação registrada via {selectedCotacao?.canal}.
+                      Aguardando resposta da transportadora.
                     </div>
                   )}
                 </div>
@@ -625,7 +598,22 @@ export default function DashboardCotacoes() {
                 <Button
                   variant="outline"
                   className="w-full gap-2 text-xs"
-                  onClick={() => toast.info("Retentativa disparada!")}
+                  onClick={() => {
+                    if (!selectedCotacao) return;
+                    updateCotacao.mutate({
+                      id: selectedCotacao.id,
+                      retry_count: (selectedCotacao.retry_count ?? 0) + 1,
+                      workflow_logs: [
+                        ...(selectedCotacao.workflow_logs ?? []),
+                        {
+                          action: "retentativa_manual",
+                          timestamp: new Date().toISOString(),
+                          details:
+                            "Retentativa disparada manualmente pelo usuário",
+                        },
+                      ],
+                    });
+                  }}
                 >
                   <RotateCcw className="w-3.5 h-3.5" /> Forçar Retentativa
                 </Button>
