@@ -7,17 +7,9 @@ Estado do main auditado: 08d5a138 (após merges #206-#210, 2026-11-20).
 
 Feitos via #207/#208: 2.1, 2.2, 2.3, 2.4.
 Já corrigidos em main (verificação nov/20): 2.13 (grants reconsiderados), 2.15 (cnpjDefault).
-Pendentes (esta sessão, branch fix-rotos-2):
+Feitos via #211/#212: 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.12, 2.14, 2.16.
 
-- 2.5 profiles.phone → whatsapp (transportadora/whatsapp) — alerta de atraso
-- 2.6 nexus-auto-healing coluna data_coleta_efetiva
-- 2.8 Ranking embed + período + conquistas
-- 2.9 ai-assistant colunas inexistentes (score_frete/pontualidade/gravidade)
-- 2.10 kanban_history embed display_name
-- 2.12 bitrix test-connection
-- 2.14 webhook_deliveries metadata inexistente
-- 2.16 MissionDetail integracoes_bitrix
-  Notas: 2.7 (fretes_internos deleted_at) — sem migration de deleted_at, tratar como achado.
+Pendentes: — (Fase A encerrada; seção 2 sem pendências de código).
 
 ## Fase B — Simulações exibidas como dado real (seção 3)
 
