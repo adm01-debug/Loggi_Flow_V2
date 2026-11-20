@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `08d5a13809` · branch `main` · 2026-11-20 13:15 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `35d65b9399` · branch `main` · 2026-11-20 13:18 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -263,7 +263,6 @@
 | status | valor `PASS` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/utils/systemTester.ts` |
 | status | valor `sent` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:supabase/functions/accuracy-weekly-digest/index.ts`<br>`escreve:supabase/functions/accuracy-weekly-digest/index.ts` |
 | status | valor `empty` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:supabase/functions/accuracy-weekly-digest/index.ts`<br>`escreve:supabase/functions/accuracy-weekly-digest/index.ts` |
-| status | valor `aberta` para `status` usado no código não existe em nenhum enum do banco/TS | `filtra:supabase/functions/ai-logistics-assistant/index.ts` |
 | status | valor `very_slow` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:supabase/functions/external-db-bridge/index.ts` |
 | status | valor `slow` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:supabase/functions/external-db-bridge/index.ts` |
 | status | valor `unhealthy` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:supabase/functions/health-check/index.ts`<br>`escreve:supabase/functions/health/index.ts` |
@@ -287,11 +286,6 @@
 | status | valor `SP` para `origem_estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/DashboardCotacoes.tsx` |
 | status | valor `RJ` para `destino_estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/DashboardCotacoes.tsx` |
 | status | valor `motorista_alocado` para `order_status` usado no código não existe em nenhum enum do banco/TS | `escreve:supabase/functions/lalamove-webhook/index.ts` |
-| coluna | coluna `data_coleta_efetiva` usada no código não existe no schema de `coletas` |  |
-| coluna | coluna `gravidade` usada no código não existe no schema de `ocorrencias` |  |
-| coluna | coluna `status` usada no código não existe no schema de `ocorrencias` |  |
-| coluna | coluna `score_frete` usada no código não existe no schema de `transportadoras` |  |
-| coluna | coluna `score_pontualidade` usada no código não existe no schema de `transportadoras` |  |
 | coluna | coluna `deleted_at` usada no código não existe no schema de `fretes_internos` |  |
 | rls | `geo_blocking_rules`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | rls | `geo_blocking_settings`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |

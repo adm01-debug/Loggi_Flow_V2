@@ -1214,12 +1214,10 @@
     "MissionDetail"
    ],
    "export_default": null,
-   "linhas": 281,
+   "linhas": 245,
    "dominio": "components/dashboard",
    "hooks_locais": [],
-   "tabelas": [
-    "integracoes_bitrix"
-   ],
+   "tabelas": [],
    "edges": [],
    "usado_por": 2,
    "orfao": false

@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "08d5a1380977fafbd0191ab2e24c62b8f9cea696",
+  "commit": "35d65b93993396d505b691b50aaf58833f3e7ae1",
   "branch": "main",
-  "data_commit": "2026-11-20T09:26:41-03:00",
+  "data_commit": "2026-11-20T10:17:35-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "35d65b9",
+    "data": "2026-11-20",
+    "assunto": "fix(audit): corrige 7 quebras da seção 2 (#211)"
+   },
    {
     "sha": "08d5a13",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "67c87ec",
     "data": "2026-11-18",
     "assunto": "ci(seguranca): recupera dependency review nos PRs da branch claude/seguranca-workflows-261112 (#182)"
-   },
-   {
-    "sha": "e73975b",
-    "data": "2026-11-18",
-    "assunto": "﻿fix: realtime usa topic unico por hook para nao estourar a pagina (#181)"
    }
   ],
-  "arquivos_mudados_7d": 135,
+  "arquivos_mudados_7d": 153,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -156,6 +156,10 @@
     "mudancas": 6
    },
    {
+    "pasta": "src/components/dashboard",
+    "mudancas": 6
+   },
+   {
     "pasta": "src/hooks/data",
     "mudancas": 6
    },
@@ -173,10 +177,6 @@
    },
    {
     "pasta": "src/components/common",
-    "mudancas": 5
-   },
-   {
-    "pasta": "src/components/dashboard",
     "mudancas": 5
    },
    {
@@ -204,14 +204,6 @@
    {
     "arquivo": "package.json",
     "mudancas": 46
-   },
-   {
-    "arquivo": "index.html",
-    "mudancas": 11
-   },
-   {
-    "arquivo": "src/hooks/gamification/useGamification.ts",
-    "mudancas": 10
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
@@ -250,15 +242,19 @@
     "mudancas": 5
    },
    {
+    "arquivo": "index.html",
+    "mudancas": 5
+   },
+   {
     "arquivo": "scripts/audit-gate.mjs",
     "mudancas": 5
    },
    {
-    "arquivo": "src/components/gamification/GamificationPanel.tsx",
+    "arquivo": "supabase/config.toml",
     "mudancas": 5
    },
    {
-    "arquivo": "supabase/config.toml",
+    "arquivo": "supabase/functions/ai-logistics-assistant/index.ts",
     "mudancas": 5
    },
    {
@@ -296,12 +292,16 @@
    {
     "arquivo": "scripts/generate-quality-report.mjs",
     "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/ops/pos_deploy_functions.sql",
+    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 139
+    "commits": 140
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1306,
+  "arquivos_total": 1317,
   "arquivos_codigo": 877,
-  "linhas_codigo": 167552,
+  "linhas_codigo": 167752,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -331,7 +331,7 @@
   "testes": 130,
   "workflows": 18,
   "scripts": 62,
-  "docs_md": 86
+  "docs_md": 97
  },
  "por_pasta": {
   "eslint.config.js": {
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48729
+   "linhas": 48693
   },
   "src/features": {
    "arquivos": 90,
@@ -492,7 +492,7 @@
   },
   "supabase/functions": {
    "arquivos": 110,
-   "linhas": 12304
+   "linhas": 12540
   },
   "tailwind.config.ts": {
    "arquivos": 1,
@@ -687,9 +687,7 @@
    "audit_logs_y2026m11",
    "audit_logs_y2026m12"
   ],
-  "tabelas_usadas_sem_definicao": [
-   "integracoes_bitrix"
-  ],
+  "tabelas_usadas_sem_definicao": [],
   "tabelas_com_drift_migration_vs_types": [
    "business_rules_config",
    "feature_flags",

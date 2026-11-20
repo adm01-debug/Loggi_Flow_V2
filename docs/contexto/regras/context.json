@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "08d5a1380977fafbd0191ab2e24c62b8f9cea696",
+  "sha": "35d65b93993396d505b691b50aaf58833f3e7ae1",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 13:15 UTC",
-  "files_total": 1316,
+  "generated_at": "2026-11-20 13:18 UTC",
+  "files_total": 1327,
   "code_files": 1138,
-  "code_lines": 184057,
+  "code_lines": 184257,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "b1a6d744f210c13c",
+ "facts_hash": "b443e5b4eb28a045",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -25874,7 +25874,7 @@
     "invokes": [],
     "doc": "",
     "errors": [
-     ": {\n        const { message, severity, vehicle_id, driver_id } = body.deal_data || {};\n        \n        // In Bitrix24, we can create a "
+     ": {\n        const { message, severity, vehicle_id, driver_id } =\n          body.deal_data || {};\n\n        // In Bitrix24, we can create a "
     ],
     "side_effects": [
      "notify_alert"
@@ -26505,6 +26505,7 @@
     "tables": [
      "contract_test_logs",
      "cotacoes_multicanal",
+     "prediction_accuracy_settings",
      "transportadoras",
      "user_notification_preferences"
     ],
@@ -26521,7 +26522,9 @@
     "errors": [
      ",\n                phone,\n                variables: {\n                  transportadora: "
     ],
-    "side_effects": [],
+    "side_effects": [
+     "notify_whatsapp"
+    ],
     "webhook_events": [],
     "idempotency": false
    },
@@ -26589,6 +26592,7 @@
      "delay_predictions_history",
      "entregas",
      "ocorrencias",
+     "prediction_accuracy_settings",
      "rate_limit_logs",
      "user_notification_preferences"
     ],
@@ -26609,7 +26613,8 @@
      "AI Gateway Error: ${response.status}"
     ],
     "side_effects": [
-     "invoke("
+     "invoke(",
+     "notify_whatsapp"
     ],
     "webhook_events": [],
     "idempotency": false
@@ -29293,7 +29298,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48729,
+   "lines": 48693,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -30396,7 +30401,7 @@
   {
    "module": "supabase/functions",
    "files": 110,
-   "lines": 12304,
+   "lines": 12540,
    "tables": [
     "ai_delay_predictions",
     "audit_logs",
@@ -31478,7 +31483,9 @@
    "prediction_accuracy_settings": {
     "select": [
      "supabase/functions/accuracy-meta-monitor/index.ts",
-     "supabase/functions/accuracy-weekly-digest/index.ts"
+     "supabase/functions/accuracy-weekly-digest/index.ts",
+     "supabase/functions/normalize-freight-response/index.ts",
+     "supabase/functions/predict-delays/index.ts"
     ]
    },
    "profiles": {
@@ -31997,7 +32004,6 @@
    "coletas": [
     "codigo_rastreamento",
     "created_at",
-    "data_coleta_efetiva",
     "data_efetiva_coleta",
     "data_prevista_coleta",
     "deleted_at",
@@ -32182,10 +32188,8 @@
     "coleta_id",
     "created_at",
     "entrega_id",
-    "gravidade",
     "id",
     "resolvida",
-    "status",
     "tipo_ocorrencia"
    ],
    "password_reset_requests": [
@@ -32307,9 +32311,7 @@
     "non_api_config",
     "prazo_medio_dias",
     "razao_social",
-    "score_frete",
-    "score_performance",
-    "score_pontualidade"
+    "score_performance"
    ],
    "user_achievements": [
     "achievement_id",
@@ -33592,26 +33594,6 @@
    "v_prediction_accuracy_daily_carrier"
   ],
   "columns_unknown": [
-   {
-    "table": "coletas",
-    "column": "data_coleta_efetiva"
-   },
-   {
-    "table": "ocorrencias",
-    "column": "gravidade"
-   },
-   {
-    "table": "ocorrencias",
-    "column": "status"
-   },
-   {
-    "table": "transportadoras",
-    "column": "score_frete"
-   },
-   {
-    "table": "transportadoras",
-    "column": "score_pontualidade"
-   },
    {
     "table": "fretes_internos",
     "column": "deleted_at"
@@ -35382,7 +35364,7 @@
    },
    {
     "file": "supabase/functions/bitrix24-integration/index.ts",
-    "msg": ": {\n        const { message, severity, vehicle_id, driver_id } = body.deal_data || {};\n        \n        // In Bitrix24, we can create a "
+    "msg": ": {\n        const { message, severity, vehicle_id, driver_id } =\n          body.deal_data || {};\n\n        // In Bitrix24, we can create a "
    },
    {
     "file": "supabase/functions/db-health-weekly-report/index.ts",
@@ -36235,6 +36217,10 @@
    {
     "file": "supabase/functions/accuracy-meta-monitor/simulator.ts",
     "text": "- Email exige formato mínimo `x@y.z`."
+   },
+   {
+    "file": "supabase/functions/bitrix24-integration/index.ts",
+    "text": "Bitrix returns only count, no items, for limit -1"
    },
    {
     "file": "supabase/functions/carrier-webhook-receiver/index.ts",
@@ -46294,12 +46280,6 @@
     "kind": "filtra"
    },
    {
-    "file": "supabase/functions/ai-logistics-assistant/index.ts",
-    "field": "status",
-    "value": "aberta",
-    "kind": "filtra"
-   },
-   {
     "file": "supabase/functions/carrier-webhook-receiver/index.ts",
     "field": "status",
     "value": "success",
@@ -47497,7 +47477,7 @@
    },
    {
     "file": "supabase/functions/ai-logistics-assistant/index.ts",
-    "line": "supabase.from('entregas').select('valor_frete, created_at').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),"
+    "line": "new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),"
    },
    {
     "file": "supabase/functions/check-rate-limit/index.ts",
@@ -49696,8 +49676,16 @@
     "call": "invoke("
    },
    {
+    "file": "supabase/functions/normalize-freight-response/index.ts",
+    "call": "notify_whatsapp"
+   },
+   {
     "file": "supabase/functions/predict-delays/index.ts",
     "call": "invoke("
+   },
+   {
+    "file": "supabase/functions/predict-delays/index.ts",
+    "call": "notify_whatsapp"
    },
    {
     "file": "supabase/functions/predict-delays-scheduled/index.ts",
@@ -57464,9 +57452,6 @@
       "compara:supabase/functions/accuracy-weekly-digest/index.ts",
       "escreve:supabase/functions/accuracy-weekly-digest/index.ts"
      ],
-     "aberta": [
-      "filtra:supabase/functions/ai-logistics-assistant/index.ts"
-     ],
      "very_slow": [
       "compara:supabase/functions/external-db-bridge/index.ts"
      ],
@@ -64636,13 +64621,6 @@
    },
    {
     "kind": "status",
-    "msg": "valor `aberta` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "filtra:supabase/functions/ai-logistics-assistant/index.ts"
-    ]
-   },
-   {
-    "kind": "status",
     "msg": "valor `very_slow` para `status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:supabase/functions/external-db-bridge/index.ts"
@@ -64803,31 +64781,6 @@
     "where": [
      "escreve:supabase/functions/lalamove-webhook/index.ts"
     ]
-   },
-   {
-    "kind": "coluna",
-    "msg": "coluna `data_coleta_efetiva` usada no código não existe no schema de `coletas`",
-    "where": []
-   },
-   {
-    "kind": "coluna",
-    "msg": "coluna `gravidade` usada no código não existe no schema de `ocorrencias`",
-    "where": []
-   },
-   {
-    "kind": "coluna",
-    "msg": "coluna `status` usada no código não existe no schema de `ocorrencias`",
-    "where": []
-   },
-   {
-    "kind": "coluna",
-    "msg": "coluna `score_frete` usada no código não existe no schema de `transportadoras`",
-    "where": []
-   },
-   {
-    "kind": "coluna",
-    "msg": "coluna `score_pontualidade` usada no código não existe no schema de `transportadoras`",
-    "where": []
    },
    {
     "kind": "coluna",
@@ -70190,7 +70143,7 @@
   },
   "src/components/dashboard/MissionDetail.tsx": {
    "path": "src/components/dashboard/MissionDetail.tsx",
-   "lines": 281,
+   "lines": 245,
    "exports": [
     "function MissionDetail"
    ],
@@ -85116,7 +85069,7 @@
   },
   "supabase/functions/ai-logistics-assistant/index.ts": {
    "path": "supabase/functions/ai-logistics-assistant/index.ts",
-   "lines": 160,
+   "lines": 222,
    "exports": [
     "const handler"
    ],
@@ -85143,9 +85096,7 @@
      "homologada",
      "id",
      "nome_fantasia",
-     "score_frete",
-     "score_performance",
-     "score_pontualidade"
+     "score_performance"
     ],
     "entregas": [
      "created_at",
@@ -85156,8 +85107,7 @@
      "valor_frete"
     ],
     "ocorrencias": [
-     "gravidade",
-     "status",
+     "resolvida",
      "tipo_ocorrencia"
     ]
    },
@@ -85191,15 +85141,10 @@
      "field": "status",
      "value": "despachado",
      "kind": "filtra"
-    },
-    {
-     "field": "status",
-     "value": "aberta",
-     "kind": "filtra"
     }
    ],
    "temporal": [
-    "supabase.from('entregas').select('valor_frete, created_at').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),"
+    "new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),"
    ],
    "pagination": [
     "10",
@@ -85209,7 +85154,7 @@
   },
   "supabase/functions/bitrix24-integration/index.ts": {
    "path": "supabase/functions/bitrix24-integration/index.ts",
-   "lines": 263,
+   "lines": 400,
    "tables": [
     {
      "table": "audit_logs",
@@ -85226,7 +85171,10 @@
     "SUPABASE_URL"
    ],
    "errors": [
-    ": {\n        const { message, severity, vehicle_id, driver_id } = body.deal_data || {};\n        \n        // In Bitrix24, we can create a "
+    ": {\n        const { message, severity, vehicle_id, driver_id } =\n          body.deal_data || {};\n\n        // In Bitrix24, we can create a "
+   ],
+   "rule_comments": [
+    "Bitrix returns only count, no items, for limit -1"
    ],
    "side_effects": [
     "notify_alert"
@@ -86205,7 +86153,7 @@
   },
   "supabase/functions/nexus-auto-healing/index.ts": {
    "path": "supabase/functions/nexus-auto-healing/index.ts",
-   "lines": 102,
+   "lines": 116,
    "tables": [
     {
      "table": "entregas",
@@ -86240,7 +86188,7 @@
      "updated_at"
     ],
     "coletas": [
-     "data_coleta_efetiva",
+     "data_efetiva_coleta",
      "id",
      "status",
      "updated_at"
@@ -86361,7 +86309,7 @@
   },
   "supabase/functions/normalize-freight-response/index.ts": {
    "path": "supabase/functions/normalize-freight-response/index.ts",
-   "lines": 211,
+   "lines": 222,
    "tables": [
     {
      "table": "transportadoras",
@@ -86373,6 +86321,10 @@
     },
     {
      "table": "user_notification_preferences",
+     "op": "select"
+    },
+    {
+     "table": "prediction_accuracy_settings",
      "op": "select"
     }
    ],
@@ -86387,6 +86339,11 @@
     "user_notification_preferences": [
      "notifications_whatsapp",
      "user_id"
+    ],
+    "prediction_accuracy_settings": [
+     "notify_whatsapp",
+     "user_id",
+     "whatsapp_phone"
     ]
    },
    "external_urls": [
@@ -86424,6 +86381,9 @@
    ],
    "rule_comments": [
     "Contract Validation — transportadora_id is optional (omitted for new/unsaved carriers)"
+   ],
+   "side_effects": [
+    "notify_whatsapp"
    ],
    "uses_service_role": true
   },
@@ -86484,7 +86444,7 @@
   },
   "supabase/functions/predict-delays/index.ts": {
    "path": "supabase/functions/predict-delays/index.ts",
-   "lines": 370,
+   "lines": 385,
    "exports": [
     "const handler"
    ],
@@ -86524,6 +86484,10 @@
     {
      "table": "user_notification_preferences",
      "op": "select"
+    },
+    {
+     "table": "prediction_accuracy_settings",
+     "op": "select"
     }
    ],
    "table_cols": {
@@ -86558,6 +86522,11 @@
      "notifications_sla",
      "notifications_whatsapp",
      "user_id"
+    ],
+    "prediction_accuracy_settings": [
+     "notify_whatsapp",
+     "user_id",
+     "whatsapp_phone"
     ]
    },
    "invokes": [
@@ -86631,7 +86600,8 @@
     "const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();"
    ],
    "side_effects": [
-    "invoke("
+    "invoke(",
+    "notify_whatsapp"
    ],
    "pagination": [
     "100"
@@ -87363,7 +87333,7 @@
   },
   "supabase/functions/webhook-status/index.ts": {
    "path": "supabase/functions/webhook-status/index.ts",
-   "lines": 214,
+   "lines": 211,
    "tables": [
     {
      "table": "client_webhooks",
@@ -88851,10 +88821,36 @@
   }
  },
  "git": {
-  "sha": "08d5a1380977fafbd0191ab2e24c62b8f9cea696",
+  "sha": "35d65b93993396d505b691b50aaf58833f3e7ae1",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "35d65b9",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "fix(audit): corrige 7 quebras da seção 2 (#211)",
+    "files": [
+     "docs/pendencias/02-05-predict-delays-whatsapp.md",
+     "docs/pendencias/02-06-nexus-auto-healing-coluna.md",
+     "docs/pendencias/02-07-fretes-internos-deleted-at.md",
+     "docs/pendencias/02-08-ranking.md",
+     "docs/pendencias/02-09-ai-assistant-colunas.md",
+     "docs/pendencias/02-10-kanban-history-embed.md",
+     "docs/pendencias/02-12-bitrix-test-connection.md",
+     "docs/pendencias/02-14-webhook-metadata.md",
+     "docs/pendencias/02-16-mission-detail-bitrix.md",
+     "docs/pendencias/_linha-de-base.md",
+     "docs/pendencias/_ordem.md",
+     "src/components/dashboard/MissionDetail.tsx",
+     "supabase/functions/ai-logistics-assistant/index.ts",
+     "supabase/functions/bitrix24-integration/index.ts",
+     "supabase/functions/nexus-auto-healing/index.ts",
+     "supabase/functions/normalize-freight-response/index.ts",
+     "supabase/functions/predict-delays/index.ts",
+     "supabase/functions/webhook-status/index.ts"
+    ]
+   },
    {
     "sha": "08d5a13",
     "date": "2026-11-20",
@@ -89167,15 +89163,6 @@
      "supabase/schema-catalog.json",
      "supabase/schema-manifest.json"
     ]
-   },
-   {
-    "sha": "214f0cd",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)",
-    "files": [
-     ".github/workflows/aplicar-migration.yml"
-    ]
    }
   ],
   "hot_files": [
@@ -89228,35 +89215,35 @@
     2
    ],
    [
-    ".github/workflows/aplicar-migration.yml",
-    2
-   ],
-   [
-    "docs/MELHORIAS.md",
+    "docs/pendencias/02-05-predict-delays-whatsapp.md",
     1
    ],
    [
-    "docs/MIGRATION-GUIDE.md",
+    "docs/pendencias/02-06-nexus-auto-healing-coluna.md",
     1
    ],
    [
-    "docs/PLANO_MELHORIAS_2026.md",
+    "docs/pendencias/02-07-fretes-internos-deleted-at.md",
     1
    ],
    [
-    "src/pages/Auth.tsx",
+    "docs/pendencias/02-08-ranking.md",
     1
    ],
    [
-    "supabase/functions/lgpd-erase-user/index.ts",
+    "docs/pendencias/02-09-ai-assistant-colunas.md",
     1
    ],
    [
-    "supabase/functions/lalamove-api/index.ts",
+    "docs/pendencias/02-10-kanban-history-embed.md",
     1
    ],
    [
-    "supabase/functions/ocr-receipt-processor/index.ts",
+    "docs/pendencias/02-12-bitrix-test-connection.md",
+    1
+   ],
+   [
+    "docs/pendencias/02-14-webhook-metadata.md",
     1
    ]
   ]

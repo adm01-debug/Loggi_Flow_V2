@@ -741,7 +741,7 @@
    "modulo": "components/dashboard",
    "arquivos": 17,
    "testes": 1,
-   "linhas": 5257,
+   "linhas": 5221,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -789,7 +789,6 @@
     "cotacoes_multicanal",
     "entregas",
     "error_events",
-    "integracoes_bitrix",
     "nexus_tactical_logs",
     "ocorrencias",
     "performance_metrics",
@@ -829,7 +828,6 @@
      "execute-protocol"
     ],
     "tabelas": [
-     "integracoes_bitrix",
      "system_heartbeat"
     ],
     "rpcs": []
@@ -4967,7 +4965,6 @@
     "geo_blocked_attempts",
     "geo_blocking_rules",
     "geo_blocking_settings",
-    "integracoes_bitrix",
     "ip_access_rules",
     "kanban_history",
     "known_devices",

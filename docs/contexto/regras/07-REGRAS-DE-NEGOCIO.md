@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `08d5a13809` · branch `main` · 2026-11-20 13:15 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `35d65b9399` · branch `main` · 2026-11-20 13:18 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -909,7 +909,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `Status` | escreve | `src/hooks/common/useExport.tsx`<br>`src/hooks/security/useAuditLogs.tsx`<br>`src/hooks/security/useEntityHistory.tsx` |
 | `status` | `TIMED_OUT` | compara | `src/hooks/data/useRealtime.tsx` |
 | `status` | `Transito` | escreve | `src/components/dashboard/MissionDetail.tsx` |
-| `status` | `aberta` | filtra | `supabase/functions/ai-logistics-assistant/index.ts` |
 | `status` | `above` | compara | `src/pages/Analytics.tsx` |
 | `status` | `aguardando_liberacao` | compara, escreve, filtra | `src/components/coletas/PickupDetailsDialog.tsx`<br>`src/components/coletas/PickupDialog.tsx`<br>`src/pages/Coletas.tsx`<br>`src/pages/PainelSLA.tsx` |
 | `status` | `aguardando_producao` | compara, escreve | `src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/pages/Envios.tsx` |
@@ -1734,7 +1733,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `delta <= 24 * 60 * 60 * 1000 + 1,` | `supabase/functions/accuracy-meta-monitor/simulator_test.ts` |
 | `export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;` | `supabase/functions/accuracy-weekly-digest/digest.ts` |
 | `now.getTime() - 7 * 24 * 60 * 60 * 1000,` | `supabase/functions/accuracy-weekly-digest/index.ts` |
-| `supabase.from('entregas').select('valor_frete, created_at').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),` | `supabase/functions/ai-logistics-assistant/index.ts` |
+| `new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),` | `supabase/functions/ai-logistics-assistant/index.ts` |
 | `const BLOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutes block` | `supabase/functions/check-rate-limit/index.ts` |
 | `timeout: 6000,` | `supabase/functions/geocode-address/index.ts` |
 | `timeout: 8000,` | `supabase/functions/geocode-address/index.ts` |
@@ -2333,7 +2332,9 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `notify_alert` | `supabase/functions/ingest-biosync/index.ts` |
 | `invoke(` | `supabase/functions/lalamove-api/index.ts` |
 | `invoke(` | `supabase/functions/nexus-webhook-receiver/index.ts` |
+| `notify_whatsapp` | `supabase/functions/normalize-freight-response/index.ts` |
 | `invoke(` | `supabase/functions/predict-delays/index.ts` |
+| `notify_whatsapp` | `supabase/functions/predict-delays/index.ts` |
 | `invoke(` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `invoke(` | `supabase/functions/send-password-reset/index.ts` |
 | `notify_status_change` | `supabase/functions/webhook-status/index.ts` |
@@ -2456,6 +2457,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | disparo deve escalar para WhatsApp mesmo com toggle desligado. | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
 | Decide se o próximo alerta para (user, carrier) deve escalar para WhatsApp | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
 | - Email exige formato mínimo `x@y.z`. | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
+| Bitrix returns only count, no items, for limit -1 | `supabase/functions/bitrix24-integration/index.ts` |
 | Contract Validation | `supabase/functions/carrier-webhook-receiver/index.ts` |
 | Rate limit configuration | `supabase/functions/check-rate-limit/index.ts` |
 | P15: smoke test — check-rate-limit | `supabase/functions/check-rate-limit/index_test.ts` |

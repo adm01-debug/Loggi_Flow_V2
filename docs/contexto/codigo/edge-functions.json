@@ -119,7 +119,7 @@
    "nome": "ai-logistics-assistant",
    "entrada": "supabase/functions/ai-logistics-assistant/index.ts",
    "arquivos": 1,
-   "linhas": 160,
+   "linhas": 222,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -162,7 +162,7 @@
    "nome": "bitrix24-integration",
    "entrada": "supabase/functions/bitrix24-integration/index.ts",
    "arquivos": 1,
-   "linhas": 263,
+   "linhas": 400,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1010,7 +1010,7 @@
    "nome": "nexus-auto-healing",
    "entrada": "supabase/functions/nexus-auto-healing/index.ts",
    "arquivos": 1,
-   "linhas": 102,
+   "linhas": 116,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1086,13 +1086,14 @@
    "nome": "normalize-freight-response",
    "entrada": "supabase/functions/normalize-freight-response/index.ts",
    "arquivos": 1,
-   "linhas": 211,
+   "linhas": 222,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
    ],
    "tabelas": [
     "cotacoes_multicanal",
+    "prediction_accuracy_settings",
     "transportadoras",
     "user_notification_preferences"
    ],
@@ -1167,7 +1168,7 @@
    "nome": "predict-delays",
    "entrada": "supabase/functions/predict-delays/index.ts",
    "arquivos": 1,
-   "linhas": 370,
+   "linhas": 385,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1178,6 +1179,7 @@
     "delay_predictions_history",
     "entregas",
     "ocorrencias",
+    "prediction_accuracy_settings",
     "user_notification_preferences"
    ],
    "rpcs": [],
@@ -1580,7 +1582,7 @@
    "nome": "webhook-status",
    "entrada": "supabase/functions/webhook-status/index.ts",
    "arquivos": 1,
-   "linhas": 214,
+   "linhas": 211,
    "verify_jwt": false,
    "metodos": [
     "OPTIONS"

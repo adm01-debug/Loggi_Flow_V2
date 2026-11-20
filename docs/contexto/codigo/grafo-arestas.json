@@ -623,7 +623,6 @@
   "src/components/dashboard/MissionDetail.tsx": [
    "src/components/ui/badge.tsx",
    "src/hooks/logistics/useUnifiedTracking.tsx",
-   "src/integrations/supabase/client.ts",
    "src/lib/utils.ts"
   ],
   "src/components/dashboard/PerformanceChart.tsx": [

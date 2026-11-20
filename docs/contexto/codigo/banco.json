@@ -10037,7 +10037,9 @@
    "usada_no_front": 2,
    "usada_em_edges": [
     "accuracy-meta-monitor",
-    "accuracy-weekly-digest"
+    "accuracy-weekly-digest",
+    "normalize-freight-response",
+    "predict-delays"
    ],
    "triggers": [
     "update_prediction_accuracy_settings_updated_at"
@@ -15764,9 +15766,7 @@
    "nao_usada": false
   }
  },
- "tabelas_usadas_no_codigo_sem_definicao": [
-  "integracoes_bitrix"
- ],
+ "tabelas_usadas_no_codigo_sem_definicao": [],
  "rpcs_usadas_no_codigo": [
   {
    "nome": "add_user_xp",
