@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `3a9fa6a9ce967372ba17afbe1b85e43a9cb5ef7a` (2026-11-19T22:14:35-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8028999777617cf747071665a59f9bc2d3bc31e7` (2026-11-20T08:07:17-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1305 |
 | arquivos_codigo | 877 |
-| linhas_codigo | 167420 |
+| linhas_codigo | 167415 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,14 +274,14 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8141 nós · 20573 arestas · 707 comunidades · grafo do commit `3a9fa6a9`
+- 8141 nós · 20573 arestas · 707 comunidades · grafo do commit `80289997`
 - comunidades maiores: lucide-react (205), sonner (172), Envios.tsx (161), App.tsx (155), db-observability/index.ts (146), react (139), date-fns (138), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (101), ref_node_path (98), cn (95), ui/index.ts (92)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
-- package-lock.json (46)
-- package.json (45)
+- package-lock.json (47)
+- package.json (46)
 - index.html (11)
 - src/hooks/gamification/useGamification.ts (10)
 - .github/workflows/contexto-ia.yml (8)
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `8028999` bump react-router 6 -> 7 e resolve 4 vulnerabilidades
 - 2026-11-19 `3a9fa6a` chore: atualiza inventario com nomes reais de componentes (#203)
 - 2026-11-19 `8f75c44` feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)
 - 2026-11-19 `ea8d1a4` chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-18 `55ec52f` fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)
 - 2026-11-18 `554aaad` chore(deps): bump peter-evans/create-pull-request from 8.1.2 to 8.1.3 (#189)
 - 2026-11-18 `f3db2b8` chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)
-- 2026-11-18 `bfd7215` chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

@@ -44,7 +44,7 @@
     "App"
    ],
    "export_default": "App",
-   "linhas": 216,
+   "linhas": 211,
    "dominio": null,
    "hooks_locais": [
     "useGlobalShortcuts",

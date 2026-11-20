@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "3a9fa6a9ce967372ba17afbe1b85e43a9cb5ef7a",
+  "commit": "8028999777617cf747071665a59f9bc2d3bc31e7",
   "branch": "main",
-  "data_commit": "2026-11-19T22:14:35-03:00",
+  "data_commit": "2026-11-20T08:07:17-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "8028999",
+    "data": "2026-11-20",
+    "assunto": "bump react-router 6 -> 7 e resolve 4 vulnerabilidades"
+   },
    {
     "sha": "3a9fa6a",
     "data": "2026-11-19",
@@ -126,14 +131,9 @@
     "sha": "214f0cd",
     "data": "2026-11-17",
     "assunto": "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)"
-   },
-   {
-    "sha": "5bfae77",
-    "data": "2026-11-17",
-    "assunto": "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)"
    }
   ],
-  "arquivos_mudados_7d": 125,
+  "arquivos_mudados_7d": 126,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -145,11 +145,11 @@
    },
    {
     "pasta": "package-lock.json",
-    "mudancas": 7
+    "mudancas": 8
    },
    {
     "pasta": "package.json",
-    "mudancas": 7
+    "mudancas": 8
    },
    {
     "pasta": ".github/workflows/types-sync.yml",
@@ -199,11 +199,11 @@
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 46
+    "mudancas": 47
    },
    {
     "arquivo": "package.json",
-    "mudancas": 45
+    "mudancas": 46
    },
    {
     "arquivo": "index.html",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 133
+    "commits": 134
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1305,
   "arquivos_codigo": 877,
-  "linhas_codigo": 167420,
+  "linhas_codigo": 167415,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -444,7 +444,7 @@
   },
   "src/App.tsx": {
    "arquivos": 1,
-   "linhas": 216
+   "linhas": 211
   },
   "src/components": {
    "arquivos": 297,
