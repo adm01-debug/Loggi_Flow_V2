@@ -5,7 +5,7 @@
   "linguagens": [
    "TypeScript (791)",
    "SQL (260)",
-   "Markdown (85)",
+   "Markdown (86)",
    "JavaScript (79)",
    "JSON (33)",
    "YAML (22)",
@@ -936,7 +936,7 @@
   },
   {
    "pasta": "docs/audit",
-   "arquivos_md": 2
+   "arquivos_md": 3
   },
   {
    "pasta": "docs/contexto",
@@ -1191,6 +1191,10 @@
     "arquivos": 1
    },
    {
+    "host": "loggi-flow-v2.vercel.app",
+    "arquivos": 1
+   },
+   {
     "host": "logiflow-nexus.lovable.app",
     "arquivos": 1
    },
@@ -1244,10 +1248,6 @@
    },
    {
     "host": "unittocity-apigateway.rte.com.br",
-    "arquivos": 1
-   },
-   {
-    "host": "uwbpzfcysppwikfpnzok.lovableproject.com",
     "arquivos": 1
    },
    {

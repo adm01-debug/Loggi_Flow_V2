@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8028999777` · branch `main` · 2026-11-20 11:07 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `99ca8662c0` · branch `main` · 2026-11-20 11:41 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -946,7 +946,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `em_execucao` | escreve | `src/hooks/predictions/useMitigationActions.ts` |
 | `status` | `em_transito` | compara, escreve | `src/components/coletas/PickupDetailsDialog.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/pages/Coletas.tsx`<br>… +5 |
 | `status` | `empty` | compara, escreve | `supabase/functions/accuracy-weekly-digest/index.ts` |
-| `status` | `entregue` | compara, escreve, filtra | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/components/dashboard/MissionDetail.tsx`<br>`src/hooks/analytics/useExecutiveMetrics.tsx`<br>`src/hooks/analytics/useKPIBenchmark.tsx`<br>… +15 |
+| `status` | `entregue` | compara, escreve, filtra | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/components/dashboard/MissionDetail.tsx`<br>`src/hooks/analytics/useExecutiveMetrics.tsx`<br>`src/hooks/analytics/useKPIBenchmark.tsx`<br>… +14 |
 | `status` | `error` | compara, escreve | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/freight/FreightAudit.tsx`<br>`src/hooks/security/useIntegrationValidation.tsx`<br>`src/pages/Configuracoes.tsx`<br>`supabase/functions/accuracy-meta-monitor/channelHealth.ts`<br>… +2 |
 | `status` | `exceeded` | compara | `src/hooks/logistics/useCostAlerts.tsx` |
 | `status` | `expirado` | compara | `src/hooks/logistics/useCotacoesMulticanal.tsx`<br>`src/pages/DashboardCotacoes.tsx`<br>`src/pages/cotacao-multicanal/CotacaoResultsTable.tsx` |
@@ -1040,8 +1040,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `state` | `suspended` | compara | `src/utils/celebrationSounds.ts` |
 | `upload_status` | `failed` | escreve | `src/components/shipping/DeliveryReceiptUpload.tsx` |
 | `upload_status` | `success` | escreve | `src/components/shipping/DeliveryReceiptUpload.tsx` |
+| `ocr_status` | `not_implemented` | escreve | `supabase/functions/ocr-receipt-processor/index.ts` |
 | `ocr_status` | `pending` | escreve | `src/components/shipping/DeliveryReceiptUpload.tsx` |
-| `ocr_status` | `processed` | escreve | `supabase/functions/ocr-receipt-processor/index.ts` |
 | `last_status` | `failed` | compara | `src/features/db-observability/components/CronJobsCard.tsx` |
 | `last_status` | `succeeded` | compara | `src/features/db-observability/components/CronJobsCard.tsx` |
 | `phase` | `entregue` | compara | `src/lib/rodonaves/eventCodes.ts` |
@@ -1739,7 +1739,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `timeout: 6000,` | `supabase/functions/geocode-address/index.ts` |
 | `timeout: 8000,` | `supabase/functions/geocode-address/index.ts` |
 | `{ timeout: 8000, allowedHosts: ["api.openweathermap.org"] },` | `supabase/functions/get-weather-data/index.ts` |
-| `await new Promise(resolve => setTimeout(resolve, 2000));` | `supabase/functions/ocr-receipt-processor/index.ts` |
 | `(1000 * 60 * 60 * 24),` | `supabase/functions/predict-delays/index.ts` |
 | `Date.now() - 6 * 60 * 60 * 1000,` | `supabase/functions/predict-delays/index.ts` |
 | `const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();` | `supabase/functions/predict-delays/index.ts` |
@@ -2332,9 +2331,11 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `notify_alert` | `supabase/functions/bitrix24-integration/index.ts` |
 | `notify` | `supabase/functions/ingest-biosync/index.ts` |
 | `notify_alert` | `supabase/functions/ingest-biosync/index.ts` |
+| `invoke(` | `supabase/functions/lalamove-api/index.ts` |
 | `invoke(` | `supabase/functions/nexus-webhook-receiver/index.ts` |
 | `invoke(` | `supabase/functions/predict-delays/index.ts` |
 | `invoke(` | `supabase/functions/predict-delays-scheduled/index.ts` |
+| `invoke(` | `supabase/functions/send-password-reset/index.ts` |
 | `notify_status_change` | `supabase/functions/webhook-status/index.ts` |
 | `notifying` | `supabase/functions/webhook-status/index.ts` |
 | `notify_ocorrencia_trigger` | `supabase/migrations/20251220122500_notifications_table.sql` |
@@ -2472,7 +2473,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | 400 (contract), 401 (invalid sig if secret set), or 429 (rate limit) — never 5xx | `supabase/functions/nexus-webhook-receiver/index_test.ts` |
 | Contract Validation — transportadora_id is optional (omitted for new/unsaved carriers) | `supabase/functions/normalize-freight-response/index.ts` |
 | Contract Validation | `supabase/functions/ocr-receipt-processor/index.ts` |
-| Consistency validation: set status only after processing | `supabase/functions/ocr-receipt-processor/index.ts` |
+| Update audit record apenas — não altera o status da entrega a partir | `supabase/functions/ocr-receipt-processor/index.ts` |
 | Limit to 10 requests per minute | `supabase/functions/predict-delays/index.ts` |
 | P15: smoke test — resend-email must never leak API key | `supabase/functions/resend-email/index_test.ts` |
 | Malha indisponível não deve impedir a cotação — retorna indeterminado. | `supabase/functions/rodonaves-api/index.ts` |

@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8028999777617cf747071665a59f9bc2d3bc31e7",
+  "commit": "99ca8662c017ace8bbd1c91b8962d4d327af96ad",
   "branch": "main",
-  "data_commit": "2026-11-20T08:07:17-03:00",
+  "data_commit": "2026-11-20T08:36:26-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "99ca866",
+    "data": "2026-11-20",
+    "assunto": "fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)"
+   },
+   {
+    "sha": "c2e148b",
+    "data": "2026-11-20",
+    "assunto": "docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)"
+   },
    {
     "sha": "8028999",
     "data": "2026-11-20",
@@ -121,19 +131,9 @@
     "sha": "e1f6935",
     "data": "2026-11-17",
     "assunto": "fix: corrige saldo, XP e nivel zerados em toda a gamificacao (#178)"
-   },
-   {
-    "sha": "ba16636",
-    "data": "2026-11-17",
-    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#177)"
-   },
-   {
-    "sha": "214f0cd",
-    "data": "2026-11-17",
-    "assunto": "infra: adiciona workflow manual para aplicar migration no banco oficial (#176)"
    }
   ],
-  "arquivos_mudados_7d": 126,
+  "arquivos_mudados_7d": 130,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 134
+    "commits": 136
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1305,
+  "arquivos_total": 1306,
   "arquivos_codigo": 877,
-  "linhas_codigo": 167415,
+  "linhas_codigo": 167443,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -331,7 +331,7 @@
   "testes": 130,
   "workflows": 18,
   "scripts": 62,
-  "docs_md": 85
+  "docs_md": 86
  },
  "por_pasta": {
   "eslint.config.js": {
@@ -492,7 +492,7 @@
   },
   "supabase/functions": {
    "arquivos": 110,
-   "linhas": 12275
+   "linhas": 12303
   },
   "tailwind.config.ts": {
    "arquivos": 1,

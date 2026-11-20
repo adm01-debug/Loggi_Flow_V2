@@ -698,13 +698,10 @@
    "nome": "lalamove-api",
    "entrada": "supabase/functions/lalamove-api/index.ts",
    "arquivos": 1,
-   "linhas": 170,
+   "linhas": 175,
    "verify_jwt": true,
    "metodos": [
-    "GET",
-    "OPTIONS",
-    "POST",
-    "PUT"
+    "OPTIONS"
    ],
    "tabelas": [],
    "rpcs": [],
@@ -1135,14 +1132,13 @@
    "nome": "ocr-receipt-processor",
    "entrada": "supabase/functions/ocr-receipt-processor/index.ts",
    "arquivos": 1,
-   "linhas": 99,
+   "linhas": 88,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
    ],
    "tabelas": [
-    "delivery_receipt_audit",
-    "entregas"
+    "delivery_receipt_audit"
    ],
    "rpcs": [],
    "env": [
@@ -1288,7 +1284,8 @@
    "chamada_pelo_front": [],
    "chamada_por_edges": [
     "accuracy-meta-monitor",
-    "accuracy-weekly-digest"
+    "accuracy-weekly-digest",
+    "send-password-reset"
    ],
    "chamada_por_sql_ou_cron": false,
    "orfa": false,
@@ -1472,7 +1469,7 @@
    "nome": "send-password-reset",
    "entrada": "supabase/functions/send-password-reset/index.ts",
    "arquivos": 1,
-   "linhas": 180,
+   "linhas": 214,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1488,9 +1485,11 @@
    ],
    "env_via_shared": [],
    "buckets": [],
-   "chama_edges": [],
+   "chama_edges": [
+    "resend-email"
+   ],
    "hosts_externos": [
-    "uwbpzfcysppwikfpnzok.lovableproject.com"
+    "loggi-flow-v2.vercel.app"
    ],
    "usa_shared": [
     "logger.ts"

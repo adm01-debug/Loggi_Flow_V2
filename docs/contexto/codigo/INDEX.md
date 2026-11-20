@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `8028999777617cf747071665a59f9bc2d3bc31e7` (2026-11-20T08:07:17-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `99ca8662c017ace8bbd1c91b8962d4d327af96ad` (2026-11-20T08:36:26-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (791), SQL (260), Markdown (85), JavaScript (79), JSON (33), YAML (22), Shell (9), Python (8)
+- linguagens: TypeScript (791), SQL (260), Markdown (86), JavaScript (79), JSON (33), YAML (22), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,9 +34,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1305 |
+| arquivos_total | 1306 |
 | arquivos_codigo | 877 |
-| linhas_codigo | 167415 |
+| linhas_codigo | 167443 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -51,7 +51,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | testes | 130 |
 | workflows | 18 |
 | scripts | 62 |
-| docs_md | 85 |
+| docs_md | 86 |
 
 ## Onde ficam as coisas
 - telas: src/pages (61)
@@ -200,7 +200,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `nexus-auto-healing` — tabelas: coletas, entregas, system_heartbeat, system_integrity_logs; chamada por 1 arquivo(s) do front
 - `nexus-webhook-receiver` (verify_jwt=false) — tabelas: cotacoes_multicanal, transportadoras; chamada por 1 arquivo(s) do front
 - `normalize-freight-response` — tabelas: cotacoes_multicanal, transportadoras, user_notification_preferences; chamada por 2 arquivo(s) do front
-- `ocr-receipt-processor` — tabelas: delivery_receipt_audit, entregas; chamada por 1 arquivo(s) do front
+- `ocr-receipt-processor` — tabelas: delivery_receipt_audit; chamada por 1 arquivo(s) do front
 - `predict-delays` — tabelas: ai_delay_predictions, coletas, delay_predictions_history, entregas, ocorrencias, user_notification_preferences; chamada por 1 arquivo(s) do front, por SQL/cron
 - `predict-delays-scheduled` (verify_jwt=false) — tabelas: delay_predictions_history, notifications, user_roles; chamada por 0 arquivo(s) do front, por SQL/cron
 - `resend-email` (verify_jwt=false) — tabelas: -; chamada por 0 arquivo(s) do front
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8141 nós · 20573 arestas · 707 comunidades · grafo do commit `80289997`
-- comunidades maiores: lucide-react (205), sonner (172), Envios.tsx (161), App.tsx (155), db-observability/index.ts (146), react (139), date-fns (138), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (101), ref_node_path (98), cn (95), ui/index.ts (92)
+- 8160 nós · 20744 arestas · 702 comunidades · grafo do commit `99ca8662`
+- comunidades maiores: lucide-react (181), client.ts (180), db-observability/index.ts (166), react (146), ref_node_path (131), Button (123), GeoBlockingPanel.tsx (118), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (90), ui/index.ts (86), App.tsx (86), celebrationSounds.ts (83)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -397,10 +397,12 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `docs/SRE_HANDBOOK.md` — 🚒 LOGIFLOW SRE & ON-CALL HANDBOOK (24 linhas)
 - `docs/auditoria-recuperacao-branches.md` (336 linhas)
 - `docs/prod-readiness.md` — Prod Readiness — Loggi_Flow_V2 (73 linhas)
-- subpastas de docs/: docs/adr (20), docs/agentes (8), docs/audit (2), docs/contexto (2), docs/data (1)
+- subpastas de docs/: docs/adr (20), docs/agentes (8), docs/audit (3), docs/contexto (2), docs/data (1)
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `99ca866` fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)
+- 2026-11-20 `c2e148b` docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)
 - 2026-11-20 `8028999` bump react-router 6 -> 7 e resolve 4 vulnerabilidades
 - 2026-11-19 `3a9fa6a` chore: atualiza inventario com nomes reais de componentes (#203)
 - 2026-11-19 `8f75c44` feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)
@@ -414,8 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-18 `7b4672c` chore: workflow temporario de diagnostico de schema prod (diag) (#194)
 - 2026-11-18 `1136900` chore: workflow temporário de destravamento do seed prod (service-role key) (#193)
 - 2026-11-18 `55ec52f` fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)
-- 2026-11-18 `554aaad` chore(deps): bump peter-evans/create-pull-request from 8.1.2 to 8.1.3 (#189)
-- 2026-11-18 `f3db2b8` chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
