@@ -153,9 +153,13 @@
     "DORAMetrics"
    ],
    "export_default": null,
-   "linhas": 144,
+   "linhas": 323,
    "dominio": "components/admin",
-   "hooks_locais": [],
+   "hooks_locais": [
+    "useGlobalHealthScore",
+    "useRemediationMttr",
+    "useRemediationSuggestions"
+   ],
    "tabelas": [],
    "edges": [],
    "usado_por": 1,
@@ -1177,10 +1181,11 @@
     "LiveStatusBar"
    ],
    "export_default": null,
-   "linhas": 197,
+   "linhas": 209,
    "dominio": "components/dashboard",
    "hooks_locais": [
     "useDashboardMetrics",
+    "useNexusHealth",
     "useOnlineStatus"
    ],
    "tabelas": [],
@@ -1194,7 +1199,7 @@
     "LogisticsMapWidget"
    ],
    "export_default": null,
-   "linhas": 1089,
+   "linhas": 1137,
    "dominio": "components/dashboard",
    "hooks_locais": [
     "useBiometricAnomalies",
@@ -1770,9 +1775,11 @@
     "SystemPulse"
    ],
    "export_default": null,
-   "linhas": 65,
+   "linhas": 123,
    "dominio": "components/layout",
-   "hooks_locais": [],
+   "hooks_locais": [
+    "useNexusHealth"
+   ],
    "tabelas": [],
    "edges": [],
    "usado_por": 1,
@@ -4905,9 +4912,11 @@
     "PostMortemDashboard"
    ],
    "export_default": null,
-   "linhas": 169,
+   "linhas": 178,
    "dominio": "features/incidents",
-   "hooks_locais": [],
+   "hooks_locais": [
+    "useRemediationActions"
+   ],
    "tabelas": [],
    "edges": [],
    "usado_por": 1,

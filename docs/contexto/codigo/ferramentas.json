@@ -3,7 +3,7 @@
  "format_version": 2,
  "stack": {
   "linguagens": [
-   "TypeScript (791)",
+   "TypeScript (792)",
    "SQL (261)",
    "Markdown (251)",
    "JavaScript (79)",
@@ -1280,6 +1280,7 @@
    "box-realtime",
    "db-regression-alerts-${user.id}",
    "health-ping",
+   "nexus-latency-probe",
    "nexus-tactical-realtime-alerts",
    "presence-health",
    "raw_responses",

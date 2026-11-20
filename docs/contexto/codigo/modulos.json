@@ -153,12 +153,16 @@
    "modulo": "components/admin",
    "arquivos": 4,
    "testes": 0,
-   "linhas": 962,
+   "linhas": 1141,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
    "componentes": 4,
-   "hooks_locais": [],
+   "hooks_locais": [
+    "useGlobalHealthScore",
+    "useRemediationMttr",
+    "useRemediationSuggestions"
+   ],
    "hooks_definidos": [],
    "edges": [],
    "tabelas": [
@@ -187,6 +191,7 @@
    ],
    "depende_de_modulos": [
     "components/ui",
+    "features/db-observability",
     "integrations/supabase"
    ],
    "pacotes_externos": [
@@ -741,7 +746,7 @@
    "modulo": "components/dashboard",
    "arquivos": 17,
    "testes": 1,
-   "linhas": 5221,
+   "linhas": 5281,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -765,6 +770,7 @@
     "useMapIntelligence",
     "useMapWeatherSync",
     "useMediaQuery",
+    "useNexusHealth",
     "useOfflineSync",
     "useOnlineStatus",
     "usePrefersDarkMode",
@@ -809,6 +815,7 @@
    ],
    "buckets": [],
    "canais_realtime": [
+    "nexus-latency-probe",
     "realtime:${config.table}:${multiTopicId}",
     "risk-zones-changes",
     "tactical-logs"
@@ -842,6 +849,7 @@
     "hooks/common",
     "hooks/gamification",
     "hooks/logistics",
+    "hooks/system",
     "integrations/supabase",
     "lib"
    ],
@@ -1261,7 +1269,7 @@
    "modulo": "components/layout",
    "arquivos": 7,
    "testes": 0,
-   "linhas": 1350,
+   "linhas": 1408,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -1273,6 +1281,7 @@
     "useGamification",
     "useGlobalSearch",
     "useNavigationHistory",
+    "useNexusHealth",
     "useNotificationBadge",
     "useNotifications",
     "useOfflineSync",
@@ -1320,6 +1329,7 @@
    "buckets": [],
    "canais_realtime": [
     "health-ping",
+    "nexus-latency-probe",
     "nexus-tactical-realtime-alerts",
     "system-health-check"
    ],
@@ -1363,6 +1373,7 @@
     "hooks/common",
     "hooks/data",
     "hooks/gamification",
+    "hooks/system",
     "hooks/ui",
     "integrations/supabase",
     "lib",
@@ -2677,6 +2688,8 @@
     ]
    },
    "importado_por_outros_modulos": [
+    "components/admin",
+    "features/incidents",
     "pages/admin"
    ],
    "depende_de_modulos": [
@@ -2696,19 +2709,28 @@
    "modulo": "features/incidents",
    "arquivos": 2,
    "testes": 0,
-   "linhas": 190,
+   "linhas": 199,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
    "componentes": 1,
-   "hooks_locais": [],
+   "hooks_locais": [
+    "useApplyRemediation",
+    "useRemediationActions",
+    "useUpdateRemediationStatus"
+   ],
    "hooks_definidos": [],
    "edges": [],
-   "tabelas": [],
+   "tabelas": [
+    "remediation_actions"
+   ],
    "rpcs": [],
    "buckets": [],
    "canais_realtime": [],
-   "env": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
    "flags": [],
    "papeis": [],
    "diretos": {
@@ -2721,11 +2743,14 @@
     "services/resilience"
    ],
    "depende_de_modulos": [
-    "components/ui"
+    "components/ui",
+    "features/db-observability"
    ],
    "pacotes_externos": [
+    "date-fns",
     "framer-motion",
-    "lucide-react"
+    "lucide-react",
+    "sonner"
    ]
   },
   {
@@ -4234,6 +4259,48 @@
    ]
   },
   {
+   "modulo": "hooks/system",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 102,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useNexusHealth"
+   ],
+   "hooks_definidos": [
+    "useNexusHealth"
+   ],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [
+    "nexus-latency-probe"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/dashboard",
+    "components/layout"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase"
+   ],
+   "pacotes_externos": []
+  },
+  {
    "modulo": "hooks/ui",
    "arquivos": 6,
    "testes": 0,
@@ -4441,6 +4508,7 @@
     "hooks/predictions",
     "hooks/rodonaves",
     "hooks/security",
+    "hooks/system",
     "hooks/ui",
     "integrations/lovable",
     "pages",
@@ -4778,6 +4846,7 @@
     "useAchievementNotifications",
     "useAnalytics",
     "useApiStatus",
+    "useApplyRemediation",
     "useAudioFeedback",
     "useAuditLogs",
     "useAuth",
@@ -4821,6 +4890,7 @@
     "useGamification",
     "useGatewayHealth",
     "useGeocoding",
+    "useGlobalHealthScore",
     "useGlobalSearch",
     "useGlobalShortcuts",
     "useImageUpload",
@@ -4846,6 +4916,7 @@
     "useMitigationActions",
     "useNavigationHistory",
     "useNewDeviceDetection",
+    "useNexusHealth",
     "useNotificationBadge",
     "useNotificationPreferences",
     "useNotifications",
@@ -4868,6 +4939,9 @@
     "useRealtime",
     "useRecentAlerts",
     "useRecordHistory",
+    "useRemediationActions",
+    "useRemediationMttr",
+    "useRemediationSuggestions",
     "useRewardPurchases",
     "useRodonavesTracking",
     "useRodonavesWebhook",
@@ -4896,6 +4970,7 @@
     "useTransportadoraPerformance",
     "useTransportadoraRotas",
     "useUnifiedTracking",
+    "useUpdateRemediationStatus",
     "useUserPreferences",
     "useVirtualTable",
     "useWebAuthn",
@@ -4986,6 +5061,7 @@
     "rastreamento_alertas",
     "rastreamento_historico",
     "rate_limit_logs",
+    "remediation_actions",
     "reward_items",
     "reward_purchases",
     "risk_zones",
@@ -5035,6 +5111,7 @@
    "canais_realtime": [
     "box-realtime",
     "health-ping",
+    "nexus-latency-probe",
     "nexus-tactical-realtime-alerts",
     "presence-health",
     "raw_responses",
@@ -5217,6 +5294,7 @@
     "useMaintenanceWindows",
     "useMeasureIndexImpact",
     "useNavigationHistory",
+    "useNexusHealth",
     "useNotificationBadge",
     "useNotifications",
     "useOfflineSync",
@@ -5305,6 +5383,7 @@
    "canais_realtime": [
     "db-regression-alerts-${user.id}",
     "health-ping",
+    "nexus-latency-probe",
     "nexus-tactical-realtime-alerts",
     "system-health-check"
    ],

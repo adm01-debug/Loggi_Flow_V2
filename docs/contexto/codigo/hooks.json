@@ -1,7 +1,7 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 177,
+ "total": 178,
  "hooks": [
   {
    "arquivo": "src/components/accessibility/index.ts",
@@ -558,8 +558,9 @@
     "useQuery"
    ],
    "canais_realtime": [],
-   "usado_por": 2,
+   "usado_por": 3,
    "usado_por_arquivos": [
+    "src/components/admin/DORAMetrics.tsx",
     "src/features/db-observability/components/GlobalHealthScoreCard.tsx",
     "src/features/db-observability/index.ts"
    ],
@@ -837,11 +838,12 @@
     "useQueryClient"
    ],
    "canais_realtime": [],
-   "usado_por": 3,
+   "usado_por": 4,
    "usado_por_arquivos": [
     "src/features/db-observability/components/RemediationHistoryCard.tsx",
     "src/features/db-observability/components/RemediationSuggestionsCard.tsx",
-    "src/features/db-observability/index.ts"
+    "src/features/db-observability/index.ts",
+    "src/features/incidents/components/PostMortemDashboard.tsx"
    ],
    "coberto_por_testes": 0
   },
@@ -859,8 +861,9 @@
     "useQuery"
    ],
    "canais_realtime": [],
-   "usado_por": 2,
+   "usado_por": 3,
    "usado_por_arquivos": [
+    "src/components/admin/DORAMetrics.tsx",
     "src/features/db-observability/components/MttrMetricsCard.tsx",
     "src/features/db-observability/index.ts"
    ],
@@ -880,8 +883,9 @@
     "useQuery"
    ],
    "canais_realtime": [],
-   "usado_por": 2,
+   "usado_por": 3,
    "usado_por_arquivos": [
+    "src/components/admin/DORAMetrics.tsx",
     "src/features/db-observability/components/RemediationSuggestionsCard.tsx",
     "src/features/db-observability/index.ts"
    ],
@@ -4339,6 +4343,31 @@
    "canais_realtime": [],
    "usado_por": 0,
    "usado_por_arquivos": [],
+   "coberto_por_testes": 0
+  },
+  {
+   "arquivo": "src/hooks/system/useNexusHealth.ts",
+   "hooks_exportados": [
+    "useNexusHealth"
+   ],
+   "linhas": 102,
+   "dominio": "hooks/system",
+   "tabelas": [],
+   "rpcs": [],
+   "edges": [],
+   "hooks_internos": [
+    "useCallback",
+    "useEffect",
+    "useState"
+   ],
+   "canais_realtime": [
+    "nexus-latency-probe"
+   ],
+   "usado_por": 2,
+   "usado_por_arquivos": [
+    "src/components/dashboard/LiveStatusBar.tsx",
+    "src/components/layout/SystemPulse.tsx"
+   ],
    "coberto_por_testes": 0
   },
   {

@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `84f200d7a4` · branch `main` · 2026-11-20 19:36 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `d952137b3b` · branch `main` · 2026-11-20 20:08 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -215,19 +215,19 @@
 |---|---|---|
 | status | valor `elite` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/admin/DORAMetrics.tsx` |
 | status | valor `JOINING` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/common/RealtimeBadge.tsx`<br>`compara:src/components/common/RealtimeStatus.tsx` |
-| status | valor `SUBSCRIBED` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/common/RealtimeBadge.tsx`<br>`compara:src/components/common/RealtimeStatus.tsx`<br>`compara:src/hooks/data/useRealtime.tsx`<br>`compara:src/utils/systemTester.ts` |
+| status | valor `SUBSCRIBED` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/common/RealtimeBadge.tsx`<br>`compara:src/components/common/RealtimeStatus.tsx`<br>`compara:src/hooks/data/useRealtime.tsx`<br>`compara:src/hooks/system/useNexusHealth.ts` |
 | status | valor `current` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/common/Timeline.tsx` |
 | status | valor `neutral` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/KPICard.tsx` |
+| status | valor `healthy` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/LiveStatusBar.tsx`<br>`compara:src/utils/systemTester.ts`<br>`compara:supabase/functions/health/index.ts`<br>`escreve:src/hooks/system/useNexusHealth.ts` |
+| status | valor `degraded` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/LiveStatusBar.tsx`<br>`compara:src/components/dashboard/SystemHealthWidget.tsx` |
+| status | valor `undefined` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/LiveStatusBar.tsx` |
 | status | valor `Iniciado` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
 | status | valor `Processamento` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
 | status | valor `Transito` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
 | status | valor `Finalizado` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
 | status | valor `operational` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/SystemHealthWidget.tsx`<br>`escreve:supabase/functions/nexus-auto-healing/index.ts` |
-| status | valor `degraded` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/SystemHealthWidget.tsx` |
 | status | valor `down` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/SystemHealthWidget.tsx` |
-| status | valor `online` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/layout/SystemPulse.tsx`<br>`compara:src/components/ui/badge.tsx`<br>`escreve:src/components/layout/SystemPulse.tsx`<br>`escreve:src/components/ui/badge.tsx` |
-| status | valor `secure` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/layout/SystemPulse.tsx`<br>`escreve:src/components/layout/SystemPulse.tsx` |
-| status | valor `optimized` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/layout/SystemPulse.tsx`<br>`escreve:src/components/layout/SystemPulse.tsx` |
+| status | valor `online` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/ui/badge.tsx`<br>`escreve:src/components/layout/SystemPulse.tsx`<br>`escreve:src/components/ui/badge.tsx` |
 | status | valor `released` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/melhorenvio/MEEtiquetasPanel.tsx` |
 | status | valor `posted` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/melhorenvio/MEEtiquetasPanel.tsx` |
 | status | valor `delivered` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/melhorenvio/MEEtiquetasPanel.tsx` |
@@ -238,7 +238,6 @@
 | status | valor `verified` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/security/TwoFactorSetup.tsx`<br>`compara:src/hooks/auth/useMFA.ts`<br>`compara:src/pages/Auth.tsx` |
 | status | valor `none` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/ui/avatar.tsx`<br>`escreve:src/components/ui/avatar.tsx` |
 | status | valor `measured` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/features/db-observability/hooks/useIndexProposals.ts` |
-| status | valor `identified` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/features/incidents/components/PostMortemDashboard.tsx` |
 | status | valor `investigating` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/features/incidents/types/index.ts` |
 | status | valor `falhou` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/hooks/analytics/useDashboardMetrics.tsx`<br>`compara:src/pages/DashboardCotacoes.tsx` |
 | status | valor `Status` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/hooks/common/useExport.tsx`<br>`escreve:src/hooks/security/useAuditLogs.tsx`<br>`escreve:src/hooks/security/useEntityHistory.tsx` |
@@ -256,7 +255,6 @@
 | status | valor `SUCCESS` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/pages/IntegracaoBitrix.tsx` |
 | status | valor `aprovado` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/LogisticaReversa.tsx` |
 | status | valor `recebido` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/pages/LogisticaReversa.tsx`<br>`escreve:src/pages/LogisticaReversa.tsx` |
-| status | valor `healthy` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/utils/systemTester.ts`<br>`compara:supabase/functions/health/index.ts`<br>`escreve:supabase/functions/health/index.ts` |
 | status | valor `PASS` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/utils/systemTester.ts` |
 | status | valor `sent` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:supabase/functions/accuracy-weekly-digest/index.ts`<br>`escreve:supabase/functions/accuracy-weekly-digest/index.ts` |
 | status | valor `empty` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:supabase/functions/accuracy-weekly-digest/index.ts`<br>`escreve:supabase/functions/accuracy-weekly-digest/index.ts` |

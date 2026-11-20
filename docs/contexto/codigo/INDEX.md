@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `84f200d7a49066634351cbd325862744e799456a` (2026-11-20T16:36:05-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `d952137b3b05ebd525eaf47ffd74dcf19eae62fd` (2026-11-20T17:08:17-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (791), SQL (261), Markdown (251), JavaScript (79), JSON (33), YAML (21), Shell (9), Python (8)
+- linguagens: TypeScript (792), SQL (261), Markdown (251), JavaScript (79), JSON (33), YAML (21), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,16 +34,16 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1471 |
-| arquivos_codigo | 877 |
-| linhas_codigo | 168551 |
+| arquivos_total | 1472 |
+| arquivos_codigo | 878 |
+| linhas_codigo | 168959 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
 | itens_menu | 77 |
-| modulos | 74 |
+| modulos | 75 |
 | componentes | 380 |
-| hooks | 177 |
+| hooks | 178 |
 | edge_functions | 43 |
 | tabelas | 142 |
 | migrations | 248 |
@@ -56,7 +56,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Onde ficam as coisas
 - telas: src/pages (61)
 - componentes: src/components (256), src/pages (77), src/features (41)
-- hooks: src/hooks (121), src/features (41), src/components (14)
+- hooks: src/hooks (122), src/features (41), src/components (14)
 - servicos_logica: src/lib (31), src/utils (6), src/services (5)
 - testes: co-localizado (*.test) (74), outro (45), tests/ (11)
 - edge_functions: supabase/functions
@@ -70,9 +70,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | módulo | itens de menu | telas/rotas | arquivos | hooks locais | edges | tabelas |
 |---|---|---|---|---|---|---|
 | components/common | 0 | 0 | 45 | 16 | 2 | 11 |
-| components/dashboard | 0 | 0 | 17 | 28 | 2 | 20 |
+| components/dashboard | 0 | 0 | 17 | 29 | 2 | 20 |
 | components/freight | 0 | 0 | 18 | 97 | 18 | 53 |
-| components/layout | 0 | 0 | 7 | 21 | 3 | 17 |
+| components/layout | 0 | 0 | 7 | 22 | 3 | 17 |
 | components/map | 0 | 0 | 6 | 7 | 0 | 2 |
 | components/melhorenvio | 0 | 0 | 18 | 6 | 1 | 3 |
 | components/notifications | 0 | 0 | 5 | 6 | 0 | 6 |
@@ -95,8 +95,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | lib | 0 | 0 | 16 | 0 | 0 | 0 |
 | lib/predictions | 0 | 0 | 6 | 0 | 0 | 0 |
 | lib/rodonaves | 0 | 0 | 8 | 0 | 0 | 0 |
-| pages | 75 | 59 | 59 | 127 | 29 | 80 |
-| pages/admin | 1 | 2 | 2 | 67 | 3 | 20 |
+| pages | 75 | 59 | 59 | 134 | 29 | 81 |
+| pages/admin | 1 | 2 | 2 | 68 | 3 | 20 |
 | pages/auth | 0 | 0 | 5 | 2 | 3 | 1 |
 | utils | 0 | 0 | 6 | 0 | 1 | 3 |
 
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8513 nós · 20935 arestas · 868 comunidades · grafo do commit `84f200d7`
-- comunidades maiores: client.ts (216), MainLayout.tsx (181), lucide-react (173), db-observability/index.ts (162), react (156), Input (133), input.tsx (108), Coletas.tsx (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ref_node_path (103), cn (88), ui/index.ts (86)
+- 8533 nós · 20981 arestas · 862 comunidades · grafo do commit `d952137b`
+- comunidades maiores: cn (219), react (207), lucide-react (180), input.tsx (177), db-observability/index.ts (164), @tanstack/react-query (138), FretesInternos.tsx (127), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), utils.ts (99), date-fns (92), client.ts (90), gerar.mjs (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `d952137` feat: substitui metricas simuladas por dados reais nos widgets 3.1-3.5 (#229)
 - 2026-11-20 `84f200d` fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)
 - 2026-11-20 `fd6431b` docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)
 - 2026-11-20 `e4392b7` fix: remove simulacao de cotacao e torna retentativa real (#226)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `5460176` fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)
 - 2026-11-20 `eaecf14` chore(db): sincronizar artefatos com o banco [auto] (#216)
 - 2026-11-20 `9654eed` docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)
-- 2026-11-20 `817700d` fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

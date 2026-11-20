@@ -1,8 +1,8 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "nos": 747,
- "arestas": 3084,
+ "nos": 748,
+ "arestas": 3090,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -10,7 +10,7 @@
   },
   {
    "arquivo": "src/integrations/supabase/client.ts",
-   "importado_por": 205
+   "importado_por": 206
   },
   {
    "arquivo": "src/components/ui/badge.tsx",
@@ -244,7 +244,7 @@
   {
    "modulo": "integrations/supabase",
    "depende_de": 1,
-   "importado_por": 36
+   "importado_por": 37
   },
   {
    "modulo": "lib",
@@ -252,14 +252,14 @@
    "importado_por": 36
   },
   {
+   "modulo": "components/layout",
+   "depende_de": 22,
+   "importado_por": 2
+  },
+  {
    "modulo": "hooks/auth",
    "depende_de": 3,
    "importado_por": 21
-  },
-  {
-   "modulo": "components/layout",
-   "depende_de": 21,
-   "importado_por": 2
   },
   {
    "modulo": "hooks/logistics",
@@ -302,14 +302,14 @@
    "importado_por": 7
   },
   {
+   "modulo": "components/dashboard",
+   "depende_de": 9,
+   "importado_por": 1
+  },
+  {
    "modulo": "hooks/data",
    "depende_de": 4,
    "importado_por": 6
-  },
-  {
-   "modulo": "components/dashboard",
-   "depende_de": 8,
-   "importado_por": 1
   },
   {
    "modulo": "components/audit",

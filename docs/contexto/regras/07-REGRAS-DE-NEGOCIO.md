@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `84f200d7a4` · branch `main` · 2026-11-20 19:36 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `d952137b3b` · branch `main` · 2026-11-20 20:08 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -904,7 +904,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `JOINING` | compara | `src/components/common/RealtimeBadge.tsx`<br>`src/components/common/RealtimeStatus.tsx` |
 | `status` | `PASS` | compara | `src/utils/systemTester.ts` |
 | `status` | `Processamento` | escreve | `src/components/dashboard/MissionDetail.tsx` |
-| `status` | `SUBSCRIBED` | compara | `src/components/common/RealtimeBadge.tsx`<br>`src/components/common/RealtimeStatus.tsx`<br>`src/hooks/data/useRealtime.tsx`<br>`src/utils/systemTester.ts` |
+| `status` | `SUBSCRIBED` | compara | `src/components/common/RealtimeBadge.tsx`<br>`src/components/common/RealtimeStatus.tsx`<br>`src/hooks/data/useRealtime.tsx`<br>`src/hooks/system/useNexusHealth.ts`<br>`src/utils/systemTester.ts` |
 | `status` | `SUCCESS` | compara | `src/pages/IntegracaoBitrix.tsx` |
 | `status` | `Status` | escreve | `src/hooks/common/useExport.tsx`<br>`src/hooks/security/useAuditLogs.tsx`<br>`src/hooks/security/useEntityHistory.tsx` |
 | `status` | `TIMED_OUT` | compara | `src/hooks/data/useRealtime.tsx` |
@@ -934,7 +934,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `critical` | compara | `src/hooks/logistics/useCostAlerts.tsx` |
 | `status` | `critical_failure` | escreve | `supabase/functions/health/index.ts` |
 | `status` | `current` | compara | `src/components/common/Timeline.tsx` |
-| `status` | `degraded` | compara | `src/components/dashboard/SystemHealthWidget.tsx` |
+| `status` | `degraded` | compara | `src/components/dashboard/LiveStatusBar.tsx`<br>`src/components/dashboard/SystemHealthWidget.tsx` |
 | `status` | `deleted_at_set` | escreve | `src/hooks/data/useSoftDelete.ts` |
 | `status` | `delivered` | compara | `src/components/melhorenvio/MEEtiquetasPanel.tsx` |
 | `status` | `despachado` | compara, escreve, filtra | `src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/hooks/logistics/useSLAAlerts.tsx`<br>`src/pages/Despachos.tsx`<br>`src/pages/Envios.tsx`<br>`src/pages/KanbanEntregas.tsx`<br>… +4 |
@@ -952,8 +952,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `falhou` | compara | `src/hooks/analytics/useDashboardMetrics.tsx`<br>`src/pages/DashboardCotacoes.tsx` |
 | `status` | `finalizada` | compara, escreve | `src/components/common/ActivityTimeline.tsx`<br>`src/hooks/analytics/useKPIBenchmark.tsx`<br>`src/pages/CalendarioLogistico.tsx`<br>`src/pages/Coletas.tsx`<br>`src/pages/Relatorios.tsx`<br>… +2 |
 | `status` | `finalizado` | compara | `src/hooks/analytics/useExecutiveMetrics.tsx`<br>`src/hooks/analytics/useKPIBenchmark.tsx`<br>`src/pages/DashboardExecutivo.tsx`<br>`src/pages/Envios.tsx`<br>`src/pages/RelatorioPDF.tsx` |
-| `status` | `healthy` | compara, escreve | `src/utils/systemTester.ts`<br>`supabase/functions/health/index.ts` |
-| `status` | `identified` | escreve | `src/features/incidents/components/PostMortemDashboard.tsx` |
+| `status` | `healthy` | compara, escreve | `src/components/dashboard/LiveStatusBar.tsx`<br>`src/hooks/system/useNexusHealth.ts`<br>`src/utils/systemTester.ts`<br>`supabase/functions/health/index.ts` |
 | `status` | `ignorado` | compara, escreve | `src/pages/ConciliacaoFinanceira.tsx`<br>`src/pages/conciliacao/ConciliacaoItensTable.tsx` |
 | `status` | `ignored` | compara, escreve | `src/features/db-observability/components/RemediationHistoryCard.tsx`<br>`src/features/db-observability/hooks/useRemediationActions.ts` |
 | `status` | `importing` | compara | `src/hooks/common/useImportData.ts` |
@@ -970,10 +969,10 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `none` | compara, escreve | `src/components/ui/avatar.tsx` |
 | `status` | `not_configured` | escreve | `src/hooks/security/useIntegrationValidation.tsx` |
 | `status` | `ocorrencia` | compara, filtra | `src/components/common/ActivityTimeline.tsx`<br>`src/components/dashboard/LogisticsMapWidget.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/analytics/useDashboardMetrics.tsx`<br>`src/hooks/logistics/useDeliveryRoutes.tsx`<br>… +4 |
+| `status` | `offline` | compara | `src/components/layout/SystemPulse.tsx` |
 | `status` | `ok` | compara, escreve | `src/components/rodonaves/RTEGatewaySLOPanel.tsx`<br>`src/components/rodonaves/RTESLOHistoryPanel.tsx`<br>`src/hooks/logistics/useCostAlerts.tsx`<br>`src/hooks/rodonaves/useSLOSnapshots.ts`<br>`src/lib/rodonaves/gatewaySLO.ts`<br>… +3 |
 | `status` | `online` | compara, escreve | `src/components/layout/SystemPulse.tsx`<br>`src/components/ui/badge.tsx` |
 | `status` | `operational` | compara, escreve | `src/components/dashboard/SystemHealthWidget.tsx`<br>`supabase/functions/nexus-auto-healing/index.ts` |
-| `status` | `optimized` | compara, escreve | `src/components/layout/SystemPulse.tsx` |
 | `status` | `parsing` | compara | `src/hooks/common/useImportData.ts` |
 | `status` | `pendente` | compara, escreve, filtra | `src/hooks/logistics/useConciliacao.tsx`<br>`src/hooks/logistics/useCotacoesMulticanal.tsx`<br>`src/hooks/logistics/useLogisticaReversaReal.tsx`<br>`src/lib/conciliacaoImport.ts`<br>`src/pages/CalendarioLogistico.tsx`<br>… +8 |
 | `status` | `pending` | compara, escreve | `src/components/common/Timeline.tsx`<br>`src/features/db-observability/components/RemediationHistoryCard.tsx`<br>`src/features/db-observability/hooks/useRemediationActions.ts`<br>`src/hooks/logistics/useAccuracyMetaCycle.ts`<br>`src/pages/AprovacaoResetSenha.tsx`<br>… +3 |
@@ -987,10 +986,9 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `recebido` | compara, escreve | `src/pages/LogisticaReversa.tsx` |
 | `status` | `rejected` | compara, escreve | `src/pages/AprovacaoResetSenha.tsx`<br>`src/pages/aprovacao-reset/ResetRequestsTable.tsx`<br>`supabase/functions/log-security-event/index.ts` |
 | `status` | `released` | compara | `src/components/melhorenvio/MEEtiquetasPanel.tsx` |
-| `status` | `resolved` | compara, escreve | `src/features/db-observability/components/RemediationHistoryCard.tsx`<br>`src/features/db-observability/hooks/useRemediationActions.ts`<br>`src/features/incidents/components/PostMortemDashboard.tsx` |
+| `status` | `resolved` | compara, escreve | `src/features/db-observability/components/RemediationHistoryCard.tsx`<br>`src/features/db-observability/hooks/useRemediationActions.ts` |
 | `status` | `respondido` | compara, escreve | `src/components/freight/ResponseConsole.tsx`<br>`src/hooks/logistics/useCotacoesMulticanal.tsx`<br>`src/pages/CotacaoMultiCanal.tsx`<br>`src/pages/DashboardCotacoes.tsx`<br>`src/pages/cotacao-multicanal/CotacaoResultsTable.tsx`<br>… +1 |
 | `status` | `saiu_entrega` | compara | `src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/pages/RastreamentoRealTime.tsx` |
-| `status` | `secure` | compara, escreve | `src/components/layout/SystemPulse.tsx` |
 | `status` | `selecionado` | compara, escreve | `src/hooks/logistics/useCotacoesMulticanal.tsx`<br>`src/pages/DashboardCotacoes.tsx`<br>`src/pages/dashboard-cotacoes/TrechoComparativo.tsx` |
 | `status` | `sem_match` | compara, escreve | `src/pages/ConciliacaoAutomatica.tsx` |
 | `status` | `sent` | compara, escreve | `supabase/functions/accuracy-weekly-digest/index.ts` |
@@ -998,6 +996,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `solicitada` | compara, filtra | `src/components/coletas/PickupDetailsDialog.tsx`<br>`supabase/functions/predict-delays/index.ts` |
 | `status` | `success` | compara, escreve | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/dashboard/LiveStatusBar.tsx`<br>`src/components/freight/DecisionAudit.tsx`<br>`src/components/freight/FreightAudit.tsx`<br>`supabase/functions/carrier-webhook-receiver/index.ts`<br>… +3 |
 | `status` | `throw` | compara, escreve | `supabase/functions/accuracy-meta-monitor/channelHealth.ts` |
+| `status` | `undefined` | compara | `src/components/dashboard/LiveStatusBar.tsx` |
 | `status` | `unhealthy` | escreve | `supabase/functions/health-check/index.ts`<br>`supabase/functions/health/index.ts` |
 | `status` | `unknown` | escreve | `supabase/functions/accuracy-meta-monitor/channelHealth.ts` |
 | `status` | `unread` | compara | `src/components/predictions/AccuracyMetaAuditPanel.tsx` |
@@ -1480,9 +1479,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `<span>0%</span>` | `src/components/dashboard/IntelligentLogisticsWidget.tsx` |
 | `<span>100%</span>` | `src/components/dashboard/IntelligentLogisticsWidget.tsx` |
 | `transition={{ delay: i * 0.15, type: "spring", stiffness: 100 }}` | `src/components/dashboard/IntelligentLogisticsWidget.tsx` |
-| `94.2%` | `src/components/dashboard/LogisticsMapWidget.tsx` |
-| `98.8%` | `src/components/dashboard/LogisticsMapWidget.tsx` |
-| `↑ 2.4% vs ontem` | `src/components/dashboard/LogisticsMapWidget.tsx` |
 | `transition={{ delay: index * 0.1, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}` | `src/components/dashboard/QuickActions.tsx` |
 | `delay: index * 0.1,` | `src/components/dashboard/TransportadoraRanking.tsx` |
 | `<span>0% Estabilidade</span>` | `src/components/dashboard/XPProgressBar.tsx` |
@@ -1494,7 +1490,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `const consolidatedRate = standardRate * 0.75; // 25% discount for consolidated` | `src/components/freight/StrategySimulator.tsx` |
 | `y += Math.max(lines.length * 0.45, 0.5);` | `src/components/labels/MaterialLabelPrinter.tsx` |
 | `delay: i * 0.05` | `src/components/layout/MobileQuickActions.tsx` |
-| `animationDelay: `${i * 0.1}s`,` | `src/components/layout/SystemPulse.tsx` |
 | `transition={{ delay: idx * 0.1 }}` | `src/components/map/AnomalyList.tsx` |
 | `transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}` | `src/components/map/CinematicHUD.tsx` |
 | `const midLat = originMarker.lat + latDiff / 2 + dist * 0.15;` | `src/components/map/MapboxMap.tsx` |
@@ -1637,8 +1632,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `await new Promise(r => setTimeout(r, 1000));` | `src/components/dashboard/BiometricConsentModal.tsx` |
 | `await new Promise(r => setTimeout(r, 2500));` | `src/components/dashboard/BiometricConsentModal.tsx` |
 | `const startDate = startOfMonth(subMonths(now, 1));` | `src/components/dashboard/FavoriteMetricsBar.tsx` |
-| `setTimeout(() => setIsOptimizing(false), 2000);` | `src/components/dashboard/LogisticsMapWidget.tsx` |
-| `toast.promise(new Promise((r) => setTimeout(r, 2000)), {` | `src/components/dashboard/LogisticsMapWidget.tsx` |
 | `rotateTimeoutId = setTimeout(() => { rotateRafId = requestAnimationFrame(rotateCamera); }, 2000);` | `src/components/map/MapboxMap.tsx` |
 | `const timer = setTimeout(() => { if (window.Notification.permission === "default" && !wasDismissed) { setShowPrompt(true); } }, 3000);` | `src/components/notifications/BrowserNotificationPrompt.tsx` |
 | `const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);` | `src/components/pwa/InstallPrompt.tsx` |
@@ -1693,6 +1686,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);` | `src/hooks/security/useSecurityEvents.ts` |
 | `const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);` | `src/hooks/security/useSecurityEvents.ts` |
 | `await new Promise(resolve => setTimeout(resolve, 2000));` | `src/hooks/security/useSelfHealing.ts` |
+| `const timeout = setTimeout(() => { supabase.removeChannel(channel); // O subscribe não confirmou em 4s — sem medição confiável. resolve(null); }, 4000);` | `src/hooks/system/useNexusHealth.ts` |
 | `setTimeout(() => { lastScannedRef.current = ""; }, 2000);` | `src/hooks/ui/useQRScanner.tsx` |
 | `DASHBOARD: 2 * 60 * 1000,` | `src/lib/queryConfig.ts` |
 | `SEMI_STATIC: 3 * 60 * 1000,` | `src/lib/queryConfig.ts` |
@@ -2308,6 +2302,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `invoke(` | `src/hooks/rodonaves/useGatewayHealth.ts` |
 | `invoke(` | `src/hooks/security/useIntegrationValidation.tsx` |
 | `invoke(` | `src/hooks/security/useSecurityEvents.ts` |
+| `invoke(` | `src/hooks/system/useNexusHealth.ts` |
 | `notify_email` | `src/integrations/supabase/types.ts` |
 | `notify_whatsapp` | `src/integrations/supabase/types.ts` |
 | `.add("outros"` | `src/lib/predictions/rootCauseAnalyzer.ts` |

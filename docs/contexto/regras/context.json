@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "84f200d7a49066634351cbd325862744e799456a",
+  "sha": "d952137b3b05ebd525eaf47ffd74dcf19eae62fd",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 19:36 UTC",
-  "files_total": 1481,
-  "code_files": 1139,
-  "code_lines": 185063,
+  "generated_at": "2026-11-20 20:08 UTC",
+  "files_total": 1482,
+  "code_files": 1140,
+  "code_lines": 185471,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "8dab82df3cd00d68",
+ "facts_hash": "7fb1c43657bca87a",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -304,7 +304,7 @@
   "package_manager": "bun",
   "languages": {
    ".tsx": 454,
-   ".ts": 337,
+   ".ts": 338,
    ".sql": 261,
    ".mjs": 77,
    ".py": 8,
@@ -23594,7 +23594,7 @@
      "add_user_xp",
      "get_dashboard_metrics"
     ],
-    "deps_count": 109
+    "deps_count": 110
    },
    {
     "path": "/admin/adr",
@@ -23623,7 +23623,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/admin/telemetria",
@@ -23653,7 +23653,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 72
+    "deps_count": 77
    },
    {
     "path": "/alertas-custo",
@@ -23684,7 +23684,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 71
+    "deps_count": 72
    },
    {
     "path": "/analytics",
@@ -23716,7 +23716,7 @@
      "add_user_xp",
      "get_monthly_analytics"
     ],
-    "deps_count": 65
+    "deps_count": 66
    },
    {
     "path": "/api-docs",
@@ -23745,7 +23745,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 63
+    "deps_count": 64
    },
    {
     "path": "/aprovacao-reset-senha",
@@ -23774,7 +23774,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 65
+    "deps_count": 66
    },
    {
     "path": "/audit-trail",
@@ -23803,7 +23803,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 77
+    "deps_count": 78
    },
    {
     "path": "/automacao-regras",
@@ -23833,7 +23833,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 63
+    "deps_count": 64
    },
    {
     "path": "/bitrix24",
@@ -23862,7 +23862,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 59
+    "deps_count": 60
    },
    {
     "path": "/calendario",
@@ -23891,7 +23891,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 58
+    "deps_count": 59
    },
    {
     "path": "/central-rastreamento",
@@ -23921,7 +23921,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 67
+    "deps_count": 68
    },
    {
     "path": "/clientes",
@@ -23949,7 +23949,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 80
+    "deps_count": 81
    },
    {
     "path": "/coletas",
@@ -23982,7 +23982,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 83
+    "deps_count": 84
    },
    {
     "path": "/conciliacao",
@@ -24059,7 +24059,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 148
+    "deps_count": 149
    },
    {
     "path": "/conciliacao-automatica",
@@ -24087,7 +24087,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 61
+    "deps_count": 62
    },
    {
     "path": "/config-frete",
@@ -24116,7 +24116,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 63
+    "deps_count": 64
    },
    {
     "path": "/configuracoes",
@@ -24194,7 +24194,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 147
+    "deps_count": 148
    },
    {
     "path": "/conquistas",
@@ -24223,7 +24223,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 66
+    "deps_count": 67
    },
    {
     "path": "/cotacao-frete",
@@ -24300,7 +24300,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 175
+    "deps_count": 176
    },
    {
     "path": "/cotacao-multicanal",
@@ -24378,7 +24378,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 177
+    "deps_count": 178
    },
    {
     "path": "/custos",
@@ -24407,7 +24407,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 63
+    "deps_count": 64
    },
    {
     "path": "/dashboard-cotacoes",
@@ -24485,7 +24485,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 148
+    "deps_count": 149
    },
    {
     "path": "/dashboard-executivo",
@@ -24513,7 +24513,7 @@
      "add_user_xp",
      "get_monthly_analytics"
     ],
-    "deps_count": 66
+    "deps_count": 67
    },
    {
     "path": "/despachos",
@@ -24547,7 +24547,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 77
+    "deps_count": 78
    },
    {
     "path": "/envios",
@@ -24578,7 +24578,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 89
+    "deps_count": 90
    },
    {
     "path": "/exportacao",
@@ -24619,7 +24619,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 73
+    "deps_count": 74
    },
    {
     "path": "/fretes-internos",
@@ -24648,7 +24648,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 76
+    "deps_count": 77
    },
    {
     "path": "/gerenciamento-usuarios",
@@ -24675,7 +24675,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/gestao-box",
@@ -24705,7 +24705,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 74
+    "deps_count": 75
    },
    {
     "path": "/gestao-rodonaves",
@@ -24740,7 +24740,7 @@
      "rte_gateway_sustained_downtime",
      "rte_rollup_slo_daily"
     ],
-    "deps_count": 83
+    "deps_count": 84
    },
    {
     "path": "/importacao-massa",
@@ -24769,7 +24769,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 65
+    "deps_count": 66
    },
    {
     "path": "/inteligencia-frete",
@@ -24845,7 +24845,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 161
+    "deps_count": 162
    },
    {
     "path": "/kanban-entregas",
@@ -24879,7 +24879,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 66
+    "deps_count": 67
    },
    {
     "path": "/logistica-reversa",
@@ -24956,7 +24956,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 143
+    "deps_count": 144
    },
    {
     "path": "/loja",
@@ -24985,7 +24985,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 69
+    "deps_count": 70
    },
    {
     "path": "/mapa-rotas",
@@ -25015,7 +25015,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 69
+    "deps_count": 70
    },
    {
     "path": "/melhor-envio",
@@ -25045,7 +25045,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 96
+    "deps_count": 97
    },
    {
     "path": "/notificacoes",
@@ -25074,7 +25074,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 69
+    "deps_count": 70
    },
    {
     "path": "/ocorrencias",
@@ -25102,7 +25102,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 76
+    "deps_count": 77
    },
    {
     "path": "/painel-otif",
@@ -25130,7 +25130,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 60
+    "deps_count": 61
    },
    {
     "path": "/painel-sla",
@@ -25178,7 +25178,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 60
+    "deps_count": 61
    },
    {
     "path": "/ranking",
@@ -25206,7 +25206,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 68
+    "deps_count": 69
    },
    {
     "path": "/rastreamento-motorista",
@@ -25237,7 +25237,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 60
+    "deps_count": 61
    },
    {
     "path": "/rastreamento/:id",
@@ -25268,7 +25268,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 68
+    "deps_count": 69
    },
    {
     "path": "/rastrear",
@@ -25308,7 +25308,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 63
+    "deps_count": 64
    },
    {
     "path": "/relatorio-pdf",
@@ -25336,7 +25336,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 59
+    "deps_count": 60
    },
    {
     "path": "/relatorios",
@@ -25362,7 +25362,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 67
+    "deps_count": 68
    },
    {
     "path": "/reset-password",
@@ -25400,7 +25400,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 67
+    "deps_count": 68
    },
    {
     "path": "/seguranca",
@@ -25444,7 +25444,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 88
+    "deps_count": 89
    },
    {
     "path": "/sla-dashboard",
@@ -25475,7 +25475,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 62
+    "deps_count": 63
    },
    {
     "path": "/transportadoras",
@@ -25504,7 +25504,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 80
+    "deps_count": 81
    },
    {
     "path": "/webhooks",
@@ -25536,7 +25536,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 63
+    "deps_count": 64
    }
   ],
   "edge_functions": [
@@ -28470,6 +28470,10 @@
     "file": "src/hooks/security/useSelfHealing.ts"
    },
    {
+    "name": "useNexusHealth",
+    "file": "src/hooks/system/useNexusHealth.ts"
+   },
+   {
     "name": "useIsMobile",
     "file": "src/hooks/ui/use-mobile.tsx"
    },
@@ -29074,7 +29078,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 49055,
+   "lines": 49352,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29184,6 +29188,7 @@
     "@radix-ui/react-switch"
    ],
    "imports_modules": [
+    "src/features/db-observability",
     "src/features/preferences",
     "src/hooks",
     "src/integrations",
@@ -29446,7 +29451,7 @@
   {
    "module": "src/features/incidents",
    "files": 2,
-   "lines": 190,
+   "lines": 199,
    "tables": [],
    "exports": [
     "PostMortemDashboard.tsx: PostMortemDashboard",
@@ -29454,12 +29459,14 @@
    ],
    "docs": [],
    "deps": [
+    "date-fns",
     "framer-motion",
     "lucide-react",
-    "react"
+    "sonner"
    ],
    "imports_modules": [
-    "src/components"
+    "src/components",
+    "src/features/db-observability"
    ],
    "file_list": [
     "src/features/incidents/components/PostMortemDashboard.tsx",
@@ -29516,8 +29523,8 @@
   },
   {
    "module": "src/hooks",
-   "files": 125,
-   "lines": 19223,
+   "files": 126,
+   "lines": 19325,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -32946,6 +32953,7 @@
     "scripts/ai-context/gerar.unit.mjs"
    ],
    "health-check": [
+    "src/hooks/system/useNexusHealth.ts",
     "src/utils/systemTester.ts"
    ],
    "inexistente": [
@@ -33083,6 +33091,9 @@
    ],
    "health-ping": [
     "src/utils/systemTester.ts"
+   ],
+   "nexus-latency-probe": [
+    "src/hooks/system/useNexusHealth.ts"
    ],
    "nexus-tactical-realtime-alerts": [
     "src/hooks/logistics/useSmartAlerts.tsx"
@@ -41812,6 +41823,30 @@
     "kind": "escreve"
    },
    {
+    "file": "src/components/dashboard/LiveStatusBar.tsx",
+    "field": "status",
+    "value": "healthy",
+    "kind": "compara"
+   },
+   {
+    "file": "src/components/dashboard/LiveStatusBar.tsx",
+    "field": "status",
+    "value": "degraded",
+    "kind": "compara"
+   },
+   {
+    "file": "src/components/dashboard/LiveStatusBar.tsx",
+    "field": "status",
+    "value": "undefined",
+    "kind": "compara"
+   },
+   {
+    "file": "src/components/dashboard/LiveStatusBar.tsx",
+    "field": "status",
+    "value": "undefined",
+    "kind": "compara"
+   },
+   {
     "file": "src/components/dashboard/LogisticsMapWidget.tsx",
     "field": "type",
     "value": "FeatureCollection",
@@ -42096,37 +42131,7 @@
    {
     "file": "src/components/layout/SystemPulse.tsx",
     "field": "status",
-    "value": "online",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/layout/SystemPulse.tsx",
-    "field": "status",
-    "value": "secure",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/layout/SystemPulse.tsx",
-    "field": "status",
-    "value": "optimized",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/layout/SystemPulse.tsx",
-    "field": "status",
-    "value": "online",
-    "kind": "compara"
-   },
-   {
-    "file": "src/components/layout/SystemPulse.tsx",
-    "field": "status",
-    "value": "secure",
-    "kind": "compara"
-   },
-   {
-    "file": "src/components/layout/SystemPulse.tsx",
-    "field": "status",
-    "value": "optimized",
+    "value": "offline",
     "kind": "compara"
    },
    {
@@ -42770,18 +42775,6 @@
     "field": "status",
     "value": "ignored",
     "kind": "compara"
-   },
-   {
-    "file": "src/features/incidents/components/PostMortemDashboard.tsx",
-    "field": "status",
-    "value": "resolved",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/features/incidents/components/PostMortemDashboard.tsx",
-    "field": "status",
-    "value": "identified",
-    "kind": "escreve"
    },
    {
     "file": "src/features/incidents/types/index.ts",
@@ -43999,6 +43992,18 @@
     "file": "src/hooks/security/useIntegrationValidation.tsx",
     "field": "status",
     "value": "error",
+    "kind": "compara"
+   },
+   {
+    "file": "src/hooks/system/useNexusHealth.ts",
+    "field": "status",
+    "value": "healthy",
+    "kind": "escreve"
+   },
+   {
+    "file": "src/hooks/system/useNexusHealth.ts",
+    "field": "status",
+    "value": "SUBSCRIBED",
     "kind": "compara"
    },
    {
@@ -46806,14 +46811,6 @@
     "line": "const startDate = startOfMonth(subMonths(now, 1));"
    },
    {
-    "file": "src/components/dashboard/LogisticsMapWidget.tsx",
-    "line": "setTimeout(() => setIsOptimizing(false), 2000);"
-   },
-   {
-    "file": "src/components/dashboard/LogisticsMapWidget.tsx",
-    "line": "toast.promise(new Promise((r) => setTimeout(r, 2000)), {"
-   },
-   {
     "file": "src/components/map/MapboxMap.tsx",
     "line": "rotateTimeoutId = setTimeout(() => { rotateRafId = requestAnimationFrame(rotateCamera); }, 2000);"
    },
@@ -47028,6 +47025,10 @@
    {
     "file": "src/hooks/security/useSelfHealing.ts",
     "line": "await new Promise(resolve => setTimeout(resolve, 2000));"
+   },
+   {
+    "file": "src/hooks/system/useNexusHealth.ts",
+    "line": "const timeout = setTimeout(() => { supabase.removeChannel(channel); // O subscribe não confirmou em 4s — sem medição confiável. resolve(null); }, 4000);"
    },
    {
     "file": "src/hooks/ui/useQRScanner.tsx",
@@ -47368,18 +47369,6 @@
     "line": "transition={{ delay: i * 0.15, type: \"spring\", stiffness: 100 }}"
    },
    {
-    "file": "src/components/dashboard/LogisticsMapWidget.tsx",
-    "line": "94.2%"
-   },
-   {
-    "file": "src/components/dashboard/LogisticsMapWidget.tsx",
-    "line": "98.8%"
-   },
-   {
-    "file": "src/components/dashboard/LogisticsMapWidget.tsx",
-    "line": "↑ 2.4% vs ontem"
-   },
-   {
     "file": "src/components/dashboard/QuickActions.tsx",
     "line": "transition={{ delay: index * 0.1, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}"
    },
@@ -47422,10 +47411,6 @@
    {
     "file": "src/components/layout/MobileQuickActions.tsx",
     "line": "delay: i * 0.05"
-   },
-   {
-    "file": "src/components/layout/SystemPulse.tsx",
-    "line": "animationDelay: `${i * 0.1}s`,"
    },
    {
     "file": "src/components/map/AnomalyList.tsx",
@@ -49295,6 +49280,10 @@
    },
    {
     "file": "src/hooks/security/useSecurityEvents.ts",
+    "call": "invoke("
+   },
+   {
+    "file": "src/hooks/system/useNexusHealth.ts",
     "call": "invoke("
    },
    {
@@ -56710,6 +56699,7 @@
       "compara:src/components/common/RealtimeBadge.tsx",
       "compara:src/components/common/RealtimeStatus.tsx",
       "compara:src/hooks/data/useRealtime.tsx",
+      "compara:src/hooks/system/useNexusHealth.ts",
       "compara:src/utils/systemTester.ts"
      ],
      "completed": [
@@ -56733,6 +56723,20 @@
      "neutral": [
       "compara:src/components/dashboard/KPICard.tsx"
      ],
+     "healthy": [
+      "compara:src/components/dashboard/LiveStatusBar.tsx",
+      "compara:src/utils/systemTester.ts",
+      "compara:supabase/functions/health/index.ts",
+      "escreve:src/hooks/system/useNexusHealth.ts",
+      "escreve:supabase/functions/health/index.ts"
+     ],
+     "degraded": [
+      "compara:src/components/dashboard/LiveStatusBar.tsx",
+      "compara:src/components/dashboard/SystemHealthWidget.tsx"
+     ],
+     "undefined": [
+      "compara:src/components/dashboard/LiveStatusBar.tsx"
+     ],
      "Iniciado": [
       "escreve:src/components/dashboard/MissionDetail.tsx"
      ],
@@ -56749,9 +56753,6 @@
       "compara:src/components/dashboard/SystemHealthWidget.tsx",
       "escreve:supabase/functions/nexus-auto-healing/index.ts"
      ],
-     "degraded": [
-      "compara:src/components/dashboard/SystemHealthWidget.tsx"
-     ],
      "down": [
       "compara:src/components/dashboard/SystemHealthWidget.tsx"
      ],
@@ -56766,18 +56767,12 @@
       "escreve:supabase/functions/normalize-freight-response/index.ts"
      ],
      "online": [
-      "compara:src/components/layout/SystemPulse.tsx",
       "compara:src/components/ui/badge.tsx",
       "escreve:src/components/layout/SystemPulse.tsx",
       "escreve:src/components/ui/badge.tsx"
      ],
-     "secure": [
-      "compara:src/components/layout/SystemPulse.tsx",
-      "escreve:src/components/layout/SystemPulse.tsx"
-     ],
-     "optimized": [
-      "compara:src/components/layout/SystemPulse.tsx",
-      "escreve:src/components/layout/SystemPulse.tsx"
+     "offline": [
+      "compara:src/components/layout/SystemPulse.tsx"
      ],
      "released": [
       "compara:src/components/melhorenvio/MEEtiquetasPanel.tsx"
@@ -56861,8 +56856,7 @@
      ],
      "resolved": [
       "compara:src/features/db-observability/hooks/useRemediationActions.ts",
-      "escreve:src/features/db-observability/components/RemediationHistoryCard.tsx",
-      "escreve:src/features/incidents/components/PostMortemDashboard.tsx"
+      "escreve:src/features/db-observability/components/RemediationHistoryCard.tsx"
      ],
      "ignored": [
       "compara:src/features/db-observability/hooks/useRemediationActions.ts",
@@ -56874,9 +56868,6 @@
      ],
      "measured": [
       "compara:src/features/db-observability/hooks/useIndexProposals.ts"
-     ],
-     "identified": [
-      "escreve:src/features/incidents/components/PostMortemDashboard.tsx"
      ],
      "investigating": [
       "escreve:src/features/incidents/types/index.ts"
@@ -57079,11 +57070,6 @@
      ],
      "ERROR": [
       "escreve:src/utils/systemTester.ts"
-     ],
-     "healthy": [
-      "compara:src/utils/systemTester.ts",
-      "compara:supabase/functions/health/index.ts",
-      "escreve:supabase/functions/health/index.ts"
      ],
      "PASS": [
       "compara:src/utils/systemTester.ts"
@@ -63859,7 +63845,7 @@
      "compara:src/components/common/RealtimeBadge.tsx",
      "compara:src/components/common/RealtimeStatus.tsx",
      "compara:src/hooks/data/useRealtime.tsx",
-     "compara:src/utils/systemTester.ts"
+     "compara:src/hooks/system/useNexusHealth.ts"
     ]
    },
    {
@@ -63874,6 +63860,31 @@
     "msg": "valor `neutral` para `status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:src/components/dashboard/KPICard.tsx"
+    ]
+   },
+   {
+    "kind": "status",
+    "msg": "valor `healthy` para `status` usado no código não existe em nenhum enum do banco/TS",
+    "where": [
+     "compara:src/components/dashboard/LiveStatusBar.tsx",
+     "compara:src/utils/systemTester.ts",
+     "compara:supabase/functions/health/index.ts",
+     "escreve:src/hooks/system/useNexusHealth.ts"
+    ]
+   },
+   {
+    "kind": "status",
+    "msg": "valor `degraded` para `status` usado no código não existe em nenhum enum do banco/TS",
+    "where": [
+     "compara:src/components/dashboard/LiveStatusBar.tsx",
+     "compara:src/components/dashboard/SystemHealthWidget.tsx"
+    ]
+   },
+   {
+    "kind": "status",
+    "msg": "valor `undefined` para `status` usado no código não existe em nenhum enum do banco/TS",
+    "where": [
+     "compara:src/components/dashboard/LiveStatusBar.tsx"
     ]
    },
    {
@@ -63914,13 +63925,6 @@
    },
    {
     "kind": "status",
-    "msg": "valor `degraded` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "compara:src/components/dashboard/SystemHealthWidget.tsx"
-    ]
-   },
-   {
-    "kind": "status",
     "msg": "valor `down` para `status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:src/components/dashboard/SystemHealthWidget.tsx"
@@ -63930,26 +63934,9 @@
     "kind": "status",
     "msg": "valor `online` para `status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
-     "compara:src/components/layout/SystemPulse.tsx",
      "compara:src/components/ui/badge.tsx",
      "escreve:src/components/layout/SystemPulse.tsx",
      "escreve:src/components/ui/badge.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `secure` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "compara:src/components/layout/SystemPulse.tsx",
-     "escreve:src/components/layout/SystemPulse.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `optimized` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "compara:src/components/layout/SystemPulse.tsx",
-     "escreve:src/components/layout/SystemPulse.tsx"
     ]
    },
    {
@@ -64023,13 +64010,6 @@
     "msg": "valor `measured` para `status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:src/features/db-observability/hooks/useIndexProposals.ts"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `identified` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/features/incidents/components/PostMortemDashboard.tsx"
     ]
    },
    {
@@ -64157,15 +64137,6 @@
     "where": [
      "compara:src/pages/LogisticaReversa.tsx",
      "escreve:src/pages/LogisticaReversa.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `healthy` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "compara:src/utils/systemTester.ts",
-     "compara:supabase/functions/health/index.ts",
-     "escreve:supabase/functions/health/index.ts"
     ]
    },
    {
@@ -68204,7 +68175,7 @@
   },
   "src/components/admin/DORAMetrics.tsx": {
    "path": "src/components/admin/DORAMetrics.tsx",
-   "lines": 144,
+   "lines": 323,
    "exports": [
     "function DORAMetrics"
    ],
@@ -69594,7 +69565,7 @@
   },
   "src/components/dashboard/LiveStatusBar.tsx": {
    "path": "src/components/dashboard/LiveStatusBar.tsx",
-   "lines": 197,
+   "lines": 209,
    "exports": [
     "function LiveStatusBar"
    ],
@@ -69603,12 +69574,32 @@
      "field": "status",
      "value": "success",
      "kind": "escreve"
+    },
+    {
+     "field": "status",
+     "value": "healthy",
+     "kind": "compara"
+    },
+    {
+     "field": "status",
+     "value": "degraded",
+     "kind": "compara"
+    },
+    {
+     "field": "status",
+     "value": "undefined",
+     "kind": "compara"
+    },
+    {
+     "field": "status",
+     "value": "undefined",
+     "kind": "compara"
     }
    ]
   },
   "src/components/dashboard/LogisticsMapWidget.tsx": {
    "path": "src/components/dashboard/LogisticsMapWidget.tsx",
-   "lines": 1089,
+   "lines": 1137,
    "exports": [
     "function LogisticsMapWidget"
    ],
@@ -69681,15 +69672,6 @@
     }
    ],
    "doc": "eslint-disable max-lines",
-   "temporal": [
-    "setTimeout(() => setIsOptimizing(false), 2000);",
-    "toast.promise(new Promise((r) => setTimeout(r, 2000)), {"
-   ],
-   "percents": [
-    "94.2%",
-    "98.8%",
-    "↑ 2.4% vs ontem"
-   ],
    "side_effects": [
     "invoke("
    ]
@@ -70327,7 +70309,7 @@
   },
   "src/components/layout/SystemPulse.tsx": {
    "path": "src/components/layout/SystemPulse.tsx",
-   "lines": 65,
+   "lines": 123,
    "exports": [
     "function SystemPulse"
    ],
@@ -70339,37 +70321,9 @@
     },
     {
      "field": "status",
-     "value": "online",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "secure",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "optimized",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "online",
-     "kind": "compara"
-    },
-    {
-     "field": "status",
-     "value": "secure",
-     "kind": "compara"
-    },
-    {
-     "field": "status",
-     "value": "optimized",
+     "value": "offline",
      "kind": "compara"
     }
-   ],
-   "percents": [
-    "animationDelay: `${i * 0.1}s`,"
    ]
   },
   "src/components/layout/index.ts": {
@@ -73533,21 +73487,9 @@
   },
   "src/features/incidents/components/PostMortemDashboard.tsx": {
    "path": "src/features/incidents/components/PostMortemDashboard.tsx",
-   "lines": 169,
+   "lines": 178,
    "exports": [
     "function PostMortemDashboard"
-   ],
-   "status_values": [
-    {
-     "field": "status",
-     "value": "resolved",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "identified",
-     "kind": "escreve"
-    }
    ]
   },
   "src/features/incidents/types/index.ts": {
@@ -78656,6 +78598,42 @@
    ],
    "temporal": [
     "await new Promise(resolve => setTimeout(resolve, 2000));"
+   ]
+  },
+  "src/hooks/system/useNexusHealth.ts": {
+   "path": "src/hooks/system/useNexusHealth.ts",
+   "lines": 102,
+   "exports": [
+    "interface NexusHealthChecks",
+    "interface NexusHealth",
+    "function useNexusHealth"
+   ],
+   "invokes": [
+    "health-check"
+   ],
+   "channels": [
+    "nexus-latency-probe"
+   ],
+   "status_values": [
+    {
+     "field": "status",
+     "value": "healthy",
+     "kind": "escreve"
+    },
+    {
+     "field": "status",
+     "value": "SUBSCRIBED",
+     "kind": "compara"
+    }
+   ],
+   "hooks": [
+    "useNexusHealth"
+   ],
+   "temporal": [
+    "const timeout = setTimeout(() => { supabase.removeChannel(channel); // O subscribe não confirmou em 4s — sem medição confiável. resolve(null); }, 4000);"
+   ],
+   "side_effects": [
+    "invoke("
    ]
   },
   "src/hooks/ui/use-mobile.tsx": {
@@ -88367,10 +88345,24 @@
   }
  },
  "git": {
-  "sha": "84f200d7a49066634351cbd325862744e799456a",
+  "sha": "d952137b3b05ebd525eaf47ffd74dcf19eae62fd",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "d952137",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "feat: substitui metricas simuladas por dados reais nos widgets 3.1-3.5 (#229)",
+    "files": [
+     "src/components/admin/DORAMetrics.tsx",
+     "src/components/dashboard/LiveStatusBar.tsx",
+     "src/components/dashboard/LogisticsMapWidget.tsx",
+     "src/components/layout/SystemPulse.tsx",
+     "src/features/incidents/components/PostMortemDashboard.tsx",
+     "src/hooks/system/useNexusHealth.ts"
+    ]
+   },
    {
     "sha": "84f200d",
     "date": "2026-11-20",
@@ -88852,20 +88844,6 @@
     "files": [
      "supabase/schema-manifest.json"
     ]
-   },
-   {
-    "sha": "7ab44e7",
-    "date": "2026-11-19",
-    "author": "adm01-debug",
-    "subject": "style(manutencao): aplica correcoes locais verificadas (#199)",
-    "files": [
-     "src/components/admin/telemetry/TelemetryCharts.tsx",
-     "src/components/auth/PasswordStrengthIndicator.tsx",
-     "src/components/automation/BusinessRulesManager.tsx",
-     "src/components/common/BulkActions.tsx",
-     "src/components/common/LoadingSpinner.tsx",
-     "src/components/freight/DecisionAudit.tsx"
-    ]
    }
   ],
   "hot_files": [
@@ -88942,11 +88920,11 @@
     2
    ],
    [
-    "src/components/map/CinematicHUD.tsx",
+    "src/components/admin/DORAMetrics.tsx",
     1
    ],
    [
-    "src/hooks/logistics/useCotacoesMulticanal.tsx",
+    "src/components/dashboard/LiveStatusBar.tsx",
     1
    ]
   ]

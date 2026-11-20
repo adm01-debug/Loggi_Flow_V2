@@ -157,7 +157,10 @@
   ],
   "src/components/admin/DORAMetrics.tsx": [
    "src/components/ui/badge.tsx",
-   "src/components/ui/card.tsx"
+   "src/components/ui/card.tsx",
+   "src/features/db-observability/hooks/useGlobalHealthScore.ts",
+   "src/features/db-observability/hooks/useRemediationMttr.ts",
+   "src/features/db-observability/hooks/useRemediationSuggestions.ts"
   ],
   "src/components/admin/TelemetryViewer.tsx": [
    "src/components/ui/badge.tsx",
@@ -594,6 +597,7 @@
    "src/components/ui/tooltip.tsx",
    "src/hooks/analytics/useDashboardMetrics.tsx",
    "src/hooks/common/useOnlineStatus.tsx",
+   "src/hooks/system/useNexusHealth.ts",
    "src/lib/utils.ts"
   ],
   "src/components/dashboard/LogisticsMapWidget.tsx": [
@@ -944,6 +948,7 @@
   ],
   "src/components/layout/SystemPulse.tsx": [
    "src/components/ui/tooltip.tsx",
+   "src/hooks/system/useNexusHealth.ts",
    "src/lib/utils.ts"
   ],
   "src/components/layout/index.ts": [
@@ -2499,7 +2504,7 @@
   "src/features/incidents/components/PostMortemDashboard.tsx": [
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
-   "src/features/incidents/types/index.ts"
+   "src/features/db-observability/hooks/useRemediationActions.ts"
   ],
   "src/features/logistics/services/LogisticsService.ts": [
    "src/integrations/supabase/client.ts",
@@ -3024,6 +3029,9 @@
    "src/integrations/supabase/client.ts"
   ],
   "src/hooks/security/useSelfHealing.ts": [
+   "src/integrations/supabase/client.ts"
+  ],
+  "src/hooks/system/useNexusHealth.ts": [
    "src/integrations/supabase/client.ts"
   ],
   "src/hooks/ui/use-toast.ts": [

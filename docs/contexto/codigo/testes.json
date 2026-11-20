@@ -1384,6 +1384,7 @@
    "src/hooks/security/useRateLimitLogs.ts",
    "src/hooks/security/useSecurityEvents.ts",
    "src/hooks/security/useSelfHealing.ts",
+   "src/hooks/system/useNexusHealth.ts",
    "src/hooks/ui/use-mobile.tsx",
    "src/hooks/ui/use-toast.ts",
    "src/hooks/ui/useOnboarding.tsx",
