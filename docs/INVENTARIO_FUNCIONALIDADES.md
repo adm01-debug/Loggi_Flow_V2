@@ -46,7 +46,7 @@ O LogiFlow é uma plataforma de gestão logística de alta performance, constru�
 ## 🤖 3. INTELIGÊNCIA ARTIFICIAL E AUTOMAÇÃO
 
 ### 3.1 Assistente Logístico (IA)
-- **Contexto Operacional**: Integração com Gemini 2.5 Pro que analisa o dashboard em tempo real.
+- **Contexto Operacional**: Integração com Gemini 2.0 Flash que analisa o dashboard em tempo real.
 - **Sugestões Proativas**: Recomendação de transportadoras com base em SLA e custo-benefício.
 - **Previsão de Atrasos**: Análise de riscos baseada em clima, trânsito e histórico.
 
@@ -96,13 +96,13 @@ Este guia indica a localização e o estado de implementação de cada recurso.
 | Módulo | Funcionalidade | Status | Localização/Componente |
 |--------|----------------|--------|-------------------------|
 | **Core** | Dashboard Real-time | ✅ Produção | `Dashboard.tsx`, `useDashboardMetricsReal` |
-| **Core** | Kanban de Entregas | ✅ Produção | `KanbanBoard.tsx`, `useShipping` |
+| **Core** | Kanban de Entregas | ✅ Produção | `KanbanEntregas.tsx`, `useShipping` |
 | **Logística** | Rastreamento Lalamove | ✅ Produção | `RastreamentoMotorista.tsx` |
 | **Logística** | Cotação Rodonaves | ✅ Produção | `CotacaoFrete.tsx`, `useRodonaves` |
-| **Financeiro** | Auditoria de Fretes | ✅ Produção | `AuditoriaFaturas.tsx`, `useLogisticsCostsReal` |
+| **Financeiro** | Auditoria de Fretes | ✅ Produção | `ConciliacaoFinanceira.tsx`, `useLogisticsCostsReal` |
 | **AI** | Assistente Contextual | ✅ Produção | `AIAssistant.tsx`, `useAIAssistant` |
-| **Gamificação** | Loja de Prêmios | ✅ Produção | `RewardShop.tsx`, `useGamificationReal` |
-| **Segurança** | Gestão de Sessões | ✅ Produção | `SecuritySettings.tsx`, `useDeviceSessions` |
+| **Gamificação** | Loja de Prêmios | ✅ Produção | `LojaRecompensas.tsx`, `useGamificationReal` |
+| **Segurança** | Gestão de Sessões | ✅ Produção | `Seguranca.tsx`, `useDeviceSessions` |
 | **Admin** | Documentação API | ✅ Produção | `APIDocumentation.tsx` |
 | **Mobile** | PWA / Offline | ✅ Produção | `public/sw.js`, `manifest.json` |
 
