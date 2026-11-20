@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "eb09cdc2d3792170f976b858a2439bcbfd37c1f6",
+  "sha": "a1da74b5af0854c955e0e700b979b2b94919254c",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 18:00 UTC",
+  "generated_at": "2026-11-20 18:07 UTC",
   "files_total": 1332,
   "code_files": 1140,
   "code_lines": 185125,
@@ -88864,10 +88864,19 @@
   }
  },
  "git": {
-  "sha": "eb09cdc2d3792170f976b858a2439bcbfd37c1f6",
+  "sha": "a1da74b5af0854c955e0e700b979b2b94919254c",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "a1da74b",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "fix: reconcilia target dos inserts de schema_migrations em prod (#222)",
+    "files": [
+     "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql"
+    ]
+   },
    {
     "sha": "eb09cdc",
     "date": "2026-11-20",
@@ -89195,16 +89204,6 @@
     "files": [
      "scripts/automation.mjs"
     ]
-   },
-   {
-    "sha": "554aaad",
-    "date": "2026-11-18",
-    "author": "dependabot[bot]",
-    "subject": "chore(deps): bump peter-evans/create-pull-request from 8.1.2 to 8.1.3 (#189)",
-    "files": [
-     ".github/workflows/inventario-estado-semanal.yml",
-     ".github/workflows/types-sync.yml"
-    ]
    }
   ],
   "hot_files": [
@@ -89223,6 +89222,10 @@
    [
     "docs/pendencias/_ordem.md",
     3
+   ],
+   [
+    "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
+    2
    ],
    [
     "supabase/schema-manifest.json",
@@ -89270,10 +89273,6 @@
    ],
    [
     ".github/workflows/deploy-functions.yml",
-    1
-   ],
-   [
-    "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
     1
    ],
    [

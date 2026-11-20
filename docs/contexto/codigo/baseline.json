@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "eb09cdc2d3792170f976b858a2439bcbfd37c1f6",
+  "commit": "a1da74b5af0854c955e0e700b979b2b94919254c",
   "branch": "main",
-  "data_commit": "2026-11-20T15:00:08-03:00",
+  "data_commit": "2026-11-20T15:06:42-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "a1da74b",
+    "data": "2026-11-20",
+    "assunto": "fix: reconcilia target dos inserts de schema_migrations em prod (#222)"
+   },
    {
     "sha": "eb09cdc",
     "data": "2026-11-20",
@@ -126,11 +131,6 @@
     "sha": "8a35843",
     "data": "2026-11-19",
     "assunto": "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)"
-   },
-   {
-    "sha": "a2979e0",
-    "data": "2026-11-19",
-    "assunto": "chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)"
    }
   ],
   "arquivos_mudados_7d": 163,
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 149
+    "commits": 150
    },
    {
     "autor": "dependabot[bot]",

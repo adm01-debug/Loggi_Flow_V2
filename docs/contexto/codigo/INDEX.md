@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `eb09cdc2d3792170f976b858a2439bcbfd37c1f6` (2026-11-20T15:00:08-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `a1da74b5af0854c955e0e700b979b2b94919254c` (2026-11-20T15:06:42-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8213 nós · 20785 arestas · 734 comunidades · grafo do commit `eb09cdc2`
+- 8213 nós · 20785 arestas · 734 comunidades · grafo do commit `a1da74b5`
 - comunidades maiores: badge.tsx (179), db-observability/index.ts (164), react (144), ref_node_path (141), input.tsx (132), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), lucide-react (101), cn (95), ui/index.ts (93), gerar.mjs (81), @tanstack/react-query (80), dependencies (77)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `a1da74b` fix: reconcilia target dos inserts de schema_migrations em prod (#222)
 - 2026-11-20 `eb09cdc` chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)
 - 2026-11-20 `021e12f` fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)
 - 2026-11-20 `3706ba6` fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `08d5a13` docs: aponta docs aspiracionais para a auditoria autoritativa (#210)
 - 2026-11-20 `8a28944` feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)
 - 2026-11-20 `1716939` fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)
-- 2026-11-20 `99ca866` fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
