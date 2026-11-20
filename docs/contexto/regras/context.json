@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "8f75c44317aeeff313e594786f178bb670c5df67",
+  "sha": "3a9fa6a9ce967372ba17afbe1b85e43a9cb5ef7a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 01:08 UTC",
+  "generated_at": "2026-11-20 02:19 UTC",
   "files_total": 1315,
   "code_files": 1138,
   "code_lines": 183925,
@@ -88863,10 +88863,19 @@
   }
  },
  "git": {
-  "sha": "8f75c44317aeeff313e594786f178bb670c5df67",
+  "sha": "3a9fa6a9ce967372ba17afbe1b85e43a9cb5ef7a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "3a9fa6a",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "chore: atualiza inventario com nomes reais de componentes (#203)",
+    "files": [
+     "docs/INVENTARIO_FUNCIONALIDADES.md"
+    ]
+   },
    {
     "sha": "8f75c44",
     "date": "2026-11-19",
@@ -89209,17 +89218,6 @@
      ".github/workflows/scripts-tests.yml",
      ".github/workflows/types-sync.yml"
     ]
-   },
-   {
-    "sha": "4c16760",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "fix: elimina as 2 regex com backtracking super-linear do codigo de producao (#169)",
-    "files": [
-     "src/hooks/data/useImageUpload.tsx",
-     "src/lib/validations.test.ts",
-     "src/lib/validations.ts"
-    ]
    }
   ],
   "hot_files": [
@@ -89249,10 +89247,6 @@
    ],
    [
     "src/components/map/MapboxMap.tsx",
-    3
-   ],
-   [
-    "src/hooks/data/useImageUpload.tsx",
     3
    ],
    [
@@ -89292,12 +89286,16 @@
     2
    ],
    [
+    "src/hooks/data/useImageUpload.tsx",
+    2
+   ],
+   [
     "scripts/audit-gate.mjs",
     2
    ],
    [
-    "src/lib/validations.test.ts",
-    2
+    "docs/INVENTARIO_FUNCIONALIDADES.md",
+    1
    ],
    [
     "src/components/coletas/PickupConference.tsx",

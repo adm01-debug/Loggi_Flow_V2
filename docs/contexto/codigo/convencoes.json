@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore: atualiza inventario com nomes reais de componentes (#203)",
    "feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)",
    "chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)",
    "chore: arquiva mapa de integracao 20261112 como registro historico (#200)",
-   "chore(db): sincronizar artefatos derivados do banco [auto]",
-   "style(manutencao): aplica correcoes locais verificadas (#199)"
+   "chore(db): sincronizar artefatos derivados do banco [auto]"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

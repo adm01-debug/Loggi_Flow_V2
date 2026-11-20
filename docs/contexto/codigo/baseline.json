@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "8f75c44317aeeff313e594786f178bb670c5df67",
+  "commit": "3a9fa6a9ce967372ba17afbe1b85e43a9cb5ef7a",
   "branch": "main",
-  "data_commit": "2026-11-19T22:06:18-03:00",
+  "data_commit": "2026-11-19T22:14:35-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "3a9fa6a",
+    "data": "2026-11-19",
+    "assunto": "chore: atualiza inventario com nomes reais de componentes (#203)"
+   },
    {
     "sha": "8f75c44",
     "data": "2026-11-19",
@@ -126,14 +131,9 @@
     "sha": "5bfae77",
     "data": "2026-11-17",
     "assunto": "chore: registra conclusao da revisao do vite 8 na allowlist do audit (#174)"
-   },
-   {
-    "sha": "4b5d4c9",
-    "data": "2026-11-17",
-    "assunto": "chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)"
    }
   ],
-  "arquivos_mudados_7d": 124,
+  "arquivos_mudados_7d": 125,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 132
+    "commits": 133
    },
    {
     "autor": "dependabot[bot]",
