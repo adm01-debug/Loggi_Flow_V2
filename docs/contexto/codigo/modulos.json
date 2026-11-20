@@ -2166,7 +2166,7 @@
    "modulo": "components/shipping",
    "arquivos": 3,
    "testes": 0,
-   "linhas": 688,
+   "linhas": 741,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -2208,7 +2208,8 @@
     "tabelas": [
      "delivery_receipt_audit",
      "entregas",
-     "kanban_history"
+     "kanban_history",
+     "profiles"
     ],
     "rpcs": []
    },
@@ -3075,7 +3076,7 @@
    "modulo": "hooks/analytics",
    "arquivos": 11,
    "testes": 0,
-   "linhas": 1907,
+   "linhas": 1904,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -4630,7 +4631,7 @@
    "modulo": "pages",
    "arquivos": 59,
    "testes": 0,
-   "linhas": 27926,
+   "linhas": 27969,
    "itens_menu": [
     "Administração",
     "Administração",
@@ -5019,6 +5020,7 @@
     "count_prediction_breach_days",
     "get_carrier_performance_stats",
     "get_dashboard_metrics",
+    "get_leaderboard",
     "get_monthly_analytics",
     "get_public_tracking",
     "get_user_permissions",
@@ -5094,6 +5096,7 @@
     ],
     "rpcs": [
      "get_carrier_performance_stats",
+     "get_leaderboard",
      "get_public_tracking",
      "purchase_reward"
     ]

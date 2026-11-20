@@ -10176,7 +10176,7 @@
     ],
     "so_no_types": []
    },
-   "usada_no_front": 7,
+   "usada_no_front": 8,
    "usada_em_edges": [
     "db-health-weekly-report",
     "health",
@@ -15822,6 +15822,11 @@
    "nome": "get_health_anomalies_fast",
    "definida": true,
    "usada_em": 2
+  },
+  {
+   "nome": "get_leaderboard",
+   "definida": true,
+   "usada_em": 1
   },
   {
    "nome": "get_lock_conflicts",

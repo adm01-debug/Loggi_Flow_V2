@@ -7416,7 +7416,8 @@
     "user_roles"
    ],
    "rpcs": [
-    "add_user_xp"
+    "add_user_xp",
+    "get_leaderboard"
    ],
    "edges": [
     "ai-logistics-assistant",

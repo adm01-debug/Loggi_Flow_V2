@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `35d65b9399` · branch `main` · 2026-11-20 13:18 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `db8f658a99` · branch `main` · 2026-11-20 13:54 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1379,7 +1379,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
   ```
 - **Ranking()** — `src/pages/Ranking.tsx`
   ```
-  const { user } = useAuth(); useGamification(); const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("all"); const [levelFilter, setLevelFilter] = useState(""); const { data: leaderboard = [], isLoading, refetch, } = useQuery({ queryKey: ["leaderboard", period], queryFn: async () => { const { data, error } = await supabase .from("user_levels") .select( ` user_id, total_xp, level, streak_days, coins, profiles:user_id(full_name, avatar_url), rank_display:user_ranks(*) `, ) .order("tot …
+  const { user } = useAuth(); useGamification(); const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("all"); const [levelFilter, setLevelFilter] = useState(""); const { data: leaderboard = [], isLoading, refetch, } = useQuery({ queryKey: ["leaderboard", period], queryFn: async () => { const { data, error } = await supabase.rpc("get_leaderboard", { limit_count: 100, }); if (error) throw error; return (data ?? []) as LeaderboardEntry[]; }, }); useRealtime({ table: "user_levels", onUpd …
   ```
 - **generatePDF()** — `src/pages/RelatorioPDF.tsx`
   ```
@@ -1718,6 +1718,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `setTimeout(() => setCurrentStep(0), 5000);` | `src/pages/ImportacaoMassa.tsx` |
 | `from: subDays(new Date(), 6),` | `src/pages/Index.tsx` |
 | `refetchInterval: 5 * 60 * 1000,` | `src/pages/PainelSLA.tsx` |
+| `return now - days * 24 * 60 * 60 * 1000;` | `src/pages/Ranking.tsx` |
 | `start: subDays(new Date(), 6),` | `src/pages/Relatorios.tsx` |
 | `setTimeout(() => { navigate("/"); }, 2000);` | `src/pages/ResetPassword.tsx` |
 | `from: subDays(new Date(), 30),` | `src/pages/SLADashboard.tsx` |
@@ -1853,7 +1854,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | 500 | `src/pages/Ocorrencias.tsx` |
 | 2000 | `src/pages/PainelOTIF.tsx` |
 | 500 | `src/pages/PainelSLA.tsx` |
-| 100 | `src/pages/Ranking.tsx` |
 | 20 | `src/pages/RastreamentoMotorista.tsx` |
 | 2000 | `src/pages/RelatorioPDF.tsx` |
 | 1000 | `src/pages/Relatorios.tsx` |

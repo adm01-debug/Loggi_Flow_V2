@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "35d65b93993396d505b691b50aaf58833f3e7ae1",
+  "commit": "db8f658a9964c0dfd72acff24a2271b9acb54317",
   "branch": "main",
-  "data_commit": "2026-11-20T10:17:35-03:00",
+  "data_commit": "2026-11-20T10:53:51-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "db8f658",
+    "data": "2026-11-20",
+    "assunto": "fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)"
+   },
    {
     "sha": "35d65b9",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "9c1c505",
     "data": "2026-11-18",
     "assunto": "chore(deps): bump @remix-run/router and react-router-dom (#185)"
-   },
-   {
-    "sha": "67c87ec",
-    "data": "2026-11-18",
-    "assunto": "ci(seguranca): recupera dependency review nos PRs da branch claude/seguranca-workflows-261112 (#182)"
    }
   ],
-  "arquivos_mudados_7d": 153,
+  "arquivos_mudados_7d": 154,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -242,10 +242,6 @@
     "mudancas": 5
    },
    {
-    "arquivo": "index.html",
-    "mudancas": 5
-   },
-   {
     "arquivo": "scripts/audit-gate.mjs",
     "mudancas": 5
    },
@@ -282,6 +278,10 @@
     "mudancas": 4
    },
    {
+    "arquivo": "index.html",
+    "mudancas": 4
+   },
+   {
     "arquivo": "scripts/audit/manifest_detail.sql",
     "mudancas": 4
    },
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 140
+    "commits": 141
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1317,
   "arquivos_codigo": 877,
-  "linhas_codigo": 167752,
+  "linhas_codigo": 167845,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48693
+   "linhas": 48746
   },
   "src/features": {
    "arquivos": 90,
@@ -456,7 +456,7 @@
   },
   "src/hooks": {
    "arquivos": 125,
-   "linhas": 19222
+   "linhas": 19219
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30819
+   "linhas": 30862
   },
   "src/services": {
    "arquivos": 5,
@@ -613,20 +613,20 @@
    "linhas": 884
   },
   {
-   "arquivo": "src/components/melhorenvio/MECarrinhoPanel.tsx",
-   "linhas": 840
+   "arquivo": "src/pages/Relatorios.tsx",
+   "linhas": 844
   },
   {
-   "arquivo": "src/pages/FretesInternos.tsx",
-   "linhas": 834
+   "arquivo": "src/components/melhorenvio/MECarrinhoPanel.tsx",
+   "linhas": 840
   },
   {
    "arquivo": "scripts/ci/github-settings-guard.mjs",
    "linhas": 829
   },
   {
-   "arquivo": "src/pages/Relatorios.tsx",
-   "linhas": 825
+   "arquivo": "src/pages/FretesInternos.tsx",
+   "linhas": 829
   },
   {
    "arquivo": "src/pages/Coletas.tsx",

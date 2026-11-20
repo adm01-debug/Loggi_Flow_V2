@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `35d65b9399` · branch `main` · 2026-11-20 13:18 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `db8f658a99` · branch `main` · 2026-11-20 13:54 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -286,7 +286,6 @@
 | status | valor `SP` para `origem_estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/DashboardCotacoes.tsx` |
 | status | valor `RJ` para `destino_estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/pages/DashboardCotacoes.tsx` |
 | status | valor `motorista_alocado` para `order_status` usado no código não existe em nenhum enum do banco/TS | `escreve:supabase/functions/lalamove-webhook/index.ts` |
-| coluna | coluna `deleted_at` usada no código não existe no schema de `fretes_internos` |  |
 | rls | `geo_blocking_rules`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | rls | `geo_blocking_settings`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | rls | `notificacoes_custo`: front faz UPDATE mas nenhuma política RLS permite UPDATE → vai falhar/retornar vazio para usuários | `src/hooks/logistics/useCostAlerts.tsx` |

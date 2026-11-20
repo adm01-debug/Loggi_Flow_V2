@@ -3206,7 +3206,7 @@
     "ExpeditionDetailsDialog"
    ],
    "export_default": null,
-   "linhas": 404,
+   "linhas": 457,
    "dominio": "components/shipping",
    "hooks_locais": [
     "useAudioFeedback",
@@ -3214,7 +3214,8 @@
    ],
    "tabelas": [
     "entregas",
-    "kanban_history"
+    "kanban_history",
+    "profiles"
    ],
    "edges": [],
    "usado_por": 1,
@@ -5788,7 +5789,7 @@
     "FretesInternos"
    ],
    "export_default": "FretesInternos",
-   "linhas": 834,
+   "linhas": 829,
    "dominio": "pages",
    "hooks_locais": [
     "useEntityHistory",
@@ -6167,7 +6168,7 @@
     "Ranking"
    ],
    "export_default": "Ranking",
-   "linhas": 459,
+   "linhas": 488,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth",
@@ -6288,7 +6289,7 @@
     "Relatorios"
    ],
    "export_default": "Relatorios",
-   "linhas": 825,
+   "linhas": 844,
    "dominio": "pages",
    "hooks_locais": [
     "useDrillDown",
