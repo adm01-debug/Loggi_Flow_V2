@@ -1,8 +1,8 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "nos": 746,
- "arestas": 3076,
+ "nos": 747,
+ "arestas": 3084,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -264,7 +264,7 @@
   {
    "modulo": "hooks/logistics",
    "depende_de": 9,
-   "importado_por": 13
+   "importado_por": 14
   },
   {
    "modulo": "hooks/common",

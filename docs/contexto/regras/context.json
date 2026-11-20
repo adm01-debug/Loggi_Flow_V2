@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "ea8d1a4c0cc347b2b94d2644139388bbc95e35bf",
+  "sha": "8f75c44317aeeff313e594786f178bb670c5df67",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 00:34 UTC",
-  "files_total": 1313,
-  "code_files": 1136,
-  "code_lines": 183787,
+  "generated_at": "2026-11-20 01:08 UTC",
+  "files_total": 1315,
+  "code_files": 1138,
+  "code_lines": 183925,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "1faa31cedb7b7d75",
+ "facts_hash": "87509f07086ff331",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -309,8 +309,8 @@
   ],
   "package_manager": "bun",
   "languages": {
-   ".tsx": 453,
-   ".ts": 336,
+   ".tsx": 454,
+   ".ts": 337,
    ".sql": 260,
    ".mjs": 77,
    ".py": 8,
@@ -24182,12 +24182,16 @@
     "tables_transitive": [
      "achievements",
      "audit_logs",
+     "business_rules",
      "clientes",
      "entregas",
      "error_events",
      "fornecedores",
+     "notifications",
+     "ocorrencias",
      "profiles",
      "reward_items",
+     "rule_execution_logs",
      "security_events",
      "telemetry_logs",
      "transportadoras",
@@ -24202,7 +24206,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 80
+    "deps_count": 83
    },
    {
     "path": "/conciliacao",
@@ -24741,12 +24745,16 @@
     "tables_transitive": [
      "achievements",
      "audit_logs",
+     "business_rules",
      "clientes",
      "coletas",
      "delivery_receipt_audit",
      "error_events",
+     "notifications",
+     "ocorrencias",
      "profiles",
      "reward_items",
+     "rule_execution_logs",
      "security_events",
      "telemetry_logs",
      "transportadoras",
@@ -24762,7 +24770,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 74
+    "deps_count": 77
    },
    {
     "path": "/envios",
@@ -24771,10 +24779,14 @@
     "tables_transitive": [
      "achievements",
      "audit_logs",
+     "business_rules",
      "coletas",
      "error_events",
+     "notifications",
+     "ocorrencias",
      "profiles",
      "reward_items",
+     "rule_execution_logs",
      "security_events",
      "telemetry_logs",
      "user_achievements",
@@ -24789,7 +24801,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 86
+    "deps_count": 89
    },
    {
     "path": "/exportacao",
@@ -25065,12 +25077,16 @@
     "tables_transitive": [
      "achievements",
      "audit_logs",
+     "business_rules",
      "clientes",
      "coletas",
      "delivery_receipt_audit",
      "error_events",
+     "notifications",
+     "ocorrencias",
      "profiles",
      "reward_items",
+     "rule_execution_logs",
      "security_events",
      "telemetry_logs",
      "transportadoras",
@@ -25086,7 +25102,7 @@
     "rpc_transitive": [
      "add_user_xp"
     ],
-    "deps_count": 63
+    "deps_count": 66
    },
    {
     "path": "/logistica-reversa",
@@ -28555,6 +28571,10 @@
     "file": "src/hooks/logistics/useRootCauseAnalysis.ts"
    },
    {
+    "name": "useRuleTriggers",
+    "file": "src/hooks/logistics/useRuleTriggers.ts"
+   },
+   {
     "name": "useSLAAlerts",
     "file": "src/hooks/logistics/useSLAAlerts.tsx"
    },
@@ -29271,7 +29291,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 48697,
+   "lines": 48729,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29712,8 +29732,8 @@
   },
   {
    "module": "src/hooks",
-   "files": 123,
-   "lines": 19133,
+   "files": 125,
+   "lines": 19222,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -30077,7 +30097,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30694,
+   "lines": 30711,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -36099,6 +36119,14 @@
    {
     "file": "src/hooks/logistics/useBusinessRuleEngine.tsx",
     "text": "Rule action failed — silent fail for background processing"
+   },
+   {
+    "file": "src/hooks/logistics/useRuleTriggers.ts",
+    "text": "* `onStatusChange` deve ser chamado sempre que um registro mudar de status (apos o update"
+   },
+   {
+    "file": "src/hooks/logistics/useRuleTriggers.ts",
+    "text": "Fallback silencioso: falha de automacao nao pode quebrar o fluxo operacional."
    },
    {
     "file": "src/hooks/logistics/useSLANotifications.tsx",
@@ -45311,6 +45339,12 @@
    },
    {
     "file": "src/pages/Despachos.tsx",
+    "field": "status",
+    "value": "despachado",
+    "kind": "escreve"
+   },
+   {
+    "file": "src/pages/Despachos.tsx",
     "field": "to_status",
     "value": "despachado",
     "kind": "escreve"
@@ -48048,6 +48082,18 @@
    {
     "file": "src/hooks/common/useBulkActions.test.ts",
     "name": "empty selection still fires mutation with []"
+   },
+   {
+    "file": "src/hooks/logistics/useRuleTriggers.test.tsx",
+    "name": "useRuleTriggers"
+   },
+   {
+    "file": "src/hooks/logistics/useRuleTriggers.test.tsx",
+    "name": "dispara a engine apenas para o trigger on_status_change"
+   },
+   {
+    "file": "src/hooks/logistics/useRuleTriggers.test.tsx",
+    "name": "engole falhas da engine sem quebrar o fluxo operacional"
    },
    {
     "file": "src/hooks/rodonaves/useGatewayHealth.test.ts",
@@ -69053,7 +69099,7 @@
   },
   "src/components/coletas/PickupConference.tsx": {
    "path": "src/components/coletas/PickupConference.tsx",
-   "lines": 288,
+   "lines": 301,
    "exports": [
     "function PickupConference"
    ],
@@ -69082,7 +69128,7 @@
   },
   "src/components/coletas/PickupDetailsDialog.tsx": {
    "path": "src/components/coletas/PickupDetailsDialog.tsx",
-   "lines": 471,
+   "lines": 477,
    "exports": [
     "function PickupDetailsDialog"
    ],
@@ -69159,7 +69205,7 @@
   },
   "src/components/coletas/PickupDialog.tsx": {
    "path": "src/components/coletas/PickupDialog.tsx",
-   "lines": 466,
+   "lines": 479,
    "exports": [
     "function PickupDialog"
    ],
@@ -74083,7 +74129,7 @@
   },
   "src/hooks/index.ts": {
    "path": "src/hooks/index.ts",
-   "lines": 150,
+   "lines": 151,
    "rule_comments": [
     "Logistics & Business"
    ],
@@ -77777,6 +77823,30 @@
    },
    "hooks": [
     "useRootCauseAnalysis"
+   ]
+  },
+  "src/hooks/logistics/useRuleTriggers.test.tsx": {
+   "path": "src/hooks/logistics/useRuleTriggers.test.tsx",
+   "lines": 52,
+   "is_test": true,
+   "tests": [
+    "useRuleTriggers",
+    "dispara a engine apenas para o trigger on_status_change",
+    "engole falhas da engine sem quebrar o fluxo operacional"
+   ]
+  },
+  "src/hooks/logistics/useRuleTriggers.ts": {
+   "path": "src/hooks/logistics/useRuleTriggers.ts",
+   "lines": 36,
+   "exports": [
+    "function useRuleTriggers"
+   ],
+   "rule_comments": [
+    "* `onStatusChange` deve ser chamado sempre que um registro mudar de status (apos o update",
+    "Fallback silencioso: falha de automacao nao pode quebrar o fluxo operacional."
+   ],
+   "hooks": [
+    "useRuleTriggers"
    ]
   },
   "src/hooks/logistics/useSLAAlerts.tsx": {
@@ -81914,7 +81984,7 @@
   },
   "src/pages/Despachos.tsx": {
    "path": "src/pages/Despachos.tsx",
-   "lines": 552,
+   "lines": 558,
    "exports": [
     "function Despachos"
    ],
@@ -81970,6 +82040,11 @@
      "kind": "escreve"
     },
     {
+     "field": "status",
+     "value": "despachado",
+     "kind": "escreve"
+    },
+    {
      "field": "to_status",
      "value": "despachado",
      "kind": "escreve"
@@ -82007,7 +82082,7 @@
   },
   "src/pages/Envios.tsx": {
    "path": "src/pages/Envios.tsx",
-   "lines": 1241,
+   "lines": 1248,
    "exports": [
     "function Envios"
    ],
@@ -82586,7 +82661,7 @@
   },
   "src/pages/KanbanEntregas.tsx": {
    "path": "src/pages/KanbanEntregas.tsx",
-   "lines": 491,
+   "lines": 495,
    "exports": [
     "function KanbanEntregas"
    ],
@@ -88788,10 +88863,27 @@
   }
  },
  "git": {
-  "sha": "ea8d1a4c0cc347b2b94d2644139388bbc95e35bf",
+  "sha": "8f75c44317aeeff313e594786f178bb670c5df67",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "8f75c44",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)",
+    "files": [
+     "src/components/coletas/PickupConference.tsx",
+     "src/components/coletas/PickupDetailsDialog.tsx",
+     "src/components/coletas/PickupDialog.tsx",
+     "src/hooks/index.ts",
+     "src/hooks/logistics/useRuleTriggers.test.tsx",
+     "src/hooks/logistics/useRuleTriggers.ts",
+     "src/pages/Despachos.tsx",
+     "src/pages/Envios.tsx",
+     "src/pages/KanbanEntregas.tsx"
+    ]
+   },
    {
     "sha": "ea8d1a4",
     "date": "2026-11-19",
@@ -89128,15 +89220,6 @@
      "src/lib/validations.test.ts",
      "src/lib/validations.ts"
     ]
-   },
-   {
-    "sha": "7931333",
-    "date": "2026-11-17",
-    "author": "github-actions[bot]",
-    "subject": "chore(db): sincronizar artefatos com o banco [auto] (#166)",
-    "files": [
-     "supabase/schema-manifest.json"
-    ]
    }
   ],
   "hot_files": [
@@ -89147,10 +89230,6 @@
    [
     "package.json",
     5
-   ],
-   [
-    "supabase/schema-manifest.json",
-    3
    ],
    [
     ".github/workflows/ci-nexus.yml",
@@ -89175,6 +89254,10 @@
    [
     "src/hooks/data/useImageUpload.tsx",
     3
+   ],
+   [
+    "supabase/schema-manifest.json",
+    2
    ],
    [
     "index.html",
@@ -89217,7 +89300,7 @@
     2
    ],
    [
-    ".github/workflows/branch-hygiene-audit.yml",
+    "src/components/coletas/PickupConference.tsx",
     1
    ]
   ]

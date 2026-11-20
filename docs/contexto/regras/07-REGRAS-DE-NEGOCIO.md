@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `ea8d1a4c0c` · branch `main` · 2026-11-20 00:34 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8f75c44317` · branch `main` · 2026-11-20 01:08 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -2217,7 +2217,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `service_role` | `supabase/functions/predict-delays-scheduled/index.ts` |
 | `service_role` | `supabase/functions/resend-email/index.ts` |
 
-## K. Testes como especificação (365 testes em 38 arquivos — nomes completos em `context.json`)
+## K. Testes como especificação (368 testes em 39 arquivos — nomes completos em `context.json`)
 
 | Arquivo | Testes | Exemplos do que o sistema DEVE fazer |
 |---|---|---|
@@ -2252,6 +2252,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `tests/unit/modules-integrity.spec.ts` | 5 | Freight-Quest Module Integrity · Logistics Engine · should correctly calculate delivery dates with margin · Financial Core … |
 | `src/lib/validations.test.ts` | 4 | isValidEmail · mantem o veredito da implementacao anterior · trata vazio como valido (campo opcional) · responde de imediato a entrada patologica que travava a regex |
 | `tests/integration/webhooks.spec.ts` | 4 | Webhook Simulation Suite (real _shared logic) · should validate carrier status updates through the production contract · should refuse events outside the contract · should reject missing required fields (production fail-closed) |
+| `src/hooks/logistics/useRuleTriggers.test.tsx` | 3 | useRuleTriggers · dispara a engine apenas para o trigger on_status_change · engole falhas da engine sem quebrar o fluxo operacional |
 | `src/utils/systemTester.spec.ts` | 3 | System Integrity Tests · should pass all checks when system is healthy · should detect database connectivity failure |
 | `tests/e2e/critical-paths.spec.ts` | 3 | Nexus Core E2E - Critical Path Validation · Complete login to dashboard and shipment creation flow · Responsiveness and Error State resilience |
 | `tests/e2e/dashboard.spec.ts` | 3 | Dashboard E2E Flow · should navigate through main modules · should handle error states gracefully |
@@ -2424,6 +2425,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Business Rule Engine — evaluates rules against entity data and executes actions. | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | Debounced Batch Logging for high-frequency rule execution | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
 | Rule action failed — silent fail for background processing | `src/hooks/logistics/useBusinessRuleEngine.tsx` |
+| * `onStatusChange` deve ser chamado sempre que um registro mudar de status (apos o update | `src/hooks/logistics/useRuleTriggers.ts` |
+| Fallback silencioso: falha de automacao nao pode quebrar o fluxo operacional. | `src/hooks/logistics/useRuleTriggers.ts` |
 | Request notification permission | `src/hooks/logistics/useSLANotifications.tsx` |
 | Check current permission status | `src/hooks/logistics/useSLANotifications.tsx` |
 | Request permission | `src/hooks/logistics/useSLANotifications.tsx` |

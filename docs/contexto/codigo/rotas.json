@@ -2106,6 +2106,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useCallback",
     "useContext",
     "useEffect",
@@ -2134,6 +2136,7 @@
     "useQueryClient",
     "useRealtime",
     "useRef",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSmartAlerts",
     "useSorting",
@@ -2153,6 +2156,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useExport",
     "useFilters",
     "useGamification",
@@ -2169,6 +2174,7 @@
     "usePrefetch",
     "useQRScanner",
     "useRealtime",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSmartAlerts",
     "useSorting",
@@ -2180,14 +2186,17 @@
    "tabelas": [
     "achievements",
     "audit_logs",
+    "business_rules",
     "clientes",
     "coletas",
     "entregas",
     "error_events",
     "fornecedores",
     "notifications",
+    "ocorrencias",
     "profiles",
     "reward_items",
+    "rule_execution_logs",
     "security_events",
     "telemetry_logs",
     "transportadoras",
@@ -2217,7 +2226,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 99
+   "arquivos_puxados": 102
   },
   {
    "protegida": true,
@@ -2320,6 +2329,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -2422,6 +2432,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -2538,7 +2549,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 181
+   "arquivos_puxados": 182
   },
   {
    "protegida": true,
@@ -2878,6 +2889,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -2980,6 +2992,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -3096,7 +3109,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 178
+   "arquivos_puxados": 179
   },
   {
    "protegida": true,
@@ -3324,6 +3337,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -3431,6 +3445,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -3549,7 +3564,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 209
+   "arquivos_puxados": 210
   },
   {
    "protegida": true,
@@ -3656,6 +3671,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -3765,6 +3781,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -3884,7 +3901,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 212
+   "arquivos_puxados": 213
   },
   {
    "protegida": true,
@@ -4109,6 +4126,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -4212,6 +4230,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -4330,7 +4349,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 180
+   "arquivos_puxados": 181
   },
   {
    "protegida": true,
@@ -4473,6 +4492,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useCallback",
     "useConfirm",
     "useContext",
@@ -4499,6 +4520,7 @@
     "useQueryClient",
     "useRealtime",
     "useRef",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSmartAlerts",
     "useSpring",
@@ -4516,6 +4538,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useConfirm",
     "useFilters",
     "useGamification",
@@ -4531,6 +4555,7 @@
     "usePrefetch",
     "useQRScanner",
     "useRealtime",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSmartAlerts",
     "useTelemetry",
@@ -4541,6 +4566,7 @@
    "tabelas": [
     "achievements",
     "audit_logs",
+    "business_rules",
     "clientes",
     "coletas",
     "delivery_receipt_audit",
@@ -4549,8 +4575,10 @@
     "fornecedores",
     "kanban_history",
     "notifications",
+    "ocorrencias",
     "profiles",
     "reward_items",
+    "rule_execution_logs",
     "security_events",
     "telemetry_logs",
     "transportadoras",
@@ -4580,7 +4608,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 95
+   "arquivos_puxados": 98
   },
   {
    "protegida": true,
@@ -4601,6 +4629,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useCallback",
     "useContext",
     "useDocumentUpload",
@@ -4629,6 +4659,7 @@
     "useRealtime",
     "useRef",
     "useRodonavesTracking",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSelection",
     "useSmartAlerts",
@@ -4648,6 +4679,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useDocumentUpload",
     "useFilters",
     "useGamification",
@@ -4665,6 +4698,7 @@
     "useQRScanner",
     "useRealtime",
     "useRodonavesTracking",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSelection",
     "useSmartAlerts",
@@ -4677,14 +4711,17 @@
    "tabelas": [
     "achievements",
     "audit_logs",
+    "business_rules",
     "clientes",
     "coletas",
     "entregas",
     "error_events",
     "fornecedores",
     "notifications",
+    "ocorrencias",
     "profiles",
     "reward_items",
+    "rule_execution_logs",
     "security_events",
     "telemetry_logs",
     "transportadoras",
@@ -4714,7 +4751,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 106
+   "arquivos_puxados": 109
   },
   {
    "protegida": true,
@@ -5614,6 +5651,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -5721,6 +5759,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -5839,7 +5878,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 203
+   "arquivos_puxados": 204
   },
   {
    "protegida": true,
@@ -5860,6 +5899,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useCallback",
     "useContext",
     "useEffect",
@@ -5884,6 +5925,7 @@
     "useQueryClient",
     "useRealtime",
     "useRef",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSmartAlerts",
     "useSpring",
@@ -5901,6 +5943,8 @@
     "useApiStatus",
     "useAudioFeedback",
     "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
     "useGamification",
     "useGlobalSearch",
     "useNavigationHistory",
@@ -5914,6 +5958,7 @@
     "usePrefetch",
     "useQRScanner",
     "useRealtime",
+    "useRuleTriggers",
     "useSLANotifications",
     "useSmartAlerts",
     "useTelemetry",
@@ -5924,6 +5969,7 @@
    "tabelas": [
     "achievements",
     "audit_logs",
+    "business_rules",
     "clientes",
     "coletas",
     "delivery_receipt_audit",
@@ -5931,8 +5977,10 @@
     "error_events",
     "fornecedores",
     "notifications",
+    "ocorrencias",
     "profiles",
     "reward_items",
+    "rule_execution_logs",
     "security_events",
     "telemetry_logs",
     "transportadoras",
@@ -5962,7 +6010,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 85
+   "arquivos_puxados": 88
   },
   {
    "protegida": true,
@@ -6066,6 +6114,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -6169,6 +6218,7 @@
     "useRodonavesTracking",
     "useRodonavesWebhook",
     "useRole",
+    "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
     "useSecurityEvents",
@@ -6285,7 +6335,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 176
+   "arquivos_puxados": 177
   },
   {
    "protegida": true,

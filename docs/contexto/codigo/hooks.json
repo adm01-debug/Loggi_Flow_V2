@@ -1,7 +1,7 @@
 {
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
- "total": 176,
+ "total": 177,
  "hooks": [
   {
    "arquivo": "src/components/accessibility/index.ts",
@@ -2648,7 +2648,7 @@
     "useIsMobile",
     "useToast"
    ],
-   "linhas": 150,
+   "linhas": 151,
    "dominio": "hooks",
    "tabelas": [],
    "rpcs": [],
@@ -2918,9 +2918,10 @@
     "useTelemetry"
    ],
    "canais_realtime": [],
-   "usado_por": 1,
+   "usado_por": 2,
    "usado_por_arquivos": [
-    "src/hooks/index.ts"
+    "src/hooks/index.ts",
+    "src/hooks/logistics/useRuleTriggers.ts"
    ],
    "coberto_por_testes": 0
   },
@@ -3627,6 +3628,33 @@
     "src/components/predictions/RootCausePanel.tsx"
    ],
    "coberto_por_testes": 0
+  },
+  {
+   "arquivo": "src/hooks/logistics/useRuleTriggers.ts",
+   "hooks_exportados": [
+    "useRuleTriggers"
+   ],
+   "linhas": 36,
+   "dominio": "hooks/logistics",
+   "tabelas": [],
+   "rpcs": [],
+   "edges": [],
+   "hooks_internos": [
+    "useBusinessRuleEngine",
+    "useCallback"
+   ],
+   "canais_realtime": [],
+   "usado_por": 7,
+   "usado_por_arquivos": [
+    "src/components/coletas/PickupConference.tsx",
+    "src/components/coletas/PickupDetailsDialog.tsx",
+    "src/components/coletas/PickupDialog.tsx",
+    "src/hooks/index.ts",
+    "src/pages/Despachos.tsx",
+    "src/pages/Envios.tsx",
+    "src/pages/KanbanEntregas.tsx"
+   ],
+   "coberto_por_testes": 1
   },
   {
    "arquivo": "src/hooks/logistics/useSLAAlerts.tsx",

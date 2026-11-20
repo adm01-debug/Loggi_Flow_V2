@@ -398,10 +398,11 @@
     "PickupConference"
    ],
    "export_default": null,
-   "linhas": 288,
+   "linhas": 301,
    "dominio": "components/coletas",
    "hooks_locais": [
     "useAudioFeedback",
+    "useRuleTriggers",
     "useToast"
    ],
    "tabelas": [
@@ -417,10 +418,11 @@
     "PickupDetailsDialog"
    ],
    "export_default": null,
-   "linhas": 471,
+   "linhas": 477,
    "dominio": "components/coletas",
    "hooks_locais": [
-    "useAudioFeedback"
+    "useAudioFeedback",
+    "useRuleTriggers"
    ],
    "tabelas": [
     "audit_logs",
@@ -436,9 +438,10 @@
     "PickupDialog"
    ],
    "export_default": null,
-   "linhas": 466,
+   "linhas": 479,
    "dominio": "components/coletas",
    "hooks_locais": [
+    "useRuleTriggers",
     "useToast"
    ],
    "tabelas": [
@@ -5694,13 +5697,14 @@
     "Despachos"
    ],
    "export_default": "Despachos",
-   "linhas": 552,
+   "linhas": 558,
    "dominio": "pages",
    "hooks_locais": [
     "useAudioFeedback",
     "useAuth",
     "useFilters",
-    "useRealtime"
+    "useRealtime",
+    "useRuleTriggers"
    ],
    "tabelas": [
     "entregas",
@@ -5716,7 +5720,7 @@
     "Envios"
    ],
    "export_default": "Envios",
-   "linhas": 1241,
+   "linhas": 1248,
    "dominio": "pages",
    "hooks_locais": [
     "useAudioFeedback",
@@ -5724,6 +5728,7 @@
     "usePagination",
     "useRealtime",
     "useRodonavesTracking",
+    "useRuleTriggers",
     "useSelection",
     "useSorting"
    ],
@@ -5966,11 +5971,12 @@
     "KanbanEntregas"
    ],
    "export_default": "KanbanEntregas",
-   "linhas": 491,
+   "linhas": 495,
    "dominio": "pages",
    "hooks_locais": [
     "useAudioFeedback",
-    "useRealtime"
+    "useRealtime",
+    "useRuleTriggers"
    ],
    "tabelas": [
     "entregas"

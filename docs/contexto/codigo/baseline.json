@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "ea8d1a4c0cc347b2b94d2644139388bbc95e35bf",
+  "commit": "8f75c44317aeeff313e594786f178bb670c5df67",
   "branch": "main",
-  "data_commit": "2026-11-19T21:01:46-03:00",
+  "data_commit": "2026-11-19T22:06:18-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "8f75c44",
+    "data": "2026-11-19",
+    "assunto": "feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)"
+   },
    {
     "sha": "ea8d1a4",
     "data": "2026-11-19",
@@ -126,18 +131,13 @@
     "sha": "4b5d4c9",
     "data": "2026-11-17",
     "assunto": "chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)"
-   },
-   {
-    "sha": "1000cd9",
-    "data": "2026-11-17",
-    "assunto": "chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)"
    }
   ],
-  "arquivos_mudados_7d": 117,
+  "arquivos_mudados_7d": 124,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
-    "mudancas": 10
+    "mudancas": 12
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 131
+    "commits": 132
    },
    {
     "autor": "dependabot[bot]",
@@ -314,21 +314,21 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1303,
-  "arquivos_codigo": 875,
-  "linhas_codigo": 167282,
+  "arquivos_total": 1305,
+  "arquivos_codigo": 877,
+  "linhas_codigo": 167420,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
   "itens_menu": 77,
   "modulos": 74,
   "componentes": 380,
-  "hooks": 176,
+  "hooks": 177,
   "edge_functions": 43,
   "tabelas": 144,
   "migrations": 247,
   "cron_jobs": 28,
-  "testes": 129,
+  "testes": 130,
   "workflows": 18,
   "scripts": 62,
   "docs_md": 85
@@ -448,15 +448,15 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 48697
+   "linhas": 48729
   },
   "src/features": {
    "arquivos": 90,
    "linhas": 6350
   },
   "src/hooks": {
-   "arquivos": 123,
-   "linhas": 19133
+   "arquivos": 125,
+   "linhas": 19222
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30694
+   "linhas": 30711
   },
   "src/services": {
    "arquivos": 5,
@@ -553,12 +553,12 @@
    "linhas": 1354
   },
   {
-   "arquivo": "scripts/graphify-local.mjs",
-   "linhas": 1247
+   "arquivo": "src/pages/Envios.tsx",
+   "linhas": 1248
   },
   {
-   "arquivo": "src/pages/Envios.tsx",
-   "linhas": 1241
+   "arquivo": "scripts/graphify-local.mjs",
+   "linhas": 1247
   },
   {
    "arquivo": "src/pages/Transportadoras.tsx",
