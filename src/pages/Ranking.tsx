@@ -63,24 +63,11 @@ export default function Ranking() {
   } = useQuery({
     queryKey: ["leaderboard", period],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_levels")
-        .select(
-          `
-          user_id,
-          total_xp,
-          level,
-          streak_days,
-          coins,
-          profiles:user_id(full_name, avatar_url),
-          rank_display:user_ranks(*)
-        `,
-        )
-        .order("total_xp", { ascending: false })
-        .limit(100);
-
+      const { data, error } = await supabase.rpc("get_leaderboard", {
+        limit_count: 100,
+      });
       if (error) throw error;
-      return data;
+      return (data ?? []) as LeaderboardEntry[];
     },
   });
 
@@ -98,22 +85,62 @@ export default function Ranking() {
     rank?: string | number;
   }
 
-  const users: RankUser[] = useMemo(
-    () =>
-      ((leaderboard || []) as unknown as Array<{ user_id: string; total_xp?: number; level?: number; streak_days?: number; coins?: number; rank_display?: { name: string; icon: string; color: string }; profiles?: { full_name?: string; avatar_url?: string } }>).map((u, index) => ({
-        id: u.user_id,
-        name: u.profiles?.full_name || "Usuário",
-        avatar: u.profiles?.avatar_url,
-        xp: u.total_xp || 0,
-        level: u.level || 1,
-        streak: u.streak_days || 0,
-        coins: u.coins || 0,
-        achievements: 0, // Simplified for now
-        rank: index + 1,
-        rank_display: u.rank_display,
-      })),
-    [leaderboard],
-  );
+  const extrasIds = (leaderboard || []).map((u) => u.user_id);
+  const extrasKey = extrasIds.slice(0, 100).join(",");
+
+  const { data: levelExtras = [] } = useQuery({
+    queryKey: ["leaderboard-extras", extrasKey],
+    queryFn: async () => {
+      const ids = extrasIds;
+      if (ids.length === 0) return [];
+      const { data, error } = await supabase
+        .from("user_levels")
+        .select("user_id, last_activity_date, rank_display:user_ranks(*)")
+        .in("user_id", ids);
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        user_id: string;
+        last_activity_date?: string | null;
+        rank_display?: RankUser["rank_display"];
+      }>;
+    },
+    enabled: extrasIds.length > 0,
+  });
+
+  const [now] = useState(() => Date.now());
+  const periodCutoff = useMemo(() => {
+    if (period === "all") return null;
+    const days = period === "weekly" ? 7 : 30;
+    return now - days * 24 * 60 * 60 * 1000;
+  }, [period, now]);
+
+  const users: RankUser[] = useMemo(() => {
+    const extrasByUser = new Map(
+      (levelExtras || []).map((l) => [l.user_id, l]),
+    );
+    const entries = (leaderboard || [])
+      .map((u) => {
+        const extra = extrasByUser.get(u.user_id);
+        return { u, extra };
+      })
+      .filter(({ extra }) => {
+        if (!periodCutoff) return true;
+        if (!extra?.last_activity_date) return true;
+        return new Date(extra.last_activity_date).getTime() >= periodCutoff;
+      });
+    return entries.map(({ u, extra }, index) => ({
+      id: u.user_id,
+      name: u.full_name || "Usuário",
+      avatar: u.avatar_url || undefined,
+      xp: u.total_xp || 0,
+      level: u.level || 1,
+      streak: u.streak_days || 0,
+      coins: u.coins || 0,
+      achievements: Number(u.achievements_count) || 0,
+      rank: period === "all" ? Number(u.rank) || index + 1 : index + 1,
+      rank_display: extra?.rank_display,
+    }));
+  }, [leaderboard, levelExtras, period, periodCutoff]);
 
   const currentUserRank = useMemo(
     () => (user?.id ? users.find((u) => u.id === user.id) : null),
@@ -352,14 +379,16 @@ export default function Ranking() {
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm",
                     (() => {
-                      if (rankUser.rank === 1) return "bg-gradient-to-br from-warning to-warning/80 text-warning-foreground";
-                      if (rankUser.rank === 2) return "bg-gradient-to-br from-muted-foreground/60 to-muted-foreground text-white";
-                      if (rankUser.rank === 3) return "bg-gradient-to-br from-warning/80 to-warning/60 text-warning-foreground";
+                      if (rankUser.rank === 1)
+                        return "bg-gradient-to-br from-warning to-warning/80 text-warning-foreground";
+                      if (rankUser.rank === 2)
+                        return "bg-gradient-to-br from-muted-foreground/60 to-muted-foreground text-white";
+                      if (rankUser.rank === 3)
+                        return "bg-gradient-to-br from-warning/80 to-warning/60 text-warning-foreground";
                       return "bg-muted";
                     })(),
                   )}
                 >
-
                   {rankUser.rank}
                 </div>
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">

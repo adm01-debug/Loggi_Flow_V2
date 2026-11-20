@@ -95,10 +95,7 @@ export function useDrillDown() {
         if (error) throw error;
         rawItems = (result || []) as Record<string, unknown>[];
       } else {
-        let query = supabase
-          .from("fretes_internos")
-          .select("*")
-          .is("deleted_at", null);
+        let query = supabase.from("fretes_internos").select("*");
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
         const { data: result, error } = await query
