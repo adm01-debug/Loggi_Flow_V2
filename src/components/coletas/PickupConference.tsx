@@ -15,6 +15,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
+import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
 import { Coleta as Pickup, ColetaStatus } from "./types";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,6 +26,7 @@ interface PickupConferenceProps {
 
 export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
   const { toast } = useToast();
+  const { onStatusChange } = useRuleTriggers();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"scan" | "blind_entry">("scan");
 
@@ -83,6 +85,17 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
         .eq("id", pickup.id);
 
       if (error) throw error;
+
+      await onStatusChange("coleta", pickup.id, {
+        status,
+        qtd_recebida: Number(qtdRecebida),
+        peso_efetivo: Number(pesoEfetivo),
+        divergencia_percentual: pickup.peso_estimado_kg
+          ? (Math.abs(Number(pesoEfetivo) - pickup.peso_estimado_kg) /
+              pickup.peso_estimado_kg) *
+            100
+          : 0,
+      });
 
       toast({
         title: hasDivergence

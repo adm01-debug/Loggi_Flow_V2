@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
+import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
 import { Database } from "@/integrations/supabase/types";
 import { Coleta as Pickup } from "./types";
 import { PickupConference } from "./PickupConference";
@@ -48,6 +49,7 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
   const [loadingTimeline, setLoadingTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState("detalhes");
   const { playSuccess, playWhoosh, playAction } = useAudioFeedback();
+  const { onStatusChange } = useRuleTriggers();
 
   const fetchTimeline = useCallback(async () => {
     if (!pickup) return;
@@ -87,6 +89,10 @@ export function PickupDetailsDialog({ open, onOpenChange, pickup, statusConfig, 
       onStatusUpdate();
       fetchTimeline();
       toast.success(`Status atualizado para: ${statusConfig[newStatus]?.label}`);
+      await onStatusChange("coleta", pickup.id, {
+        status: newStatus,
+        data_efetiva_coleta: newStatus === 'em_transito' ? new Date().toISOString() : pickup.data_efetiva_coleta,
+      });
     }
   };
 

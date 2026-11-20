@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
+import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
 import {
   Loader2,
   Package,
@@ -64,6 +65,7 @@ export function PickupDialog({
   pickup,
 }: PickupDialogProps) {
   const { toast } = useToast();
+  const { onStatusChange } = useRuleTriggers();
   const [loading, setLoading] = useState(false);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [transportadoras, setTransportadoras] = useState<Transportadora[]>([]);
@@ -149,12 +151,16 @@ export function PickupDialog({
       };
 
       let error;
+      let updatedStatus: string | null = null;
       if (pickup?.id) {
         const { error: err } = await supabase
           .from("coletas")
           .update(payload as ColetaUpdate)
           .eq("id", pickup.id);
         error = err;
+        if (!err && payload.status) {
+          updatedStatus = payload.status as string;
+        }
       } else {
         const { error: err } = await supabase
           .from("coletas")
@@ -163,6 +169,13 @@ export function PickupDialog({
       }
 
       if (error) throw error;
+
+      if (updatedStatus && pickup?.id) {
+        await onStatusChange("coleta", pickup.id, {
+          status: updatedStatus,
+          ...payload,
+        });
+      }
 
       toast({
         title: pickup ? "Injeção Atualizada" : "Protocolo Injetado",
