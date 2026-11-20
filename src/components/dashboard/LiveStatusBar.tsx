@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/common/useOnlineStatus";
 import { useDashboardMetrics } from "@/hooks/analytics/useDashboardMetrics";
+import { useNexusHealth } from "@/hooks/system/useNexusHealth";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -19,58 +20,62 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState, useEffect } from "react";
+
+function pingStatus(
+  latency: number | null,
+): "success" | "warning" | "undefined" {
+  if (latency === null) return "undefined";
+  return latency > 1000 ? "warning" : "success";
+}
 
 export function LiveStatusBar() {
   const { isOnline } = useOnlineStatus();
   const { data: metrics, isFetching } = useDashboardMetrics();
-  const [latency, setLatency] = useState(12);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLatency((prev) =>
-        Math.max(8, Math.min(45, prev + (Math.random() * 6 - 3))),
-      );
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  const { latency, status } = useNexusHealth();
 
   const statusItems = [
     {
       icon: Wifi,
-      label: isOnline ? "Link Estável" : "Link Offline",
+      label: isOnline ? "Link Ativo" : "Link Offline",
       status: isOnline ? "success" : "danger",
       tooltip: isOnline
-        ? "Conexão criptografada ativa"
-        : "Protocolo de rede interrompido",
+        ? "Conexão com a rede ativa"
+        : "Dispositivo sem conexão com a rede",
       subLabel: "Rede Nexus",
     },
     {
       icon: Database,
       label: isFetching ? "Sync em Curso..." : "Nuvem Sincronizada",
       status: isFetching ? "warning" : "success",
-      tooltip: "Status do barramento de dados Supabase Cloud",
+      tooltip: "Sincronização de dados com o Supabase",
       subLabel: "Data Core",
     },
     {
       icon: Server,
-      label: `Ping: ${latency.toFixed(0)}ms`,
-      status: latency > 30 ? "warning" : "success",
-      tooltip: "Latência de rede otimizada para operações em escala",
+      label: latency === null ? "Ping: —" : `Ping: ${latency}ms`,
+      status: pingStatus(latency),
+      tooltip:
+        latency === null
+          ? "Latência não medida neste momento"
+          : `Latência real medida via round-trip ao Supabase: ${latency}ms`,
       subLabel: "Mainframe",
     },
     {
       icon: Shield,
-      label: "SSL Ativo",
+      label:
+        status === "healthy" || status === "degraded"
+          ? "SSL Ativo"
+          : "SSL Indeterminado",
       status: "success" as const,
-      tooltip: "Criptografia de nível militar ponta-a-ponta",
+      tooltip: "Conexão criptografada via HTTPS",
       subLabel: "Security",
     },
     {
       icon: Activity,
       label: `${metrics?.alertasCriticos || 0} Eventos`,
       status: (metrics?.alertasCriticos || 0) > 0 ? "warning" : "success",
-      tooltip: "Monitoramento bio-digital de anomalias operacionais",
+      tooltip:
+        "Alertas críticos ativos calculados a partir das operações reais",
       subLabel: "Telemetry",
     },
   ];
@@ -79,12 +84,14 @@ export function LiveStatusBar() {
     success: "text-success",
     warning: "text-warning",
     danger: "text-destructive",
+    undefined: "text-muted-foreground",
   };
 
   const dotColors = {
     success: "bg-success shadow-[0_0_15px_rgba(34,197,94,0.6)]",
     warning: "bg-warning shadow-[0_0_15px_rgba(234,179,8,0.6)]",
     danger: "bg-destructive shadow-[0_0_15px_rgba(239,68,68,0.6)]",
+    undefined: "bg-muted-foreground",
   };
 
   return (
@@ -129,7 +136,8 @@ export function LiveStatusBar() {
                       <div
                         className={cn(
                           "absolute inset-0 rounded-full animate-ping opacity-30",
-                          dotColors[item.status as keyof typeof dotColors],
+                          item.status !== "undefined" &&
+                            dotColors[item.status as keyof typeof dotColors],
                         )}
                       />
                     </div>
@@ -160,8 +168,12 @@ export function LiveStatusBar() {
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "w-2 h-2 rounded-full animate-pulse",
-                        dotColors[item.status as keyof typeof dotColors],
+                        "w-2 h-2 rounded-full",
+                        dotColors[
+                          item.status === "undefined"
+                            ? "undefined"
+                            : (item.status as keyof typeof dotColors)
+                        ],
                       )}
                     />
                     {item.tooltip}
