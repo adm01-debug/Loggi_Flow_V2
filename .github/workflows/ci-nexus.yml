@@ -67,6 +67,6 @@ jobs:
       - name: Check Coverage
         run: npm run test:coverage -- --run
 
-      # E2E movido para .github/workflows/e2e.yml (workflow_dispatch): os specs de
-      # tests/e2e usam credenciais ficticias e exigem usuario de teste seedado +
-      # secrets — nao podem bloquear o gate ate serem estabilizados.
+      # E2E nao e gate (nao roda no CI): specs de tests/e2e usam credenciais
+      # ficticias e sem webServer; o workflow e2e.yml foi removido em 20/11/2026.
+      # Reativar so com usuario de teste seedado em prod + webServer no workflow.

@@ -50,8 +50,17 @@ jobs:
           fi
       - name: Instalar cliente PostgreSQL
         run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client >/dev/null
-      - name: Aplicar migration em transacao
+      - name: Aplicar migration em transacao e registrar no tracking
         run: |
+          VERSION=$(basename "$ARQUIVO")
+          JA_APLICADA=$(psql "$DESTINO_URL" -X -At -c "SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '$VERSION';")
+          if [ "$JA_APLICADA" = "1" ]; then
+            echo "::error::Migration '$VERSION' ja consta no schema_migrations; nada foi aplicado."
+            exit 1
+          fi
           echo "Aplicando $ARQUIVO"
-          psql "$DESTINO_URL" -v ON_ERROR_STOP=1 --single-transaction -f "$ARQUIVO"
+          {
+            cat "$ARQUIVO"
+            printf "\nINSERT INTO supabase_migrations.schema_migrations (version, statements) VALUES ('%s', '{}') ON CONFLICT (version) DO NOTHING;\n" "$VERSION"
+          } | psql "$DESTINO_URL" -v ON_ERROR_STOP=1 --single-transaction
           echo "OK"
