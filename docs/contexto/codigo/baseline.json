@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "021e12f01fd14144099beb3d68e76095abc13805",
+  "commit": "eb09cdc2d3792170f976b858a2439bcbfd37c1f6",
   "branch": "main",
-  "data_commit": "2026-11-20T14:08:50-03:00",
+  "data_commit": "2026-11-20T15:00:08-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "eb09cdc",
+    "data": "2026-11-20",
+    "assunto": "chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)"
+   },
    {
     "sha": "021e12f",
     "data": "2026-11-20",
@@ -126,22 +131,17 @@
     "sha": "a2979e0",
     "data": "2026-11-19",
     "assunto": "chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)"
-   },
-   {
-    "sha": "f93a675",
-    "data": "2026-11-19",
-    "assunto": "fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)"
    }
   ],
-  "arquivos_mudados_7d": 162,
+  "arquivos_mudados_7d": 163,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
-    "mudancas": 12
+    "mudancas": 13
    },
    {
     "pasta": "package.json",
-    "mudancas": 12
+    "mudancas": 13
    },
    {
     "pasta": "src/hooks/logistics",
@@ -199,11 +199,11 @@
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 51
+    "mudancas": 52
    },
    {
     "arquivo": "package.json",
-    "mudancas": 50
+    "mudancas": 51
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
@@ -218,16 +218,16 @@
     "mudancas": 6
    },
    {
+    "arquivo": ".github/workflows/deploy-functions.yml",
+    "mudancas": 6
+   },
+   {
     "arquivo": ".github/workflows/types-sync.yml",
     "mudancas": 6
    },
    {
     "arquivo": "scripts/validate-csp.mjs",
     "mudancas": 6
-   },
-   {
-    "arquivo": ".github/workflows/deploy-functions.yml",
-    "mudancas": 5
    },
    {
     "arquivo": ".github/workflows/e2e.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 148
+    "commits": 149
    },
    {
     "autor": "dependabot[bot]",
@@ -314,7 +314,7 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1321,
+  "arquivos_total": 1322,
   "arquivos_codigo": 877,
   "linhas_codigo": 168517,
   "rotas": 61,
@@ -326,7 +326,7 @@
   "hooks": 177,
   "edge_functions": 43,
   "tabelas": 144,
-  "migrations": 248,
+  "migrations": 249,
   "cron_jobs": 28,
   "testes": 130,
   "workflows": 18,

@@ -4,7 +4,7 @@
  "stack": {
   "linguagens": [
    "TypeScript (791)",
-   "SQL (261)",
+   "SQL (262)",
    "Markdown (100)",
    "JavaScript (79)",
    "JSON (33)",
@@ -435,10 +435,13 @@
    "arquivo": ".github/workflows/deploy-functions.yml",
    "nome": "Deploy Edge Functions",
    "gatilhos": [
+    "push",
     "workflow_dispatch"
    ],
    "crons": [],
-   "branches": [],
+   "branches": [
+    "main"
+   ],
    "jobs": [
     "deploy"
    ],

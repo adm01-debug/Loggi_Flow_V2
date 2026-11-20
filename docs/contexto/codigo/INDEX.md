@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `021e12f01fd14144099beb3d68e76095abc13805` (2026-11-20T14:08:50-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `eb09cdc2d3792170f976b858a2439bcbfd37c1f6` (2026-11-20T15:00:08-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (791), SQL (261), Markdown (100), JavaScript (79), JSON (33), YAML (22), Shell (9), Python (8)
+- linguagens: TypeScript (791), SQL (262), Markdown (100), JavaScript (79), JSON (33), YAML (22), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,7 +34,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1321 |
+| arquivos_total | 1322 |
 | arquivos_codigo | 877 |
 | linhas_codigo | 168517 |
 | rotas | 61 |
@@ -46,7 +46,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | hooks | 177 |
 | edge_functions | 43 |
 | tabelas | 144 |
-| migrations | 248 |
+| migrations | 249 |
 | cron_jobs | 28 |
 | testes | 130 |
 | workflows | 18 |
@@ -274,20 +274,20 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8211 nós · 20784 arestas · 718 comunidades · grafo do commit `021e12f0`
-- comunidades maiores: Envios.tsx (220), lucide-react (211), App.tsx (171), db-observability/index.ts (150), input.tsx (148), react (144), @tanstack/react-query (140), ref_node_path (119), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), celebrationSounds.ts (89), common/index.ts (84), cn (82)
+- 8213 nós · 20785 arestas · 734 comunidades · grafo do commit `eb09cdc2`
+- comunidades maiores: badge.tsx (179), db-observability/index.ts (164), react (144), ref_node_path (141), input.tsx (132), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), lucide-react (101), cn (95), ui/index.ts (93), gerar.mjs (81), @tanstack/react-query (80), dependencies (77)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
-- package-lock.json (51)
-- package.json (50)
+- package-lock.json (52)
+- package.json (51)
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci.yml (7)
 - .github/workflows/ci-nexus.yml (6)
+- .github/workflows/deploy-functions.yml (6)
 - .github/workflows/types-sync.yml (6)
 - scripts/validate-csp.mjs (6)
-- .github/workflows/deploy-functions.yml (5)
 - .github/workflows/e2e.yml (5)
 - .github/workflows/inventario-estado-semanal.yml (5)
 - docs/auditoria-recuperacao-branches.md (5)
@@ -306,7 +306,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `codeql.yml` — CodeQL (schedule, workflow_dispatch; cron 30 9 * * *)
 - `contexto-ia.yml` — Contexto para agentes de IA (10 min) (push, schedule, workflow_dispatch; cron 7 * * * *)
 - `dependency-review.yml` — Dependency Review (pull_request)
-- `deploy-functions.yml` — Deploy Edge Functions (workflow_dispatch)
+- `deploy-functions.yml` — Deploy Edge Functions (push, workflow_dispatch)
 - `e2e.yml` — E2E (manual) (workflow_dispatch)
 - `inventario-estado-semanal.yml` — Inventário do estado real (semanal) (schedule, workflow_dispatch; cron 23 10 * * 1)
 - `notifica-falha-main.yml` — Notifica falha na main (workflow_run)
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `eb09cdc` chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)
 - 2026-11-20 `021e12f` fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)
 - 2026-11-20 `3706ba6` fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)
 - 2026-11-20 `b7a7b5f` fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `8a28944` feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)
 - 2026-11-20 `1716939` fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)
 - 2026-11-20 `99ca866` fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)
-- 2026-11-20 `c2e148b` docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

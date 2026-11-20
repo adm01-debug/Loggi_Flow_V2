@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "021e12f01fd14144099beb3d68e76095abc13805",
+  "sha": "eb09cdc2d3792170f976b858a2439bcbfd37c1f6",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 17:09 UTC",
-  "files_total": 1331,
-  "code_files": 1139,
-  "code_lines": 185031,
+  "generated_at": "2026-11-20 18:00 UTC",
+  "files_total": 1332,
+  "code_files": 1140,
+  "code_lines": 185125,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "eeec755b13dfae2a",
+ "facts_hash": "cc0f1f9869c59267",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -241,6 +241,7 @@
     "file": ".github/workflows/deploy-functions.yml",
     "name": "Deploy Edge Functions",
     "triggers": [
+     "push",
      "workflow_dispatch"
     ]
    },
@@ -311,7 +312,7 @@
   "languages": {
    ".tsx": 454,
    ".ts": 337,
-   ".sql": 261,
+   ".sql": 262,
    ".mjs": 77,
    ".py": 8,
    ".js": 2
@@ -20596,6 +20597,7 @@
    "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql",
    "supabase/migrations/20261118220000_fix_notif_type_enum_cast.sql",
    "supabase/migrations/20261120120000_restore_grant_execute_add_user_xp.sql",
+   "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
    "supabase/seed.sql",
    "src/integrations/supabase/types.ts"
   ],
@@ -30584,8 +30586,8 @@
   },
   {
    "module": "supabase/migrations",
-   "files": 248,
-   "lines": 15167,
+   "files": 249,
+   "lines": 15261,
    "tables": [],
    "exports": [],
    "docs": [],
@@ -88691,6 +88693,10 @@
     "add_user_xp"
    ]
   },
+  "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql": {
+   "path": "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
+   "lines": 94
+  },
   "tests/contracts/nexus-contracts.spec.ts": {
    "path": "tests/contracts/nexus-contracts.spec.ts",
    "lines": 110,
@@ -88858,10 +88864,22 @@
   }
  },
  "git": {
-  "sha": "021e12f01fd14144099beb3d68e76095abc13805",
+  "sha": "eb09cdc2d3792170f976b858a2439bcbfd37c1f6",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "eb09cdc",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)",
+    "files": [
+     ".github/workflows/deploy-functions.yml",
+     "package-lock.json",
+     "package.json",
+     "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql"
+    ]
+   },
    {
     "sha": "021e12f",
     "date": "2026-11-20",
@@ -89187,29 +89205,16 @@
      ".github/workflows/inventario-estado-semanal.yml",
      ".github/workflows/types-sync.yml"
     ]
-   },
-   {
-    "sha": "f3db2b8",
-    "date": "2026-11-18",
-    "author": "dependabot[bot]",
-    "subject": "chore(deps): bump actions/setup-node from 6.5.0 to 7.1.0 (#187)",
-    "files": [
-     ".github/workflows/automation-local.yml",
-     ".github/workflows/ci-nexus.yml",
-     ".github/workflows/ci.yml",
-     ".github/workflows/contexto-ia.yml",
-     ".github/workflows/e2e.yml"
-    ]
    }
   ],
   "hot_files": [
    [
     "package-lock.json",
-    5
+    6
    ],
    [
     "package.json",
-    5
+    6
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
@@ -89264,6 +89269,14 @@
     2
    ],
    [
+    ".github/workflows/deploy-functions.yml",
+    1
+   ],
+   [
+    "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
+    1
+   ],
+   [
     "scripts/db-audit/grants-baseline.json",
     1
    ],
@@ -89273,14 +89286,6 @@
    ],
    [
     "docs/pendencias/02-11-rodonaves-clientes.md",
-    1
-   ],
-   [
-    "docs/pendencias/02-13-add-user-xp-grant.md",
-    1
-   ],
-   [
-    "docs/pendencias/02-15-cnpj-remetente-default.md",
     1
    ]
   ]
