@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "13eb1a108133cfc5acf9aa085897b0c31e985db2",
+  "sha": "ea8d1a4c0cc347b2b94d2644139388bbc95e35bf",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-19 17:12 UTC",
+  "generated_at": "2026-11-20 00:34 UTC",
   "files_total": 1313,
   "code_files": 1136,
   "code_lines": 183787,
@@ -88788,10 +88788,19 @@
   }
  },
  "git": {
-  "sha": "13eb1a108133cfc5acf9aa085897b0c31e985db2",
+  "sha": "ea8d1a4c0cc347b2b94d2644139388bbc95e35bf",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "ea8d1a4",
+    "date": "2026-11-19",
+    "author": "adm01-debug",
+    "subject": "chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)",
+    "files": [
+     ".github/workflows/branch-hygiene-audit.yml"
+    ]
+   },
    {
     "sha": "13eb1a1",
     "date": "2026-11-19",
@@ -89128,21 +89137,12 @@
     "files": [
      "supabase/schema-manifest.json"
     ]
-   },
-   {
-    "sha": "0ead536",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "chore: atualiza 64 dependencias dentro dos ranges ja aprovados (#167)",
-    "files": [
-     "package-lock.json"
-    ]
    }
   ],
   "hot_files": [
    [
     "package-lock.json",
-    6
+    5
    ],
    [
     "package.json",
@@ -89217,7 +89217,7 @@
     2
    ],
    [
-    "docs/agentes/mapa-integracao-20261112.md",
+    ".github/workflows/branch-hygiene-audit.yml",
     1
    ]
   ]

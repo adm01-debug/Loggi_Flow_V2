@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "13eb1a108133cfc5acf9aa085897b0c31e985db2",
+  "commit": "ea8d1a4c0cc347b2b94d2644139388bbc95e35bf",
   "branch": "main",
-  "data_commit": "2026-11-19T13:54:49-03:00",
+  "data_commit": "2026-11-19T21:01:46-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "ea8d1a4",
+    "data": "2026-11-19",
+    "assunto": "chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)"
+   },
    {
     "sha": "13eb1a1",
     "data": "2026-11-19",
@@ -126,14 +131,9 @@
     "sha": "1000cd9",
     "data": "2026-11-17",
     "assunto": "chore: atualiza eslint-plugin-sonarjs para 4.2.2 (#171)"
-   },
-   {
-    "sha": "cf7f398",
-    "data": "2026-11-17",
-    "assunto": "fix: audit-gate derrubava o CI por advisory novo de picomatch sem fix (#173)"
    }
   ],
-  "arquivos_mudados_7d": 121,
+  "arquivos_mudados_7d": 117,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 130
+    "commits": 131
    },
    {
     "autor": "dependabot[bot]",

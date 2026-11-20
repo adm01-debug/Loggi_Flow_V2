@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)",
    "chore: arquiva mapa de integracao 20261112 como registro historico (#200)",
    "chore(db): sincronizar artefatos derivados do banco [auto]",
    "style(manutencao): aplica correcoes locais verificadas (#199)",
-   "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)",
-   "chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)"
+   "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

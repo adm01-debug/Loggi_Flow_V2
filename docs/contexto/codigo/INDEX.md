@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `13eb1a108133cfc5acf9aa085897b0c31e985db2` (2026-11-19T13:54:49-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `ea8d1a4c0cc347b2b94d2644139388bbc95e35bf` (2026-11-19T21:01:46-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8137 nós · 20544 arestas · 710 comunidades · grafo do commit `13eb1a10`
+- 8137 nós · 20544 arestas · 710 comunidades · grafo do commit `ea8d1a4c`
 - comunidades maiores: utils.ts (239), lucide-react (222), react (193), client.ts (170), ui/index.ts (121), ref_node_path (112), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), cn (90), common/index.ts (83), gerar.mjs (81), dependencies (77), rodonaves-api/index.ts (77)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -401,6 +401,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-19 `ea8d1a4` chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)
 - 2026-11-19 `13eb1a1` chore: arquiva mapa de integracao 20261112 como registro historico (#200)
 - 2026-11-19 `ed9aa79` chore(db): sincronizar artefatos derivados do banco [auto]
 - 2026-11-19 `7ab44e7` style(manutencao): aplica correcoes locais verificadas (#199)
@@ -415,7 +416,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-18 `bfd7215` chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)
 - 2026-11-18 `094b33b` chore(deps): bump vaul from 0.9.9 to 1.1.2 (#191)
 - 2026-11-18 `9c1c505` chore(deps): bump @remix-run/router and react-router-dom (#185)
-- 2026-11-18 `67c87ec` ci(seguranca): recupera dependency review nos PRs da branch claude/seguranca-workflows-261112 (#182)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
