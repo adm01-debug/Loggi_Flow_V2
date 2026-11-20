@@ -3532,7 +3532,7 @@
         "e:public.frete_interno_status|PUBLIC|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "e:public.frete_interno_status|postgres|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327"
     },
-    "generated_at": "2026-11-19T10:27:49Z",
+    "generated_at": "2026-11-20T14:47:43Z",
     "column_grants": {
     },
     "schema_grants": {
@@ -3924,6 +3924,7 @@
         "f:ensure_monthly_partition(p_parent text, p_year integer, p_month integer)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:add_user_xp(p_user_id uuid, p_xp_amount integer, p_coins_amount integer)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:ensure_monthly_partition(p_parent text, p_year integer, p_month integer)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
+        "f:add_user_xp(p_user_id uuid, p_xp_amount integer, p_coins_amount integer)|authenticated|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_cache_hit_ratios(p_min_reads bigint, p_max_ratio numeric, p_limit integer)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:auto_revert_ineffective_indexes(p_min_hours integer, p_min_improvement numeric)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_maintenance_windows(p_days integer, p_window_hours integer, p_limit integer)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
