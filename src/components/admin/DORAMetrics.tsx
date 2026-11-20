@@ -9,13 +9,17 @@ import {
   History,
   TrendingUp,
   ShieldCheck,
+  Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useGlobalHealthScore } from "@/features/db-observability/hooks/useGlobalHealthScore";
+import { useRemediationMttr } from "@/features/db-observability/hooks/useRemediationMttr";
+import { useRemediationSuggestions } from "@/features/db-observability/hooks/useRemediationSuggestions";
 
 interface DORAIndicatorProps {
   label: string;
   value: string;
-  trend: string;
+  trend?: string | null;
   status: "elite" | "high" | "medium" | "low";
   icon: React.ComponentType<{ className?: string }>;
 }
@@ -54,16 +58,233 @@ const DORAIndicator = ({
         </p>
         <div className="flex items-end gap-2 mt-1">
           <span className="text-2xl font-black text-foreground">{value}</span>
-          <span className="text-[10px] text-success font-bold mb-1 flex items-center">
-            <TrendingUp className="w-3 h-3 mr-0.5" /> {trend}
-          </span>
+          {trend && (
+            <span className="text-[10px] text-success font-bold mb-1 flex items-center">
+              <TrendingUp className="w-3 h-3 mr-0.5" /> {trend}
+            </span>
+          )}
         </div>
       </div>
     </motion.div>
   );
 };
 
+/** Nível DORA derivado de um score 0–100 real (grade A+..F). */
+function levelForScore(
+  score: number | null | undefined,
+): "elite" | "high" | "medium" | "low" {
+  if (score == null) return "low";
+  if (score >= 90) return "elite";
+  if (score >= 70) return "high";
+  if (score >= 40) return "medium";
+  return "low";
+}
+
+const fmtHours = (h: number | null | undefined): string => {
+  if (h == null) return "—";
+  if (h < 1) return `${Math.round(h * 60)}min`;
+  if (h < 48) return `${h.toFixed(1)}h`;
+  return `${(h / 24).toFixed(1)}d`;
+};
+
+interface HealthDetails {
+  critical_anomalies?: number;
+  warning_anomalies?: number;
+  resolution_rate_pct?: number;
+  avg_mttr_hours?: number;
+  [key: string]: unknown;
+}
+
+interface DerivedLabels {
+  deployLabel: string;
+  sloLabel: string;
+  anomaliesLabel: string;
+  capacityLabel: string;
+}
+
+/** Deriva os rótulos exibidos dos valores reais (0-100) retornados pelas RPCs. */
+function deriveLabels(args: {
+  slo: number | null;
+  anomaly: number | null;
+  capacity: number | null;
+  details: HealthDetails | null | undefined;
+  anomalies: number;
+}): DerivedLabels {
+  let anomaliesLabel: string;
+  if (args.anomalies > 0) {
+    anomaliesLabel = `${args.anomalies} ativas`;
+  } else if (args.anomaly != null) {
+    anomaliesLabel = `${args.anomaly.toFixed(1)}/100 sem ativos`;
+  } else {
+    anomaliesLabel = "—";
+  }
+
+  let deployLabel: string;
+  if (args.details && args.details.resolution_rate_pct != null) {
+    deployLabel = `${args.details.resolution_rate_pct.toFixed(1)}% de entregas concluídas`;
+  } else {
+    deployLabel = "— sem fonte de deploys";
+  }
+
+  let sloLabel: string;
+  if (args.slo != null) {
+    sloLabel = `${args.slo.toFixed(1)}/100`;
+  } else {
+    sloLabel = "—";
+  }
+
+  let capacityLabel: string;
+  if (args.capacity != null) {
+    capacityLabel = `${args.capacity.toFixed(1)}/100`;
+  } else {
+    capacityLabel = "—";
+  }
+
+  return { deployLabel, sloLabel, anomaliesLabel, capacityLabel };
+}
+
 export function DORAMetrics() {
+  const health = useGlobalHealthScore();
+  const mttr = useRemediationMttr();
+  const suggestions = useRemediationSuggestions();
+
+  const loading = health.isLoading || mttr.isLoading;
+  const error =
+    health.error || mttr.error ? "Falha ao consultar métricas de saúde." : null;
+
+  const grade = health.data?.grade ?? null;
+  const slo = health.data?.slo_score ?? null;
+  const anomaly = health.data?.anomaly_score ?? null;
+  const capacity = health.data?.capacity_score ?? null;
+  const mttrScore = health.data?.mttr_score ?? null;
+  const details = health.data?.details;
+
+  const mttrHours =
+    mttr.data?.find((r) => r.mttr_hours != null)?.mttr_hours ??
+    details?.avg_mttr_hours ??
+    null;
+  const resolutionRate =
+    mttr.data?.find((r) => r.resolution_rate_pct != null)
+      ?.resolution_rate_pct ??
+    details?.resolution_rate_pct ??
+    null;
+
+  const pending =
+    suggestions.data?.filter((s) => s.severity !== "ok").length ?? null;
+
+  // --- valores derivados das fontes reais (RPCs) ---
+  const critical = details?.critical_anomalies ?? 0;
+  const warning = details?.warning_anomalies ?? 0;
+  const anomalies = critical + warning;
+
+  const { deployLabel, sloLabel, anomaliesLabel, capacityLabel } = deriveLabels(
+    {
+      slo,
+      anomaly,
+      capacity,
+      details,
+      anomalies,
+    },
+  );
+
+  const indicators = [
+    {
+      label: "Frequência de Deploy",
+      value: deployLabel,
+      trend: null,
+      status: levelForScore(details?.resolution_rate_pct ?? null),
+      icon: Rocket,
+    },
+    {
+      label: "Disponibilidade (SLO)",
+      value: sloLabel,
+      trend: null,
+      status: levelForScore(slo),
+      icon: Zap,
+    },
+    {
+      label: "Anomalias Ativas",
+      value: anomaliesLabel,
+      trend: null,
+      status: levelForScore(anomaly),
+      icon: AlertTriangle,
+    },
+    {
+      label: "MTTR (Restauração)",
+      value: fmtHours(mttrHours),
+      trend:
+        resolutionRate != null
+          ? `resolução ${resolutionRate.toFixed(0)}%`
+          : null,
+      status: levelForScore(mttrScore),
+      icon: History,
+    },
+  ];
+
+  let body: React.ReactNode;
+  if (loading) {
+    body = (
+      <div className="flex items-center justify-center py-10 text-muted-foreground text-sm gap-2">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Carregando métricas reais de operação…
+      </div>
+    );
+  } else if (error) {
+    body = (
+      <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20 text-sm text-destructive">
+        {error}
+      </div>
+    );
+  } else {
+    body = (
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {indicators.map((ind) => (
+            <DORAIndicator key={ind.label} {...ind} />
+          ))}
+        </div>
+
+        <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+          <div className="flex items-center gap-2 mb-4">
+            <Activity className="h-4 w-4 text-primary" />
+            <h4 className="text-sm font-bold uppercase tracking-widest text-primary">
+              Sugestões de Remediação Pendentes
+            </h4>
+          </div>
+          {pending != null && pending > 0 ? (
+            <ul className="space-y-3">
+              {(suggestions.data ?? [])
+                .filter((s) => s.severity !== "ok")
+                .slice(0, 4)
+                .map((s) => (
+                  <li
+                    key={s.id}
+                    className="flex items-center gap-2 text-xs text-muted-foreground"
+                  >
+                    <div className={cnBadge(s.severity)} />
+                    <span>
+                      {s.title}
+                      <span className="text-muted-foreground/70">
+                        {" — "}
+                        {s.severity}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Nenhuma remediação pendente detectada no momento.
+            </p>
+          )}
+          <p className="mt-3 text-[10px] text-muted-foreground/70 uppercase tracking-widest">
+            Capacidade de processamento: {capacityLabel}
+          </p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <Card className="border-primary/20 bg-zinc-950/50 backdrop-blur-xl">
       <CardHeader className="pb-3 border-b border-white/5">
@@ -77,67 +298,25 @@ export function DORAMetrics() {
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-success" />
             <span className="text-[10px] font-black text-muted-foreground uppercase">
-              Maturidade 10/10
+              {grade ? `Saúde do Sistema ${grade}` : "Saúde do Sistema"}
             </span>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <DORAIndicator
-            label="Frequência de Deploy"
-            value="4.2/dia"
-            trend="+12%"
-            status="elite"
-            icon={Rocket}
-          />
-          <DORAIndicator
-            label="Lead Time (Commits)"
-            value="45min"
-            trend="-5%"
-            status="elite"
-            icon={Zap}
-          />
-          <DORAIndicator
-            label="Taxa de Erro (Fail)"
-            value="0.8%"
-            trend="-2%"
-            status="high"
-            icon={AlertTriangle}
-          />
-          <DORAIndicator
-            label="MTTR (Restauração)"
-            value="12min"
-            trend="-15%"
-            status="elite"
-            icon={History}
-          />
-        </div>
-
-        <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-          <div className="flex items-center gap-2 mb-4">
-            <Activity className="h-4 w-4 text-primary" />
-            <h4 className="text-sm font-bold uppercase tracking-widest text-primary">
-              Próximas Automatizações
-            </h4>
-          </div>
-          <ul className="space-y-3">
-            {[
-              "Migração para Canary Deployments via Edge",
-              "Automação de Testes de Carga (Load Testing)",
-              "Otimização de Bundles via Module Federation",
-            ].map((task, i) => (
-              <li
-                key={i}
-                className="flex items-center gap-2 text-xs text-muted-foreground"
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                {task}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </CardContent>
+      <CardContent className="pt-6 space-y-6">{body}</CardContent>
     </Card>
   );
 }
+
+const badgeClass = (severity: string) => {
+  switch (severity) {
+    case "critical":
+      return "w-1.5 h-1.5 rounded-full bg-destructive";
+    case "warning":
+      return "w-1.5 h-1.5 rounded-full bg-warning";
+    default:
+      return "w-1.5 h-1.5 rounded-full bg-primary/40";
+  }
+};
+
+const cnBadge = (severity: string) => badgeClass(severity);

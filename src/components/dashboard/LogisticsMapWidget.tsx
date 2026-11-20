@@ -81,7 +81,6 @@ export function LogisticsMapWidget() {
   >("all");
   const [showMission, setShowMission] = React.useState(false);
   const [showHeatmap] = React.useState(false);
-  const [isOptimizing, setIsOptimizing] = React.useState(false);
   const [showPerformance, setShowPerformance] = React.useState(false);
   const [isExporting, setIsExporting] = React.useState(false);
   const [showAnomalies, setShowAnomalies] = React.useState(false);
@@ -96,6 +95,29 @@ export function LogisticsMapWidget() {
   });
 
   const [mapStyle, setMapStyle] = React.useState<"dark" | "satellite">("dark");
+
+  const performanceData = React.useMemo(() => {
+    const bins = [
+      { name: "00h", v: 0, c: 0 },
+      { name: "04h", v: 0, c: 0 },
+      { name: "08h", v: 0, c: 0 },
+      { name: "12h", v: 0, c: 0 },
+      { name: "16h", v: 0, c: 0 },
+      { name: "20h", v: 0, c: 0 },
+      { name: "23h", v: 0, c: 0 },
+    ];
+    for (const s of shipments) {
+      const hour = s.previsao ? new Date(s.previsao).getHours() : 12;
+      let bin = bins.find((b) => {
+        const [hb] = b.name.replace("h", "").split(":").map(Number);
+        return hb === hour;
+      });
+      if (!bin) bin = bins[bins.length - 1];
+      bin.v += 1;
+      if (s.atrasado) bin.c += 1;
+    }
+    return bins;
+  }, [shipments]);
 
   const filteredShipments = React.useMemo(() => {
     return shipments.filter((s) => {
@@ -226,7 +248,9 @@ export function LogisticsMapWidget() {
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  setMapStyle((prev) => (prev === "dark" ? "satellite" : "dark"))
+                  setMapStyle((prev) =>
+                    prev === "dark" ? "satellite" : "dark",
+                  )
                 }
                 className="h-9 rounded-full bg-white/5 border-white/10 text-white hover:bg-white/10 gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2"
               >
@@ -241,25 +265,15 @@ export function LogisticsMapWidget() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  setIsOptimizing(true);
-                  toast.promise(new Promise((r) => setTimeout(r, 2000)), {
-                    loading: "Calculando rotas neurais...",
-                    success: "Logística otimizada via IA!",
-                    error: "Falha na otimização",
-                  });
-                  setTimeout(() => setIsOptimizing(false), 2000);
-                }}
-                disabled={isOptimizing}
-                className={cn(
-                  "h-9 rounded-full bg-primary/10 border-primary/20 text-primary gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all",
-                  isOptimizing && "animate-pulse",
-                )}
+                onClick={() =>
+                  toast.info(
+                    "Otimização automática de rotas requer integração com provedor de roteirização.",
+                  )
+                }
+                className="h-9 rounded-full bg-primary/10 border-primary/20 text-primary gap-2 font-black text-[10px] uppercase tracking-widest px-4 border-2 transition-all"
               >
-                <Zap
-                  className={cn("w-3 h-3", isOptimizing && "fill-current")}
-                />
-                {isOptimizing ? "Otimizando..." : "Auto-Otimizar"}
+                <Zap className="w-3 h-3" />
+                Auto-Otimizar
               </Button>
 
               <Button
@@ -371,7 +385,9 @@ export function LogisticsMapWidget() {
               <div className="px-2">
                 <Slider
                   value={timeTravelRange}
-                  onValueChange={(val: number[]) => setTimeTravelRange(val as [number, number])}
+                  onValueChange={(val: number[]) =>
+                    setTimeTravelRange(val as [number, number])
+                  }
                   max={24}
                   step={1}
                   minStepsBetweenThumbs={1}
@@ -414,14 +430,14 @@ export function LogisticsMapWidget() {
                     <div className="flex items-center gap-3 mb-4 text-primary">
                       <Zap className="w-5 h-5" />
                       <span className="text-[10px] font-black uppercase tracking-widest">
-                        Velocidade de Fluxo
+                        Operações no Paniel
                       </span>
                     </div>
                     <p className="text-4xl font-black text-white italic tracking-tighter">
-                      94.2%
+                      {shipments.length}
                     </p>
                     <p className="text-[10px] font-bold text-success uppercase mt-2">
-                      ↑ 2.4% vs ontem
+                      carregamentos reais
                     </p>
                   </div>
                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
@@ -432,24 +448,47 @@ export function LogisticsMapWidget() {
                       </span>
                     </div>
                     <p className="text-4xl font-black text-white italic tracking-tighter">
-                      98.8%
+                      {shipments.length > 0
+                        ? `${Math.round(
+                            (shipments.filter((s) =>
+                              [
+                                "entregue",
+                                "finalizado",
+                                "recebido",
+                                "coletado",
+                              ].includes(s.status),
+                            ).length /
+                              shipments.length) *
+                              100,
+                          )}%`
+                        : "—"}
                     </p>
                     <p className="text-[10px] font-bold text-success uppercase mt-2">
-                      Nominal
+                      {
+                        shipments.filter((s) =>
+                          [
+                            "entregue",
+                            "finalizado",
+                            "recebido",
+                            "coletado",
+                          ].includes(s.status),
+                        ).length
+                      }{" "}
+                      concluídos de {shipments.length}
                     </p>
                   </div>
                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
                     <div className="flex items-center gap-3 mb-4 text-primary">
                       <Clock className="w-5 h-5" />
                       <span className="text-[10px] font-black uppercase tracking-widest">
-                        SLA Médio
+                        Atrasos
                       </span>
                     </div>
                     <p className="text-4xl font-black text-white italic tracking-tighter">
-                      1.4d
+                      {shipments.filter((s) => s.atrasado).length}
                     </p>
                     <p className="text-[10px] font-bold text-white/40 uppercase mt-2">
-                      Meta: 2.0d
+                      operações fora do prazo
                     </p>
                   </div>
                 </div>
@@ -457,16 +496,8 @@ export function LogisticsMapWidget() {
                 <div className="h-[300px] w-full bg-white/5 rounded-[2rem] border border-white/10 p-6">
                   <PerformanceChart
                     title="Análise de Vazão Logística"
-                    subtitle="Volume de remessas vs Capacidade de processamento"
-                    data={[
-                      { name: "00h", v: 12, c: 80 },
-                      { name: "04h", v: 8, c: 80 },
-                      { name: "08h", v: 45, c: 90 },
-                      { name: "12h", v: 82, c: 95 },
-                      { name: "16h", v: 65, c: 90 },
-                      { name: "20h", v: 30, c: 85 },
-                      { name: "23h", v: 15, c: 80 },
-                    ]}
+                    subtitle="Operações reais no período selecionado"
+                    data={performanceData}
                     dataKey="v"
                     secondaryDataKey="c"
                     xAxisKey="name"
@@ -504,7 +535,9 @@ export function LogisticsMapWidget() {
                       {["all", "entrega", "coleta"].map((type) => (
                         <button
                           key={type}
-                          onClick={() => setTypeFilter(type as "all" | "entrega" | "coleta")}
+                          onClick={() =>
+                            setTypeFilter(type as "all" | "entrega" | "coleta")
+                          }
                           className={cn(
                             "h-8 rounded-xl border text-[8px] font-black uppercase transition-all",
                             typeFilter === type
@@ -809,116 +842,131 @@ export function LogisticsMapWidget() {
               )}
 
               {filteredShipments.map((s) => {
-                const inTransit = ["em_transito", "despachado", "saiu_entrega"].includes(s.status);
-                const delivered = ["entregue", "finalizado", "recebido"].includes(s.status);
+                const inTransit = [
+                  "em_transito",
+                  "despachado",
+                  "saiu_entrega",
+                ].includes(s.status);
+                const delivered = [
+                  "entregue",
+                  "finalizado",
+                  "recebido",
+                ].includes(s.status);
                 let statusRingColor = "bg-destructive";
                 if (inTransit) statusRingColor = "bg-primary";
                 else if (delivered) statusRingColor = "bg-success";
-                let markerColorClass = "bg-black border-destructive text-destructive";
-                if (inTransit) markerColorClass = "bg-black border-primary text-primary";
-                else if (delivered) markerColorClass = "bg-black border-success text-success";
+                let markerColorClass =
+                  "bg-black border-destructive text-destructive";
+                if (inTransit)
+                  markerColorClass = "bg-black border-primary text-primary";
+                else if (delivered)
+                  markerColorClass = "bg-black border-success text-success";
                 let MarkerIcon = <Package className="w-5 h-5" />;
-                if (s.atrasado) MarkerIcon = <AlertTriangle className="w-5 h-5 animate-bounce" />;
+                if (s.atrasado)
+                  MarkerIcon = (
+                    <AlertTriangle className="w-5 h-5 animate-bounce" />
+                  );
                 else if (s.valorFrete && s.valorFrete > 500)
-                  MarkerIcon = <Star className="w-5 h-5 animate-pulse text-primary fill-primary" />;
-                else if (s.tipo === "entrega") MarkerIcon = <Truck className="w-5 h-5" />;
+                  MarkerIcon = (
+                    <Star className="w-5 h-5 animate-pulse text-primary fill-primary" />
+                  );
+                else if (s.tipo === "entrega")
+                  MarkerIcon = <Truck className="w-5 h-5" />;
                 return (
-                <Marker
-                  key={s.id}
-                  latitude={s.coordinates!.lat}
-                  longitude={s.coordinates!.lng}
-                  anchor="bottom"
-                  onClick={(e) => {
-                    e.originalEvent.stopPropagation();
-                    setSelectedShipment(s);
-                  }}
-                >
-                  <div className="group/marker cursor-pointer relative">
-                    {/* Variational Alert Rings */}
-                    {(s.atrasado || (s.valorFrete && s.valorFrete > 500)) && (
+                  <Marker
+                    key={s.id}
+                    latitude={s.coordinates!.lat}
+                    longitude={s.coordinates!.lng}
+                    anchor="bottom"
+                    onClick={(e) => {
+                      e.originalEvent.stopPropagation();
+                      setSelectedShipment(s);
+                    }}
+                  >
+                    <div className="group/marker cursor-pointer relative">
+                      {/* Variational Alert Rings */}
+                      {(s.atrasado || (s.valorFrete && s.valorFrete > 500)) && (
+                        <div
+                          className={cn(
+                            "absolute -inset-8 rounded-full animate-ping",
+                            s.atrasado ? "bg-destructive/30" : "bg-primary/30",
+                          )}
+                        />
+                      )}
                       <div
                         className={cn(
-                          "absolute -inset-8 rounded-full animate-ping",
-                          s.atrasado ? "bg-destructive/30" : "bg-primary/30",
+                          "absolute -inset-4 rounded-full animate-ping opacity-20",
+                          statusRingColor,
                         )}
                       />
-                    )}
-                    <div
-                      className={cn(
-                        "absolute -inset-4 rounded-full animate-ping opacity-20",
-                        statusRingColor,
-                      )}
-                    />
 
-                    <div
-                      className={cn(
-                        "relative p-2 rounded-xl border-2 shadow-2xl transition-all duration-500 group-hover/marker:scale-125 group-hover/marker:-translate-y-2",
-                        selectedShipment?.id === s.id
-                          ? "scale-125 -translate-y-2 border-white ring-4 ring-primary/30"
-                          : "border-primary/50",
-                        markerColorClass,
-                      )}
-                    >
-                      {MarkerIcon}
-                    </div>
+                      <div
+                        className={cn(
+                          "relative p-2 rounded-xl border-2 shadow-2xl transition-all duration-500 group-hover/marker:scale-125 group-hover/marker:-translate-y-2",
+                          selectedShipment?.id === s.id
+                            ? "scale-125 -translate-y-2 border-white ring-4 ring-primary/30"
+                            : "border-primary/50",
+                          markerColorClass,
+                        )}
+                      >
+                        {MarkerIcon}
+                      </div>
 
-
-                    {/* Simple Tooltip on Hover */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 group-hover/marker:opacity-100 transition-opacity pointer-events-none z-50">
-                      <div className="bg-black/90 border-2 border-primary/30 backdrop-blur-xl p-4 rounded-2xl shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] min-w-[220px]">
-                        <div className="flex justify-between items-start mb-2">
-                          <p className="text-[10px] font-black uppercase text-primary tracking-widest">
-                            {s.numero}
+                      {/* Simple Tooltip on Hover */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 group-hover/marker:opacity-100 transition-opacity pointer-events-none z-50">
+                        <div className="bg-black/90 border-2 border-primary/30 backdrop-blur-xl p-4 rounded-2xl shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] min-w-[220px]">
+                          <div className="flex justify-between items-start mb-2">
+                            <p className="text-[10px] font-black uppercase text-primary tracking-widest">
+                              {s.numero}
+                            </p>
+                            <div className="flex gap-1">
+                              {s.atrasado && (
+                                <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce uppercase">
+                                  Atraso
+                                </Badge>
+                              )}
+                              {s.valorFrete && s.valorFrete > 500 && (
+                                <Badge className="bg-primary text-[8px] font-black px-1 h-4 animate-pulse uppercase">
+                                  Variação
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-sm font-black text-white mb-1 uppercase tracking-tighter italic">
+                            {s.cliente || "CLIENTE NÃO INFORMADO"}
                           </p>
-                          <div className="flex gap-1">
-                            {s.atrasado && (
-                              <Badge className="bg-destructive text-[8px] font-black px-1 h-4 animate-bounce uppercase">
-                                Atraso
-                              </Badge>
-                            )}
-                            {s.valorFrete && s.valorFrete > 500 && (
-                              <Badge className="bg-primary text-[8px] font-black px-1 h-4 animate-pulse uppercase">
-                                Variação
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <p className="text-sm font-black text-white mb-1 uppercase tracking-tighter italic">
-                          {s.cliente || "CLIENTE NÃO INFORMADO"}
-                        </p>
-                        <p className="text-[9px] font-bold text-white/50 mb-3 uppercase tracking-widest">
-                          {s.transportadora}
-                        </p>
+                          <p className="text-[9px] font-bold text-white/50 mb-3 uppercase tracking-widest">
+                            {s.transportadora}
+                          </p>
 
-                        <div className="h-px bg-white/10 mb-3" />
+                          <div className="h-px bg-white/10 mb-3" />
 
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1.5">
-                            <Activity className="w-3 h-3 text-primary" />
-                            <span className="text-[8px] font-black text-white uppercase">
-                              {s.statusLabel}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              size="sm"
-                              className="h-6 px-3 bg-primary text-[8px] font-black uppercase rounded-lg pointer-events-auto"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setShowMission(true);
-                              }}
-                            >
-                              Missão
-                            </Button>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <Activity className="w-3 h-3 text-primary" />
+                              <span className="text-[8px] font-black text-white uppercase">
+                                {s.statusLabel}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                className="h-6 px-3 bg-primary text-[8px] font-black uppercase rounded-lg pointer-events-auto"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowMission(true);
+                                }}
+                              >
+                                Missão
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Marker>
+                  </Marker>
                 );
               })}
-
 
               {/* Rota Visualization if selected */}
               {selectedShipment?.coordinates && (
