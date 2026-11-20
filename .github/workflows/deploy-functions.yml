@@ -1,10 +1,15 @@
 # Deploy manual das Edge Functions no projeto jvfhclubfpxrtrrazrgr.
 # Requer o secret SUPABASE_ACCESS_TOKEN (token pessoal sbp_... da conta dona do projeto,
 # criado em https://supabase.com/dashboard/account/tokens e salvo em Settings → Secrets → Actions).
-# Sem trigger de push de propósito: enquanto o secret não existir, nada roda nem fica vermelho.
+# Deploy automatico em merge para a main (paths supabase/functions/**) e manual via workflow_dispatch.
+# O secret SUPABASE_ACCESS_TOKEN esta configurado desde 13/11; se for removido, o job falha na checagem inicial.
 name: Deploy Edge Functions
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/**'
   workflow_dispatch:
     inputs:
       only:
