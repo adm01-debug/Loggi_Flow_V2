@@ -6,8 +6,8 @@ Estado do main auditado: 08d5a138 (após merges #206-#210, 2026-11-20).
 ## Fase A — Itens QUEBRADOS (seção 2) que alteram dado/mentem ao usuário
 
 Feitos via #207/#208: 2.1, 2.2, 2.3, 2.4.
-Já corrigidos em main (verificação nov/20): 2.13 (grants reconsiderados), 2.15 (cnpjDefault).
 Feitos via #211/#212: 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.12, 2.14, 2.16.
+Feitos via #215: 2.11, 2.13, 2.15 (esta PR).
 
 Pendentes: — (Fase A encerrada; seção 2 sem pendências de código).
 
