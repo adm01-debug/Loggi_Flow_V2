@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `5d31fbc9e6` · branch `main` · 2026-11-20 19:12 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e4392b7d13` · branch `main` · 2026-11-20 19:25 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1045,8 +1045,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `last_status` | `succeeded` | compara | `src/features/db-observability/components/CronJobsCard.tsx` |
 | `phase` | `entregue` | compara | `src/lib/rodonaves/eventCodes.ts` |
 | `phase` | `no_destino` | compara | `src/lib/rodonaves/freightHealth.ts` |
-| `origem_estado` | `SP` | escreve | `src/pages/DashboardCotacoes.tsx` |
-| `destino_estado` | `RJ` | escreve | `src/pages/DashboardCotacoes.tsx` |
 | `to_status` | `despachado` | escreve | `src/pages/Despachos.tsx` |
 | `order_status` | `motorista_alocado` | escreve | `supabase/functions/lalamove-webhook/index.ts` |
 

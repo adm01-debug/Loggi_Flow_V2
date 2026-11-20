@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "5d31fbc9e6dc02890c8a49620d3278d19137aff7",
+  "commit": "e4392b7d13f811e5c744857ba39cb6891989eabf",
   "branch": "main",
-  "data_commit": "2026-11-20T16:05:59-03:00",
+  "data_commit": "2026-11-20T16:24:19-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "e4392b7",
+    "data": "2026-11-20",
+    "assunto": "fix: remove simulacao de cotacao e torna retentativa real (#226)"
+   },
    {
     "sha": "5d31fbc",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "ea8d1a4",
     "data": "2026-11-19",
     "assunto": "chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)"
-   },
-   {
-    "sha": "13eb1a1",
-    "data": "2026-11-19",
-    "assunto": "chore: arquiva mapa de integracao 20261112 como registro historico (#200)"
    }
   ],
-  "arquivos_mudados_7d": 315,
+  "arquivos_mudados_7d": 317,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -145,7 +145,7 @@
    },
    {
     "pasta": "src/hooks/logistics",
-    "mudancas": 12
+    "mudancas": 13
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 153
+    "commits": 154
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1471,
   "arquivos_codigo": 877,
-  "linhas_codigo": 168517,
+  "linhas_codigo": 168523,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -456,7 +456,7 @@
   },
   "src/hooks": {
    "arquivos": 125,
-   "linhas": 19219
+   "linhas": 19223
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30862
+   "linhas": 30864
   },
   "src/services": {
    "arquivos": 5,
@@ -593,12 +593,12 @@
    "linhas": 982
   },
   {
-   "arquivo": "src/pages/DashboardExecutivo.tsx",
-   "linhas": 948
+   "arquivo": "src/pages/CotacaoMultiCanal.tsx",
+   "linhas": 959
   },
   {
-   "arquivo": "src/pages/CotacaoMultiCanal.tsx",
-   "linhas": 945
+   "arquivo": "src/pages/DashboardExecutivo.tsx",
+   "linhas": 948
   },
   {
    "arquivo": "scripts/maintenance/lib.mjs",

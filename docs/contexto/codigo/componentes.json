@@ -5606,7 +5606,7 @@
     "CotacaoMultiCanal"
    ],
    "export_default": "CotacaoMultiCanal",
-   "linhas": 945,
+   "linhas": 959,
    "dominio": "pages",
    "hooks_locais": [
     "useCotacoesMulticanal",
@@ -5657,14 +5657,12 @@
     "DashboardCotacoes"
    ],
    "export_default": "DashboardCotacoes",
-   "linhas": 640,
+   "linhas": 628,
    "dominio": "pages",
    "hooks_locais": [
     "useCotacoesMulticanal"
    ],
-   "tabelas": [
-    "cotacoes_multicanal"
-   ],
+   "tabelas": [],
    "edges": [],
    "usado_por": 1,
    "orfao": false

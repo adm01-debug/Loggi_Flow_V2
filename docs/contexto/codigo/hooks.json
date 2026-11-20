@@ -3087,7 +3087,7 @@
    "hooks_exportados": [
     "useCotacoesMulticanal"
    ],
-   "linhas": 183,
+   "linhas": 187,
    "dominio": "hooks/logistics",
    "tabelas": [
     "cotacoes_multicanal"
