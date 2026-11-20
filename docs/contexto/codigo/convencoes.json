@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "chore: remove migration legada 20240822_gamification_system.sql (#224)",
+   "chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)",
    "fix: reconcilia target dos inserts de schema_migrations em prod (#222)",
    "chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)",
-   "fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)",
-   "fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)",
-   "fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)"
+   "fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

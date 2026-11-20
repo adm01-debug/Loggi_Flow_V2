@@ -4,11 +4,11 @@
  "stack": {
   "linguagens": [
    "TypeScript (791)",
-   "SQL (262)",
+   "SQL (261)",
    "Markdown (100)",
    "JavaScript (79)",
    "JSON (33)",
-   "YAML (22)",
+   "YAML (21)",
    "Shell (9)",
    "Python (8)"
   ],
@@ -459,30 +459,6 @@
    ]
   },
   {
-   "arquivo": ".github/workflows/e2e.yml",
-   "nome": "E2E (manual)",
-   "gatilhos": [
-    "workflow_dispatch"
-   ],
-   "crons": [],
-   "branches": [],
-   "jobs": [
-    "e2e"
-   ],
-   "permissoes": [
-    "contents: read"
-   ],
-   "scripts_usados": [],
-   "npm_scripts": [
-    "test:e2e"
-   ],
-   "secrets": [],
-   "actions": [
-    "actions/checkout",
-    "actions/setup-node"
-   ]
-  },
-  {
    "arquivo": ".github/workflows/inventario-estado-semanal.yml",
    "nome": "Inventário do estado real (semanal)",
    "gatilhos": [
@@ -805,7 +781,7 @@
   {
    "arquivo": "docs/AUTOMACAO_LOCAL.md",
    "titulo": "Automação local — Loggi_Flow_V2",
-   "linhas": 159
+   "linhas": 158
   },
   {
    "arquivo": "docs/DISASTER_RECOVERY.md",

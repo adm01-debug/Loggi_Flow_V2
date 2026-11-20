@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "a1da74b5af0854c955e0e700b979b2b94919254c",
+  "commit": "190f724e9a1dee1b4ae0db93be84473090579b93",
   "branch": "main",
-  "data_commit": "2026-11-20T15:06:42-03:00",
+  "data_commit": "2026-11-20T15:46:05-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "190f724",
+    "data": "2026-11-20",
+    "assunto": "chore: remove migration legada 20240822_gamification_system.sql (#224)"
+   },
+   {
+    "sha": "e2fd132",
+    "data": "2026-11-20",
+    "assunto": "chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)"
+   },
    {
     "sha": "a1da74b",
     "data": "2026-11-20",
@@ -121,19 +131,9 @@
     "sha": "ed9aa79",
     "data": "2026-11-19",
     "assunto": "chore(db): sincronizar artefatos derivados do banco [auto]"
-   },
-   {
-    "sha": "7ab44e7",
-    "data": "2026-11-19",
-    "assunto": "style(manutencao): aplica correcoes locais verificadas (#199)"
-   },
-   {
-    "sha": "8a35843",
-    "data": "2026-11-19",
-    "assunto": "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)"
    }
   ],
-  "arquivos_mudados_7d": 163,
+  "arquivos_mudados_7d": 164,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -168,6 +168,10 @@
     "mudancas": 5
    },
    {
+    "pasta": "docs/agentes/github-ci.md",
+    "mudancas": 5
+   },
+   {
     "pasta": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 5
    },
@@ -184,15 +188,11 @@
     "mudancas": 5
    },
    {
+    "pasta": ".github/workflows/ci-nexus.yml",
+    "mudancas": 4
+   },
+   {
     "pasta": ".github/workflows/ci.yml",
-    "mudancas": 4
-   },
-   {
-    "pasta": "docs/agentes/github-ci.md",
-    "mudancas": 4
-   },
-   {
-    "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     "mudancas": 4
    }
   ],
@@ -210,12 +210,12 @@
     "mudancas": 8
    },
    {
-    "arquivo": ".github/workflows/ci.yml",
+    "arquivo": ".github/workflows/ci-nexus.yml",
     "mudancas": 7
    },
    {
-    "arquivo": ".github/workflows/ci-nexus.yml",
-    "mudancas": 6
+    "arquivo": ".github/workflows/ci.yml",
+    "mudancas": 7
    },
    {
     "arquivo": ".github/workflows/deploy-functions.yml",
@@ -230,11 +230,11 @@
     "mudancas": 6
    },
    {
-    "arquivo": ".github/workflows/e2e.yml",
+    "arquivo": ".github/workflows/inventario-estado-semanal.yml",
     "mudancas": 5
    },
    {
-    "arquivo": ".github/workflows/inventario-estado-semanal.yml",
+    "arquivo": "docs/agentes/github-ci.md",
     "mudancas": 5
    },
    {
@@ -274,10 +274,6 @@
     "mudancas": 4
    },
    {
-    "arquivo": "docs/agentes/github-ci.md",
-    "mudancas": 4
-   },
-   {
     "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     "mudancas": 4
    },
@@ -296,12 +292,16 @@
    {
     "arquivo": "scripts/check-warning-budget.mjs",
     "mudancas": 4
+   },
+   {
+    "arquivo": "scripts/generate-quality-report.mjs",
+    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 150
+    "commits": 152
    },
    {
     "autor": "dependabot[bot]",
@@ -314,7 +314,7 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1322,
+  "arquivos_total": 1320,
   "arquivos_codigo": 877,
   "linhas_codigo": 168517,
   "rotas": 61,
@@ -325,11 +325,11 @@
   "componentes": 380,
   "hooks": 177,
   "edge_functions": 43,
-  "tabelas": 144,
-  "migrations": 249,
+  "tabelas": 142,
+  "migrations": 248,
   "cron_jobs": 28,
   "testes": 130,
-  "workflows": 18,
+  "workflows": 17,
   "scripts": 62,
   "docs_md": 100
  },
@@ -691,9 +691,7 @@
   "tabelas_com_drift_migration_vs_types": [
    "business_rules_config",
    "feature_flags",
-   "freight_integration_mappings",
-   "profiles",
-   "user_achievements"
+   "freight_integration_mappings"
   ],
   "rpcs_sem_definicao": [],
   "componentes_orfaos": [

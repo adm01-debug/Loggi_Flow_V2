@@ -1,6 +1,6 @@
 # 10 · ACESSO E SEGURANÇA — quem pode o quê
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a1da74b5af` · branch `main` · 2026-11-20 18:07 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `190f724e9a` · branch `main` · 2026-11-20 18:46 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Perfis / roles identificados
@@ -96,7 +96,6 @@
 | `profiles` | enabled | public: auth.uid() = id<br>public: public.has_role(auth.uid(), 'admin')<br>authenticated: true | — | public: auth.uid() = id | — |
 | `push_subscriptions` | enabled | public: auth.uid() = user_id | public: auth.uid() = user_id | public: auth.uid() = user_id | public: auth.uid() = user_id |
 | `query_telemetry` | enabled | authenticated: public.has_role(auth.uid(), 'admin') | authenticated: user_id = auth.uid() OR user_id IS NULL | — | authenticated: public.has_role(auth.uid(), 'admin') |
-| `rank_badges` | enabled | authenticated: true | — | — | — |
 | `rastreamento_alertas` | enabled | public: auth.uid() IS NOT NULL | public: auth.uid() IS NOT NULL<br>authenticated: auth.uid() IS NOT NULL | public: auth.uid() IS NOT NULL<br>authenticated: has_role(auth.uid(), 'admin') | — |
 | `rastreamento_historico` | enabled | authenticated: has_role(auth.uid(), 'admin'::app_role) | authenticated: auth.uid() IS NOT NULL | — | — |
 | `rastreamento_historico_y2026m01` | enabled | authenticated: has_role(auth.uid(), 'admin'::app_role) | authenticated: true | — | — |
@@ -137,11 +136,10 @@
 | `system_heartbeat` | enabled | public: true | — | — | — |
 | `system_integrity_logs` | enabled | public: auth.uid() IN (SELECT id FROM profiles WHERE cargo = 'admin' OR cargo = 'gestor') | public: auth.uid() IN (SELECT id FROM profiles WHERE cargo = 'admin' OR cargo = 'gestor') | public: auth.uid() IN (SELECT id FROM profiles WHERE cargo = 'admin' OR cargo = 'gestor') | public: auth.uid() IN (SELECT id FROM profiles WHERE cargo = 'admin' OR cargo = 'gestor') |
 | `tabelas_frete` | enabled | authenticated: auth.uid() IS NOT NULL | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') |
-| `task_gifts` | enabled | authenticated: true | — | — | — |
 | `telemetry_logs` | enabled | public: EXISTS ( SELECT 1 FROM public.user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role = 'admin' ) | authenticated: auth.uid() IS NOT NULL | — | — |
 | `transportadora_rotas` | enabled | authenticated: auth.uid() IS NOT NULL | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') | authenticated: has_role(auth.uid(), 'admin') |
 | `transportadoras` | enabled | authenticated: true<br>authenticated: true | authenticated: true<br>authenticated: has_role(auth.uid(), 'admin') | authenticated: true<br>authenticated: has_role(auth.uid(), 'admin') | authenticated: true<br>authenticated: has_role(auth.uid(), 'admin') |
-| `user_achievements` | enabled | authenticated: auth.uid() = user_id<br>public: auth.uid() = user_id | authenticated: true<br>authenticated: auth.uid() IS NOT NULL | — | — |
+| `user_achievements` | enabled | public: auth.uid() = user_id | authenticated: true<br>authenticated: auth.uid() IS NOT NULL | — | — |
 | `user_gamification` | enabled | public: auth.uid() = user_id | — | public: auth.uid() = user_id | — |
 | `user_levels` | enabled | public: auth.uid() = user_id<br>authenticated: true | authenticated: true<br>authenticated: auth.uid() IS NOT NULL | — | — |
 | `user_notification_preferences` | enabled | authenticated: auth.uid() = user_id | authenticated: auth.uid() = user_id | authenticated: auth.uid() = user_id | — |
@@ -160,7 +158,7 @@
 
 > `—` com RLS ligado = ninguém além de service_role. `sem RLS` = qualquer chave anon lê/escreve tudo.
 
-## Onde o RLS é IGNORADO (service_role) — 131 arquivo(s)
+## Onde o RLS é IGNORADO (service_role) — 130 arquivo(s)
 
 - `scripts/ai-context/cenarios.mjs`
 - `scripts/ai-context/gerar.unit.mjs`
@@ -249,7 +247,6 @@
 - `supabase/functions/webhook-status/index_test.ts`
 - `supabase/functions/whatsapp-notification/index.ts`
 - `supabase/functions/whatsapp-notification/index_test.ts`
-- `supabase/migrations/20240822_gamification_system.sql`
 - `supabase/migrations/20260314202647_2105a918-ba42-44f9-805d-bdc954688fe5.sql`
 - `supabase/migrations/20260314203713_95f85fe5-f0ed-44fb-8a0f-5c2157deda07.sql`
 - `supabase/migrations/20260317222256_785e5238-ea75-4138-b9d5-cfbabd62ae59.sql`
@@ -302,7 +299,6 @@
 - `audit_log_trigger`
 - `audit_trigger_func`
 - `auto_revert_ineffective_indexes`
-- `award_gamification_points`
 - `cancel_long_running_query`
 - `capture_index_proposal_baseline`
 - `check_and_alert_health_regression`
@@ -489,13 +485,12 @@ Middleware matcher (Next.js): nenhum
 | grant | anon, authenticated | execute | `get_public_tracking`, `get_public_tracking`, `get_public_tracking` |
 | grant | anon, authenticated, service_role | execute | `get_public_tracking`, `xp_for_level`, `calculate_level` |
 | grant | authenticated | execute | `add_user_xp`, `create_notification`, `broadcast_notification`, `get_leaderboard`, `add_user_xp`, `update_user_streak`, `add_user_xp`, `calculate_level`, `get_carrier_performance_stats`, `get_leaderboard`, `get_user_permissions`, `purchase_reward`, `update_user_streak`, `xp_for_level`, `system_health_check` … +35 |
-| grant | authenticated | select | `rank_badges`, `task_gifts`, `mv_dashboard_metrics`, `mv_carrier_performance`, `db_health_snapshots`, `db_slo_daily`, `db_health_score_history`, `delay_predictions_history`, `v_prediction_accuracy`, `v_prediction_accuracy`, `rte_gateway_health` |
-| grant | authenticated | select, insert | `user_achievements` |
+| grant | authenticated | select | `mv_dashboard_metrics`, `mv_carrier_performance`, `db_health_snapshots`, `db_slo_daily`, `db_health_score_history`, `delay_predictions_history`, `v_prediction_accuracy`, `v_prediction_accuracy`, `rte_gateway_health` |
 | grant | authenticated | select, insert, update | `index_proposals` |
 | grant | authenticated | select, insert, update, delete | `remediation_actions`, `prediction_accuracy_settings`, `mitigation_actions`, `rte_slo_targets`, `rte_slo_daily_snapshots` |
 | grant | authenticated, service_role | execute | `has_role`, `has_permission`, `get_user_permissions`, `get_current_organization_id`, `get_leaderboard`, `get_dashboard_metrics`, `get_carrier_performance_stats`, `get_monthly_analytics`, `refresh_dashboard_views`, `get_dashboard_metrics_fast`, `get_carrier_performance_fast`, `get_transaction_health`, `get_wal_health`, `get_calibrated_tolerance`, `count_prediction_breach_days` … +1 |
 | grant | authenticated, service_role | select | `v_prediction_accuracy_by_carrier`, `v_prediction_accuracy_daily`, `v_prediction_accuracy_daily_carrier` |
-| grant | service_role | all | `rank_badges`, `task_gifts`, `user_achievements`, `mv_dashboard_metrics`, `mv_carrier_performance`, `db_health_snapshots`, `db_slo_daily`, `remediation_actions`, `db_health_score_history`, `index_proposals`, `delay_predictions_history`, `prediction_accuracy_settings`, `mitigation_actions`, `rte_gateway_health`, `rte_slo_targets` … +1 |
+| grant | service_role | all | `mv_dashboard_metrics`, `mv_carrier_performance`, `db_health_snapshots`, `db_slo_daily`, `remediation_actions`, `db_health_score_history`, `index_proposals`, `delay_predictions_history`, `prediction_accuracy_settings`, `mitigation_actions`, `rte_gateway_health`, `rte_slo_targets`, `rte_slo_daily_snapshots` |
 | grant | service_role | execute | `update_carrier_ranking`, `drop_old_partitions`, `cleanup_old_notifications`, `record_heartbeat`, `alert_slow_queries`, `public`, `ensure_monthly_partition`, `ensure_future_partitions`, `ensure_monthly_partition`, `refresh_dashboard_views`, `cleanup_old_health_snapshots`, `persist_db_health_snapshot`, `compute_db_slo_for`, `purge_rte_gateway_health`, `rte_gateway_sustained_downtime` … +1 |
 | revoke | PUBLIC | all | `get_public_tracking`, `add_user_xp`, `update_user_streak`, `system_health_check`, `refresh_dashboard_views`, `internal.collect_db_health`, `persist_db_health_snapshot`, `get_health_anomalies_fast`, `compute_db_slo_for`, `get_capacity_forecast_fast`, `get_remediation_suggestions_fast`, `get_long_running_queries`, `cancel_long_running_query`, `get_lock_conflicts`, `get_cache_hit_ratios` … +12 |
 | revoke | PUBLIC | execute | `add_user_xp`, `audit_trigger_func`, `calculate_level`, `cleanup_old_telemetry_logs`, `fn_audit_trigger`, `generate_coleta_numero`, `generate_entrega_numero`, `get_carrier_performance_stats`, `get_leaderboard`, `get_user_permissions`, `handle_new_user`, `handle_new_user_levels`, `notify_coleta_atrasada`, `notify_conquista_desbloqueada`, `notify_entrega_atrasada` … +22 |
@@ -554,9 +549,6 @@ Middleware matcher (Next.js): nenhum
 
 | Tabela | Colunas |
 |---|---|
-| `rank_badges` | `created_at`, `updated_at` |
-| `task_gifts` | `created_at`, `updated_at` |
-| `profiles` | `created_at`, `updated_at` |
 | `transportadoras` | `created_at`, `updated_at` |
 | `fornecedores` | `created_at`, `updated_at` |
 | `coletas` | `created_at`, `updated_at` |
@@ -564,6 +556,7 @@ Middleware matcher (Next.js): nenhum
 | `entregas` | `created_at`, `updated_at` |
 | `ocorrencias` | `created_at` |
 | `cotacoes_frete` | `created_at` |
+| `profiles` | `created_at`, `updated_at` |
 | `user_roles` | `created_at` |
 | `user_levels` | `created_at`, `updated_at` |
 | `achievements` | `created_at` |
@@ -687,7 +680,6 @@ Middleware matcher (Next.js): nenhum
 
 | Tabela | Coluna |
 |---|---|
-| `profiles` | `email` |
 | `transportadoras` | `cnpj` |
 | `fornecedores` | `cnpj` |
 | `fornecedores` | `cep` |
@@ -695,6 +687,7 @@ Middleware matcher (Next.js): nenhum
 | `clientes` | `cep` |
 | `entregas` | `latitude` |
 | `entregas` | `longitude` |
+| `profiles` | `email` |
 | `rastreamento_alertas` | `latitude` |
 | `rastreamento_alertas` | `longitude` |
 | `password_reset_requests` | `email` |

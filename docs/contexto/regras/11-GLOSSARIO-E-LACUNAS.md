@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a1da74b5af` · branch `main` · 2026-11-20 18:07 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `190f724e9a` · branch `main` · 2026-11-20 18:46 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -87,7 +87,6 @@
 | `profiles` | _(sem COMMENT ON TABLE — significado não documentado)_ | 8 colunas | migration |
 | `push_subscriptions` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | migration |
 | `query_telemetry` | _(sem COMMENT ON TABLE — significado não documentado)_ | 13 colunas | migration |
-| `rank_badges` | _(sem COMMENT ON TABLE — significado não documentado)_ | 8 colunas | migration |
 | `rastreamento_alertas` | _(sem COMMENT ON TABLE — significado não documentado)_ | 11 colunas | migration |
 | `rastreamento_historico` | _(sem COMMENT ON TABLE — significado não documentado)_ | 12 colunas | migration |
 | `rastreamento_historico_y2026m01` | _(sem COMMENT ON TABLE — significado não documentado)_ | 12 colunas | types.ts |
@@ -128,7 +127,6 @@
 | `system_heartbeat` | _(sem COMMENT ON TABLE — significado não documentado)_ | 6 colunas | migration |
 | `system_integrity_logs` | _(sem COMMENT ON TABLE — significado não documentado)_ | 9 colunas | migration |
 | `tabelas_frete` | _(sem COMMENT ON TABLE — significado não documentado)_ | 12 colunas | migration |
-| `task_gifts` | _(sem COMMENT ON TABLE — significado não documentado)_ | 8 colunas | migration |
 | `telemetry_logs` | _(sem COMMENT ON TABLE — significado não documentado)_ | 10 colunas | migration |
 | `transportadora_rotas` | _(sem COMMENT ON TABLE — significado não documentado)_ | 17 colunas | migration |
 | `transportadoras` | _(sem COMMENT ON TABLE — significado não documentado)_ | 22 colunas | migration |
@@ -148,7 +146,6 @@
 | `webauthn_credentials` | _(sem COMMENT ON TABLE — significado não documentado)_ | 10 colunas | migration |
 | `webhook_deliveries` | _(sem COMMENT ON TABLE — significado não documentado)_ | 8 colunas | migration |
 | `webhook_events_processed` | _(sem COMMENT ON TABLE — significado não documentado)_ | 5 colunas | migration |
-| `achievement_tier` (enum) | bronze, silver, gold, platinum, diamond |  | banco |
 | `coleta_tipo` (enum) | lalamove, transportadora |  | banco |
 | `coleta_status` (enum) | aguardando_liberacao, solicitada, em_transito, chegou_expedicao, conferencia_ok, divergencia, finalizada |  | banco |
 | `entrega_status` (enum) | aguardando_producao, pronto_despacho, cotacao_frete, nf_emitida, despachado, em_transito, saiu_entrega, entregue, ocorrencia, finalizado |  | banco |
@@ -318,7 +315,7 @@
 - `delivery_receipt_audit.ocr_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `system_heartbeat.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
 - `rte_gateway_health.http_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.
-- 134/141 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `profiles`, `transportadoras`, `cotacoes_frete`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …
+- 132/139 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `transportadoras`, `cotacoes_frete`, `profiles`, `user_roles`, `user_levels`, `achievements`, `user_achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo`, `rastreamento_alertas`, `fretes_internos` …
 
 ## Regras manuais presentes
 

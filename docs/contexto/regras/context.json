@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "a1da74b5af0854c955e0e700b979b2b94919254c",
+  "sha": "190f724e9a1dee1b4ae0db93be84473090579b93",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 18:07 UTC",
-  "files_total": 1332,
-  "code_files": 1140,
-  "code_lines": 185125,
+  "generated_at": "2026-11-20 18:46 UTC",
+  "files_total": 1330,
+  "code_files": 1139,
+  "code_lines": 185029,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "cc0f1f9869c59267",
+ "facts_hash": "c633b27f94c0ab6f",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -246,13 +246,6 @@
     ]
    },
    {
-    "file": ".github/workflows/e2e.yml",
-    "name": "E2E (manual)",
-    "triggers": [
-     "workflow_dispatch"
-    ]
-   },
-   {
     "file": ".github/workflows/inventario-estado-semanal.yml",
     "name": "Inventário do estado real (semanal)",
     "triggers": [
@@ -312,7 +305,7 @@
   "languages": {
    ".tsx": 454,
    ".ts": 337,
-   ".sql": 262,
+   ".sql": 261,
    ".mjs": 77,
    ".py": 8,
    ".js": 2
@@ -340,236 +333,6 @@
  },
  "schema": {
   "tables": {
-   "rank_badges": {
-    "columns": [
-     {
-      "name": "id",
-      "type": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "name",
-      "type": "TEXT NOT NULL",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "description",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "tier",
-      "type": "public.achievement_tier NOT NULL DEFAULT 'bronze'",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "icon_url",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "xp_requirement",
-      "type": "INTEGER NOT NULL DEFAULT 0",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "created_at",
-      "type": "TIMESTAMPTZ DEFAULT now()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "updated_at",
-      "type": "TIMESTAMPTZ DEFAULT now()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     }
-    ],
-    "constraints": [],
-    "src": "supabase/migrations/20240822_gamification_system.sql",
-    "comment": "",
-    "origin": "migration"
-   },
-   "task_gifts": {
-    "columns": [
-     {
-      "name": "id",
-      "type": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "name",
-      "type": "TEXT NOT NULL",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "description",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "coin_cost",
-      "type": "INTEGER NOT NULL DEFAULT 0",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "stock_quantity",
-      "type": "INTEGER DEFAULT 0",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "image_url",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "created_at",
-      "type": "TIMESTAMPTZ DEFAULT now()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     },
-     {
-      "name": "updated_at",
-      "type": "TIMESTAMPTZ DEFAULT now()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20240822_gamification_system.sql"
-     }
-    ],
-    "constraints": [],
-    "src": "supabase/migrations/20240822_gamification_system.sql",
-    "comment": "",
-    "origin": "migration"
-   },
-   "user_achievements": {
-    "columns": [
-     {
-      "name": "id",
-      "type": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
-     },
-     {
-      "name": "user_id",
-      "type": "UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL",
-      "fk": "users.id ON DELETE CASCADE",
-      "generated": "",
-      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
-     },
-     {
-      "name": "achievement_id",
-      "type": "UUID REFERENCES public.achievements(id) ON DELETE CASCADE NOT NULL",
-      "fk": "achievements.id ON DELETE CASCADE",
-      "generated": "",
-      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
-     },
-     {
-      "name": "unlocked_at",
-      "type": "TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
-     }
-    ],
-    "constraints": [
-     "UNIQUE(user_id, achievement_id)"
-    ],
-    "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql",
-    "comment": "",
-    "origin": "migration"
-   },
-   "profiles": {
-    "columns": [
-     {
-      "name": "id",
-      "type": "UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE",
-      "fk": "users.id ON DELETE CASCADE",
-      "generated": "",
-      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
-     },
-     {
-      "name": "email",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
-     },
-     {
-      "name": "full_name",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
-     },
-     {
-      "name": "avatar_url",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
-     },
-     {
-      "name": "cargo",
-      "type": "TEXT",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
-     },
-     {
-      "name": "created_at",
-      "type": "TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
-     },
-     {
-      "name": "updated_at",
-      "type": "TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()",
-      "fk": "",
-      "generated": "",
-      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
-     },
-     {
-      "name": "organization_id",
-      "type": "UUID REFERENCES public.organizations(id)",
-      "fk": "organizations.id",
-      "generated": "",
-      "src": "supabase/migrations/20260519180115_2a639fb5-0349-42c5-acc5-5194d9b1a8e2.sql"
-     }
-    ],
-    "constraints": [],
-    "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql",
-    "comment": "",
-    "origin": "migration"
-   },
    "transportadoras": {
     "columns": [
      {
@@ -1579,6 +1342,70 @@
     "comment": "",
     "origin": "migration"
    },
+   "profiles": {
+    "columns": [
+     {
+      "name": "id",
+      "type": "UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE",
+      "fk": "users.id ON DELETE CASCADE",
+      "generated": "",
+      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
+     },
+     {
+      "name": "email",
+      "type": "TEXT",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
+     },
+     {
+      "name": "full_name",
+      "type": "TEXT",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
+     },
+     {
+      "name": "avatar_url",
+      "type": "TEXT",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
+     },
+     {
+      "name": "cargo",
+      "type": "TEXT",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
+     },
+     {
+      "name": "created_at",
+      "type": "TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
+     },
+     {
+      "name": "updated_at",
+      "type": "TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql"
+     },
+     {
+      "name": "organization_id",
+      "type": "UUID REFERENCES public.organizations(id)",
+      "fk": "organizations.id",
+      "generated": "",
+      "src": "supabase/migrations/20260519180115_2a639fb5-0349-42c5-acc5-5194d9b1a8e2.sql"
+     }
+    ],
+    "constraints": [],
+    "src": "supabase/migrations/20251215125853_8293a0b4-7a49-4600-ae63-dcb1e921209b.sql",
+    "comment": "",
+    "origin": "migration"
+   },
    "user_roles": {
     "columns": [
      {
@@ -1803,6 +1630,44 @@
     ],
     "constraints": [
      "constraint achievements_rewards_nonneg CHECK (xp_reward >= 0 AND coins_reward >= 0) NOT VALID"
+    ],
+    "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql",
+    "comment": "",
+    "origin": "migration"
+   },
+   "user_achievements": {
+    "columns": [
+     {
+      "name": "id",
+      "type": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
+     },
+     {
+      "name": "user_id",
+      "type": "UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL",
+      "fk": "users.id ON DELETE CASCADE",
+      "generated": "",
+      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
+     },
+     {
+      "name": "achievement_id",
+      "type": "UUID REFERENCES public.achievements(id) ON DELETE CASCADE NOT NULL",
+      "fk": "achievements.id ON DELETE CASCADE",
+      "generated": "",
+      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
+     },
+     {
+      "name": "unlocked_at",
+      "type": "TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()",
+      "fk": "",
+      "generated": "",
+      "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql"
+     }
+    ],
+    "constraints": [
+     "UNIQUE(user_id, achievement_id)"
     ],
     "src": "supabase/migrations/20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql",
     "comment": "",
@@ -11875,36 +11740,6 @@
   },
   "policies": [
    {
-    "name": "Allow public read for authenticated",
-    "table": "rank_badges",
-    "cmd": "SELECT",
-    "roles": "authenticated",
-    "mode": "permissive",
-    "using": "true",
-    "check": "",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "name": "Allow public read for authenticated",
-    "table": "task_gifts",
-    "cmd": "SELECT",
-    "roles": "authenticated",
-    "mode": "permissive",
-    "using": "true",
-    "check": "",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "name": "Users can view their own achievements",
-    "table": "user_achievements",
-    "cmd": "SELECT",
-    "roles": "authenticated",
-    "mode": "permissive",
-    "using": "auth.uid() = user_id",
-    "check": "",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
     "name": "Users can view their own profile",
     "table": "profiles",
     "cmd": "SELECT",
@@ -15666,19 +15501,6 @@
    }
   ],
   "functions": {
-   "award_gamification_points": {
-    "args": "_user_id UUID, _xp_amount INTEGER, _coins_amount INTEGER",
-    "returns": "VOID",
-    "lang": "plpgsql",
-    "src": "supabase/migrations/20240822_gamification_system.sql",
-    "security_definer": true,
-    "search_path": true,
-    "body": "BEGIN UPDATE public.profiles SET xp = xp + _xp_amount, coins = coins + _coins_amount, updated_at = now() WHERE id = _user_id; END;",
-    "raises": [],
-    "tables": [
-     "profiles"
-    ]
-   },
    "update_updated_at_column": {
     "args": "",
     "returns": "TRIGGER",
@@ -17428,13 +17250,6 @@
    }
   },
   "enums": {
-   "achievement_tier": [
-    "bronze",
-    "silver",
-    "gold",
-    "platinum",
-    "diamond"
-   ],
    "coleta_tipo": [
     "lalamove",
     "transportadora"
@@ -20349,7 +20164,6 @@
    }
   },
   "sources": [
-   "supabase/migrations/20240822_gamification_system.sql",
    "supabase/migrations/20241231000000_saved_filters.sql",
    "supabase/migrations/20241231000001_entity_versions.sql",
    "supabase/migrations/20251215123841_69fdc13e-5215-49b0-abfb-1c49d264c2a0.sql",
@@ -20602,9 +20416,6 @@
    "src/integrations/supabase/types.ts"
   ],
   "rls": {
-   "rank_badges": "enabled",
-   "task_gifts": "enabled",
-   "user_achievements": "enabled",
    "transportadoras": "enabled",
    "fornecedores": "enabled",
    "coletas": "enabled",
@@ -20616,6 +20427,7 @@
    "user_roles": "enabled",
    "user_levels": "enabled",
    "achievements": "enabled",
+   "user_achievements": "enabled",
    "tabelas_frete": "enabled",
    "alertas_custo": "enabled",
    "notificacoes_custo": "enabled",
@@ -20712,54 +20524,6 @@
    "rte_slo_daily_snapshots": "enabled"
   },
   "grants": [
-   {
-    "kind": "grant",
-    "privs": "select",
-    "object": "rank_badges",
-    "objkind": "table",
-    "roles": "authenticated",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "all",
-    "object": "rank_badges",
-    "objkind": "table",
-    "roles": "service_role",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "select",
-    "object": "task_gifts",
-    "objkind": "table",
-    "roles": "authenticated",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "all",
-    "object": "task_gifts",
-    "objkind": "table",
-    "roles": "service_role",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "select, insert",
-    "object": "user_achievements",
-    "objkind": "table",
-    "roles": "authenticated",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "all",
-    "object": "user_achievements",
-    "objkind": "table",
-    "roles": "service_role",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
    {
     "kind": "grant",
     "privs": "execute",
@@ -30586,15 +30350,14 @@
   },
   {
    "module": "supabase/migrations",
-   "files": 249,
-   "lines": 15261,
+   "files": 248,
+   "lines": 15165,
    "tables": [],
    "exports": [],
    "docs": [],
    "deps": [],
    "imports_modules": [],
    "file_list": [
-    "supabase/migrations/20240822_gamification_system.sql",
     "supabase/migrations/20241231000000_saved_filters.sql",
     "supabase/migrations/20241231000001_entity_versions.sql",
     "supabase/migrations/20251215123841_69fdc13e-5215-49b0-abfb-1c49d264c2a0.sql",
@@ -30673,7 +30436,8 @@
     "supabase/migrations/20260512142743_5457eba7-7f29-480c-973a-51029770f273.sql",
     "supabase/migrations/20260512162404_351faab8-6435-4e92-9873-8cfacfdf2462.sql",
     "supabase/migrations/20260512162618_e6477c9d-6ae1-4576-97a5-400716e4992c.sql",
-    "supabase/migrations/20260512173757_f0c9fb25-4b9c-4e0c-b1b3-a0acec2ec21d.sql"
+    "supabase/migrations/20260512173757_f0c9fb25-4b9c-4e0c-b1b3-a0acec2ec21d.sql",
+    "supabase/migrations/20260512174836_1f4cffc8-00bb-4f76-a991-c57a97625e1f.sql"
    ]
   },
   {
@@ -33452,10 +33216,10 @@
   ],
   "cascade_chains": {
    "users": [
-    "user_achievements",
     "profiles",
     "user_roles",
     "user_levels",
+    "user_achievements",
     "comments",
     "password_reset_requests",
     "allowed_ips",
@@ -33575,7 +33339,6 @@
    "notification_templates",
    "organizations",
    "query_baseline",
-   "rank_badges",
    "rastreamento_historico_y2026m01",
    "rastreamento_historico_y2026m02",
    "rastreamento_historico_y2026m03",
@@ -33599,7 +33362,6 @@
    "rewards",
    "system_adr",
    "system_contract_schemas",
-   "task_gifts",
    "user_gamification",
    "user_ranks",
    "v_prediction_accuracy",
@@ -36366,111 +36128,6 @@
   ],
   "db_constraints": [
    {
-    "table": "rank_badges",
-    "column": "id",
-    "rule": "PK; default gen_random_uuid()"
-   },
-   {
-    "table": "rank_badges",
-    "column": "name",
-    "rule": "obrigatório"
-   },
-   {
-    "table": "rank_badges",
-    "column": "tier",
-    "rule": "default 'bronze'"
-   },
-   {
-    "table": "rank_badges",
-    "column": "xp_requirement",
-    "rule": "default 0"
-   },
-   {
-    "table": "rank_badges",
-    "column": "created_at",
-    "rule": "default now()"
-   },
-   {
-    "table": "rank_badges",
-    "column": "updated_at",
-    "rule": "default now()"
-   },
-   {
-    "table": "task_gifts",
-    "column": "id",
-    "rule": "PK; default gen_random_uuid()"
-   },
-   {
-    "table": "task_gifts",
-    "column": "name",
-    "rule": "obrigatório"
-   },
-   {
-    "table": "task_gifts",
-    "column": "coin_cost",
-    "rule": "default 0"
-   },
-   {
-    "table": "task_gifts",
-    "column": "stock_quantity",
-    "rule": "default 0"
-   },
-   {
-    "table": "task_gifts",
-    "column": "created_at",
-    "rule": "default now()"
-   },
-   {
-    "table": "task_gifts",
-    "column": "updated_at",
-    "rule": "default now()"
-   },
-   {
-    "table": "user_achievements",
-    "column": "id",
-    "rule": "PK; default gen_random_uuid()"
-   },
-   {
-    "table": "user_achievements",
-    "column": "user_id",
-    "rule": "obrigatório; FK → users.id ON DELETE CASCADE"
-   },
-   {
-    "table": "user_achievements",
-    "column": "achievement_id",
-    "rule": "obrigatório; FK → achievements.id ON DELETE CASCADE"
-   },
-   {
-    "table": "user_achievements",
-    "column": "unlocked_at",
-    "rule": "default now()"
-   },
-   {
-    "table": "user_achievements",
-    "column": "(tabela)",
-    "rule": "UNIQUE(user_id, achievement_id)"
-   },
-   {
-    "table": "profiles",
-    "column": "id",
-    "rule": "PK; FK → users.id ON DELETE CASCADE"
-   },
-   {
-    "table": "profiles",
-    "column": "created_at",
-    "rule": "default now()"
-   },
-   {
-    "table": "profiles",
-    "column": "updated_at",
-    "rule": "default now()"
-   },
-   {
-    "table": "profiles",
-    "column": "organization_id",
-    "rule": "FK → organizations.id"
-   },
-   {
     "table": "transportadoras",
     "column": "id",
     "rule": "PK; default gen_random_uuid()"
@@ -36856,6 +36513,26 @@
     "rule": "default 1"
    },
    {
+    "table": "profiles",
+    "column": "id",
+    "rule": "PK; FK → users.id ON DELETE CASCADE"
+   },
+   {
+    "table": "profiles",
+    "column": "created_at",
+    "rule": "default now()"
+   },
+   {
+    "table": "profiles",
+    "column": "updated_at",
+    "rule": "default now()"
+   },
+   {
+    "table": "profiles",
+    "column": "organization_id",
+    "rule": "FK → organizations.id"
+   },
+   {
     "table": "user_roles",
     "column": "id",
     "rule": "PK; default gen_random_uuid()"
@@ -37019,6 +36696,31 @@
     "table": "achievements",
     "column": "(tabela)",
     "rule": "constraint achievements_rewards_nonneg CHECK (xp_reward >= 0 AND coins_reward >= 0) NOT VALID"
+   },
+   {
+    "table": "user_achievements",
+    "column": "id",
+    "rule": "PK; default gen_random_uuid()"
+   },
+   {
+    "table": "user_achievements",
+    "column": "user_id",
+    "rule": "obrigatório; FK → users.id ON DELETE CASCADE"
+   },
+   {
+    "table": "user_achievements",
+    "column": "achievement_id",
+    "rule": "obrigatório; FK → achievements.id ON DELETE CASCADE"
+   },
+   {
+    "table": "user_achievements",
+    "column": "unlocked_at",
+    "rule": "default now()"
+   },
+   {
+    "table": "user_achievements",
+    "column": "(tabela)",
+    "rule": "UNIQUE(user_id, achievement_id)"
    },
    {
     "table": "tabelas_frete",
@@ -50003,36 +49705,6 @@
   ],
   "db_policies": [
    {
-    "name": "Allow public read for authenticated",
-    "table": "rank_badges",
-    "cmd": "SELECT",
-    "roles": "authenticated",
-    "mode": "permissive",
-    "using": "true",
-    "check": "",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "name": "Allow public read for authenticated",
-    "table": "task_gifts",
-    "cmd": "SELECT",
-    "roles": "authenticated",
-    "mode": "permissive",
-    "using": "true",
-    "check": "",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "name": "Users can view their own achievements",
-    "table": "user_achievements",
-    "cmd": "SELECT",
-    "roles": "authenticated",
-    "mode": "permissive",
-    "using": "auth.uid() = user_id",
-    "check": "",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
     "name": "Users can view their own profile",
     "table": "profiles",
     "cmd": "SELECT",
@@ -53794,19 +53466,6 @@
    }
   ],
   "db_functions": {
-   "award_gamification_points": {
-    "args": "_user_id UUID, _xp_amount INTEGER, _coins_amount INTEGER",
-    "returns": "VOID",
-    "lang": "plpgsql",
-    "src": "supabase/migrations/20240822_gamification_system.sql",
-    "security_definer": true,
-    "search_path": true,
-    "body": "BEGIN UPDATE public.profiles SET xp = xp + _xp_amount, coins = coins + _coins_amount, updated_at = now() WHERE id = _user_id; END;",
-    "raises": [],
-    "tables": [
-     "profiles"
-    ]
-   },
    "update_updated_at_column": {
     "args": "",
     "returns": "TRIGGER",
@@ -55556,13 +55215,6 @@
    }
   },
   "db_enums": {
-   "achievement_tier": [
-    "bronze",
-    "silver",
-    "gold",
-    "platinum",
-    "diamond"
-   ],
    "coleta_tipo": [
     "lalamove",
     "transportadora"
@@ -58794,15 +58446,6 @@
      "authenticated: public.has_role(auth.uid(), 'admin')"
     ]
    },
-   "rank_badges": {
-    "rls": "enabled",
-    "SELECT": [
-     "authenticated: true"
-    ],
-    "INSERT": [],
-    "UPDATE": [],
-    "DELETE": []
-   },
    "rastreamento_alertas": {
     "rls": "enabled",
     "SELECT": [
@@ -59239,15 +58882,6 @@
      "authenticated: has_role(auth.uid(), 'admin')"
     ]
    },
-   "task_gifts": {
-    "rls": "enabled",
-    "SELECT": [
-     "authenticated: true"
-    ],
-    "INSERT": [],
-    "UPDATE": [],
-    "DELETE": []
-   },
    "telemetry_logs": {
     "rls": "enabled",
     "SELECT": [
@@ -59296,7 +58930,6 @@
    "user_achievements": {
     "rls": "enabled",
     "SELECT": [
-     "authenticated: auth.uid() = user_id",
      "public: auth.uid() = user_id"
     ],
     "INSERT": [
@@ -59598,7 +59231,6 @@
    "supabase/functions/webhook-status/index_test.ts",
    "supabase/functions/whatsapp-notification/index.ts",
    "supabase/functions/whatsapp-notification/index_test.ts",
-   "supabase/migrations/20240822_gamification_system.sql",
    "supabase/migrations/20260314202647_2105a918-ba42-44f9-805d-bdc954688fe5.sql",
    "supabase/migrations/20260314203713_95f85fe5-f0ed-44fb-8a0f-5c2157deda07.sql",
    "supabase/migrations/20260317222256_785e5238-ea75-4138-b9d5-cfbabd62ae59.sql",
@@ -59650,7 +59282,6 @@
    "audit_log_trigger",
    "audit_trigger_func",
    "auto_revert_ineffective_indexes",
-   "award_gamification_points",
    "cancel_long_running_query",
    "capture_index_proposal_baseline",
    "check_and_alert_health_regression",
@@ -59759,54 +59390,6 @@
   ],
   "auth_config": {},
   "grants": [
-   {
-    "kind": "grant",
-    "privs": "select",
-    "object": "rank_badges",
-    "objkind": "table",
-    "roles": "authenticated",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "all",
-    "object": "rank_badges",
-    "objkind": "table",
-    "roles": "service_role",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "select",
-    "object": "task_gifts",
-    "objkind": "table",
-    "roles": "authenticated",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "all",
-    "object": "task_gifts",
-    "objkind": "table",
-    "roles": "service_role",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "select, insert",
-    "object": "user_achievements",
-    "objkind": "table",
-    "roles": "authenticated",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
-   {
-    "kind": "grant",
-    "privs": "all",
-    "object": "user_achievements",
-    "objkind": "table",
-    "roles": "service_role",
-    "src": "supabase/migrations/20240822_gamification_system.sql"
-   },
    {
     "kind": "grant",
     "privs": "execute",
@@ -63354,19 +62937,6 @@
    ]
   ],
   "audit": {
-   "rank_badges": [
-    "created_at",
-    "updated_at"
-   ],
-   "task_gifts": [
-    "created_at",
-    "updated_at"
-   ],
-   "user_achievements": [],
-   "profiles": [
-    "created_at",
-    "updated_at"
-   ],
    "transportadoras": [
     "created_at",
     "updated_at"
@@ -63393,6 +62963,10 @@
    "cotacoes_frete": [
     "created_at"
    ],
+   "profiles": [
+    "created_at",
+    "updated_at"
+   ],
    "user_roles": [
     "created_at"
    ],
@@ -63403,6 +62977,7 @@
    "achievements": [
     "created_at"
    ],
+   "user_achievements": [],
    "tabelas_frete": [
     "created_at",
     "updated_at"
@@ -63811,10 +63386,6 @@
   },
   "pii": [
    [
-    "profiles",
-    "email"
-   ],
-   [
     "transportadoras",
     "cnpj"
    ],
@@ -63841,6 +63412,10 @@
    [
     "entregas",
     "longitude"
+   ],
+   [
+    "profiles",
+    "email"
    ],
    [
     "rastreamento_alertas",
@@ -64906,7 +64481,7 @@
    "`delivery_receipt_audit.ocr_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.",
    "`system_heartbeat.status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.",
    "`rte_gateway_health.http_status` é uma coluna de status sem enum/CHECK — os valores válidos e as transições permitidas não estão no banco.",
-   "134/141 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `rank_badges`, `task_gifts`, `user_achievements`, `profiles`, `transportadoras`, `cotacoes_frete`, `user_roles`, `user_levels`, `achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo` …"
+   "132/139 tabelas sem `COMMENT ON TABLE` — o significado de negócio não está no schema: `transportadoras`, `cotacoes_frete`, `profiles`, `user_roles`, `user_levels`, `achievements`, `user_achievements`, `tabelas_frete`, `alertas_custo`, `notificacoes_custo`, `rastreamento_alertas`, `fretes_internos` …"
   ]
  },
  "manual": [],
@@ -87481,11 +87056,6 @@
    "doc": "P15: smoke test — whatsapp-notification",
    "uses_service_role": true
   },
-  "supabase/migrations/20240822_gamification_system.sql": {
-   "path": "supabase/migrations/20240822_gamification_system.sql",
-   "lines": 96,
-   "uses_service_role": true
-  },
   "supabase/migrations/20241231000000_saved_filters.sql": {
    "path": "supabase/migrations/20241231000000_saved_filters.sql",
    "lines": 108
@@ -88864,10 +88434,32 @@
   }
  },
  "git": {
-  "sha": "a1da74b5af0854c955e0e700b979b2b94919254c",
+  "sha": "190f724e9a1dee1b4ae0db93be84473090579b93",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "190f724",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "chore: remove migration legada 20240822_gamification_system.sql (#224)",
+    "files": [
+     "supabase/migrations/20240822_gamification_system.sql"
+    ]
+   },
+   {
+    "sha": "e2fd132",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)",
+    "files": [
+     ".github/workflows/aplicar-migration.yml",
+     ".github/workflows/ci-nexus.yml",
+     ".github/workflows/e2e.yml",
+     "docs/AUTOMACAO_LOCAL.md",
+     "docs/agentes/github-ci.md"
+    ]
+   },
    {
     "sha": "a1da74b",
     "date": "2026-11-20",
@@ -89186,24 +88778,6 @@
     "files": [
      ".github/workflows/diag-schema-prod.yml"
     ]
-   },
-   {
-    "sha": "1136900",
-    "date": "2026-11-18",
-    "author": "adm01-debug",
-    "subject": "chore: workflow temporário de destravamento do seed prod (service-role key) (#193)",
-    "files": [
-     ".github/workflows/revela-seed-prod.yml"
-    ]
-   },
-   {
-    "sha": "55ec52f",
-    "date": "2026-11-18",
-    "author": "adm01-debug",
-    "subject": "fix: devolve configurabilidade de REPO_AUTOMATION_GRACE_MS perdida no merge da #120 (#192)",
-    "files": [
-     "scripts/automation.mjs"
-    ]
    }
   ],
   "hot_files": [
@@ -89268,23 +88842,23 @@
     2
    ],
    [
-    ".github/workflows/revela-seed-prod.yml",
-    2
-   ],
-   [
-    ".github/workflows/deploy-functions.yml",
+    "supabase/migrations/20240822_gamification_system.sql",
     1
    ],
    [
-    "scripts/db-audit/grants-baseline.json",
+    ".github/workflows/aplicar-migration.yml",
     1
    ],
    [
-    "scripts/db-audit/known-violations.json",
+    ".github/workflows/ci-nexus.yml",
     1
    ],
    [
-    "docs/pendencias/02-11-rodonaves-clientes.md",
+    ".github/workflows/e2e.yml",
+    1
+   ],
+   [
+    "docs/AUTOMACAO_LOCAL.md",
     1
    ]
   ]

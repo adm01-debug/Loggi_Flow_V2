@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a1da74b5af` · branch `main` · 2026-11-20 18:07 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `190f724e9a` · branch `main` · 2026-11-20 18:46 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -11,9 +11,6 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 
 | Tabela | Política | Comando | Roles | Modo | USING | WITH CHECK |
 |---|---|---|---|---|---|---|
-| `rank_badges` | Allow public read for authenticated | SELECT | authenticated | permissive | `true` |  |
-| `task_gifts` | Allow public read for authenticated | SELECT | authenticated | permissive | `true` |  |
-| `user_achievements` | Users can view their own achievements | SELECT | authenticated | permissive | `auth.uid() = user_id` |  |
 | `profiles` | Users can view their own profile | SELECT | public | permissive | `auth.uid() = id` |  |
 | `profiles` | Users can update their own profile | UPDATE | public | permissive | `auth.uid() = id` |  |
 | `profiles` | Admins can view all profiles | SELECT | public | permissive | `public.has_role(auth.uid(), 'admin')` |  |
@@ -311,33 +308,15 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `scheduled_reports` | Users can create their own scheduled reports | INSERT | public | permissive |  | `(auth.uid() = user_id)` |
 | `scheduled_reports` | Users can delete their own scheduled reports | DELETE | public | permissive | `(auth.uid() = user_id)` |  |
 | `scheduled_reports` | Users can update their own scheduled reports | UPDATE | public | permissive | `(auth.uid() = user_id)` |  |
-| … +5 linhas — lista completa em `context.json` | | | | | | |
+| `scheduled_reports` | Users can view their own scheduled reports | SELECT | public | permissive | `(auth.uid() = user_id)` |  |
+| `audit_logs_y2027m07` | Admins view audit logs | SELECT | authenticated | permissive | `has_role(auth.uid(), 'admin'::app_role)` |  |
+| `audit_logs_y2027m07` | Authenticated insert audit logs | INSERT | authenticated | permissive |  | `auth.uid() IS NOT NULL` |
+| … +2 linhas — lista completa em `context.json` | | | | | | |
 
 ## C. Restrições de dados (obrigatório / único / default / CHECK / FK / calculada)
 
 | Tabela | Coluna | Regra |
 |---|---|---|
-| `rank_badges` | `id` | PK; default gen_random_uuid() |
-| `rank_badges` | `name` | obrigatório |
-| `rank_badges` | `tier` | default 'bronze' |
-| `rank_badges` | `xp_requirement` | default 0 |
-| `rank_badges` | `created_at` | default now() |
-| `rank_badges` | `updated_at` | default now() |
-| `task_gifts` | `id` | PK; default gen_random_uuid() |
-| `task_gifts` | `name` | obrigatório |
-| `task_gifts` | `coin_cost` | default 0 |
-| `task_gifts` | `stock_quantity` | default 0 |
-| `task_gifts` | `created_at` | default now() |
-| `task_gifts` | `updated_at` | default now() |
-| `user_achievements` | `id` | PK; default gen_random_uuid() |
-| `user_achievements` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
-| `user_achievements` | `achievement_id` | obrigatório; FK → achievements.id ON DELETE CASCADE |
-| `user_achievements` | `unlocked_at` | default now() |
-| `user_achievements` | `(tabela)` | UNIQUE(user_id, achievement_id) |
-| `profiles` | `id` | PK; FK → users.id ON DELETE CASCADE |
-| `profiles` | `created_at` | default now() |
-| `profiles` | `updated_at` | default now() |
-| `profiles` | `organization_id` | FK → organizations.id |
 | `transportadoras` | `id` | PK; default gen_random_uuid() |
 | `transportadoras` | `razao_social` | obrigatório |
 | `transportadoras` | `cnpj` | obrigatório; único |
@@ -415,6 +394,10 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `cotacoes_frete` | `selecionada` | default FALSE |
 | `cotacoes_frete` | `created_at` | default now() |
 | `cotacoes_frete` | `version` | default 1 |
+| `profiles` | `id` | PK; FK → users.id ON DELETE CASCADE |
+| `profiles` | `created_at` | default now() |
+| `profiles` | `updated_at` | default now() |
+| `profiles` | `organization_id` | FK → organizations.id |
 | `user_roles` | `id` | PK; default gen_random_uuid() |
 | `user_roles` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
 | `user_roles` | `role` | default 'user' |
@@ -448,6 +431,11 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `achievements` | `requirement_value` | default 1 |
 | `achievements` | `created_at` | default now() |
 | `achievements` | `(tabela)` | constraint achievements_rewards_nonneg CHECK (xp_reward >= 0 AND coins_reward >= 0) NOT VALID |
+| `user_achievements` | `id` | PK; default gen_random_uuid() |
+| `user_achievements` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
+| `user_achievements` | `achievement_id` | obrigatório; FK → achievements.id ON DELETE CASCADE |
+| `user_achievements` | `unlocked_at` | default now() |
+| `user_achievements` | `(tabela)` | UNIQUE(user_id, achievement_id) |
 | `tabelas_frete` | `id` | PK; default gen_random_uuid() |
 | `tabelas_frete` | `transportadora_id` | obrigatório; FK → transportadoras.id ON DELETE CASCADE |
 | `tabelas_frete` | `regiao_destino` | obrigatório |
@@ -617,7 +605,19 @@ _Nenhum arquivo em `manual/`. Copie `manual/TEMPLATE-regras-de-negocio.md` para 
 | `rate_limit_logs` | `ip_address` | obrigatório |
 | `rate_limit_logs` | `endpoint` | obrigatório |
 | `rate_limit_logs` | `user_id` | FK → users.id ON DELETE SET NULL |
-| … +679 linhas — lista completa em `context.json` | | |
+| `rate_limit_logs` | `request_count` | default 1 |
+| `rate_limit_logs` | `blocked` | default false |
+| `rate_limit_logs` | `created_at` | default now() |
+| `rate_limit_logs` | `window_start` | default now() |
+| `user_sessions` | `id` | PK; default gen_random_uuid() |
+| `user_sessions` | `user_id` | obrigatório; FK → users.id ON DELETE CASCADE |
+| `user_sessions` | `is_current` | default false |
+| `user_sessions` | `last_active_at` | default now() |
+| `user_sessions` | `created_at` | default now() |
+| `permissions` | `id` | PK; default gen_random_uuid() |
+| `permissions` | `code` | obrigatório; único |
+| `permissions` | `name` | obrigatório |
+| … +667 linhas — lista completa em `context.json` | | |
 
 ## D. Automações no banco (triggers e funções — regras que rodam sozinhas)
 
@@ -1054,7 +1054,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 
 | Nome | Valores | Onde |
 |---|---|---|
-| achievement_tier | `bronze`, `silver`, `gold`, `platinum`, `diamond` | banco |
 | coleta_tipo | `lalamove`, `transportadora` | banco |
 | coleta_status | `aguardando_liberacao`, `solicitada`, `em_transito`, `chegou_expedicao`, `conferencia_ok`, `divergencia`, `finalizada` | banco |
 | entrega_status | `aguardando_producao`, `pronto_despacho`, `cotacao_frete`, `nf_emitida`, `despachado`, `em_transito`, `saiu_entrega`, `entregue`, `ocorrencia`, `finalizado` | banco |

@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `a1da74b5af0854c955e0e700b979b2b94919254c` (2026-11-20T15:06:42-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `190f724e9a1dee1b4ae0db93be84473090579b93` (2026-11-20T15:46:05-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (791), SQL (262), Markdown (100), JavaScript (79), JSON (33), YAML (22), Shell (9), Python (8)
+- linguagens: TypeScript (791), SQL (261), Markdown (100), JavaScript (79), JSON (33), YAML (21), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,7 +34,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1322 |
+| arquivos_total | 1320 |
 | arquivos_codigo | 877 |
 | linhas_codigo | 168517 |
 | rotas | 61 |
@@ -45,11 +45,11 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | componentes | 380 |
 | hooks | 177 |
 | edge_functions | 43 |
-| tabelas | 144 |
-| migrations | 249 |
+| tabelas | 142 |
+| migrations | 248 |
 | cron_jobs | 28 |
 | testes | 130 |
-| workflows | 18 |
+| workflows | 17 |
 | scripts | 62 |
 | docs_md | 100 |
 
@@ -264,7 +264,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - edges_chamadas_sem_pasta: 0
 - tabelas_sem_rls: 12 — ex.: audit_logs_y2026m01, audit_logs_y2026m02, audit_logs_y2026m03
 - tabelas_usadas_sem_definicao: 0
-- tabelas_com_drift_migration_vs_types: 5 — ex.: business_rules_config, feature_flags, freight_integration_mappings
+- tabelas_com_drift_migration_vs_types: 3 — ex.: business_rules_config, feature_flags, freight_integration_mappings
 - rpcs_sem_definicao: 0
 - componentes_orfaos: 2 — ex.: src/components/common/TiltCard.tsx, src/components/gamification/GamificationPanel.tsx
 - componentes_com_nome_duplicado: 8 — ex.: ConfirmProvider, DeleteButton, InlineConfirm
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8213 nós · 20785 arestas · 734 comunidades · grafo do commit `a1da74b5`
-- comunidades maiores: badge.tsx (179), db-observability/index.ts (164), react (144), ref_node_path (141), input.tsx (132), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), lucide-react (101), cn (95), ui/index.ts (93), gerar.mjs (81), @tanstack/react-query (80), dependencies (77)
+- 8206 nós · 20779 arestas · 715 comunidades · grafo do commit `190f724e`
+- comunidades maiores: db-observability/index.ts (159), react (127), ref_node_path (119), lucide-react (116), Envios.tsx (112), button.tsx (110), ui/index.ts (110), Clientes.tsx (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), utils.ts (96), client.ts (94), cn (92)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -283,13 +283,13 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - package-lock.json (52)
 - package.json (51)
 - .github/workflows/contexto-ia.yml (8)
+- .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
-- .github/workflows/ci-nexus.yml (6)
 - .github/workflows/deploy-functions.yml (6)
 - .github/workflows/types-sync.yml (6)
 - scripts/validate-csp.mjs (6)
-- .github/workflows/e2e.yml (5)
 - .github/workflows/inventario-estado-semanal.yml (5)
+- docs/agentes/github-ci.md (5)
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/audit-gate.mjs (5)
 - supabase/config.toml (5)
@@ -307,7 +307,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `contexto-ia.yml` — Contexto para agentes de IA (10 min) (push, schedule, workflow_dispatch; cron 7 * * * *)
 - `dependency-review.yml` — Dependency Review (pull_request)
 - `deploy-functions.yml` — Deploy Edge Functions (push, workflow_dispatch)
-- `e2e.yml` — E2E (manual) (workflow_dispatch)
 - `inventario-estado-semanal.yml` — Inventário do estado real (semanal) (schedule, workflow_dispatch; cron 23 10 * * 1)
 - `notifica-falha-main.yml` — Notifica falha na main (workflow_run)
 - `scripts-tests.yml` — Scripts Tests (pull_request, push, workflow_dispatch)
@@ -372,7 +371,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - `docs/ARCHITECTURE.md` — 🏗️ Arquitetura do Loggi-Flow (181 linhas)
 - `docs/ARCHITECTURE_C4.md` — C4 Architecture Model - LogiFlow (63 linhas)
 - `docs/AUDITORIA_BACKEND_SENIOR_2026.md` — 🔍 Auditoria Sênior de Back-End — Loggi-Flow (245 linhas)
-- `docs/AUTOMACAO_LOCAL.md` — Automação local — Loggi_Flow_V2 (159 linhas)
+- `docs/AUTOMACAO_LOCAL.md` — Automação local — Loggi_Flow_V2 (158 linhas)
 - `docs/DISASTER_RECOVERY.md` — Disaster Recovery Runbook (15 linhas)
 - `docs/ER_DIAGRAM.md` — Entity Relationship Diagram - LogiFlow (61 linhas)
 - `docs/HOOKS_COMPONENTS_API.md` — Documentação de Hooks e Componentes Reutilizáveis (640 linhas)
@@ -401,6 +400,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `190f724` chore: remove migration legada 20240822_gamification_system.sql (#224)
+- 2026-11-20 `e2fd132` chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)
 - 2026-11-20 `a1da74b` fix: reconcilia target dos inserts de schema_migrations em prod (#222)
 - 2026-11-20 `eb09cdc` chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)
 - 2026-11-20 `021e12f` fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)
@@ -414,8 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `db8f658` fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)
 - 2026-11-20 `35d65b9` fix(audit): corrige 7 quebras da seção 2 (#211)
 - 2026-11-20 `08d5a13` docs: aponta docs aspiracionais para a auditoria autoritativa (#210)
-- 2026-11-20 `8a28944` feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)
-- 2026-11-20 `1716939` fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

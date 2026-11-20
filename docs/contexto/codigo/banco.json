@@ -6,7 +6,7 @@
   "src/integrations/supabase/types.ts",
   "supabase/migrations"
  ],
- "migrations": 249,
+ "migrations": 248,
  "seeds": [
   "supabase/seed.sql"
  ],
@@ -19,13 +19,6 @@
   "pg_trgm"
  ],
  "enums": {
-  "achievement_tier": [
-   "bronze",
-   "silver",
-   "gold",
-   "platinum",
-   "diamond"
-  ],
   "app_role": [
    "admin",
    "user"
@@ -90,7 +83,6 @@
   "audit_log_trigger",
   "audit_trigger_func",
   "auto_revert_ineffective_indexes",
-  "award_gamification_points",
   "calculate_level",
   "cancel_long_running_query",
   "capture_index_proposal_baseline",
@@ -10063,13 +10055,6 @@
      "default": null,
      "ref": null
     },
-    "coins": {
-     "tipo": "integer",
-     "nn": false,
-     "pk": false,
-     "default": "0",
-     "ref": null
-    },
     "created_at": {
      "tipo": "timestamp with time zone",
      "nn": true,
@@ -10110,13 +10095,6 @@
      "nn": true,
      "pk": false,
      "default": "now()",
-     "ref": null
-    },
-    "xp": {
-     "tipo": "integer",
-     "nn": false,
-     "pk": false,
-     "default": "0",
      "ref": null
     }
    },
@@ -10170,10 +10148,7 @@
     "updated_at": "string"
    },
    "drift": {
-    "so_na_migration": [
-     "xp",
-     "coins"
-    ],
+    "so_na_migration": [],
     "so_no_types": []
    },
    "usada_no_front": 8,
@@ -10453,83 +10428,6 @@
    "triggers": [],
    "sem_rls": false,
    "nao_usada": false
-  },
-  "rank_badges": {
-   "colunas": {
-    "created_at": {
-     "tipo": "timestamptz",
-     "nn": false,
-     "pk": false,
-     "default": "now()",
-     "ref": null
-    },
-    "description": {
-     "tipo": "text",
-     "nn": false,
-     "pk": false,
-     "default": null,
-     "ref": null
-    },
-    "icon_url": {
-     "tipo": "text",
-     "nn": false,
-     "pk": false,
-     "default": null,
-     "ref": null
-    },
-    "id": {
-     "tipo": "uuid",
-     "nn": false,
-     "pk": true,
-     "default": "gen_random_uuid()",
-     "ref": null
-    },
-    "name": {
-     "tipo": "text",
-     "nn": true,
-     "pk": false,
-     "default": null,
-     "ref": null
-    },
-    "tier": {
-     "tipo": "public",
-     "nn": true,
-     "pk": false,
-     "default": "'bronze'",
-     "ref": null
-    },
-    "updated_at": {
-     "tipo": "timestamptz",
-     "nn": false,
-     "pk": false,
-     "default": "now()",
-     "ref": null
-    },
-    "xp_requirement": {
-     "tipo": "integer",
-     "nn": true,
-     "pk": false,
-     "default": "0",
-     "ref": null
-    }
-   },
-   "rls": true,
-   "policies": [
-    {
-     "nome": "Allow public read for authenticated",
-     "comando": "select",
-     "para": "authenticated",
-     "tipo": "permissive"
-    }
-   ],
-   "indices": [],
-   "fks": [],
-   "criada_em": "20240822_gamification_system.sql",
-   "usada_no_front": 0,
-   "usada_em_edges": [],
-   "triggers": [],
-   "sem_rls": false,
-   "nao_usada": true
   },
   "rastreamento_alertas": {
    "colunas": {
@@ -13691,83 +13589,6 @@
    "sem_rls": false,
    "nao_usada": false
   },
-  "task_gifts": {
-   "colunas": {
-    "coin_cost": {
-     "tipo": "integer",
-     "nn": true,
-     "pk": false,
-     "default": "0",
-     "ref": null
-    },
-    "created_at": {
-     "tipo": "timestamptz",
-     "nn": false,
-     "pk": false,
-     "default": "now()",
-     "ref": null
-    },
-    "description": {
-     "tipo": "text",
-     "nn": false,
-     "pk": false,
-     "default": null,
-     "ref": null
-    },
-    "id": {
-     "tipo": "uuid",
-     "nn": false,
-     "pk": true,
-     "default": "gen_random_uuid()",
-     "ref": null
-    },
-    "image_url": {
-     "tipo": "text",
-     "nn": false,
-     "pk": false,
-     "default": null,
-     "ref": null
-    },
-    "name": {
-     "tipo": "text",
-     "nn": true,
-     "pk": false,
-     "default": null,
-     "ref": null
-    },
-    "stock_quantity": {
-     "tipo": "integer",
-     "nn": false,
-     "pk": false,
-     "default": "0",
-     "ref": null
-    },
-    "updated_at": {
-     "tipo": "timestamptz",
-     "nn": false,
-     "pk": false,
-     "default": "now()",
-     "ref": null
-    }
-   },
-   "rls": true,
-   "policies": [
-    {
-     "nome": "Allow public read for authenticated",
-     "comando": "select",
-     "para": "authenticated",
-     "tipo": "permissive"
-    }
-   ],
-   "indices": [],
-   "fks": [],
-   "criada_em": "20240822_gamification_system.sql",
-   "usada_no_front": 0,
-   "usada_em_edges": [],
-   "triggers": [],
-   "sem_rls": false,
-   "nao_usada": true
-  },
   "telemetry_logs": {
    "colunas": {
     "category": {
@@ -14375,13 +14196,6 @@
      "default": null,
      "ref": "achievements"
     },
-    "badge_id": {
-     "tipo": "uuid",
-     "nn": true,
-     "pk": false,
-     "default": null,
-     "ref": "rank_badges"
-    },
     "id": {
      "tipo": "uuid",
      "nn": false,
@@ -14423,12 +14237,6 @@
      "comando": "select",
      "para": "public",
      "tipo": "permissive"
-    },
-    {
-     "nome": "Users can view their own achievements",
-     "comando": "select",
-     "para": "authenticated",
-     "tipo": "permissive"
     }
    ],
    "indices": [
@@ -14445,10 +14253,9 @@
    ],
    "fks": [
     "achievement_id->achievements",
-    "badge_id->rank_badges",
     "user_id->auth"
    ],
-   "criada_em": "20240822_gamification_system.sql",
+   "criada_em": "20251215162356_35cbc8c7-ef9f-4c75-bb60-1ab23b1b5b33.sql",
    "colunas_types": {
     "achievement_id": "string",
     "id": "string",
@@ -14456,9 +14263,7 @@
     "user_id": "string"
    },
    "drift": {
-    "so_na_migration": [
-     "badge_id"
-    ],
+    "so_na_migration": [],
     "so_no_types": []
    },
    "usada_no_front": 2,
