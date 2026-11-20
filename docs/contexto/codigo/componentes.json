@@ -1827,7 +1827,7 @@
     "CinematicHUD"
    ],
    "export_default": null,
-   "linhas": 80,
+   "linhas": 108,
    "dominio": "components/map",
    "hooks_locais": [
     "useIsMobile"

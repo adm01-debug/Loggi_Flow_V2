@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "e4392b7d13f811e5c744857ba39cb6891989eabf",
+  "commit": "84f200d7a49066634351cbd325862744e799456a",
   "branch": "main",
-  "data_commit": "2026-11-20T16:24:19-03:00",
+  "data_commit": "2026-11-20T16:36:05-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "84f200d",
+    "data": "2026-11-20",
+    "assunto": "fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)"
+   },
+   {
+    "sha": "fd6431b",
+    "data": "2026-11-20",
+    "assunto": "docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)"
+   },
    {
     "sha": "e4392b7",
     "data": "2026-11-20",
@@ -121,19 +131,9 @@
     "sha": "3a9fa6a",
     "data": "2026-11-19",
     "assunto": "chore: atualiza inventario com nomes reais de componentes (#203)"
-   },
-   {
-    "sha": "8f75c44",
-    "data": "2026-11-19",
-    "assunto": "feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)"
-   },
-   {
-    "sha": "ea8d1a4",
-    "data": "2026-11-19",
-    "assunto": "chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)"
    }
   ],
-  "arquivos_mudados_7d": 317,
+  "arquivos_mudados_7d": 318,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -176,6 +176,10 @@
     "mudancas": 5
    },
    {
+    "pasta": "docs/pendencias/_ordem.md",
+    "mudancas": 5
+   },
+   {
     "pasta": "scripts/validate-csp.mjs",
     "mudancas": 5
    },
@@ -184,16 +188,12 @@
     "mudancas": 5
    },
    {
-    "pasta": "supabase/schema-manifest.json",
+    "pasta": "src/components/map",
     "mudancas": 5
    },
    {
-    "pasta": ".github/workflows/ci-nexus.yml",
-    "mudancas": 4
-   },
-   {
-    "pasta": ".github/workflows/ci.yml",
-    "mudancas": 4
+    "pasta": "supabase/schema-manifest.json",
+    "mudancas": 5
    }
   ],
   "arquivos_mais_mudados_90d": [
@@ -242,6 +242,10 @@
     "mudancas": 5
    },
    {
+    "arquivo": "docs/pendencias/_ordem.md",
+    "mudancas": 5
+   },
+   {
     "arquivo": "scripts/audit-gate.mjs",
     "mudancas": 5
    },
@@ -278,10 +282,6 @@
     "mudancas": 4
    },
    {
-    "arquivo": "docs/pendencias/_ordem.md",
-    "mudancas": 4
-   },
-   {
     "arquivo": "eslint.config.js",
     "mudancas": 4
    },
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 154
+    "commits": 156
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1471,
   "arquivos_codigo": 877,
-  "linhas_codigo": 168523,
+  "linhas_codigo": 168551,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 49027
+   "linhas": 49055
   },
   "src/features": {
    "arquivos": 90,

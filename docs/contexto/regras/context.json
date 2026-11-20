@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "e4392b7d13f811e5c744857ba39cb6891989eabf",
+  "sha": "84f200d7a49066634351cbd325862744e799456a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 19:25 UTC",
+  "generated_at": "2026-11-20 19:36 UTC",
   "files_total": 1481,
   "code_files": 1139,
-  "code_lines": 185035,
+  "code_lines": 185063,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "5dd046dc7224b225",
+ "facts_hash": "8dab82df3cd00d68",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29074,7 +29074,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 49027,
+   "lines": 49055,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -70397,7 +70397,7 @@
   },
   "src/components/map/CinematicHUD.tsx": {
    "path": "src/components/map/CinematicHUD.tsx",
-   "lines": 80,
+   "lines": 108,
    "exports": [
     "function CinematicHUD"
    ],
@@ -88367,10 +88367,30 @@
   }
  },
  "git": {
-  "sha": "e4392b7d13f811e5c744857ba39cb6891989eabf",
+  "sha": "84f200d7a49066634351cbd325862744e799456a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "84f200d",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)",
+    "files": [
+     "src/components/map/CinematicHUD.tsx"
+    ]
+   },
+   {
+    "sha": "fd6431b",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)",
+    "files": [
+     "docs/pendencias/03-19-cotacao-api-simulada.md",
+     "docs/pendencias/03-20-dashboard-cotacoes-simula.md",
+     "docs/pendencias/_ordem.md"
+    ]
+   },
    {
     "sha": "e4392b7",
     "date": "2026-11-20",
@@ -88846,26 +88866,6 @@
      "src/components/common/LoadingSpinner.tsx",
      "src/components/freight/DecisionAudit.tsx"
     ]
-   },
-   {
-    "sha": "8a35843",
-    "date": "2026-11-19",
-    "author": "adm01-debug",
-    "subject": "chore: remove service worker manual obsoleto sobrescrito pelo vite-plugin-pwa (#198)",
-    "files": [
-     "index.html",
-     "public/sw.js"
-    ]
-   },
-   {
-    "sha": "a2979e0",
-    "date": "2026-11-19",
-    "author": "adm01-debug",
-    "subject": "chore: remove workflows temporarios de seed e diagnostico apos conclusao (#196)",
-    "files": [
-     ".github/workflows/diag-schema-prod.yml",
-     ".github/workflows/revela-seed-prod.yml"
-    ]
    }
   ],
   "hot_files": [
@@ -88879,11 +88879,19 @@
    ],
    [
     "docs/pendencias/_ordem.md",
-    4
+    5
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     4
+   ],
+   [
+    "docs/pendencias/03-19-cotacao-api-simulada.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-20-dashboard-cotacoes-simula.md",
+    2
    ],
    [
     "docs/pendencias/02-05-predict-delays-whatsapp.md",
@@ -88934,19 +88942,11 @@
     2
    ],
    [
+    "src/components/map/CinematicHUD.tsx",
+    1
+   ],
+   [
     "src/hooks/logistics/useCotacoesMulticanal.tsx",
-    1
-   ],
-   [
-    "src/pages/CotacaoMultiCanal.tsx",
-    1
-   ],
-   [
-    "src/pages/DashboardCotacoes.tsx",
-    1
-   ],
-   [
-    "docs/pendencias/01-01-hooks-real-ausentes.md",
     1
    ]
   ]

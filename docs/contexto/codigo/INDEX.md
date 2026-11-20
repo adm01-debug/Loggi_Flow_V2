@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e4392b7d13f811e5c744857ba39cb6891989eabf` (2026-11-20T16:24:19-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `84f200d7a49066634351cbd325862744e799456a` (2026-11-20T16:36:05-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1471 |
 | arquivos_codigo | 877 |
-| linhas_codigo | 168523 |
+| linhas_codigo | 168551 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8513 nós · 20935 arestas · 868 comunidades · grafo do commit `e4392b7d`
+- 8513 nós · 20935 arestas · 868 comunidades · grafo do commit `84f200d7`
 - comunidades maiores: client.ts (216), MainLayout.tsx (181), lucide-react (173), db-observability/index.ts (162), react (156), Input (133), input.tsx (108), Coletas.tsx (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ref_node_path (103), cn (88), ui/index.ts (86)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -291,10 +291,10 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - .github/workflows/inventario-estado-semanal.yml (5)
 - docs/agentes/github-ci.md (5)
 - docs/auditoria-recuperacao-branches.md (5)
+- docs/pendencias/_ordem.md (5)
 - scripts/audit-gate.mjs (5)
 - supabase/config.toml (5)
 - supabase/functions/ai-logistics-assistant/index.ts (5)
-- supabase/schema-manifest.json (5)
 
 ## Workflows
 - `aplicar-migration.yml` — Aplicar Migration (workflow_dispatch)
@@ -400,6 +400,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-20 `84f200d` fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)
+- 2026-11-20 `fd6431b` docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)
 - 2026-11-20 `e4392b7` fix: remove simulacao de cotacao e torna retentativa real (#226)
 - 2026-11-20 `5d31fbc` docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)
 - 2026-11-20 `190f724` chore: remove migration legada 20240822_gamification_system.sql (#224)
@@ -413,8 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `eaecf14` chore(db): sincronizar artefatos com o banco [auto] (#216)
 - 2026-11-20 `9654eed` docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)
 - 2026-11-20 `817700d` fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)
-- 2026-11-20 `f1d13b6` docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)
-- 2026-11-20 `db8f658` fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

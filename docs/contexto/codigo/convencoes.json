@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)",
+   "docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)",
    "fix: remove simulacao de cotacao e torna retentativa real (#226)",
    "docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)",
-   "chore: remove migration legada 20240822_gamification_system.sql (#224)",
-   "chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)",
-   "fix: reconcilia target dos inserts de schema_migrations em prod (#222)"
+   "chore: remove migration legada 20240822_gamification_system.sql (#224)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",
