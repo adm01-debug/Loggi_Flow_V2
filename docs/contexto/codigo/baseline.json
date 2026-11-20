@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "d952137b3b05ebd525eaf47ffd74dcf19eae62fd",
+  "commit": "3d7affa0fb2477f6283c038347f64106a3bd7220",
   "branch": "main",
-  "data_commit": "2026-11-20T17:08:17-03:00",
+  "data_commit": "2026-11-20T17:17:50-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "3d7affa",
+    "data": "2026-11-20",
+    "assunto": "docs: marca 03-01 a 03-05 (Fase B) como concluidos via PR #229 (#230)"
+   },
    {
     "sha": "d952137",
     "data": "2026-11-20",
@@ -126,11 +131,6 @@
     "sha": "c2e148b",
     "data": "2026-11-20",
     "assunto": "docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)"
-   },
-   {
-    "sha": "8028999",
-    "data": "2026-11-20",
-    "assunto": "bump react-router 6 -> 7 e resolve 4 vulnerabilidades"
    }
   ],
   "arquivos_mudados_7d": 322,
@@ -160,6 +160,10 @@
     "mudancas": 6
    },
    {
+    "pasta": "docs/pendencias/_ordem.md",
+    "mudancas": 6
+   },
+   {
     "pasta": "src/hooks/data",
     "mudancas": 6
    },
@@ -173,10 +177,6 @@
    },
    {
     "pasta": "docs/auditoria-recuperacao-branches.md",
-    "mudancas": 5
-   },
-   {
-    "pasta": "docs/pendencias/_ordem.md",
     "mudancas": 5
    },
    {
@@ -226,6 +226,10 @@
     "mudancas": 6
    },
    {
+    "arquivo": "docs/pendencias/_ordem.md",
+    "mudancas": 6
+   },
+   {
     "arquivo": "scripts/validate-csp.mjs",
     "mudancas": 6
    },
@@ -239,10 +243,6 @@
    },
    {
     "arquivo": "docs/auditoria-recuperacao-branches.md",
-    "mudancas": 5
-   },
-   {
-    "arquivo": "docs/pendencias/_ordem.md",
     "mudancas": 5
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 157
+    "commits": 158
    },
    {
     "autor": "dependabot[bot]",

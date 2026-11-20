@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "d952137b3b05ebd525eaf47ffd74dcf19eae62fd",
+  "sha": "3d7affa0fb2477f6283c038347f64106a3bd7220",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 20:08 UTC",
+  "generated_at": "2026-11-20 21:12 UTC",
   "files_total": 1482,
   "code_files": 1140,
   "code_lines": 185471,
@@ -88345,10 +88345,24 @@
   }
  },
  "git": {
-  "sha": "d952137b3b05ebd525eaf47ffd74dcf19eae62fd",
+  "sha": "3d7affa0fb2477f6283c038347f64106a3bd7220",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "3d7affa",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "docs: marca 03-01 a 03-05 (Fase B) como concluidos via PR #229 (#230)",
+    "files": [
+     "docs/pendencias/03-01-dora-metrics-literal.md",
+     "docs/pendencias/03-02-postmortem-literal.md",
+     "docs/pendencias/03-03-systempulse-fixo.md",
+     "docs/pendencias/03-04-livestatusbar-ping.md",
+     "docs/pendencias/03-05-logisticsmapwidget-kpis.md",
+     "docs/pendencias/_ordem.md"
+    ]
+   },
    {
     "sha": "d952137",
     "date": "2026-11-20",
@@ -88835,18 +88849,13 @@
     "files": [
      "docs/agentes/mapa-integracao-20261112.md"
     ]
-   },
-   {
-    "sha": "ed9aa79",
-    "date": "2026-11-19",
-    "author": "github-actions[bot]",
-    "subject": "chore(db): sincronizar artefatos derivados do banco [auto]",
-    "files": [
-     "supabase/schema-manifest.json"
-    ]
    }
   ],
   "hot_files": [
+   [
+    "docs/pendencias/_ordem.md",
+    6
+   ],
    [
     "package-lock.json",
     6
@@ -88856,12 +88865,28 @@
     6
    ],
    [
-    "docs/pendencias/_ordem.md",
-    5
-   ],
-   [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     4
+   ],
+   [
+    "docs/pendencias/03-01-dora-metrics-literal.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-02-postmortem-literal.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-03-systempulse-fixo.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-04-livestatusbar-ping.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-05-logisticsmapwidget-kpis.md",
+    2
    ],
    [
     "docs/pendencias/03-19-cotacao-api-simulada.md",
@@ -88881,10 +88906,6 @@
    ],
    [
     "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
-    2
-   ],
-   [
-    "supabase/schema-manifest.json",
     2
    ],
    [
@@ -88910,22 +88931,6 @@
    [
     "docs/pendencias/02-08-ranking.md",
     2
-   ],
-   [
-    "docs/pendencias/02-10-kanban-history-embed.md",
-    2
-   ],
-   [
-    "docs/INVENTARIO_FUNCIONALIDADES.md",
-    2
-   ],
-   [
-    "src/components/admin/DORAMetrics.tsx",
-    1
-   ],
-   [
-    "src/components/dashboard/LiveStatusBar.tsx",
-    1
    ]
   ]
  }
