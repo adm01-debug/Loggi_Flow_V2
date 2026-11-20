@@ -62,33 +62,34 @@ serve(async (req) => {
 
     if (profileError) throw profileError;
 
-    // 2. Anonimizar entregas vinculadas
-    const { error: anonError } = await supabaseClient
-      .from("entregas")
-      .update({
-        cliente_nome: "ANONIMIZADO",
-        cliente_email: "anon@example.com",
-        cliente_documento: "000.000.000-00",
-      })
-      .eq("user_id", userId);
-
-    if (anonError) throw anonError;
-
-    // 3. Delete the auth user so they can no longer sign in
+    // 2. Delete the auth user so they can no longer sign in.
     const { error: deleteAuthError } =
       await supabaseClient.auth.admin.deleteUser(userId);
     if (deleteAuthError) throw deleteAuthError;
 
-    // 4. Registrar no log de auditoria
-    await supabaseClient.from("audit_logs").insert({
-      event: "lgpd_erase",
-      user_id: userId,
-      metadata: {
-        timestamp: new Date().toISOString(),
-        status: "success",
-        erased_by: caller.id,
-      },
-    });
+    // 3. Registrar no log de auditoria, conforme o schema real de `audit_logs`
+    //    (action/table_name/record_id/...). O UPDATE antigo em `entregas` usava
+    //    colunas inexistentes (cliente_nome/cliente_email/cliente_documento/
+    //    user_id) e quebrava com 400 DEPOIS de apagar o perfil e ANTES de apagar
+    //    o usuário de auth — o usuário ficava com o perfil sumido e o login vivo.
+    //    Como `entregas` não tem vínculo real com o titular (só `cliente_id`),
+    //    não há PII sua para anonimizar ali. Agora perfil e usuário de auth são
+    //    apagados de verdade e a ação fica registrada no schema real.
+    const { error: auditError } = await supabaseClient
+      .from("audit_logs")
+      .insert({
+        action: "lgpd_erase",
+        table_name: "auth.users",
+        record_id: userId,
+        user_id: caller.id,
+        user_email: caller.email ?? null,
+        new_data: {
+          timestamp: new Date().toISOString(),
+          status: "success",
+          erased_by: caller.id,
+        },
+      });
+    if (auditError) throw auditError;
 
     return new Response(
       JSON.stringify({ message: "User data erased/anonymized successfully" }),
