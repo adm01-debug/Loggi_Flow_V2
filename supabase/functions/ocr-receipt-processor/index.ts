@@ -49,38 +49,27 @@ serve(async (req) => {
 
     if (downloadError) throw downloadError;
 
-    // Simulate OCR Processing
-    log.info(`Processing OCR for delivery ${delivery_id}...`);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // OCR real ainda não foi implementado nesta function. Antes, este bloco
+    // fabricava um resultado (confidence/receiver_name fixos) e aplicava dois
+    // efeitos reais a partir dele: marcava a entrega como 'entregue' e o
+    // registro de auditoria como 'processed' — ambos falsos. Corrige a causa
+    // raiz: não fabricar dado nem aplicar efeito colateral sem extração real.
+    log.info(`OCR não implementado para entrega ${delivery_id}; upload fica para revisão manual.`);
 
     const extractedData = {
       extraction_date: new Date().toISOString(),
-      confidence: 0.98,
-      fields: {
-        date: new Date().toLocaleDateString('pt-BR'),
-        signature_present: true,
-        receiver_name: "CARLOS ALBERTO SILVA",
-        document_number: "MG-12.345.678",
-        summary: "Entrega recebida sem ressalvas."
-      }
+      implemented: false,
+      note: "OCR automático não implementado nesta function — revisão manual necessária.",
     };
 
-    // Update the delivery with OCR results
-    // Consistency validation: set status only after processing
-    const { error: updateError } = await supabaseAdmin
-      .from("entregas")
-      .update({ 
-        ocr_data_extraida: extractedData,
-        status: 'entregue'
-      })
-      .eq("id", delivery_id);
-
-    if (updateError) throw updateError;
-
-    // Update audit record
+    // Update audit record apenas — não altera o status da entrega a partir
+    // de um resultado de OCR que não existe.
     await supabaseAdmin
       .from("delivery_receipt_audit")
-      .update({ ocr_status: 'processed' })
+      .update({
+        ocr_status: 'not_implemented',
+        error_message: 'OCR automático não implementado nesta function.',
+      })
       .eq("delivery_id", delivery_id)
       .eq("storage_path", storage_path);
 
