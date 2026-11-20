@@ -3199,8 +3199,10 @@
    "src/integrations/supabase/client.ts"
   ],
   "src/pages/Auth.tsx": [
+   "src/components/security/MFAVerify.tsx",
    "src/hooks/auth/useAuth.tsx",
    "src/hooks/ui/use-toast.ts",
+   "src/integrations/supabase/client.ts",
    "src/pages/auth/AuthForgotPassword.tsx",
    "src/pages/auth/AuthFormPanel.tsx",
    "src/pages/auth/AuthHeroSection.tsx",

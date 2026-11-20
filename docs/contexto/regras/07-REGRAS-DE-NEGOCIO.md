@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `171693962f` · branch `main` · 2026-11-20 11:54 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8a2894459b` · branch `main` · 2026-11-20 12:08 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1003,7 +1003,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `unknown` | escreve | `supabase/functions/accuracy-meta-monitor/channelHealth.ts` |
 | `status` | `unread` | compara | `src/components/predictions/AccuracyMetaAuditPanel.tsx` |
 | `status` | `validating` | compara | `src/hooks/common/useImportData.ts` |
-| `status` | `verified` | compara | `src/components/security/TwoFactorSetup.tsx`<br>`src/hooks/auth/useMFA.ts` |
+| `status` | `verified` | compara | `src/components/security/TwoFactorSetup.tsx`<br>`src/hooks/auth/useMFA.ts`<br>`src/pages/Auth.tsx` |
 | `status` | `very_slow` | compara | `supabase/functions/external-db-bridge/index.ts` |
 | `status` | `violado` | compara | `src/hooks/rodonaves/useSLOSnapshots.ts`<br>`src/lib/rodonaves/gatewaySLO.ts`<br>`src/lib/rodonaves/sloAlerts.ts`<br>`src/lib/rodonaves/sloReport.ts` |
 | `status` | `warning` | compara, escreve | `src/components/analytics/OperationalPulse.tsx` |

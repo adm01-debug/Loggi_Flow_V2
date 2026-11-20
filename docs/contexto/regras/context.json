@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "171693962fa5f5adc1866939e5634610cac6e246",
+  "sha": "8a2894459bbb6a6f4bca97628b9ed4f634e215cc",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 11:54 UTC",
+  "generated_at": "2026-11-20 12:08 UTC",
   "files_total": 1316,
   "code_files": 1138,
-  "code_lines": 183949,
+  "code_lines": 184057,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "8816afb60b129735",
+ "facts_hash": "b1a6d744f210c13c",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -23768,6 +23768,7 @@
     "tables_transitive": [
      "password_reset_requests",
      "profiles",
+     "security_events",
      "user_levels",
      "user_roles"
     ],
@@ -23777,7 +23778,7 @@
      "validate-login"
     ],
     "rpc_transitive": [],
-    "deps_count": 24
+    "deps_count": 26
    },
    {
     "path": "/, /ch, /comentada-jsx, /comentada-linha, /h, /nova, /z, /ä",
@@ -30098,7 +30099,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30711,
+   "lines": 30819,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -44931,6 +44932,12 @@
     "kind": "escreve"
    },
    {
+    "file": "src/pages/Auth.tsx",
+    "field": "status",
+    "value": "verified",
+    "kind": "compara"
+   },
+   {
     "file": "src/pages/CalendarioLogistico.tsx",
     "field": "type",
     "value": "all",
@@ -57181,7 +57188,8 @@
      ],
      "verified": [
       "compara:src/components/security/TwoFactorSetup.tsx",
-      "compara:src/hooks/auth/useMFA.ts"
+      "compara:src/hooks/auth/useMFA.ts",
+      "compara:src/pages/Auth.tsx"
      ],
      "cotacao_frete": [
       "compara:src/components/shipping/ExpeditionDetailsDialog.tsx",
@@ -64441,7 +64449,8 @@
     "msg": "valor `verified` para `status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:src/components/security/TwoFactorSetup.tsx",
-     "compara:src/hooks/auth/useMFA.ts"
+     "compara:src/hooks/auth/useMFA.ts",
+     "compara:src/pages/Auth.tsx"
     ]
    },
    {
@@ -81224,7 +81233,7 @@
   },
   "src/pages/Auth.tsx": {
    "path": "src/pages/Auth.tsx",
-   "lines": 159,
+   "lines": 267,
    "exports": [
     "function Auth"
    ],
@@ -81241,6 +81250,11 @@
      "field": "type",
      "value": "spring",
      "kind": "escreve"
+    },
+    {
+     "field": "status",
+     "value": "verified",
+     "kind": "compara"
     }
    ]
   },
@@ -88837,10 +88851,19 @@
   }
  },
  "git": {
-  "sha": "171693962fa5f5adc1866939e5634610cac6e246",
+  "sha": "8a2894459bbb6a6f4bca97628b9ed4f634e215cc",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "8a28944",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)",
+    "files": [
+     "src/pages/Auth.tsx"
+    ]
+   },
    {
     "sha": "1716939",
     "date": "2026-11-20",
@@ -89150,37 +89173,16 @@
     "files": [
      "scripts/audit-gate.mjs"
     ]
-   },
-   {
-    "sha": "4b5d4c9",
-    "date": "2026-11-17",
-    "author": "adm01-debug",
-    "subject": "chore: atualiza @supabase/supabase-js para 2.119 e corrige 4 bugs de schema (#172)",
-    "files": [
-     "package-lock.json",
-     "package.json",
-     "src/components/common/WidgetErrorBoundary.tsx",
-     "src/hooks/logistics/useBusinessRuleEngine.tsx",
-     "src/hooks/logistics/useBusinessRules.tsx",
-     "src/hooks/logistics/useConciliacao.tsx",
-     "src/hooks/logistics/useCostAlerts.tsx",
-     "src/hooks/logistics/useCotacoesMulticanal.tsx",
-     "src/hooks/logistics/useFreightQuotation.tsx",
-     "src/hooks/logistics/useLogisticaReversaReal.tsx",
-     "src/integrations/supabase/types.ts",
-     "src/pages/ConfiguracoesFrete.tsx",
-     "supabase/migrations/20261117150000_add_peso_efetivo_coletas.sql"
-    ]
    }
   ],
   "hot_files": [
    [
     "package-lock.json",
-    5
+    4
    ],
    [
     "package.json",
-    5
+    4
    ],
    [
     "supabase/schema-manifest.json",
@@ -89223,6 +89225,10 @@
     2
    ],
    [
+    "src/pages/Auth.tsx",
+    1
+   ],
+   [
     "supabase/functions/lgpd-erase-user/index.ts",
     1
    ],
@@ -89248,10 +89254,6 @@
    ],
    [
     "docs/INVENTARIO_FUNCIONALIDADES.md",
-    1
-   ],
-   [
-    "src/components/coletas/PickupConference.tsx",
     1
    ]
   ]

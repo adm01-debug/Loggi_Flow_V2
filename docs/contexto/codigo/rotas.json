@@ -1444,6 +1444,7 @@
     "useContext",
     "useDebounce",
     "useEffect",
+    "useMFA",
     "useMemo",
     "useMotionValue",
     "useNavigate",
@@ -1455,11 +1456,13 @@
    "hooks_locais": [
     "useAuth",
     "useDebounce",
+    "useMFA",
     "useToast"
    ],
    "tabelas": [
     "password_reset_requests",
     "profiles",
+    "security_events",
     "user_levels",
     "user_roles"
    ],
@@ -1476,7 +1479,7 @@
     "Coordenadora",
     "admin"
    ],
-   "arquivos_puxados": 24
+   "arquivos_puxados": 26
   },
   {
    "protegida": true,

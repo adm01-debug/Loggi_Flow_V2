@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)",
    "fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)",
    "fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)",
    "docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)",
-   "bump react-router 6 -> 7 e resolve 4 vulnerabilidades",
-   "chore: atualiza inventario com nomes reais de componentes (#203)"
+   "bump react-router 6 -> 7 e resolve 4 vulnerabilidades"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

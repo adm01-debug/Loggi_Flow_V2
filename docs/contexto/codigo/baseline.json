@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "171693962fa5f5adc1866939e5634610cac6e246",
+  "commit": "8a2894459bbb6a6f4bca97628b9ed4f634e215cc",
   "branch": "main",
-  "data_commit": "2026-11-20T08:53:43-03:00",
+  "data_commit": "2026-11-20T09:07:53-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "8a28944",
+    "data": "2026-11-20",
+    "assunto": "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)"
+   },
    {
     "sha": "1716939",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "8530be9",
     "data": "2026-11-17",
     "assunto": "feat: substitui Mapbox por MapLibre e geocodificação OpenStreetMap (token revogado derrubava todos os mapas) (#180)"
-   },
-   {
-    "sha": "6e1ffcf",
-    "data": "2026-11-17",
-    "assunto": "fix: arquivos enviados nao abriam (getPublicUrl em bucket privado) (#179)"
    }
   ],
-  "arquivos_mudados_7d": 131,
+  "arquivos_mudados_7d": 132,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 137
+    "commits": 138
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1306,
   "arquivos_codigo": 877,
-  "linhas_codigo": 167444,
+  "linhas_codigo": 167552,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30711
+   "linhas": 30819
   },
   "src/services": {
    "arquivos": 5,

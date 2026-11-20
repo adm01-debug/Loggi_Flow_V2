@@ -4,10 +4,10 @@
  "presente": true,
  "como_gerar": "uvx --from \"graphifyy[sql]\" graphify update .  (ou: npm run graph:update); saída em graphify-out/ — graph.json e graph.html NÃO são versionados (dezenas de MB); use `graphify query/path/explain` localmente",
  "relatorio": null,
- "commit_do_grafo": "171693962fa5f5adc1866939e5634610cac6e246",
+ "commit_do_grafo": "8a2894459bbb6a6f4bca97628b9ed4f634e215cc",
  "grafo_atual": true,
  "nos": 8160,
- "arestas": 20744,
+ "arestas": 20748,
  "comunidades_total": 702,
  "relacoes": {
   "calls": 2831,
@@ -18,8 +18,8 @@
   "dynamic_import": 111,
   "extends": 1,
   "implements": 1,
-  "imports": 4843,
-  "imports_from": 4615,
+  "imports": 4845,
+  "imports_from": 4617,
   "indexes": 351,
   "indirect_call": 103,
   "inherits": 25,
@@ -31,7 +31,7 @@
   "triggers": 101
  },
  "origem": {
-  "EXTRACTED": 20401,
+  "EXTRACTED": 20405,
   "INFERRED": 343
  },
  "comunidades": [
@@ -1215,14 +1215,14 @@
    "id": "src_integrations_supabase_client",
    "rotulo": "client.ts",
    "arquivo": "src/integrations/supabase/client.ts",
-   "grau": 213,
+   "grau": 214,
    "comunidade": "client.ts"
   },
   {
    "id": "src_integrations_supabase_client_supabase",
    "rotulo": "supabase",
    "arquivo": "src/integrations/supabase/client.ts",
-   "grau": 206,
+   "grau": 207,
    "comunidade": "client.ts"
   },
   {

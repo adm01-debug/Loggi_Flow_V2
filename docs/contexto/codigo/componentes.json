@@ -2994,7 +2994,7 @@
    ],
    "tabelas": [],
    "edges": [],
-   "usado_por": 1,
+   "usado_por": 2,
    "orfao": false
   },
   {
@@ -5239,7 +5239,7 @@
     "Auth"
    ],
    "export_default": "Auth",
-   "linhas": 159,
+   "linhas": 267,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth",

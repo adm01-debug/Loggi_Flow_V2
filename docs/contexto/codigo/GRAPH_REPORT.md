@@ -1,17 +1,17 @@
 # Graph Report - Loggi_Flow_V2  (2026-11-20)
 
 ## Corpus Check
-- 1271 files · ~794,538 words
+- 1271 files · ~794,752 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: .toml 6, (none) 6, .example 1)
 
 ## Summary
-- 8160 nodes · 20744 edges · 702 communities (373 shown, 329 thin omitted)
+- 8160 nodes · 20748 edges · 702 communities (373 shown, 329 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 343 edges (avg confidence: 0.92)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `17169396`
+- Built from commit: `8a289445`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -601,7 +601,7 @@
 2. `react` - 343 edges
 3. `lucide-react` - 329 edges
 4. `Button` - 215 edges
-5. `supabase` - 206 edges
+5. `supabase` - 207 edges
 6. `Badge` - 180 edges
 7. `@tanstack/react-query` - 153 edges
 8. `useAuth()` - 153 edges
@@ -2126,9 +2126,9 @@ Nodes (3): 🎯 Criação do Projeto, Opção 1: Via Lovable (Recomendado), Opç
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `7. Segurança parcial` connect `13. Código morto (MORTO)` to `lucide-react`, `seed-database.unit.mjs`, `Auditoria: funcionalidades planejadas × implementadas — Loggi Flow V2 — 2026-11-20`, `graphify-local.mjs`, `SnapshotCallerFreshnessTests`, `Index.tsx`, `useAuth`, `safeFetch`?**
-  _High betweenness centrality (0.135) - this node is a cross-community bridge._
+  _High betweenness centrality (0.138) - this node is a cross-community bridge._
 - **Why does `status()` connect `graphify-local.mjs` to `typecheck-ratchet.mjs`, `ref_node_path`, `Auditoria: funcionalidades planejadas × implementadas — Loggi Flow V2 — 2026-11-20`, `ESTADO ATUAL DO SISTEMA — LogiFlow / loggi-flow-v2`, `SnapshotCallerFreshnessTests`, `auditoria-recuperacao-branches.md`, `13. Código morto (MORTO)`?**
-  _High betweenness centrality (0.127) - this node is a cross-community bridge._
+  _High betweenness centrality (0.129) - this node is a cross-community bridge._
 - **Why does `cn()` connect `cn` to `lucide-react`, `react`, `Button`, `GeoBlockingPanel.tsx`, `Envios.tsx`, `App.tsx`, `celebrationSounds.ts`, `dialog.tsx`, `ui/index.ts`, `carousel.tsx`, `form.tsx`, `useAuth`, `Transportadoras.tsx`, `PasswordStrengthIndicator.tsx`, `MEAddressBlock.tsx`, `Clientes.tsx`, `GestaoMelhorEnvio.tsx`, `Ocorrencias.tsx`, `PainelSLA.tsx`, `DashboardExecutivo.tsx`, `useSLANotifications.tsx`, `4. Botões, controles e telas sem efeito (PARCIAL)`, `ImportacaoMassa.tsx`, `Coletas.tsx`, `AchievementBadge.tsx`, `PreferencePanel.tsx`, `useToast`, `chart.tsx`, `lib/index.ts`, `common/index.ts`, `RelatorioPDF.tsx`, `GestaoBox.tsx`, `GlobalSearch.tsx`, `sidebar.tsx`, `useUnifiedTracking.tsx`, `DraggableDashboard.tsx`, `Index.tsx`, `AdminTelemetria.tsx`, `useMediaQuery.ts`, `StatusBadge.tsx`, `micro-interactions.tsx`, `ExcelImporter.tsx`, `sloReport.ts`, `useDashboardMetrics`, `Auditoria: funcionalidades planejadas × implementadas — Loggi Flow V2 — 2026-11-20`, `WidgetErrorBoundary`, `toggle-group.tsx`, `WhatIfPanel.tsx`, `sloAlerts.ts`, `useIntegrationValidation.tsx`, `avatar.tsx`, `AppSidebar.tsx`, `gatewaySLO.ts`, `13. Código morto (MORTO)`, `OnboardingTooltip.tsx`, `ConciliacaoExport.tsx`, `ActionButton`?**
   _High betweenness centrality (0.103) - this node is a cross-community bridge._
 - **What connects `session-start.sh script`, `PATH`, `@commitlint/config-conventional` to the rest of the system?**

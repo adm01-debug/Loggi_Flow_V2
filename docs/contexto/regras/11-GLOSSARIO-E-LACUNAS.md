@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `171693962f` · branch `main` · 2026-11-20 11:54 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `8a2894459b` · branch `main` · 2026-11-20 12:08 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -238,7 +238,7 @@
 | status | valor `read` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/predictions/AccuracyMetaAuditPanel.tsx` |
 | status | valor `unread` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/predictions/AccuracyMetaAuditPanel.tsx` |
 | status | valor `purchased` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/rewards/RewardPurchaseHistory.tsx` |
-| status | valor `verified` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/security/TwoFactorSetup.tsx`<br>`compara:src/hooks/auth/useMFA.ts` |
+| status | valor `verified` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/security/TwoFactorSetup.tsx`<br>`compara:src/hooks/auth/useMFA.ts`<br>`compara:src/pages/Auth.tsx` |
 | status | valor `none` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/ui/avatar.tsx`<br>`escreve:src/components/ui/avatar.tsx` |
 | status | valor `measured` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/features/db-observability/hooks/useIndexProposals.ts` |
 | status | valor `identified` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/features/incidents/components/PostMortemDashboard.tsx` |
