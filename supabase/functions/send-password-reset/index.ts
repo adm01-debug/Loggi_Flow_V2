@@ -111,29 +111,63 @@ serve(async (req: Request) => {
       );
     }
 
-    // Get the origin from the request headers or use a default
+    // Get the origin from the request headers or use the production domain
+    // (AGENTS.md:88, docs/agentes/deploy.md:9). O fallback antigo apontava
+    // para o projeto Lovable morto uwbpzfcysppwikfpnzok — dívida já
+    // registrada em docs/agentes/banco.md:37 e docs/agentes/deploy.md:81.
     const origin =
-      req.headers.get("origin") ||
-      "https://uwbpzfcysppwikfpnzok.lovableproject.com";
+      req.headers.get("origin") || "https://loggi-flow-v2.vercel.app";
     const redirectTo = `${origin}/reset-password`;
 
-    log.info(`Sending password reset email to: ${resetRequest.email}`);
+    log.info(`Generating password reset link for: ${resetRequest.email}`);
     log.info(`Redirect URL: ${redirectTo}`);
 
-    // Send the password reset email using admin API
-    const { error: resetError } = await supabaseAdmin.auth.admin.generateLink({
-      type: "recovery",
-      email: resetRequest.email,
-      options: {
-        redirectTo: redirectTo,
-      },
-    });
+    // generateLink só gera o link de recuperação — NÃO envia e-mail. O envio
+    // real é feito abaixo, via a function interna resend-email (mesmo padrão
+    // de accuracy-weekly-digest/index.ts).
+    const { data: linkData, error: resetError } =
+      await supabaseAdmin.auth.admin.generateLink({
+        type: "recovery",
+        email: resetRequest.email,
+        options: {
+          redirectTo: redirectTo,
+        },
+      });
 
-    if (resetError) {
+    if (resetError || !linkData?.properties?.action_link) {
       log.error("Error generating reset link:", resetError);
       return new Response(
         JSON.stringify({
-          error: `Failed to send reset email: ${resetError.message}`,
+          error: `Failed to generate reset link: ${resetError?.message ?? "no action_link returned"}`,
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const actionLink = linkData.properties.action_link;
+
+    log.info(`Sending password reset email to: ${resetRequest.email}`);
+    const { error: sendError } = await supabaseAdmin.functions.invoke(
+      "resend-email",
+      {
+        body: {
+          to: resetRequest.email,
+          subject: "Redefinição de senha — LogiFlow",
+          html: `<p>Você solicitou a redefinição de senha da sua conta LogiFlow.</p>
+<p><a href="${actionLink}">Clique aqui para definir uma nova senha</a>.</p>
+<p>Se você não solicitou isso, ignore este e-mail.</p>`,
+        },
+      },
+    );
+
+    if (sendError) {
+      log.error("Error sending reset email:", sendError);
+      return new Response(
+        JSON.stringify({
+          error: `Failed to send reset email: ${sendError.message}`,
         }),
         {
           status: 500,

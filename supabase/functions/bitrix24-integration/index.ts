@@ -5,11 +5,19 @@ import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface BitrixRequest {
-  action: "sync_deals" | "update_deal" | "get_deals" | "create_deal" | "webhook" | "notify_alert";
+  action:
+    | "test-connection"
+    | "sync_deals"
+    | "update_deal"
+    | "get_deals"
+    | "create_deal"
+    | "webhook"
+    | "notify_alert";
   deal_id?: string;
   deal_data?: Record<string, unknown>;
   spa_id?: number;
@@ -29,8 +37,14 @@ serve(async (req) => {
 
     if (!bitrixWebhookUrl) {
       return new Response(
-        JSON.stringify({ success: false, error: "BITRIX24_WEBHOOK_URL not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          success: false,
+          error: "BITRIX24_WEBHOOK_URL not configured",
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -38,6 +52,39 @@ serve(async (req) => {
     const body: BitrixRequest = await req.json();
 
     switch (body.action) {
+      case "test-connection": {
+        // Safe, side-effect-free reachability check used by the integrations panel.
+        const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            entityTypeId: body.spa_id || 1186,
+            filter: { ">=updatedTime": getLastSyncTime() },
+            select: ["id"],
+            start: -1, // Bitrix returns only count, no items, for limit -1
+          }),
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: data.error_description || data.error,
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+
+        return new Response(
+          JSON.stringify({ success: true, connected: true, total: data.total }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
       case "get_deals": {
         const spaId = body.spa_id || 1186; // Default: Gestão Compras
         const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
@@ -46,62 +93,97 @@ serve(async (req) => {
           body: JSON.stringify({
             entityTypeId: spaId,
             filter: body.filters || {},
-            select: ["id", "title", "stageId", "assignedById", "createdTime", "updatedTime", "ufCrm*"],
+            select: [
+              "id",
+              "title",
+              "stageId",
+              "assignedById",
+              "createdTime",
+              "updatedTime",
+              "ufCrm*",
+            ],
           }),
         });
 
         const data = await response.json();
         if (data.error) {
           return new Response(
-            JSON.stringify({ success: false, error: data.error_description || data.error }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({
+              success: false,
+              error: data.error_description || data.error,
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         return new Response(
-          JSON.stringify({ success: true, deals: data.result?.items || [], total: data.total }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({
+            success: true,
+            deals: data.result?.items || [],
+            total: data.total,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
 
       case "update_deal": {
         if (!body.deal_id || !body.deal_data) {
           return new Response(
-            JSON.stringify({ success: false, error: "deal_id and deal_data are required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({
+              success: false,
+              error: "deal_id and deal_data are required",
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         const spaId = body.spa_id || 1186;
-        const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.update`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            entityTypeId: spaId,
-            id: body.deal_id,
-            fields: body.deal_data,
-          }),
-        });
+        const response = await safeFetch(
+          `${bitrixWebhookUrl}/crm.item.update`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              entityTypeId: spaId,
+              id: body.deal_id,
+              fields: body.deal_data,
+            }),
+          },
+        );
 
         const data = await response.json();
         if (data.error) {
           return new Response(
-            JSON.stringify({ success: false, error: data.error_description || data.error }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({
+              success: false,
+              error: data.error_description || data.error,
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
-        return new Response(
-          JSON.stringify({ success: true, updated: true }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ success: true, updated: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
       case "create_deal": {
         if (!body.deal_data) {
           return new Response(
             JSON.stringify({ success: false, error: "deal_data is required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
@@ -118,52 +200,91 @@ serve(async (req) => {
         const data = await response.json();
         if (data.error) {
           return new Response(
-            JSON.stringify({ success: false, error: data.error_description || data.error }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({
+              success: false,
+              error: data.error_description || data.error,
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         return new Response(
           JSON.stringify({ success: true, deal_id: data.result?.item?.id }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
 
       case "sync_deals": {
         // Sync coletas from SPA 1186 (Gestão Compras)
-        const coletasResponse = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            entityTypeId: 1186,
-            filter: { ">=updatedTime": getLastSyncTime() },
-            select: ["id", "title", "stageId", "assignedById", "createdTime", "updatedTime", "ufCrm*"],
-          }),
-        });
+        const coletasResponse = await safeFetch(
+          `${bitrixWebhookUrl}/crm.item.list`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              entityTypeId: 1186,
+              filter: { ">=updatedTime": getLastSyncTime() },
+              select: [
+                "id",
+                "title",
+                "stageId",
+                "assignedById",
+                "createdTime",
+                "updatedTime",
+                "ufCrm*",
+              ],
+            }),
+          },
+        );
         const coletasData = await coletasResponse.json();
 
         // Sync entregas from SPA 1234 (Entregas Log)
-        const entregasResponse = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            entityTypeId: 1234,
-            filter: { ">=updatedTime": getLastSyncTime() },
-            select: ["id", "title", "stageId", "assignedById", "createdTime", "updatedTime", "ufCrm*"],
-          }),
-        });
+        const entregasResponse = await safeFetch(
+          `${bitrixWebhookUrl}/crm.item.list`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              entityTypeId: 1234,
+              filter: { ">=updatedTime": getLastSyncTime() },
+              select: [
+                "id",
+                "title",
+                "stageId",
+                "assignedById",
+                "createdTime",
+                "updatedTime",
+                "ufCrm*",
+              ],
+            }),
+          },
+        );
         const entregasData = await entregasResponse.json();
 
         // Sync Ocorrências from SPA 1050 (New: Ocorrências Log)
-        const ocorrenciasResponse = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            entityTypeId: 1050, 
-            filter: { ">=updatedTime": getLastSyncTime() },
-            select: ["id", "title", "stageId", "assignedById", "createdTime", "updatedTime", "ufCrm*"],
-          }),
-        });
+        const ocorrenciasResponse = await safeFetch(
+          `${bitrixWebhookUrl}/crm.item.list`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              entityTypeId: 1050,
+              filter: { ">=updatedTime": getLastSyncTime() },
+              select: [
+                "id",
+                "title",
+                "stageId",
+                "assignedById",
+                "createdTime",
+                "updatedTime",
+                "ufCrm*",
+              ],
+            }),
+          },
+        );
         const ocorrenciasData = await ocorrenciasResponse.json();
 
         const syncResults = {
@@ -181,10 +302,9 @@ serve(async (req) => {
           new_data: syncResults,
         });
 
-        return new Response(
-          JSON.stringify({ success: true, ...syncResults }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ success: true, ...syncResults }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
       case "webhook": {
@@ -193,7 +313,10 @@ serve(async (req) => {
         if (!webhookData) {
           return new Response(
             JSON.stringify({ success: false, error: "webhook_data required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
@@ -207,50 +330,63 @@ serve(async (req) => {
 
         return new Response(
           JSON.stringify({ success: true, processed: true }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
 
       case "notify_alert": {
-        const { message, severity, vehicle_id, driver_id } = body.deal_data || {};
-        
+        const { message, severity, vehicle_id, driver_id } =
+          body.deal_data || {};
+
         // In Bitrix24, we can create a "Timeline Item" or a "Notification"
         // Here we'll create a CRM activity/task for the assigned user of a default deal or unit
-        const response = await safeFetch(`${bitrixWebhookUrl}/crm.activity.add`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fields: {
-              OWNER_TYPE_ID: 2, // Deal
-              OWNER_ID: 1, // Default CCO Deal or similar
-              TYPE_ID: 2, // Call/Meeting/Task
-              SUBJECT: `BIO_SYNC ALERT: ${severity === 'crit' ? 'CRITICAL' : 'WARNING'}`,
-              COMPLETED: "N",
-              PRIORITY: severity === 'crit' ? 2 : 1,
-              DESCRIPTION: `${message}\nVehicle: ${vehicle_id}\nDriver: ${driver_id}\nTime: ${new Date().toLocaleString()}`,
-              RESPONSIBLE_ID: 1 // Default Admin/CCO
-            }
-          }),
-        });
+        const response = await safeFetch(
+          `${bitrixWebhookUrl}/crm.activity.add`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fields: {
+                OWNER_TYPE_ID: 2, // Deal
+                OWNER_ID: 1, // Default CCO Deal or similar
+                TYPE_ID: 2, // Call/Meeting/Task
+                SUBJECT: `BIO_SYNC ALERT: ${severity === "crit" ? "CRITICAL" : "WARNING"}`,
+                COMPLETED: "N",
+                PRIORITY: severity === "crit" ? 2 : 1,
+                DESCRIPTION: `${message}\nVehicle: ${vehicle_id}\nDriver: ${driver_id}\nTime: ${new Date().toLocaleString()}`,
+                RESPONSIBLE_ID: 1, // Default Admin/CCO
+              },
+            }),
+          },
+        );
 
         const data = await response.json();
         return new Response(
           JSON.stringify({ success: !data.error, result: data.result }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
 
       default:
         return new Response(
-          JSON.stringify({ success: false, error: `Unknown action: ${body.action}` }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({
+            success: false,
+            error: `Unknown action: ${body.action}`,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
         );
     }
   } catch (error) {
     log.error("Bitrix24 integration error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 });

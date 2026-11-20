@@ -76,11 +76,7 @@ import { useSorting } from "@/hooks/common/useSorting";
 import { useEntityHistory } from "@/hooks/security/useEntityHistory";
 
 type FreteStatus =
-  | "pendente"
-  | "em_transito"
-  | "entregue"
-  | "atrasado"
-  | "cancelado";
+  "pendente" | "em_transito" | "entregue" | "atrasado" | "cancelado";
 
 interface FreteInterno {
   id: string;
@@ -170,7 +166,6 @@ export default function FretesInternos() {
       const { data, error } = await supabase
         .from("fretes_internos")
         .select("*")
-        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;

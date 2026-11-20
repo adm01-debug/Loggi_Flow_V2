@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   MapPin,
@@ -15,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { UnifiedShipment } from "@/hooks/logistics/useUnifiedTracking";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { supabase } from "@/integrations/supabase/client";
 
 interface MissionDetailProps {
   shipment: UnifiedShipment;
@@ -32,40 +30,6 @@ function formatDate(date: string | null): string {
 }
 
 export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
-  const [, setBitrixData] = useState<Record<string, unknown> | null>(null);
-  const [, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchBitrixInfo() {
-      if (!shipment.id) return;
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("integracoes_bitrix" as never)
-          .select("*")
-          .eq("entidade_id", shipment.id)
-          .maybeSingle();
-
-        if (cancelled) return;
-        if (error) {
-          console.warn("Bitrix fetch:", error.message);
-        } else if (data) {
-          setBitrixData(data as Record<string, unknown>);
-        }
-      } catch (err) {
-        if (!cancelled) console.error("Error fetching bitrix data:", err);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    }
-
-    fetchBitrixInfo();
-    return () => {
-      cancelled = true;
-    };
-  }, [shipment.id]);
   // Mock timeline events based on status
   const mockTimeline = [
     {

@@ -9,8 +9,6 @@ interface Transportadora {
   id: string;
   nome_fantasia: string;
   score_performance: number;
-  score_frete: number;
-  score_pontualidade: number;
   homologada: boolean;
 }
 
@@ -26,25 +24,32 @@ interface Entrega {
 
 interface Ocorrencia {
   tipo_ocorrencia: string;
-  gravidade: string;
-  status: string;
+  resolvida: boolean | null;
 }
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 export const handler = async (req: Request) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { allowed } = await checkRateLimit(req, 'ai-logistics-assistant', { maxRequests: 30 });
+    const { allowed } = await checkRateLimit(req, "ai-logistics-assistant", {
+      maxRequests: 30,
+    });
     if (!allowed) {
-      return new Response(JSON.stringify({ success: false, message: "Muitas solicitações. Tente novamente em alguns minutos." }), {
-        status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Muitas solicitações. Tente novamente em alguns minutos.",
+        }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const body = await req.json();
@@ -53,10 +58,16 @@ export const handler = async (req: Request) => {
     const stream = body.stream || false;
 
     if (!message) {
-      return new Response(JSON.stringify({ success: false, message: "Por favor, envie uma mensagem." }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Por favor, envie uma mensagem.",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
@@ -70,33 +81,61 @@ export const handler = async (req: Request) => {
       resEntregasAtivas,
       resCustosRecentes,
       resOcorrenciasAbertas,
-      resSlaStats
+      resSlaStats,
     ] = await Promise.all([
-      supabase.from('transportadoras').select('id, nome_fantasia, score_performance, score_frete, score_pontualidade, homologada').eq('homologada', true).order('score_performance', { ascending: false }).limit(10),
-      supabase.from('entregas').select('id, status, previsao_entrega, endereco_entrega, transportadoras(nome_fantasia)').in('status', ['despachado', 'em_transito', 'saiu_entrega']).limit(50),
-      supabase.from('entregas').select('valor_frete, created_at').gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
-      supabase.from('ocorrencias').select('tipo_ocorrencia, gravidade, status').eq('status', 'aberta'),
-      supabase.rpc('get_carrier_performance_stats')
+      supabase
+        .from("transportadoras")
+        .select("id, nome_fantasia, score_performance, homologada")
+        .eq("homologada", true)
+        .order("score_performance", { ascending: false })
+        .limit(10),
+      supabase
+        .from("entregas")
+        .select(
+          "id, status, previsao_entrega, endereco_entrega, transportadoras(nome_fantasia)",
+        )
+        .in("status", ["despachado", "em_transito", "saiu_entrega"])
+        .limit(50),
+      supabase
+        .from("entregas")
+        .select("valor_frete, created_at")
+        .gte(
+          "created_at",
+          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        ),
+      supabase
+        .from("ocorrencias")
+        .select("tipo_ocorrencia, resolvida")
+        .eq("resolvida", false),
+      supabase.rpc("get_carrier_performance_stats"),
     ]);
 
     const transportadoras = (resTransportadoras.data as Transportadora[]) || [];
     const entregasAtivas = (resEntregasAtivas.data as Entrega[]) || [];
     const custosRecentes = (resCustosRecentes.data as Entrega[]) || [];
-    const ocorrenciasAbertas = (resOcorrenciasAbertas.data as Ocorrencia[]) || [];
+    const ocorrenciasAbertas =
+      (resOcorrenciasAbertas.data as Ocorrencia[]) || [];
     const slaError = resSlaStats.error;
 
-    if (slaError) log.warn("Aviso: Falha ao carregar estatísticas de performance via RPC.");
+    if (slaError)
+      log.warn("Aviso: Falha ao carregar estatísticas de performance via RPC.");
 
     // Manual SLA calc fallback
-    const totalFrete = custosRecentes.reduce((acc: number, curr: Entrega) => acc + (Number(curr.valor_frete) || 0), 0);
+    const totalFrete = custosRecentes.reduce(
+      (acc: number, curr: Entrega) => acc + (Number(curr.valor_frete) || 0),
+      0,
+    );
     const now = new Date();
-    const emAtraso = entregasAtivas.filter((e: Entrega) => e.previsao_entrega && new Date(e.previsao_entrega) < now).length;
-    
-    // Simulate "Traffic/Weather" context
+    const emAtraso = entregasAtivas.filter(
+      (e: Entrega) => e.previsao_entrega && new Date(e.previsao_entrega) < now,
+    ).length;
+
+    // Contexto externo real (clima/tráfego) quando as functions estiverem disponíveis;
+    // mantém rótulo honesto enquanto não houver dados dinâmicos.
     const contextAmbiental = {
-      clima: "Instável na região Sul (risco de lentidão na BR-101)",
-      trafego: "Alto fluxo nas saídas de Curitiba e São Paulo devido a obras",
-      data_analise: now.toLocaleString('pt-BR')
+      clima: "Não avaliado no momento",
+      trafego: "Não avaliado no momento",
+      data_analise: now.toLocaleString("pt-BR"),
     };
 
     const systemPrompt = `Você é o LOGI-GPT v5.0, o Assistente Logístico de Elite da LogiFlow. 
@@ -105,9 +144,12 @@ export const handler = async (req: Request) => {
     DADOS OPERACIONAIS EM TEMPO REAL:
     - Entregas em Trânsito: ${entregasAtivas.length}
     - Entregas com Risco de Atraso (Previsão Vencida): ${emAtraso}
-    - Ocorrências Críticas Abertas: ${ocorrenciasAbertas.filter((o: Ocorrencia) => o.gravidade === 'alta').length}
-    - Custo Logístico (30 dias): R$ ${totalFrete.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-    - Top Transportadoras (Performance): ${transportadoras.slice(0,3).map((t: Transportadora) => t.nome_fantasia).join(', ')}
+    - Ocorrências Abertas: ${ocorrenciasAbertas.length}
+    - Custo Logístico (30 dias): R$ ${totalFrete.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+    - Top Transportadoras (Performance): ${transportadoras
+      .slice(0, 3)
+      .map((t: Transportadora) => t.nome_fantasia)
+      .join(", ")}
 
     CONTEXTO EXTERNO:
     - Clima: ${contextAmbiental.clima}
@@ -122,37 +164,57 @@ export const handler = async (req: Request) => {
 
     Analise o contexto e a pergunta do usuário para dar a melhor recomendação logística possível.`;
 
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${googleApiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gemini-3.6-flash",
-        messages: [
-          { role: "system", content: systemPrompt }, 
-          ...conversationHistory.slice(-10), 
-          { role: "user", content: message }
-        ],
-        temperature: 0.2,
-        stream,
-      }),
-    });
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${googleApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gemini-3.6-flash",
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...conversationHistory.slice(-10),
+            { role: "user", content: message },
+          ],
+          temperature: 0.2,
+          stream,
+        }),
+      },
+    );
 
-    if (!response.ok) throw new Error(`Erro no gateway de IA: ${response.status}`);
-    if (stream) return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
+    if (!response.ok)
+      throw new Error(`Erro no gateway de IA: ${response.status}`);
+    if (stream)
+      return new Response(response.body, {
+        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      });
 
     const data = await response.json();
-    const assistantMessage = data.choices?.[0]?.message?.content || "Erro ao gerar insight estratégico.";
+    const assistantMessage =
+      data.choices?.[0]?.message?.content ||
+      "Erro ao gerar insight estratégico.";
 
-    return new Response(JSON.stringify({ success: true, message: assistantMessage }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-
+    return new Response(
+      JSON.stringify({ success: true, message: assistantMessage }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   } catch (error) {
     log.error("Erro no Assistente IA:", error);
-    return new Response(JSON.stringify({ success: false, message: "Erro de processamento na inteligência logística." }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: "Erro de processamento na inteligência logística.",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 };
 

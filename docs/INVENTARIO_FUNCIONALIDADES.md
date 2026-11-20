@@ -1,5 +1,7 @@
 # 🛡️ INVENTÁRIO DE FUNCIONALIDADES LOGIFLOW — 10/10
 
+> **ATENCAO**: este documento pode descrever funcionalidades NAO implementadas. Fonte autoritativa do estado real: docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (item 13). Consulte-a antes de procurar hooks/tabelas/funcoes citados aqui.
+
 Este é o inventário oficial e consolidado de todas as funcionalidades, módulos e infraestrutura do ecossistema LogiFlow, unificando auditorias, planos de melhoria e manuais técnicos.
 
 ---
@@ -20,23 +22,27 @@ O LogiFlow é uma plataforma de gestão logística de alta performance, constru�
 ## 📦 2. MÓDULOS FUNCIONAIS (Domínios de Negócio)
 
 ### 2.1 Gestão de Coletas (Pickups)
+
 - **Fluxo Completo**: Criação, agendamento, coleta efetiva e conferência de volumes.
 - **Divergências**: Detecção automática de discrepâncias entre peso declarado e aferido.
 - **Modos Operacionais**: Suporte para Lalamove (on-demand) e Transportadoras Tradicionais.
 - **Status Real-time**: Sincronização automática via Supabase Realtime.
 
 ### 2.2 Gestão de Entregas (Shipping & Kanban)
+
 - **Kanban Logístico**: Board visual (Pendente -> Despachado -> Entregue).
 - **Gestão de Boxes**: Controle físico de 16 boxes de expedição com Drag-and-Drop.
 - **Rastreamento Público**: Portal externo para consulta de status via link (sem necessidade de login).
 - **Comprovantes**: Sistema de upload e visualização de fotos/PDFs de entregas.
 
 ### 2.3 Gestão Financeira e Inteligência de Frete
+
 - **Cotação Multicanal**: Comparativo em tempo real (Rodonaves, Melhor Envio, Lalamove).
 - **Auditoria de Faturas**: Cruzamento automático de Valor Cotado vs. Valor Faturado via Importação (CSV/Excel).
 - **Simulador de Cenários**: Ferramenta preditiva baseada em volumes históricos para otimização de custos.
 
 ### 2.4 Gamificação (Task Gifts)
+
 - **Sistema de Progressão**: Níveis, XP e Medalhas baseados em performance operacional.
 - **Loja de Recompensas**: Resgate de benefícios utilizando moedas virtuais acumuladas.
 - **Ranking (Leaderboard)**: Comparativo de eficiência entre operadores e equipes.
@@ -46,11 +52,13 @@ O LogiFlow é uma plataforma de gestão logística de alta performance, constru�
 ## 🤖 3. INTELIGÊNCIA ARTIFICIAL E AUTOMAÇÃO
 
 ### 3.1 Assistente Logístico (IA)
+
 - **Contexto Operacional**: Integração com Gemini 2.0 Flash que analisa o dashboard em tempo real.
 - **Sugestões Proativas**: Recomendação de transportadoras com base em SLA e custo-benefício.
 - **Previsão de Atrasos**: Análise de riscos baseada em clima, trânsito e histórico.
 
 ### 3.2 Motor de Automação
+
 - **Gatilhos (Triggers)**: Automações baseadas em eventos (ex: Alerta via WhatsApp em caso de atraso > 24h).
 - **Webhooks**: Integração de entrada e saída para sistemas ERP/CRM de terceiros.
 
@@ -58,15 +66,15 @@ O LogiFlow é uma plataforma de gestão logística de alta performance, constru�
 
 ## 🔌 4. CATÁLOGO DE INTEGRAÇÕES
 
-| Parceiro | Funcionalidades Integradas |
-|----------|----------------------------|
-| **Rodonaves RTE** | Cotação, Coleta, Rastreamento e Webhooks. |
-| **Lalamove** | Rastreamento real-time no mapa, criação de pedidos on-demand. |
-| **Melhor Envio** | Cotação em massa e geração de etiquetas de postagem. |
-| **Bitrix24** | Sincronização bidirecional de Deals (Negócios) e Contatos. |
-| **WhatsApp (Evolution)** | Notificações automáticas de status para o cliente final. |
-| **Resend** | Envio de e-mails transacionais (Auditoria, Login, Alertas). |
-| **Mapbox** | Telemetria, roteirização e visualização de frotas. |
+| Parceiro                 | Funcionalidades Integradas                                    |
+| ------------------------ | ------------------------------------------------------------- |
+| **Rodonaves RTE**        | Cotação, Coleta, Rastreamento e Webhooks.                     |
+| **Lalamove**             | Rastreamento real-time no mapa, criação de pedidos on-demand. |
+| **Melhor Envio**         | Cotação em massa e geração de etiquetas de postagem.          |
+| **Bitrix24**             | Sincronização bidirecional de Deals (Negócios) e Contatos.    |
+| **WhatsApp (Evolution)** | Notificações automáticas de status para o cliente final.      |
+| **Resend**               | Envio de e-mails transacionais (Auditoria, Login, Alertas).   |
+| **Mapbox**               | Telemetria, roteirização e visualização de frotas.            |
 
 ---
 
@@ -93,24 +101,25 @@ O LogiFlow é uma plataforma de gestão logística de alta performance, constru�
 
 Este guia indica a localização e o estado de implementação de cada recurso.
 
-| Módulo | Funcionalidade | Status | Localização/Componente |
-|--------|----------------|--------|-------------------------|
-| **Core** | Dashboard Real-time | ✅ Produção | `Dashboard.tsx`, `useDashboardMetricsReal` |
-| **Core** | Kanban de Entregas | ✅ Produção | `KanbanEntregas.tsx`, `useShipping` |
-| **Logística** | Rastreamento Lalamove | ✅ Produção | `RastreamentoMotorista.tsx` |
-| **Logística** | Cotação Rodonaves | ✅ Produção | `CotacaoFrete.tsx`, `useRodonaves` |
-| **Financeiro** | Auditoria de Fretes | ✅ Produção | `ConciliacaoFinanceira.tsx`, `useLogisticsCostsReal` |
-| **AI** | Assistente Contextual | ✅ Produção | `AIAssistant.tsx`, `useAIAssistant` |
-| **Gamificação** | Loja de Prêmios | ✅ Produção | `LojaRecompensas.tsx`, `useGamificationReal` |
-| **Segurança** | Gestão de Sessões | ✅ Produção | `Seguranca.tsx`, `useDeviceSessions` |
-| **Admin** | Documentação API | ✅ Produção | `APIDocumentation.tsx` |
-| **Mobile** | PWA / Offline | ✅ Produção | `public/sw.js`, `manifest.json` |
+| Módulo          | Funcionalidade        | Status      | Localização/Componente                               |
+| --------------- | --------------------- | ----------- | ---------------------------------------------------- |
+| **Core**        | Dashboard Real-time   | ✅ Produção | `Dashboard.tsx`, `useDashboardMetricsReal`           |
+| **Core**        | Kanban de Entregas    | ✅ Produção | `KanbanEntregas.tsx`, `useShipping`                  |
+| **Logística**   | Rastreamento Lalamove | ✅ Produção | `RastreamentoMotorista.tsx`                          |
+| **Logística**   | Cotação Rodonaves     | ✅ Produção | `CotacaoFrete.tsx`, `useRodonaves`                   |
+| **Financeiro**  | Auditoria de Fretes   | ✅ Produção | `ConciliacaoFinanceira.tsx`, `useLogisticsCostsReal` |
+| **AI**          | Assistente Contextual | ✅ Produção | `AIAssistant.tsx`, `useAIAssistant`                  |
+| **Gamificação** | Loja de Prêmios       | ✅ Produção | `LojaRecompensas.tsx`, `useGamificationReal`         |
+| **Segurança**   | Gestão de Sessões     | ✅ Produção | `Seguranca.tsx`, `useDeviceSessions`                 |
+| **Admin**       | Documentação API      | ✅ Produção | `APIDocumentation.tsx`                               |
+| **Mobile**      | PWA / Offline         | ✅ Produção | `public/sw.js`, `manifest.json`                      |
 
 ---
 
 ## 📚 8. REFERÊNCIAS HISTÓRICAS
 
 Os seguintes documentos contêm o histórico detalhado das evoluções:
+
 - `docs/MELHORIAS.md`: Histórico da v4.0.
 - `docs/PLANO_MELHORIAS_2026.md`: Sprint de bugs e integrações críticas.
 - `docs/RELATORIO_PERFEICAO_FINAL.md`: Resumo da meta 10/10 atingida.

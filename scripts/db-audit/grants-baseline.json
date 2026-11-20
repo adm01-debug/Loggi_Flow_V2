@@ -5,7 +5,7 @@
         "count_prediction_breach_days(_target numeric, _carrier text)",
         "get_public_tracking(p_code text)"
     ],
-    "generated_at": "2026-11-12",
+    "generated_at": "2026-11-20",
     "anon_table_select": [
         "account_lockouts",
         "achievements",
@@ -139,5 +139,5 @@
     ],
     "how_to_regenerate": "scripts/db-audit/grants-baseline.sql (E26)",
     "service_role_execute_count": 113,
-    "authenticated_execute_count": 58
+    "authenticated_execute_count": 59
 }

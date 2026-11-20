@@ -71,12 +71,17 @@ serve(async (req) => {
   try {
     // Read the body once at the top — the client always sends a JSON body
     // containing `path` and `method` plus the route-specific fields.
+    // supabase.functions.invoke() sempre faz a requisição HTTP real como
+    // POST (o `method` do corpo é só a intenção de rota do chamador), então
+    // o roteamento abaixo usa body.method, não req.method — do contrário
+    // GET e PUT nunca casam e toda chamada cai no ramo de criar pedido.
     const body = await req.json().catch(() => ({} as Record<string, any>))
     const routePath: string = body.path || ''
+    const routeMethod: string = body.method || req.method
     const pathParts = routePath.split('/').filter(Boolean)
 
     // POST /quotations - Criar cotação
-    if (req.method === 'POST' && pathParts.includes('quotations')) {
+    if (routeMethod === 'POST' && pathParts.includes('quotations')) {
       // Try cache first
       const redis = getRedisClient();
       const cacheKey = `lalamove_quote_${JSON.stringify(body.stops)}`;
@@ -123,7 +128,7 @@ serve(async (req) => {
 
 
     // POST /orders - Criar pedido
-    if (req.method === 'POST' && pathParts.includes('orders') && !pathParts.includes('cancel')) {
+    if (routeMethod === 'POST' && pathParts.includes('orders') && !pathParts.includes('cancel')) {
       const { path: _path, method: _method, ...orderPayload } = body
       const result = await lalamoveRequest('POST', '/v3/orders', orderPayload)
 
@@ -133,7 +138,7 @@ serve(async (req) => {
     }
 
     // GET /orders/:id - Buscar pedido
-    if (req.method === 'GET' && pathParts.includes('orders')) {
+    if (routeMethod === 'GET' && pathParts.includes('orders')) {
       const orderId = pathParts[pathParts.indexOf('orders') + 1]
       const result = await lalamoveRequest('GET', `/v3/orders/${orderId}`)
 
@@ -143,7 +148,7 @@ serve(async (req) => {
     }
 
     // PUT /orders/:id/cancel - Cancelar pedido
-    if (req.method === 'PUT' && pathParts.includes('cancel')) {
+    if (routeMethod === 'PUT' && pathParts.includes('cancel')) {
       const orderId = pathParts[pathParts.indexOf('orders') + 1]
       const result = await lalamoveRequest('PUT', `/v3/orders/${orderId}/cancel`)
 

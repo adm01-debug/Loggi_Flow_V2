@@ -113,7 +113,6 @@ export default function Relatorios() {
       const { data, error } = await supabase
         .from("fretes_internos")
         .select("id, status, created_at, data_entrega_efetiva")
-        .is("deleted_at", null)
         .gte("created_at", startDate.toISOString())
         .limit(5000);
       if (error) throw error;
@@ -514,7 +513,13 @@ export default function Relatorios() {
                           entregando activePayload / a fatia clicada. */}
                       <BarChart
                         data={dailyData}
-                        onClick={(state) => handleBarClick(state as unknown as Parameters<typeof handleBarClick>[0])}
+                        onClick={(state) =>
+                          handleBarClick(
+                            state as unknown as Parameters<
+                              typeof handleBarClick
+                            >[0],
+                          )
+                        }
                       >
                         <CartesianGrid
                           strokeDasharray="3 3"
@@ -580,7 +585,13 @@ export default function Relatorios() {
                           label={({ name, percent }) =>
                             `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
                           }
-                          onClick={(sector) => handlePieClick(sector as unknown as Parameters<typeof handlePieClick>[0])}
+                          onClick={(sector) =>
+                            handlePieClick(
+                              sector as unknown as Parameters<
+                                typeof handlePieClick
+                              >[0],
+                            )
+                          }
                           className="cursor-pointer"
                         >
                           {statusDistribution.map((entry, index) => (
@@ -660,32 +671,40 @@ export default function Relatorios() {
                   {driverPerformance.length > 0 ? (
                     <div className="space-y-4">
                       {driverPerformance.map((user, idx) => {
-                        const rankBg = ["bg-warning", "bg-muted-foreground", "bg-destructive/80"][idx] ?? "bg-muted";
+                        const rankBg =
+                          [
+                            "bg-warning",
+                            "bg-muted-foreground",
+                            "bg-destructive/80",
+                          ][idx] ?? "bg-muted";
                         return (
-                        <div key={idx} className="flex items-center gap-4">
-                          <div
-                            className={cn(
-                              "w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold",
-                              rankBg,
-                            )}
-                          >
-                            {idx + 1}
+                          <div key={idx} className="flex items-center gap-4">
+                            <div
+                              className={cn(
+                                "w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold",
+                                rankBg,
+                              )}
+                            >
+                              {idx + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">
+                                {user.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {user.xp.toLocaleString()} XP • Nível{" "}
+                                {user.nivel}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium text-success">
+                                {user.eficiencia}%
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                eficiência
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{user.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {user.xp.toLocaleString()} XP • Nível {user.nivel}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-success">
-                              {user.eficiencia}%
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              eficiência
-                            </p>
-                          </div>
-                        </div>
                         );
                       })}
                     </div>

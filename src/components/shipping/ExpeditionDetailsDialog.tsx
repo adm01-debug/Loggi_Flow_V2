@@ -1,12 +1,29 @@
 /* eslint-disable max-lines */
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Truck, Package, MapPin, Clock, History, Info, Zap, FileText, Loader2, User, Camera } from "lucide-react";
+import {
+  Truck,
+  Package,
+  MapPin,
+  Clock,
+  History,
+  Info,
+  Zap,
+  FileText,
+  Loader2,
+  User,
+  Camera,
+} from "lucide-react";
 import { DeliveryReceiptUpload } from "./DeliveryReceiptUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -27,7 +44,7 @@ interface TimelineEvent {
   created_at: string;
   action_by?: string;
   action_by_user?: {
-    display_name: string | null;
+    full_name: string | null;
     avatar_url: string | null;
   };
 }
@@ -76,19 +93,51 @@ export function ExpeditionDetailsDialog({
   const fetchTimeline = useCallback(async () => {
     if (!delivery) return;
     setLoadingTimeline(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("kanban_history")
-      .select(
-        `
-        *,
-        action_by_user:profiles(display_name, avatar_url)
-      `,
-      )
+      .select("*")
       .eq("delivery_id", delivery.id)
       .order("created_at", { ascending: false })
       .limit(100);
 
-    if (data) setTimeline(data as unknown as TimelineEvent[]);
+    if (error) {
+      setTimeline([]);
+      setLoadingTimeline(false);
+      return;
+    }
+
+    const events = data as (TimelineEvent & { action_by?: string })[] | null;
+    if (!events) {
+      setTimeline([]);
+      setLoadingTimeline(false);
+      return;
+    }
+
+    const userIds = Array.from(
+      new Set(events.map((e) => e.action_by).filter(Boolean) as string[]),
+    );
+    if (userIds.length === 0) {
+      setTimeline(events as TimelineEvent[]);
+      setLoadingTimeline(false);
+      return;
+    }
+
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .in("id", userIds);
+    const profileMap = new Map((profiles || []).map((pr) => [pr.id, pr]));
+    setTimeline(
+      events.map((e) => ({
+        ...e,
+        action_by_user: e.action_by
+          ? {
+              full_name: profileMap.get(e.action_by)?.full_name ?? null,
+              avatar_url: profileMap.get(e.action_by)?.avatar_url ?? null,
+            }
+          : undefined,
+      })),
+    );
     setLoadingTimeline(false);
   }, [delivery]);
 
@@ -104,7 +153,11 @@ export function ExpeditionDetailsDialog({
   const updateStatus = async (newStatus: EntregaStatus) => {
     if (!delivery) return;
 
-    const updates: { status: EntregaStatus; updated_at: string; data_despacho?: string } = {
+    const updates: {
+      status: EntregaStatus;
+      updated_at: string;
+      data_despacho?: string;
+    } = {
       status: newStatus,
       updated_at: new Date().toISOString(),
     };
@@ -347,10 +400,10 @@ export function ExpeditionDetailsDialog({
                                   { locale: ptBR },
                                 )}
                               </span>
-                              {event.action_by_user?.display_name && (
+                              {event.action_by_user?.full_name && (
                                 <span className="flex items-center gap-1.5 text-primary">
                                   <User className="w-3 h-3" />{" "}
-                                  {event.action_by_user.display_name}
+                                  {event.action_by_user.full_name}
                                 </span>
                               )}
                             </div>
