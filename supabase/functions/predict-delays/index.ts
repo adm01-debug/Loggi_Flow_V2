@@ -275,7 +275,10 @@ export const handler = async (req: Request) => {
           entity_numero: p.numero,
           transportadora: original?.transportadora ?? null,
           risco: p.risco,
-          probabilidade_atraso: Math.max(0, Math.min(100, Number(p.probabilidade_atraso) || 0)),
+          probabilidade_atraso: Math.max(
+            0,
+            Math.min(100, Number(p.probabilidade_atraso) || 0),
+          ),
           horas_estimadas_atraso: Number(p.horas_estimadas_atraso) || 0,
           motivos: Array.isArray(p.motivos) ? p.motivos : [],
           recomendacoes: Array.isArray(p.recomendacoes) ? p.recomendacoes : [],
@@ -286,7 +289,8 @@ export const handler = async (req: Request) => {
       const { error: histError } = await supabase
         .from("delay_predictions_history")
         .insert(historyRows);
-      if (histError) log("ERROR", "Failed to persist prediction history", histError);
+      if (histError)
+        log("ERROR", "Failed to persist prediction history", histError);
     }
 
     const summary = {
@@ -308,11 +312,22 @@ export const handler = async (req: Request) => {
       // Fetch users with WhatsApp notifications enabled for SLA
       const { data: usersToNotify } = await supabase
         .from("user_notification_preferences")
-        .select("user_id, profiles(phone)")
+        .select("user_id")
         .eq("notifications_whatsapp", true)
         .eq("notifications_sla", true);
 
       if (usersToNotify && usersToNotify.length > 0) {
+        const userIds = usersToNotify.map((u: any) => u.user_id);
+        const { data: settings } = await supabase
+          .from("prediction_accuracy_settings")
+          .select("user_id, whatsapp_phone")
+          .in("user_id", userIds)
+          .eq("notify_whatsapp", true);
+        const phoneByUser = new Map<string, string>();
+        for (const s of settings ?? []) {
+          if (s.whatsapp_phone) phoneByUser.set(s.user_id, s.whatsapp_phone);
+        }
+
         for (const prediction of criticals) {
           const originalItem =
             prediction.tipo === "entrega"
@@ -320,7 +335,7 @@ export const handler = async (req: Request) => {
               : coletasForAnalysis.find((c) => c.id === prediction.id);
 
           for (const user of usersToNotify) {
-            const phone = (user.profiles as any)?.phone;
+            const phone = phoneByUser.get(user.user_id);
             if (phone) {
               await supabase.functions.invoke("whatsapp-notification", {
                 body: {
