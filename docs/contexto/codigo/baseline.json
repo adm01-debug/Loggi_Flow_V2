@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "b7a7b5f7039536415ee27b48b030c3cee8b8e56e",
+  "commit": "3706ba6d3f8311ce3a8a2462694ca0902eca10a0",
   "branch": "main",
-  "data_commit": "2026-11-20T13:54:06-03:00",
+  "data_commit": "2026-11-20T14:02:27-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "3706ba6",
+    "data": "2026-11-20",
+    "assunto": "fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)"
+   },
    {
     "sha": "b7a7b5f",
     "data": "2026-11-20",
@@ -126,11 +131,6 @@
     "sha": "7b4672c",
     "data": "2026-11-18",
     "assunto": "chore: workflow temporario de diagnostico de schema prod (diag) (#194)"
-   },
-   {
-    "sha": "1136900",
-    "data": "2026-11-18",
-    "assunto": "chore: workflow temporário de destravamento do seed prod (service-role key) (#193)"
    }
   ],
   "arquivos_mudados_7d": 162,
@@ -141,11 +141,11 @@
    },
    {
     "pasta": "package-lock.json",
-    "mudancas": 10
+    "mudancas": 11
    },
    {
     "pasta": "package.json",
-    "mudancas": 10
+    "mudancas": 11
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -199,11 +199,11 @@
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 49
+    "mudancas": 50
    },
    {
     "arquivo": "package.json",
-    "mudancas": 48
+    "mudancas": 49
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 146
+    "commits": 147
    },
    {
     "autor": "dependabot[bot]",
