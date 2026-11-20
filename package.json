@@ -165,6 +165,7 @@
   },
   "overrides": {
     "postcss-selector-parser": "6.1.5",
-    "minimatch": "11.0.9"
+    "minimatch": "11.0.9",
+    "glob": "14.0.6"
   }
 }
