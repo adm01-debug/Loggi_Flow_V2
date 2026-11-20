@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)",
    "fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)",
    "fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)",
    "fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)",
-   "chore(db): sincronizar artefatos com o banco [auto] (#216)",
-   "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)"
+   "chore(db): sincronizar artefatos com o banco [auto] (#216)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

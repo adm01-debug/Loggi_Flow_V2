@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "3706ba6d3f8311ce3a8a2462694ca0902eca10a0",
+  "commit": "021e12f01fd14144099beb3d68e76095abc13805",
   "branch": "main",
-  "data_commit": "2026-11-20T14:02:27-03:00",
+  "data_commit": "2026-11-20T14:08:50-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "021e12f",
+    "data": "2026-11-20",
+    "assunto": "fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)"
+   },
    {
     "sha": "3706ba6",
     "data": "2026-11-20",
@@ -126,26 +131,21 @@
     "sha": "f93a675",
     "data": "2026-11-19",
     "assunto": "fix: casta literais de type para o enum notification_type nas triggers de notifications (#195)"
-   },
-   {
-    "sha": "7b4672c",
-    "data": "2026-11-18",
-    "assunto": "chore: workflow temporario de diagnostico de schema prod (diag) (#194)"
    }
   ],
   "arquivos_mudados_7d": 162,
   "pastas_mais_mudadas_30d": [
    {
-    "pasta": "src/hooks/logistics",
+    "pasta": "package-lock.json",
     "mudancas": 12
    },
    {
-    "pasta": "package-lock.json",
-    "mudancas": 11
+    "pasta": "package.json",
+    "mudancas": 12
    },
    {
-    "pasta": "package.json",
-    "mudancas": 11
+    "pasta": "src/hooks/logistics",
+    "mudancas": 12
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -199,11 +199,11 @@
   "arquivos_mais_mudados_90d": [
    {
     "arquivo": "package-lock.json",
-    "mudancas": 50
+    "mudancas": 51
    },
    {
     "arquivo": "package.json",
-    "mudancas": 49
+    "mudancas": 50
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 147
+    "commits": 148
    },
    {
     "autor": "dependabot[bot]",

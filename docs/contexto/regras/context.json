@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "3706ba6d3f8311ce3a8a2462694ca0902eca10a0",
+  "sha": "021e12f01fd14144099beb3d68e76095abc13805",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 17:02 UTC",
+  "generated_at": "2026-11-20 17:09 UTC",
   "files_total": 1331,
   "code_files": 1139,
   "code_lines": 185031,
@@ -88858,10 +88858,20 @@
   }
  },
  "git": {
-  "sha": "3706ba6d3f8311ce3a8a2462694ca0902eca10a0",
+  "sha": "021e12f01fd14144099beb3d68e76095abc13805",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "021e12f",
+    "date": "2026-11-20",
+    "author": "adm01-debug",
+    "subject": "fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)",
+    "files": [
+     "package-lock.json",
+     "package.json"
+    ]
+   },
    {
     "sha": "3706ba6",
     "date": "2026-11-20",
@@ -89190,33 +89200,16 @@
      ".github/workflows/contexto-ia.yml",
      ".github/workflows/e2e.yml"
     ]
-   },
-   {
-    "sha": "bfd7215",
-    "date": "2026-11-18",
-    "author": "dependabot[bot]",
-    "subject": "chore(deps): bump actions/checkout from 6.1.0 to 7.0.1 (#188)",
-    "files": [
-     ".github/workflows/aplicar-migration.yml",
-     ".github/workflows/automation-local.yml",
-     ".github/workflows/ci-nexus.yml",
-     ".github/workflows/ci.yml",
-     ".github/workflows/contexto-ia.yml",
-     ".github/workflows/deploy-functions.yml",
-     ".github/workflows/e2e.yml",
-     ".github/workflows/security.yml",
-     ".github/workflows/sync-internal-secret.yml"
-    ]
    }
   ],
   "hot_files": [
    [
     "package-lock.json",
-    4
+    5
    ],
    [
     "package.json",
-    4
+    5
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
@@ -89271,24 +89264,24 @@
     2
    ],
    [
-    ".github/workflows/automation-local.yml",
-    2
+    "scripts/db-audit/grants-baseline.json",
+    1
    ],
    [
-    ".github/workflows/ci-nexus.yml",
-    2
+    "scripts/db-audit/known-violations.json",
+    1
    ],
    [
-    ".github/workflows/ci.yml",
-    2
+    "docs/pendencias/02-11-rodonaves-clientes.md",
+    1
    ],
    [
-    ".github/workflows/contexto-ia.yml",
-    2
+    "docs/pendencias/02-13-add-user-xp-grant.md",
+    1
    ],
    [
-    ".github/workflows/e2e.yml",
-    2
+    "docs/pendencias/02-15-cnpj-remetente-default.md",
+    1
    ]
   ]
  }
