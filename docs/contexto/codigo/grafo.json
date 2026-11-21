@@ -2,7 +2,7 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "nos": 749,
- "arestas": 3098,
+ "arestas": 3105,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -10,7 +10,7 @@
   },
   {
    "arquivo": "src/integrations/supabase/client.ts",
-   "importado_por": 207
+   "importado_por": 208
   },
   {
    "arquivo": "src/components/ui/badge.tsx",
@@ -34,7 +34,7 @@
   },
   {
    "arquivo": "src/components/ui/label.tsx",
-   "importado_por": 71
+   "importado_por": 72
   },
   {
    "arquivo": "src/components/layout/MainLayout.tsx",
@@ -42,7 +42,7 @@
   },
   {
    "arquivo": "src/components/ui/dialog.tsx",
-   "importado_por": 52
+   "importado_por": 53
   },
   {
    "arquivo": "src/components/ui/select.tsx",
@@ -81,15 +81,15 @@
    "importado_por": 20
   },
   {
+   "arquivo": "src/components/ui/textarea.tsx",
+   "importado_por": 20
+  },
+  {
    "arquivo": "src/lib/queryConfig.ts",
    "importado_por": 20
   },
   {
    "arquivo": "src/components/ui/dropdown-menu.tsx",
-   "importado_por": 19
-  },
-  {
-   "arquivo": "src/components/ui/textarea.tsx",
    "importado_por": 19
   },
   {
@@ -244,7 +244,7 @@
   {
    "modulo": "integrations/supabase",
    "depende_de": 1,
-   "importado_por": 37
+   "importado_por": 38
   },
   {
    "modulo": "lib",
@@ -313,7 +313,7 @@
   },
   {
    "modulo": "components/audit",
-   "depende_de": 7,
+   "depende_de": 8,
    "importado_por": 1
   },
   {

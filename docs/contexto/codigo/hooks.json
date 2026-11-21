@@ -1946,7 +1946,7 @@
     "useCallback"
    ],
    "canais_realtime": [],
-   "usado_por": 8,
+   "usado_por": 9,
    "usado_por_arquivos": [
     "src/components/audit/AuditTrailViewer.tsx",
     "src/components/common/DataExporter.tsx",
@@ -1954,6 +1954,7 @@
     "src/hooks/index.ts",
     "src/pages/AuditTrail.tsx",
     "src/pages/Coletas.tsx",
+    "src/pages/LogisticaReversa.tsx",
     "src/pages/Relatorios.tsx",
     "src/pages/Transportadoras.tsx"
    ],
@@ -3824,7 +3825,7 @@
    "hooks_exportados": [
     "useTransportadoraRotas"
    ],
-   "linhas": 288,
+   "linhas": 294,
    "dominio": "hooks/logistics",
    "tabelas": [
     "transportadora_rotas"

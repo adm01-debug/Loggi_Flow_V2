@@ -2967,6 +2967,7 @@
     "useRuleTriggers",
     "useSLAMetrics",
     "useSLANotifications",
+    "useSearchParams",
     "useSecurityEvents",
     "useSecurityPushNotifications",
     "useSessionTimeout",
@@ -6474,7 +6475,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 178
+   "arquivos_puxados": 179
   },
   {
    "protegida": true,

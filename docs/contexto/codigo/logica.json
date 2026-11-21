@@ -314,10 +314,11 @@
    "zod_schemas": 0,
    "flags": [],
    "papeis": [],
-   "usado_por": 205,
+   "usado_por": 206,
    "usado_por_modulos": [
     "components/admin",
     "components/analytics",
+    "components/audit",
     "components/auth",
     "components/coletas",
     "components/common",

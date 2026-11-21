@@ -201,7 +201,7 @@
     "TelemetryViewer"
    ],
    "export_default": null,
-   "linhas": 220,
+   "linhas": 255,
    "dominio": "components/admin",
    "hooks_locais": [],
    "tabelas": [
@@ -226,7 +226,7 @@
    "edges": [
     "ai-logistics-assistant"
    ],
-   "usado_por": 3,
+   "usado_por": 4,
    "orfao": false
   },
   {
@@ -283,7 +283,7 @@
     "AuditTrailViewer"
    ],
    "export_default": null,
-   "linhas": 289,
+   "linhas": 487,
    "dominio": "components/audit",
    "hooks_locais": [
     "useAuditLogs",
@@ -1084,7 +1084,7 @@
     "AlertsPanel"
    ],
    "export_default": null,
-   "linhas": 451,
+   "linhas": 454,
    "dominio": "components/dashboard",
    "hooks_locais": [
     "useLocalStorage",
@@ -1236,7 +1236,7 @@
     "PerformanceChart"
    ],
    "export_default": null,
-   "linhas": 530,
+   "linhas": 591,
    "dominio": "components/dashboard",
    "hooks_locais": [],
    "tabelas": [],
@@ -1400,7 +1400,7 @@
     "FreightTableManager"
    ],
    "export_default": null,
-   "linhas": 266,
+   "linhas": 623,
    "dominio": "components/freight",
    "hooks_locais": [
     "useFilters",
@@ -1766,7 +1766,7 @@
     "MobileQuickActions"
    ],
    "export_default": null,
-   "linhas": 134,
+   "linhas": 183,
    "dominio": "components/layout",
    "hooks_locais": [],
    "tabelas": [],
@@ -2146,7 +2146,7 @@
     "NotificationCenter"
    ],
    "export_default": null,
-   "linhas": 317,
+   "linhas": 358,
    "dominio": "components/notifications",
    "hooks_locais": [
     "useSmartAlerts"
@@ -2178,7 +2178,7 @@
     "UserNotificationCenter"
    ],
    "export_default": null,
-   "linhas": 395,
+   "linhas": 406,
    "dominio": "components/notifications",
    "hooks_locais": [
     "useNotifications"
@@ -3218,7 +3218,7 @@
     "ExpeditionDetailsDialog"
    ],
    "export_default": null,
-   "linhas": 457,
+   "linhas": 455,
    "dominio": "components/shipping",
    "hooks_locais": [
     "useAudioFeedback",
@@ -3286,7 +3286,7 @@
     "RotaResultsList"
    ],
    "export_default": null,
-   "linhas": 216,
+   "linhas": 329,
    "dominio": "components/transportadoras",
    "hooks_locais": [],
    "tabelas": [],
@@ -3613,7 +3613,7 @@
    "hooks_locais": [],
    "tabelas": [],
    "edges": [],
-   "usado_por": 52,
+   "usado_por": 53,
    "orfao": false
   },
   {
@@ -3749,7 +3749,7 @@
    "hooks_locais": [],
    "tabelas": [],
    "edges": [],
-   "usado_por": 71,
+   "usado_por": 72,
    "orfao": false
   },
   {
@@ -3995,7 +3995,7 @@
    "hooks_locais": [],
    "tabelas": [],
    "edges": [],
-   "usado_por": 7,
+   "usado_por": 8,
    "orfao": false
   },
   {
@@ -4194,7 +4194,7 @@
    "hooks_locais": [],
    "tabelas": [],
    "edges": [],
-   "usado_por": 19,
+   "usado_por": 20,
    "orfao": false
   },
   {
@@ -5504,7 +5504,7 @@
     "Configuracoes"
    ],
    "export_default": "Configuracoes",
-   "linhas": 385,
+   "linhas": 464,
    "dominio": "pages",
    "hooks_locais": [
     "useConfirmExit",
@@ -5948,7 +5948,7 @@
     "IntegracaoBitrix"
    ],
    "export_default": "IntegracaoBitrix",
-   "linhas": 449,
+   "linhas": 468,
    "dominio": "pages",
    "hooks_locais": [],
    "tabelas": [
@@ -6003,9 +6003,10 @@
     "LogisticaReversa"
    ],
    "export_default": "LogisticaReversa",
-   "linhas": 289,
+   "linhas": 645,
    "dominio": "pages",
    "hooks_locais": [
+    "useExport",
     "useLogisticaReversaReal"
    ],
    "tabelas": [],
@@ -6237,7 +6238,7 @@
     "RastreamentoPublico"
    ],
    "export_default": "RastreamentoPublico",
-   "linhas": 297,
+   "linhas": 521,
    "dominio": "pages",
    "hooks_locais": [],
    "tabelas": [],

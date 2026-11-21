@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "e271db764f62fce29c04ee2f52d1eabfcdf84568",
+  "sha": "daa5f481db9e42df8ba9b7cb7aade862084cf072",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 16:48 UTC",
+  "generated_at": "2026-11-21 17:31 UTC",
   "files_total": 1483,
   "code_files": 1141,
-  "code_lines": 186569,
+  "code_lines": 188119,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "ce9a6a096a4b083a",
+ "facts_hash": "d0d54cc7034cd12e",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -24962,7 +24962,7 @@
      "get_monthly_analytics",
      "get_user_permissions"
     ],
-    "deps_count": 144
+    "deps_count": 145
    },
    {
     "path": "/loja",
@@ -29084,7 +29084,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 50045,
+   "lines": 50911,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29163,8 +29163,8 @@
     "index.ts: Achievements Components - barrel export ============================================",
     "index.ts: AI Components - barrel export ============================================",
     "index.ts: Analytics Components - barrel export ============================================",
-    "index.ts: Audit Components - barrel export ============================================",
-    "index.ts: Auth Components - barrel export ============================================"
+    "AuditTrailViewer.tsx: eslint-disable max-lines",
+    "index.ts: Audit Components - barrel export ============================================"
    ],
    "deps": [
     "@dnd-kit/core",
@@ -29530,7 +29530,7 @@
   {
    "module": "src/hooks",
    "files": 126,
-   "lines": 19340,
+   "lines": 19346,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -29894,7 +29894,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 31076,
+   "lines": 31754,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -29972,7 +29972,7 @@
     "Coletas.tsx: eslint-disable max-lines",
     "ConciliacaoAutomatica.tsx: eslint-disable max-lines",
     "ConciliacaoFinanceira.tsx: eslint-disable max-lines",
-    "ConfiguracoesFrete.tsx: eslint-disable max-lines"
+    "Configuracoes.tsx: eslint-disable max-lines"
    ],
    "deps": [
     "@hello-pangea/dnd",
@@ -33207,6 +33207,10 @@
     "count": 1
    },
    {
+    "file": "src/components/audit/AuditTrailViewer.tsx",
+    "count": 1
+   },
+   {
     "file": "src/hooks/common/useBulkActions.ts",
     "count": 4
    },
@@ -33963,6 +33967,10 @@
     "msg": "Stream não disponível"
    },
    {
+    "file": "src/components/audit/AuditTrailViewer.tsx",
+    "msg": "Falha ao restaurar ${failed} registro(s)."
+   },
+   {
     "file": "src/components/automation/RuleEditor.tsx",
     "msg": " && (\n                      <Input value={action.config.alert_message || "
    },
@@ -34029,6 +34037,14 @@
    {
     "file": "src/components/freight/FreightAudit.tsx",
     "msg": "Preencha todos os campos para auditoria"
+   },
+   {
+    "file": "src/components/freight/FreightTableManager.tsx",
+    "msg": "Arquivo CSV vazio."
+   },
+   {
+    "file": "src/components/freight/FreightTableManager.tsx",
+    "msg": "Falha ao ler o arquivo CSV."
    },
    {
     "file": "src/components/freight/QuickQuoteWidget.tsx",
@@ -35045,6 +35061,10 @@
    {
     "file": "src/pages/KanbanEntregas.tsx",
     "msg": "Erro crítico na transição de status"
+   },
+   {
+    "file": "src/pages/LogisticaReversa.tsx",
+    "msg": "Informe o motivo da solicitação."
    },
    {
     "file": "src/pages/LojaRecompensas.tsx",
@@ -47372,7 +47392,7 @@
    },
    {
     "file": "src/components/layout/MobileQuickActions.tsx",
-    "line": "delay: i * 0.05"
+    "line": "delay: i * 0.05,"
    },
    {
     "file": "src/components/map/AnomalyList.tsx",
@@ -64183,6 +64203,13 @@
    },
    {
     "kind": "dinâmico",
+    "msg": "1 chamada(s) `.from(variável)` — tabela só conhecida em runtime",
+    "where": [
+     "src/components/audit/AuditTrailViewer.tsx"
+    ]
+   },
+   {
+    "kind": "dinâmico",
     "msg": "4 chamada(s) `.from(variável)` — tabela só conhecida em runtime",
     "where": [
      "src/hooks/common/useBulkActions.ts"
@@ -68026,7 +68053,7 @@
   },
   "src/components/admin/TelemetryViewer.tsx": {
    "path": "src/components/admin/TelemetryViewer.tsx",
-   "lines": 220,
+   "lines": 255,
    "exports": [
     "function TelemetryViewer"
    ],
@@ -68279,10 +68306,15 @@
   },
   "src/components/audit/AuditTrailViewer.tsx": {
    "path": "src/components/audit/AuditTrailViewer.tsx",
-   "lines": 289,
+   "lines": 487,
    "exports": [
     "function AuditTrailViewer"
-   ]
+   ],
+   "dyn_from": 1,
+   "errors": [
+    "Falha ao restaurar ${failed} registro(s)."
+   ],
+   "doc": "eslint-disable max-lines"
   },
   "src/components/audit/index.ts": {
    "path": "src/components/audit/index.ts",
@@ -69214,7 +69246,10 @@
   },
   "src/components/dashboard/AlertsPanel.tsx": {
    "path": "src/components/dashboard/AlertsPanel.tsx",
-   "lines": 451,
+   "lines": 454,
+   "navigates": [
+    "/admin/telemetria"
+   ],
    "status_values": [
     {
      "field": "type",
@@ -69545,7 +69580,7 @@
   },
   "src/components/dashboard/PerformanceChart.tsx": {
    "path": "src/components/dashboard/PerformanceChart.tsx",
-   "lines": 530,
+   "lines": 591,
    "status_values": [
     {
      "field": "type",
@@ -69784,10 +69819,15 @@
   },
   "src/components/freight/FreightTableManager.tsx": {
    "path": "src/components/freight/FreightTableManager.tsx",
-   "lines": 266,
+   "lines": 623,
    "exports": [
     "function FreightTableManager"
-   ]
+   ],
+   "errors": [
+    "Arquivo CSV vazio.",
+    "Falha ao ler o arquivo CSV."
+   ],
+   "doc": "eslint-disable max-lines"
   },
   "src/components/freight/NegotiationAssistant.tsx": {
    "path": "src/components/freight/NegotiationAssistant.tsx",
@@ -70108,12 +70148,9 @@
   },
   "src/components/layout/MobileQuickActions.tsx": {
    "path": "src/components/layout/MobileQuickActions.tsx",
-   "lines": 134,
+   "lines": 183,
    "exports": [
     "const MobileQuickActions"
-   ],
-   "navigates": [
-    "/configuracoes"
    ],
    "status_values": [
     {
@@ -70123,7 +70160,7 @@
     }
    ],
    "percents": [
-    "delay: i * 0.05"
+    "delay: i * 0.05,"
    ]
   },
   "src/components/layout/SystemPulse.tsx": {
@@ -70584,9 +70621,12 @@
   },
   "src/components/notifications/NotificationCenter.tsx": {
    "path": "src/components/notifications/NotificationCenter.tsx",
-   "lines": 317,
+   "lines": 358,
    "exports": [
     "function NotificationCenter"
+   ],
+   "navigates": [
+    "/configuracoes?tab=notifications"
    ],
    "status_values": [
     {
@@ -70629,9 +70669,12 @@
   },
   "src/components/notifications/UserNotificationCenter.tsx": {
    "path": "src/components/notifications/UserNotificationCenter.tsx",
-   "lines": 395,
+   "lines": 406,
    "exports": [
     "function UserNotificationCenter"
+   ],
+   "navigates": [
+    "/configuracoes?tab=notifications"
    ],
    "status_values": [
     {
@@ -70674,7 +70717,8 @@
      "value": "achievement",
      "kind": "compara"
     }
-   ]
+   ],
+   "doc": "eslint-disable max-lines"
   },
   "src/components/notifications/index.ts": {
    "path": "src/components/notifications/index.ts",
@@ -71768,7 +71812,7 @@
   },
   "src/components/shipping/ExpeditionDetailsDialog.tsx": {
    "path": "src/components/shipping/ExpeditionDetailsDialog.tsx",
-   "lines": 457,
+   "lines": 455,
    "exports": [
     "interface ExpeditionDelivery",
     "function ExpeditionDetailsDialog"
@@ -71890,7 +71934,7 @@
   },
   "src/components/transportadoras/RotaResultsList.tsx": {
    "path": "src/components/transportadoras/RotaResultsList.tsx",
-   "lines": 216,
+   "lines": 329,
    "exports": [
     "function RotaResultsList"
    ]
@@ -77435,7 +77479,7 @@
   },
   "src/hooks/logistics/useTransportadoraRotas.tsx": {
    "path": "src/hooks/logistics/useTransportadoraRotas.tsx",
-   "lines": 288,
+   "lines": 294,
    "exports": [
     "interface TransportadoraRota",
     "interface RotaFilter",
@@ -80933,7 +80977,7 @@
   },
   "src/pages/Configuracoes.tsx": {
    "path": "src/pages/Configuracoes.tsx",
-   "lines": 385,
+   "lines": 464,
    "exports": [
     "function Configuracoes"
    ],
@@ -80956,7 +81000,8 @@
      "value": "error",
      "kind": "compara"
     }
-   ]
+   ],
+   "doc": "eslint-disable max-lines"
   },
   "src/pages/ConfiguracoesFrete.tsx": {
    "path": "src/pages/ConfiguracoesFrete.tsx",
@@ -81865,7 +81910,7 @@
   },
   "src/pages/IntegracaoBitrix.tsx": {
    "path": "src/pages/IntegracaoBitrix.tsx",
-   "lines": 449,
+   "lines": 468,
    "exports": [
     "function IntegracaoBitrix"
    ],
@@ -82012,9 +82057,12 @@
   },
   "src/pages/LogisticaReversa.tsx": {
    "path": "src/pages/LogisticaReversa.tsx",
-   "lines": 289,
+   "lines": 645,
    "exports": [
     "function LogisticaReversa"
+   ],
+   "errors": [
+    "Informe o motivo da solicitação."
    ],
    "status_values": [
     {
@@ -82052,7 +82100,8 @@
      "value": "recebido",
      "kind": "compara"
     }
-   ]
+   ],
+   "doc": "eslint-disable max-lines"
   },
   "src/pages/LojaRecompensas.tsx": {
    "path": "src/pages/LojaRecompensas.tsx",
@@ -82470,7 +82519,7 @@
   },
   "src/pages/RastreamentoPublico.tsx": {
    "path": "src/pages/RastreamentoPublico.tsx",
-   "lines": 297,
+   "lines": 521,
    "exports": [
     "function RastreamentoPublico"
    ],
@@ -82493,7 +82542,8 @@
      "value": "completed",
      "kind": "escreve"
     }
-   ]
+   ],
+   "doc": "eslint-disable max-lines"
   },
   "src/pages/RastreamentoRealTime.tsx": {
    "path": "src/pages/RastreamentoRealTime.tsx",
@@ -88165,10 +88215,33 @@
   }
  },
  "git": {
-  "sha": "e271db764f62fce29c04ee2f52d1eabfcdf84568",
+  "sha": "daa5f481db9e42df8ba9b7cb7aade862084cf072",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "daa5f48",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: liga botões sem handler na Fase C (04-05) (#256)",
+    "files": [
+     "src/components/admin/TelemetryViewer.tsx",
+     "src/components/audit/AuditTrailViewer.tsx",
+     "src/components/dashboard/AlertsPanel.tsx",
+     "src/components/dashboard/PerformanceChart.tsx",
+     "src/components/freight/FreightTableManager.tsx",
+     "src/components/layout/MobileQuickActions.tsx",
+     "src/components/notifications/NotificationCenter.tsx",
+     "src/components/notifications/UserNotificationCenter.tsx",
+     "src/components/shipping/ExpeditionDetailsDialog.tsx",
+     "src/components/transportadoras/RotaResultsList.tsx",
+     "src/hooks/logistics/useTransportadoraRotas.tsx",
+     "src/pages/Configuracoes.tsx",
+     "src/pages/IntegracaoBitrix.tsx",
+     "src/pages/LogisticaReversa.tsx",
+     "src/pages/RastreamentoPublico.tsx"
+    ]
+   },
    {
     "sha": "e271db7",
     "date": "2026-11-21",
@@ -88485,250 +88558,88 @@
      "src/pages/CotacaoMultiCanal.tsx",
      "src/pages/DashboardCotacoes.tsx"
     ]
-   },
-   {
-    "sha": "5d31fbc",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)",
-    "files": [
-     "docs/pendencias/01-01-hooks-real-ausentes.md",
-     "docs/pendencias/01-02-hooks-crud-ausentes.md",
-     "docs/pendencias/01-03-componentes-ausentes.md",
-     "docs/pendencias/01-04-tabelas-ausentes.md",
-     "docs/pendencias/01-05-edicao-concorrente.md",
-     "docs/pendencias/01-06-n8n-integration.md",
-     "docs/pendencias/01-07-public-api.md",
-     "docs/pendencias/01-08-i18n.md",
-     "docs/pendencias/01-09-mobilecard-loading.md",
-     "docs/pendencias/01-10-testes-src.md",
-     "docs/pendencias/01-11-testes-hooks.md",
-     "docs/pendencias/01-12-sw-manual.md",
-     "docs/pendencias/01-13-componentes-analytics.md",
-     "docs/pendencias/01-14-hooks-ai-rodonaves.md",
-     "docs/pendencias/01-15-atalhos-teclado.md",
-     "docs/pendencias/01-16-roteirizacao-mapbox.md",
-     "docs/pendencias/01-17-prazo-rodonaves-calendario.md",
-     "docs/pendencias/01-18-views-ativas-purge.md",
-     "docs/pendencias/01-19-force-logout-admin.md",
-     "docs/pendencias/01-20-lgpd-logs.md",
-     "docs/pendencias/01-21-monitor-uptime.md",
-     "docs/pendencias/01-22-contexto-supabase.md",
-     "docs/pendencias/01-23-mapbox-lalamove-secrets.md",
-     "docs/pendencias/01-24-diagramas-er-c4.md",
-     "docs/pendencias/02-05-predict-delays-whatsapp.md",
-     "docs/pendencias/02-06-nexus-auto-healing-coluna.md",
-     "docs/pendencias/03-01-dora-metrics-literal.md",
-     "docs/pendencias/03-02-postmortem-literal.md",
-     "docs/pendencias/03-03-systempulse-fixo.md",
-     "docs/pendencias/03-04-livestatusbar-ping.md",
-     "docs/pendencias/03-05-logisticsmapwidget-kpis.md",
-     "docs/pendencias/03-06-missiondetail-timeline.md",
-     "docs/pendencias/03-07-biometric-scan.md",
-     "docs/pendencias/03-08-alertspanel-latencia.md",
-     "docs/pendencias/03-09-nexuscoverage-fixo.md",
-     "docs/pendencias/03-10-negotiation-fixo.md",
-     "docs/pendencias/03-11-pickupconference-ocr.md",
-     "docs/pendencias/03-12-pickupdetails-custo.md",
-     "docs/pendencias/03-13-cinemathic-hud.md",
-     "docs/pendencias/03-14-label-qrcode.md",
-     "docs/pendencias/03-15-dashboard-executivo.md",
-     "docs/pendencias/03-16-cotacaofrete-economia.md",
-     "docs/pendencias/03-17-coletas-otif.md",
-     "docs/pendencias/03-18-inteligenciafrete-acoes.md",
-     "docs/pendencias/03-19-cotacao-api-simulada.md",
-     "docs/pendencias/03-20-dashboard-cotacoes-simula.md",
-     "docs/pendencias/03-21-rastreamento-interpolado.md",
-     "docs/pendencias/03-22-mapa-rotas-time-travel.md",
-     "docs/pendencias/03-23-uselogisticsintelligence.md",
-     "docs/pendencias/03-24-ai-assistant-clima-fixo.md",
-     "docs/pendencias/03-25-predict-delays-clima.md",
-     "docs/pendencias/03-26-estatisticas-fixas.md",
-     "docs/pendencias/03-27-authhero-depoimentos.md",
-     "docs/pendencias/03-28-painelsla-localstorage.md",
-     "docs/pendencias/03-29-qualitygate-estatico.md",
-     "docs/pendencias/03-30-analyticscharts-fallback.md",
-     "docs/pendencias/04-01-configuracoes-frete-estatico.md",
-     "docs/pendencias/04-02-configuracoes-security.md",
-     "docs/pendencias/04-03-profile-statico.md",
-     "docs/pendencias/04-04-api-documentation.md",
-     "docs/pendencias/04-05-botoes-sem-handler.md",
-     "docs/pendencias/04-06-rotas-404.md",
-     "docs/pendencias/04-07-mapas-sem-markers.md",
-     "docs/pendencias/04-08-deep-link.md",
-     "docs/pendencias/04-09-estados-erro-ausentes.md",
-     "docs/pendencias/04-SECAO4-geral.md",
-     "docs/pendencias/05-01-bitrix24.md",
-     "docs/pendencias/05-02-lalamove.md",
-     "docs/pendencias/05-03-rodonaves.md",
-     "docs/pendencias/05-04-melhor-envio.md",
-     "docs/pendencias/05-05-whatsapp.md",
-     "docs/pendencias/05-06-push-notifications.md",
-     "docs/pendencias/05-07-email-resend.md",
-     "docs/pendencias/05-08-mapbox-mapas.md",
-     "docs/pendencias/05-09-openweather.md",
-     "docs/pendencias/05-10-external-db-bridge.md",
-     "docs/pendencias/05-11-carrier-webhook-receiver.md",
-     "docs/pendencias/05-12-ingestao-entregas-coletas.md",
-     "docs/pendencias/05-13-secrets.md",
-     "docs/pendencias/05-14-vite-bitrix24-webhook.md",
-     "docs/pendencias/06-01-motor-regras.md",
-     "docs/pendencias/06-02-webhooks-saida.md",
-     "docs/pendencias/06-03-relatorios-agendados.md",
-     "docs/pendencias/06-04-feature-flags.md",
-     "docs/pendencias/06-05-alerta-regressao.md",
-     "docs/pendencias/06-06-auto-cura.md",
-     "docs/pendencias/06-07-preferencias-notificacao.md",
-     "docs/pendencias/06-08-agendamento-cache.md",
-     "docs/pendencias/06-09-contexto-ia.md",
-     "docs/pendencias/07-01-mfa-2fa.md",
-     "docs/pendencias/07-02-passkeys.md",
-     "docs/pendencias/07-03-matriz-permissoes.md",
-     "docs/pendencias/07-05-gestao-sessoes.md",
-     "docs/pendencias/07-06-functions-sem-auth.md",
-     "docs/pendencias/07-07-hmac-opcional.md",
-     "docs/pendencias/07-08-cors-prod.md",
-     "docs/pendencias/07-09-rate-limiting.md",
-     "docs/pendencias/07-10-timeout-circuit-breaker.md",
-     "docs/pendencias/07-11-check-password-breach.md",
-     "docs/pendencias/07-12-health-sem-auth.md",
-     "docs/pendencias/07-13-heartbeat.md",
-     "docs/pendencias/07-14-mcp-exec.md",
-     "docs/pendencias/07-15-sec-definer.md",
-     "docs/pendencias/07-16-user-ranks-anon.md",
-     "docs/pendencias/07-17-validacao-payload.md",
-     "docs/pendencias/07-18-env-versionado.md",
-     "docs/pendencias/07-19-csp.md",
-     "docs/pendencias/07-20-login-social.md",
-     "docs/pendencias/08-01-streak.md",
-     "docs/pendencias/08-02-conquistas-ranking.md",
-     "docs/pendencias/08-04-loja-recompensas.md",
-     "docs/pendencias/08-05-hook-duplicado.md",
-     "docs/pendencias/08-06-componentes-gamificacao.md",
-     "docs/pendencias/08-07-notificacao-conquista.md",
-     "docs/pendencias/09-01-rpcs-sem-consumidor.md",
-     "docs/pendencias/09-02-tabelas-sem-ref.md",
-     "docs/pendencias/09-03-performance-metrics.md",
-     "docs/pendencias/09-04-realtime-sem-publication.md",
-     "docs/pendencias/09-05-maquina-estados.md",
-     "docs/pendencias/09-06-soft-delete.md",
-     "docs/pendencias/09-07-migrations-sem-rollback.md",
-     "docs/pendencias/09-08-crons-duplicados.md",
-     "docs/pendencias/09-09-carrier-performance.md",
-     "docs/pendencias/09-10-freight-mappings.md",
-     "docs/pendencias/09-11-zod-compartilhado.md",
-     "docs/pendencias/09-12-query-keys.md",
-     "docs/pendencias/09-13-seed.md",
-     "docs/pendencias/09-14-dicionario-dados.md",
-     "docs/pendencias/09-15-aplicacao-migration.md",
-     "docs/pendencias/10-01-slos.md",
-     "docs/pendencias/10-02-sentry-webvitals.md",
-     "docs/pendencias/10-03-error-events.md",
-     "docs/pendencias/10-04-alerta-rollback.md",
-     "docs/pendencias/10-05-runbooks-infra.md",
-     "docs/pendencias/10-06-restore-drill.md",
-     "docs/pendencias/10-07-staging.md",
-     "docs/pendencias/10-08-functions-obs.md",
-     "docs/pendencias/10-09-logging-estruturado.md",
-     "docs/pendencias/10-10-densidade.md",
-     "docs/pendencias/11-01-testes-espelho.md",
-     "docs/pendencias/11-02-teste-rls.md",
-     "docs/pendencias/11-03-smoke-deno.md",
-     "docs/pendencias/11-04-size-limit.md",
-     "docs/pendencias/11-05-deps-circulares.md",
-     "docs/pendencias/11-06-max-lines.md",
-     "docs/pendencias/11-07-warning-budget.md",
-     "docs/pendencias/11-08-e2e.md",
-     "docs/pendencias/11-09-codeowners.md",
-     "docs/pendencias/11-10-config-morta.md",
-     "docs/pendencias/11-11-functions-sem-teste.md",
-     "docs/pendencias/11-12-magic-bytes.md",
-     "docs/pendencias/12-SEcoes-12a16-contexto.md",
-     "docs/pendencias/_ordem.md",
-     "docs/pendencias/_regras-de-negocio.md"
-    ]
    }
   ],
   "hot_files": [
    [
     "docs/pendencias/_ordem.md",
-    9
+    8
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     5
    ],
    [
-    "docs/pendencias/03-19-cotacao-api-simulada.md",
-    3
-   ],
-   [
     "src/pages/CotacaoMultiCanal.tsx",
     3
    ],
    [
-    "docs/pendencias/03-27-authhero-depoimentos.md",
+    "src/components/dashboard/AlertsPanel.tsx",
     2
    ],
    [
-    "docs/pendencias/03-29-qualitygate-estatico.md",
+    "src/pages/IntegracaoBitrix.tsx",
     2
    ],
    [
-    "docs/pendencias/03-30-analyticscharts-fallback.md",
+    "docs/pendencias/03-19-cotacao-api-simulada.md",
     2
    ],
    [
-    "docs/pendencias/03-24-ai-assistant-clima-fixo.md",
-    2
+    "src/components/admin/TelemetryViewer.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-25-predict-delays-clima.md",
-    2
+    "src/components/audit/AuditTrailViewer.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-26-estatisticas-fixas.md",
-    2
+    "src/components/dashboard/PerformanceChart.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-21-rastreamento-interpolado.md",
-    2
+    "src/components/freight/FreightTableManager.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-22-mapa-rotas-time-travel.md",
-    2
+    "src/components/layout/MobileQuickActions.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-23-uselogisticsintelligence.md",
-    2
+    "src/components/notifications/NotificationCenter.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-15-dashboard-executivo.md",
-    2
+    "src/components/notifications/UserNotificationCenter.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-16-cotacaofrete-economia.md",
-    2
+    "src/components/shipping/ExpeditionDetailsDialog.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-17-coletas-otif.md",
-    2
+    "src/components/transportadoras/RotaResultsList.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-18-inteligenciafrete-acoes.md",
-    2
+    "src/hooks/logistics/useTransportadoraRotas.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-12-pickupdetails-custo.md",
-    2
+    "src/pages/Configuracoes.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-13-cinemathic-hud.md",
-    2
+    "src/pages/LogisticaReversa.tsx",
+    1
    ],
    [
-    "docs/pendencias/03-14-label-qrcode.md",
-    2
+    "src/pages/RastreamentoPublico.tsx",
+    1
+   ],
+   [
+    "src/components/common/Breadcrumbs.tsx",
+    1
    ]
   ]
  }

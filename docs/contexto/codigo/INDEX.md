@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e271db764f62fce29c04ee2f52d1eabfcdf84568` (2026-11-21T13:48:00-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `daa5f481db9e42df8ba9b7cb7aade862084cf072` (2026-11-21T14:31:18-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1473 |
 | arquivos_codigo | 879 |
-| linhas_codigo | 170057 |
+| linhas_codigo | 171607 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -246,7 +246,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 
 ## Integrações externas
 - SDKs: Sentry, Supabase, Upstash, i18next, react-query, zod
-- hosts mais citados: api.resend.com, viacep.com.br, api.ipify.org, wa.me, generativelanguage.googleapis.com, rest.lalamove.com, s3.amazonaws.com, 01wapi.rte.com.br, api.a-ticket.com.br, api.loggi-flow.com, api.openai.com, api.openweathermap.org, api.pwnedpasswords.com, api.transportadora.com, basemaps.cartocdn.com
+- hosts mais citados: api.resend.com, viacep.com.br, wa.me, api.ipify.org, generativelanguage.googleapis.com, rest.lalamove.com, s3.amazonaws.com, 01wapi.rte.com.br, api.a-ticket.com.br, api.loggi-flow.com, api.openai.com, api.openweathermap.org, api.pwnedpasswords.com, api.transportadora.com, basemaps.cartocdn.com
 - webhooks recebidos: carrier-webhook-receiver, evolution-whatsapp, health, health-check, lalamove-webhook, log-security-event, melhor-envio-api, nexus-webhook-receiver, predict-delays-scheduled, resend-email, rodonaves-webhook, webhook-status
 - env de integração (só nomes): ATICKET_API_KEY, BITRIX24_WEBHOOK_URL, EVOLUTION_API_KEY, EVOLUTION_API_URL, GOOGLE_API_KEY, INTERNAL_FN_SECRET, LALAMOVE_API_KEY, LALAMOVE_API_SECRET, MAPBOX_PUBLIC_TOKEN, MELHOR_ENVIO_TOKEN, NEXUS_WEBHOOK_SECRET, OPENAI_API_KEY, OPENWEATHER_API_KEY, RESEND_API_KEY, SECURITY_SLACK_WEBHOOK_URL, UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL, VITE_BITRIX24_WEBHOOK, VITE_GOOGLE_MAPS_API_KEY, VITE_MAPBOX_TOKEN, VITE_N8N_WEBHOOK_URL, VITE_SENTRY_DSN
 
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8558 nós · 21057 arestas · 858 comunidades · grafo do commit `e271db76`
-- comunidades maiores: cn (174), App.tsx (169), db-observability/index.ts (130), Coletas.tsx (129), input.tsx (128), card.tsx (112), client.ts (111), ui/index.ts (106), react (105), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), badge.tsx (94), celebrationSounds.ts (88)
+- 8559 nós · 21086 arestas · 868 comunidades · grafo do commit `daa5f481`
+- comunidades maiores: lucide-react (251), Clientes.tsx (153), utils.ts (150), db-observability/index.ts (146), button.tsx (132), App.tsx (131), react (123), client.ts (113), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ui/index.ts (98), ref_node_url (98), cn (94)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `daa5f48` fix: liga botões sem handler na Fase C (04-05) (#256)
 - 2026-11-21 `e271db7` fix: corrige links para rotas inexistentes e adiciona rotas admin sem entrada (04-06) (#255)
 - 2026-11-21 `560f85e` chore: encerra Fase B no _ordem.md com PRs reais (#242-#253) (#254)
 - 2026-11-21 `cb197d6` chore: reconcilia audit Fase B (3.19-3.20, 3.27, 3.29-3.30) com as PRs mergeadas (#253)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-21 `13c9e3f` fix: torna inteligencia logistica honesta (#243)
 - 2026-11-21 `0f32426` fix: torna mapa de rotas e rastreamento em tempo real honestos (03-21/03-22) (#242)
 - 2026-11-21 `c517e6c` docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)
-- 2026-11-21 `d15ef79` fix: substitui simulacoes de lead time, divergencia semanal e acoes corretivas por dados reais (#240)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

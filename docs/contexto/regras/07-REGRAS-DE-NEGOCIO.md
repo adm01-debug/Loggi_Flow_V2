@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e271db764f` · branch `main` · 2026-11-21 16:48 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `daa5f481db` · branch `main` · 2026-11-21 17:31 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1482,7 +1482,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `// usually resulting in ~20% lower cost for consolidated volume` | `src/components/freight/StrategySimulator.tsx` |
 | `const consolidatedRate = standardRate * 0.75; // 25% discount for consolidated` | `src/components/freight/StrategySimulator.tsx` |
 | `y += Math.max(lines.length * 0.45, 0.5);` | `src/components/labels/MaterialLabelPrinter.tsx` |
-| `delay: i * 0.05` | `src/components/layout/MobileQuickActions.tsx` |
+| `delay: i * 0.05,` | `src/components/layout/MobileQuickActions.tsx` |
 | `transition={{ delay: idx * 0.1 }}` | `src/components/map/AnomalyList.tsx` |
 | `transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}` | `src/components/map/CinematicHUD.tsx` |
 | `const midLat = originMarker.lat + latDiff / 2 + dist * 0.15;` | `src/components/map/MapboxMap.tsx` |
@@ -1864,6 +1864,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Erro ao processar mensagem estratégica. | `src/components/ai/AIAssistant.tsx` |
 | Limite de requisições atingido. | `src/components/ai/AIAssistant.tsx` |
 | Stream não disponível | `src/components/ai/AIAssistant.tsx` |
+| Falha ao restaurar ${failed} registro(s). | `src/components/audit/AuditTrailViewer.tsx` |
 |  && (                       <Input value={action.config.alert_message \|\|  | `src/components/automation/RuleEditor.tsx` |
 | ; import {   Package,   AlertTriangle,   Loader2,   Weight,   Camera,   ShieldCheck,   Zap, } from  | `src/components/coletas/PickupConference.tsx` |
 | Dados incompletos | `src/components/coletas/PickupConference.tsx` |
@@ -1881,6 +1882,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Seu dispositivo não suporta autenticação biométrica (WebAuthn) | `src/components/dashboard/BiometricConsentModal.tsx` |
 | Erro ao executar protocolo:  | `src/components/dashboard/LogisticsMapWidget.tsx` |
 | Preencha todos os campos para auditoria | `src/components/freight/FreightAudit.tsx` |
+| Arquivo CSV vazio. | `src/components/freight/FreightTableManager.tsx` |
+| Falha ao ler o arquivo CSV. | `src/components/freight/FreightTableManager.tsx` |
 | Preencha UF e peso | `src/components/freight/QuickQuoteWidget.tsx` |
 | Preencha estado e peso | `src/components/freight/QuotationForm.tsx` |
 | Erro ao normalizar: ${(error as Error).message} | `src/components/freight/ResponseConsole.tsx` |
@@ -2135,6 +2138,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Erro na sincronização: ${err.message} | `src/pages/IntegracaoBitrix.tsx` |
 | Conflito de versão — registro alterado por outro usuário, por favor recarregue | `src/pages/KanbanEntregas.tsx` |
 | Erro crítico na transição de status | `src/pages/KanbanEntregas.tsx` |
+| Informe o motivo da solicitação. | `src/pages/LogisticaReversa.tsx` |
 | Não autenticado | `src/pages/LojaRecompensas.tsx` |
 | BIOSYNC_CRITICAL: Limite excedido! | `src/pages/MapaRotas.tsx` |
 | Erro:  | `src/pages/Ocorrencias.tsx` |
@@ -2153,11 +2157,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | FIELD_ENCRYPTION_KEY missing or too short (fail-closed) | `supabase/functions/_shared/crypto.ts` |
 | Request timed out after ${timeout}ms | `supabase/functions/_shared/fetch-with-timeout.ts` |
 | host ${host} | `supabase/functions/_shared/safeFetch.ts` |
-| host ${host} not in allow-list | `supabase/functions/_shared/safeFetch.ts` |
-| invalid URL | `supabase/functions/_shared/safeFetch.ts` |
-| private IPv4 ${host} | `supabase/functions/_shared/safeFetch.ts` |
-| private IPv6 ${host} | `supabase/functions/_shared/safeFetch.ts` |
-| … +150 linhas — lista completa em `context.json` | |
+| … +154 linhas — lista completa em `context.json` | |
 
 ## J. Controle de acesso no código (checagens de perfil/permissão)
 

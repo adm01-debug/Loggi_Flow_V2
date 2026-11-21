@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e271db764f` · branch `main` · 2026-11-21 16:48 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `daa5f481db` · branch `main` · 2026-11-21 17:31 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -276,6 +276,7 @@
 | rls | `notificacoes_custo`: front faz UPDATE mas nenhuma política RLS permite UPDATE → vai falhar/retornar vazio para usuários | `src/hooks/logistics/useCostAlerts.tsx` |
 | rls | `user_levels`: front faz UPDATE mas nenhuma política RLS permite UPDATE → vai falhar/retornar vazio para usuários | `src/hooks/gamification/useGamification.tsx` |
 | dinheiro | `internal.query_baseline.total_exec_time` guarda dinheiro em `double precision NOT NULL` (ponto flutuante) — arredondamento imprevisível; padrão é numeric |  |
+| dinâmico | 1 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/components/audit/AuditTrailViewer.tsx` |
 | dinâmico | 4 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/common/useBulkActions.ts` |
 | dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/data/useDocumentUpload.ts` |
 | dinâmico | 2 chamada(s) `.from(variável)` — tabela só conhecida em runtime | `src/hooks/data/useImageUpload.tsx` |

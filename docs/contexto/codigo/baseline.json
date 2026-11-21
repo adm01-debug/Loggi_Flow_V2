@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "e271db764f62fce29c04ee2f52d1eabfcdf84568",
+  "commit": "daa5f481db9e42df8ba9b7cb7aade862084cf072",
   "branch": "main",
-  "data_commit": "2026-11-21T13:48:00-03:00",
+  "data_commit": "2026-11-21T14:31:18-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "daa5f48",
+    "data": "2026-11-21",
+    "assunto": "fix: liga botões sem handler na Fase C (04-05) (#256)"
+   },
    {
     "sha": "e271db7",
     "data": "2026-11-21",
@@ -126,17 +131,16 @@
     "sha": "24dbf91",
     "data": "2026-11-21",
     "assunto": "feat: (#231)"
-   },
-   {
-    "sha": "3d7affa",
-    "data": "2026-11-20",
-    "assunto": "docs: marca 03-01 a 03-05 (Fase B) como concluidos via PR #229 (#230)"
    }
   ],
-  "arquivos_mudados_7d": 339,
+  "arquivos_mudados_7d": 351,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
+    "mudancas": 15
+   },
+   {
+    "pasta": "src/components/dashboard",
     "mudancas": 14
    },
    {
@@ -152,10 +156,6 @@
     "mudancas": 12
    },
    {
-    "pasta": "src/components/dashboard",
-    "mudancas": 12
-   },
-   {
     "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     "mudancas": 9
    },
@@ -168,15 +168,19 @@
     "mudancas": 7
    },
    {
+    "pasta": "src/components/freight",
+    "mudancas": 7
+   },
+   {
     "pasta": ".github/workflows/types-sync.yml",
     "mudancas": 6
    },
    {
-    "pasta": "src/components/common",
+    "pasta": "src/components/admin",
     "mudancas": 6
    },
    {
-    "pasta": "src/components/freight",
+    "pasta": "src/components/common",
     "mudancas": 6
    },
    {
@@ -189,10 +193,6 @@
    },
    {
     "pasta": "docs/agentes/github-ci.md",
-    "mudancas": 5
-   },
-   {
-    "pasta": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 5
    }
   ],
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 182
+    "commits": 183
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1473,
   "arquivos_codigo": 879,
-  "linhas_codigo": 170057,
+  "linhas_codigo": 171607,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 50045
+   "linhas": 50911
   },
   "src/features": {
    "arquivos": 90,
@@ -456,7 +456,7 @@
   },
   "src/hooks": {
    "arquivos": 126,
-   "linhas": 19340
+   "linhas": 19346
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 31076
+   "linhas": 31754
   },
   "src/services": {
    "arquivos": 5,
@@ -643,7 +643,7 @@
   "ts_ignore": 0,
   "eslint_disable": 3,
   "todos": 2,
-  "arquivos_acima_500_linhas": 39
+  "arquivos_acima_500_linhas": 42
  },
  "todos": [
   {
