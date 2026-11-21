@@ -142,60 +142,54 @@ export default function RastreamentoRealTime() {
       });
     }
 
-    // Add truck/driver simulated marker if in transit
+    // Marker do veículo só quando há coordenada GPS real (lat/lng do despacho).
+    // Sem telemetria, não se inventa posição, velocidade ou sinal GPS.
     if (
-      shipment?.status === "em_transito" ||
-      shipment?.status === "saiu_entrega"
+      (shipment?.status === "em_transito" ||
+        shipment?.status === "saiu_entrega") &&
+      shipment.coordinates
     ) {
-      // Simulate truck position between origin and destination
-      if (originCoords && destCoords) {
-        const factor = shipment?.status === "saiu_entrega" ? 0.85 : 0.45;
-        const truckLat =
-          originCoords.lat + (destCoords.lat - originCoords.lat) * factor;
-        const truckLng =
-          originCoords.lng + (destCoords.lng - originCoords.lng) * factor;
-
-        markers.push({
-          id: "truck",
-          lat: truckLat,
-          lng: truckLng,
-          label: "Veículo em Movimento",
-          type: "truck",
-          color: "#06b6d4",
-          heading: 45,
-          popupHTML: `
-            <div class="p-4 bg-black/95 border-2 border-primary/20 rounded-[1.5rem] shadow-2xl min-w-[240px]">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
-                </div>
-                <div>
-                  <div class="text-[10px] font-black text-primary uppercase tracking-widest">Veículo_Nexus</div>
-                  <div class="text-sm font-black text-white italic">EM DESLOCAMENTO</div>
-                </div>
+      const gps = shipment.coordinates;
+      markers.push({
+        id: "truck",
+        lat: gps.lat,
+        lng: gps.lng,
+        label: "Última posição GPS",
+        type: "truck",
+        color: "#06b6d4",
+        heading: 45,
+        popupHTML: `
+          <div class="p-4 bg-black/95 border-2 border-primary/20 rounded-[1.5rem] shadow-2xl min-w-[240px]">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
               </div>
-              <div class="space-y-2">
-                <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase">
-                  <span>Velocidade</span>
-                  <span class="text-primary font-black">48 km/h</span>
-                </div>
-                <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase">
-                  <span>Sinal GPS</span>
-                  <span class="text-success font-black">EXCELENTE</span>
-                </div>
-                <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase pt-2 border-t border-white/5">
-                  <span>Próximo Checkpoint</span>
-                  <span class="text-white">Unidade Santana</span>
-                </div>
+              <div>
+                <div class="text-[10px] font-black text-primary uppercase tracking-widest">Veículo_${shipment.numero}</div>
+                <div class="text-sm font-black text-white italic">ÚLTIMA POSIÇÃO GPS</div>
               </div>
             </div>
-          `,
-        });
-      }
+            <div class="space-y-2">
+              <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase">
+                <span>Status</span>
+                <span class="text-primary font-black">${shipment?.statusLabel}</span>
+              </div>
+              <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase">
+                <span>Previsão</span>
+                <span class="text-white">${formatDate(shipment?.previsao)}</span>
+              </div>
+              <div class="flex justify-between text-[9px] font-bold text-white/30 uppercase pt-2 border-t border-white/5">
+                <span>Telemetria GPS</span>
+                <span class="text-white/60">Somente posição de despacho</span>
+              </div>
+            </div>
+          </div>
+        `,
+      });
     }
 
     return markers;
-  }, [destCoords, originCoords, shipment]);
+  }, [destCoords, shipment]);
 
   if (isLoadingTracking) {
     return (
@@ -536,53 +530,53 @@ export default function RastreamentoRealTime() {
                         );
                       }
                       return (
-                      <div className="space-y-8 relative pl-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-1 before:bg-gradient-to-b before:from-primary/40 before:to-transparent">
-                        {history.map((log, idx) => (
-                          <motion.div
-                            key={log.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="relative"
-                          >
-                            <div className="absolute -left-8 top-1.5 w-6 h-6 rounded-full bg-black border-2 border-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                              <div
-                                className={cn(
-                                  "w-2 h-2 rounded-full",
-                                  idx === 0
-                                    ? "bg-primary animate-pulse"
-                                    : "bg-primary/40",
-                                )}
-                              />
-                            </div>
-                            <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all group">
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-[11px] font-black uppercase tracking-widest text-primary italic">
-                                  {log.action === "INSERT"
-                                    ? "Protocolo Gerado"
-                                    : "Transação de Sistema"}
-                                </span>
-                                <span className="text-[9px] text-white/30 font-bold uppercase">
-                                  {formatDate(log.created_at)}
-                                </span>
+                        <div className="space-y-8 relative pl-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-1 before:bg-gradient-to-b before:from-primary/40 before:to-transparent">
+                          {history.map((log, idx) => (
+                            <motion.div
+                              key={log.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.1 }}
+                              className="relative"
+                            >
+                              <div className="absolute -left-8 top-1.5 w-6 h-6 rounded-full bg-black border-2 border-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                                <div
+                                  className={cn(
+                                    "w-2 h-2 rounded-full",
+                                    idx === 0
+                                      ? "bg-primary animate-pulse"
+                                      : "bg-primary/40",
+                                  )}
+                                />
                               </div>
-                              <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-black/40 text-[9px] font-black uppercase tracking-widest border border-white/5 text-white/60">
-                                  <User className="w-3 h-3 text-primary" />
-                                  {log.user_name ||
-                                    log.user_email ||
-                                    "Nexus Core"}
-                                </div>
-                                {log.ip_address && (
-                                  <span className="text-[8px] font-mono opacity-20 group-hover:opacity-40 transition-opacity">
-                                    NODE_IP: {log.ip_address}
+                              <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all group">
+                                <div className="flex items-center justify-between mb-3">
+                                  <span className="text-[11px] font-black uppercase tracking-widest text-primary italic">
+                                    {log.action === "INSERT"
+                                      ? "Protocolo Gerado"
+                                      : "Transação de Sistema"}
                                   </span>
-                                )}
+                                  <span className="text-[9px] text-white/30 font-bold uppercase">
+                                    {formatDate(log.created_at)}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-black/40 text-[9px] font-black uppercase tracking-widest border border-white/5 text-white/60">
+                                    <User className="w-3 h-3 text-primary" />
+                                    {log.user_name ||
+                                      log.user_email ||
+                                      "Nexus Core"}
+                                  </div>
+                                  {log.ip_address && (
+                                    <span className="text-[8px] font-mono opacity-20 group-hover:opacity-40 transition-opacity">
+                                      NODE_IP: {log.ip_address}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
+                            </motion.div>
+                          ))}
+                        </div>
                       );
                     })()}
                   </AnimatePresence>
