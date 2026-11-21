@@ -746,7 +746,7 @@
    "modulo": "components/dashboard",
    "arquivos": 17,
    "testes": 1,
-   "linhas": 5362,
+   "linhas": 5370,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -877,7 +877,7 @@
    "modulo": "components/freight",
    "arquivos": 18,
    "testes": 0,
-   "linhas": 2823,
+   "linhas": 2970,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -1086,7 +1086,8 @@
     "tabelas": [
      "audit_logs",
      "cotacoes_multicanal",
-     "freight_decisions"
+     "freight_decisions",
+     "transportadora_rotas"
     ],
     "rpcs": []
    },

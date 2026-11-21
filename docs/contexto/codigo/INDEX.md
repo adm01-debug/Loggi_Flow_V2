@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `24dbf9192eef98ce5ddeabcb7c780a8abcd6757f` (2026-11-21T08:44:29-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `a1e670f76fffb12310c37655e8360140939e61f5` (2026-11-21T09:14:30-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1472 |
 | arquivos_codigo | 878 |
-| linhas_codigo | 169040 |
+| linhas_codigo | 169195 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8539 nós · 20994 arestas · 864 comunidades · grafo do commit `24dbf919`
-- comunidades maiores: lucide-react (234), react (233), Envios.tsx (217), cn (185), utils.ts (151), client.ts (147), button.tsx (138), db-observability/index.ts (131), ref_node_fs (121), date-fns (112), useAuth (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103)
+- 8546 nós · 21015 arestas · 859 comunidades · grafo do commit `a1e670f7`
+- comunidades maiores: lucide-react (243), cn (238), react (222), input.tsx (222), @tanstack/react-query (149), FretesInternos.tsx (130), db-observability/index.ts (129), ref_node_path (111), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), client.ts (95), ref_node_fs (84), celebrationSounds.ts (82)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -285,9 +285,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
+- docs/pendencias/_ordem.md (7)
 - .github/workflows/deploy-functions.yml (6)
 - .github/workflows/types-sync.yml (6)
-- docs/pendencias/_ordem.md (6)
 - scripts/validate-csp.mjs (6)
 - .github/workflows/inventario-estado-semanal.yml (5)
 - docs/agentes/github-ci.md (5)
@@ -400,6 +400,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `a1e670f` fix: dados reais de latência e cobertura no AlertsPanel e NexusCoverageMap (#233)
+- 2026-11-21 `bdbad76` docs: marca 03-06 e 03-07 (Fase B) como concluidos via PR #231 (#232)
 - 2026-11-21 `24dbf91` feat: (#231)
 - 2026-11-20 `3d7affa` docs: marca 03-01 a 03-05 (Fase B) como concluidos via PR #229 (#230)
 - 2026-11-20 `d952137` feat: substitui metricas simuladas por dados reais nos widgets 3.1-3.5 (#229)
@@ -413,8 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `eb09cdc` chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)
 - 2026-11-20 `021e12f` fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)
 - 2026-11-20 `3706ba6` fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)
-- 2026-11-20 `b7a7b5f` fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)
-- 2026-11-20 `5460176` fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

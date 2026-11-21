@@ -1084,10 +1084,11 @@
     "AlertsPanel"
    ],
    "export_default": null,
-   "linhas": 443,
+   "linhas": 451,
    "dominio": "components/dashboard",
    "hooks_locais": [
-    "useLocalStorage"
+    "useLocalStorage",
+    "useNexusHealth"
    ],
    "tabelas": [],
    "edges": [],
@@ -1432,10 +1433,12 @@
     "NexusCoverageMap"
    ],
    "export_default": null,
-   "linhas": 110,
+   "linhas": 257,
    "dominio": "components/freight",
    "hooks_locais": [],
-   "tabelas": [],
+   "tabelas": [
+    "transportadora_rotas"
+   ],
    "edges": [],
    "usado_por": 1,
    "orfao": false

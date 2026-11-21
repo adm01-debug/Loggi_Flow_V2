@@ -4364,8 +4364,9 @@
    "canais_realtime": [
     "nexus-latency-probe"
    ],
-   "usado_por": 2,
+   "usado_por": 3,
    "usado_por_arquivos": [
+    "src/components/dashboard/AlertsPanel.tsx",
     "src/components/dashboard/LiveStatusBar.tsx",
     "src/components/layout/SystemPulse.tsx"
    ],

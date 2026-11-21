@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "24dbf9192eef98ce5ddeabcb7c780a8abcd6757f",
+  "sha": "a1e670f76fffb12310c37655e8360140939e61f5",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 11:45 UTC",
+  "generated_at": "2026-11-21 12:15 UTC",
   "files_total": 1482,
   "code_files": 1140,
-  "code_lines": 185552,
+  "code_lines": 185707,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "47b47a9512392788",
+ "facts_hash": "5aa6076ff9d34072",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29080,7 +29080,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 49433,
+   "lines": 49588,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -31547,11 +31547,12 @@
     ]
    },
    "transportadora_rotas": {
-    "insert": [
-     "src/components/transportadoras/BulkRouteImport.tsx",
+    "select": [
+     "src/components/freight/NexusCoverageMap.tsx",
      "src/hooks/logistics/useTransportadoraRotas.tsx"
     ],
-    "select": [
+    "insert": [
+     "src/components/transportadoras/BulkRouteImport.tsx",
      "src/hooks/logistics/useTransportadoraRotas.tsx"
     ],
     "update": [
@@ -42049,30 +42050,6 @@
     "field": "status",
     "value": "success",
     "kind": "compara"
-   },
-   {
-    "file": "src/components/freight/NexusCoverageMap.tsx",
-    "field": "estado",
-    "value": "SP",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/freight/NexusCoverageMap.tsx",
-    "field": "estado",
-    "value": "RJ",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/freight/NexusCoverageMap.tsx",
-    "field": "estado",
-    "value": "MG",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/freight/NexusCoverageMap.tsx",
-    "field": "estado",
-    "value": "PE",
-    "kind": "escreve"
    },
    {
     "file": "src/components/freight/ResponseConsole.tsx",
@@ -57186,23 +57163,6 @@
       "escreve:src/pages/AlertasCusto.tsx"
      ]
     },
-    "estado": {
-     "SP": [
-      "escreve:src/components/freight/NexusCoverageMap.tsx"
-     ],
-     "RJ": [
-      "escreve:src/components/freight/NexusCoverageMap.tsx"
-     ],
-     "MG": [
-      "escreve:src/components/freight/NexusCoverageMap.tsx"
-     ],
-     "PE": [
-      "escreve:src/components/freight/NexusCoverageMap.tsx"
-     ],
-     "UF": [
-      "escreve:src/hooks/common/useExport.tsx"
-     ]
-    },
     "state": {
      "installed": [
       "compara:src/components/pwa/UpdatePrompt.tsx"
@@ -57245,6 +57205,11 @@
      ],
      "failed": [
       "compara:src/features/db-observability/components/CronJobsCard.tsx"
+     ]
+    },
+    "estado": {
+     "UF": [
+      "escreve:src/hooks/common/useExport.tsx"
      ]
     },
     "phase": {
@@ -64174,41 +64139,6 @@
    },
    {
     "kind": "status",
-    "msg": "valor `SP` para `estado` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/freight/NexusCoverageMap.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `RJ` para `estado` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/freight/NexusCoverageMap.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `MG` para `estado` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/freight/NexusCoverageMap.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `PE` para `estado` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/freight/NexusCoverageMap.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `UF` para `estado` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/hooks/common/useExport.tsx"
-    ]
-   },
-   {
-    "kind": "status",
     "msg": "valor `installed` para `state` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:src/components/pwa/UpdatePrompt.tsx"
@@ -64247,6 +64177,13 @@
     "msg": "valor `succeeded` para `last_status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:src/features/db-observability/components/CronJobsCard.tsx"
+    ]
+   },
+   {
+    "kind": "status",
+    "msg": "valor `UF` para `estado` usado no código não existe em nenhum enum do banco/TS",
+    "where": [
+     "escreve:src/hooks/common/useExport.tsx"
     ]
    },
    {
@@ -69322,7 +69259,7 @@
   },
   "src/components/dashboard/AlertsPanel.tsx": {
    "path": "src/components/dashboard/AlertsPanel.tsx",
-   "lines": 443,
+   "lines": 451,
    "status_values": [
     {
      "field": "type",
@@ -69909,32 +69846,26 @@
   },
   "src/components/freight/NexusCoverageMap.tsx": {
    "path": "src/components/freight/NexusCoverageMap.tsx",
-   "lines": 110,
+   "lines": 257,
    "exports": [
     "function NexusCoverageMap"
    ],
-   "status_values": [
+   "tables": [
     {
-     "field": "estado",
-     "value": "SP",
-     "kind": "escreve"
-    },
-    {
-     "field": "estado",
-     "value": "RJ",
-     "kind": "escreve"
-    },
-    {
-     "field": "estado",
-     "value": "MG",
-     "kind": "escreve"
-    },
-    {
-     "field": "estado",
-     "value": "PE",
-     "kind": "escreve"
+     "table": "transportadora_rotas",
+     "op": "select"
     }
    ],
+   "table_cols": {
+    "transportadora_rotas": [
+     "ativo",
+     "destino_cidade",
+     "destino_estado",
+     "id",
+     "origem_cidade",
+     "origem_estado"
+    ]
+   },
    "doc": "eslint-disable sonarjs/class-name"
   },
   "src/components/freight/QuickQuoteWidget.tsx": {
@@ -88281,10 +88212,31 @@
   }
  },
  "git": {
-  "sha": "24dbf9192eef98ce5ddeabcb7c780a8abcd6757f",
+  "sha": "a1e670f76fffb12310c37655e8360140939e61f5",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "a1e670f",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: dados reais de latência e cobertura no AlertsPanel e NexusCoverageMap (#233)",
+    "files": [
+     "src/components/dashboard/AlertsPanel.tsx",
+     "src/components/freight/NexusCoverageMap.tsx"
+    ]
+   },
+   {
+    "sha": "bdbad76",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "docs: marca 03-06 e 03-07 (Fase B) como concluidos via PR #231 (#232)",
+    "files": [
+     "docs/pendencias/03-06-missiondetail-timeline.md",
+     "docs/pendencias/03-07-biometric-scan.md",
+     "docs/pendencias/_ordem.md"
+    ]
+   },
    {
     "sha": "24dbf91",
     "date": "2026-11-21",
@@ -88760,38 +88712,12 @@
     "files": [
      "docs/INVENTARIO_FUNCIONALIDADES.md"
     ]
-   },
-   {
-    "sha": "8f75c44",
-    "date": "2026-11-19",
-    "author": "adm01-debug",
-    "subject": "feat: integra motor de regras de negocio aos fluxos de coleta e entrega (#202)",
-    "files": [
-     "src/components/coletas/PickupConference.tsx",
-     "src/components/coletas/PickupDetailsDialog.tsx",
-     "src/components/coletas/PickupDialog.tsx",
-     "src/hooks/index.ts",
-     "src/hooks/logistics/useRuleTriggers.test.tsx",
-     "src/hooks/logistics/useRuleTriggers.ts",
-     "src/pages/Despachos.tsx",
-     "src/pages/Envios.tsx",
-     "src/pages/KanbanEntregas.tsx"
-    ]
-   },
-   {
-    "sha": "ea8d1a4",
-    "date": "2026-11-19",
-    "author": "adm01-debug",
-    "subject": "chore(ci): atualiza NOTA do branch-hygiene apos porte dos scripts (#140) (#201)",
-    "files": [
-     ".github/workflows/branch-hygiene-audit.yml"
-    ]
    }
   ],
   "hot_files": [
    [
     "docs/pendencias/_ordem.md",
-    6
+    7
    ],
    [
     "package-lock.json",
@@ -88804,6 +88730,14 @@
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     4
+   ],
+   [
+    "docs/pendencias/03-06-missiondetail-timeline.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-07-biometric-scan.md",
+    2
    ],
    [
     "src/components/dashboard/MissionDetail.tsx",
@@ -88859,14 +88793,6 @@
    ],
    [
     "docs/pendencias/02-14-webhook-metadata.md",
-    2
-   ],
-   [
-    "docs/pendencias/02-16-mission-detail-bitrix.md",
-    2
-   ],
-   [
-    "docs/pendencias/02-07-fretes-internos-deleted-at.md",
     2
    ]
   ]

@@ -555,6 +555,7 @@
    "src/components/ui/slider.tsx",
    "src/hooks/analytics/useDashboardMetrics.tsx",
    "src/hooks/common/useLocalStorage.ts",
+   "src/hooks/system/useNexusHealth.ts",
    "src/lib/utils.ts"
   ],
   "src/components/dashboard/BiometricConsentModal.tsx": [
@@ -741,7 +742,8 @@
   "src/components/freight/NexusCoverageMap.tsx": [
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
-   "src/components/ui/card.tsx"
+   "src/components/ui/card.tsx",
+   "src/integrations/supabase/client.ts"
   ],
   "src/components/freight/QuickQuoteWidget.tsx": [
    "src/components/ui/button.tsx",

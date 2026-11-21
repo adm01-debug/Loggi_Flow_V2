@@ -3685,6 +3685,7 @@
     "useContext",
     "useCotacoesFrete",
     "useCotacoesMulticanal",
+    "useCoveragePracas",
     "useDashboardData",
     "useDashboardMetrics",
     "useDashboardWidgets",

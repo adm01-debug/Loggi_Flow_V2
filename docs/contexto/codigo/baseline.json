@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "24dbf9192eef98ce5ddeabcb7c780a8abcd6757f",
+  "commit": "a1e670f76fffb12310c37655e8360140939e61f5",
   "branch": "main",
-  "data_commit": "2026-11-21T08:44:29-03:00",
+  "data_commit": "2026-11-21T09:14:30-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "a1e670f",
+    "data": "2026-11-21",
+    "assunto": "fix: dados reais de latência e cobertura no AlertsPanel e NexusCoverageMap (#233)"
+   },
+   {
+    "sha": "bdbad76",
+    "data": "2026-11-21",
+    "assunto": "docs: marca 03-06 e 03-07 (Fase B) como concluidos via PR #231 (#232)"
+   },
    {
     "sha": "24dbf91",
     "data": "2026-11-21",
@@ -121,19 +131,9 @@
     "sha": "8a28944",
     "data": "2026-11-20",
     "assunto": "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)"
-   },
-   {
-    "sha": "1716939",
-    "data": "2026-11-20",
-    "assunto": "fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)"
-   },
-   {
-    "sha": "99ca866",
-    "data": "2026-11-20",
-    "assunto": "fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)"
    }
   ],
-  "arquivos_mudados_7d": 323,
+  "arquivos_mudados_7d": 324,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -149,18 +149,18 @@
    },
    {
     "pasta": "src/components/dashboard",
-    "mudancas": 10
+    "mudancas": 11
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
     "mudancas": 8
    },
    {
-    "pasta": ".github/workflows/types-sync.yml",
-    "mudancas": 6
+    "pasta": "docs/pendencias/_ordem.md",
+    "mudancas": 7
    },
    {
-    "pasta": "docs/pendencias/_ordem.md",
+    "pasta": ".github/workflows/types-sync.yml",
     "mudancas": 6
    },
    {
@@ -192,7 +192,7 @@
     "mudancas": 5
    },
    {
-    "pasta": "src/components/map",
+    "pasta": "src/components/freight",
     "mudancas": 5
    }
   ],
@@ -218,15 +218,15 @@
     "mudancas": 7
    },
    {
+    "arquivo": "docs/pendencias/_ordem.md",
+    "mudancas": 7
+   },
+   {
     "arquivo": ".github/workflows/deploy-functions.yml",
     "mudancas": 6
    },
    {
     "arquivo": ".github/workflows/types-sync.yml",
-    "mudancas": 6
-   },
-   {
-    "arquivo": "docs/pendencias/_ordem.md",
     "mudancas": 6
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 159
+    "commits": 161
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169040,
+  "linhas_codigo": 169195,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 49433
+   "linhas": 49588
   },
   "src/features": {
    "arquivos": 90,

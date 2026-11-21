@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `24dbf9192e` · branch `main` · 2026-11-21 11:45 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a1e670f76f` · branch `main` · 2026-11-21 12:15 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1021,11 +1021,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `tipo` | `rota` | compara | `src/hooks/logistics/useCostAlerts.tsx` |
 | `tipo` | `transportadora` | compara, escreve | `src/hooks/logistics/useCostAlerts.tsx` |
 | `tipo` | `valor_maximo` | escreve | `src/pages/AlertasCusto.tsx` |
-| `estado` | `MG` | escreve | `src/components/freight/NexusCoverageMap.tsx` |
-| `estado` | `PE` | escreve | `src/components/freight/NexusCoverageMap.tsx` |
-| `estado` | `RJ` | escreve | `src/components/freight/NexusCoverageMap.tsx` |
-| `estado` | `SP` | escreve | `src/components/freight/NexusCoverageMap.tsx` |
-| `estado` | `UF` | escreve | `src/hooks/common/useExport.tsx` |
 | `state` | `OPEN` | compara | `src/services/resilience/CircuitBreaker.ts` |
 | `state` | `collapsed` | compara | `src/components/ui/sidebar.tsx` |
 | `state` | `expanded` | escreve | `src/components/ui/sidebar.tsx` |
@@ -1038,6 +1033,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `ocr_status` | `pending` | escreve | `src/components/shipping/DeliveryReceiptUpload.tsx` |
 | `last_status` | `failed` | compara | `src/features/db-observability/components/CronJobsCard.tsx` |
 | `last_status` | `succeeded` | compara | `src/features/db-observability/components/CronJobsCard.tsx` |
+| `estado` | `UF` | escreve | `src/hooks/common/useExport.tsx` |
 | `phase` | `entregue` | compara | `src/lib/rodonaves/eventCodes.ts` |
 | `phase` | `no_destino` | compara | `src/lib/rodonaves/freightHealth.ts` |
 | `to_status` | `despachado` | escreve | `src/pages/Despachos.tsx` |

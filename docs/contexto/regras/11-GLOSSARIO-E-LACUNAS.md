@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `24dbf9192e` · branch `main` · 2026-11-21 11:45 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a1e670f76f` · branch `main` · 2026-11-21 12:15 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -263,17 +263,13 @@
 | status | valor `scan` para `step` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/coletas/PickupConference.tsx` |
 | status | valor `scanning` para `step` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/BiometricConsentModal.tsx` |
 | status | valor `start` para `step` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/security/MFAEnroll.tsx` |
-| status | valor `SP` para `estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/freight/NexusCoverageMap.tsx` |
-| status | valor `RJ` para `estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/freight/NexusCoverageMap.tsx` |
-| status | valor `MG` para `estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/freight/NexusCoverageMap.tsx` |
-| status | valor `PE` para `estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/freight/NexusCoverageMap.tsx` |
-| status | valor `UF` para `estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/hooks/common/useExport.tsx` |
 | status | valor `installed` para `state` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/pwa/UpdatePrompt.tsx` |
 | status | valor `expanded` para `state` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/ui/sidebar.tsx` |
 | status | valor `collapsed` para `state` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/ui/sidebar.tsx` |
 | status | valor `suspended` para `state` usado no código não existe em nenhum enum do banco/TS | `compara:src/utils/celebrationSounds.ts` |
 | status | valor `not_implemented` para `ocr_status` usado no código não existe em nenhum enum do banco/TS | `escreve:supabase/functions/ocr-receipt-processor/index.ts` |
 | status | valor `succeeded` para `last_status` usado no código não existe em nenhum enum do banco/TS | `compara:src/features/db-observability/components/CronJobsCard.tsx` |
+| status | valor `UF` para `estado` usado no código não existe em nenhum enum do banco/TS | `escreve:src/hooks/common/useExport.tsx` |
 | status | valor `motorista_alocado` para `order_status` usado no código não existe em nenhum enum do banco/TS | `escreve:supabase/functions/lalamove-webhook/index.ts` |
 | rls | `geo_blocking_rules`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
 | rls | `geo_blocking_settings`: acessada do front (1 arquivo(s)) sem RLS (não encontrado) | `src/components/security/GeoBlockingPanel.tsx` |
