@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -63,6 +64,7 @@ export default function RastreamentoRealTime() {
   const {
     allShipments,
     isLoading: isLoadingTracking,
+    isError: isErrorTracking,
     refetch,
   } = useUnifiedTracking();
   const { geocodeAddress } = useGeocoding();
@@ -192,6 +194,24 @@ export default function RastreamentoRealTime() {
 
     return markers;
   }, [destCoords, shipment]);
+
+  if (isErrorTracking) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar rastreamento em tempo real"
+            description="Não foi possível carregar os envios. Tente novamente em instantes."
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (isLoadingTracking) {
     return (

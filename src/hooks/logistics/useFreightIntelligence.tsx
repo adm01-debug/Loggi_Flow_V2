@@ -43,7 +43,12 @@ export interface ConsolidationOpportunity {
 export function useFreightIntelligence() {
   const { user } = useAuth();
 
-  const { data: rawData = [], isLoading } = useQuery({
+  const {
+    data: rawData = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["freight-intelligence", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -268,6 +273,8 @@ export function useFreightIntelligence() {
 
   return {
     isLoading,
+    isError,
+    error,
     rawData,
     regionAnalysis,
     carrierRouteComparison,

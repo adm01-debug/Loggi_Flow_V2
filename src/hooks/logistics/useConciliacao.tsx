@@ -61,24 +61,30 @@ export function useConciliacao() {
     useState<Conciliacao | null>(null);
 
   // Fetch all conciliacoes
-  const { data: conciliacoes = [], isLoading: isLoadingConciliacoes } =
-    useQuery({
-      queryKey: ["conciliacoes", user?.id],
-      queryFn: async (): Promise<Conciliacao[]> => {
-        const { data, error } = await supabase
-          .from("conciliacoes")
-          .select("*")
-          .order("created_at", { ascending: false });
-        if (error) throw error;
-        return data as Conciliacao[];
-      },
-      enabled: !!user?.id,
-    });
+  const {
+    data: conciliacoes = [],
+    isLoading: isLoadingConciliacoes,
+    isError: isErrorConciliacoes,
+    error: errorConciliacoes,
+  } = useQuery({
+    queryKey: ["conciliacoes", user?.id],
+    queryFn: async (): Promise<Conciliacao[]> => {
+      const { data, error } = await supabase
+        .from("conciliacoes")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Conciliacao[];
+    },
+    enabled: !!user?.id,
+  });
 
   // Fetch items for selected conciliacao
   const {
     data: itensImportados = [],
     isLoading: isLoadingItens,
+    isError: isErrorItens,
+    error: errorItens,
     refetch: refetchItens,
   } = useQuery({
     queryKey: ["conciliacao_itens", selectedConciliacao?.id],
@@ -421,10 +427,14 @@ export function useConciliacao() {
   return {
     conciliacoes,
     isLoadingConciliacoes,
+    isErrorConciliacoes,
+    errorConciliacoes,
     selectedConciliacao,
     setSelectedConciliacao,
     itensImportados,
     isLoadingItens,
+    isErrorItens,
+    errorItens,
     refetchItens,
     entregasSistema,
     createConciliacao,

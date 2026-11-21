@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +38,8 @@ export default function CalendarioLogistico() {
 
   const events = calendarResult.data || [];
   const isLoading = calendarResult.isLoading;
-  
+  const isError = calendarResult.isError;
+  const error = calendarResult.error;
 
   const days = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -51,6 +53,27 @@ export default function CalendarioLogistico() {
 
   const selectedEvents = selectedDate ? getEventsForDate(selectedDate) : [];
   const getEventCountForDay = (date: Date) => getEventsForDate(date).length;
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar calendário logístico"
+            description={
+              error?.message ||
+              "Não foi possível carregar os eventos. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -188,9 +211,14 @@ export default function CalendarioLogistico() {
                         </p>
                       </div>
                       <Badge
-                        variant={((): "secondary" | "default" | "destructive" => {
+                        variant={(():
+                          "secondary" | "default" | "destructive" => {
                           if (e.status === "pendente") return "secondary";
-                          if (e.status === "finalizada" || e.status === "entregue") return "default";
+                          if (
+                            e.status === "finalizada" ||
+                            e.status === "entregue"
+                          )
+                            return "default";
                           return "destructive";
                         })()}
                       >

@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,6 +96,7 @@ export default function AlertasCusto() {
     alertas = [],
     notificacoes,
     isLoadingAlertas,
+    isErrorAlertas,
     checkCosts,
     createAlerta,
     deleteAlerta,
@@ -464,6 +466,20 @@ export default function AlertasCusto() {
               },
             ]}
           />
+        )}
+
+        {isErrorAlertas && (
+          <div className="flex justify-center py-12">
+            <EmptyState
+              variant="error"
+              title="Erro ao carregar alertas de custo"
+              description="Não foi possível carregar os alertas. Tente novamente em instantes."
+              action={{
+                label: "Tentar novamente",
+                onClick: () => window.location.reload(),
+              }}
+            />
+          </div>
         )}
 
         {isLoadingAlertas && (

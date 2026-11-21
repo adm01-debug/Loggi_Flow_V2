@@ -3,7 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { differenceInHours, parseISO, isPast, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertTriangle, Clock, Package, Truck, Target, Settings2, CheckCircle2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Clock,
+  Package,
+  Truck,
+  Target,
+  Settings2,
+  CheckCircle2,
+} from "lucide-react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +90,10 @@ function classificar(horas: number, atrasado: boolean, metas: SLAMetas): Risco {
   return "ok";
 }
 
-const RISCO_STYLES: Record<Risco, { label: string; className: string; icon: typeof AlertTriangle }> = {
+const RISCO_STYLES: Record<
+  Risco,
+  { label: string; className: string; icon: typeof AlertTriangle }
+> = {
   critico: {
     label: "CRÍTICO",
     className: "bg-destructive/15 text-destructive border-destructive/30",
@@ -131,7 +143,12 @@ export default function PainelSLA() {
     };
   }, []);
 
-  const { data: entregas, isLoading: loadingEntregas } = useQuery({
+  const {
+    data: entregas,
+    isLoading: loadingEntregas,
+    isError: isErrorEntregas,
+    error: errorEntregas,
+  } = useQuery({
     queryKey: ["painel-sla-entregas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -153,7 +170,12 @@ export default function PainelSLA() {
     refetchInterval: 5 * 60 * 1000,
   });
 
-  const { data: coletas, isLoading: loadingColetas } = useQuery({
+  const {
+    data: coletas,
+    isLoading: loadingColetas,
+    isError: isErrorColetas,
+    error: errorColetas,
+  } = useQuery({
     queryKey: ["painel-sla-coletas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -196,11 +218,16 @@ export default function PainelSLA() {
       };
     });
     const cList: SLAItem[] = (coletas ?? []).map((c) => {
-      const previsao = c.data_prevista_coleta ? parseISO(c.data_prevista_coleta) : null;
+      const previsao = c.data_prevista_coleta
+        ? parseISO(c.data_prevista_coleta)
+        : null;
       const horas = previsao ? differenceInHours(previsao, now) : 0;
       const atrasado = previsao ? isPast(previsao) : false;
       const transp = c.transportadora as { nome_fantasia?: string } | null;
-      const forn = c.fornecedor as { razao_social?: string; nome_fantasia?: string } | null;
+      const forn = c.fornecedor as {
+        razao_social?: string;
+        nome_fantasia?: string;
+      } | null;
       return {
         id: c.id,
         numero: c.numero_coleta,
@@ -214,7 +241,9 @@ export default function PainelSLA() {
         referencia: forn?.nome_fantasia || forn?.razao_social || "Fornecedor",
       };
     });
-    return [...eList, ...cList].sort((a, b) => a.horasRestantes - b.horasRestantes);
+    return [...eList, ...cList].sort(
+      (a, b) => a.horasRestantes - b.horasRestantes,
+    );
   }, [entregas, coletas, metas]);
 
   const filtered = useMemo(() => {
@@ -229,7 +258,8 @@ export default function PainelSLA() {
     const alto = items.filter((i) => i.risco === "alto").length;
     const medio = items.filter((i) => i.risco === "medio").length;
     const ok = items.filter((i) => i.risco === "ok").length;
-    const onTimePct = total > 0 ? Math.round(((ok + medio) / total) * 100) : 100;
+    const onTimePct =
+      total > 0 ? Math.round(((ok + medio) / total) * 100) : 100;
     return { total, critico, alto, medio, ok, onTimePct };
   }, [items]);
 
@@ -241,12 +271,31 @@ export default function PainelSLA() {
   };
 
   const isLoading = loadingEntregas || loadingColetas;
+  const isError = isErrorEntregas || isErrorColetas;
+  const errorMessage = errorEntregas?.message || errorColetas?.message;
+
+  if (isError) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        <EmptyState
+          variant="error"
+          title="Erro ao carregar o Painel de SLA"
+          description={
+            errorMessage ||
+            "Não foi possível carregar os itens de SLA. Tente novamente."
+          }
+          action={{
+            label: "Tentar novamente",
+            onClick: () => window.location.reload(),
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* SEO handled via useEffect below */}
-
-
 
       <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -258,7 +307,13 @@ export default function PainelSLA() {
             Metas e alertas de vencimento para cada expedição e coleta.
           </p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (o) setDraftMetas(metas); }}>
+        <Dialog
+          open={dialogOpen}
+          onOpenChange={(o) => {
+            setDialogOpen(o);
+            if (o) setDraftMetas(metas);
+          }}
+        >
           <DialogTrigger asChild>
             <Button variant="outline" className="gap-2">
               <Settings2 className="h-4 w-4" /> Configurar metas
@@ -275,7 +330,12 @@ export default function PainelSLA() {
                   type="number"
                   min={0}
                   value={draftMetas.criticoHoras}
-                  onChange={(e) => setDraftMetas({ ...draftMetas, criticoHoras: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setDraftMetas({
+                      ...draftMetas,
+                      criticoHoras: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -284,7 +344,12 @@ export default function PainelSLA() {
                   type="number"
                   min={0}
                   value={draftMetas.altoHoras}
-                  onChange={(e) => setDraftMetas({ ...draftMetas, altoHoras: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setDraftMetas({
+                      ...draftMetas,
+                      altoHoras: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -293,7 +358,12 @@ export default function PainelSLA() {
                   type="number"
                   min={0}
                   value={draftMetas.medioHoras}
-                  onChange={(e) => setDraftMetas({ ...draftMetas, medioHoras: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setDraftMetas({
+                      ...draftMetas,
+                      medioHoras: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -303,12 +373,19 @@ export default function PainelSLA() {
                   min={0}
                   max={100}
                   value={draftMetas.metaOnTimePct}
-                  onChange={(e) => setDraftMetas({ ...draftMetas, metaOnTimePct: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setDraftMetas({
+                      ...draftMetas,
+                      metaOnTimePct: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+              <Button variant="ghost" onClick={() => setDialogOpen(false)}>
+                Cancelar
+              </Button>
               <Button onClick={salvarMetas}>Salvar metas</Button>
             </DialogFooter>
           </DialogContent>
@@ -316,10 +393,30 @@ export default function PainelSLA() {
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <StatCard label="Total monitorado" value={stats.total} icon={Target} tone="default" />
-        <StatCard label="Críticos" value={stats.critico} icon={AlertTriangle} tone="destructive" />
-        <StatCard label="Alto risco" value={stats.alto} icon={Clock} tone="warning" />
-        <StatCard label="Médio risco" value={stats.medio} icon={Clock} tone="primary" />
+        <StatCard
+          label="Total monitorado"
+          value={stats.total}
+          icon={Target}
+          tone="default"
+        />
+        <StatCard
+          label="Críticos"
+          value={stats.critico}
+          icon={AlertTriangle}
+          tone="destructive"
+        />
+        <StatCard
+          label="Alto risco"
+          value={stats.alto}
+          icon={Clock}
+          tone="warning"
+        />
+        <StatCard
+          label="Médio risco"
+          value={stats.medio}
+          icon={Clock}
+          tone="primary"
+        />
         <StatCard
           label={`OTIF (meta ${metas.metaOnTimePct}%)`}
           value={`${stats.onTimePct}%`}
@@ -349,7 +446,11 @@ export default function PainelSLA() {
             <CardContent className="p-0">
               {(() => {
                 if (isLoading) {
-                  return <div className="p-8 text-center text-muted-foreground">Carregando…</div>;
+                  return (
+                    <div className="p-8 text-center text-muted-foreground">
+                      Carregando…
+                    </div>
+                  );
                 }
                 if (filtered.length === 0) {
                   return (
@@ -360,66 +461,75 @@ export default function PainelSLA() {
                 }
                 return (
                   <ul className="divide-y">
-                  {filtered.map((item) => {
-                    const style = RISCO_STYLES[item.risco];
-                    const Icon = style.icon;
-                    const TipoIcon = item.tipo === "entrega" ? Truck : Package;
-                    return (
-                      <li
-                        key={`${item.tipo}-${item.id}`}
-                        className="flex flex-col md:flex-row md:items-center gap-3 p-4 hover:bg-muted/40 transition-colors"
-                      >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                            <TipoIcon className="h-5 w-5 text-muted-foreground" />
+                    {filtered.map((item) => {
+                      const style = RISCO_STYLES[item.risco];
+                      const Icon = style.icon;
+                      const TipoIcon =
+                        item.tipo === "entrega" ? Truck : Package;
+                      return (
+                        <li
+                          key={`${item.tipo}-${item.id}`}
+                          className="flex flex-col md:flex-row md:items-center gap-3 p-4 hover:bg-muted/40 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                              <TipoIcon className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-semibold truncate">
+                                {item.numero}
+                                <span className="text-xs text-muted-foreground ml-2 font-normal">
+                                  {item.tipo === "entrega"
+                                    ? "Expedição"
+                                    : "Coleta"}
+                                </span>
+                              </p>
+                              <p className="text-sm text-muted-foreground truncate">
+                                {item.referencia} • {item.parceiro}
+                              </p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold truncate">
-                              {item.numero}
-                              <span className="text-xs text-muted-foreground ml-2 font-normal">
-                                {item.tipo === "entrega" ? "Expedição" : "Coleta"}
-                              </span>
-                            </p>
-                            <p className="text-sm text-muted-foreground truncate">
-                              {item.referencia} • {item.parceiro}
-                            </p>
-                          </div>
-                        </div>
 
-                        <div className="flex items-center gap-4 md:gap-6">
-                          <div className="text-right">
-                            <p className="text-xs text-muted-foreground">Previsão</p>
-                            <p className="text-sm font-medium">
-                              {item.previsao
-                                ? format(parseISO(item.previsao), "dd/MM HH:mm", { locale: ptBR })
-                                : "—"}
-                            </p>
-                          </div>
-                          <div className="text-right min-w-[92px]">
-                            <p className="text-xs text-muted-foreground">
-                              {item.atrasado ? "Atraso" : "Restam"}
-                            </p>
-                            <p
-                              className={cn(
-                                "text-sm font-semibold",
-                                item.atrasado && "text-destructive",
-                              )}
+                          <div className="flex items-center gap-4 md:gap-6">
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">
+                                Previsão
+                              </p>
+                              <p className="text-sm font-medium">
+                                {item.previsao
+                                  ? format(
+                                      parseISO(item.previsao),
+                                      "dd/MM HH:mm",
+                                      { locale: ptBR },
+                                    )
+                                  : "—"}
+                              </p>
+                            </div>
+                            <div className="text-right min-w-[92px]">
+                              <p className="text-xs text-muted-foreground">
+                                {item.atrasado ? "Atraso" : "Restam"}
+                              </p>
+                              <p
+                                className={cn(
+                                  "text-sm font-semibold",
+                                  item.atrasado && "text-destructive",
+                                )}
+                              >
+                                {Math.abs(item.horasRestantes)}h
+                              </p>
+                            </div>
+                            <Badge
+                              variant="outline"
+                              className={cn("gap-1 border", style.className)}
                             >
-                              {Math.abs(item.horasRestantes)}h
-                            </p>
+                              <Icon className="h-3 w-3" />
+                              {style.label}
+                            </Badge>
                           </div>
-                          <Badge
-                            variant="outline"
-                            className={cn("gap-1 border", style.className)}
-                          >
-                            <Icon className="h-3 w-3" />
-                            {style.label}
-                          </Badge>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 );
               })()}
             </CardContent>
@@ -437,8 +547,6 @@ export default function PainelSLA() {
       <MitigationHistoryPanel currentOtif={stats.onTimePct} />
       <MitigationROIPanel />
     </div>
-
-
   );
 }
 
@@ -465,7 +573,14 @@ function StatCard({ label, value, icon: Icon, tone }: StatCardProps) {
         </div>
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground truncate">{label}</p>
-          <p className={cn("text-2xl font-bold leading-tight", toneClasses[tone])}>{value}</p>
+          <p
+            className={cn(
+              "text-2xl font-bold leading-tight",
+              toneClasses[tone],
+            )}
+          >
+            {value}
+          </p>
         </div>
       </CardContent>
     </Card>

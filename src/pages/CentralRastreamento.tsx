@@ -70,6 +70,7 @@ export default function CentralRastreamento() {
     shipments,
     summary,
     isLoading,
+    isError,
     filter,
     setFilter,
     searchTerm,
@@ -101,6 +102,24 @@ export default function CentralRastreamento() {
       navigate(`/rastreamento/${target.id}`);
     }
   }, [searchParams, shipments, navigate, setSearchParams]);
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar rastreamento"
+            description="Não foi possível carregar os envios. Tente novamente em instantes."
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
