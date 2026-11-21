@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `ba49b7b1a5` · branch `main` · 2026-11-21 15:27 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `bf72eb8985` · branch `main` · 2026-11-21 15:39 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1001,8 +1001,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `very_slow` | compara | `supabase/functions/external-db-bridge/index.ts` |
 | `status` | `violado` | compara | `src/hooks/rodonaves/useSLOSnapshots.ts`<br>`src/lib/rodonaves/gatewaySLO.ts`<br>`src/lib/rodonaves/sloAlerts.ts`<br>`src/lib/rodonaves/sloReport.ts` |
 | `status` | `warning` | compara, escreve | `src/components/analytics/OperationalPulse.tsx` |
-| `role` | `CEO` | escreve | `src/pages/auth/AuthHeroSection.tsx` |
-| `role` | `Coordenadora` | escreve | `src/pages/auth/AuthHeroSection.tsx` |
 | `role` | `admin` | compara, escreve, filtra | `src/hooks/auth/useAuth.tsx`<br>`src/pages/GerenciamentoUsuarios.tsx`<br>`supabase/functions/db-health-weekly-report/index.ts`<br>`supabase/functions/db-regression-monitor/index.ts`<br>`supabase/functions/lgpd-erase-user/index.ts`<br>… +2 |
 | `role` | `assistant` | compara, escreve | `src/components/ai/AIAssistant.tsx` |
 | `role` | `authenticated` | compara | `supabase/functions/_shared/auth.ts`<br>`supabase/functions/log-security-event/index.ts` |

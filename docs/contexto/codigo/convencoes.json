@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: torna AuthHeroSection honesta (03-27) (#247)",
+   "docs: reconcilia 03-26 (Fase B) como concluido via PR #245 (#246)",
    "fix: substitui estatisticas fixas por dados reais (03-26) (#245)",
    "docs: reconcilia 03-21/03-22/03-23 (Fase B) como concluidos (#244)",
-   "fix: torna inteligencia logistica honesta (#243)",
-   "fix: torna mapa de rotas e rastreamento em tempo real honestos (03-21/03-22) (#242)",
-   "docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)"
+   "fix: torna inteligencia logistica honesta (#243)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

@@ -5136,8 +5136,6 @@
    ],
    "flags": [],
    "papeis": [
-    "CEO",
-    "Coordenadora",
     "admin",
     "assistant",
     "user"
@@ -5493,7 +5491,7 @@
    "modulo": "pages/auth",
    "arquivos": 5,
    "testes": 0,
-   "linhas": 1086,
+   "linhas": 1104,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -5519,10 +5517,7 @@
     "VITE_SUPABASE_URL"
    ],
    "flags": [],
-   "papeis": [
-    "CEO",
-    "Coordenadora"
-   ],
+   "papeis": [],
    "diretos": {
     "edges": [
      "log-login-attempt",

@@ -5302,7 +5302,7 @@
     "AuthHeroSection"
    ],
    "export_default": null,
-   "linhas": 430,
+   "linhas": 448,
    "dominio": "pages/auth",
    "hooks_locais": [],
    "tabelas": [],
