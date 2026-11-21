@@ -163,7 +163,7 @@
 
 ~~**Deep link ignorado:**~~ — CORRIGIDO na PR #259 (`23b83482`): `CentralRastreamento.tsx` lê `?entrega=|<coleta>=<id>` e navega direto para `/rastreamento/<id>`.
 
-**Estados ausentes em páginas com fetch:** sem tratamento de erro em ~30 páginas (`DashboardExecutivo`, `DashboardCotacoes`, `Conquistas`, `MapaRotas`, `PainelOTIF`, `RelatorioPDF`, `ConciliacaoAutomatica`, `Index`, `Analytics`, `SLADashboard`, `CustosDashboard`, `AlertasCusto`, `CalendarioLogistico`, `CentralRastreamento`, `InteligenciaFrete`, `LogisticaReversa`, `RastreamentoRealTime`, `CotacaoFrete`, `ConciliacaoFinanceira`, `Coletas`, `Transportadoras`, `Relatorios`, `PainelSLA`, `GerenciamentoUsuarios`, `ExportacaoDados`, `Ranking`, `KanbanEntregas`, `LojaRecompensas`, `RotasTransportadoras`, `AdminADR`); sem loading em 7 delas. Tratam os três estados: `Envios`, `Clientes`, `Fornecedores`, `FretesInternos`, `Notificacoes`, `Ocorrencias`, `AdminTelemetria`.
+~~**Estados ausentes em páginas com fetch:**~~ — CONCLUÍDO via PR #260 (`c3c72a95`): 27 páginas com fetch ganharam guard de erro (`if (isError) → EmptyState variant=error`) e loading, e 12 hooks de dados espelham `isError`; warning budget da CI voltou a 105/105. Cobertas: `DashboardExecutivo`, `DashboardCotacoes`, `Conquistas`, `MapaRotas`, `PainelOTIF`, `RelatorioPDF`, `ConciliacaoAutomatica`, `Index`, `Analytics`, `SLADashboard`, `CustosDashboard`, `AlertasCusto`, `CalendarioLogistico`, `CentralRastreamento`, `InteligenciaFrete`, `LogisticaReversa`, `RastreamentoRealTime`, `CotacaoFrete`, `ConciliacaoFinanceira`, `Coletas`, `Transportadoras`, `Relatorios`, `PainelSLA`, `GerenciamentoUsuarios`, `ExportacaoDados`, `Ranking`, `KanbanEntregas`, `LojaRecompensas`, `RotasTransportadoras`, `AdminADR`.
 
 ---
 
