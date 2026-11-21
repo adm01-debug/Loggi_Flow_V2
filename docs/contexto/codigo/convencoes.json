@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: remove fallback zerado do AnalyticsCharts (03-30) (#250)",
+   "chore: regenera quality-gate-report com dados reais (03-29) (#249)",
    "fix: torna AuthHeroSection honesta (03-27) (#247)",
    "docs: reconcilia 03-26 (Fase B) como concluido via PR #245 (#246)",
-   "fix: substitui estatisticas fixas por dados reais (03-26) (#245)",
-   "docs: reconcilia 03-21/03-22/03-23 (Fase B) como concluidos (#244)",
-   "fix: torna inteligencia logistica honesta (#243)"
+   "fix: substitui estatisticas fixas por dados reais (03-26) (#245)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

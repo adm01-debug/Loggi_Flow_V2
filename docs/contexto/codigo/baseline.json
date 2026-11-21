@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "bf72eb8985911b5085eb25ddfb0dfa3d2eb15c51",
+  "commit": "2c38634c455086d26c62d5244f8cefc4554be658",
   "branch": "main",
-  "data_commit": "2026-11-21T12:39:12-03:00",
+  "data_commit": "2026-11-21T12:53:43-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "2c38634",
+    "data": "2026-11-21",
+    "assunto": "fix: remove fallback zerado do AnalyticsCharts (03-30) (#250)"
+   },
+   {
+    "sha": "f8c8fad",
+    "data": "2026-11-21",
+    "assunto": "chore: regenera quality-gate-report com dados reais (03-29) (#249)"
+   },
    {
     "sha": "bf72eb8",
     "data": "2026-11-21",
@@ -121,19 +131,9 @@
     "sha": "5d31fbc",
     "data": "2026-11-20",
     "assunto": "docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)"
-   },
-   {
-    "sha": "190f724",
-    "data": "2026-11-20",
-    "assunto": "chore: remove migration legada 20240822_gamification_system.sql (#224)"
-   },
-   {
-    "sha": "e2fd132",
-    "data": "2026-11-20",
-    "assunto": "chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)"
    }
   ],
-  "arquivos_mudados_7d": 331,
+  "arquivos_mudados_7d": 333,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 175
+    "commits": 177
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169628,
+  "linhas_codigo": 169627,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 49823
+   "linhas": 49822
   },
   "src/features": {
    "arquivos": 90,
