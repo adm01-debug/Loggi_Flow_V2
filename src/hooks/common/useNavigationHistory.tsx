@@ -41,7 +41,7 @@ export const routeLabels: Record<string, string> = {
   "/seguranca": "Segurança",
   "/configuracoes": "Configurações",
   "/perfil": "Perfil",
-  "/gestao-melhor-envio": "Melhor Envio",
+  "/melhor-envio": "Melhor Envio",
   "/gestao-rodonaves": "Rodonaves",
   "/dashboard-executivo": "Dashboard Executivo",
   "/inteligencia-frete": "Inteligência de Frete",
@@ -59,37 +59,47 @@ export function useNavigationHistory() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [recentPages, setRecentPages] = useLocalStorage<VisitedPage[]>("recent-pages", []);
+  const [recentPages, setRecentPages] = useLocalStorage<VisitedPage[]>(
+    "recent-pages",
+    [],
+  );
   const [historyStack, setHistoryStack] = useState<string[]>([]);
   const prevPathRef = useRef(location.pathname);
   const directionRef = useRef<"forward" | "back" | "none">("none");
 
   useEffect(() => {
     const currentPath = location.pathname;
-    
+
     // Skip auth pages
     if (currentPath === "/auth" || currentPath === "/reset-password") return;
 
-    const label = routeLabels[currentPath] || currentPath.split("/").pop() || "Página";
-    
+    const label =
+      routeLabels[currentPath] || currentPath.split("/").pop() || "Página";
+
     // Detect navigation direction by comparing with the stack
-    setHistoryStack(prev => {
-      const isGoingBack = prev.length > 1 && prev[prev.length - 2] === currentPath;
-      
+    setHistoryStack((prev) => {
+      const isGoingBack =
+        prev.length > 1 && prev[prev.length - 2] === currentPath;
+
       if (isGoingBack) {
         directionRef.current = "back";
         return prev.slice(0, -1);
       } else {
-        directionRef.current = prevPathRef.current === currentPath ? "none" : "forward";
+        directionRef.current =
+          prevPathRef.current === currentPath ? "none" : "forward";
         // Avoid adding the same path multiple times in a row
         if (prev[prev.length - 1] === currentPath) return prev;
         return [...prev, currentPath];
       }
     });
-    
-    setRecentPages(prev => {
-      const filtered = prev.filter(p => p.path !== currentPath);
-      const newEntry: VisitedPage = { path: currentPath, label, timestamp: Date.now() };
+
+    setRecentPages((prev) => {
+      const filtered = prev.filter((p) => p.path !== currentPath);
+      const newEntry: VisitedPage = {
+        path: currentPath,
+        label,
+        timestamp: Date.now(),
+      };
       return [newEntry, ...filtered].slice(0, MAX_RECENT);
     });
 
@@ -102,14 +112,18 @@ export function useNavigationHistory() {
           description: `Visualizou: ${label}`,
           severity: "low",
           ip_address: "client-side",
-          metadata: { path: currentPath, label, timestamp: new Date().toISOString() }
+          metadata: {
+            path: currentPath,
+            label,
+            timestamp: new Date().toISOString(),
+          },
         });
       }
     };
     trackPageView();
 
     prevPathRef.current = currentPath;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, user?.id]);
 
   const getPageLabel = useCallback((path: string) => {

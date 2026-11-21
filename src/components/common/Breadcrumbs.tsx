@@ -1,5 +1,12 @@
 import { memo, useState } from "react";
-import { ChevronRight, Home, Copy, Check, History as HistoryIcon, ChevronDown } from "lucide-react";
+import {
+  ChevronRight,
+  Home,
+  Copy,
+  Check,
+  History as HistoryIcon,
+  ChevronDown,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -59,7 +66,7 @@ const routeLabels: Record<string, string> = {
   "/configuracoes": "Configurações",
   "/perfil": "Perfil",
   "/auth": "Autenticação",
-  "/gestao-melhor-envio": "Melhor Envio",
+  "/melhor-envio": "Melhor Envio",
   "/gestao-rodonaves": "Rodonaves",
   "/dashboard-executivo": "Dashboard Executivo",
   "/inteligencia-frete": "Inteligência de Frete",
@@ -91,10 +98,16 @@ const routeCategories: Record<string, { label: string; path: string }> = {
   "/kanban-entregas": { label: "Operações", path: "/envios" },
   "/central-rastreamento": { label: "Operações", path: "/envios" },
   "/transportadoras": { label: "Rede Logística", path: "/transportadoras" },
-  "/rotas-transportadoras": { label: "Rede Logística", path: "/transportadoras" },
+  "/rotas-transportadoras": {
+    label: "Rede Logística",
+    path: "/transportadoras",
+  },
   "/cotacao-frete": { label: "Rede Logística", path: "/transportadoras" },
   "/mapa-rotas": { label: "Rede Logística", path: "/transportadoras" },
-  "/rastreamento-motorista": { label: "Rede Logística", path: "/transportadoras" },
+  "/rastreamento-motorista": {
+    label: "Rede Logística",
+    path: "/transportadoras",
+  },
   "/fornecedores": { label: "Cadastros", path: "/fornecedores" },
   "/clientes": { label: "Cadastros", path: "/clientes" },
   "/relatorios": { label: "Cadastros", path: "/relatorios" },
@@ -102,42 +115,51 @@ const routeCategories: Record<string, { label: string; path: string }> = {
   "/conquistas": { label: "Gamificação", path: "/ranking" },
   "/loja": { label: "Gamificação", path: "/ranking" },
   "/notificacoes": { label: "Gamificação", path: "/ranking" },
-  "/gerenciamento-usuarios": { label: "Administração", path: "/gerenciamento-usuarios" },
+  "/gerenciamento-usuarios": {
+    label: "Administração",
+    path: "/gerenciamento-usuarios",
+  },
   "/seguranca": { label: "Administração", path: "/seguranca" },
   "/aprovacao-reset-senha": { label: "Administração", path: "/seguranca" },
   "/audit-trail": { label: "Administração", path: "/audit-trail" },
-  "/gestao-melhor-envio": { label: "Integrações", path: "/gestao-melhor-envio" },
+  "/melhor-envio": { label: "Integrações", path: "/melhor-envio" },
   "/gestao-rodonaves": { label: "Integrações", path: "/gestao-rodonaves" },
   "/importacao-massa": { label: "Administração", path: "/configuracoes" },
   "/automacao-regras": { label: "Administração", path: "/configuracoes" },
 };
 
-export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
+export const Breadcrumbs = memo(function Breadcrumbs({
+  items,
+  className,
+  showHome = true,
+}: BreadcrumbsProps) {
   const location = useLocation();
   const { recentPages, getPageLabel } = useNavigationHistory();
   const [copied, setCopied] = useState(false);
-  
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     toast.success("Link copiado para a área de transferência!");
     setTimeout(() => setCopied(false), 2000);
   };
-  
-  const breadcrumbItems: BreadcrumbItem[] = items || (() => {
-    const result: BreadcrumbItem[] = [];
-    const currentPath = location.pathname;
-    
-    const category = routeCategories[currentPath];
-    if (category && category.path !== currentPath) {
-      result.push({ label: category.label, path: category.path });
-    }
-    
-    const label = getPageLabel(currentPath);
-    result.push({ label });
-    
-    return result;
-  })();
+
+  const breadcrumbItems: BreadcrumbItem[] =
+    items ||
+    (() => {
+      const result: BreadcrumbItem[] = [];
+      const currentPath = location.pathname;
+
+      const category = routeCategories[currentPath];
+      if (category && category.path !== currentPath) {
+        result.push({ label: category.label, path: category.path });
+      }
+
+      const label = getPageLabel(currentPath);
+      result.push({ label });
+
+      return result;
+    })();
 
   if (location.pathname === "/" && !items) {
     return null;
@@ -152,7 +174,7 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
       className={cn(
         "flex items-center justify-between text-sm overflow-hidden gap-4",
         "bg-background/40 backdrop-blur-md p-1.5 rounded-xl border border-white/10 shadow-sm",
-        className
+        className,
       )}
     >
       <div className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 px-1">
@@ -165,7 +187,7 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                   "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
                   "text-muted-foreground hover:text-primary hover:bg-primary/10 hover:shadow-inner",
                   "focus:outline-none focus:ring-2 focus:ring-primary/20",
-                  "active:scale-90"
+                  "active:scale-90",
                 )}
                 aria-label="Ir para Dashboard"
               >
@@ -176,20 +198,20 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
 
           {breadcrumbItems.map((item, index) => {
             const isLast = index === breadcrumbItems.length - 1;
-            
+
             return (
               <li key={index} className="flex items-center shrink-0">
                 <div className="flex items-center justify-center w-4 h-4 text-muted-foreground/30">
                   <ChevronRight className="w-3.5 h-3.5" />
                 </div>
-                
+
                 {item.path && !isLast ? (
                   <Link
                     to={item.path}
                     className={cn(
                       "px-2.5 py-1.5 rounded-lg transition-all duration-300",
                       "text-muted-foreground hover:text-primary hover:bg-primary/10 hover:shadow-sm",
-                      "font-medium whitespace-nowrap active:scale-95 text-xs"
+                      "font-medium whitespace-nowrap active:scale-95 text-xs",
                     )}
                   >
                     {item.label}
@@ -201,7 +223,7 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-300",
                           "bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/10",
-                          "whitespace-nowrap group active:scale-95 text-xs"
+                          "whitespace-nowrap group active:scale-95 text-xs",
                         )}
                         aria-current="page"
                       >
@@ -209,24 +231,31 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                         <ChevronDown className="w-3 h-3 opacity-70 transition-transform group-data-[state=open]:rotate-180" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="start" 
+                    <DropdownMenuContent
+                      align="start"
                       className="w-64 p-2 border-2 border-primary/5 shadow-2xl animate-in zoom-in-95 duration-200"
                     >
                       <div className="px-2 py-1.5 mb-1">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Histórico de Navegação</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">
+                          Histórico de Navegação
+                        </span>
                       </div>
                       <DropdownMenuSeparator className="opacity-50" />
                       <div className="max-h-[300px] overflow-y-auto pr-1">
                         {recentPages.length > 0 ? (
                           recentPages.map((page, pIdx) => (
-                            <DropdownMenuItem key={`${page.path}-${pIdx}`} asChild>
-                              <Link 
-                                to={page.path} 
+                            <DropdownMenuItem
+                              key={`${page.path}-${pIdx}`}
+                              asChild
+                            >
+                              <Link
+                                to={page.path}
                                 className="flex flex-col items-start gap-0.5 py-2.5 px-3 rounded-md cursor-pointer transition-colors hover:bg-primary/10 group/item"
                               >
                                 <div className="flex items-center justify-between w-full">
-                                  <span className="font-bold text-sm text-foreground group-hover/item:text-primary transition-colors">{page.label}</span>
+                                  <span className="font-bold text-sm text-foreground group-hover/item:text-primary transition-colors">
+                                    {page.label}
+                                  </span>
                                   {page.path === location.pathname && (
                                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                                   )}
@@ -245,7 +274,10 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
                       </div>
                       <DropdownMenuSeparator className="opacity-50" />
                       <DropdownMenuItem asChild>
-                        <Link to="/audit-trail" className="flex items-center gap-2 py-2 px-3 text-xs font-semibold text-primary/80">
+                        <Link
+                          to="/audit-trail"
+                          className="flex items-center gap-2 py-2 px-3 text-xs font-semibold text-primary/80"
+                        >
                           <HistoryIcon className="w-3.5 h-3.5" />
                           <span>Ver Audit Trail Completo</span>
                         </Link>
@@ -265,7 +297,7 @@ export const Breadcrumbs = memo(function Breadcrumbs({ items, className, showHom
           className={cn(
             "flex items-center gap-2 px-3 py-1.5 rounded-lg",
             "text-muted-foreground hover:text-foreground hover:bg-white/10",
-            "transition-all text-[10px] font-bold uppercase tracking-widest border border-white/5 bg-white/5 active:scale-95"
+            "transition-all text-[10px] font-bold uppercase tracking-widest border border-white/5 bg-white/5 active:scale-95",
           )}
           title="Compartilhar link seguro"
         >
