@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "13c9e3f514ff294a893d80ffde462a626956eebf",
+  "sha": "ba49b7b1a5f06c9aca7eea4c5da4aa284861367a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 14:46 UTC",
+  "generated_at": "2026-11-21 15:27 UTC",
   "files_total": 1482,
   "code_files": 1140,
-  "code_lines": 186063,
+  "code_lines": 186122,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "b61a8fcb34c573aa",
+ "facts_hash": "7e6f740d527e95a2",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29894,7 +29894,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30984,
+   "lines": 31043,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -47461,15 +47461,7 @@
    },
    {
     "file": "src/pages/ConciliacaoAutomatica.tsx",
-    "line": "Conciliados 100%"
-   },
-   {
-    "file": "src/pages/ConciliacaoAutomatica.tsx",
     "line": "const tolerancia = item.valor * 0.02; // 2% tolerance"
-   },
-   {
-    "file": "src/pages/ConfiguracoesFrete.tsx",
-    "line": "94.8% OPTIMIZED"
    },
    {
     "file": "src/pages/Conquistas.tsx",
@@ -80839,7 +80831,7 @@
   },
   "src/pages/ConciliacaoAutomatica.tsx": {
    "path": "src/pages/ConciliacaoAutomatica.tsx",
-   "lines": 471,
+   "lines": 475,
    "exports": [
     "function ConciliacaoAutomatica"
    ],
@@ -80925,7 +80917,6 @@
    ],
    "doc": "eslint-disable max-lines",
    "percents": [
-    "Conciliados 100%",
     "const tolerancia = item.valor * 0.02; // 2% tolerance"
    ],
    "pagination": [
@@ -81000,7 +80991,7 @@
   },
   "src/pages/ConfiguracoesFrete.tsx": {
    "path": "src/pages/ConfiguracoesFrete.tsx",
-   "lines": 1073,
+   "lines": 1126,
    "exports": [
     "function FreightConfig"
    ],
@@ -81065,9 +81056,6 @@
     }
    ],
    "doc": "eslint-disable max-lines",
-   "percents": [
-    "94.8% OPTIMIZED"
-   ],
    "pagination": [
     "200"
    ]
@@ -81919,7 +81907,7 @@
   },
   "src/pages/IntegracaoBitrix.tsx": {
    "path": "src/pages/IntegracaoBitrix.tsx",
-   "lines": 447,
+   "lines": 449,
    "exports": [
     "function IntegracaoBitrix"
    ],
@@ -88200,10 +88188,33 @@
   }
  },
  "git": {
-  "sha": "13c9e3f514ff294a893d80ffde462a626956eebf",
+  "sha": "ba49b7b1a5f06c9aca7eea4c5da4aa284861367a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "ba49b7b",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: substitui estatisticas fixas por dados reais (03-26) (#245)",
+    "files": [
+     "src/pages/ConciliacaoAutomatica.tsx",
+     "src/pages/ConfiguracoesFrete.tsx",
+     "src/pages/IntegracaoBitrix.tsx"
+    ]
+   },
+   {
+    "sha": "ae881a3",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "docs: reconcilia 03-21/03-22/03-23 (Fase B) como concluidos (#244)",
+    "files": [
+     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+     "docs/pendencias/03-21-rastreamento-interpolado.md",
+     "docs/pendencias/03-22-mapa-rotas-time-travel.md",
+     "docs/pendencias/03-23-uselogisticsintelligence.md"
+    ]
+   },
    {
     "sha": "13c9e3f",
     "date": "2026-11-21",
@@ -88658,41 +88669,12 @@
      "scripts/db-audit/known-violations.json",
      "supabase/schema-manifest.json"
     ]
-   },
-   {
-    "sha": "9654eed",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)",
-    "files": [
-     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md"
-    ]
-   },
-   {
-    "sha": "817700d",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)",
-    "files": [
-     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-     "docs/pendencias/02-09-ai-assistant-colunas.md",
-     "docs/pendencias/02-11-rodonaves-clientes.md",
-     "docs/pendencias/02-12-bitrix-test-connection.md",
-     "docs/pendencias/02-13-add-user-xp-grant.md",
-     "docs/pendencias/02-14-webhook-metadata.md",
-     "docs/pendencias/02-15-cnpj-remetente-default.md",
-     "docs/pendencias/02-16-mission-detail-bitrix.md",
-     "docs/pendencias/_ordem.md",
-     "src/components/rodonaves/RTECustomerManager.tsx",
-     "supabase/functions/rodonaves-api/index.ts",
-     "supabase/migrations/20261120120000_restore_grant_execute_add_user_xp.sql"
-    ]
    }
   ],
   "hot_files": [
    [
     "docs/pendencias/_ordem.md",
-    9
+    8
    ],
    [
     "package-lock.json",
@@ -88704,7 +88686,19 @@
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    3
+    2
+   ],
+   [
+    "docs/pendencias/03-21-rastreamento-interpolado.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-22-mapa-rotas-time-travel.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-23-uselogisticsintelligence.md",
+    2
    ],
    [
     "docs/pendencias/03-15-dashboard-executivo.md",
@@ -88756,18 +88750,6 @@
    ],
    [
     "docs/pendencias/03-06-missiondetail-timeline.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-07-biometric-scan.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-01-dora-metrics-literal.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-02-postmortem-literal.md",
     2
    ]
   ]

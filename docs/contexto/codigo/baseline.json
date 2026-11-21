@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "13c9e3f514ff294a893d80ffde462a626956eebf",
+  "commit": "ba49b7b1a5f06c9aca7eea4c5da4aa284861367a",
   "branch": "main",
-  "data_commit": "2026-11-21T11:46:24-03:00",
+  "data_commit": "2026-11-21T12:26:32-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "ba49b7b",
+    "data": "2026-11-21",
+    "assunto": "fix: substitui estatisticas fixas por dados reais (03-26) (#245)"
+   },
+   {
+    "sha": "ae881a3",
+    "data": "2026-11-21",
+    "assunto": "docs: reconcilia 03-21/03-22/03-23 (Fase B) como concluidos (#244)"
+   },
    {
     "sha": "13c9e3f",
     "data": "2026-11-21",
@@ -121,19 +131,9 @@
     "sha": "eb09cdc",
     "data": "2026-11-20",
     "assunto": "chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)"
-   },
-   {
-    "sha": "021e12f",
-    "data": "2026-11-20",
-    "assunto": "fix: override minimatch para 11.0.9 (GHSA-6g67-3g4c-9r5c) (#220)"
-   },
-   {
-    "sha": "3706ba6",
-    "data": "2026-11-20",
-    "assunto": "fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)"
    }
   ],
-  "arquivos_mudados_7d": 328,
+  "arquivos_mudados_7d": 330,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -168,6 +168,10 @@
     "mudancas": 6
    },
    {
+    "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+    "mudancas": 6
+   },
+   {
     "pasta": "src/components/freight",
     "mudancas": 6
    },
@@ -181,10 +185,6 @@
    },
    {
     "pasta": "docs/agentes/github-ci.md",
-    "mudancas": 5
-   },
-   {
-    "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     "mudancas": 5
    },
    {
@@ -230,6 +230,10 @@
     "mudancas": 6
    },
    {
+    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+    "mudancas": 6
+   },
+   {
     "arquivo": "scripts/validate-csp.mjs",
     "mudancas": 6
    },
@@ -242,15 +246,15 @@
     "mudancas": 5
    },
    {
-    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    "mudancas": 5
-   },
-   {
     "arquivo": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 5
    },
    {
     "arquivo": "scripts/audit-gate.mjs",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "src/pages/ConfiguracoesFrete.tsx",
     "mudancas": 5
    },
    {
@@ -292,16 +296,12 @@
    {
     "arquivo": "scripts/audit/manifest_detail.sql",
     "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/check-warning-budget.mjs",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 171
+    "commits": 173
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169551,
+  "linhas_codigo": 169610,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30984
+   "linhas": 31043
   },
   "src/services": {
    "arquivos": 5,
@@ -573,12 +573,12 @@
    "linhas": 1137
   },
   {
-   "arquivo": "src/pages/Clientes.tsx",
-   "linhas": 1102
+   "arquivo": "src/pages/ConfiguracoesFrete.tsx",
+   "linhas": 1126
   },
   {
-   "arquivo": "src/pages/ConfiguracoesFrete.tsx",
-   "linhas": 1073
+   "arquivo": "src/pages/Clientes.tsx",
+   "linhas": 1102
   },
   {
    "arquivo": "src/pages/Ocorrencias.tsx",

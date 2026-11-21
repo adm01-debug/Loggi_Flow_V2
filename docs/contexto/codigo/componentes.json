@@ -5469,7 +5469,7 @@
     "ConciliacaoAutomatica"
    ],
    "export_default": "ConciliacaoAutomatica",
-   "linhas": 471,
+   "linhas": 475,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth"
@@ -5522,7 +5522,7 @@
     "FreightConfig"
    ],
    "export_default": "FreightConfig",
-   "linhas": 1073,
+   "linhas": 1126,
    "dominio": "pages",
    "hooks_locais": [],
    "tabelas": [
@@ -5948,7 +5948,7 @@
     "IntegracaoBitrix"
    ],
    "export_default": "IntegracaoBitrix",
-   "linhas": 447,
+   "linhas": 449,
    "dominio": "pages",
    "hooks_locais": [],
    "tabelas": [

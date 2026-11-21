@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `13c9e3f514` · branch `main` · 2026-11-21 14:46 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `ba49b7b1a5` · branch `main` · 2026-11-21 15:27 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1506,9 +1506,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `transition={{ delay: i * 0.02 }}` | `src/pages/CentralRastreamento.tsx` |
 | `+12%` | `src/pages/Coletas.tsx` |
 | `-5% REDUÇÃO` | `src/pages/Coletas.tsx` |
-| `Conciliados 100%` | `src/pages/ConciliacaoAutomatica.tsx` |
 | `const tolerancia = item.valor * 0.02; // 2% tolerance` | `src/pages/ConciliacaoAutomatica.tsx` |
-| `94.8% OPTIMIZED` | `src/pages/ConfiguracoesFrete.tsx` |
 | `transition={{ delay: i * 0.03 }}` | `src/pages/Conquistas.tsx` |
 | `Bitrix24 para encontrar discrepâncias de até 50%.` | `src/pages/CotacaoFrete.tsx` |
 | `// Weight: 70% Price, 30% Deadline` | `src/pages/CotacaoMultiCanal.tsx` |
