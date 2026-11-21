@@ -47,6 +47,16 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogBody,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
   NormalizationMapping,
   type NormalizationConfig,
 } from "@/components/transportadoras/NormalizationMapping";
@@ -74,14 +84,27 @@ interface FreightRule {
 
 interface FreightMapping {
   id: string;
+  transportadora_id?: string | null;
   source_type: string;
   is_active: boolean;
+  mapping_config?: {
+    endpoint_url?: string | null;
+  } | null;
   transportadora?: { nome_fantasia?: string } | null;
 }
 
 export default function FreightConfig() {
   const queryClient = useQueryClient();
   const [selectedCarrierId, setSelectedCarrierId] = useState<string>("");
+  const [carrierFilter, setCarrierFilter] = useState("");
+  const [novaRegiao, setNovaRegiao] = useState("");
+  const [novaRegiaoModal, setNovaRegiaoModal] = useState(false);
+  const [novoGatewayModal, setNovoGatewayModal] = useState(false);
+  const [novoGatewayTransp, setNovoGatewayTransp] = useState("");
+  const [novoGatewayUrl, setNovoGatewayUrl] = useState("");
+  const [parserCarrierId, setParserCarrierId] = useState("");
+  const [autoRetries, setAutoRetries] = useState(true);
+  const [autoOcr, setAutoOcr] = useState(true);
 
   // 1. Selection Rules
   const { data: rules = [], refetch: refetchRules } = useQuery({
@@ -172,7 +195,100 @@ export default function FreightConfig() {
     },
   });
 
-  const selectedCarrier = carriers.find((c) => c.id === selectedCarrierId);
+  const loadedCarrier = carriers.find((c) => c.id === selectedCarrierId);
+  const selectedCarrier = loadedCarrier;
+
+  const toggleMapping = useMutation({
+    mutationFn: async (m: FreightMapping) => {
+      const { error } = await supabase
+        .from("freight_integration_mappings")
+        .update({ is_active: !m.is_active })
+        .eq("id", m.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["freight-integration-mappings"],
+      });
+      toast.success("Gateway atualizado!");
+    },
+    onError: (e) => {
+      toast.error(`Não foi possível atualizar o gateway: ${e.message}`);
+    },
+  });
+
+  const addMapping = useMutation({
+    mutationFn: async () => {
+      if (!novoGatewayTransp) throw new Error("Selecione uma transportadora");
+      const { data, error } = await supabase
+        .from("freight_integration_mappings")
+        .insert({
+          transportadora_id: novoGatewayTransp,
+          source_type: "webhook",
+          mapping_config: {
+            endpoint_url:
+              novoGatewayUrl || "/functions/v1/nexus-webhook-receiver",
+          },
+          is_active: true,
+        })
+        .select();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Gateway criado!");
+      setNovoGatewayModal(false);
+      setNovoGatewayTransp("");
+      setNovoGatewayUrl("");
+      queryClient.invalidateQueries({
+        queryKey: ["freight-integration-mappings"],
+      });
+    },
+    onError: (e) => {
+      toast.error(
+        `Falha ao criar gateway (permissão de admin necessária): ${e.message}`,
+      );
+    },
+  });
+
+  const zonasMalha = [
+    "SP - Capital",
+    "RJ - Metropolitana",
+    "MG - BH",
+    "Curitiba - PR",
+    "Porto Alegre - RS",
+    "Campinas - SP",
+  ];
+
+  const toggleZona = (zona: string) => {
+    if (!selectedCarrier) return;
+    const atuais = selectedCarrier.regioes_atendidas ?? [];
+    const next = atuais.includes(zona)
+      ? atuais.filter((r: string) => r !== zona)
+      : [...atuais, zona];
+    updateCarrier.mutate({ id: selectedCarrier.id, regioes_atendidas: next });
+  };
+
+  const persistirCobertura = (coverageType: string) => {
+    if (!selectedCarrier) return;
+    updateCarrier.mutate({
+      id: selectedCarrier.id,
+      coverage_details: {
+        ...(selectedCarrier.coverage_details as
+          Record<string, unknown> | undefined),
+        coverage_type: coverageType,
+      },
+    });
+  };
+
+  const addRegiao = () => {
+    if (!selectedCarrier || !novaRegiao.trim()) return;
+    const atual = selectedCarrier.regioes_atendidas ?? [];
+    const next = Array.from(new Set([...atual, novaRegiao.trim()]));
+    updateCarrier.mutate({ id: selectedCarrier.id, regioes_atendidas: next });
+    setNovaRegiao("");
+    setNovaRegiaoModal(false);
+  };
 
   return (
     <MainLayout>
@@ -240,22 +356,33 @@ export default function FreightConfig() {
                 <CardContent className="space-y-4">
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Buscar..." className="pl-8" />
+                    <Input
+                      placeholder="Buscar..."
+                      className="pl-8"
+                      value={carrierFilter}
+                      onChange={(e) => setCarrierFilter(e.target.value)}
+                    />
                   </div>
                   <div className="space-y-1">
-                    {carriers.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => setSelectedCarrierId(c.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          selectedCarrierId === c.id
-                            ? "bg-primary text-white font-black uppercase tracking-widest text-[10px] italic shadow-lg shadow-primary/20"
-                            : "hover:bg-muted font-bold text-muted-foreground"
-                        }`}
-                      >
-                        {c.nome_fantasia}
-                      </button>
-                    ))}
+                    {carriers
+                      .filter((c) =>
+                        c.nome_fantasia
+                          .toLowerCase()
+                          .includes(carrierFilter.toLowerCase()),
+                      )
+                      .map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => setSelectedCarrierId(c.id)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                            selectedCarrierId === c.id
+                              ? "bg-primary text-white font-black uppercase tracking-widest text-[10px] italic shadow-lg shadow-primary/20"
+                              : "hover:bg-muted font-bold text-muted-foreground"
+                          }`}
+                        >
+                          {c.nome_fantasia}
+                        </button>
+                      ))}
                   </div>
                 </CardContent>
               </Card>
@@ -414,7 +541,11 @@ export default function FreightConfig() {
                         <TabsContent value="malha" className="space-y-4">
                           <div className="flex items-center justify-between">
                             <Label>Cobertura de Regiões e Malha Tática</Label>
-                            <Button size="sm" variant="outline">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setNovaRegiaoModal(true)}
+                            >
                               <Plus className="h-4 w-4 mr-2" />
                               Nova Região
                             </Button>
@@ -425,7 +556,17 @@ export default function FreightConfig() {
                               <Label className="text-[10px] uppercase font-bold">
                                 Tipo de Cobertura
                               </Label>
-                              <Select defaultValue="regional">
+                              <Select
+                                value={
+                                  ((
+                                    selectedCarrier.coverage_details as Record<
+                                      string,
+                                      unknown
+                                    > | null
+                                  )?.coverage_type as string) ?? "regional"
+                                }
+                                onValueChange={persistirCobertura}
+                              >
                                 <SelectTrigger className="h-8 text-xs font-black uppercase">
                                   <SelectValue />
                                 </SelectTrigger>
@@ -462,14 +603,12 @@ export default function FreightConfig() {
                               Zonas de Atuação
                             </Label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                              {[
-                                "SP - Capital",
-                                "RJ - Metropolitana",
-                                "MG - BH",
-                                "Curitiba - PR",
-                                "Porto Alegre - RS",
-                                "Campinas - SP",
-                              ].map((r) => (
+                              {Array.from(
+                                new Set([
+                                  ...zonasMalha,
+                                  ...(selectedCarrier.regioes_atendidas ?? []),
+                                ]),
+                              ).map((r) => (
                                 <div
                                   key={r}
                                   className="flex items-center justify-between p-2 border rounded-xl bg-muted/20 hover:border-primary/40 transition-all group/region"
@@ -478,9 +617,12 @@ export default function FreightConfig() {
                                     {r}
                                   </span>
                                   <Switch
-                                    checked={selectedCarrier.regioes_atendidas?.includes(
-                                      r,
-                                    )}
+                                    checked={
+                                      selectedCarrier.regioes_atendidas?.includes(
+                                        r,
+                                      ) ?? false
+                                    }
+                                    onCheckedChange={() => toggleZona(r)}
                                     className="scale-75"
                                   />
                                 </div>
@@ -894,7 +1036,8 @@ export default function FreightConfig() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-black uppercase italic tracking-tighter">
-                              {m.transportadora?.nome_fantasia}
+                              {m.transportadora?.nome_fantasia ??
+                                "Gateway genérico"}
                             </p>
                             <p className="text-[10px] font-mono text-muted-foreground">
                               NX-WH-{m.id.slice(0, 8)}
@@ -905,15 +1048,29 @@ export default function FreightConfig() {
                               size="sm"
                               variant="ghost"
                               className="h-8 w-8 p-0"
+                              onClick={() => {
+                                const url =
+                                  m.mapping_config?.endpoint_url ??
+                                  "/functions/v1/nexus-webhook-receiver";
+                                navigator.clipboard.writeText(
+                                  `${sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? ""}${url}`,
+                                );
+                                toast.success("URL do Gateway Copiada");
+                              }}
+                              title="Copiar URL"
                             >
                               <Settings className="h-4 w-4" />
                             </Button>
-                            <Switch checked={m.is_active} />
+                            <Switch
+                              checked={m.is_active}
+                              onCheckedChange={() => toggleMapping.mutate(m)}
+                            />
                           </div>
                         </div>
                         <div className="bg-black/40 p-2 rounded border border-white/10 flex items-center justify-between">
                           <code className="text-[10px] text-primary truncate mr-2">
-                            /functions/v1/nexus-webhook-receiver
+                            {m.mapping_config?.endpoint_url ??
+                              "/functions/v1/nexus-webhook-receiver"}
                           </code>
                           <Button
                             variant="ghost"
@@ -921,7 +1078,7 @@ export default function FreightConfig() {
                             className="h-6 px-2 text-[8px] uppercase font-black"
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                `${sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? ""}/functions/v1/nexus-webhook-receiver`,
+                                `${sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? ""}${m.mapping_config?.endpoint_url ?? "/functions/v1/nexus-webhook-receiver"}`,
                               );
                               toast.success("URL do Nexus Receiver Copiada");
                             }}
@@ -934,6 +1091,7 @@ export default function FreightConfig() {
                   <Button
                     className="w-full h-12 border-dashed border-2 rounded-xl"
                     variant="outline"
+                    onClick={() => setNovoGatewayModal(true)}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Novo Gateway de Resposta
@@ -952,59 +1110,54 @@ export default function FreightConfig() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-2 text-[9px] font-black uppercase text-muted-foreground px-2">
-                    <span>CHAVE EXTERNA (PARTNER)</span>
-                    <span>CHAVE INTERNA (NEXUS)</span>
-                  </div>
                   <div className="space-y-2">
-                    {[
-                      {
-                        ext: "shipping_cost",
-                        int: "valor_cotado",
-                        type: "decimal",
-                      },
-                      {
-                        ext: "estimated_days",
-                        int: "prazo_dias",
-                        type: "integer",
-                      },
-                      {
-                        ext: "partner_notes",
-                        int: "observacoes",
-                        type: "text",
-                      },
-                      {
-                        ext: "tracking_id",
-                        int: "codigo_rastreio",
-                        type: "text",
-                      },
-                    ].map((m, i) => (
-                      <div
-                        key={i}
-                        className="grid grid-cols-2 gap-2 p-1 border border-white/5 rounded bg-muted/10"
-                      >
-                        <Input
-                          defaultValue={m.ext}
-                          className="h-8 text-xs font-mono bg-transparent border-none"
-                        />
-                        <div className="flex items-center gap-2 px-2 bg-muted/40 rounded">
-                          <span className="text-xs font-bold text-primary italic">
-                            →
-                          </span>
-                          <span className="text-[10px] font-black text-foreground uppercase">
-                            {m.int}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                    <Label className="text-[10px] uppercase font-bold">
+                      Transportadora (para configurar o parser)
+                    </Label>
+                    <Select
+                      value={parserCarrierId}
+                      onValueChange={(v) => setParserCarrierId(v)}
+                    >
+                      <SelectTrigger className="h-9 text-xs">
+                        <SelectValue placeholder="Selecione uma transportadora..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {carriers.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.nome_fantasia}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="pt-4 border-t border-white/5 mt-4">
-                    <p className="text-[9px] text-muted-foreground leading-relaxed uppercase font-bold">
-                      A normalização garante que o sistema consolide preço e
-                      prazo automaticamente, independente do formato enviado
-                      pelo parceiro.
-                    </p>
-                  </div>
+                  {parserCarrierId && (
+                    <NormalizationMapping
+                      carrierId={parserCarrierId}
+                      initialConfig={
+                        (
+                          carriers.find((c) => c.id === parserCarrierId)
+                            ?.non_api_config as Record<string, unknown> | null
+                        )?.normalization as NormalizationConfig | undefined
+                      }
+                      onSave={(normConfig) => {
+                        const carrier = carriers.find(
+                          (c) => c.id === parserCarrierId,
+                        );
+                        if (!carrier) return;
+                        const cfg = {
+                          ...(carrier.non_api_config as Record<
+                            string,
+                            unknown
+                          >),
+                          normalization: normConfig,
+                        };
+                        updateCarrier.mutate({
+                          id: carrier.id,
+                          non_api_config: cfg,
+                        });
+                      }}
+                    />
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -1038,7 +1191,10 @@ export default function FreightConfig() {
                           </p>
                         </div>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch
+                        checked={autoRetries}
+                        onCheckedChange={setAutoRetries}
+                      />
                     </div>
                     <div className="p-4 bg-white border-2 border-primary/30 rounded-xl flex items-center justify-between group/auto transition-all">
                       <div className="flex items-center gap-4">
@@ -1054,15 +1210,19 @@ export default function FreightConfig() {
                           </p>
                         </div>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch checked={autoOcr} onCheckedChange={setAutoOcr} />
                     </div>
                   </div>
 
                   <div className="flex-1 p-6 bg-black border border-white/10 rounded-2xl relative overflow-hidden group/logs">
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-primary animate-scan opacity-40" />
-                    <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">
+                    <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">
                       Nexus RPA Status
                     </h5>
+                    <p className="text-[8px] text-muted-foreground uppercase font-bold mb-3">
+                      Simulação de exemplo — consulte o monitor real em
+                      "Operação & Telemetria" para execuções ao vivo
+                    </p>
                     <div className="space-y-3 font-mono text-[9px]">
                       <div className="flex gap-2 text-success">
                         <span className="opacity-50">[12:45]</span>
@@ -1078,21 +1238,6 @@ export default function FreightConfig() {
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-success/10 rounded-full">
-                      <RefreshCw className="h-6 w-6 text-success" />
-                    </div>
-                    <div>
-                      <p className="font-bold">Retentativas Automáticas</p>
-                      <p className="text-xs text-muted-foreground">
-                        Tentar novamente se falhar no envio do WhatsApp/Email
-                      </p>
-                    </div>
-                  </div>
-                  <Switch defaultChecked />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
@@ -1115,10 +1260,115 @@ export default function FreightConfig() {
                     </p>
                   </div>
                 </div>
+                <p className="text-[9px] text-muted-foreground uppercase font-bold text-center tracking-widest">
+                  Valores de referência da política de retry padrão do produto
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        <Dialog open={novaRegiaoModal} onOpenChange={setNovaRegiaoModal}>
+          <DialogContent>
+            <DialogHeader icon={<Map className="h-5 w-5" />}>
+              <DialogTitle>Nova Região na Malha</DialogTitle>
+              <DialogDescription>
+                Adiciona uma região atendida por{" "}
+                {selectedCarrier?.nome_fantasia ?? "esta transportadora"}. O
+                Nexus passa a priorizar esta rota.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogBody>
+              <Label className="text-[10px] uppercase font-bold">
+                Nome da Região
+              </Label>
+              <Input
+                value={novaRegiao}
+                onChange={(e) => setNovaRegiao(e.target.value)}
+                placeholder="ex.: Salvador - BA"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") addRegiao();
+                }}
+                className="mt-2"
+              />
+            </DialogBody>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline" size="sm">
+                  Cancelar
+                </Button>
+              </DialogClose>
+              <Button
+                size="sm"
+                onClick={addRegiao}
+                disabled={!novaRegiao.trim()}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Região
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={novoGatewayModal} onOpenChange={setNovoGatewayModal}>
+          <DialogContent>
+            <DialogHeader icon={<Globe className="h-5 w-5" />}>
+              <DialogTitle>Novo Gateway de Resposta</DialogTitle>
+              <DialogDescription>
+                Cria um mapping de webhook para receber respostas de uma
+                transportadora via API externa.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogBody className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase font-bold">
+                  Transportadora
+                </Label>
+                <Select
+                  value={novoGatewayTransp}
+                  onValueChange={setNovoGatewayTransp}
+                >
+                  <SelectTrigger className="h-9 text-xs">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {carriers.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nome_fantasia}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase font-bold">
+                  URL do Webhook (opcional)
+                </Label>
+                <Input
+                  value={novoGatewayUrl}
+                  onChange={(e) => setNovoGatewayUrl(e.target.value)}
+                  placeholder="/functions/v1/nexus-webhook-receiver"
+                  className="font-mono text-xs"
+                />
+              </div>
+            </DialogBody>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline" size="sm">
+                  Cancelar
+                </Button>
+              </DialogClose>
+              <Button
+                size="sm"
+                onClick={() => addMapping.mutate()}
+                disabled={!novoGatewayTransp || addMapping.isPending}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Criar Gateway
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
