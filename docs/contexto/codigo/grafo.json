@@ -2,7 +2,7 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "nos": 749,
- "arestas": 3105,
+ "arestas": 3131,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -45,6 +45,10 @@
    "importado_por": 53
   },
   {
+   "arquivo": "src/components/common/EmptyState.tsx",
+   "importado_por": 49
+  },
+  {
    "arquivo": "src/components/ui/select.tsx",
    "importado_por": 45
   },
@@ -71,10 +75,6 @@
   {
    "arquivo": "src/components/ui/scroll-area.tsx",
    "importado_por": 24
-  },
-  {
-   "arquivo": "src/components/common/EmptyState.tsx",
-   "importado_por": 23
   },
   {
    "arquivo": "src/components/ui/switch.tsx",

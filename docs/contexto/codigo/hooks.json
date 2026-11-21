@@ -1290,7 +1290,7 @@
    "hooks_exportados": [
     "useAnalytics"
    ],
-   "linhas": 169,
+   "linhas": 195,
    "dominio": "hooks/analytics",
    "tabelas": [
     "entregas"
@@ -1318,7 +1318,7 @@
    "hooks_exportados": [
     "useDashboardData"
    ],
-   "linhas": 109,
+   "linhas": 115,
    "dominio": "hooks/analytics",
    "tabelas": [
     "coletas",
@@ -2557,7 +2557,7 @@
    "hooks_exportados": [
     "useGamification"
    ],
-   "linhas": 243,
+   "linhas": 260,
    "dominio": "hooks/gamification",
    "tabelas": [
     "achievements",
@@ -2599,7 +2599,7 @@
    "hooks_exportados": [
     "useGamification"
    ],
-   "linhas": 339,
+   "linhas": 350,
    "dominio": "hooks/gamification",
    "tabelas": [
     "achievements",
@@ -3010,7 +3010,7 @@
    "hooks_exportados": [
     "useConciliacao"
    ],
-   "linhas": 440,
+   "linhas": 450,
    "dominio": "hooks/logistics",
    "tabelas": [
     "conciliacao_itens_importados",
@@ -3039,7 +3039,7 @@
    "hooks_exportados": [
     "useCostAlerts"
    ],
-   "linhas": 355,
+   "linhas": 378,
    "dominio": "hooks/logistics",
    "tabelas": [
     "alertas_custo",
@@ -3180,7 +3180,7 @@
    "hooks_exportados": [
     "useFreightIntelligence"
    ],
-   "linhas": 286,
+   "linhas": 293,
    "dominio": "hooks/logistics",
    "tabelas": [
     "entregas"
@@ -3205,7 +3205,7 @@
    "hooks_exportados": [
     "useFreightQuotation"
    ],
-   "linhas": 265,
+   "linhas": 310,
    "dominio": "hooks/logistics",
    "tabelas": [
     "freight_selection_rules",
@@ -3337,7 +3337,7 @@
    "hooks_exportados": [
     "useLogisticsCosts"
    ],
-   "linhas": 214,
+   "linhas": 219,
    "dominio": "hooks/logistics",
    "tabelas": [
     "entregas"
@@ -3539,7 +3539,7 @@
    "hooks_exportados": [
     "useQuotationFlow"
    ],
-   "linhas": 187,
+   "linhas": 275,
    "dominio": "hooks/logistics",
    "tabelas": [],
    "rpcs": [],
@@ -3855,7 +3855,7 @@
    "hooks_exportados": [
     "useUnifiedTracking"
    ],
-   "linhas": 411,
+   "linhas": 410,
    "dominio": "hooks/logistics",
    "tabelas": [
     "coletas",

@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: adiciona estados de erro em todas as telas com fetch (04-09) (#260)",
    "fix: lê deep-link de predição no central de rastreamento (04-08) (#259)",
    "fix: liga onMarkerClick no mapa de rotas e rastreamento em tempo real (04-07) (#258)",
    "chore: reconcilia docs da Fase C (04-05/04-06 concluídos) (#257)",
-   "fix: liga botões sem handler na Fase C (04-05) (#256)",
-   "fix: corrige links para rotas inexistentes e adiciona rotas admin sem entrada (04-06) (#255)"
+   "fix: liga botões sem handler na Fase C (04-05) (#256)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

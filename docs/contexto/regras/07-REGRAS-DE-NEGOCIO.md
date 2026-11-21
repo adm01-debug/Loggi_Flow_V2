@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `bff564f06c` · branch `main` · 2026-11-21 18:10 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `c3c72a955a` · branch `main` · 2026-11-21 19:49 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1303,9 +1303,9 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
   ```
   currentLevel: number; currentLevelXP: number; nextLevelXP: number; progress: number;
   ```
-- **calculateQuotations(request: QuotationRequest & { event_type?: string })** — `src/hooks/logistics/useFreightQuotation.tsx`
+- **calculateQuotations(request: QuotationRequest & { event_type?: string },)** — `src/hooks/logistics/useFreightQuotation.tsx`
   ```
-  if (!tabelasFrete || tabelasFrete.length === 0) return []; // Fetch selection rules for specific event type if provided const { data: selectionRules } = await (supabase as unknown as { from: (t: string) => { select: (c: string) => { eq: (k: string, v: string) => { eq: (k: string, v: boolean) => { maybeSingle: () => Promise<{ data: { price_weight?: string; time_weight?: string; max_sla_days?: number } | null }>; }; }; }; }; }) .from('freight_selection_rules') .select('*') .eq('event_type', reques …
+  if (!tabelasFrete || tabelasFrete.length === 0) return []; // Fetch selection rules for specific event type if provided const { data: selectionRules } = await ( supabase as unknown as { from: (t: string) => { select: (c: string) => { eq: ( k: string, v: string, ) => { eq: ( k: string, v: boolean, ) => { maybeSingle: () => Promise<{ data: { price_weight?: string; time_weight?: string; max_sla_days?: number; } | null; }>; }; }; }; }; } ) .from("freight_selection_rules") .select("*") .eq("event_typ …
   ```
 - **calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number)** — `src/hooks/logistics/useLalamoveTracking.tsx`
   ```
@@ -1369,7 +1369,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
   ```
 - **Ranking()** — `src/pages/Ranking.tsx`
   ```
-  const { user } = useAuth(); useGamification(); const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("all"); const [levelFilter, setLevelFilter] = useState(""); const { data: leaderboard = [], isLoading, refetch, } = useQuery({ queryKey: ["leaderboard", period], queryFn: async () => { const { data, error } = await supabase.rpc("get_leaderboard", { limit_count: 100, }); if (error) throw error; return (data ?? []) as LeaderboardEntry[]; }, }); useRealtime({ table: "user_levels", onUpd …
+  const { user } = useAuth(); useGamification(); const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("all"); const [levelFilter, setLevelFilter] = useState(""); const { data: leaderboard = [], isLoading, isError, error, refetch, } = useQuery({ queryKey: ["leaderboard", period], queryFn: async () => { const { data, error } = await supabase.rpc("get_leaderboard", { limit_count: 100, }); if (error) throw error; return (data ?? []) as LeaderboardEntry[]; }, }); useRealtime({ table: "use …
   ```
 - **generatePDF()** — `src/pages/RelatorioPDF.tsx`
   ```
@@ -1496,7 +1496,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `// Estimate 30% savings from consolidation` | `src/hooks/logistics/useFreightIntelligence.tsx` |
 | `const potentialSavings = totalCost * 0.3;` | `src/hooks/logistics/useFreightIntelligence.tsx` |
 | `// Logic: (Price * Wp) + (Time * Wt) + (Performance * 0.1)` | `src/hooks/logistics/useFreightQuotation.tsx` |
-| `const compositeScore = (normalizedPrice * priceWeight) + (normalizedTime * timeWeight) + (normalizedScore * 0.1);` | `src/hooks/logistics/useFreightQuotation.tsx` |
+| `normalizedScore * 0.1;` | `src/hooks/logistics/useFreightQuotation.tsx` |
 | `const roiScore = Math.round(normalized * 0.6 + successRate * 0.4);` | `src/lib/predictions/mitigationROI.ts` |
 | `const score = freq * 0.7 + sev * 0.3;` | `src/lib/predictions/mitigationRecommender.ts` |
 | `* Com meta 100% (budget zero), qualquer downtime consome 100% do orçamento.` | `src/lib/rodonaves/gatewaySLO.ts` |
@@ -1679,8 +1679,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `export const DEFAULT_COOLDOWN_MS = 60 * 60 * 1000;` | `src/lib/rodonaves/sloAlerts.ts` |
 | `setTimeout(() => setCopied(null), 2000);` | `src/pages/APIDocumentation.tsx` |
 | `const threshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();` | `src/pages/AdminTelemetria.tsx` |
-| `<Button variant="outline" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })} className="shrink-0 h-10">` | `src/pages/Analytics.tsx` |
 | `from: subDays(new Date(), 30),` | `src/pages/Analytics.tsx` |
+| `setDateRange({ from: subDays(new Date(), 30), to: new Date() })` | `src/pages/Analytics.tsx` |
 | `onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}` | `src/pages/CalendarioLogistico.tsx` |
 | `onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}` | `src/pages/CalendarioLogistico.tsx` |
 | `setTimeout(() => setShowConfetti(false), 5000);` | `src/pages/Clientes.tsx` |

@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "bff564f06c99081bb5f356da61b8d7125dc23972",
+  "commit": "c3c72a955afb63004bacb19df45ef459bb194c86",
   "branch": "main",
-  "data_commit": "2026-11-21T15:07:36-03:00",
+  "data_commit": "2026-11-21T16:49:01-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "c3c72a9",
+    "data": "2026-11-21",
+    "assunto": "fix: adiciona estados de erro em todas as telas com fetch (04-09) (#260)"
+   },
    {
     "sha": "bff564f",
     "data": "2026-11-21",
@@ -126,18 +131,13 @@
     "sha": "e7cd1b4",
     "data": "2026-11-21",
     "assunto": "fix: dados reais em NegotiationAssistant e conferencia honesta sem OCR simulado (#235)"
-   },
-   {
-    "sha": "dda0a82",
-    "data": "2026-11-21",
-    "assunto": "docs: marca 03-08 e 03-09 (Fase B) como concluidos via PR #233 (#234)"
    }
   ],
-  "arquivos_mudados_7d": 352,
+  "arquivos_mudados_7d": 375,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
-    "mudancas": 15
+    "mudancas": 22
    },
    {
     "pasta": "docs/pendencias/_ordem.md",
@@ -262,6 +262,18 @@
     "mudancas": 5
    },
    {
+    "arquivo": "src/pages/InteligenciaFrete.tsx",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "src/pages/MapaRotas.tsx",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "src/pages/Relatorios.tsx",
+    "mudancas": 5
+   },
+   {
     "arquivo": "supabase/config.toml",
     "mudancas": 5
    },
@@ -284,24 +296,12 @@
    {
     "arquivo": ".github/workflows/security.yml",
     "mudancas": 4
-   },
-   {
-    "arquivo": "AGENTS.md",
-    "mudancas": 4
-   },
-   {
-    "arquivo": "eslint.config.js",
-    "mudancas": 4
-   },
-   {
-    "arquivo": "index.html",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 186
+    "commits": 187
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1473,
   "arquivos_codigo": 879,
-  "linhas_codigo": 171767,
+  "linhas_codigo": 173385,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -456,7 +456,7 @@
   },
   "src/hooks": {
    "arquivos": 126,
-   "linhas": 19346
+   "linhas": 19583
   },
   "src/i18n.ts": {
    "arquivos": 1,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 31914
+   "linhas": 33295
   },
   "src/services": {
    "arquivos": 5,
@@ -553,16 +553,16 @@
    "linhas": 1745
   },
   {
+   "arquivo": "src/pages/Transportadoras.tsx",
+   "linhas": 1258
+  },
+  {
    "arquivo": "src/pages/Envios.tsx",
    "linhas": 1248
   },
   {
    "arquivo": "scripts/graphify-local.mjs",
    "linhas": 1247
-  },
-  {
-   "arquivo": "src/pages/Transportadoras.tsx",
-   "linhas": 1209
   },
   {
    "arquivo": "scripts/automation.mjs",
@@ -581,12 +581,12 @@
    "linhas": 1102
   },
   {
-   "arquivo": "src/pages/Ocorrencias.tsx",
-   "linhas": 1060
+   "arquivo": "src/pages/DashboardExecutivo.tsx",
+   "linhas": 1085
   },
   {
-   "arquivo": "src/pages/DashboardExecutivo.tsx",
-   "linhas": 1010
+   "arquivo": "src/pages/Ocorrencias.tsx",
+   "linhas": 1060
   },
   {
    "arquivo": "scripts/ai-context/gerar.mjs",
@@ -613,12 +613,12 @@
    "linhas": 884
   },
   {
-   "arquivo": "src/pages/Coletas.tsx",
-   "linhas": 847
+   "arquivo": "src/pages/Relatorios.tsx",
+   "linhas": 884
   },
   {
-   "arquivo": "src/pages/Relatorios.tsx",
-   "linhas": 844
+   "arquivo": "src/pages/Coletas.tsx",
+   "linhas": 882
   },
   {
    "arquivo": "src/components/melhorenvio/MECarrinhoPanel.tsx",
@@ -634,7 +634,7 @@
   },
   {
    "arquivo": "src/pages/RastreamentoRealTime.tsx",
-   "linhas": 790
+   "linhas": 810
   }
  ],
  "qualidade": {
@@ -643,7 +643,7 @@
   "ts_ignore": 0,
   "eslint_disable": 3,
   "todos": 2,
-  "arquivos_acima_500_linhas": 43
+  "arquivos_acima_500_linhas": 47
  },
  "todos": [
   {

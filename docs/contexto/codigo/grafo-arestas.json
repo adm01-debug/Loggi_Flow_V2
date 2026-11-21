@@ -3128,6 +3128,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/AdminADR.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3157,6 +3158,7 @@
   ],
   "src/pages/AlertasCusto.tsx": [
    "src/components/common/BulkActions.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/common/FilterBar.tsx",
    "src/components/common/Pagination.tsx",
    "src/components/layout/MainLayout.tsx",
@@ -3179,6 +3181,7 @@
   "src/pages/Analytics.tsx": [
    "src/components/analytics/AnalyticsCharts.tsx",
    "src/components/common/DateRangePicker.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3226,6 +3229,7 @@
    "src/components/layout/MainLayout.tsx"
   ],
   "src/pages/CalendarioLogistico.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3279,6 +3283,7 @@
    "src/components/coletas/PickupDetailsDialog.tsx",
    "src/components/coletas/PickupDialog.tsx",
    "src/components/coletas/types.ts",
+   "src/components/common/EmptyState.tsx",
    "src/components/common/FilterBar.tsx",
    "src/components/common/Pagination.tsx",
    "src/components/common/RealtimeBadge.tsx",
@@ -3310,6 +3315,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/ConciliacaoFinanceira.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/alert-dialog.tsx",
    "src/components/ui/button.tsx",
@@ -3358,6 +3364,7 @@
    "src/lib/supabaseEnv.ts"
   ],
   "src/pages/Conquistas.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/common/FilterBar.tsx",
    "src/components/common/Pagination.tsx",
    "src/components/layout/MainLayout.tsx",
@@ -3372,6 +3379,7 @@
   ],
   "src/pages/CotacaoFrete.tsx": [
    "src/components/common/DataExporter.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/dashboard/TransportadoraRanking.tsx",
    "src/components/freight/CotacoesFreteManager.tsx",
    "src/components/freight/QuotationForm.tsx",
@@ -3409,6 +3417,7 @@
   ],
   "src/pages/CustosDashboard.tsx": [
    "src/components/common/DateRangePicker.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3441,6 +3450,7 @@
    "src/components/ai/AIAssistant.tsx",
    "src/components/analytics/AnalyticsCharts.tsx",
    "src/components/analytics/OperationalPulse.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3502,6 +3512,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/ExportacaoDados.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/ui/button.tsx",
    "src/components/ui/card.tsx",
    "src/components/ui/input.tsx",
@@ -3563,6 +3574,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/GerenciamentoUsuarios.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3640,6 +3652,7 @@
   ],
   "src/pages/Index.tsx": [
    "src/components/common/DateRangePicker.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/common/PageTransition.tsx",
    "src/components/common/WidgetErrorBoundary.tsx",
    "src/components/dashboard/AlertsPanel.tsx",
@@ -3678,6 +3691,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/InteligenciaFrete.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/freight/index.ts",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
@@ -3687,6 +3701,7 @@
    "src/lib/formatters.ts"
   ],
   "src/pages/KanbanEntregas.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/shipping/DeliveryReceiptUpload.tsx",
    "src/components/ui/badge.tsx",
@@ -3701,6 +3716,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/LogisticaReversa.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3717,6 +3733,7 @@
    "src/hooks/logistics/useLogisticaReversaReal.tsx"
   ],
   "src/pages/LojaRecompensas.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/common/FilterBar.tsx",
    "src/components/common/Pagination.tsx",
    "src/components/layout/MainLayout.tsx",
@@ -3733,6 +3750,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/MapaRotas.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/map/CinematicHUD.tsx",
    "src/components/map/index.ts",
@@ -3804,6 +3822,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/PainelSLA.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/predictions/AccuracyMetaAuditPanel.tsx",
    "src/components/predictions/AccuracyMetaCycleWidget.tsx",
    "src/components/predictions/CarrierAccuracyPanel.tsx",
@@ -3838,6 +3857,7 @@
    "src/integrations/supabase/client.ts"
   ],
   "src/pages/Ranking.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/common/FilterBar.tsx",
    "src/components/common/Pagination.tsx",
    "src/components/layout/MainLayout.tsx",
@@ -3875,6 +3895,7 @@
    "src/lib/utils.ts"
   ],
   "src/pages/RastreamentoRealTime.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/logistics/TrackingPredictiveInsights.tsx",
    "src/components/map/MapboxMap.tsx",
@@ -3895,6 +3916,7 @@
    "src/components/security/RateLimitDashboardPanel.tsx"
   ],
   "src/pages/RelatorioPDF.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/common/StatsCard.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/button.tsx",
@@ -3906,6 +3928,7 @@
   ],
   "src/pages/Relatorios.tsx": [
    "src/components/analytics/DrillDownModal.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/reports/ScheduledReportsManager.tsx",
    "src/components/ui/button.tsx",
@@ -3926,6 +3949,7 @@
    "src/integrations/supabase/client.ts"
   ],
   "src/pages/RotasTransportadoras.tsx": [
+   "src/components/common/EmptyState.tsx",
    "src/components/common/PageHeader.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/transportadoras/BulkRouteImport.tsx",
@@ -3938,6 +3962,7 @@
   ],
   "src/pages/SLADashboard.tsx": [
    "src/components/common/DateRangePicker.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/badge.tsx",
    "src/components/ui/button.tsx",
@@ -3965,6 +3990,7 @@
   ],
   "src/pages/Transportadoras.tsx": [
    "src/components/common/BulkActions.tsx",
+   "src/components/common/EmptyState.tsx",
    "src/components/common/FilterBar.tsx",
    "src/components/common/Pagination.tsx",
    "src/components/layout/MainLayout.tsx",

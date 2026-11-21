@@ -653,7 +653,7 @@
    "hooks_locais": [],
    "tabelas": [],
    "edges": [],
-   "usado_por": 23,
+   "usado_por": 49,
    "orfao": false
   },
   {
@@ -5109,7 +5109,7 @@
     "AdminADR"
    ],
    "export_default": "AdminADR",
-   "linhas": 219,
+   "linhas": 330,
    "dominio": "pages",
    "hooks_locais": [
     "useToast"
@@ -5143,7 +5143,7 @@
     "AlertasCusto"
    ],
    "export_default": "AlertasCusto",
-   "linhas": 573,
+   "linhas": 589,
    "dominio": "pages",
    "hooks_locais": [
     "useCostAlerts",
@@ -5164,7 +5164,7 @@
     "Analytics"
    ],
    "export_default": "Analytics",
-   "linhas": 202,
+   "linhas": 360,
    "dominio": "pages",
    "hooks_locais": [
     "useAnalytics",
@@ -5346,7 +5346,7 @@
     "CalendarioLogistico"
    ],
    "export_default": "CalendarioLogistico",
-   "linhas": 218,
+   "linhas": 246,
    "dominio": "pages",
    "hooks_locais": [
     "useLogisticsCalendar"
@@ -5362,7 +5362,7 @@
     "CentralRastreamento"
    ],
    "export_default": "CentralRastreamento",
-   "linhas": 413,
+   "linhas": 432,
    "dominio": "pages",
    "hooks_locais": [
     "useDelayPrediction",
@@ -5402,7 +5402,7 @@
     "Coletas"
    ],
    "export_default": "Coletas",
-   "linhas": 847,
+   "linhas": 882,
    "dominio": "pages",
    "hooks_locais": [
     "useAudioFeedback",
@@ -5469,7 +5469,7 @@
     "ConciliacaoAutomatica"
    ],
    "export_default": "ConciliacaoAutomatica",
-   "linhas": 475,
+   "linhas": 517,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth"
@@ -5488,7 +5488,7 @@
     "ConciliacaoFinanceira"
    ],
    "export_default": "ConciliacaoFinanceira",
-   "linhas": 430,
+   "linhas": 459,
    "dominio": "pages",
    "hooks_locais": [
     "useConciliacao"
@@ -5542,7 +5542,7 @@
     "Conquistas"
    ],
    "export_default": "Conquistas",
-   "linhas": 600,
+   "linhas": 650,
    "dominio": "pages",
    "hooks_locais": [
     "useFilters",
@@ -5604,7 +5604,7 @@
     "CotacaoFrete"
    ],
    "export_default": "CotacaoFrete",
-   "linhas": 295,
+   "linhas": 316,
    "dominio": "pages",
    "hooks_locais": [
     "useQuotationFlow"
@@ -5640,7 +5640,7 @@
     "CustosDashboard"
    ],
    "export_default": "CustosDashboard",
-   "linhas": 444,
+   "linhas": 471,
    "dominio": "pages",
    "hooks_locais": [
     "useLogisticsCosts",
@@ -5671,7 +5671,7 @@
     "DashboardCotacoes"
    ],
    "export_default": "DashboardCotacoes",
-   "linhas": 628,
+   "linhas": 659,
    "dominio": "pages",
    "hooks_locais": [
     "useCotacoesMulticanal"
@@ -5687,7 +5687,7 @@
     "DashboardExecutivo"
    ],
    "export_default": "DashboardExecutivo",
-   "linhas": 1010,
+   "linhas": 1085,
    "dominio": "pages",
    "hooks_locais": [
     "useAnalytics",
@@ -5759,7 +5759,7 @@
     "ExportacaoDados"
    ],
    "export_default": "ExportacaoDados",
-   "linhas": 405,
+   "linhas": 489,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth"
@@ -5824,7 +5824,7 @@
     "GerenciamentoUsuarios"
    ],
    "export_default": "GerenciamentoUsuarios",
-   "linhas": 432,
+   "linhas": 469,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth",
@@ -5925,7 +5925,7 @@
     "Index"
    ],
    "export_default": "Index",
-   "linhas": 468,
+   "linhas": 499,
    "dominio": "pages",
    "hooks_locais": [
     "useDashboardData",
@@ -5967,7 +5967,7 @@
     "InteligenciaFrete"
    ],
    "export_default": "InteligenciaFrete",
-   "linhas": 713,
+   "linhas": 737,
    "dominio": "pages",
    "hooks_locais": [
     "useFreightIntelligence"
@@ -5983,7 +5983,7 @@
     "KanbanEntregas"
    ],
    "export_default": "KanbanEntregas",
-   "linhas": 495,
+   "linhas": 532,
    "dominio": "pages",
    "hooks_locais": [
     "useAudioFeedback",
@@ -6003,7 +6003,7 @@
     "LogisticaReversa"
    ],
    "export_default": "LogisticaReversa",
-   "linhas": 645,
+   "linhas": 669,
    "dominio": "pages",
    "hooks_locais": [
     "useExport",
@@ -6020,7 +6020,7 @@
     "LojaRecompensas"
    ],
    "export_default": "LojaRecompensas",
-   "linhas": 419,
+   "linhas": 470,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth",
@@ -6042,7 +6042,7 @@
     "MapaRotas"
    ],
    "export_default": "MapaRotas",
-   "linhas": 569,
+   "linhas": 598,
    "dominio": "pages",
    "hooks_locais": [
     "useDeliveryRoutes",
@@ -6124,7 +6124,7 @@
     "PainelOTIF"
    ],
    "export_default": "PainelOTIF",
-   "linhas": 536,
+   "linhas": 571,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth"
@@ -6142,7 +6142,7 @@
     "PainelSLA"
    ],
    "export_default": "PainelSLA",
-   "linhas": 474,
+   "linhas": 589,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth"
@@ -6182,7 +6182,7 @@
     "Ranking"
    ],
    "export_default": "Ranking",
-   "linhas": 488,
+   "linhas": 536,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth",
@@ -6252,7 +6252,7 @@
     "RastreamentoRealTime"
    ],
    "export_default": "RastreamentoRealTime",
-   "linhas": 790,
+   "linhas": 810,
    "dominio": "pages",
    "hooks_locais": [
     "useDelayPrediction",
@@ -6285,7 +6285,7 @@
     "RelatorioPDF"
    ],
    "export_default": "RelatorioPDF",
-   "linhas": 578,
+   "linhas": 629,
    "dominio": "pages",
    "hooks_locais": [
     "useAuth"
@@ -6303,7 +6303,7 @@
     "Relatorios"
    ],
    "export_default": "Relatorios",
-   "linhas": 844,
+   "linhas": 884,
    "dominio": "pages",
    "hooks_locais": [
     "useDrillDown",
@@ -6343,7 +6343,7 @@
     "RotasTransportadoras"
    ],
    "export_default": "RotasTransportadoras",
-   "linhas": 132,
+   "linhas": 161,
    "dominio": "pages",
    "hooks_locais": [
     "useTransportadoraRotas"
@@ -6377,7 +6377,7 @@
     "SLADashboard"
    ],
    "export_default": "SLADashboard",
-   "linhas": 294,
+   "linhas": 329,
    "dominio": "pages",
    "hooks_locais": [
     "useRealtime",
@@ -6394,7 +6394,7 @@
     "Transportadoras"
    ],
    "export_default": "Transportadoras",
-   "linhas": 1209,
+   "linhas": 1258,
    "dominio": "pages",
    "hooks_locais": [
     "useExport",
