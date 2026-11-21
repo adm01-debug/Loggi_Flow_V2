@@ -4,11 +4,11 @@
  "presente": true,
  "como_gerar": "uvx --from \"graphifyy[sql]\" graphify update .  (ou: npm run graph:update); saída em graphify-out/ — graph.json e graph.html NÃO são versionados (dezenas de MB); use `graphify query/path/explain` localmente",
  "relatorio": null,
- "commit_do_grafo": "fa1afdb00c93580e14d497770be1e6f656440a69",
+ "commit_do_grafo": "bff564f06c99081bb5f356da61b8d7125dc23972",
  "grafo_atual": true,
  "nos": 8559,
  "arestas": 21091,
- "comunidades_total": 862,
+ "comunidades_total": 861,
  "relacoes": {
   "calls": 2870,
   "case_of": 7,
@@ -19,7 +19,7 @@
   "extends": 1,
   "implements": 1,
   "imports": 4873,
-  "imports_from": 4644,
+  "imports_from": 4645,
   "indexes": 351,
   "indirect_call": 103,
   "inherits": 25,
@@ -27,12 +27,12 @@
   "rationale_for": 42,
   "re_exports": 1030,
   "reads_from": 87,
-  "references": 503,
+  "references": 502,
   "triggers": 101
  },
  "origem": {
-  "EXTRACTED": 20732,
-  "INFERRED": 359
+  "EXTRACTED": 20733,
+  "INFERRED": 358
  },
  "comunidades": [
   {
@@ -346,13 +346,14 @@
   {
    "id": 20,
    "nome": "package.json",
-   "nos": 62,
+   "nos": 66,
    "callables": 0,
-   "arquivos": 4,
+   "arquivos": 5,
    "exemplos_arquivos": [
     "eslint.config.js",
     "package.json",
     "src/components/ui/aspect-ratio.tsx",
+    "src/i18n.ts",
     "tailwind.config.ts"
    ]
   },
@@ -1162,7 +1163,7 @@
    "id": "ref_react",
    "rotulo": "react",
    "arquivo": "package.json",
-   "grau": 342,
+   "grau": 343,
    "comunidade": "react"
   },
   {
@@ -2020,7 +2021,7 @@
   "docs/RUNBOOK_DB_PERFORMANCE.md": "Runbook — Investigação de Performance de Banco",
   "docs/SECURITY_AUDIT_REPORT.md": "🕵️ SECURITY PEN-TEST REPORT (SELF-AUDIT)",
   "docs/SLO.md": "📈 Service Level Objectives (SLOs) — LogiFlow",
-  "docs/SOFT_DELETE_POLICY.md": "Regras de domínio que o código não deixa óbvio — referência para agentes",
+  "docs/SOFT_DELETE_POLICY.md": "Política de Soft Delete — LogiFlow",
   "docs/SRE_HANDBOOK.md": "🚒 LOGIFLOW SRE & ON-CALL HANDBOOK",
   "docs/adr/0001-stack-choice.md": "ADR 0001: Stack Choice",
   "docs/adr/0001-strict-ts-financial-integrity.md": "adr/README.md",
@@ -2042,7 +2043,7 @@
   "docs/adr/0013-real-metrics-anomaly-slo.md": "ADR 0013: Real Metrics, Anomaly Detection & SLO (Sprints 37-39)",
   "docs/adr/0014-security-definer-rls-pattern.md": "ADR 0014: SECURITY DEFINER Functions as First-Class RLS Building Blocks",
   "docs/adr/README.md": "adr/README.md",
-  "docs/agentes/banco.md": "Regras de domínio que o código não deixa óbvio — referência para agentes",
+  "docs/agentes/banco.md": "Banco de dados — referência para agentes",
   "docs/agentes/contexto-ia.md": "Contexto para agentes de IA — como ler o estado real do projeto",
   "docs/agentes/deploy.md": "Vercel e deploy — referência para agentes",
   "docs/agentes/github-ci.md": "SnapshotCallerFreshnessTests",
@@ -2890,12 +2891,12 @@
   "src/hooks/ui/useQRScanner.tsx": "sonner",
   "src/hooks/ui/useTouchGestures.ts": "react",
   "src/hooks/ui/useVirtualTable.ts": "useVirtualTable.ts",
-  "src/i18n.ts": "i18n.ts",
+  "src/i18n.ts": "package.json",
   "src/integrations/lovable/index.ts": "client.ts",
   "src/integrations/shared/api-schemas.ts": "zod",
   "src/integrations/supabase/client.ts": "client.ts",
-  "src/lib/centroDistribuicao.test.ts": "centroDistribuicao.ts",
-  "src/lib/centroDistribuicao.ts": "centroDistribuicao.ts",
+  "src/lib/centroDistribuicao.test.ts": "MapboxMap.tsx",
+  "src/lib/centroDistribuicao.ts": "MapboxMap.tsx",
   "src/lib/conciliacaoImport.test.ts": "conciliacaoImport.ts",
   "src/lib/conciliacaoImport.ts": "conciliacaoImport.ts",
   "src/lib/constants.ts": "lib/index.ts",

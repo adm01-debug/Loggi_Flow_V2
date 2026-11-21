@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "fa1afdb00c93580e14d497770be1e6f656440a69",
+  "sha": "bff564f06c99081bb5f356da61b8d7125dc23972",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 17:57 UTC",
+  "generated_at": "2026-11-21 18:10 UTC",
   "files_total": 1483,
   "code_files": 1141,
-  "code_lines": 188220,
+  "code_lines": 188279,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "5c122cd6b09dbdac",
+ "facts_hash": "ffbf299bdec53863",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29894,7 +29894,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 31855,
+   "lines": 31914,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -29968,11 +29968,11 @@
    ],
    "docs": [
     "AlertasCusto.tsx: eslint-disable max-lines",
+    "CentralRastreamento.tsx: eslint-disable max-lines",
     "Clientes.tsx: eslint-disable max-lines",
     "Coletas.tsx: eslint-disable max-lines",
     "ConciliacaoAutomatica.tsx: eslint-disable max-lines",
-    "ConciliacaoFinanceira.tsx: eslint-disable max-lines",
-    "Configuracoes.tsx: eslint-disable max-lines"
+    "ConciliacaoFinanceira.tsx: eslint-disable max-lines"
    ],
    "deps": [
     "@hello-pangea/dnd",
@@ -80661,7 +80661,7 @@
   },
   "src/pages/CentralRastreamento.tsx": {
    "path": "src/pages/CentralRastreamento.tsx",
-   "lines": 354,
+   "lines": 413,
    "exports": [
     "function CentralRastreamento"
    ],
@@ -80675,6 +80675,7 @@
      "kind": "compara"
     }
    ],
+   "doc": "eslint-disable max-lines",
    "percents": [
     "transition={{ delay: i * 0.02 }}"
    ]
@@ -88218,10 +88219,23 @@
   }
  },
  "git": {
-  "sha": "fa1afdb00c93580e14d497770be1e6f656440a69",
+  "sha": "bff564f06c99081bb5f356da61b8d7125dc23972",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "bff564f",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: lê deep-link de predição no central de rastreamento (04-08) (#259)",
+    "files": [
+     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+     "docs/pendencias/04-07-mapas-sem-markers.md",
+     "docs/pendencias/04-08-deep-link.md",
+     "docs/pendencias/_ordem.md",
+     "src/pages/CentralRastreamento.tsx"
+    ]
+   },
    {
     "sha": "fa1afdb",
     "date": "2026-11-21",
@@ -88552,25 +88566,16 @@
      "src/features/incidents/components/PostMortemDashboard.tsx",
      "src/hooks/system/useNexusHealth.ts"
     ]
-   },
-   {
-    "sha": "84f200d",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)",
-    "files": [
-     "src/components/map/CinematicHUD.tsx"
-    ]
    }
   ],
   "hot_files": [
    [
     "docs/pendencias/_ordem.md",
-    8
+    9
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    6
+    7
    ],
    [
     "src/pages/MapaRotas.tsx",
@@ -88591,6 +88596,18 @@
    [
     "src/pages/CotacaoMultiCanal.tsx",
     2
+   ],
+   [
+    "docs/pendencias/04-07-mapas-sem-markers.md",
+    1
+   ],
+   [
+    "docs/pendencias/04-08-deep-link.md",
+    1
+   ],
+   [
+    "src/pages/CentralRastreamento.tsx",
+    1
    ],
    [
     "docs/pendencias/04-05-botoes-sem-handler.md",
@@ -88630,18 +88647,6 @@
    ],
    [
     "src/components/shipping/ExpeditionDetailsDialog.tsx",
-    1
-   ],
-   [
-    "src/components/transportadoras/RotaResultsList.tsx",
-    1
-   ],
-   [
-    "src/hooks/logistics/useTransportadoraRotas.tsx",
-    1
-   ],
-   [
-    "src/pages/Configuracoes.tsx",
     1
    ]
   ]

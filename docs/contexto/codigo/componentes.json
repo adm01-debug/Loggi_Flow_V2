@@ -5362,7 +5362,7 @@
     "CentralRastreamento"
    ],
    "export_default": "CentralRastreamento",
-   "linhas": 354,
+   "linhas": 413,
    "dominio": "pages",
    "hooks_locais": [
     "useDelayPrediction",

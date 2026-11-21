@@ -1936,6 +1936,7 @@
     "useRealtime",
     "useRef",
     "useSLANotifications",
+    "useSearchParams",
     "useSmartAlerts",
     "useSpring",
     "useState",
