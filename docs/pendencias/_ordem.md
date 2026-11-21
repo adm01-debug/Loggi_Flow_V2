@@ -30,7 +30,7 @@ Regra: nenhuma destas pode inserir linha em tabela real com dados simulados. Alt
 
 ## Fase C — Botões/telas sem efeito (seção 4)
 
-04-05 botoes-sem-handler (~~CONCLUÍDO #256~~), 04-06 rotas-404 (~~CONCLUÍDO #255~~), 04-07 mapas-sem-markers (~~CONCLUÍDO #258~~) · pendentes: 04-01 configuracoes-frete-estatico, 04-02 configuracoes-security, 04-03 profile-statico, 04-04 api-documentation, 04-08 deep-link (~~PR #259~~), 04-09 estados-erro-ausentes (~~CONCLUÍDO #260~~). Registro geral: 04-SECAO4-geral.
+04-05 botoes-sem-handler (~~CONCLUÍDO #256~~), 04-06 rotas-404 (~~CONCLUÍDO #255~~), 04-07 mapas-sem-markers (~~CONCLUÍDO #258~~) · pendentes: 04-02 configuracoes-security, 04-03 profile-statico, 04-04 api-documentation, 04-08 deep-link (~~PR #259~~), 04-09 estados-erro-ausentes (~~CONCLUÍDO #260~~), 04-01 configuracoes-frete-estatico (~~CONCLUÍDO #262~~). Registro geral: 04-SECAO4-geral.
 
 ## Fase D — Integrações parciais (seção 5)
 
