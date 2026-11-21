@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: torna mapa de rotas e rastreamento em tempo real honestos (03-21/03-22) (#242)",
    "docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)",
    "fix: substitui simulacoes de lead time, divergencia semanal e acoes corretivas por dados reais (#240)",
    "fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)",
-   "docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)",
-   "fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)"
+   "docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

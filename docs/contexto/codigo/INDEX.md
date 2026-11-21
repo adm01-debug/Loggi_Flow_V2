@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `c517e6cafce8072445b4c2c7744e8b73f8e3051d` (2026-11-21T10:54:51-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `0f32426a75e44e1348ed8419003a3bd498ac57b6` (2026-11-21T11:33:35-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1472 |
 | arquivos_codigo | 878 |
-| linhas_codigo | 169583 |
+| linhas_codigo | 169550 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8553 nós · 21042 arestas · 868 comunidades · grafo do commit `c517e6ca`
-- comunidades maiores: lucide-react (206), utils.ts (166), Clientes.tsx (154), db-observability/index.ts (147), react (142), date-fns (137), App.tsx (117), ui/index.ts (117), button.tsx (115), useAuth (112), ref_node_path (109), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103)
+- 8553 nós · 21040 arestas · 855 comunidades · grafo do commit `0f32426a`
+- comunidades maiores: lucide-react (234), utils.ts (206), react (202), db-observability/index.ts (156), ui/index.ts (116), CotacaoMultiCanal.tsx (113), ref_node_path (109), cn (107), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), useAuth (100), @tanstack/react-query (86), App.tsx (81)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `0f32426` fix: torna mapa de rotas e rastreamento em tempo real honestos (03-21/03-22) (#242)
 - 2026-11-21 `c517e6c` docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)
 - 2026-11-21 `d15ef79` fix: substitui simulacoes de lead time, divergencia semanal e acoes corretivas por dados reais (#240)
 - 2026-11-21 `73b5d8c` fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `3d7affa` docs: marca 03-01 a 03-05 (Fase B) como concluidos via PR #229 (#230)
 - 2026-11-20 `d952137` feat: substitui metricas simuladas por dados reais nos widgets 3.1-3.5 (#229)
 - 2026-11-20 `84f200d` fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)
-- 2026-11-20 `fd6431b` docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

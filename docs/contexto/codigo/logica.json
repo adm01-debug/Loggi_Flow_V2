@@ -416,11 +416,10 @@
    "zod_schemas": 0,
    "flags": [],
    "papeis": [],
-   "usado_por": 3,
+   "usado_por": 2,
    "usado_por_modulos": [
     "components/dashboard",
-    "components/map",
-    "pages"
+    "components/map"
    ],
    "coberto_por_testes": 1,
    "orfao": false

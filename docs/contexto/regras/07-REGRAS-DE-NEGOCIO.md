@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `c517e6cafc` · branch `main` · 2026-11-21 14:13 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `0f32426a75` · branch `main` · 2026-11-21 14:34 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -933,13 +933,13 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `degraded` | compara | `src/components/dashboard/LiveStatusBar.tsx`<br>`src/components/dashboard/SystemHealthWidget.tsx` |
 | `status` | `deleted_at_set` | escreve | `src/hooks/data/useSoftDelete.ts` |
 | `status` | `delivered` | compara | `src/components/melhorenvio/MEEtiquetasPanel.tsx` |
-| `status` | `despachado` | compara, escreve, filtra | `src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/hooks/logistics/useSLAAlerts.tsx`<br>`src/pages/Despachos.tsx`<br>`src/pages/Envios.tsx`<br>`src/pages/KanbanEntregas.tsx`<br>… +4 |
+| `status` | `despachado` | compara, escreve, filtra | `src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/hooks/logistics/useSLAAlerts.tsx`<br>`src/pages/Despachos.tsx`<br>`src/pages/Envios.tsx`<br>`src/pages/KanbanEntregas.tsx`<br>… +3 |
 | `status` | `divergencia` | compara | `src/components/coletas/PickupDetailsDialog.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/logistics/useConciliacao.tsx`<br>`src/pages/Coletas.tsx`<br>`src/pages/ConciliacaoAutomatica.tsx`<br>… +2 |
 | `status` | `down` | compara | `src/components/dashboard/SystemHealthWidget.tsx` |
 | `status` | `elite` | escreve | `src/components/admin/DORAMetrics.tsx` |
 | `status` | `em_andamento` | compara, escreve | `src/hooks/logistics/useConciliacao.tsx`<br>`src/pages/conciliacao/ConciliacaoList.tsx` |
 | `status` | `em_execucao` | escreve | `src/hooks/predictions/useMitigationActions.ts` |
-| `status` | `em_transito` | compara, escreve | `src/components/coletas/PickupDetailsDialog.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/pages/Coletas.tsx`<br>… +5 |
+| `status` | `em_transito` | compara, escreve | `src/components/coletas/PickupDetailsDialog.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/pages/Coletas.tsx`<br>… +4 |
 | `status` | `empty` | compara, escreve | `supabase/functions/accuracy-weekly-digest/index.ts` |
 | `status` | `entregue` | compara, escreve, filtra | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/hooks/analytics/useExecutiveMetrics.tsx`<br>`src/hooks/analytics/useKPIBenchmark.tsx`<br>`src/pages/CalendarioLogistico.tsx`<br>… +13 |
 | `status` | `error` | compara, escreve | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/freight/FreightAudit.tsx`<br>`src/hooks/security/useIntegrationValidation.tsx`<br>`src/pages/Configuracoes.tsx`<br>`supabase/functions/accuracy-meta-monitor/channelHealth.ts`<br>… +2 |

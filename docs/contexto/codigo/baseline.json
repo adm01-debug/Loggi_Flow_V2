@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "c517e6cafce8072445b4c2c7744e8b73f8e3051d",
+  "commit": "0f32426a75e44e1348ed8419003a3bd498ac57b6",
   "branch": "main",
-  "data_commit": "2026-11-21T10:54:51-03:00",
+  "data_commit": "2026-11-21T11:33:35-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "0f32426",
+    "data": "2026-11-21",
+    "assunto": "fix: torna mapa de rotas e rastreamento em tempo real honestos (03-21/03-22) (#242)"
+   },
    {
     "sha": "c517e6c",
     "data": "2026-11-21",
@@ -126,14 +131,9 @@
     "sha": "b7a7b5f",
     "data": "2026-11-20",
     "assunto": "fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)"
-   },
-   {
-    "sha": "5460176",
-    "data": "2026-11-20",
-    "assunto": "fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)"
    }
   ],
-  "arquivos_mudados_7d": 330,
+  "arquivos_mudados_7d": 327,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 169
+    "commits": 170
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169583,
+  "linhas_codigo": 169550,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 31017
+   "linhas": 30984
   },
   "src/services": {
    "arquivos": 5,
@@ -634,7 +634,7 @@
   },
   {
    "arquivo": "src/pages/RastreamentoRealTime.tsx",
-   "linhas": 783
+   "linhas": 777
   }
  ],
  "qualidade": {
@@ -643,7 +643,7 @@
   "ts_ignore": 0,
   "eslint_disable": 3,
   "todos": 2,
-  "arquivos_acima_500_linhas": 39
+  "arquivos_acima_500_linhas": 38
  },
  "todos": [
   {

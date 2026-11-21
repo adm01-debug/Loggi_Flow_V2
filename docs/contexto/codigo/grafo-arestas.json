@@ -3737,7 +3737,6 @@
    "src/hooks/common/useFilters.ts",
    "src/hooks/logistics/useDeliveryRoutes.tsx",
    "src/integrations/supabase/client.ts",
-   "src/lib/centroDistribuicao.ts",
    "src/lib/exportUtils.ts",
    "src/lib/utils.ts"
   ],
