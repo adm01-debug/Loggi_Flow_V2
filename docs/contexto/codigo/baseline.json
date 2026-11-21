@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "2c38634c455086d26c62d5244f8cefc4554be658",
+  "commit": "a33c6754a88d67360406d4401877f4c9eebe525a",
   "branch": "main",
-  "data_commit": "2026-11-21T12:53:43-03:00",
+  "data_commit": "2026-11-21T13:10:46-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "a33c675",
+    "data": "2026-11-21",
+    "assunto": "fix: clima real OpenWeather nas functions de IA (03-24/03-25) (#251)"
+   },
    {
     "sha": "2c38634",
     "data": "2026-11-21",
@@ -126,14 +131,9 @@
     "sha": "e4392b7",
     "data": "2026-11-20",
     "assunto": "fix: remove simulacao de cotacao e torna retentativa real (#226)"
-   },
-   {
-    "sha": "5d31fbc",
-    "data": "2026-11-20",
-    "assunto": "docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)"
    }
   ],
-  "arquivos_mudados_7d": 333,
+  "arquivos_mudados_7d": 334,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "src/hooks/logistics",
@@ -161,7 +161,7 @@
    },
    {
     "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    "mudancas": 7
+    "mudancas": 8
    },
    {
     "pasta": "src/components/coletas",
@@ -214,15 +214,15 @@
     "mudancas": 8
    },
    {
+    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+    "mudancas": 8
+   },
+   {
     "arquivo": ".github/workflows/ci-nexus.yml",
     "mudancas": 7
    },
    {
     "arquivo": ".github/workflows/ci.yml",
-    "mudancas": 7
-   },
-   {
-    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     "mudancas": 7
    },
    {
@@ -235,6 +235,10 @@
    },
    {
     "arquivo": "scripts/validate-csp.mjs",
+    "mudancas": 6
+   },
+   {
+    "arquivo": "supabase/functions/ai-logistics-assistant/index.ts",
     "mudancas": 6
    },
    {
@@ -262,7 +266,7 @@
     "mudancas": 5
    },
    {
-    "arquivo": "supabase/functions/ai-logistics-assistant/index.ts",
+    "arquivo": "supabase/functions/predict-delays/index.ts",
     "mudancas": 5
    },
    {
@@ -292,16 +296,12 @@
    {
     "arquivo": "index.html",
     "mudancas": 4
-   },
-   {
-    "arquivo": "scripts/audit/manifest_detail.sql",
-    "mudancas": 4
    }
   ],
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 177
+    "commits": 178
    },
    {
     "autor": "dependabot[bot]",
@@ -314,9 +314,9 @@
   ]
  },
  "contagens": {
-  "arquivos_total": 1472,
-  "arquivos_codigo": 878,
-  "linhas_codigo": 169627,
+  "arquivos_total": 1473,
+  "arquivos_codigo": 879,
+  "linhas_codigo": 169805,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -491,8 +491,8 @@
    "linhas": 713
   },
   "supabase/functions": {
-   "arquivos": 110,
-   "linhas": 12931
+   "arquivos": 111,
+   "linhas": 13109
   },
   "tailwind.config.ts": {
    "arquivos": 1,
@@ -638,7 +638,7 @@
   }
  ],
  "qualidade": {
-  "any": 57,
+  "any": 60,
   "console_log": 152,
   "ts_ignore": 0,
   "eslint_disable": 3,

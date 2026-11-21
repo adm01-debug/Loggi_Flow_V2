@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: clima real OpenWeather nas functions de IA (03-24/03-25) (#251)",
    "fix: remove fallback zerado do AnalyticsCharts (03-30) (#250)",
    "chore: regenera quality-gate-report com dados reais (03-29) (#249)",
    "fix: torna AuthHeroSection honesta (03-27) (#247)",
-   "docs: reconcilia 03-26 (Fase B) como concluido via PR #245 (#246)",
-   "fix: substitui estatisticas fixas por dados reais (03-26) (#245)"
+   "docs: reconcilia 03-26 (Fase B) como concluido via PR #245 (#246)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

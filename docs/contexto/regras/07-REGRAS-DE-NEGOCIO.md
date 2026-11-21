@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `2c38634c45` · branch `main` · 2026-11-21 15:54 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a33c6754a8` · branch `main` · 2026-11-21 16:11 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1576,6 +1576,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `WHATIF_MAX_CAP` | `25` | `src/lib/predictions/whatIfSimulator.ts` |
 | `DEFAULT_STALLED_HOURS` | `48` | `src/lib/rodonaves/freightHealth.ts` |
 | `DEFAULT_COOLDOWN_MS` | `60 * 60 * 1000` | `src/lib/rodonaves/sloAlerts.ts` |
+| `OPENWEATHER_HOST` | `"api.openweathermap.org"` | `supabase/functions/_shared/weather.ts` |
 | `WINDOW_MS` | `24 * 60 * 60 * 1000` | `supabase/functions/accuracy-meta-monitor/index.ts` |
 | `WINDOW_MS` | `24 * 60 * 60 * 1000` | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
 | `CRON_HOUR_UTC` | `8` | `supabase/functions/accuracy-meta-monitor/simulator.ts` |
@@ -1706,6 +1707,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `current_date - (random() * 5)::int * interval '1 day',` | `supabase/seed.sql` |
 | `const { timeout = 10000 } = options;` | `supabase/functions/_shared/fetch-with-timeout.ts` |
 | `* await safeFetch(url, { timeout: 8000, allowedHosts: ["api.mapbox.com"] });` | `supabase/functions/_shared/safeFetch.ts` |
+| `timeout: 8000,` | `supabase/functions/_shared/weather.ts` |
 | `const windowStart = now.getTime() - cfg.windowHours * 60 * 60 * 1000;` | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
 | `Date.now() - DEFAULT_ESCALATION.windowHours * 60 * 60 * 1000,` | `supabase/functions/accuracy-meta-monitor/index.ts` |
 | `const WINDOW_MS = 24 * 60 * 60 * 1000;` | `supabase/functions/accuracy-meta-monitor/index.ts` |
@@ -2434,6 +2436,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Aceita apenas role 'authenticated' (com sub) ou 'service_role' — o anon key é | `supabase/functions/_shared/auth.ts` |
 | Logs validation attempts to the database for auditing and monitoring. | `supabase/functions/_shared/contract-validator.ts` |
 | Lightweight validation helpers for edge functions (no Zod dependency in Deno). | `supabase/functions/_shared/validate.ts` |
+| Busca clima de um conjunto de coordenadas únicas (com limite de requisições), | `supabase/functions/_shared/weather.ts` |
 | disparo deve escalar para WhatsApp mesmo com toggle desligado. | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
 | Decide se o próximo alerta para (user, carrier) deve escalar para WhatsApp | `supabase/functions/accuracy-meta-monitor/escalation.ts` |
 | - Email exige formato mínimo `x@y.z`. | `supabase/functions/accuracy-meta-monitor/simulator.ts` |

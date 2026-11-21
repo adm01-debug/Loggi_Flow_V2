@@ -36,6 +36,7 @@
   "supabase/functions/_shared/security.ts",
   "supabase/functions/_shared/service-wrapper.ts",
   "supabase/functions/_shared/validate.ts",
+  "supabase/functions/_shared/weather.ts",
   "supabase/functions/_shared/webhookSignature.ts"
  ],
  "edges": [
@@ -119,7 +120,7 @@
    "nome": "ai-logistics-assistant",
    "entrada": "supabase/functions/ai-logistics-assistant/index.ts",
    "arquivos": 1,
-   "linhas": 222,
+   "linhas": 246,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -138,7 +139,8 @@
     "SUPABASE_URL"
    ],
    "env_via_shared": [
-    "ALLOWED_ORIGINS"
+    "ALLOWED_ORIGINS",
+    "OPENWEATHER_API_KEY"
    ],
    "buckets": [],
    "chama_edges": [],
@@ -148,7 +150,8 @@
    "usa_shared": [
     "cors.ts",
     "logger.ts",
-    "rateLimiter.ts"
+    "rateLimiter.ts",
+    "weather.ts"
    ],
    "chamada_pelo_front": [
     "src/components/ai/AIAssistant.tsx"
@@ -1168,7 +1171,7 @@
    "nome": "predict-delays",
    "entrada": "supabase/functions/predict-delays/index.ts",
    "arquivos": 1,
-   "linhas": 385,
+   "linhas": 397,
    "verify_jwt": true,
    "metodos": [
     "OPTIONS"
@@ -1189,7 +1192,8 @@
     "SUPABASE_URL"
    ],
    "env_via_shared": [
-    "ALLOWED_ORIGINS"
+    "ALLOWED_ORIGINS",
+    "OPENWEATHER_API_KEY"
    ],
    "buckets": [],
    "chama_edges": [
@@ -1202,7 +1206,8 @@
     "circuitBreaker.ts",
     "cors.ts",
     "logger.ts",
-    "rateLimiter.ts"
+    "rateLimiter.ts",
+    "weather.ts"
    ],
    "chamada_pelo_front": [
     "src/hooks/logistics/useDelayPrediction.tsx"

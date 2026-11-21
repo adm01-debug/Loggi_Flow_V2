@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `2c38634c455086d26c62d5244f8cefc4554be658` (2026-11-21T12:53:43-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `a33c6754a88d67360406d4401877f4c9eebe525a` (2026-11-21T13:10:46-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -14,7 +14,7 @@ Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ 
 Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua tarefa; não carregue tudo.
 
 ## Stack
-- linguagens: TypeScript (792), SQL (261), Markdown (251), JavaScript (79), JSON (33), YAML (21), Shell (9), Python (8)
+- linguagens: TypeScript (793), SQL (261), Markdown (251), JavaScript (79), JSON (33), YAML (21), Shell (9), Python (8)
 - linguagem_principal: TypeScript
 - framework: React
 - backend_http: n/d
@@ -34,9 +34,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Números
 | item | qtd |
 |---|---|
-| arquivos_total | 1472 |
-| arquivos_codigo | 878 |
-| linhas_codigo | 169627 |
+| arquivos_total | 1473 |
+| arquivos_codigo | 879 |
+| linhas_codigo | 169805 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8553 nós · 21040 arestas · 855 comunidades · grafo do commit `2c38634c`
-- comunidades maiores: lucide-react (234), utils.ts (206), react (202), db-observability/index.ts (156), ui/index.ts (116), CotacaoMultiCanal.tsx (113), ref_node_path (109), cn (107), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), useAuth (100), @tanstack/react-query (86), App.tsx (81)
+- 8558 nós · 21057 arestas · 858 comunidades · grafo do commit `a33c6754`
+- comunidades maiores: cn (174), App.tsx (169), db-observability/index.ts (130), Coletas.tsx (129), input.tsx (128), card.tsx (112), client.ts (111), ui/index.ts (106), react (105), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), badge.tsx (94), celebrationSounds.ts (88)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -284,17 +284,17 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - package.json (51)
 - docs/pendencias/_ordem.md (11)
 - .github/workflows/contexto-ia.yml (8)
+- docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (8)
 - .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
-- docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (7)
 - .github/workflows/deploy-functions.yml (6)
 - .github/workflows/types-sync.yml (6)
 - scripts/validate-csp.mjs (6)
+- supabase/functions/ai-logistics-assistant/index.ts (6)
 - .github/workflows/inventario-estado-semanal.yml (5)
 - docs/agentes/github-ci.md (5)
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/audit-gate.mjs (5)
-- src/pages/ConfiguracoesFrete.tsx (5)
 
 ## Workflows
 - `aplicar-migration.yml` — Aplicar Migration (workflow_dispatch)
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `a33c675` fix: clima real OpenWeather nas functions de IA (03-24/03-25) (#251)
 - 2026-11-21 `2c38634` fix: remove fallback zerado do AnalyticsCharts (03-30) (#250)
 - 2026-11-21 `f8c8fad` chore: regenera quality-gate-report com dados reais (03-29) (#249)
 - 2026-11-21 `bf72eb8` fix: torna AuthHeroSection honesta (03-27) (#247)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-21 `81e9459` docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)
 - 2026-11-21 `df04cb6` fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)
 - 2026-11-21 `546b1cc` docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)
-- 2026-11-21 `e7cd1b4` fix: dados reais em NegotiationAssistant e conferencia honesta sem OCR simulado (#235)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
