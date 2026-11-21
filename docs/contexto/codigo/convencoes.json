@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: corrige links para rotas inexistentes e adiciona rotas admin sem entrada (04-06) (#255)",
+   "chore: encerra Fase B no _ordem.md com PRs reais (#242-#253) (#254)",
+   "chore: reconcilia audit Fase B (3.19-3.20, 3.27, 3.29-3.30) com as PRs mergeadas (#253)",
    "fix: estrategia Nexus com pesos reais e select funcional (3.19) (#252)",
-   "fix: clima real OpenWeather nas functions de IA (03-24/03-25) (#251)",
-   "fix: remove fallback zerado do AnalyticsCharts (03-30) (#250)",
-   "chore: regenera quality-gate-report com dados reais (03-29) (#249)",
-   "fix: torna AuthHeroSection honesta (03-27) (#247)"
+   "fix: clima real OpenWeather nas functions de IA (03-24/03-25) (#251)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

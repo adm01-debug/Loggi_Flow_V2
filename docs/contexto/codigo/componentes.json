@@ -479,7 +479,7 @@
     "Breadcrumbs"
    ],
    "export_default": null,
-   "linhas": 285,
+   "linhas": 317,
    "dominio": "components/common",
    "hooks_locais": [
     "useNavigationHistory"
@@ -1250,7 +1250,7 @@
     "QuickActions"
    ],
    "export_default": null,
-   "linhas": 264,
+   "linhas": 331,
    "dominio": "components/dashboard",
    "hooks_locais": [],
    "tabelas": [],
@@ -1694,7 +1694,7 @@
     "AppSidebar"
    ],
    "export_default": null,
-   "linhas": 440,
+   "linhas": 562,
    "dominio": "components/layout",
    "hooks_locais": [
     "useAuth",
@@ -2833,7 +2833,7 @@
     "GlobalSearch"
    ],
    "export_default": null,
-   "linhas": 188,
+   "linhas": 190,
    "dominio": "components/search",
    "hooks_locais": [
     "useAuth",

@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `97192d5b1f5346a4611114937162a6620c6c6a3b` (2026-11-21T13:26:49-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e271db764f62fce29c04ee2f52d1eabfcdf84568` (2026-11-21T13:48:00-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,11 +36,11 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1473 |
 | arquivos_codigo | 879 |
-| linhas_codigo | 169820 |
+| linhas_codigo | 170057 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
-| itens_menu | 77 |
+| itens_menu | 81 |
 | modulos | 75 |
 | componentes | 380 |
 | hooks | 178 |
@@ -95,8 +95,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | lib | 0 | 0 | 16 | 0 | 0 | 0 |
 | lib/predictions | 0 | 0 | 6 | 0 | 0 | 0 |
 | lib/rodonaves | 0 | 0 | 8 | 0 | 0 | 0 |
-| pages | 75 | 59 | 59 | 134 | 29 | 81 |
-| pages/admin | 1 | 2 | 2 | 68 | 3 | 20 |
+| pages | 79 | 59 | 59 | 134 | 29 | 81 |
+| pages/admin | 2 | 2 | 2 | 68 | 3 | 20 |
 | pages/auth | 0 | 0 | 5 | 2 | 3 | 1 |
 | utils | 0 | 0 | 6 | 0 | 1 | 3 |
 
@@ -259,7 +259,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Alertas (baseline.json → alertas)
 - rotas_sem_arquivo: 0
 - componentes_ambiguos: 0
-- menu_sem_destino: 1 — ex.: Integrações -> /gestao-melhor-envio
+- menu_sem_destino: 0
 - edges_orfas: 5 — ex.: get-mapbox-token, get-weather-data, ingest-biosync
 - edges_chamadas_sem_pasta: 0
 - tabelas_sem_rls: 12 — ex.: audit_logs_y2026m01, audit_logs_y2026m02, audit_logs_y2026m03
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8558 nós · 21057 arestas · 858 comunidades · grafo do commit `97192d5b`
+- 8558 nós · 21057 arestas · 858 comunidades · grafo do commit `e271db76`
 - comunidades maiores: cn (174), App.tsx (169), db-observability/index.ts (130), Coletas.tsx (129), input.tsx (128), card.tsx (112), client.ts (111), ui/index.ts (106), react (105), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), badge.tsx (94), celebrationSounds.ts (88)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -282,9 +282,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Hotspots (arquivos mais alterados, 90 dias)
 - package-lock.json (52)
 - package.json (51)
-- docs/pendencias/_ordem.md (11)
+- docs/pendencias/_ordem.md (12)
+- docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (9)
 - .github/workflows/contexto-ia.yml (8)
-- docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (8)
 - .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
 - .github/workflows/deploy-functions.yml (6)
@@ -400,6 +400,9 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `e271db7` fix: corrige links para rotas inexistentes e adiciona rotas admin sem entrada (04-06) (#255)
+- 2026-11-21 `560f85e` chore: encerra Fase B no _ordem.md com PRs reais (#242-#253) (#254)
+- 2026-11-21 `cb197d6` chore: reconcilia audit Fase B (3.19-3.20, 3.27, 3.29-3.30) com as PRs mergeadas (#253)
 - 2026-11-21 `97192d5` fix: estrategia Nexus com pesos reais e select funcional (3.19) (#252)
 - 2026-11-21 `a33c675` fix: clima real OpenWeather nas functions de IA (03-24/03-25) (#251)
 - 2026-11-21 `2c38634` fix: remove fallback zerado do AnalyticsCharts (03-30) (#250)
@@ -412,9 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-21 `0f32426` fix: torna mapa de rotas e rastreamento em tempo real honestos (03-21/03-22) (#242)
 - 2026-11-21 `c517e6c` docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)
 - 2026-11-21 `d15ef79` fix: substitui simulacoes de lead time, divergencia semanal e acoes corretivas por dados reais (#240)
-- 2026-11-21 `73b5d8c` fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)
-- 2026-11-21 `81e9459` docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)
-- 2026-11-21 `df04cb6` fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

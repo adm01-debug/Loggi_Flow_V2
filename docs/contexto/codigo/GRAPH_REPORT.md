@@ -1,7 +1,7 @@
 # Graph Report - Loggi_Flow_V2  (2026-11-21)
 
 ## Corpus Check
-- 1439 files · ~803,210 words
+- 1439 files · ~803,462 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: .toml 6, (none) 6, .example 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `97192d5b`
+- Built from commit: `e271db76`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1449,7 +1449,7 @@ Nodes (9): 3.9 — NexusCoverageMap usa SAMPLE_DATA fixo, addToEntry(), collectP
 
 ### Community 167 - "Ordem de execução — backlog pendencias Loggi Flow V2"
 Cohesion: 0.15
-Nodes (12): Fase A — Itens QUEBRADOS (seção 2) que alteram dado/mentem ao usuário, Fase B — Simulações exibidas como dado real (seção 3) — EM ANDAMENTO, Fase C — Botões/telas sem efeito (seção 4), Fase D — Integrações parciais (seção 5), Fase E — Automação (seção 6), Fase F — Segurança (seção 7: MFA feito nº209, restante), Fase G — Gamificação (seção 8), Fase H — Banco (seção 9) (+4 more)
+Nodes (12): Fase A — Itens QUEBRADOS (seção 2) que alteram dado/mentem ao usuário, Fase B — Simulações exibidas como dado real (seção 3) — ENCERRADA (2026-11-21), Fase C — Botões/telas sem efeito (seção 4), Fase D — Integrações parciais (seção 5), Fase E — Automação (seção 6), Fase F — Segurança (seção 7: MFA feito nº209, restante), Fase G — Gamificação (seção 8), Fase H — Banco (seção 9) (+4 more)
 
 ### Community 168 - "db-health-weekly-report/index.ts"
 Cohesion: 0.18

@@ -5,7 +5,7 @@
   "urls": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
-  "itens_menu": 77,
+  "itens_menu": 81,
   "lazy": 74
  },
  "urls": [
@@ -8997,6 +8997,15 @@
    "resolve_para": "src/pages/Configuracoes.tsx"
   },
   {
+   "rotulo": "ADR",
+   "destino": "/admin/adr",
+   "grupo": null,
+   "papeis": [],
+   "papeis_nao_resolvidos": null,
+   "definido_em": "src/components/layout/AppSidebar.tsx",
+   "resolve_para": "src/pages/AdminADR.tsx"
+  },
+  {
    "rotulo": "Alertas Custo",
    "destino": "/alertas-custo",
    "grupo": null,
@@ -9295,12 +9304,12 @@
   },
   {
    "rotulo": "Integrações",
-   "destino": "/gestao-melhor-envio",
+   "destino": "/melhor-envio",
    "grupo": null,
    "papeis": [],
    "papeis_nao_resolvidos": null,
    "definido_em": "src/components/common/Breadcrumbs.tsx",
-   "resolve_para": null
+   "resolve_para": "src/pages/GestaoMelhorEnvio.tsx"
   },
   {
    "rotulo": "Integrações",
@@ -9393,6 +9402,15 @@
    "resolve_para": "src/pages/PainelSLA.tsx"
   },
   {
+   "rotulo": "Quality Gate",
+   "destino": "/admin/quality-gate",
+   "grupo": null,
+   "papeis": [],
+   "papeis_nao_resolvidos": null,
+   "definido_em": "src/components/layout/AppSidebar.tsx",
+   "resolve_para": "src/pages/admin/QualityGate.tsx"
+  },
+  {
    "rotulo": "Ranking",
    "destino": "/ranking",
    "grupo": null,
@@ -9409,6 +9427,15 @@
    "papeis_nao_resolvidos": null,
    "definido_em": "src/components/layout/AppSidebar.tsx",
    "resolve_para": "src/pages/RastreamentoMotorista.tsx"
+  },
+  {
+   "rotulo": "Rate Limit",
+   "destino": "/rate-limit",
+   "grupo": null,
+   "papeis": [],
+   "papeis_nao_resolvidos": null,
+   "definido_em": "src/components/layout/AppSidebar.tsx",
+   "resolve_para": "src/pages/RateLimitDashboard.tsx"
   },
   {
    "rotulo": "Rede Logística",
@@ -9472,6 +9499,15 @@
    "papeis_nao_resolvidos": null,
    "definido_em": "src/components/layout/AppSidebar.tsx",
    "resolve_para": "src/pages/admin/DbHealth.tsx"
+  },
+  {
+   "rotulo": "Telemetria",
+   "destino": "/admin/telemetria",
+   "grupo": null,
+   "papeis": [],
+   "papeis_nao_resolvidos": null,
+   "definido_em": "src/components/layout/AppSidebar.tsx",
+   "resolve_para": "src/pages/AdminTelemetria.tsx"
   },
   {
    "rotulo": "Usuários",

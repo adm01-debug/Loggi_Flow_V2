@@ -2144,7 +2144,7 @@
    "hooks_exportados": [
     "useNavigationHistory"
    ],
-   "linhas": 136,
+   "linhas": 150,
    "dominio": "hooks/common",
    "tabelas": [
     "security_events"
