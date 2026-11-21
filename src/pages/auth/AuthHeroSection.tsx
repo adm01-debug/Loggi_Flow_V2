@@ -26,7 +26,7 @@ const features = [
   {
     icon: TrendingUp,
     title: "Otimize Operações",
-    description: "Reduza custos em até 30%",
+    description: "Automação que corta retrabalho operacional",
   },
   { icon: Zap, title: "Tempo Real", description: "Rastreamento instantâneo" },
   { icon: Award, title: "Gamificação", description: "Engaje sua equipe" },
@@ -35,68 +35,87 @@ const features = [
 
 const testimonials = [
   {
-    name: "Carlos Silva",
-    role: "Gerente de Logística",
-    company: "TransLog BR",
-    avatar: "CS",
+    name: "Rastreamento em tempo real",
+    role: "GPS e histórico",
+    company: "LogiFlow",
+    avatar: "R",
     content:
-      "Reduzimos 40% do tempo de gestão com o LogiFlow. A gamificação transformou nossa equipe!",
+      "Posição das entregas em tempo real com histórico por período e alertas automatizados de atraso.",
     rating: 5,
   },
   {
-    name: "Ana Beatriz",
-    role: "Diretora de Operações",
-    company: "Express Cargo",
-    avatar: "AB",
+    name: "Previsão de atrasos",
+    role: "Machine learning",
+    company: "LogiFlow",
+    avatar: "A",
     content:
-      "A visibilidade em tempo real mudou completamente nossa operação. Recomendo demais!",
+      "Modelos preditivos sinalizam entregas com risco de atraso antes de elas acontecerem, ativando correção automática.",
     rating: 5,
   },
   {
-    name: "Roberto Mendes",
-    role: "CEO",
-    company: "FastShip",
-    avatar: "RM",
+    name: "Automação de frete",
+    role: "Múltiplas transportadoras",
+    company: "LogiFlow",
+    avatar: "F",
     content:
-      "ROI positivo em 3 meses. A melhor decisão que tomamos para nossa logística.",
+      "Seleção automática da transportadora por custo e prazo, com conciliação e OCR de comprovantes integrados.",
     rating: 5,
   },
   {
-    name: "Fernanda Costa",
-    role: "Coordenadora",
-    company: "LogiMaster",
-    avatar: "FC",
+    name: "Inteligência logística",
+    role: "OTIF e produtividade",
+    company: "LogiFlow",
+    avatar: "O",
     content:
-      "Interface intuitiva e relatórios detalhados. Perfeito para gestão de frotas!",
+      "Indicadores OTIF, produtividade por motorista e gamificação com recompensas baseadas em entregas reais.",
     rating: 5,
   },
   {
-    name: "Pedro Santos",
-    role: "Diretor de TI",
-    company: "RápidoLog",
-    avatar: "PS",
-    content: "Integração perfeita com nossos sistemas. Suporte excepcional!",
+    name: "Integrações nativas",
+    role: "Sistema aberto",
+    company: "LogiFlow",
+    avatar: "I",
+    content:
+      "Bitrix24, WhatsApp, Lalamove, Melhor Envio e Rodonaves integrados por edge functions com webhooks e alertas.",
     rating: 5,
   },
 ];
 
 const stats = [
   {
-    value: 10000,
-    label: "Entregas/mês",
+    value: 43,
+    label: "Edge functions",
     prefix: "",
-    suffix: "+",
+    suffix: "",
     decimals: undefined as number | undefined,
   },
-  { value: 98.5, label: "Satisfação", prefix: "", suffix: "%", decimals: 1 },
-  { value: 150, label: "Empresas", prefix: "", suffix: "+" },
-  { value: 35, label: "Redução Custos", prefix: "-", suffix: "%" },
+  {
+    value: 78,
+    label: "Telas de gestão",
+    prefix: "",
+    suffix: "",
+    decimals: undefined as number | undefined,
+  },
+  {
+    value: 161,
+    label: "Tabelas com RLS",
+    prefix: "",
+    suffix: "",
+    decimals: undefined as number | undefined,
+  },
+  {
+    value: 17,
+    label: "Pipelines de deploy",
+    prefix: "",
+    suffix: "",
+    decimals: undefined as number | undefined,
+  },
 ];
 
 const trustBadges = [
-  { name: "ISO 27001", icon: ShieldCheck },
-  { name: "LGPD Compliant", icon: Shield },
-  { name: "99.9% Uptime", icon: Globe },
+  { name: "RLS em 161 tabelas", icon: ShieldCheck },
+  { name: "LGPD", icon: Shield },
+  { name: "Edge isolation", icon: Globe },
   { name: "Suporte 24/7", icon: Users },
 ];
 
@@ -300,8 +319,7 @@ export function AuthHeroSection() {
           <p className="text-xl text-muted-foreground leading-relaxed font-medium">
             O futuro da gestão logística chegou.{" "}
             <span className="text-primary font-bold">LogiFlow</span> une
-            gamificação de elite e inteligência artificial para performance
-            10/10.
+            gamificação e inteligência artificial em toda a operação logística.
           </p>
           <div className="grid grid-cols-2 gap-4 pt-4">
             {features.map((feature, i) => (
