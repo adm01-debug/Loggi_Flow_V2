@@ -52,7 +52,7 @@ interface MatchResult {
 
 export default function ConciliacaoAutomatica() {
   const { user } = useAuth();
-  
+
   const [showResults, setShowResults] = useState(false);
   const [matchResults, setMatchResults] = useState<MatchResult[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -185,6 +185,10 @@ export default function ConciliacaoAutomatica() {
   const divergencias = matchResults.filter((r) => r.status === "divergencia");
   const semMatch = matchResults.filter((r) => r.status === "sem_match");
   const valorDivergencia = divergencias.reduce((s, r) => s + r.diferenca, 0);
+  const pctConciliados =
+    matchResults.length > 0
+      ? Math.round((conciliados.length / matchResults.length) * 100)
+      : 0;
 
   return (
     <MainLayout>
@@ -245,7 +249,7 @@ export default function ConciliacaoAutomatica() {
                     {conciliados.length}
                   </p>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                    Conciliados 100%
+                    Conciliados · {pctConciliados}%
                   </p>
                 </CardContent>
               </Card>
