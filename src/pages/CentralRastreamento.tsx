@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router-dom";
+/* eslint-disable max-lines */
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 
 const FILTER_TABS: {
@@ -63,6 +65,7 @@ function formatDate(date: string | null): string {
 
 export default function CentralRastreamento() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     shipments,
     summary,
@@ -85,6 +88,19 @@ export default function CentralRastreamento() {
   const openDetail = (s: UnifiedShipment) => {
     navigate(`/rastreamento/${s.id}`);
   };
+
+  // Deep-link: notificações de predição gravam /central-rastreamento?entrega=<id> ou ?coleta=<id>.
+  useEffect(() => {
+    const targetId = searchParams.get("entrega") ?? searchParams.get("coleta");
+    if (!targetId) return;
+    const target = shipments.find(
+      (s) => s.id === targetId || s.numero === targetId,
+    );
+    if (target) {
+      setSearchParams({}, { replace: true });
+      navigate(`/rastreamento/${target.id}`);
+    }
+  }, [searchParams, shipments, navigate, setSearchParams]);
 
   return (
     <MainLayout>
@@ -245,18 +261,24 @@ export default function CentralRastreamento() {
         <Card>
           <CardContent className="p-0">
             {(() => {
-              if (isLoading) return (
-                <div className="flex justify-center py-16">
-                  <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-                </div>
-              );
-              if (pagination.paginatedData.length === 0) return (
-                <EmptyState
-                  icon={Package}
-                  title="Nenhuma remessa encontrada"
-                  description={searchTerm ? "Tente alterar os filtros" : "Cadastre entregas ou coletas para rastrear"}
-                />
-              );
+              if (isLoading)
+                return (
+                  <div className="flex justify-center py-16">
+                    <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+                  </div>
+                );
+              if (pagination.paginatedData.length === 0)
+                return (
+                  <EmptyState
+                    icon={Package}
+                    title="Nenhuma remessa encontrada"
+                    description={
+                      searchTerm
+                        ? "Tente alterar os filtros"
+                        : "Cadastre entregas ou coletas para rastrear"
+                    }
+                  />
+                );
               return (
                 <div className="overflow-x-auto">
                   <Table>
@@ -287,30 +309,67 @@ export default function CentralRastreamento() {
                         >
                           <TableCell>
                             <Badge variant="outline" className="text-[10px]">
-                              {s.tipo === "entrega" ? "📦 Entrega" : "🚚 Coleta"}
+                              {s.tipo === "entrega"
+                                ? "📦 Entrega"
+                                : "🚚 Coleta"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="font-mono text-sm font-medium">{s.numero}</TableCell>
-                          <TableCell>
-                            <div className="max-w-[200px] truncate text-sm" title={s.destino}>{s.destino}</div>
-                            {s.cliente && <span className="text-xs text-muted-foreground">{s.cliente}</span>}
+                          <TableCell className="font-mono text-sm font-medium">
+                            {s.numero}
                           </TableCell>
-                          <TableCell className="text-sm">{s.transportadora}</TableCell>
+                          <TableCell>
+                            <div
+                              className="max-w-[200px] truncate text-sm"
+                              title={s.destino}
+                            >
+                              {s.destino}
+                            </div>
+                            {s.cliente && (
+                              <span className="text-xs text-muted-foreground">
+                                {s.cliente}
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {s.transportadora}
+                          </TableCell>
                           <TableCell className="text-center">
-                            <Badge variant="outline" className="text-[10px]" style={{ borderColor: s.statusColor, color: s.statusColor }}>
+                            <Badge
+                              variant="outline"
+                              className="text-[10px]"
+                              style={{
+                                borderColor: s.statusColor,
+                                color: s.statusColor,
+                              }}
+                            >
                               {s.statusLabel}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-center text-xs text-muted-foreground">{formatDate(s.previsao)}</TableCell>
+                          <TableCell className="text-center text-xs text-muted-foreground">
+                            {formatDate(s.previsao)}
+                          </TableCell>
                           <TableCell className="text-center">
                             {s.atrasado ? (
-                              <Badge variant="destructive" className="text-[10px]">{s.diasAtraso}d</Badge>
+                              <Badge
+                                variant="destructive"
+                                className="text-[10px]"
+                              >
+                                {s.diasAtraso}d
+                              </Badge>
                             ) : (
                               <span className="text-xs text-success">✓</span>
                             )}
                           </TableCell>
                           <TableCell>
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); navigate(`/rastreamento/${s.id}`); }}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/rastreamento/${s.id}`);
+                              }}
+                            >
                               <Eye className="w-3.5 h-3.5" />
                             </Button>
                           </TableCell>

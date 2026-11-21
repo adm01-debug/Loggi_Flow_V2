@@ -159,9 +159,9 @@
 
 ~~**Rotas sem entrada em nenhuma navegação**~~ — CONCLUÍDO via PR #255 (`e271db76`): `/admin/adr`, `/admin/quality-gate`, `/rate-limit` e `/admin/telemetria` adicionadas ao AppSidebar (admin).
 
-**Mapas:** `MapboxMap` suporta `onMarkerClick` (`:32,512`), mas `RastreamentoRealTime.tsx:471` e `MapaRotas.tsx:330` não passam a prop: clicar em veículo/entrega só abre o popup informativo, sem selecionar, detalhar ou navegar.
+~~**Mapas:**~~ — CONCLUÍDO via PR #258 (`fa1afdb0`): `MapaRotas.tsx` seleciona marcador e abre painel "Rota Selecionada" com navegação para `/rastreamento/<id>`; `RastreamentoRealTime.tsx` destaca veículo/destino selecionado no mapa.
 
-**Deep link ignorado:** `predict-delays-scheduled/index.ts:113` grava `action_url=/central-rastreamento?entrega=<id>`, mas `CentralRastreamento.tsx` não lê `searchParams`.
+~~**Deep link ignorado:**~~ — CORRIGIDO na PR #259 (`23b83482`): `CentralRastreamento.tsx` lê `?entrega=|<coleta>=<id>` e navega direto para `/rastreamento/<id>`.
 
 **Estados ausentes em páginas com fetch:** sem tratamento de erro em ~30 páginas (`DashboardExecutivo`, `DashboardCotacoes`, `Conquistas`, `MapaRotas`, `PainelOTIF`, `RelatorioPDF`, `ConciliacaoAutomatica`, `Index`, `Analytics`, `SLADashboard`, `CustosDashboard`, `AlertasCusto`, `CalendarioLogistico`, `CentralRastreamento`, `InteligenciaFrete`, `LogisticaReversa`, `RastreamentoRealTime`, `CotacaoFrete`, `ConciliacaoFinanceira`, `Coletas`, `Transportadoras`, `Relatorios`, `PainelSLA`, `GerenciamentoUsuarios`, `ExportacaoDados`, `Ranking`, `KanbanEntregas`, `LojaRecompensas`, `RotasTransportadoras`, `AdminADR`); sem loading em 7 delas. Tratam os três estados: `Envios`, `Clientes`, `Fornecedores`, `FretesInternos`, `Notificacoes`, `Ocorrencias`, `AdminTelemetria`.
 
