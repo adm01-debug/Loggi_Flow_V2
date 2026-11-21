@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useState } from "react";
 import {
   History,
@@ -269,7 +270,7 @@ export function AuditTrailViewer({
                 );
                 if (targets.length === 0) {
                   toast.info(
-                    "Nenhum registro excluído encontrável para restauração (ão). Selecione logs de exclusão (DELETE) para restaurar.",
+                    "Nenhum registro excluído encontrável para restauração. Selecione logs de exclusão (DELETE) para restaurar.",
                     { id: loadingToast },
                   );
                   return;
