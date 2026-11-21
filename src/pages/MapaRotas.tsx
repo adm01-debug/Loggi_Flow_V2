@@ -19,6 +19,7 @@ import {
   useDeliveryRoutes,
   getStatusColor,
   getStatusLabel,
+  type DeliveryRoute,
 } from "@/hooks/logistics/useDeliveryRoutes";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
@@ -47,6 +48,8 @@ interface DeliveryPoint {
   order: number;
 }
 
+const EMPTY_ROUTES: DeliveryRoute[] = [];
+
 const filterConfig: FilterConfig<DeliveryPoint> = {
   search: { fields: ["address"], placeholder: "Buscar endereço..." },
 };
@@ -54,10 +57,7 @@ const filterConfig: FilterConfig<DeliveryPoint> = {
 export default function MapaRotas() {
   const navigate = useNavigate();
   const deliveryRoutes = useDeliveryRoutes();
-  const routes = useMemo(
-    () => deliveryRoutes?.data || [],
-    [deliveryRoutes?.data],
-  );
+  const routes = deliveryRoutes?.data ?? EMPTY_ROUTES;
 
   const [showRouteLines] = useState(true);
   const [mapStyle] = useState<"dark" | "satellite">("dark");

@@ -148,6 +148,44 @@ function MetasEmFocoCard({ otifRate, targetOtif }: MetasEmFocoCardProps) {
   );
 }
 
+function anyError(...flags: Array<boolean | undefined>): boolean {
+  return flags.some(Boolean);
+}
+
+function AIAssistantToggle({
+  showAI,
+  onToggle,
+}: {
+  showAI: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <Button
+      variant={showAI ? "secondary" : "default"}
+      className={cn(
+        "gap-2 transition-all duration-300",
+        !showAI && "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20",
+      )}
+      onClick={onToggle}
+    >
+      {showAI ? (
+        <X className="w-4 h-4" />
+      ) : (
+        <BrainCircuit className="w-4 h-4 animate-pulse" />
+      )}
+      {showAI ? "Fechar Assistente" : "Assistente Logístico IA"}
+      {!showAI && (
+        <Badge
+          variant="secondary"
+          className="ml-1 h-5 bg-white/20 text-white border-none text-[10px]"
+        >
+          Gemini 2.0
+        </Badge>
+      )}
+    </Button>
+  );
+}
+
 export default function DashboardExecutivo() {
   const [showAI, setShowAI] = useState(false);
   const { trends, carrierOtif, avgCollectionTime } = useExecutiveMetrics();
@@ -372,12 +410,17 @@ export default function DashboardExecutivo() {
   const avgColTime = avgCollectionTime.data || 0;
   const { data: alertas, isLoading: alertasLoading } = useRecentAlerts();
 
-  const loading =
-    isLoadingEntregas ||
-    isLoadingColetas ||
-    isLoadingOcorrencias ||
-    alertasLoading;
-  const hasError = isErrorEntregas || isErrorColetas || isErrorOcorrencias;
+  const loading = anyError(
+    isLoadingEntregas,
+    isLoadingColetas,
+    isLoadingOcorrencias,
+    alertasLoading,
+  );
+  const hasError = anyError(
+    isErrorEntregas,
+    isErrorColetas,
+    isErrorOcorrencias,
+  );
 
   if (loading) {
     return (
@@ -429,30 +472,10 @@ export default function DashboardExecutivo() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant={showAI ? "secondary" : "default"}
-              className={cn(
-                "gap-2 transition-all duration-300",
-                !showAI &&
-                  "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20",
-              )}
-              onClick={() => setShowAI(!showAI)}
-            >
-              {showAI ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <BrainCircuit className="w-4 h-4 animate-pulse" />
-              )}
-              {showAI ? "Fechar Assistente" : "Assistente Logístico IA"}
-              {!showAI && (
-                <Badge
-                  variant="secondary"
-                  className="ml-1 h-5 bg-white/20 text-white border-none text-[10px]"
-                >
-                  Gemini 2.0
-                </Badge>
-              )}
-            </Button>
+            <AIAssistantToggle
+              showAI={showAI}
+              onToggle={() => setShowAI(!showAI)}
+            />
           </div>
         </div>
 

@@ -27,6 +27,35 @@ import {
   DistributionChart,
 } from "@/components/analytics/AnalyticsCharts";
 
+function anyError(...flags: Array<boolean | undefined>): boolean {
+  return flags.some(Boolean);
+}
+
+function GrowthStatCard({ growthRate }: { growthRate: number }) {
+  const positive = growthRate >= 0;
+  return (
+    <div className="stat-card text-center p-3 sm:p-4 col-span-2 sm:col-span-1">
+      {positive ? (
+        <TrendingUp className="w-5 h-5 text-success mx-auto mb-2" />
+      ) : (
+        <TrendingDown className="w-5 h-5 text-destructive mx-auto mb-2" />
+      )}
+      <p
+        className={cn(
+          "text-xl sm:text-2xl font-bold",
+          positive ? "text-success" : "text-destructive",
+        )}
+      >
+        {positive ? "+" : ""}
+        {growthRate}%
+      </p>
+      <p className="text-[10px] sm:text-xs text-muted-foreground">
+        Crescimento
+      </p>
+    </div>
+  );
+}
+
 export default function Analytics() {
   const [dateRange, setDateRange] = useState<DayPickerDateRange | undefined>({
     from: subDays(new Date(), 30),
@@ -64,7 +93,7 @@ export default function Analytics() {
     setDateRange(range);
   };
 
-  if (isError || isErrorBenchmark || isErrorTracking) {
+  if (anyError(isError, isErrorBenchmark, isErrorTracking)) {
     return (
       <MainLayout>
         <div className="px-2">
@@ -153,25 +182,7 @@ export default function Analytics() {
               Receita
             </p>
           </div>
-          <div className="stat-card text-center p-3 sm:p-4 col-span-2 sm:col-span-1">
-            {stats.growthRate >= 0 ? (
-              <TrendingUp className="w-5 h-5 text-success mx-auto mb-2" />
-            ) : (
-              <TrendingDown className="w-5 h-5 text-destructive mx-auto mb-2" />
-            )}
-            <p
-              className={cn(
-                "text-xl sm:text-2xl font-bold",
-                stats.growthRate >= 0 ? "text-success" : "text-destructive",
-              )}
-            >
-              {stats.growthRate >= 0 ? "+" : ""}
-              {stats.growthRate}%
-            </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
-              Crescimento
-            </p>
-          </div>
+          <GrowthStatCard growthRate={stats.growthRate} />
         </div>
 
         <Tabs defaultValue="kpis">
