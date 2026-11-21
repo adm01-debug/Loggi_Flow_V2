@@ -1,339 +1,153 @@
 {
-  "generatedAt": "2026-07-12T22:37:30.920Z",
+  "generatedAt": "2026-11-21T15:44:53.936Z",
   "budget": {
-    "lintWarnings": 740,
+    "lintWarnings": 105,
     "lintErrors": 0,
     "tsErrors": 0
   },
   "totals": {
-    "files": 245,
-    "warnings": 740,
+    "files": 63,
+    "warnings": 103,
     "errors": 0
   },
   "rules": [
     {
-      "rule": "@typescript-eslint/no-explicit-any",
-      "warnings": 193,
+      "rule": "react-hooks/set-state-in-effect",
+      "warnings": 38,
       "errors": 0
     },
     {
-      "rule": "sonarjs/no-nested-conditional",
-      "warnings": 147,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-dead-store",
-      "warnings": 91,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-unused-vars",
-      "warnings": 87,
-      "errors": 0
-    },
-    {
-      "rule": "max-lines",
-      "warnings": 59,
-      "errors": 0
-    },
-    {
-      "rule": "react-refresh/only-export-components",
+      "rule": "react-hooks/static-components",
       "warnings": 37,
       "errors": 0
     },
     {
-      "rule": "react-hooks/exhaustive-deps",
-      "warnings": 26,
+      "rule": "react-hooks/refs",
+      "warnings": 6,
+      "errors": 0
+    },
+    {
+      "rule": "react-hooks/immutability",
+      "warnings": 5,
+      "errors": 0
+    },
+    {
+      "rule": "react-hooks/preserve-manual-memoization",
+      "warnings": 5,
+      "errors": 0
+    },
+    {
+      "rule": "react-hooks/incompatible-library",
+      "warnings": 3,
+      "errors": 0
+    },
+    {
+      "rule": "react-hooks/purity",
+      "warnings": 3,
+      "errors": 0
+    },
+    {
+      "rule": "max-lines",
+      "warnings": 2,
       "errors": 0
     },
     {
       "rule": "sonarjs/cognitive-complexity",
-      "warnings": 20,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-ignored-exceptions",
-      "warnings": 19,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/pseudo-random",
-      "warnings": 17,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-nested-functions",
-      "warnings": 11,
-      "errors": 0
-    },
-    {
-      "rule": "no-useless-catch",
-      "warnings": 4,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-useless-catch",
-      "warnings": 4,
-      "errors": 0
-    },
-    {
-      "rule": "@typescript-eslint/no-empty-object-type",
-      "warnings": 3,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-nested-template-literals",
-      "warnings": 3,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-identical-functions",
-      "warnings": 3,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/slow-regex",
-      "warnings": 3,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/constructor-for-side-effects",
-      "warnings": 2,
-      "errors": 0
-    },
-    {
-      "rule": "no-empty",
-      "warnings": 2,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/no-redundant-assignments",
-      "warnings": 2,
-      "errors": 0
-    },
-    {
-      "rule": "@typescript-eslint/ban-ts-comment",
-      "warnings": 2,
-      "errors": 0
-    },
-    {
-      "rule": "no-useless-escape",
-      "warnings": 2,
-      "errors": 0
-    },
-    {
-      "rule": "sonarjs/class-name",
       "warnings": 1,
       "errors": 0
     },
     {
-      "rule": "sonarjs/prefer-single-boolean-return",
+      "rule": "react-hooks/globals",
       "warnings": 1,
       "errors": 0
     },
     {
-      "rule": "@typescript-eslint/no-require-imports",
+      "rule": "parse-error",
+      "warnings": 1,
+      "errors": 0
+    },
+    {
+      "rule": "sonarjs/super-linear-regex",
       "warnings": 1,
       "errors": 0
     }
   ],
   "files": [
     {
-      "file": "src/pages/MapaRotas.tsx",
-      "warnings": 24,
+      "file": "src/pages/DashboardExecutivo.tsx",
+      "warnings": 7,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 10,
+          "rule": "react-hooks/static-components",
+          "warnings": 5,
           "errors": 0
         },
         {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 10,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
+          "rule": "react-hooks/preserve-manual-memoization",
+          "warnings": 2,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/ConfiguracoesFrete.tsx",
-      "warnings": 23,
+      "file": "src/pages/Clientes.tsx",
+      "warnings": 5,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 22,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
+          "rule": "react-hooks/static-components",
+          "warnings": 5,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/dashboard/LogisticsMapWidget.tsx",
-      "warnings": 15,
+      "file": "src/pages/Fornecedores.tsx",
+      "warnings": 5,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 4,
+          "rule": "react-hooks/static-components",
+          "warnings": 5,
           "errors": 0
-        },
+        }
+      ]
+    },
+    {
+      "file": "src/pages/FretesInternos.tsx",
+      "warnings": 5,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 4,
+          "rule": "react-hooks/static-components",
+          "warnings": 5,
           "errors": 0
-        },
+        }
+      ]
+    },
+    {
+      "file": "src/hooks/ui/useQRScanner.tsx",
+      "warnings": 4,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
         {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/immutability",
           "warnings": 2,
           "errors": 0
         },
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/preserve-manual-memoization",
           "warnings": 1,
           "errors": 0
         },
         {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/rodonaves/RTECustomerManager.tsx",
-      "warnings": 14,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 8,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/CentralRastreamento.tsx",
-      "warnings": 13,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 6,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 6,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/labels/MaterialLabelPrinter.tsx",
-      "warnings": 11,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/notifications/useNotifications.tsx",
-      "warnings": 11,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 5,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 5,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/constructor-for-side-effects",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
@@ -341,908 +155,64 @@
     },
     {
       "file": "src/pages/Transportadoras.tsx",
-      "warnings": 11,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 9,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/auth/useMFA.ts",
-      "warnings": 10,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "no-useless-catch",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-useless-catch",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Coletas.tsx",
-      "warnings": 10,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 6,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Configuracoes.tsx",
-      "warnings": 10,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 6,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Ranking.tsx",
-      "warnings": 10,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/map/MapboxMap.tsx",
-      "warnings": 9,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/GestaoBox.tsx",
-      "warnings": 9,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/RastreamentoRealTime.tsx",
-      "warnings": 9,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/rodonaves/RTETrackingPanel.tsx",
-      "warnings": 8,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 6,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/security/TwoFactorSetup.tsx",
-      "warnings": 8,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/AlertasCusto.tsx",
-      "warnings": 8,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Despachos.tsx",
-      "warnings": 8,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 5,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/dashboard/AlertsPanel.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/preferences/components/PreferencePanel.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 7,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/useDashboardMetrics.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 7,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Clientes.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/CotacaoMultiCanal.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/DashboardCotacoes.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Envios.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/SLADashboard.tsx",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 6,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/utils/systemTester.spec.ts",
-      "warnings": 7,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 7,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/ResponseConsole.tsx",
-      "warnings": 6,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/melhorenvio/METransportadorasPanel.tsx",
-      "warnings": 6,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 6,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/shipping/ExpeditionDetailsDialog.tsx",
-      "warnings": 6,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/common/useTimezone.tsx",
-      "warnings": 6,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-identical-functions",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useBusinessRuleEngine.tsx",
-      "warnings": 6,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/security/useIntegrationValidation.tsx",
-      "warnings": 6,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Conquistas.tsx",
-      "warnings": 6,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/dashboard/KPICard.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/dashboard/MissionDetail.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/dashboard/PerformanceChart.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 4,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/melhorenvio/MECarrinhoPanel.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/shipping/DeliveryReceiptUpload.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/LongRunningQueriesCard.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 5,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/data/useRealtime.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-empty-object-type",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Index.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/RastreamentoMotorista.tsx",
-      "warnings": 5,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/melhorenvio/MECartDialog.tsx",
       "warnings": 4,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/cognitive-complexity",
+          "rule": "react-hooks/static-components",
+          "warnings": 4,
+          "errors": 0
+        }
+      ]
+    },
+    {
+      "file": "src/components/audit/AuditTrailViewer.tsx",
+      "warnings": 2,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
+        {
+          "rule": "react-hooks/static-components",
           "warnings": 2,
           "errors": 0
-        },
+        }
+      ]
+    },
+    {
+      "file": "src/components/freight/FreightTableManager.tsx",
+      "warnings": 2,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
         {
-          "rule": "react-hooks/exhaustive-deps",
+          "rule": "react-hooks/static-components",
+          "warnings": 2,
+          "errors": 0
+        }
+      ]
+    },
+    {
+      "file": "src/components/notifications/BrowserNotificationPrompt.tsx",
+      "warnings": 2,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
+        {
+          "rule": "react-hooks/set-state-in-effect",
+          "warnings": 2,
+          "errors": 0
+        }
+      ]
+    },
+    {
+      "file": "src/components/predictions/WhatIfPanel.tsx",
+      "warnings": 2,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
+        {
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         },
@@ -1254,72 +224,13 @@
       ]
     },
     {
-      "file": "src/components/melhorenvio/MEEtiquetasPanel.tsx",
-      "warnings": 4,
+      "file": "src/components/pwa/InstallPrompt.tsx",
+      "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/melhorenvio/MELojasPanel.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/onboarding/OnboardingChecklist.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/rodonaves/RTEPickupActions.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 2,
           "errors": 0
         }
@@ -1327,1427 +238,114 @@
     },
     {
       "file": "src/components/security/SecurityOverviewPanel.tsx",
-      "warnings": 4,
+      "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-hooks/exhaustive-deps",
+          "rule": "react-hooks/preserve-manual-memoization",
           "warnings": 1,
           "errors": 0
         },
         {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "no-empty",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/features/db-observability/components/CacheHitRatioCard.tsx",
-      "warnings": 4,
+      "file": "src/hooks/common/useNavigationHistory.tsx",
+      "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/TopTablesBySizeCard.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/common/useBulkActions.ts",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/common/useDensity.ts",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-dead-store",
+          "rule": "react-hooks/refs",
           "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-redundant-assignments",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/data/useSoftDelete.ts",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useSLAAlerts.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/lib/queryKeys.ts",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/ConciliacaoAutomatica.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/PainelOTIF.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/RelatorioPDF.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Relatorios.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/conciliacao/ConciliacaoExport.tsx",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "tests/integration/massive-simulation.spec.ts",
-      "warnings": 4,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 4,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/coletas/PickupDetailsDialog.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/common/StatusBadge.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/ScenarioSimulator.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/layout/Header.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/notifications/NotificationCenter.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/onboarding/OnboardingWizard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/reports/ScheduledReportsManager.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/security/PermissionGate.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/sidebar.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/ActiveSessionsCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/AutovacuumHealthCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/DuplicateIndexesCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/LockConflictsCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/ReplicationStatusCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/RlsAuditCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/TempFileStatsCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/WraparoundStatusCard.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/preferences/hooks/useUserPreferences.ts",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/usePerformanceMonitor.ts",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/useScheduledReports.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/common/useImportData.ts",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
       "file": "src/hooks/common/useOnlineStatus.tsx",
-      "warnings": 3,
+      "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/data/useImageUpload.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/slow-regex",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useDeliveryRoutes.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/pseudo-random",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 2,
           "errors": 0
-        },
-        {
-          "rule": "sonarjs/prefer-single-boolean-return",
-          "warnings": 1,
-          "errors": 0
         }
       ]
     },
     {
-      "file": "src/hooks/logistics/useLalamoveTracking.tsx",
-      "warnings": 3,
+      "file": "src/hooks/data/useRealtime.tsx",
+      "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useSmartAlerts.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
+          "rule": "react-hooks/refs",
+          "warnings": 2,
           "errors": 0
         }
       ]
     },
     {
       "file": "src/hooks/notifications/usePushNotifications.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/ui/useQRScanner.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/ban-ts-comment",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/AdminADR.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 3,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/CalendarioLogistico.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/IntegracaoBitrix.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/Ocorrencias.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/RastreamentoPublico.tsx",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-template-literals",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/auth/authUtils.ts",
-      "warnings": 3,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "no-useless-escape",
-          "warnings": 2,
-          "errors": 0
-        },
-        {
-          "rule": "no-empty",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/App.tsx",
       "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-unused-vars",
+          "rule": "react-hooks/immutability",
           "warnings": 1,
           "errors": 0
         },
         {
-          "rule": "sonarjs/no-dead-store",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/accessibility/LiveRegion.tsx",
+      "file": "src/pages/AlertasCusto.tsx",
       "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/static-components",
           "warnings": 2,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/accessibility/ReducedMotion.tsx",
+      "file": "src/pages/Envios.tsx",
       "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/static-components",
           "warnings": 2,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/common/ConfirmProvider.tsx",
+      "file": "src/pages/Index.tsx",
       "warnings": 2,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/common/EmptyState.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/dashboard/FavoriteMetricsBar.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/DecisionAudit.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/gamification/LevelUpModal.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/integrations/WebhookManager.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/map/CinematicHUD.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/search/GlobalSearch.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/animated-number.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/avatar.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/button.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/input.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/micro-interactions.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/ExtensionsAuditCard.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/RemediationHistoryCard.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/hooks/useIndexProposals.ts",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/auth/useWebAuthn.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/common/useGlobalSearch.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-template-literals",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/common/useSorting.ts",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/gamification/useAchievementNotifications.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useCotacoesMulticanal.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useDelayPrediction.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useLogisticsCalendar.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useQuotationFlow.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useRodonavesTracking.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useSLANotifications.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useUnifiedTracking.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/security/useSelfHealing.ts",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/ui/useOnboarding.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/AdminTelemetria.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/CustosDashboard.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/ImportacaoMassa.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/KanbanEntregas.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "max-lines",
-          "warnings": 1,
           "errors": 0
         }
       ]
@@ -2759,10 +357,49 @@
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/static-components",
+          "warnings": 2,
+          "errors": 0
+        }
+      ]
+    },
+    {
+      "file": "src/pages/Ocorrencias.tsx",
+      "warnings": 2,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
+        {
+          "rule": "react-hooks/static-components",
+          "warnings": 2,
+          "errors": 0
+        }
+      ]
+    },
+    {
+      "file": "tests/e2e/critical-paths.spec.ts",
+      "warnings": 2,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
+        {
+          "rule": "parse-error",
           "warnings": 1,
           "errors": 0
         },
+        {
+          "rule": "sonarjs/super-linear-regex",
+          "warnings": 1,
+          "errors": 0
+        }
+      ]
+    },
+    {
+      "file": "scripts/seed-database.ts",
+      "warnings": 1,
+      "errors": 0,
+      "tsErrors": 0,
+      "rules": [
         {
           "rule": "max-lines",
           "warnings": 1,
@@ -2771,137 +408,39 @@
       ]
     },
     {
-      "file": "src/pages/Profile.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/RotasTransportadoras.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "sonarjs/no-dead-store",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/admin-telemetria/TelemetryTable.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/conciliacao/ConciliacaoList.tsx",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/services/resilience/CircuitBreaker.ts",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/ban-ts-comment",
-          "warnings": 1,
-          "errors": 0
-        },
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/test/setup.ts",
-      "warnings": 2,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 2,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/achievements/AchievementBadge.tsx",
+      "file": "src/components/accessibility/ReducedMotion.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/admin/DORAMetrics.tsx",
+      "file": "src/components/analytics/OperationalPulse.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/box/BoxGrid.tsx",
+      "file": "src/components/coletas/PickupDetailsDialog.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
@@ -2914,20 +453,7 @@
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/common/CSVImporter.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/incompatible-library",
           "warnings": 1,
           "errors": 0
         }
@@ -2940,215 +466,85 @@
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/common/DateRangePicker.tsx",
+      "file": "src/components/common/GlobalLoadingBar.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/common/ErrorBoundary.tsx",
+      "file": "src/components/common/RealtimeBadge.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/common/RealtimeStatus.tsx",
+      "file": "src/components/common/SearchInput.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-ignored-exceptions",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/common/WidgetErrorBoundary.tsx",
+      "file": "src/components/common/VirtualizedList.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-ignored-exceptions",
+          "rule": "react-hooks/incompatible-library",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/dashboard/BiometricConsentModal.tsx",
+      "file": "src/components/dashboard/LogisticsMapWidget.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/dashboard/DraggableDashboard.tsx",
+      "file": "src/components/freight/ResponseConsole.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/dashboard/IntelligentLogisticsWidget.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/dashboard/LiveStatusBar.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/AIFreightForecasting.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/FreightAudit.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/FreightTableManager.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/NexusCoverageMap.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/class-name",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/freight/SmartCarrierSelector.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/layout/AppSidebar.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/layout/SystemPulse.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/map/AnomalyList.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/immutability",
           "warnings": 1,
           "errors": 0
         }
@@ -3161,306 +557,137 @@
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/melhorenvio/MEDetailDialog.tsx",
+      "file": "src/components/melhorenvio/MECartDialog.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/cognitive-complexity",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/melhorenvio/MEUsuarioPanel.tsx",
+      "file": "src/components/onboarding/OnboardingTooltip.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/notifications/BrowserNotificationPrompt.tsx",
+      "file": "src/components/predictions/MitigationHistoryPanel.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/constructor-for-side-effects",
+          "rule": "react-hooks/static-components",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/notifications/SLANotificationSettings.tsx",
+      "file": "src/components/predictions/PredictionAccuracyTimeline.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/notifications/UserNotificationCenter.tsx",
+      "file": "src/components/rodonaves/RTESLOAlertsPanel.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/predictions/DelayPredictionPanel.tsx",
+      "file": "src/components/security/MFAEnroll.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-conditional",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/pwa/InstallPrompt.tsx",
+      "file": "src/components/security/TwoFactorSetup.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/immutability",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/pwa/UpdatePrompt.tsx",
+      "file": "src/components/shipping/ExpeditionDetailsDialog.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-functions",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/rodonaves/RTEAdvancedQuotation.tsx",
+      "file": "src/components/ui/carousel.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/rodonaves/RTEOrdersPanel.tsx",
+      "file": "src/components/ui/sidebar.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/rodonaves/RTESelfAttendance.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/scanner/QRScannerModal.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/security/GeoBlockingPanel.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/security/MFAVerify.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/security/PermissionMatrix.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-functions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/security/SecurityScoreCard.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/transportadoras/BulkRouteImport.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/transportadoras/RotaResultsList.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/badge.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/card.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/command.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-empty-object-type",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/form.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/navigation-menu.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/purity",
           "warnings": 1,
           "errors": 0
         }
@@ -3473,241 +700,20 @@
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/pseudo-random",
+          "rule": "react-hooks/purity",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/components/ui/sonner.tsx",
+      "file": "src/hooks/analytics/usePerformanceMonitor.ts",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/table.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/textarea.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-empty-object-type",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/components/ui/toggle.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/analytics/hooks/useAnalyticsFeature.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/AnomaliesCard.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/CapacityForecastCard.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/CronJobsCard.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/RegressionsCard.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/components/RemediationSuggestionsCard.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/db-observability/hooks/useRemediationActions.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/features/logistics/services/LogisticsService.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/ai/useNexusSimulator.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-ignored-exceptions",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/useAnalytics.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/useDrillDown.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/useExecutiveMetrics.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-unused-vars",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/useKPIBenchmark.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/cognitive-complexity",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/analytics/useTelemetry.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/refs",
           "warnings": 1,
           "errors": 0
         }
@@ -3720,170 +726,53 @@
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-refresh/only-export-components",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/hooks/common/useNavigationHistory.tsx",
+      "file": "src/hooks/auth/useNewDeviceDetection.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-hooks/exhaustive-deps",
+          "rule": "react-hooks/preserve-manual-memoization",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/hooks/common/useSearch.ts",
+      "file": "src/hooks/common/useDebounce.ts",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/refs",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/hooks/data/useDocumentUpload.ts",
+      "file": "src/hooks/common/useMediaQuery.ts",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/pseudo-random",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/hooks/data/useMemoizedQuery.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/data/useResilientMutation.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useBiometricAnomalies.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useBusinessRules.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useConciliacao.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useCostAlerts.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useFreightQuotation.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useMapWeatherSync.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useSmartCarrierSelection.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-hooks/exhaustive-deps",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/hooks/logistics/useTrackingAnalytics.tsx",
+      "file": "src/hooks/logistics/useBusinessRuleEngine.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
@@ -3896,338 +785,143 @@
       ]
     },
     {
-      "file": "src/hooks/notifications/useNotificationPreferences.tsx",
+      "file": "src/hooks/logistics/useCostAlerts.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "react-hooks/exhaustive-deps",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/integrations/supabase/types.ts",
+      "file": "src/hooks/logistics/useDeliveryRoutes.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/lib/excelImporter.ts",
+      "file": "src/hooks/logistics/useMapWeatherSync.ts",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/no-nested-functions",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/lib/validations.ts",
+      "file": "src/hooks/logistics/useMelhorEnvio.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "sonarjs/slow-regex",
+          "rule": "react-hooks/globals",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/AuditTrail.tsx",
+      "file": "src/hooks/logistics/useSLANotifications.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "@typescript-eslint/no-explicit-any",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/ConciliacaoFinanceira.tsx",
+      "file": "src/hooks/notifications/useSecurityPushNotifications.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/DashboardExecutivo.tsx",
+      "file": "src/hooks/ui/use-mobile.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/Fornecedores.tsx",
+      "file": "src/hooks/ui/useVirtualTable.ts",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/incompatible-library",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/FretesInternos.tsx",
+      "file": "src/pages/DashboardCotacoes.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/purity",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/GerenciamentoUsuarios.tsx",
+      "file": "src/pages/MapaRotas.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
       ]
     },
     {
-      "file": "src/pages/InteligenciaFrete.tsx",
+      "file": "src/pages/Profile.tsx",
       "warnings": 1,
       "errors": 0,
       "tsErrors": 0,
       "rules": [
         {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/LogisticaReversa.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/admin-telemetria/TelemetryStatsCards.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/aprovacao-reset/ResetRequestsTable.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/auth/AuthFormPanel.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/auth/AuthHeroSection.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "max-lines",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/conciliacao/ConciliacaoItensTable.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/cotacao-multicanal/CotacaoSearchForm.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "react-refresh/only-export-components",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/pages/ranking/RankingPodium.tsx",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/no-nested-conditional",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/services/api/authService.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/services/base/BaseService.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/utils/celebrationSounds.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/pseudo-random",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "src/utils/logger.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-explicit-any",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "tailwind.config.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "@typescript-eslint/no-require-imports",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "tests/e2e/critical-paths.spec.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/slow-regex",
-          "warnings": 1,
-          "errors": 0
-        }
-      ]
-    },
-    {
-      "file": "tests/load/backend-stress.spec.ts",
-      "warnings": 1,
-      "errors": 0,
-      "tsErrors": 0,
-      "rules": [
-        {
-          "rule": "sonarjs/pseudo-random",
+          "rule": "react-hooks/set-state-in-effect",
           "warnings": 1,
           "errors": 0
         }
