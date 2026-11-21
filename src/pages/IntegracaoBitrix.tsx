@@ -178,7 +178,9 @@ export default function IntegracaoBitrix() {
                 {config?.is_active ? "Saudável" : "Desconectado"}
               </h3>
               <p className="text-xs text-muted-foreground mt-2">
-                Latência média: 145ms
+                {logs.length > 0 && logs[0].created_at
+                  ? `Último log: ${format(new Date(logs[0].created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })} (${logs[0].status})`
+                  : "Nenhuma sincronização registrada ainda"}
               </p>
             </CardContent>
           </Card>

@@ -46,7 +46,10 @@ import {
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { NormalizationMapping, type NormalizationConfig } from "@/components/transportadoras/NormalizationMapping";
+import {
+  NormalizationMapping,
+  type NormalizationConfig,
+} from "@/components/transportadoras/NormalizationMapping";
 import { Slider } from "@/components/ui/slider";
 
 interface CarrierConfig {
@@ -153,7 +156,10 @@ export default function FreightConfig() {
   });
 
   const updateCarrier = useMutation({
-    mutationFn: async ({ id, ...updates }: TablesUpdate<"transportadoras"> & { id: string }) => {
+    mutationFn: async ({
+      id,
+      ...updates
+    }: TablesUpdate<"transportadoras"> & { id: string }) => {
       const { error } = await supabase
         .from("transportadoras")
         .update(updates)
@@ -298,12 +304,19 @@ export default function FreightConfig() {
                               <Input
                                 type="password"
                                 value={
-                                  (selectedCarrier.credentials as Record<string, string>)
-                                    ?.api_key || ""
+                                  (
+                                    selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >
+                                  )?.api_key || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as Record<string, string>),
+                                    ...(selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >),
                                     api_key: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -318,12 +331,19 @@ export default function FreightConfig() {
                               <Input
                                 placeholder="https://api..."
                                 value={
-                                  (selectedCarrier.credentials as Record<string, string>)
-                                    ?.endpoint || ""
+                                  (
+                                    selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >
+                                  )?.endpoint || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as Record<string, string>),
+                                    ...(selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >),
                                     endpoint: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -339,12 +359,19 @@ export default function FreightConfig() {
                               <Label>Usuário Portal</Label>
                               <Input
                                 value={
-                                  (selectedCarrier.credentials as Record<string, string>)
-                                    ?.username || ""
+                                  (
+                                    selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >
+                                  )?.username || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as Record<string, string>),
+                                    ...(selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >),
                                     username: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -359,12 +386,19 @@ export default function FreightConfig() {
                               <Input
                                 type="password"
                                 value={
-                                  (selectedCarrier.credentials as Record<string, string>)
-                                    ?.password || ""
+                                  (
+                                    selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >
+                                  )?.password || ""
                                 }
                                 onChange={(e) => {
                                   const creds = {
-                                    ...(selectedCarrier.credentials as Record<string, string>),
+                                    ...(selectedCarrier.credentials as Record<
+                                      string,
+                                      string
+                                    >),
                                     password: e.target.value,
                                   };
                                   updateCarrier.mutate({
@@ -410,12 +444,14 @@ export default function FreightConfig() {
                             </div>
                             <div className="space-y-2">
                               <Label className="text-[10px] uppercase font-bold">
-                                Eficiência Malha
+                                Regiões na Malha
                               </Label>
                               <div className="h-8 flex items-center gap-2 bg-muted/40 px-3 rounded">
                                 <Zap className="h-3 w-3 text-warning" />
                                 <span className="text-xs font-black">
-                                  94.8% OPTIMIZED
+                                  {selectedCarrier.regioes_atendidas?.length ??
+                                    0}{" "}
+                                  regiões configuradas
                                 </span>
                               </div>
                             </div>
@@ -471,12 +507,19 @@ export default function FreightConfig() {
                                   className="font-mono text-xs h-32"
                                   placeholder="Olá {{carrier}}, solicito cotação para o trecho {{origem}} -> {{destino}}..."
                                   value={
-                                    ((selectedCarrier.non_api_config as Record<string, unknown> | null)
-                                      ?.whatsapp_template as string) || ""
+                                    ((
+                                      selectedCarrier.non_api_config as Record<
+                                        string,
+                                        unknown
+                                      > | null
+                                    )?.whatsapp_template as string) || ""
                                   }
                                   onChange={(e) => {
                                     const cfg = {
-                                      ...(selectedCarrier.non_api_config as Record<string, unknown>),
+                                      ...(selectedCarrier.non_api_config as Record<
+                                        string,
+                                        unknown
+                                      >),
                                       whatsapp_template: e.target.value,
                                     };
                                     updateCarrier.mutate({
@@ -496,12 +539,20 @@ export default function FreightConfig() {
                               <NormalizationMapping
                                 carrierId={selectedCarrier.id}
                                 initialConfig={
-                                  (selectedCarrier.non_api_config as Record<string, unknown> | null)
-                                    ?.normalization as NormalizationConfig | undefined
+                                  (
+                                    selectedCarrier.non_api_config as Record<
+                                      string,
+                                      unknown
+                                    > | null
+                                  )?.normalization as
+                                    NormalizationConfig | undefined
                                 }
                                 onSave={(normConfig) => {
                                   const cfg = {
-                                    ...(selectedCarrier.non_api_config as Record<string, unknown>),
+                                    ...(selectedCarrier.non_api_config as Record<
+                                      string,
+                                      unknown
+                                    >),
                                     normalization: normConfig,
                                   };
                                   updateCarrier.mutate({
@@ -770,7 +821,9 @@ export default function FreightConfig() {
                               size="icon"
                               variant="ghost"
                               className="text-destructive"
-                              onClick={() => rule.id && deleteRule.mutate(rule.id)}
+                              onClick={() =>
+                                rule.id && deleteRule.mutate(rule.id)
+                              }
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
