@@ -6,11 +6,38 @@ import { Sparkles, MessageSquare, ShieldCheck } from "lucide-react";
 interface NegotiationAssistantProps {
   bestValue: number | null;
   carrierName: string | null;
+  /** Média dos valores respondidos na cotação atual; null quando sem referência. */
+  averageValue: number | null;
+}
+
+/** Percentual real de economia frente à média das cotações respondidas. */
+function percentBelow(bestValue: number, averageValue: number): number | null {
+  if (averageValue <= 0) return null;
+  const diff = averageValue - bestValue;
+  const pct = (diff / averageValue) * 100;
+  // Só exibe comparação quando o valor é de fato menor que a média.
+  return pct > 0 ? Math.round(Math.abs(pct)) : null;
+}
+
+/** Frase honesta do contexto do valor: comparação real ou indicação de melhor oferta. */
+function comparisonText(
+  bestValue: number,
+  averageValue: number | null,
+): string {
+  if (averageValue === null) {
+    return "é a melhor oferta disponível neste momento.";
+  }
+  const pct = percentBelow(bestValue, averageValue);
+  if (pct !== null) {
+    return `está ${pct}% abaixo da média das cotações desta consulta.`;
+  }
+  return "é a melhor oferta desta consulta.";
 }
 
 export function NegotiationAssistant({
   bestValue,
   carrierName,
+  averageValue,
 }: NegotiationAssistantProps) {
   if (!bestValue || !carrierName) return null;
 
@@ -32,8 +59,7 @@ export function NegotiationAssistant({
             <span className="text-foreground font-bold">
               R$ {bestValue.toFixed(2)}
             </span>{" "}
-            ({carrierName}) está 12% abaixo da sua média mensal para este
-            trecho.
+            ({carrierName}) {comparisonText(bestValue, averageValue)}
           </p>
         </div>
         <div className="flex gap-2">

@@ -127,23 +127,14 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
     }
   };
 
-  const simulateOCR = () => {
+  const onScanUnavailable = () => {
     playAction();
     toast({
-      title: "Scanner_OCR Ativo",
-      description: "Buscando dados em CTE/Manifesto...",
+      title: "Scanner de documento indisponível",
+      description:
+        "A extração automática via OCR ainda não está implementada. Use a entrada manual blindada para conferir volumes e peso.",
     });
-
-    // Simulação de OCR após 1.5s
-    setTimeout(() => {
-      setQtdRecebida(pickup.qtd_volumes || 0);
-      setPesoEfetivo(pickup.peso_estimado_kg || 0);
-      setStep("blind_entry");
-      toast({
-        title: "OCR Concluído",
-        description: "Dados extraídos do documento com 98% de precisão.",
-      });
-    }, 1500);
+    setStep("blind_entry");
   };
 
   return (
@@ -159,18 +150,18 @@ export function PickupConference({ pickup, onSuccess }: PickupConferenceProps) {
           >
             <div
               className="bg-primary/5 p-8 rounded-[2rem] border-2 border-dashed border-primary/20 flex flex-col items-center justify-center text-center gap-4 group cursor-pointer hover:bg-primary/10 transition-all"
-              onClick={simulateOCR}
+              onClick={onScanUnavailable}
             >
               <div className="p-4 rounded-full bg-primary/20 group-hover:scale-110 transition-transform">
                 <Camera className="w-10 h-10 text-primary" />
               </div>
               <div>
                 <p className="font-black text-xl italic tracking-tighter uppercase text-primary">
-                  Scan de Documento_OCR
+                  Scan de Documento
                 </p>
                 <p className="text-xs text-white/40 font-medium max-w-[250px] mt-1 uppercase tracking-widest">
-                  Aponte para o CTE ou Manifesto de Coleta para extração
-                  automática
+                  Extração automática indisponível — prossegue para conferência
+                  manual blindada
                 </p>
               </div>
             </div>
