@@ -4,6 +4,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { getWeatherForRoutes } from "../_shared/weather.ts";
 
 const GOOGLE_API_KEY = Deno.env.get("GOOGLE_API_KEY")!;
 
@@ -89,6 +90,8 @@ export const handler = async (req: Request) => {
         status,
         created_at,
         data_despacho,
+        latitude,
+        longitude,
         transportadoras (nome_fantasia)
       `,
       )
@@ -152,6 +155,8 @@ export const handler = async (req: Request) => {
       previsao: e.previsao_entrega,
       status: e.status,
       transportadora: e.transportadoras?.nome_fantasia || "N/A",
+      latitude: e.latitude ?? null,
+      longitude: e.longitude ?? null,
       dias_em_transito: e.data_despacho
         ? Math.floor(
             (Date.now() - new Date(e.data_despacho).getTime()) /
@@ -178,12 +183,19 @@ export const handler = async (req: Request) => {
         }, {}) || {},
     };
 
+    // 3.24/3.25 — clima real (OpenWeather) para entregas com coordenadas
+    const coords = entregasForAnalysis
+      .filter((e: any) => e.latitude && e.longitude)
+      .map((e: any) => ({ lat: Number(e.latitude), lon: Number(e.longitude) }));
+    const weather = await getWeatherForRoutes(coords);
+
     const now = new Date();
     const prompt = `Analise os dados logísticos e preveja riscos de atraso:
     DADOS: ${JSON.stringify({
       entregas: entregasForAnalysis,
       coletas: coletasForAnalysis,
       stats: { delayRate: delayRate.toFixed(1), occurrences: occurrenceStats },
+      clima: weather.summary,
     })}
     Retorne um JSON array (max 10 itens críticos). Para "fatores", use APENAS estes nomes: "clima", "historico_transportadora", "distancia", "horario", "sazonalidade", "ocorrencias_recentes", "tempo_transito". Peso 0-100, impacto "positivo"|"negativo"|"neutro":
     [{
