@@ -56,7 +56,12 @@ interface TransportadoraOTIF {
 export default function PainelOTIF() {
   const { user } = useAuth();
 
-  const { data: entregas } = useQuery({
+  const {
+    data: entregas,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["otif-entregas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -216,6 +221,36 @@ export default function PainelOTIF() {
     if (index === 2) return "🥉";
     return `#${index + 1}`;
   };
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
+          <Target className="w-10 h-10 text-primary animate-spin" />
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-white/60">
+            Carregando OTIF...
+          </p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            variant="error"
+            icon={BarChart3}
+            title="Erro ao carregar OTIF"
+            description={String(
+              error?.message ?? "Falha na consulta de entregas",
+            )}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

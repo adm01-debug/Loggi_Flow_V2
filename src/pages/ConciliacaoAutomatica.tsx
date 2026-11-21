@@ -57,7 +57,12 @@ export default function ConciliacaoAutomatica() {
   const [matchResults, setMatchResults] = useState<MatchResult[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const { data: entregas } = useQuery({
+  const {
+    data: entregas,
+    isLoading: isLoadingEntregas,
+    isError: isErrorEntregas,
+    error: errorEntregas,
+  } = useQuery({
     queryKey: ["conciliacao-entregas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -78,7 +83,12 @@ export default function ConciliacaoAutomatica() {
     enabled: !!user?.id,
   });
 
-  const { data: itensImportados } = useQuery({
+  const {
+    data: itensImportados,
+    isLoading: isLoadingItens,
+    isError: isErrorItens,
+    error: errorItens,
+  } = useQuery({
     queryKey: ["conciliacao-itens"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -189,6 +199,38 @@ export default function ConciliacaoAutomatica() {
     matchResults.length > 0
       ? Math.round((conciliados.length / matchResults.length) * 100)
       : 0;
+
+  if (isLoadingEntregas || isLoadingItens) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-white/60">
+            Carregando conciliação...
+          </p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isErrorEntregas || isErrorItens) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            variant="error"
+            icon={AlertTriangle}
+            title="Erro ao carregar conciliação"
+            description={String(
+              errorEntregas?.message ??
+                errorItens?.message ??
+                "Falha na consulta",
+            )}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

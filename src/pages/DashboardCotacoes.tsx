@@ -50,6 +50,7 @@ import {
   Send,
   History,
   RotateCcw,
+  Loader2,
 } from "lucide-react";
 import { useCotacoesMulticanal } from "@/hooks/logistics/useCotacoesMulticanal";
 import { type CotacaoMulticanal } from "@/hooks";
@@ -176,6 +177,8 @@ export default function DashboardCotacoes() {
     pendentes,
     respondidas,
     expiradas,
+    isLoading,
+    error,
     refetch,
     updateCotacao,
     selectCotacao,
@@ -250,6 +253,34 @@ export default function DashboardCotacoes() {
     });
     return totalSaved;
   }, [trechoGroups]);
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-white/60">
+            Carregando cotações...
+          </p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            variant="error"
+            icon={AlertTriangle}
+            title="Erro ao carregar cotações"
+            description={String(error.message)}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

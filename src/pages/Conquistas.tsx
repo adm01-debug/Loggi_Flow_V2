@@ -45,6 +45,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useGamification } from "@/hooks/gamification/useGamification";
 
+import { EmptyState } from "@/components/common/EmptyState";
 import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { usePagination } from "@/hooks/common/usePagination";
@@ -234,6 +235,7 @@ export default function Conquistas() {
     userLevel,
     achievements: dbAchievements,
     unlockedAchievementIds,
+    isLoading: isLoadingGamification,
   } = useGamification();
   const [tab, setTab] = useState("all");
 
@@ -321,6 +323,33 @@ export default function Conquistas() {
     }),
     [mappedAchievements],
   );
+
+  if (isLoadingGamification) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
+          <Award className="w-10 h-10 text-primary animate-pulse" />
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-white/60">
+            Carregando conquistas...
+          </p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (mappedAchievements.length === 0) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            icon={Trophy}
+            title="Nenhuma conquista disponível"
+            description="As conquistas aparecem conforme o uso do sistema pela sua equipe"
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

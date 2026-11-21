@@ -46,7 +46,12 @@ export function useAnalytics(dateRange?: DateRange) {
   const endDate = dateRange?.to || new Date();
 
   // Monthly comparison data - Optimized via RPC
-  const { data: monthlyData = [], isLoading: isLoadingMonthly } = useQuery({
+  const {
+    data: monthlyData = [],
+    isLoading: isLoadingMonthly,
+    isError: isErrorMonthly,
+    error: errorMonthly,
+  } = useQuery({
     queryKey: [
       "analytics-monthly-optimized",
       user?.id,
@@ -61,20 +66,34 @@ export function useAnalytics(dateRange?: DateRange) {
 
       if (error) throw error;
 
-      return data.map((d: { month_label: string; entregas_count: number | string; coletas_count: number | string; custo_total: number | string; sla_atingido: number | string; ocorrencias_count: number | string }) => ({
-        month: d.month_label,
-        entregas: Number(d.entregas_count),
-        coletas: Number(d.coletas_count),
-        custoTotal: Number(d.custo_total),
-        slaAtingido: Number(d.sla_atingido),
-        ocorrencias: Number(d.ocorrencias_count),
-      })) as MonthlyData[];
+      return data.map(
+        (d: {
+          month_label: string;
+          entregas_count: number | string;
+          coletas_count: number | string;
+          custo_total: number | string;
+          sla_atingido: number | string;
+          ocorrencias_count: number | string;
+        }) => ({
+          month: d.month_label,
+          entregas: Number(d.entregas_count),
+          coletas: Number(d.coletas_count),
+          custoTotal: Number(d.custo_total),
+          slaAtingido: Number(d.sla_atingido),
+          ocorrencias: Number(d.ocorrencias_count),
+        }),
+      ) as MonthlyData[];
     },
     enabled: !!user?.id,
   });
 
   // Heatmap data - Peaking hours logic remains frontend-side for now, but limited
-  const { data: heatmapData = [], isLoading: isLoadingHeatmap } = useQuery({
+  const {
+    data: heatmapData = [],
+    isLoading: isLoadingHeatmap,
+    isError: isErrorHeatmap,
+    error: errorHeatmap,
+  } = useQuery({
     queryKey: [
       "analytics-heatmap-v2",
       startDate.toISOString(),
@@ -128,7 +147,12 @@ export function useAnalytics(dateRange?: DateRange) {
   });
 
   // Simplified summary metrics calculation
-  const { data: summaryMetrics, isLoading: isLoadingSummary } = useQuery({
+  const {
+    data: summaryMetrics,
+    isLoading: isLoadingSummary,
+    isError: isErrorSummary,
+    error: errorSummary,
+  } = useQuery({
     queryKey: ["analytics-summary-optimized", monthlyData.length],
     queryFn: async () => {
       if (monthlyData.length === 0) return null;
@@ -164,5 +188,7 @@ export function useAnalytics(dateRange?: DateRange) {
     heatmapData,
     summaryMetrics,
     isLoading: isLoadingMonthly || isLoadingHeatmap || isLoadingSummary,
+    isError: isErrorMonthly || isErrorHeatmap || isErrorSummary,
+    error: errorMonthly ?? errorHeatmap ?? errorSummary,
   };
 }
