@@ -14,10 +14,11 @@ Maior impacto ao usuário: a UI mostra como real algo que é simulado localmente
 
 1. ~~03-19 cotacao-api-simulada~~ — CONCLUÍDO via PR #226 (`e4392b7d`)
 2. ~~03-20 dashboard-cotacoes-simula~~ — CONCLUÍDO via PR #226 (`e4392b7d`)
-3. 03-13 cinematichud-telemetria-fixa (SAT_LOCK/HDOP/coords fixas)
+3. ~~03-13 cinematichud-telemetria-fixa (SAT_LOCK/HDOP/coords fixas)~~ — CONCLUÍDO via PR #228 (`84f200d7`)
 4. ~~03-01 dora-metrics-literal / 03-02 postmortem-literal / 03-03 systempulse-fixo / 03-04 livestatusbar-ping / 03-05 logisticsmapwidget-kpis~~ — CONCLUÍDO via PR #229 (`b6710412`)
 5. ~~03-06 missiondetail-timeline / 03-07 biometric-scan~~ — CONCLUÍDO via PR #231 (`24dbf919`); ~~03-08 alertspanel-latencia / 03-09 nexuscoverage-fixo~~ — CONCLUÍDO via PR #233 (`a1e670f7`); ~~03-10 negotiation-fixo / 03-11 pickupconference-ocr~~ — CONCLUÍDO via PR #235 (`e7cd1b44`)
-6. 03-11 a 03-18 e 03-21 a 03-30 (detalhe por arquivo)
+6. ~~03-12 pickupdetails-custo / 03-14 label-qrcode~~ — CONCLUÍDO via PR #237 (`df04cb6c`)
+7. 03-15 a 03-18 e 03-21 a 03-30 (detalhe por arquivo)
 
 Regra: nenhuma destas pode inserir linha em tabela real com dados simulados. Alternativas: medir de verdade, marcar UX como "demo", ou persistir parametro/config quando fizer sentido.
 
