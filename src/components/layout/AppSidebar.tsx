@@ -2,23 +2,75 @@
 import { useState, lazy, Suspense, memo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Truck, Package, Building2, Send, BarChart3,
-  Trophy, Zap, ChevronLeft, ChevronRight, Box, PackageSearch, History,
-  Shield, Target, CalendarDays, Calculator, DollarSign, AlertTriangle,
-  Map, Navigation, Users, Bell, FileCheck, Route, Bot, ChevronDown,
-  Sparkles, TrendingUp, Gamepad2, Cog, KeyRound, Award, Upload, Zap as ZapIcon, Webhook,
-  Code, Star, Coins, RotateCcw, Database, Download
+  LayoutDashboard,
+  Truck,
+  Package,
+  Building2,
+  Send,
+  BarChart3,
+  Trophy,
+  Zap,
+  ChevronLeft,
+  ChevronRight,
+  Box,
+  PackageSearch,
+  History,
+  Shield,
+  Target,
+  CalendarDays,
+  Calculator,
+  DollarSign,
+  AlertTriangle,
+  Map,
+  Navigation,
+  Users,
+  Bell,
+  FileCheck,
+  Route,
+  Bot,
+  ChevronDown,
+  Sparkles,
+  TrendingUp,
+  Gamepad2,
+  Cog,
+  KeyRound,
+  Award,
+  Upload,
+  Zap as ZapIcon,
+  Webhook,
+  Code,
+  Star,
+  Coins,
+  RotateCcw,
+  Database,
+  Download,
+  Activity,
+  Gauge,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 // Lazy-load AIAssistant - only needed when user opens the sheet
-const AIAssistant = lazy(() => import("@/components/ai/AIAssistant").then(m => ({ default: m.AIAssistant })));
+const AIAssistant = lazy(() =>
+  import("@/components/ai/AIAssistant").then((m) => ({
+    default: m.AIAssistant,
+  })),
+);
 import { usePrefetch } from "@/hooks/data/usePrefetch";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useGamification } from "@/hooks/gamification/useGamification";
 import { Progress } from "@/components/ui/progress";
 
@@ -51,7 +103,11 @@ const menuSections: MenuSection[] = [
     icon: DollarSign,
     items: [
       { title: "Custos Logísticos", url: "/custos", icon: DollarSign },
-      { title: "Inteligência Frete", url: "/inteligencia-frete", icon: TrendingUp },
+      {
+        title: "Inteligência Frete",
+        url: "/inteligencia-frete",
+        icon: TrendingUp,
+      },
       { title: "Conciliação", url: "/conciliacao", icon: FileCheck },
       { title: "Alertas Custo", url: "/alertas-custo", icon: AlertTriangle },
     ],
@@ -68,7 +124,11 @@ const menuSections: MenuSection[] = [
       { title: "Fretes Internos", url: "/fretes-internos", icon: Truck },
       { title: "Gestão de BOX", url: "/gestao-box", icon: Box },
       { title: "Ocorrências", url: "/ocorrencias", icon: AlertTriangle },
-      { title: "Logística Reversa", url: "/logistica-reversa", icon: RotateCcw },
+      {
+        title: "Logística Reversa",
+        url: "/logistica-reversa",
+        icon: RotateCcw,
+      },
     ],
   },
   {
@@ -80,17 +140,29 @@ const menuSections: MenuSection[] = [
       { title: "Rotas", url: "/rotas-transportadoras", icon: Route },
       { title: "Cotação Frete", url: "/cotacao-frete", icon: Calculator },
       { title: "Cotação Multi-Canal", url: "/cotacao-multicanal", icon: Zap },
-      { title: "Dashboard Cotações", url: "/dashboard-cotacoes", icon: FileCheck },
+      {
+        title: "Dashboard Cotações",
+        url: "/dashboard-cotacoes",
+        icon: FileCheck,
+      },
       { title: "Mapa de Rotas", url: "/mapa-rotas", icon: Map },
-      { title: "Central Rastreamento", url: "/central-rastreamento", icon: Target },
-      { title: "Rastreamento Motorista", url: "/rastreamento-motorista", icon: Navigation },
-       { title: "Rodonaves RTE", url: "/gestao-rodonaves", icon: Truck },
-       { title: "Melhor Envio", url: "/melhor-envio", icon: Package },
-        { title: "Bitrix24 CRM", url: "/bitrix24", icon: Building2 },
-        { title: "Config Nexus", url: "/config-frete", icon: Cog },
-        { title: "Auditoria Nexus", url: "/audit-trail", icon: History },
-      ],
-    },
+      {
+        title: "Central Rastreamento",
+        url: "/central-rastreamento",
+        icon: Target,
+      },
+      {
+        title: "Rastreamento Motorista",
+        url: "/rastreamento-motorista",
+        icon: Navigation,
+      },
+      { title: "Rodonaves RTE", url: "/gestao-rodonaves", icon: Truck },
+      { title: "Melhor Envio", url: "/melhor-envio", icon: Package },
+      { title: "Bitrix24 CRM", url: "/bitrix24", icon: Building2 },
+      { title: "Config Nexus", url: "/config-frete", icon: Cog },
+      { title: "Auditoria Nexus", url: "/audit-trail", icon: History },
+    ],
+  },
   {
     id: "entities",
     title: "Cadastros",
@@ -122,6 +194,10 @@ const adminItems = [
   { title: "Audit Trail", url: "/audit-trail", icon: History },
   { title: "Saúde do Banco", url: "/admin/db-health", icon: Database },
   { title: "Documentação API", url: "/api-docs", icon: Code },
+  { title: "Telemetria", url: "/admin/telemetria", icon: Activity },
+  { title: "Rate Limit", url: "/rate-limit", icon: Gauge },
+  { title: "ADR", url: "/admin/adr", icon: Database },
+  { title: "Quality Gate", url: "/admin/quality-gate", icon: Shield },
 ];
 export const AppSidebar = memo(function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -133,7 +209,7 @@ export const AppSidebar = memo(function AppSidebar() {
   // Determine initially active section based on current route
   const getActiveSection = () => {
     for (const section of menuSections) {
-      if (section.items.some(item => location.pathname === item.url)) {
+      if (section.items.some((item) => location.pathname === item.url)) {
         return section.id;
       }
     }
@@ -141,20 +217,25 @@ export const AppSidebar = memo(function AppSidebar() {
   };
 
   // Exclusive accordion — only one section open at a time
-  const [openSection, setOpenSection] = useState<string | null>(getActiveSection);
+  const [openSection, setOpenSection] = useState<string | null>(
+    getActiveSection,
+  );
 
   const isActive = (path: string) => location.pathname === path;
-  const isSectionActive = (section: MenuSection) => section.items.some(item => isActive(item.url));
+  const isSectionActive = (section: MenuSection) =>
+    section.items.some((item) => isActive(item.url));
 
   const toggleSection = (id: string) => {
-    setOpenSection(prev => prev === id ? null : id);
+    setOpenSection((prev) => (prev === id ? null : id));
   };
 
   return (
     <aside
       className={cn(
         "relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border/50 transition-all duration-500 ease-out-expo z-50 shadow-2xl shadow-black/40 group/sidebar",
-        collapsed ? "w-[var(--sidebar-collapsed-width)]" : "w-[var(--sidebar-width)]"
+        collapsed
+          ? "w-[var(--sidebar-collapsed-width)]"
+          : "w-[var(--sidebar-width)]",
       )}
     >
       {/* Dynamic Tactical Background */}
@@ -163,15 +244,11 @@ export const AppSidebar = memo(function AppSidebar() {
 
       {/* Logo */}
       <div className="flex items-center gap-4 p-8 border-b border-sidebar-border/30 bg-gradient-to-b from-sidebar via-sidebar to-transparent shrink-0">
-        <div 
-          className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_30px_rgba(var(--primary-rgb),0.5)] border border-white/20 animate-float"
-        >
+        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/40 shadow-[0_8px_30px_rgba(var(--primary-rgb),0.5)] border border-white/20 animate-float">
           <Truck className="w-7 h-7 text-white" />
         </div>
         {!collapsed && (
-          <div 
-            className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700 ease-out-expo"
-          >
+          <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700 ease-out-expo">
             <span className="font-display font-black text-2xl tracking-tighter uppercase italic bg-gradient-to-r from-foreground via-foreground/80 to-primary bg-clip-text text-transparent drop-shadow-sm">
               LogiFlow
             </span>
@@ -188,39 +265,52 @@ export const AppSidebar = memo(function AppSidebar() {
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
               {userLevel?.rank ? (
-                <div 
+                <div
                   className="p-1 rounded flex items-center justify-center"
                   style={{ backgroundColor: `${userLevel.rank.color}20` }}
                   title={userLevel.rank.name}
                 >
-                  <Star className="w-3 h-3 fill-current" style={{ color: userLevel.rank.color }} />
+                  <Star
+                    className="w-3 h-3 fill-current"
+                    style={{ color: userLevel.rank.color }}
+                  />
                 </div>
               ) : (
                 <div className="p-1 rounded bg-xp/20">
                   <Star className="w-3 h-3 text-xp fill-xp" />
                 </div>
               )}
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nível {levelProgress.currentLevel}</span>
-
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                Nível {levelProgress.currentLevel}
+              </span>
             </div>
             {userLevel?.rank && (
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className="text-[8px] px-1 h-3.5 border-none font-black uppercase tracking-tighter"
-                style={{ backgroundColor: `${userLevel.rank.color}15`, color: userLevel.rank.color }}
+                style={{
+                  backgroundColor: `${userLevel.rank.color}15`,
+                  color: userLevel.rank.color,
+                }}
               >
                 {userLevel.rank.name}
               </Badge>
             )}
-            <span className="text-[10px] font-bold text-xp">{Math.round(levelProgress.progress)}%</span>
+            <span className="text-[10px] font-bold text-xp">
+              {Math.round(levelProgress.progress)}%
+            </span>
           </div>
           <Progress value={levelProgress.progress} className="h-1 bg-xp/10" />
           <div className="flex justify-between items-center mt-1.5">
-             <div className="flex items-center gap-1">
-               <Coins className="w-3 h-3 text-warning" />
-               <span className="text-[10px] font-bold text-foreground">{userLevel?.coins || 0}</span>
-             </div>
-             <span className="text-[9px] text-muted-foreground tabular-nums">{levelProgress.currentLevelXP} / {levelProgress.nextLevelXP} XP</span>
+            <div className="flex items-center gap-1">
+              <Coins className="w-3 h-3 text-warning" />
+              <span className="text-[10px] font-bold text-foreground">
+                {userLevel?.coins || 0}
+              </span>
+            </div>
+            <span className="text-[9px] text-muted-foreground tabular-nums">
+              {levelProgress.currentLevelXP} / {levelProgress.nextLevelXP} XP
+            </span>
           </div>
         </div>
       )}
@@ -231,8 +321,8 @@ export const AppSidebar = memo(function AppSidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
         {menuSections.map((section) => (
-          <Collapsible 
-            key={section.id} 
+          <Collapsible
+            key={section.id}
             open={openSection === section.id || collapsed}
             onOpenChange={() => !collapsed && toggleSection(section.id)}
           >
@@ -242,13 +332,17 @@ export const AppSidebar = memo(function AppSidebar() {
                   "flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-300 group active-press",
                   isSectionActive(section)
                     ? "bg-primary/10 text-primary shadow-sm shadow-primary/5 border border-primary/10"
-                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground border border-transparent"
+                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground border border-transparent",
                 )}
               >
-                <section.icon className={cn(
-                  "w-5 h-5 flex-shrink-0 transition-all duration-300",
-                  isSectionActive(section) ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)]" : "group-hover:scale-110"
-                )} />
+                <section.icon
+                  className={cn(
+                    "w-5 h-5 flex-shrink-0 transition-all duration-300",
+                    isSectionActive(section)
+                      ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)]"
+                      : "group-hover:scale-110",
+                  )}
+                />
                 {!collapsed && (
                   <>
                     <span className="flex-1 text-left text-[11px] font-black uppercase tracking-[0.15em]">
@@ -257,10 +351,12 @@ export const AppSidebar = memo(function AppSidebar() {
                     <span className="text-[10px] font-bold text-muted-foreground/40 tabular-nums mr-1">
                       {section.items.length}
                     </span>
-                    <ChevronDown className={cn(
-                      "w-4 h-4 transition-transform duration-500 ease-out-expo",
-                      openSection === section.id && "rotate-180 text-primary"
-                    )} />
+                    <ChevronDown
+                      className={cn(
+                        "w-4 h-4 transition-transform duration-500 ease-out-expo",
+                        openSection === section.id && "rotate-180 text-primary",
+                      )}
+                    />
                   </>
                 )}
               </button>
@@ -280,19 +376,25 @@ export const AppSidebar = memo(function AppSidebar() {
                       collapsed ? "justify-center" : "ml-4",
                       isActive(item.url)
                         ? "bg-gradient-to-br from-primary via-primary to-primary-glow text-white shadow-lg shadow-primary/25 scale-[1.02] border border-white/10"
-                        : "text-sidebar-foreground/70 hover:bg-primary/5 hover:text-primary hover:translate-x-1"
+                        : "text-sidebar-foreground/70 hover:bg-primary/5 hover:text-primary hover:translate-x-1",
                     )}
                   >
                     {/* Active indicator glow */}
                     {isActive(item.url) && !collapsed && (
                       <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-6 rounded-full bg-white/40 blur-[2px]" />
                     )}
-                    <item.icon className={cn(
-                      "w-4 h-4 flex-shrink-0 transition-all duration-500",
-                      isActive(item.url) ? "scale-110 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]" : "group-hover/item:scale-110"
-                    )} />
+                    <item.icon
+                      className={cn(
+                        "w-4 h-4 flex-shrink-0 transition-all duration-500",
+                        isActive(item.url)
+                          ? "scale-110 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]"
+                          : "group-hover/item:scale-110",
+                      )}
+                    />
                     {!collapsed && (
-                      <span className="text-sm font-bold tracking-tight">{item.title}</span>
+                      <span className="text-sm font-bold tracking-tight">
+                        {item.title}
+                      </span>
                     )}
                   </NavLink>
                 </div>
@@ -321,15 +423,19 @@ export const AppSidebar = memo(function AppSidebar() {
                   collapsed && "justify-center",
                   isActive(item.url)
                     ? "bg-gradient-to-r from-xp/20 to-primary/20 text-primary border border-primary/20"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 )}
               >
-                <item.icon className={cn(
-                  "w-4 h-4 flex-shrink-0 transition-transform duration-200",
-                  !isActive(item.url) && "group-hover:scale-110",
-                  isActive(item.url) && "text-xp"
-                )} />
-                {!collapsed && <span className="text-sm font-medium">{item.title}</span>}
+                <item.icon
+                  className={cn(
+                    "w-4 h-4 flex-shrink-0 transition-transform duration-200",
+                    !isActive(item.url) && "group-hover:scale-110",
+                    isActive(item.url) && "text-xp",
+                  )}
+                />
+                {!collapsed && (
+                  <span className="text-sm font-medium">{item.title}</span>
+                )}
               </NavLink>
             ))}
           </div>
@@ -345,7 +451,9 @@ export const AppSidebar = memo(function AppSidebar() {
           {!collapsed && (
             <div className="flex items-center gap-2 px-3 mb-2">
               <Shield className="w-3 h-3 text-warning" />
-              <span className="text-[10px] font-bold text-warning uppercase tracking-wider">Admin</span>
+              <span className="text-[10px] font-bold text-warning uppercase tracking-wider">
+                Admin
+              </span>
             </div>
           )}
           {adminItems.map((item) => (
@@ -357,11 +465,13 @@ export const AppSidebar = memo(function AppSidebar() {
                 collapsed && "justify-center",
                 isActive(item.url)
                   ? "bg-warning/20 text-warning border border-warning/30"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               )}
             >
               <item.icon className="w-4 h-4 flex-shrink-0" />
-              {!collapsed && <span className="text-sm font-medium">{item.title}</span>}
+              {!collapsed && (
+                <span className="text-sm font-medium">{item.title}</span>
+              )}
             </NavLink>
           ))}
         </div>
@@ -377,7 +487,7 @@ export const AppSidebar = memo(function AppSidebar() {
                 "bg-gradient-to-r from-primary/15 via-primary/10 to-transparent",
                 "text-primary hover:from-primary/25 hover:via-primary/15",
                 "border border-primary/20 hover:border-primary/40",
-                "shadow-sm hover:shadow-md hover:shadow-primary/10"
+                "shadow-sm hover:shadow-md hover:shadow-primary/10",
               )}
             >
               <div className="relative">
@@ -399,7 +509,13 @@ export const AppSidebar = memo(function AppSidebar() {
               </SheetTitle>
             </SheetHeader>
             <div className="p-4 h-[calc(100vh-80px)]">
-              <Suspense fallback={<div className="flex items-center justify-center h-full text-muted-foreground text-sm">Carregando assistente...</div>}>
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                    Carregando assistente...
+                  </div>
+                }
+              >
                 <AIAssistant />
               </Suspense>
             </div>
@@ -416,11 +532,13 @@ export const AppSidebar = memo(function AppSidebar() {
             collapsed && "justify-center",
             isActive("/configuracoes")
               ? "bg-sidebar-accent text-sidebar-accent-foreground"
-              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
           )}
         >
           <Cog className="w-5 h-5 flex-shrink-0 group-hover:rotate-90 transition-transform duration-500" />
-          {!collapsed && <span className="text-sm font-medium">Configurações</span>}
+          {!collapsed && (
+            <span className="text-sm font-medium">Configurações</span>
+          )}
         </NavLink>
       </div>
 
@@ -432,7 +550,11 @@ export const AppSidebar = memo(function AppSidebar() {
         aria-label={collapsed ? "Expandir" : "Recolher"}
         className="absolute -right-3 top-20 w-6 h-6 rounded-full shadow-lg border-2 bg-background z-[60] hover:scale-110 active:scale-95 transition-transform"
       >
-        {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        {collapsed ? (
+          <ChevronRight className="h-3 w-3" />
+        ) : (
+          <ChevronLeft className="h-3 w-3" />
+        )}
       </Button>
     </aside>
   );

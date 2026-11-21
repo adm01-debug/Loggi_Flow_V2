@@ -125,7 +125,9 @@ export function GlobalSearch() {
               <span>Nova Coleta</span>
             </CommandItem>
             <CommandItem
-              onSelect={() => handleCommand(() => navigate("/rastreamento"))}
+              onSelect={() =>
+                handleCommand(() => navigate("/central-rastreamento"))
+              }
             >
               <Map className="mr-2 h-4 w-4" />
               <span>Central de Rastreamento</span>
@@ -152,7 +154,7 @@ export function GlobalSearch() {
               </span>
             </CommandItem>
             <CommandItem
-              onSelect={() => handleCommand(() => navigate("/profile"))}
+              onSelect={() => handleCommand(() => navigate("/perfil"))}
             >
               <User className="mr-2 h-4 w-4" />
               <span>Meu Perfil</span>
