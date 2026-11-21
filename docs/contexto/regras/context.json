@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "df04cb6c4e98b39469564affd3e42a273da0d99a",
+  "sha": "81e94592afadc8123e267f02105cb82b876f0c24",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 12:49 UTC",
+  "generated_at": "2026-11-21 13:12 UTC",
   "files_total": 1482,
   "code_files": 1140,
   "code_lines": 185949,
@@ -88205,10 +88205,22 @@
   }
  },
  "git": {
-  "sha": "df04cb6c4e98b39469564affd3e42a273da0d99a",
+  "sha": "81e94592afadc8123e267f02105cb82b876f0c24",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "81e9459",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)",
+    "files": [
+     "docs/pendencias/03-12-pickupdetails-custo.md",
+     "docs/pendencias/03-13-cinemathic-hud.md",
+     "docs/pendencias/03-14-label-qrcode.md",
+     "docs/pendencias/_ordem.md"
+    ]
+   },
    {
     "sha": "df04cb6",
     "date": "2026-11-21",
@@ -88699,21 +88711,12 @@
     "files": [
      "src/pages/Auth.tsx"
     ]
-   },
-   {
-    "sha": "1716939",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "fix(lgpd): apaga perfil e auth com schema real e registra em audit_logs (#208)",
-    "files": [
-     "supabase/functions/lgpd-erase-user/index.ts"
-    ]
    }
   ],
   "hot_files": [
    [
     "docs/pendencias/_ordem.md",
-    9
+    10
    ],
    [
     "package-lock.json",
@@ -88726,6 +88729,18 @@
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     3
+   ],
+   [
+    "docs/pendencias/03-12-pickupdetails-custo.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-13-cinemathic-hud.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-14-label-qrcode.md",
+    2
    ],
    [
     "docs/pendencias/03-10-negotiation-fixo.md",
@@ -88777,18 +88792,6 @@
    ],
    [
     "docs/pendencias/03-05-logisticsmapwidget-kpis.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-19-cotacao-api-simulada.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-20-dashboard-cotacoes-simula.md",
-    2
-   ],
-   [
-    "docs/pendencias/02-05-predict-delays-whatsapp.md",
     2
    ]
   ]

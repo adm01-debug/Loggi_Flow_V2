@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `df04cb6c4e98b39469564affd3e42a273da0d99a` (2026-11-21T09:48:50-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `81e94592afadc8123e267f02105cb82b876f0c24` (2026-11-21T09:55:12-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8549 nós · 21024 arestas · 861 comunidades · grafo do commit `df04cb6c`
+- 8549 nós · 21024 arestas · 861 comunidades · grafo do commit `81e94592`
 - comunidades maiores: lucide-react (263), react (210), utils.ts (169), db-observability/index.ts (156), client.ts (148), Button (133), input.tsx (123), useAuth (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ui/index.ts (97), cn (93), log (86)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -282,7 +282,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 ## Hotspots (arquivos mais alterados, 90 dias)
 - package-lock.json (52)
 - package.json (51)
-- docs/pendencias/_ordem.md (9)
+- docs/pendencias/_ordem.md (10)
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `81e9459` docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)
 - 2026-11-21 `df04cb6` fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)
 - 2026-11-21 `546b1cc` docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)
 - 2026-11-21 `e7cd1b4` fix: dados reais em NegotiationAssistant e conferencia honesta sem OCR simulado (#235)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `e4392b7` fix: remove simulacao de cotacao e torna retentativa real (#226)
 - 2026-11-20 `5d31fbc` docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)
 - 2026-11-20 `190f724` chore: remove migration legada 20240822_gamification_system.sql (#224)
-- 2026-11-20 `e2fd132` chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
