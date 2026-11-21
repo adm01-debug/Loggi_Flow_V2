@@ -81,6 +81,19 @@ export default function CotacaoMultiCanal() {
   const [manualPrazo, setManualPrazo] = useState("");
   const [manualObs, setManualObs] = useState("");
   const [cotacoes, setCotacoes] = useState<CotacaoManual[]>([]);
+  const [nexusStrategy, setNexusStrategy] = useState("Normal");
+
+  // 3.19 - pesos reais da tabela freight_selection_rules (evita UI divergente
+  // e Select sem efeito). Valores espelham a migration 20260517131144.
+  const STRATEGY_WEIGHTS: Record<
+    string,
+    { price: number; time: number; perf: number }
+  > = {
+    Normal: { price: 0.7, time: 0.2, perf: 0.1 },
+    Urgente: { price: 0.2, time: 0.6, perf: 0.2 },
+    Evento: { price: 0.4, time: 0.4, perf: 0.2 },
+  };
+  const weights = STRATEGY_WEIGHTS[nexusStrategy] ?? STRATEGY_WEIGHTS.Normal;
 
   const handleSearch = async () => {
     if (!origemEstado || !destinoEstado) {
@@ -263,7 +276,8 @@ export default function CotacaoMultiCanal() {
         if (carrier.canal_cotacao === "api") {
           await handleCotarAPI(carrier);
         } else if (carrier.canal_cotacao === "whatsapp") {
-          // Record that we intend to quote via WhatsApp (automation would trigger here in real scenario)
+          // Registro honesto: sem instancia configurada no front para o Evolution,
+          // a cotacao fica pendente aguardando resposta manual da transportadora.
           createCotacao.mutate({
             transportadora_id: carrier.transportadora_id,
             canal: "whatsapp",
@@ -587,7 +601,7 @@ export default function CotacaoMultiCanal() {
             <Label className="text-xs font-black uppercase mb-1.5 block text-muted-foreground">
               Estratégia Nexus (Priorização)
             </Label>
-            <Select defaultValue="Normal">
+            <Select value={nexusStrategy} onValueChange={setNexusStrategy}>
               <SelectTrigger className="h-10 border-primary/20 bg-primary/5">
                 <SelectValue />
               </SelectTrigger>
@@ -608,19 +622,19 @@ export default function CotacaoMultiCanal() {
                 variant="ghost"
                 className="text-[9px] px-1 py-0 h-4 bg-primary/10"
               >
-                Preço: 70%
+                Preço: {Math.round(weights.price * 100)}%
               </Badge>
               <Badge
                 variant="ghost"
                 className="text-[9px] px-1 py-0 h-4 bg-primary/10"
               >
-                Prazo: 20%
+                Prazo: {Math.round(weights.time * 100)}%
               </Badge>
               <Badge
                 variant="ghost"
                 className="text-[9px] px-1 py-0 h-4 bg-primary/10"
               >
-                Perf: 10%
+                Perf: {Math.round(weights.perf * 100)}%
               </Badge>
             </div>
           </div>
@@ -847,11 +861,12 @@ export default function CotacaoMultiCanal() {
                       <CardContent className="p-3 pt-0">
                         {(() => {
                           const bestValue = respondidas.reduce((a, b) => {
-                            // Weight: 70% Price, 30% Deadline
                             const scoreA =
-                              a.valor! * 0.7 + (a.prazo_dias || 0) * 50 * 0.3;
+                              a.valor! * weights.price +
+                              (a.prazo_dias || 0) * 50 * weights.time;
                             const scoreB =
-                              b.valor! * 0.7 + (b.prazo_dias || 0) * 50 * 0.3;
+                              b.valor! * weights.price +
+                              (b.prazo_dias || 0) * 50 * weights.time;
                             return scoreA < scoreB ? a : b;
                           });
                           return (
