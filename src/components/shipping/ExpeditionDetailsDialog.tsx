@@ -356,9 +356,7 @@ export function ExpeditionDetailsDialog({
                   <Button
                     variant="ghost"
                     className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] text-white/40 hover:text-primary transition-colors"
-                    onClick={() =>
-                      toast.info("Funcionalidade tática em desenvolvimento")
-                    }
+                    onClick={() => setActiveTab("historico")}
                   >
                     <History className="w-4 h-4 mr-2" /> Log Detalhado
                   </Button>

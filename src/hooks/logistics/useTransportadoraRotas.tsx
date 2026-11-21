@@ -28,6 +28,9 @@ export interface TransportadoraRota {
     razao_social: string;
     score_performance: number;
     homologada: boolean;
+    email_comercial: string | null;
+    contato_comercial: string | null;
+    whatsapp_operacional: string | null;
   };
 }
 
@@ -82,7 +85,10 @@ export const useTransportadoraRotas = (filters?: RotaFilter) => {
             nome_fantasia,
             razao_social,
             score_performance,
-            homologada
+            homologada,
+            email_comercial,
+            contato_comercial,
+            whatsapp_operacional
           )
         `,
         )

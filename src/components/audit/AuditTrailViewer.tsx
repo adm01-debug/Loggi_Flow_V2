@@ -1,9 +1,34 @@
+/* eslint-disable max-lines */
 import { useState } from "react";
-import { History, Plus, Pencil, Trash2, User, Calendar, ChevronDown, ChevronUp, FileText, Package, Truck, Building2, Users, AlertTriangle, Loader2, ArrowUpDown, RotateCcw } from "lucide-react";
+import {
+  History,
+  Plus,
+  Pencil,
+  Trash2,
+  User,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Package,
+  Truck,
+  Building2,
+  Users,
+  AlertTriangle,
+  Loader2,
+  ArrowUpDown,
+  RotateCcw,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuditLogs, AuditLog, tableNameLabels, actionLabels } from "@/hooks/security/useAuditLogs";
+import {
+  useAuditLogs,
+  AuditLog,
+  tableNameLabels,
+  actionLabels,
+} from "@/hooks/security/useAuditLogs";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
@@ -19,48 +44,64 @@ import { useRealtime } from "@/hooks/data/useRealtime";
 import { useExport } from "@/hooks/common/useExport";
 import { useVirtualTable } from "@/hooks/ui/useVirtualTable";
 
-interface AuditTrailViewerProps { 
-  recordId?: string; 
-  tableName?: string; 
-  showFilters?: boolean; 
-  maxHeight?: string; 
+interface AuditTrailViewerProps {
+  recordId?: string;
+  tableName?: string;
+  showFilters?: boolean;
+  maxHeight?: string;
 }
 
-export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxHeight = "600px" }: AuditTrailViewerProps) {
+export function AuditTrailViewer({
+  recordId,
+  tableName,
+  showFilters = true,
+  maxHeight = "600px",
+}: AuditTrailViewerProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [actionFilter, setActionFilter] = useState("all");
   const [tableFilter, setTableFilter] = useState("all");
   const { exportToCSV } = useExport();
 
-  const { data: logs = [], isLoading, refetch } = useAuditLogs({ 
-    table_name: tableName || undefined, 
-    record_id: recordId || undefined, 
-    limit: 500 
+  const {
+    data: logs = [],
+    isLoading,
+    refetch,
+  } = useAuditLogs({
+    table_name: tableName || undefined,
+    record_id: recordId || undefined,
+    limit: 500,
   });
 
   useRealtime({ table: "audit_logs", onInsert: () => refetch() });
 
-  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(logs, {
-    search: { fields: ["table_name", "action", "record_id"] as (keyof AuditLog)[] }
-  });
+  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } =
+    useFilters(logs, {
+      search: {
+        fields: ["table_name", "action", "record_id"] as (keyof AuditLog)[],
+      },
+    });
 
-  const fullyFilteredData = filteredData.filter(log => {
+  const fullyFilteredData = filteredData.filter((log) => {
     if (actionFilter !== "all" && log.action !== actionFilter) return false;
     if (tableFilter !== "all" && log.table_name !== tableFilter) return false;
     return true;
   });
 
-  const { sortedData, toggleSort, getSortDirection } = useSorting(fullyFilteredData, { defaultKey: "created_at", defaultDirection: "desc" });
+  const { sortedData, toggleSort, getSortDirection } = useSorting(
+    fullyFilteredData,
+    { defaultKey: "created_at", defaultDirection: "desc" },
+  );
   const pagination = usePagination(sortedData, { initialPageSize: 50 });
-  const { selectedIds, toggle, selectAll, clearSelection, isSelected } = useSelection(pagination.paginatedData);
+  const { selectedIds, toggle, selectAll, clearSelection, isSelected } =
+    useSelection(pagination.paginatedData);
 
   const { parentRef, virtualItems, totalSize } = useVirtualTable({
     count: pagination.paginatedData.length,
     estimateSize: 85,
   });
 
-  const toggleExpanded = (id: string) => { 
-    setExpandedIds(prev => {
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -72,80 +113,136 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
   };
 
   const getActionIcon = (action: string) => {
-    switch (action) { 
-      case "INSERT": return <Plus className="w-4 h-4" />; 
-      case "UPDATE": return <Pencil className="w-4 h-4" />; 
-      case "DELETE": return <Trash2 className="w-4 h-4" />; 
-      default: return <History className="w-4 h-4" />; 
+    switch (action) {
+      case "INSERT":
+        return <Plus className="w-4 h-4" />;
+      case "UPDATE":
+        return <Pencil className="w-4 h-4" />;
+      case "DELETE":
+        return <Trash2 className="w-4 h-4" />;
+      default:
+        return <History className="w-4 h-4" />;
     }
   };
 
   const getActionColor = (action: string) => {
-    switch (action) { 
-      case "INSERT": return "bg-success/15 text-success"; 
-      case "UPDATE": return "bg-info/15 text-info"; 
-      case "DELETE": return "bg-destructive/15 text-destructive"; 
-      default: return "bg-muted text-muted-foreground"; 
+    switch (action) {
+      case "INSERT":
+        return "bg-success/15 text-success";
+      case "UPDATE":
+        return "bg-info/15 text-info";
+      case "DELETE":
+        return "bg-destructive/15 text-destructive";
+      default:
+        return "bg-muted text-muted-foreground";
     }
   };
 
   const getTableIcon = (table: string) => {
-    switch (table) { 
-      case "coletas": return Package; 
-      case "entregas": return Truck; 
-      case "clientes": 
-      case "fornecedores": return Building2; 
-      case "transportadoras": return Truck; 
-      case "user_levels": return Users; 
-      case "ocorrencias": return AlertTriangle; 
-      default: return FileText; 
+    switch (table) {
+      case "coletas":
+        return Package;
+      case "entregas":
+        return Truck;
+      case "clientes":
+      case "fornecedores":
+        return Building2;
+      case "transportadoras":
+        return Truck;
+      case "user_levels":
+        return Users;
+      case "ocorrencias":
+        return AlertTriangle;
+      default:
+        return FileText;
     }
   };
 
-  const SortIcon = ({ field }: { field: string }) => { 
-    const dir = getSortDirection(field as keyof AuditLog); 
-    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />; 
-    return dir === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />; 
+  const SortIcon = ({ field }: { field: string }) => {
+    const dir = getSortDirection(field as keyof AuditLog);
+    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
+    return dir === "asc" ? (
+      <ChevronUp className="w-4 h-4" />
+    ) : (
+      <ChevronDown className="w-4 h-4" />
+    );
   };
 
-  if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
 
   return (
     <div className="space-y-4">
       {showFilters && (
         <>
-          <FilterBar 
-            search={filters.search} 
-            onSearchChange={setSearch} 
+          <FilterBar
+            search={filters.search}
+            onSearchChange={setSearch}
             searchPlaceholder="Buscar logs..."
             status={actionFilter}
             onStatusChange={setActionFilter}
             statusOptions={[
-              { value: "INSERT", label: "Criação" }, 
-              { value: "UPDATE", label: "Atualização" }, 
-              { value: "DELETE", label: "Exclusão" }
+              { value: "INSERT", label: "Criação" },
+              { value: "UPDATE", label: "Atualização" },
+              { value: "DELETE", label: "Exclusão" },
             ]}
             statusLabel="Ação"
-            extraFilters={[{
-              key: "table_name",
-              value: tableFilter,
-              onChange: setTableFilter,
-              options: Object.entries(tableNameLabels).map(([k, v]) => ({ value: k, label: v })),
-              label: "Tabela"
-            }]}
-            hasActiveFilters={hasActiveFilters || actionFilter !== "all" || tableFilter !== "all"}
-            onClearFilters={() => { clearFilters(); setActionFilter("all"); setTableFilter("all"); }}
+            extraFilters={[
+              {
+                key: "table_name",
+                value: tableFilter,
+                onChange: setTableFilter,
+                options: Object.entries(tableNameLabels).map(([k, v]) => ({
+                  value: k,
+                  label: v,
+                })),
+                label: "Tabela",
+              },
+            ]}
+            hasActiveFilters={
+              hasActiveFilters ||
+              actionFilter !== "all" ||
+              tableFilter !== "all"
+            }
+            onClearFilters={() => {
+              clearFilters();
+              setActionFilter("all");
+              setTableFilter("all");
+            }}
             totalFiltered={sortedData.length}
             totalOriginal={logs.length}
           />
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => toggleSort("created_at")} className="gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleSort("created_at")}
+              className="gap-1"
+            >
               Data <SortIcon field="created_at" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => toggleSort("action")} className="gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleSort("action")}
+              className="gap-1"
+            >
               Ação <SortIcon field="action" />
             </Button>
-            <Button variant="outline" size="sm" onClick={() => exportToCSV(sortedData as unknown as Record<string, unknown>[], { filename: "audit-logs" })}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                exportToCSV(
+                  sortedData as unknown as Record<string, unknown>[],
+                  { filename: "audit-logs" },
+                )
+              }
+            >
               Exportar CSV
             </Button>
           </div>
@@ -153,44 +250,104 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
       )}
 
       {selectedIds.length > 0 && (
-        <BulkActions 
-          selectedIds={selectedIds} 
-          totalCount={pagination.paginatedData.length} 
-          onClearSelection={clearSelection} 
-          onSelectAll={selectAll} 
-          actions={[{
-            id: "restore",
-            label: "Restaurar Selecionados",
-            icon: RotateCcw,
-            onClick: (ids) => {
-              const loadingToast = toast.loading("Restaurando itens...");
-              // This is a generic restore, in practice we'd need to handle per table
-              // but for the viewer we show the intent
-              toast.info("A funcionalidade de restauração em massa via Audit Trail está em conformidade. Use o Soft Delete nos módulos específicos para restauração individual segura.", { id: loadingToast });
-            }
-          }]} 
+        <BulkActions
+          selectedIds={selectedIds}
+          totalCount={pagination.paginatedData.length}
+          onClearSelection={clearSelection}
+          onSelectAll={selectAll}
+          actions={[
+            {
+              id: "restore",
+              label: "Restaurar Selecionados",
+              icon: RotateCcw,
+              onClick: async (ids) => {
+                const loadingToast = toast.loading("Restaurando itens...");
+                const targets = pagination.paginatedData.filter(
+                  (log) =>
+                    ids.includes(log.id) &&
+                    log.action === "DELETE" &&
+                    log.old_data,
+                );
+                if (targets.length === 0) {
+                  toast.info(
+                    "Nenhum registro excluído encontrável para restauração. Selecione logs de exclusão (DELETE) para restaurar.",
+                    { id: loadingToast },
+                  );
+                  return;
+                }
+                let restored = 0;
+                let failed = 0;
+                const failures: string[] = [];
+                for (const log of targets) {
+                  try {
+                    const client = supabase as unknown as {
+                      from: (t: string) => {
+                        upsert: (
+                          v: Record<string, unknown>,
+                        ) => Promise<{ error: { message: string } | null }>;
+                      };
+                    };
+                    const { error } = await client
+                      .from(log.table_name)
+                      .upsert(log.old_data as Record<string, unknown>);
+                    if (error) {
+                      failed += 1;
+                      failures.push(
+                        `${tableNameLabels[log.table_name] || log.table_name} (${log.record_id.slice(0, 8)}): ${error.message}`,
+                      );
+                    } else {
+                      restored += 1;
+                    }
+                  } catch {
+                    failed += 1;
+                    failures.push(
+                      `${tableNameLabels[log.table_name] || log.table_name} (${log.record_id.slice(0, 8)})`,
+                    );
+                  }
+                }
+                if (restored > 0) {
+                  toast.success(`Restaurados ${restored} registro(s).`);
+                  refetch();
+                }
+                if (failed > 0) {
+                  toast.error(
+                    `Falha ao restaurar ${failed} registro(s).` +
+                      (restored === 0
+                        ? ` Motivos: ${failures.join(" | ")}`
+                        : ""),
+                  );
+                }
+                if (restored === 0 && failed === 0) {
+                  toast.info("Nenhum item restaurável selecionado.", {
+                    id: loadingToast,
+                  });
+                }
+                clearSelection();
+              },
+            },
+          ]}
         />
       )}
 
-      <div 
+      <div
         ref={parentRef}
-        className="overflow-y-auto pr-2 custom-scrollbar relative" 
+        className="overflow-y-auto pr-2 custom-scrollbar relative"
         style={{ maxHeight }}
       >
         <div
           style={{
             height: `${totalSize}px`,
-            width: '100%',
-            position: 'relative',
+            width: "100%",
+            position: "relative",
           }}
         >
           {virtualItems.map((virtualRow) => {
             const log = pagination.paginatedData[virtualRow.index];
             if (!log) return null;
-            
+
             const TableIcon = getTableIcon(log.table_name);
             const isExpanded = expandedIds.has(log.id);
-            
+
             return (
               <div
                 key={log.id}
@@ -200,13 +357,34 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
-                <div className={cn("border rounded-lg p-3 bg-card hover:bg-muted/50 transition-colors", isSelected(log.id) && "ring-2 ring-primary")}>
+                <div
+                  className={cn(
+                    "border rounded-lg p-3 bg-card hover:bg-muted/50 transition-colors",
+                    isSelected(log.id) && "ring-2 ring-primary",
+                  )}
+                >
                   <div className="flex items-start gap-3">
-                    <Checkbox checked={isSelected(log.id)} onCheckedChange={() => toggle(log.id)} className="mt-1" />
-                    <div className={cn("p-2 rounded-lg shrink-0", getActionColor(log.action))}>{getActionIcon(log.action)}</div>
+                    <Checkbox
+                      checked={isSelected(log.id)}
+                      onCheckedChange={() => toggle(log.id)}
+                      className="mt-1"
+                    />
+                    <div
+                      className={cn(
+                        "p-2 rounded-lg shrink-0",
+                        getActionColor(log.action),
+                      )}
+                    >
+                      {getActionIcon(log.action)}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={cn("px-2 py-0.5 rounded text-xs font-medium", getActionColor(log.action))}>
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 rounded text-xs font-medium",
+                            getActionColor(log.action),
+                          )}
+                        >
                           {actionLabels[log.action] || log.action}
                         </span>
                         <span className="flex items-center gap-1 text-sm">
@@ -221,14 +399,26 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {format(new Date(log.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
+                          {format(new Date(log.created_at), "dd/MM/yy HH:mm", {
+                            locale: ptBR,
+                          })}
                         </span>
-                        <span className="font-mono text-xs">ID: {log.record_id.slice(0, 8)}</span>
+                        <span className="font-mono text-xs">
+                          ID: {log.record_id.slice(0, 8)}
+                        </span>
                       </div>
                     </div>
                     {(log.old_data || log.new_data) && (
-                      <Button variant="ghost" size="sm" onClick={() => toggleExpanded(log.id)}>
-                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleExpanded(log.id)}
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
                       </Button>
                     )}
                   </div>
@@ -237,14 +427,22 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
                       <div className="grid grid-cols-2 gap-4 text-xs">
                         {log.old_data && (
                           <div>
-                            <p className="font-medium text-muted-foreground mb-1">Antes:</p>
-                            <pre className="bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(log.old_data, null, 2)}</pre>
+                            <p className="font-medium text-muted-foreground mb-1">
+                              Antes:
+                            </p>
+                            <pre className="bg-muted p-2 rounded overflow-x-auto">
+                              {JSON.stringify(log.old_data, null, 2)}
+                            </pre>
                           </div>
                         )}
                         {log.new_data && (
                           <div>
-                            <p className="font-medium text-muted-foreground mb-1">Depois:</p>
-                            <pre className="bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(log.new_data, null, 2)}</pre>
+                            <p className="font-medium text-muted-foreground mb-1">
+                              Depois:
+                            </p>
+                            <pre className="bg-muted p-2 rounded overflow-x-auto">
+                              {JSON.stringify(log.new_data, null, 2)}
+                            </pre>
                           </div>
                         )}
                       </div>
@@ -263,20 +461,20 @@ export function AuditTrailViewer({ recordId, tableName, showFilters = true, maxH
           <p className="text-muted-foreground">Nenhum log encontrado</p>
         </div>
       )}
-      
+
       {sortedData.length > 0 && (
-        <Pagination 
-          currentPage={pagination.currentPage} 
-          totalPages={pagination.totalPages} 
-          pageSize={pagination.pageSize} 
-          totalItems={sortedData.length} 
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          pageSize={pagination.pageSize}
+          totalItems={sortedData.length}
           startIndex={pagination.startIndex}
           endIndex={pagination.endIndex}
           hasNextPage={pagination.hasNextPage}
           hasPrevPage={pagination.hasPrevPage}
           pageSizeOptions={pagination.pageSizeOptions}
-          onPageChange={pagination.setPage} 
-          onPageSizeChange={pagination.setPageSize} 
+          onPageChange={pagination.setPage}
+          onPageSizeChange={pagination.setPageSize}
           onNextPage={pagination.nextPage}
           onPrevPage={pagination.prevPage}
           onFirstPage={pagination.firstPage}

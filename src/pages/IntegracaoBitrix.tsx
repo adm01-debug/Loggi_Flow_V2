@@ -150,7 +150,26 @@ export default function IntegracaoBitrix() {
               />
               Sincronizar Agora
             </Button>
-            <Button className="gap-2 shadow-lg shadow-primary/20">
+            <Button
+              className="gap-2 shadow-lg shadow-primary/20"
+              onClick={() => {
+                const clean = webhookUrl
+                  .trim()
+                  .replace(/^https?:\/\//, "")
+                  .split("/")[0];
+                if (!clean) {
+                  toast.info(
+                    "Configure a URL do webhook do Bitrix24 para abrir o CRM.",
+                  );
+                  return;
+                }
+                window.open(
+                  `https://${clean}`,
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              }}
+            >
               <ExternalLink className="w-4 h-4" />
               Abrir CRM
             </Button>

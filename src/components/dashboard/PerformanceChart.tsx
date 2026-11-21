@@ -68,7 +68,47 @@ const PerformanceChart = React.forwardRef<
     },
     ref,
   ) => {
-    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color?: string; dataKey: string; payload?: Record<string, unknown> }>; label?: string }) => {
+    const [isFullscreen, setIsFullscreen] = React.useState(false);
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const chartInnerRef = React.useRef<HTMLDivElement>(null);
+
+    const handleRefresh = React.useCallback(() => {
+      setIsRefreshing(true);
+      window.setTimeout(() => setIsRefreshing(false), 700);
+    }, []);
+
+    const handleMaximize = React.useCallback(() => {
+      const el = chartInnerRef.current;
+      if (!el) return;
+      if (!isFullscreen) {
+        el.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    }, [isFullscreen]);
+
+    React.useEffect(() => {
+      const onFsChange = () =>
+        setIsFullscreen(Boolean(document.fullscreenElement));
+      document.addEventListener("fullscreenchange", onFsChange);
+      return () => document.removeEventListener("fullscreenchange", onFsChange);
+    }, []);
+
+    const CustomTooltip = ({
+      active,
+      payload,
+      label,
+    }: {
+      active?: boolean;
+      payload?: Array<{
+        name: string;
+        value: number;
+        color?: string;
+        dataKey: string;
+        payload?: Record<string, unknown>;
+      }>;
+      label?: string;
+    }) => {
       if (active && payload && payload.length) {
         return (
           <div className="relative group/tooltip">
@@ -100,14 +140,20 @@ const PerformanceChart = React.forwardRef<
                         <div
                           className="absolute inset-0 rounded-full animate-ping opacity-50"
                           style={{
-                            backgroundColor: entry.color || (entry.payload?.fill as string | undefined),
+                            backgroundColor:
+                              entry.color ||
+                              (entry.payload?.fill as string | undefined),
                           }}
                         />
                         <div
                           className="relative w-2.5 h-2.5 rounded-full shadow-[0_0_15px_currentColor]"
                           style={{
-                            backgroundColor: entry.color || (entry.payload?.fill as string | undefined),
-                            color: entry.color || (entry.payload?.fill as string | undefined),
+                            backgroundColor:
+                              entry.color ||
+                              (entry.payload?.fill as string | undefined),
+                            color:
+                              entry.color ||
+                              (entry.payload?.fill as string | undefined),
                           }}
                         />
                       </div>
@@ -362,7 +408,14 @@ const PerformanceChart = React.forwardRef<
 
     return (
       <motion.div
-        ref={ref}
+        ref={(node) => {
+          if (typeof ref === "function") ref(node);
+          else if (ref)
+            (ref as { current?: HTMLDivElement | null }).current = node;
+          (
+            chartInnerRef as React.MutableRefObject<HTMLDivElement | null>
+          ).current = node;
+        }}
         initial={{ opacity: 0, scale: 0.95, y: 50 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
         viewport={{ once: true }}
@@ -426,13 +479,21 @@ const PerformanceChart = React.forwardRef<
                 variant="ghost"
                 size="icon"
                 className="w-14 h-14 rounded-2xl hover:bg-primary hover:text-white transition-all active:scale-90 group/btn"
+                onClick={handleRefresh}
+                aria-label="Atualizar dados do gráfico"
               >
-                <RefreshCw className="w-5 h-5 group-hover/btn:rotate-180 transition-transform duration-500" />
+                <RefreshCw
+                  className={`w-5 h-5 group-hover/btn:rotate-180 transition-transform duration-500 ${isRefreshing ? "animate-spin" : ""}`}
+                />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="w-14 h-14 rounded-2xl hover:bg-primary hover:text-white transition-all active:scale-90 group/btn"
+                onClick={handleMaximize}
+                aria-label={
+                  isFullscreen ? "Sair da tela cheia" : "Expandir tela cheia"
+                }
               >
                 <Maximize2 className="w-5 h-5 group-hover/btn:scale-125 transition-transform duration-500" />
               </Button>

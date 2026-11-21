@@ -15,6 +15,7 @@ import {
   BarChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 import { useNexusHealth } from "@/hooks/system/useNexusHealth";
 import { motion, AnimatePresence } from "framer-motion";
 import { RecentAlert } from "@/hooks/analytics/useDashboardMetrics";
@@ -55,6 +56,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
     );
 
     const { latency } = useNexusHealth();
+    const navigate = useNavigate();
 
     const processingLabel = React.useMemo(() => {
       if (latency === null) return "Processamento em Tempo Real";
@@ -431,6 +433,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
               <Button
                 variant="ghost"
                 className="h-16 px-12 text-[13px] font-black uppercase tracking-[0.5em] text-white/60 hover:text-destructive hover:bg-destructive/5 transition-all rounded-[1.5rem] border border-white/5 hover:border-destructive/40 group/footer italic"
+                onClick={() => navigate("/admin/telemetria")}
               >
                 ACESSAR TERMINAL COMPLETO
                 <ArrowRight className="w-5 h-5 ml-4 group-hover/footer:translate-x-3 transition-transform duration-500" />
