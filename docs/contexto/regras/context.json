@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "73b5d8cc69b3f4ad3456c6e343ba71786f71e661",
+  "sha": "d15ef794f0b9aae3b50fbc34f1548606f84feb13",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 13:42 UTC",
+  "generated_at": "2026-11-21 13:47 UTC",
   "files_total": 1482,
   "code_files": 1140,
-  "code_lines": 186037,
+  "code_lines": 186095,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "316065688058b50f",
+ "facts_hash": "b10b8776561290b2",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29084,7 +29084,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 49822,
+   "lines": 49823,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -29894,7 +29894,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30960,
+   "lines": 31017,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -44698,6 +44698,24 @@
    {
     "file": "src/pages/Coletas.tsx",
     "field": "status",
+    "value": "conferencia_ok",
+    "kind": "compara"
+   },
+   {
+    "file": "src/pages/Coletas.tsx",
+    "field": "status",
+    "value": "finalizada",
+    "kind": "compara"
+   },
+   {
+    "file": "src/pages/Coletas.tsx",
+    "field": "status",
+    "value": "divergencia",
+    "kind": "compara"
+   },
+   {
+    "file": "src/pages/Coletas.tsx",
+    "field": "status",
     "value": "aguardando_liberacao",
     "kind": "compara"
    },
@@ -47505,11 +47523,11 @@
    },
    {
     "file": "src/pages/InteligenciaFrete.tsx",
-    "line": "+40%."
+    "line": "Custo superior a 20% da média histórica"
    },
    {
     "file": "src/pages/InteligenciaFrete.tsx",
-    "line": "Custo superior a 20% da média histórica"
+    "line": "Nenhum frete acima de 20% da média regional no mês."
    },
    {
     "file": "src/pages/InteligenciaFrete.tsx",
@@ -68653,7 +68671,7 @@
   },
   "src/components/coletas/types.ts": {
    "path": "src/components/coletas/types.ts",
-   "lines": 41,
+   "lines": 42,
    "exports": [
     "type ColetaStatus",
     "type ColetaTipo",
@@ -80748,7 +80766,7 @@
   },
   "src/pages/Coletas.tsx": {
    "path": "src/pages/Coletas.tsx",
-   "lines": 810,
+   "lines": 847,
    "exports": [
     "function Coletas"
    ],
@@ -80782,6 +80800,21 @@
     {
      "field": "status",
      "value": "finalizada",
+     "kind": "compara"
+    },
+    {
+     "field": "status",
+     "value": "conferencia_ok",
+     "kind": "compara"
+    },
+    {
+     "field": "status",
+     "value": "finalizada",
+     "kind": "compara"
+    },
+    {
+     "field": "status",
+     "value": "divergencia",
      "kind": "compara"
     },
     {
@@ -81977,14 +82010,14 @@
   },
   "src/pages/InteligenciaFrete.tsx": {
    "path": "src/pages/InteligenciaFrete.tsx",
-   "lines": 693,
+   "lines": 713,
    "exports": [
     "function InteligenciaFrete"
    ],
    "doc": "eslint-disable max-lines",
    "percents": [
-    "+40%.",
     "Custo superior a 20% da média histórica",
+    "Nenhum frete acima de 20% da média regional no mês.",
     "~30% com consolidação"
    ]
   },
@@ -88202,10 +88235,21 @@
   }
  },
  "git": {
-  "sha": "73b5d8cc69b3f4ad3456c6e343ba71786f71e661",
+  "sha": "d15ef794f0b9aae3b50fbc34f1548606f84feb13",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "d15ef79",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: substitui simulacoes de lead time, divergencia semanal e acoes corretivas por dados reais (#240)",
+    "files": [
+     "src/components/coletas/types.ts",
+     "src/pages/Coletas.tsx",
+     "src/pages/InteligenciaFrete.tsx"
+    ]
+   },
    {
     "sha": "73b5d8c",
     "date": "2026-11-21",
@@ -88696,18 +88740,6 @@
      "supabase/functions/normalize-freight-response/index.ts",
      "supabase/functions/predict-delays/index.ts",
      "supabase/functions/webhook-status/index.ts"
-    ]
-   },
-   {
-    "sha": "08d5a13",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "docs: aponta docs aspiracionais para a auditoria autoritativa (#210)",
-    "files": [
-     "docs/INVENTARIO_FUNCIONALIDADES.md",
-     "docs/MELHORIAS.md",
-     "docs/MIGRATION-GUIDE.md",
-     "docs/PLANO_MELHORIAS_2026.md"
     ]
    }
   ],

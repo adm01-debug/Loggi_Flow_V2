@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "73b5d8cc69b3f4ad3456c6e343ba71786f71e661",
+  "commit": "d15ef794f0b9aae3b50fbc34f1548606f84feb13",
   "branch": "main",
-  "data_commit": "2026-11-21T10:42:30-03:00",
+  "data_commit": "2026-11-21T10:46:44-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "d15ef79",
+    "data": "2026-11-21",
+    "assunto": "fix: substitui simulacoes de lead time, divergencia semanal e acoes corretivas por dados reais (#240)"
+   },
    {
     "sha": "73b5d8c",
     "data": "2026-11-21",
@@ -126,14 +131,9 @@
     "sha": "eaecf14",
     "data": "2026-11-20",
     "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#216)"
-   },
-   {
-    "sha": "9654eed",
-    "data": "2026-11-20",
-    "assunto": "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)"
    }
   ],
-  "arquivos_mudados_7d": 328,
+  "arquivos_mudados_7d": 330,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -160,11 +160,11 @@
     "mudancas": 8
    },
    {
-    "pasta": ".github/workflows/types-sync.yml",
-    "mudancas": 6
+    "pasta": "src/components/coletas",
+    "mudancas": 7
    },
    {
-    "pasta": "src/components/coletas",
+    "pasta": ".github/workflows/types-sync.yml",
     "mudancas": 6
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 167
+    "commits": 168
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169525,
+  "linhas_codigo": 169583,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 49822
+   "linhas": 49823
   },
   "src/features": {
    "arquivos": 90,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30960
+   "linhas": 31017
   },
   "src/services": {
    "arquivos": 5,
@@ -613,6 +613,10 @@
    "linhas": 884
   },
   {
+   "arquivo": "src/pages/Coletas.tsx",
+   "linhas": 847
+  },
+  {
    "arquivo": "src/pages/Relatorios.tsx",
    "linhas": 844
   },
@@ -627,10 +631,6 @@
   {
    "arquivo": "src/pages/FretesInternos.tsx",
    "linhas": 829
-  },
-  {
-   "arquivo": "src/pages/Coletas.tsx",
-   "linhas": 810
   },
   {
    "arquivo": "src/pages/RastreamentoRealTime.tsx",

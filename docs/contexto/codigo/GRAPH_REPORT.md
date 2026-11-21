@@ -1,17 +1,17 @@
 # Graph Report - Loggi_Flow_V2  (2026-11-21)
 
 ## Corpus Check
-- 1438 files · ~807,237 words
+- 1438 files · ~807,440 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: .toml 6, (none) 6, .example 1)
 
 ## Summary
-- 8553 nodes · 21037 edges · 871 communities (388 shown, 483 thin omitted)
+- 8553 nodes · 21038 edges · 871 communities (388 shown, 483 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 353 edges (avg confidence: 0.92)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `73b5d8cc`
+- Built from commit: `d15ef794`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -765,7 +765,7 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 517 edges
-2. `react` - 341 edges
+2. `react` - 342 edges
 3. `lucide-react` - 329 edges
 4. `Button` - 215 edges
 5. `supabase` - 207 edges

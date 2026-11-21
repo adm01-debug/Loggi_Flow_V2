@@ -5402,7 +5402,7 @@
     "Coletas"
    ],
    "export_default": "Coletas",
-   "linhas": 810,
+   "linhas": 847,
    "dominio": "pages",
    "hooks_locais": [
     "useAudioFeedback",
@@ -5967,7 +5967,7 @@
     "InteligenciaFrete"
    ],
    "export_default": "InteligenciaFrete",
-   "linhas": 693,
+   "linhas": 713,
    "dominio": "pages",
    "hooks_locais": [
     "useFreightIntelligence"

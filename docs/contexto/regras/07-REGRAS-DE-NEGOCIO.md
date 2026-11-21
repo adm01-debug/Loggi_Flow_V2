@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `73b5d8cc69` · branch `main` · 2026-11-21 13:42 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `d15ef794f0` · branch `main` · 2026-11-21 13:47 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1517,8 +1517,8 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `Preço: 70%` | `src/pages/CotacaoMultiCanal.tsx` |
 | `a.valor! * 0.7 + (a.prazo_dias \|\| 0) * 50 * 0.3;` | `src/pages/CotacaoMultiCanal.tsx` |
 | `b.valor! * 0.7 + (b.prazo_dias \|\| 0) * 50 * 0.3;` | `src/pages/CotacaoMultiCanal.tsx` |
-| `+40%.` | `src/pages/InteligenciaFrete.tsx` |
 | `Custo superior a 20% da média histórica` | `src/pages/InteligenciaFrete.tsx` |
+| `Nenhum frete acima de 20% da média regional no mês.` | `src/pages/InteligenciaFrete.tsx` |
 | `~30% com consolidação` | `src/pages/InteligenciaFrete.tsx` |
 | `transition={{ delay: colIdx * 0.1 }}` | `src/pages/KanbanEntregas.tsx` |
 | `delay: i * 0.5,` | `src/pages/NotFound.tsx` |
