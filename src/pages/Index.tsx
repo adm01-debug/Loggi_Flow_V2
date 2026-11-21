@@ -35,6 +35,7 @@ import { FavoriteMetricsBar } from "@/components/dashboard/FavoriteMetricsBar";
 import { LiveStatusBar } from "@/components/dashboard/LiveStatusBar";
 import { SystemHealthWidget } from "@/components/dashboard/SystemHealthWidget";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/common/EmptyState";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -79,14 +80,19 @@ RefreshTimer.displayName = "RefreshTimer";
 export default function Index() {
   const [performanceMode, setPerformanceMode] = useState(false);
   usePerformanceMonitor();
-  const { refetch: refetchMetrics } = useDashboardMetrics();
+  const { refetch: refetchMetrics, isError: isErrorMetrics } =
+    useDashboardMetrics();
   const {
     data: alerts = [],
     isLoading: alertsLoading,
+    isError: isErrorAlerts,
     refetch: refetchAlerts,
   } = useRecentAlerts();
-  const { data: transportadoras = [], isLoading: transportadorasLoading } =
-    useTransportadoraPerformance();
+  const {
+    data: transportadoras = [],
+    isLoading: transportadorasLoading,
+    isError: isErrorTransportadoras,
+  } = useTransportadoraPerformance();
   const { userLevel } = useGamification();
   const {
     isEditMode,
@@ -136,8 +142,12 @@ export default function Index() {
   const {
     chartData,
     statusStats,
+    isError: isErrorChart,
     refetch: combinedRefetch,
   } = useDashboardData(dateRange);
+
+  const dashboardHasError =
+    isErrorMetrics || isErrorAlerts || isErrorTransportadoras || isErrorChart;
 
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
@@ -328,6 +338,27 @@ export default function Index() {
     setWidgetOrder(newWidgets.map((w) => w.id));
   const handleRemove = (id: string) =>
     setWidgetOrder(widgetOrder.filter((wid) => wid !== id));
+
+  if (dashboardHasError) {
+    return (
+      <MainLayout>
+        <PageTransition>
+          <div className="px-4">
+            <EmptyState
+              variant="error"
+              icon={AlertTriangle}
+              title="Erro ao carregar o dashboard"
+              description="Não foi possível carregar as métricas do dashboard. Tente novamente."
+              action={{
+                label: "Tentar novamente",
+                onClick: () => window.location.reload(),
+              }}
+            />
+          </div>
+        </PageTransition>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

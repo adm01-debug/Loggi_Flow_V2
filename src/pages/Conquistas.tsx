@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
   Zap,
   Trophy,
+  AlertTriangle,
   Flame,
   Star,
   Target,
@@ -236,6 +237,7 @@ export default function Conquistas() {
     achievements: dbAchievements,
     unlockedAchievementIds,
     isLoading: isLoadingGamification,
+    isError: isErrorGamification,
   } = useGamification();
   const [tab, setTab] = useState("all");
 
@@ -323,6 +325,25 @@ export default function Conquistas() {
     }),
     [mappedAchievements],
   );
+
+  if (isErrorGamification) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            variant="error"
+            icon={AlertTriangle}
+            title="Erro ao carregar conquistas"
+            description="Não foi possível carregar suas conquistas e progresso. Tente novamente."
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (isLoadingGamification) {
     return (

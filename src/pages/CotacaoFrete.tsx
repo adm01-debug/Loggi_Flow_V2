@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calculator,
   TrendingUp,
+  AlertTriangle,
   MapPin,
   Truck,
   Clock,
@@ -13,6 +14,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { DataExporter } from "@/components/common/DataExporter";
+import { EmptyState } from "@/components/common/EmptyState";
 import { useQuotationFlow } from "@/hooks/logistics/useQuotationFlow";
 import { type TabelaFrete } from "@/hooks";
 import {
@@ -78,6 +80,25 @@ export default function CotacaoFrete() {
     melhor_preco: r.melhor_preco ? "Sim" : "",
     melhor_prazo: r.melhor_prazo ? "Sim" : "",
   }));
+
+  if (flow.isErrorTabelas) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            variant="error"
+            icon={AlertTriangle}
+            title="Erro ao carregar tabelas de frete"
+            description="Não foi possível carregar as tabelas de frete e transportadoras. Tente novamente."
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
