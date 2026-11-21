@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useConfirmExit } from "@/hooks/common/useConfirmExit";
-import { useIntegrationValidation, type IntegrationStatus } from "@/hooks/security/useIntegrationValidation";
+import {
+  useIntegrationValidation,
+  type IntegrationStatus,
+} from "@/hooks/security/useIntegrationValidation";
 import { useNotificationPreferences } from "@/hooks/notifications/useNotificationPreferences";
 import { type NotificationPreferences } from "@/hooks";
 import { format } from "date-fns";
@@ -34,7 +37,10 @@ import { BusinessRulesManager } from "@/components/automation/BusinessRulesManag
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import { useSearchParams } from "react-router-dom";
+
 export default function Configuracoes() {
+  const [searchParams] = useSearchParams();
   const integrationValidation = useIntegrationValidation();
   const notificationPrefs = useNotificationPreferences();
   const [saving, setSaving] = useState(false);
@@ -65,16 +71,50 @@ export default function Configuracoes() {
     }
   };
 
-  const findStatus = (name: string, fallback: IntegrationStatus["status"] = "not_configured") =>
-    (integrations.find((i) => i.name === name)?.status || fallback) as IntegrationStatus["status"];
+  const findStatus = (
+    name: string,
+    fallback: IntegrationStatus["status"] = "not_configured",
+  ) =>
+    (integrations.find((i) => i.name === name)?.status ||
+      fallback) as IntegrationStatus["status"];
 
   const integrationsList = [
-    { id: "supabase", name: "Supabase", icon: Database, status: "connected" as IntegrationStatus["status"] },
-    { id: "bitrix24", name: "Bitrix24", icon: Link, status: findStatus("Bitrix24") },
-    { id: "lalamove", name: "Lalamove", icon: Globe, status: findStatus("Lalamove") },
-    { id: "n8n", name: "n8n", icon: Settings, status: findStatus("n8n", "unknown") },
-    { id: "rodonaves", name: "Rodonaves RTE", icon: Truck, status: findStatus("Rodonaves") },
-    { id: "melhorenvio", name: "Melhor Envio", icon: Package, status: findStatus("Melhor Envio") },
+    {
+      id: "supabase",
+      name: "Supabase",
+      icon: Database,
+      status: "connected" as IntegrationStatus["status"],
+    },
+    {
+      id: "bitrix24",
+      name: "Bitrix24",
+      icon: Link,
+      status: findStatus("Bitrix24"),
+    },
+    {
+      id: "lalamove",
+      name: "Lalamove",
+      icon: Globe,
+      status: findStatus("Lalamove"),
+    },
+    {
+      id: "n8n",
+      name: "n8n",
+      icon: Settings,
+      status: findStatus("n8n", "unknown"),
+    },
+    {
+      id: "rodonaves",
+      name: "Rodonaves RTE",
+      icon: Truck,
+      status: findStatus("Rodonaves"),
+    },
+    {
+      id: "melhorenvio",
+      name: "Melhor Envio",
+      icon: Package,
+      status: findStatus("Melhor Envio"),
+    },
   ];
 
   const handleValidateIntegration = (id: string) => {
@@ -169,214 +209,252 @@ export default function Configuracoes() {
           description="Configure integrações com serviços externos, personalize notificações e ajuste as configurações de segurança."
           position="bottom"
         >
-          <Tabs defaultValue="integrations">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
-              <TabsTrigger
-                value="integrations"
-                className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
-              >
-                <Link className="w-4 h-4" />
-                Integrações
-              </TabsTrigger>
-              <TabsTrigger
-                value="preferences"
-                className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
-              >
-                <Palette className="w-4 h-4" />
-                Personalização
-              </TabsTrigger>
-              <TabsTrigger
-                value="automation"
-                className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
-              >
-                <Zap className="w-4 h-4" />
-                Automações
-              </TabsTrigger>
-              <TabsTrigger
-                value="notifications"
-                className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
-              >
-                <Bell className="w-4 h-4" />
-                Notificações
-              </TabsTrigger>
-              <TabsTrigger
-                value="security"
-                className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
-              >
-                <Shield className="w-4 h-4" />
-                Segurança
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="integrations" className="space-y-4">
-              <div className="flex justify-end mb-6">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleValidateAll}
-                  disabled={isValidating}
-                  className="h-10 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[10px] gap-2"
-                >
-                  <RefreshCw
-                    className={cn(
-                      "w-3.5 h-3.5",
-                      isValidating && "animate-spin",
-                    )}
-                  />
-                  Validar Todas
-                </Button>
-              </div>
-              <div className="grid gap-4">
-                {integrationsList.map((int) => {
-                  const Icon = int.icon;
-                  const integrationData = integrations.find(
-                    (i) =>
-                      i.name.toLowerCase() === int.name.toLowerCase() ||
-                      i.name.toLowerCase() === int.id.toLowerCase(),
-                  );
-                  const status = integrationData?.status || int.status;
-                  const isConnected = status === "connected";
-                  const isError = status === "error";
-
-                  let badgeVariant: "default" | "destructive" | "secondary" = "secondary";
-                  if (isConnected) badgeVariant = "default";
-                  else if (isError) badgeVariant = "destructive";
-                  let badgeContent: React.ReactNode = "Pendente";
-                  if (isConnected) {
-                    badgeContent = (<><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</>);
-                  } else if (isError) {
-                    badgeContent = (<><XCircle className="w-3 h-3 mr-1" />Erro</>);
-                  }
-
-                  return (
-                    <div
-                      key={int.id}
-                      className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-5">
-                        <div
-                          className={cn(
-                            "p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500",
-                            isConnected
-                              ? "bg-success/15 text-success"
-                              : "bg-muted/20 text-muted-foreground",
-                          )}
-                        >
-                          <Icon className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <p className="font-black text-xl tracking-tighter uppercase italic">
-                            {int.name}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-0.5">
-                            ID_NODE: {int.id}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right hidden sm:block">
-                          <Badge variant={badgeVariant} className="mb-1">
-                            {badgeContent}
-                          </Badge>
-                          {integrationData?.lastCheck && (
-                            <p className="text-[10px] text-muted-foreground">
-                              Check:{" "}
-                              {format(
-                                new Date(integrationData.lastCheck),
-                                "HH:mm:ss",
-                              )}
-                            </p>
-                          )}
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleValidateIntegration(int.id)}
-                          disabled={isValidating}
-                          className="h-10 px-6 rounded-xl border-2 font-black uppercase tracking-widest text-[10px] hover:bg-primary/5"
-                        >
-                          Testar
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </TabsContent>
-            <TabsContent value="preferences" className="space-y-4">
-              <div className="card-base p-6">
-                <PreferencePanel />
-              </div>
-            </TabsContent>
-            <TabsContent value="automation" className="space-y-4">
-              <BusinessRulesManager />
-            </TabsContent>
-            <TabsContent value="notifications" className="space-y-4">
-              <div className="card-base p-4 space-y-4">
-                {[
-                  { key: "email", label: "Notificações por Email" },
-                  { key: "push", label: "Notificações Push" },
-                  { key: "whatsapp", label: "Notificações WhatsApp" },
-                  { key: "sms", label: "Notificações SMS" },
-                  { key: "slack", label: "Integração Slack" },
-                ].map((pref) => (
-                  <div
-                    key={pref.key}
-                    className="flex items-center justify-between py-2"
+          {(() => {
+            const tabFromUrl = searchParams.get("tab");
+            const validTab: string = [
+              "integrations",
+              "preferences",
+              "automation",
+              "notifications",
+              "security",
+            ].includes(tabFromUrl || "")
+              ? (tabFromUrl ?? "integrations")
+              : "integrations";
+            return (
+              <Tabs key={validTab} defaultValue={validTab}>
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1.5 bg-sidebar-accent/50 rounded-2xl border border-white/5 mb-8">
+                  <TabsTrigger
+                    value="integrations"
+                    className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
                   >
-                    <div>
-                      <p className="font-medium">{pref.label}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Receber alertas via {pref.key}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={(preferences as Partial<NotificationPreferences> & Record<string, boolean | undefined>)?.[`notifications_${pref.key}`] ?? false}
-                      onCheckedChange={(v) =>
-                        handleUpdatePreference(pref.key, v)
+                    <Link className="w-4 h-4" />
+                    Integrações
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="preferences"
+                    className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
+                  >
+                    <Palette className="w-4 h-4" />
+                    Personalização
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="automation"
+                    className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
+                  >
+                    <Zap className="w-4 h-4" />
+                    Automações
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="notifications"
+                    className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
+                  >
+                    <Bell className="w-4 h-4" />
+                    Notificações
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="security"
+                    className="rounded-xl py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] gap-2 transition-all"
+                  >
+                    <Shield className="w-4 h-4" />
+                    Segurança
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="integrations" className="space-y-4">
+                  <div className="flex justify-end mb-6">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleValidateAll}
+                      disabled={isValidating}
+                      className="h-10 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[10px] gap-2"
+                    >
+                      <RefreshCw
+                        className={cn(
+                          "w-3.5 h-3.5",
+                          isValidating && "animate-spin",
+                        )}
+                      />
+                      Validar Todas
+                    </Button>
+                  </div>
+                  <div className="grid gap-4">
+                    {integrationsList.map((int) => {
+                      const Icon = int.icon;
+                      const integrationData = integrations.find(
+                        (i) =>
+                          i.name.toLowerCase() === int.name.toLowerCase() ||
+                          i.name.toLowerCase() === int.id.toLowerCase(),
+                      );
+                      const status = integrationData?.status || int.status;
+                      const isConnected = status === "connected";
+                      const isError = status === "error";
+
+                      let badgeVariant:
+                        "default" | "destructive" | "secondary" = "secondary";
+                      if (isConnected) badgeVariant = "default";
+                      else if (isError) badgeVariant = "destructive";
+                      let badgeContent: React.ReactNode = "Pendente";
+                      if (isConnected) {
+                        badgeContent = (
+                          <>
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            Conectado
+                          </>
+                        );
+                      } else if (isError) {
+                        badgeContent = (
+                          <>
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Erro
+                          </>
+                        );
                       }
-                      disabled={!isLoaded}
-                    />
+
+                      return (
+                        <div
+                          key={int.id}
+                          className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-5">
+                            <div
+                              className={cn(
+                                "p-4 rounded-2xl transition-all shadow-inner group-hover:scale-110 duration-500",
+                                isConnected
+                                  ? "bg-success/15 text-success"
+                                  : "bg-muted/20 text-muted-foreground",
+                              )}
+                            >
+                              <Icon className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="font-black text-xl tracking-tighter uppercase italic">
+                                {int.name}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-0.5">
+                                ID_NODE: {int.id}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right hidden sm:block">
+                              <Badge variant={badgeVariant} className="mb-1">
+                                {badgeContent}
+                              </Badge>
+                              {integrationData?.lastCheck && (
+                                <p className="text-[10px] text-muted-foreground">
+                                  Check:{" "}
+                                  {format(
+                                    new Date(integrationData.lastCheck),
+                                    "HH:mm:ss",
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleValidateIntegration(int.id)}
+                              disabled={isValidating}
+                              className="h-10 px-6 rounded-xl border-2 font-black uppercase tracking-widest text-[10px] hover:bg-primary/5"
+                            >
+                              Testar
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="security" className="space-y-4">
-              <div className="card-base p-4 space-y-4">
-                <div>
-                  <Label>API Key</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input type="password" value="••••••••••••••••" readOnly />
-                    <Button variant="outline">Regenerar</Button>
+                </TabsContent>
+                <TabsContent value="preferences" className="space-y-4">
+                  <div className="card-base p-6">
+                    <PreferencePanel />
                   </div>
-                </div>
-                <div>
-                  <Label>Webhook Secret</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input type="password" value="••••••••••••••••" readOnly />
-                    <Button variant="outline">Regenerar</Button>
+                </TabsContent>
+                <TabsContent value="automation" className="space-y-4">
+                  <BusinessRulesManager />
+                </TabsContent>
+                <TabsContent value="notifications" className="space-y-4">
+                  <div className="card-base p-4 space-y-4">
+                    {[
+                      { key: "email", label: "Notificações por Email" },
+                      { key: "push", label: "Notificações Push" },
+                      { key: "whatsapp", label: "Notificações WhatsApp" },
+                      { key: "sms", label: "Notificações SMS" },
+                      { key: "slack", label: "Integração Slack" },
+                    ].map((pref) => (
+                      <div
+                        key={pref.key}
+                        className="flex items-center justify-between py-2"
+                      >
+                        <div>
+                          <p className="font-medium">{pref.label}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Receber alertas via {pref.key}
+                          </p>
+                        </div>
+                        <Switch
+                          checked={
+                            (
+                              preferences as Partial<NotificationPreferences> &
+                                Record<string, boolean | undefined>
+                            )?.[`notifications_${pref.key}`] ?? false
+                          }
+                          onCheckedChange={(v) =>
+                            handleUpdatePreference(pref.key, v)
+                          }
+                          disabled={!isLoaded}
+                        />
+                      </div>
+                    ))}
                   </div>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <p className="font-medium">Two-Factor Authentication</p>
-                    <p className="text-sm text-muted-foreground">
-                      Adicionar camada extra de segurança
-                    </p>
+                </TabsContent>
+                <TabsContent value="security" className="space-y-4">
+                  <div className="card-base p-4 space-y-4">
+                    <div>
+                      <Label>API Key</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          type="password"
+                          value="••••••••••••••••"
+                          readOnly
+                        />
+                        <Button variant="outline">Regenerar</Button>
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Webhook Secret</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          type="password"
+                          value="••••••••••••••••"
+                          readOnly
+                        />
+                        <Button variant="outline">Regenerar</Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <p className="font-medium">Two-Factor Authentication</p>
+                        <p className="text-sm text-muted-foreground">
+                          Adicionar camada extra de segurança
+                        </p>
+                      </div>
+                      <Switch />
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <p className="font-medium">Session Timeout</p>
+                        <p className="text-sm text-muted-foreground">
+                          Logout automático após inatividade
+                        </p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
                   </div>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <p className="font-medium">Session Timeout</p>
-                    <p className="text-sm text-muted-foreground">
-                      Logout automático após inatividade
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+                </TabsContent>
+              </Tabs>
+            );
+          })()}
         </OnboardingTooltip>
       </div>
     </MainLayout>

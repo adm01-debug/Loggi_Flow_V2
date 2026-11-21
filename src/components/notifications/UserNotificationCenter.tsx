@@ -10,6 +10,7 @@ import {
   Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -33,6 +34,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function UserNotificationCenter() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const {
     notifications,
@@ -310,31 +312,38 @@ export function UserNotificationCenter() {
               <TabsContent value="all" className="m-0 border-none outline-none">
                 <ScrollArea className="h-[380px] -mx-4 px-4">
                   {(() => {
-                    if (isLoading) return (
-                      <div className="flex items-center justify-center py-20">
-                        <div className="relative">
-                          <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                    if (isLoading)
+                      return (
+                        <div className="flex items-center justify-center py-20">
+                          <div className="relative">
+                            <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                    if (notifications.length === 0) return (
-                      <div className="flex flex-col items-center justify-center py-20 px-8 text-center animate-in fade-in duration-500">
-                        <div className="w-20 h-20 rounded-3xl bg-muted/30 flex items-center justify-center mb-6 border border-border/50 rotate-3">
-                          <Mail className="w-10 h-10 text-muted-foreground/30" />
+                      );
+                    if (notifications.length === 0)
+                      return (
+                        <div className="flex flex-col items-center justify-center py-20 px-8 text-center animate-in fade-in duration-500">
+                          <div className="w-20 h-20 rounded-3xl bg-muted/30 flex items-center justify-center mb-6 border border-border/50 rotate-3">
+                            <Mail className="w-10 h-10 text-muted-foreground/30" />
+                          </div>
+                          <p className="font-black text-base text-foreground tracking-tight">
+                            Inbox Vazio
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-[220px]">
+                            Fique tranquilo! Você receberá mensagens aqui quando
+                            houver novidades.
+                          </p>
                         </div>
-                        <p className="font-black text-base text-foreground tracking-tight">Inbox Vazio</p>
-                        <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-[220px]">
-                          Fique tranquilo! Você receberá mensagens aqui quando houver novidades.
-                        </p>
-                      </div>
-                    );
+                      );
                     return (
                       <div className="pb-4">
                         <AnimatePresence mode="popLayout" initial={false}>
-                          {notifications.map((notification, index) => renderNotification(notification, index))}
+                          {notifications.map((notification, index) =>
+                            renderNotification(notification, index),
+                          )}
                         </AnimatePresence>
                       </div>
                     );
@@ -383,6 +392,7 @@ export function UserNotificationCenter() {
             variant="ghost"
             size="sm"
             className="w-full text-[10px] font-black uppercase tracking-widest h-8 hover:bg-background/50"
+            onClick={() => navigate("/configuracoes?tab=notifications")}
           >
             <Filter className="w-3 h-3 mr-2" />
             Preferências de Email

@@ -28,10 +28,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 export function TelemetryViewer() {
   const [severityFilter, setSeverityFilter] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const {
     data: logs,
@@ -166,50 +167,84 @@ export function TelemetryViewer() {
               logs &&
               logs.length > 0 &&
               logs?.map((log) => (
-                <TableRow key={log.id} className="group">
-                  <TableCell className="text-xs font-mono text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3 h-3" />
-                      {format(new Date(log.created_at), "dd/MM HH:mm:ss", {
-                        locale: ptBR,
-                      })}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getSeverityIcon(log.severity)}
-                      {getSeverityBadge(log.severity)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className="font-mono text-[10px] uppercase"
-                    >
-                      {log.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="max-w-[400px] truncate font-medium text-sm">
-                      {log.message}
-                    </div>
-                    {log.url && (
-                      <div className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                        <ExternalLink className="w-2.5 h-2.5" />
-                        {log.url}
+                <Fragment key={log.id}>
+                  <TableRow className="group">
+                    <TableCell className="text-xs font-mono text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3 h-3" />
+                        {format(new Date(log.created_at), "dd/MM HH:mm:ss", {
+                          locale: ptBR,
+                        })}
                       </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getSeverityIcon(log.severity)}
+                        {getSeverityBadge(log.severity)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className="font-mono text-[10px] uppercase"
+                      >
+                        {log.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div
+                        className={`max-w-[400px] font-medium text-sm ${expandedId === log.id ? "" : "truncate"}`}
+                      >
+                        {log.message}
+                      </div>
+                      {log.url && (
+                        <div className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <ExternalLink className="w-2.5 h-2.5" />
+                          {log.url}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() =>
+                          setExpandedId(expandedId === log.id ? null : log.id)
+                        }
+                        aria-label={
+                          expandedId === log.id
+                            ? "Recolher detalhes do log"
+                            : "Expandir detalhes do log"
+                        }
+                      >
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform ${expandedId === log.id ? "rotate-180" : ""}`}
+                        />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  {expandedId === log.id && (
+                    <TableRow className="group bg-muted/40 border-b border-border/60">
+                      <TableCell colSpan={5} className="py-3 px-6">
+                        <div className="text-sm font-mono text-foreground whitespace-pre-wrap break-words">
+                          {log.message}
+                        </div>
+                        {log.url && (
+                          <a
+                            href={log.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline mt-2 inline-flex items-center gap-1"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            {log.url}
+                          </a>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </Fragment>
               ))}
           </TableBody>
         </Table>
