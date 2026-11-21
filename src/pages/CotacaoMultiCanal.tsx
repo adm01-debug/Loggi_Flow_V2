@@ -476,6 +476,13 @@ export default function CotacaoMultiCanal() {
     const v = respondidas.map((c) => c.valor!);
     return Math.max(...v) - Math.min(...v);
   }, [respondidas]);
+  const averageValue = useMemo(() => {
+    if (respondidas.length === 0) {
+      return null;
+    }
+    const v = respondidas.map((c) => c.valor!);
+    return v.reduce((acc, x) => acc + x, 0) / v.length;
+  }, [respondidas]);
   const currentStep = useMemo(() => {
     if (cotacoes.some((c) => c.status === "respondido")) {
       return 3;
@@ -770,6 +777,7 @@ export default function CotacaoMultiCanal() {
                   <NegotiationAssistant
                     bestValue={melhorCotacao.valor}
                     carrierName={melhorCotacao.transportadora_nome}
+                    averageValue={averageValue}
                   />
                 </motion.div>
               )}
