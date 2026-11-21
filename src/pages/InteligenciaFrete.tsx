@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useFreightIntelligence } from "@/hooks/logistics/useFreightIntelligence";
 import { formatCurrency } from "@/lib/formatters";
@@ -51,6 +52,7 @@ const pieColors = [
 ];
 
 export default function InteligenciaFrete() {
+  const [activeTab, setActiveTab] = useState("impacto");
   const {
     isLoading,
     rawData,
@@ -215,7 +217,7 @@ export default function InteligenciaFrete() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="impacto" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 sm:grid-cols-7 mb-4">
             <TabsTrigger value="impacto">Impacto Regional</TabsTrigger>
             <TabsTrigger value="consolidacao">Consolidação</TabsTrigger>
@@ -618,50 +620,68 @@ export default function InteligenciaFrete() {
                     Ações Corretivas
                   </h3>
                   <div className="space-y-3">
-                    <div className="p-3 rounded-lg bg-background border border-border">
-                      <p className="text-xs font-bold">
-                        Revisar Tabela Rodonaves
-                      </p>
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        Detectada divergência persistente em entregas para o
-                        Nordeste.
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full mt-2 h-7 text-[10px]"
-                      >
-                        Abrir Tabela
-                      </Button>
-                    </div>
-                    <div className="p-3 rounded-lg bg-background border border-border">
-                      <p className="text-xs font-bold">
-                        Solicitar Estorno (Loggi)
-                      </p>
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        3 entregas recentes ultrapassaram o teto de cotação em
-                        +40%.
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full mt-2 h-7 text-[10px]"
-                      >
-                        Gerar Ofício
-                      </Button>
-                    </div>
-                    <div className="p-3 rounded-lg bg-success/10 border border-success/20">
-                      <p className="text-xs font-bold text-success">
-                        Otimizar Rotas
-                      </p>
-                      <p className="text-[10px] text-success/80 mt-1">
-                        Consolidação pode reduzir em até R$ 4.200 o custo mensal
-                        atual.
-                      </p>
-                      <Button className="w-full mt-2 h-7 text-[10px] bg-success hover:bg-success/90">
-                        Ativar Consolidador
-                      </Button>
-                    </div>
+                    {abusiveFreights.length > 0 ? (
+                      <div className="p-3 rounded-lg bg-background border border-border">
+                        <p className="text-xs font-bold">
+                          Revisar {abusiveFreights[0].transportadora} —{" "}
+                          {abusiveFreights[0].estado}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          {abusiveFreights.length} fretes custam até{" "}
+                          {formatCurrency(
+                            abusiveFreights[0].valor_frete -
+                              abusiveFreights[0].avgForState,
+                          )}{" "}
+                          acima da média regional.
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full mt-2 h-7 text-[10px]"
+                          onClick={() => setActiveTab("abusivos")}
+                        >
+                          Ver Alertas de Fretes
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-lg bg-background border border-border">
+                        <p className="text-xs font-bold text-success">
+                          Sem fretes abusivos
+                        </p>
+                        <p className="text-[10px] text-success/80 mt-1">
+                          Nenhum frete acima de 20% da média regional no mês.
+                        </p>
+                      </div>
+                    )}
+
+                    {consolidationOpportunities.length > 0 ? (
+                      <div className="p-3 rounded-lg bg-success/10 border border-success/20">
+                        <p className="text-xs font-bold text-success">
+                          Consolidar {consolidationOpportunities.length}{" "}
+                          oportunidades
+                        </p>
+                        <p className="text-[10px] text-success/80 mt-1">
+                          Economia potencial de{" "}
+                          {formatCurrency(summary.consolidationSavings)} em
+                          entregas para o mesmo destino.
+                        </p>
+                        <Button
+                          className="w-full mt-2 h-7 text-[10px] bg-success hover:bg-success/90"
+                          onClick={() => setActiveTab("consolidacao")}
+                        >
+                          Ver Oportunidades
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-lg bg-success/10 border border-success/20">
+                        <p className="text-xs font-bold text-success">
+                          Sem consolidação pendente
+                        </p>
+                        <p className="text-[10px] text-success/80 mt-1">
+                          Nenhuma entrega pendente no mesmo destino no momento.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 

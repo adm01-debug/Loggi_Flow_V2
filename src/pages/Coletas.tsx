@@ -100,7 +100,7 @@ const statusConfig: Record<
 
 export default function Coletas() {
   const { exportToCSV } = useExport();
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState<Coleta | null>(null);
@@ -169,8 +169,6 @@ export default function Coletas() {
       (c) => c.status === "divergencia",
     ).length;
 
-    // Simulação de cálculo de OTIF (On-Time In-Full)
-    // Em produção, isso viria de cálculos reais entre data_prevista e data_recebimento
     const otif =
       coletas.length > 0
         ? Math.round((conferidas.length / coletas.length) * 100)
@@ -180,6 +178,52 @@ export default function Coletas() {
         ? Math.round((divergencias / coletas.length) * 100)
         : 0;
 
+    // Lead Time médio real (data_recebimento - data_prevista_coleta), em horas
+    const comPrevistaERecebida = coletas.filter(
+      (c) => c.data_prevista_coleta && c.data_recebimento,
+    ) as Array<
+      Coleta & {
+        data_prevista_coleta: string;
+        data_recebimento: string;
+      }
+    >;
+    const leadTimeHoras =
+      comPrevistaERecebida.length > 0
+        ? comPrevistaERecebida.reduce((acc, c) => {
+            const prevista = new Date(c.data_prevista_coleta).getTime();
+            const recebimento = new Date(c.data_recebimento).getTime();
+            return acc + Math.max((recebimento - prevista) / 3600000, 0);
+          }, 0) / comPrevistaERecebida.length
+        : null;
+
+    // Agregação semanal real (Seg..Dom) a partir de created_at
+    const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"];
+    const diaIndex = (iso: string) => (new Date(iso).getDay() + 6) % 7;
+    const porDia = coletas.reduce<
+      Record<number, { total: number; ok: number; div: number }>
+    >((acc, c) => {
+      const i = diaIndex(c.created_at);
+      if (!acc[i]) acc[i] = { total: 0, ok: 0, div: 0 };
+      acc[i].total += 1;
+      if (c.status === "conferencia_ok" || c.status === "finalizada") {
+        acc[i].ok += 1;
+      }
+      if (c.status === "divergencia") acc[i].div += 1;
+      return acc;
+    }, {});
+    const diasSemana = dias.map((name, i) => ({
+      name,
+      otif:
+        porDia[i] && porDia[i].total > 0
+          ? Math.round((porDia[i].ok / porDia[i].total) * 100)
+          : 0,
+      vol: porDia[i] ? porDia[i].total : 0,
+      divergencia:
+        porDia[i] && porDia[i].total > 0
+          ? Math.round((porDia[i].div / porDia[i].total) * 100)
+          : 0,
+    }));
+
     return {
       total: coletas.length,
       aguardando: coletas.filter((c) => c.status === "aguardando_liberacao")
@@ -188,7 +232,8 @@ export default function Coletas() {
       finalizadas: finalizadas.length,
       otif,
       taxaDivergencia,
-      leadTime: "18.4h", // Simulado
+      leadTime: leadTimeHoras !== null ? `${leadTimeHoras.toFixed(1)}h` : "—",
+      diasSemana,
     };
   }, [coletas]);
 
@@ -247,7 +292,9 @@ export default function Coletas() {
               variant="outline"
               size="lg"
               onClick={() =>
-                exportToCSV(coletas as unknown as Record<string, unknown>[], { filename: "coletas" })
+                exportToCSV(coletas as unknown as Record<string, unknown>[], {
+                  filename: "coletas",
+                })
               }
               className="h-12 px-6 rounded-xl border-2 font-bold uppercase tracking-widest text-[11px] gap-2 hover:bg-primary/5 transition-all"
             >
@@ -307,7 +354,7 @@ export default function Coletas() {
                       <History className="w-6 h-6" />
                     </div>
                     <Badge className="bg-warning/10 text-warning border-warning/20">
-                      ESTÁVEL
+                      {stats.leadTime !== "—" ? "ESTÁVEL" : "SEM DADO"}
                     </Badge>
                   </div>
                   <p className="text-3xl font-black tracking-tighter text-white">
@@ -337,11 +384,12 @@ export default function Coletas() {
                     Taxa Divergência
                   </p>
                   <div className="mt-4 flex gap-1">
-                    {[40, 60, 45, 80, 50, 30, 20].map((h, i) => (
+                    {stats.diasSemana.map((d, i) => (
                       <motion.div
                         key={i}
                         initial={{ height: 0 }}
-                        animate={{ height: `${h}%` }}
+                        animate={{ height: `${d.divergencia}%` }}
+                        title={`${d.name}: ${d.divergencia}% divergência`}
                         className="flex-1 bg-destructive/40 rounded-t-sm"
                       />
                     ))}
@@ -393,17 +441,7 @@ export default function Coletas() {
                   </div>
                   <div className="h-[250px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart
-                        data={[
-                          { name: "Seg", otif: 85, vol: 120 },
-                          { name: "Ter", otif: 88, vol: 150 },
-                          { name: "Qua", otif: 82, vol: 110 },
-                          { name: "Qui", otif: 94, vol: 180 },
-                          { name: "Sex", otif: 91, vol: 140 },
-                          { name: "Sab", otif: 96, vol: 90 },
-                          { name: "Dom", otif: 98, vol: 60 },
-                        ]}
-                      >
+                      <AreaChart data={stats.diasSemana}>
                         <defs>
                           <linearGradient
                             id="colorOtif"
@@ -480,18 +518,15 @@ export default function Coletas() {
                             type: "Inbound",
                             val:
                               stats.total -
-                              coletas.filter((c) => c.is_reverse)
-                                .length,
+                              coletas.filter((c) => c.is_reverse).length,
                           },
                           {
                             type: "Reversa",
-                            val: coletas.filter((c) => c.is_reverse)
-                              .length,
+                            val: coletas.filter((c) => c.is_reverse).length,
                           },
                           {
                             type: "Urgente",
-                            val: coletas.filter((c) => c.is_urgent)
-                              .length,
+                            val: coletas.filter((c) => c.is_urgent).length,
                           },
                         ]}
                       >
@@ -517,9 +552,11 @@ export default function Coletas() {
                           }}
                         />
                         <Bar dataKey="val" radius={[8, 8, 0, 0]}>
-                          {(["var(--primary)", "#a855f7", "#f97316"]).map((fill, index) => (
-                            <Cell key={`cell-${index}`} fill={fill} />
-                          ))}
+                          {["var(--primary)", "#a855f7", "#f97316"].map(
+                            (fill, index) => (
+                              <Cell key={`cell-${index}`} fill={fill} />
+                            ),
+                          )}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>

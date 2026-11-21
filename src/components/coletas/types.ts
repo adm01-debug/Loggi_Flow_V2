@@ -18,6 +18,7 @@ export interface Coleta {
   transportadora_id: string | null;
   data_prevista_coleta: string | null;
   data_efetiva_coleta: string | null;
+  data_recebimento?: string | null;
   qtd_volumes: number | null;
   qtd_recebida?: number | null;
   peso_estimado_kg: number | null;
