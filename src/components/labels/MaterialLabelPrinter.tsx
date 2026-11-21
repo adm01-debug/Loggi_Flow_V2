@@ -165,48 +165,48 @@ export function MaterialLabelPrinter() {
         });
         doc.line(0.6, 2, 9.4, 2);
 
-        // QR Code placeholder text
+        // Código e NF ao lado do QR Code
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
-        doc.text("CÓDIGO:", 0.8, 2.8);
+        doc.text("CÓDIGO:", 3.7, 2.8);
         doc.setFontSize(16);
-        doc.text(label.codigo, 0.8, 3.5);
+        doc.text(label.codigo, 3.7, 3.5);
 
         if (label.nfRemessa) {
           doc.setFontSize(8);
           doc.setFont("helvetica", "bold");
-          doc.text("NF REMESSA:", 0.8, 4.3);
+          doc.text("NF REMESSA:", 3.7, 4.3);
           doc.setFontSize(12);
-          doc.text(label.nfRemessa, 0.8, 4.9);
+          doc.text(label.nfRemessa, 3.7, 4.9);
         }
 
-        // QR code as data URL
-        await import("qrcode.react");
-        // Generate QR as canvas
-        document.createElement("canvas");
-        await import("react-dom/client");
+        // QR Code real via data URL (mesma lib do preview em tela)
+        const { QRCodeCanvas } = await import("qrcode.react");
+        const { createRoot } = await import("react-dom/client");
+        const { flushSync } = await import("react-dom");
         const qrDiv = document.createElement("div");
+        qrDiv.style.position = "fixed";
+        qrDiv.style.left = "-9999px";
         document.body.appendChild(qrDiv);
-
-        await new Promise<void>((resolve) => {
-          new Image();
-          // Use a simple QR code generation approach
-          const tempCanvas = document.createElement("canvas");
-          tempCanvas.width = 200;
-          tempCanvas.height = 200;
-          const ctx = tempCanvas.getContext("2d");
-          if (ctx) {
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(0, 0, 200, 200);
-            ctx.fillStyle = "#000";
-            ctx.font = "10px monospace";
-            ctx.textAlign = "center";
-            ctx.fillText("QR", 100, 100);
-          }
-          resolve();
+        const qrRoot = createRoot(qrDiv);
+        flushSync(() => {
+          qrRoot.render(
+            <QRCodeCanvas
+              value={qrContent}
+              size={200}
+              level="M"
+              includeMargin={false}
+            />,
+          );
         });
-
+        const qrCanvas = qrDiv.querySelector("canvas");
+        const qrDataUrl = qrCanvas ? qrCanvas.toDataURL("image/png") : null;
+        qrRoot.unmount();
         document.body.removeChild(qrDiv);
+
+        if (qrDataUrl) {
+          doc.addImage(qrDataUrl, "PNG", 0.8, 2.3, 2.6, 2.6);
+        }
 
         // Info section
         doc.line(0.6, 5.5, 9.4, 5.5);
@@ -336,73 +336,71 @@ export function MaterialLabelPrinter() {
               );
             }
             return (
-
-            <ScrollArea className="max-h-[500px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">
-                      <Checkbox
-                        checked={
-                          selectedIds.length === filtered.length &&
-                          filtered.length > 0
-                        }
-                        onCheckedChange={toggleAll}
-                      />
-                    </TableHead>
-                    <TableHead>Entrega</TableHead>
-                    <TableHead>NF Remessa</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Destino</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-16" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((e) => (
-                    <TableRow key={e.id}>
-                      <TableCell>
+              <ScrollArea className="max-h-[500px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-10">
                         <Checkbox
-                          checked={selectedIds.includes(e.id)}
-                          onCheckedChange={() => toggleSelect(e.id)}
+                          checked={
+                            selectedIds.length === filtered.length &&
+                            filtered.length > 0
+                          }
+                          onCheckedChange={toggleAll}
                         />
-                      </TableCell>
-                      <TableCell className="font-mono text-sm font-semibold">
-                        {e.numero_entrega}
-                      </TableCell>
-                      <TableCell className="font-mono text-sm">
-                        {e.nf_remessa || "—"}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {e.cliente?.nome_fantasia ||
-                          e.cliente?.razao_social ||
-                          "—"}
-                      </TableCell>
-                      <TableCell className="text-xs max-w-[200px] truncate">
-                        {e.endereco_entrega}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="text-xs">
-                          {e.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setPreviewLabel(entregaToLabel(e))}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
+                      </TableHead>
+                      <TableHead>Entrega</TableHead>
+                      <TableHead>NF Remessa</TableHead>
+                      <TableHead>Cliente</TableHead>
+                      <TableHead>Destino</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="w-16" />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((e) => (
+                      <TableRow key={e.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedIds.includes(e.id)}
+                            onCheckedChange={() => toggleSelect(e.id)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-mono text-sm font-semibold">
+                          {e.numero_entrega}
+                        </TableCell>
+                        <TableCell className="font-mono text-sm">
+                          {e.nf_remessa || "—"}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {e.cliente?.nome_fantasia ||
+                            e.cliente?.razao_social ||
+                            "—"}
+                        </TableCell>
+                        <TableCell className="text-xs max-w-[200px] truncate">
+                          {e.endereco_entrega}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="text-xs">
+                            {e.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setPreviewLabel(entregaToLabel(e))}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
             );
           })()}
-
         </CardContent>
       </Card>
 
