@@ -1,9 +1,9 @@
 {
  "meta": {
-  "sha": "d15ef794f0b9aae3b50fbc34f1548606f84feb13",
+  "sha": "c517e6cafce8072445b4c2c7744e8b73f8e3051d",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 13:47 UTC",
+  "generated_at": "2026-11-21 14:13 UTC",
   "files_total": 1482,
   "code_files": 1140,
   "code_lines": 186095,
@@ -88235,10 +88235,24 @@
   }
  },
  "git": {
-  "sha": "d15ef794f0b9aae3b50fbc34f1548606f84feb13",
+  "sha": "c517e6cafce8072445b4c2c7744e8b73f8e3051d",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "c517e6c",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)",
+    "files": [
+     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+     "docs/pendencias/03-15-dashboard-executivo.md",
+     "docs/pendencias/03-16-cotacaofrete-economia.md",
+     "docs/pendencias/03-17-coletas-otif.md",
+     "docs/pendencias/03-18-inteligenciafrete-acoes.md",
+     "docs/pendencias/_ordem.md"
+    ]
+   },
    {
     "sha": "d15ef79",
     "date": "2026-11-21",
@@ -88715,32 +88729,6 @@
      "src/pages/Ranking.tsx",
      "src/pages/Relatorios.tsx"
     ]
-   },
-   {
-    "sha": "35d65b9",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "fix(audit): corrige 7 quebras da seção 2 (#211)",
-    "files": [
-     "docs/pendencias/02-05-predict-delays-whatsapp.md",
-     "docs/pendencias/02-06-nexus-auto-healing-coluna.md",
-     "docs/pendencias/02-07-fretes-internos-deleted-at.md",
-     "docs/pendencias/02-08-ranking.md",
-     "docs/pendencias/02-09-ai-assistant-colunas.md",
-     "docs/pendencias/02-10-kanban-history-embed.md",
-     "docs/pendencias/02-12-bitrix-test-connection.md",
-     "docs/pendencias/02-14-webhook-metadata.md",
-     "docs/pendencias/02-16-mission-detail-bitrix.md",
-     "docs/pendencias/_linha-de-base.md",
-     "docs/pendencias/_ordem.md",
-     "src/components/dashboard/MissionDetail.tsx",
-     "supabase/functions/ai-logistics-assistant/index.ts",
-     "supabase/functions/bitrix24-integration/index.ts",
-     "supabase/functions/nexus-auto-healing/index.ts",
-     "supabase/functions/normalize-freight-response/index.ts",
-     "supabase/functions/predict-delays/index.ts",
-     "supabase/functions/webhook-status/index.ts"
-    ]
    }
   ],
   "hot_files": [
@@ -88758,7 +88746,23 @@
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    3
+    4
+   ],
+   [
+    "docs/pendencias/03-15-dashboard-executivo.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-16-cotacaofrete-economia.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-17-coletas-otif.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-18-inteligenciafrete-acoes.md",
+    2
    ],
    [
     "docs/pendencias/03-12-pickupdetails-custo.md",
@@ -88801,27 +88805,11 @@
     2
    ],
    [
-    "src/components/dashboard/MissionDetail.tsx",
-    2
-   ],
-   [
     "docs/pendencias/03-01-dora-metrics-literal.md",
     2
    ],
    [
     "docs/pendencias/03-02-postmortem-literal.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-03-systempulse-fixo.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-04-livestatusbar-ping.md",
-    2
-   ],
-   [
-    "docs/pendencias/03-05-logisticsmapwidget-kpis.md",
     2
    ]
   ]

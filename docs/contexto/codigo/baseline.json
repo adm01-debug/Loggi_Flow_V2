@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "d15ef794f0b9aae3b50fbc34f1548606f84feb13",
+  "commit": "c517e6cafce8072445b4c2c7744e8b73f8e3051d",
   "branch": "main",
-  "data_commit": "2026-11-21T10:46:44-03:00",
+  "data_commit": "2026-11-21T10:54:51-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "c517e6c",
+    "data": "2026-11-21",
+    "assunto": "docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)"
+   },
    {
     "sha": "d15ef79",
     "data": "2026-11-21",
@@ -126,11 +131,6 @@
     "sha": "5460176",
     "data": "2026-11-20",
     "assunto": "fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)"
-   },
-   {
-    "sha": "eaecf14",
-    "data": "2026-11-20",
-    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#216)"
    }
   ],
   "arquivos_mudados_7d": 330,
@@ -148,12 +148,12 @@
     "mudancas": 13
    },
    {
-    "pasta": "src/components/dashboard",
+    "pasta": "docs/pendencias/_ordem.md",
     "mudancas": 11
    },
    {
-    "pasta": "docs/pendencias/_ordem.md",
-    "mudancas": 10
+    "pasta": "src/components/dashboard",
+    "mudancas": 11
    },
    {
     "pasta": ".github/workflows/contexto-ia.yml",
@@ -184,15 +184,15 @@
     "mudancas": 5
    },
    {
+    "pasta": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+    "mudancas": 5
+   },
+   {
     "pasta": "docs/auditoria-recuperacao-branches.md",
     "mudancas": 5
    },
    {
     "pasta": "scripts/validate-csp.mjs",
-    "mudancas": 5
-   },
-   {
-    "pasta": "src/components/admin",
     "mudancas": 5
    }
   ],
@@ -207,7 +207,7 @@
    },
    {
     "arquivo": "docs/pendencias/_ordem.md",
-    "mudancas": 10
+    "mudancas": 11
    },
    {
     "arquivo": ".github/workflows/contexto-ia.yml",
@@ -239,6 +239,10 @@
    },
    {
     "arquivo": "docs/agentes/github-ci.md",
+    "mudancas": 5
+   },
+   {
+    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     "mudancas": 5
    },
    {
@@ -278,10 +282,6 @@
     "mudancas": 4
    },
    {
-    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    "mudancas": 4
-   },
-   {
     "arquivo": "eslint.config.js",
     "mudancas": 4
    },
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 168
+    "commits": 169
    },
    {
     "autor": "dependabot[bot]",

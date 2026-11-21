@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `d15ef794f0b9aae3b50fbc34f1548606f84feb13` (2026-11-21T10:46:44-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `c517e6cafce8072445b4c2c7744e8b73f8e3051d` (2026-11-21T10:54:51-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -274,15 +274,15 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8553 nós · 21038 arestas · 871 comunidades · grafo do commit `d15ef794`
-- comunidades maiores: lucide-react (206), utils.ts (166), db-observability/index.ts (165), Clientes.tsx (154), react (142), date-fns (137), client.ts (122), ref_node_fs (121), App.tsx (117), button.tsx (115), ui/index.ts (114), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103)
+- 8553 nós · 21042 arestas · 868 comunidades · grafo do commit `c517e6ca`
+- comunidades maiores: lucide-react (206), utils.ts (166), Clientes.tsx (154), db-observability/index.ts (147), react (142), date-fns (137), App.tsx (117), ui/index.ts (117), button.tsx (115), useAuth (112), ref_node_path (109), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
 - package-lock.json (52)
 - package.json (51)
-- docs/pendencias/_ordem.md (10)
+- docs/pendencias/_ordem.md (11)
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
@@ -291,10 +291,10 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - scripts/validate-csp.mjs (6)
 - .github/workflows/inventario-estado-semanal.yml (5)
 - docs/agentes/github-ci.md (5)
+- docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (5)
 - docs/auditoria-recuperacao-branches.md (5)
 - scripts/audit-gate.mjs (5)
 - supabase/config.toml (5)
-- supabase/functions/ai-logistics-assistant/index.ts (5)
 
 ## Workflows
 - `aplicar-migration.yml` — Aplicar Migration (workflow_dispatch)
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `c517e6c` docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)
 - 2026-11-21 `d15ef79` fix: substitui simulacoes de lead time, divergencia semanal e acoes corretivas por dados reais (#240)
 - 2026-11-21 `73b5d8c` fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)
 - 2026-11-21 `81e9459` docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `d952137` feat: substitui metricas simuladas por dados reais nos widgets 3.1-3.5 (#229)
 - 2026-11-20 `84f200d` fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)
 - 2026-11-20 `fd6431b` docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)
-- 2026-11-20 `e4392b7` fix: remove simulacao de cotacao e torna retentativa real (#226)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
