@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +12,13 @@ import {
   Clock,
   History,
   ChevronRight,
+  X,
+  Navigation,
 } from "lucide-react";
 import {
   useDeliveryRoutes,
   getStatusColor,
+  getStatusLabel,
 } from "@/hooks/logistics/useDeliveryRoutes";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
@@ -47,6 +51,7 @@ const filterConfig: FilterConfig<DeliveryPoint> = {
 };
 
 export default function MapaRotas() {
+  const navigate = useNavigate();
   const deliveryRoutes = useDeliveryRoutes();
   const routes = useMemo(
     () => deliveryRoutes?.data || [],
@@ -87,6 +92,7 @@ export default function MapaRotas() {
   const [vehicleFilter, setVehicleFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedLogTime, setSelectedLogTime] = useState<string | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
   const fetchLogs = useCallback(async () => {
     let query = supabase
@@ -198,6 +204,15 @@ export default function MapaRotas() {
 
   const { filteredData } = useFilters(points, filterConfig);
 
+  const selectedRoute = useMemo(
+    () => routes.find((r) => r.id === selectedRouteId) ?? null,
+    [routes, selectedRouteId],
+  );
+
+  const handleMarkerClick = useCallback((id: string) => {
+    setSelectedRouteId(id);
+  }, []);
+
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
       if (vehicleFilter !== "all" && log.vehicle !== vehicleFilter)
@@ -307,8 +322,81 @@ export default function MapaRotas() {
               riskZones={riskZones}
               mapStyle={mapStyle}
               pitch={mapPitch}
+              onMarkerClick={handleMarkerClick}
             />
             <CinematicHUD isLiveData={isLiveData} lastSync={lastSync} />
+            {selectedRoute && (
+              <div className="absolute top-4 right-4 z-40 w-72 rounded-2xl bg-black/90 backdrop-blur-xl border border-cyan-500/20 shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-cyan-500/5">
+                  <div className="flex items-center gap-2">
+                    <Navigation className="w-3.5 h-3.5 text-cyan-500" />
+                    <span className="text-[9px] font-black text-cyan-500 uppercase tracking-widest">
+                      Rota Selecionada
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRouteId(null)}
+                    className="p-1 rounded-lg hover:bg-white/10 transition-colors text-white/40 hover:text-white"
+                    aria-label="Fechar detalhes da rota"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="p-4 space-y-3">
+                  <div>
+                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">
+                      Protocolo
+                    </p>
+                    <p className="text-sm font-black text-white uppercase italic">
+                      {selectedRoute.numero_entrega}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">
+                      Destino
+                    </p>
+                    <p className="text-[11px] text-white/80 font-bold leading-snug line-clamp-2 uppercase">
+                      {selectedRoute.endereco_entrega}
+                    </p>
+                  </div>
+                  {selectedRoute.cliente?.razao_social && (
+                    <div>
+                      <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">
+                        Cliente
+                      </p>
+                      <p className="text-[11px] text-white/70 font-bold line-clamp-1 uppercase">
+                        {selectedRoute.cliente.razao_social}
+                        {selectedRoute.cliente.cidade
+                          ? ` — ${selectedRoute.cliente.cidade}${selectedRoute.cliente.estado ? `/${selectedRoute.cliente.estado}` : ""}`
+                          : ""}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[8px] font-black text-white/30 uppercase tracking-widest">
+                      Status
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="h-6 px-2 rounded-lg text-[8px] font-black uppercase border-white/10"
+                      style={{ color: getStatusColor(selectedRoute.status) }}
+                    >
+                      {getStatusLabel(selectedRoute.status)}
+                    </Badge>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="w-full h-10 rounded-xl font-black uppercase tracking-widest text-[9px]"
+                    onClick={() =>
+                      navigate(`/rastreamento/${selectedRoute.id}`)
+                    }
+                  >
+                    <Navigation className="w-3.5 h-3.5" /> Abrir Tracking
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[85%] z-50">
               <div className="px-10 py-8 bg-black/80 backdrop-blur-3xl rounded-3xl border border-white/10 shadow-2xl space-y-6 relative overflow-hidden">
                 <div className="flex items-center justify-between">

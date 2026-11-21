@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Share2,
   Copy,
+  Target,
   Zap,
   ShieldCheck,
   Map as MapIcon,
@@ -80,6 +81,7 @@ export default function RastreamentoRealTime() {
     lng: number;
   } | null>(null);
   const [activeTab, setActiveTab] = useState("mapa");
+  const [focusedMarker, setFocusedMarker] = useState<string | null>(null);
 
   const shipment = useMemo(
     () => allShipments.find((s) => s.id === id || s.numero === id),
@@ -476,7 +478,18 @@ export default function RastreamentoRealTime() {
                     }
                     showRoute={true}
                     zoom={12}
+                    onMarkerClick={(id) => setFocusedMarker(id)}
                   />
+                  {focusedMarker && (
+                    <div className="absolute top-4 right-4 z-20">
+                      <Badge className="bg-black/80 backdrop-blur-md border-cyan-500/30 text-cyan-300 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-2xl border">
+                        <Target className="w-3 h-3 mr-2 animate-pulse" />
+                        {focusedMarker === "truck"
+                          ? "Veículo GPS Selecionado"
+                          : "Destino Selecionado"}
+                      </Badge>
+                    </div>
+                  )}
                   <div className="absolute bottom-6 left-6 right-6 z-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-black/80 backdrop-blur-xl p-5 rounded-[1.5rem] border border-white/10 flex items-center gap-4 group/item hover:bg-black transition-all">
                       <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover/item:rotate-12 transition-transform">
