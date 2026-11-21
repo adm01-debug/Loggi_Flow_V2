@@ -23,14 +23,7 @@ interface AnalyticsChartsProps {
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 export const PerformanceChart = memo(({ data }: AnalyticsChartsProps) => {
-  // Use real data if available, otherwise mock it for visual stability
-  const chartData =
-    data && data.length > 0
-      ? data
-      : [
-          { month: "Jan", entregas: 0, slaAtingido: 0 },
-          { month: "Fev", entregas: 0, slaAtingido: 0 },
-        ];
+  const chartData = data ?? [];
 
   return (
     <Card className="card-base border-primary/10 bg-black/40 backdrop-blur-xl">
@@ -40,6 +33,11 @@ export const PerformanceChart = memo(({ data }: AnalyticsChartsProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
+        {chartData.length === 0 && (
+          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+            Sem dados no período selecionado.
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
             <defs>
@@ -116,11 +114,7 @@ export const DistributionChart = memo(({ data }: AnalyticsChartsProps) => {
           { name: "Coletas", value: data[data.length - 1].coletas },
           { name: "Ocorrências", value: data[data.length - 1].ocorrencias },
         ]
-      : [
-          { name: "Entregas", value: 0 },
-          { name: "Coletas", value: 0 },
-          { name: "Ocorrências", value: 0 },
-        ];
+      : [];
 
   return (
     <Card className="card-base border-primary/10 bg-black/40 backdrop-blur-xl">
@@ -130,6 +124,11 @@ export const DistributionChart = memo(({ data }: AnalyticsChartsProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
+        {chartData.length === 0 && (
+          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+            Sem dados no período selecionado.
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
