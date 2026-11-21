@@ -8,7 +8,7 @@ Backlog completo (164 itens) consolidado na PR #225 (Fase 1 do GOAL).
 
 ENCERRADA. Feitos via #207/#208 (2.1-2.4), #211/#212 (2.5-2.10, 2.12, 2.14, 2.16), #215 (2.11, 2.13, 2.15). 02-05/02-06 atualizados como resolvidos com evidência.
 
-## Fase B — Simulações exibidas como dado real (seção 3) — EM ANDAMENTO
+## Fase B — Simulações exibidas como dado real (seção 3) — ENCERRADA (2026-11-21)
 
 Maior impacto ao usuário: a UI mostra como real algo que é simulado localmente.
 
@@ -19,7 +19,12 @@ Maior impacto ao usuário: a UI mostra como real algo que é simulado localmente
 5. ~~03-06 missiondetail-timeline / 03-07 biometric-scan~~ — CONCLUÍDO via PR #231 (`24dbf919`); ~~03-08 alertspanel-latencia / 03-09 nexuscoverage-fixo~~ — CONCLUÍDO via PR #233 (`a1e670f7`); ~~03-10 negotiation-fixo / 03-11 pickupconference-ocr~~ — CONCLUÍDO via PR #235 (`e7cd1b44`)
 6. ~~03-12 pickupdetails-custo / 03-14 label-qrcode~~ — CONCLUÍDO via PR #237 (`df04cb6c`)
 7. ~~03-15 dashboard-executivo / 03-16 cotacaofrete-economia~~ — CONCLUÍDO via PR #239 (`73b5d8cc`); ~~03-17 coletas-otif / 03-18 inteligenciafrete-acoes~~ — CONCLUÍDO via PR #240 (`d15ef794`)
-8. 03-21 a 03-30 (detalhe por arquivo)
+8. ~~03-21 rastreamento-realtime / 03-22 mapa-rotas~~ - CONCLU—IDO via PR #242
+9. ~~03-23 intelligence-widget~~ - CONCLU—IDO via PR #243; ~~03-26 integracao-bitrix~~ via PR #245
+10. ~~03-27 authhero-depoimentos~~ via PR #247; ~~03-29 quality-gate~~ via PR #249; ~~03-30 analytics-charts~~ via PR #250
+11. ~~03-24 ai-assistant-clima / 03-25 predict-delays-clima~~ via PR #251; ~~03-19 cotacao-multicanal (select+pesos)~~ via PR #252
+12. Docs reconciliados no audit 2026-11-20 e pendências individuais via PR #253
+13. 03-28 painel-sla-metas (persistência em banco) - PR #248 ABERTA, Regra 8 (migration produção aguardando dono)
 
 Regra: nenhuma destas pode inserir linha em tabela real com dados simulados. Alternativas: medir de verdade, marcar UX como "demo", ou persistir parametro/config quando fizer sentido.
 
