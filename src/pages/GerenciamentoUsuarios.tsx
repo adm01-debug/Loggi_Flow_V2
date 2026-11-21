@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import {
   Card,
@@ -75,7 +76,12 @@ export default function GerenciamentoUsuarios() {
   const queryClient = useQueryClient();
 
   // Fetch all users with their roles
-  const { data: users, isLoading } = useQuery({
+  const {
+    data: users,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["users-with-roles"],
     queryFn: async () => {
       // Get all profiles
@@ -192,6 +198,37 @@ export default function GerenciamentoUsuarios() {
           <p className="text-muted-foreground">
             Você não tem permissão para acessar esta página.
           </p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar usuários"
+            description={
+              error?.message ||
+              "Não foi possível carregar os usuários. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
         </div>
       </MainLayout>
     );

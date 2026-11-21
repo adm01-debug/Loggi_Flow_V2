@@ -1,7 +1,14 @@
 /* eslint-disable max-lines */
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, FileSpreadsheet, FileText, Filter, Loader2 } from "lucide-react";
+import { EmptyState } from "@/components/common/EmptyState";
+import {
+  Download,
+  FileSpreadsheet,
+  FileText,
+  Filter,
+  Loader2,
+} from "lucide-react";
 import { format, parseISO, startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,7 +92,14 @@ export default function ExportacaoDados() {
     enabled: !!user?.id,
   });
 
-  const { data: rows, isLoading, refetch, isFetching } = useQuery({
+  const {
+    data: rows,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ["export-rows", entidade, dataInicio, dataFim, transportadoraId],
     queryFn: async (): Promise<Row[]> => {
       const inicioIso = new Date(`${dataInicio}T00:00:00`).toISOString();
@@ -104,7 +118,8 @@ export default function ExportacaoDados() {
           .lte("created_at", fimIso)
           .order("created_at", { ascending: false })
           .limit(5000);
-        if (transportadoraId !== "todas") q = q.eq("transportadora_id", transportadoraId);
+        if (transportadoraId !== "todas")
+          q = q.eq("transportadora_id", transportadoraId);
         const { data, error } = await q;
         if (error) throw error;
         return (data ?? []).map((e) => {
@@ -135,7 +150,8 @@ export default function ExportacaoDados() {
           .lte("created_at", fimIso)
           .order("created_at", { ascending: false })
           .limit(5000);
-        if (transportadoraId !== "todas") q = q.eq("transportadora_id", transportadoraId);
+        if (transportadoraId !== "todas")
+          q = q.eq("transportadora_id", transportadoraId);
         const { data, error } = await q;
         if (error) throw error;
         return (data ?? []).map((c) => {
@@ -161,7 +177,9 @@ export default function ExportacaoDados() {
       // fretes_internos (não possui transportadora)
       const { data, error } = await supabase
         .from("fretes_internos")
-        .select("id, origem, destino, motorista, status, previsao_entrega, created_at, quantidade_itens")
+        .select(
+          "id, origem, destino, motorista, status, previsao_entrega, created_at, quantidade_itens",
+        )
         .gte("created_at", inicioIso)
         .lte("created_at", fimIso)
         .order("created_at", { ascending: false })
@@ -191,9 +209,10 @@ export default function ExportacaoDados() {
     const t =
       transportadoraId === "todas"
         ? "todas"
-        : transportadoras?.find((x) => x.id === transportadoraId)?.nome_fantasia
-            ?.replace(/\s+/g, "_")
-            .toLowerCase() ?? "carrier";
+        : (transportadoras
+            ?.find((x) => x.id === transportadoraId)
+            ?.nome_fantasia?.replace(/\s+/g, "_")
+            .toLowerCase() ?? "carrier");
     return `${entidade}_${dataInicio}_a_${dataFim}_${t}`;
   };
 
@@ -233,7 +252,15 @@ export default function ExportacaoDados() {
       const data = buildExportRows();
       exportToPDF(
         data,
-        ["Número", "Data", "Transportadora", "Status", "Origem → Destino", "Valor", "Detalhes"],
+        [
+          "Número",
+          "Data",
+          "Transportadora",
+          "Status",
+          "Origem → Destino",
+          "Valor",
+          "Detalhes",
+        ],
         buildFilename(),
       );
       toast.success(`${rows.length} registros exportados em PDF`);
@@ -241,6 +268,25 @@ export default function ExportacaoDados() {
       setExporting(null);
     }
   };
+
+  if (isError) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        <EmptyState
+          variant="error"
+          title="Erro ao carregar dados"
+          description={
+            error?.message ||
+            "Não foi possível carregar os dados para exportação. Tente novamente."
+          }
+          action={{
+            label: "Tentar novamente",
+            onClick: () => window.location.reload(),
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -250,7 +296,8 @@ export default function ExportacaoDados() {
           Exportação de Dados
         </h1>
         <p className="text-muted-foreground mt-1">
-          Gere relatórios em CSV e PDF de fretes, cotações e entregas por período e transportadora.
+          Gere relatórios em CSV e PDF de fretes, cotações e entregas por
+          período e transportadora.
         </p>
       </header>
 
@@ -263,7 +310,10 @@ export default function ExportacaoDados() {
         <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label>Tipo de dado</Label>
-            <Select value={entidade} onValueChange={(v) => setEntidade(v as Entidade)}>
+            <Select
+              value={entidade}
+              onValueChange={(v) => setEntidade(v as Entidade)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -276,11 +326,19 @@ export default function ExportacaoDados() {
           </div>
           <div className="space-y-2">
             <Label>Data inicial</Label>
-            <Input type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} />
+            <Input
+              type="date"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Data final</Label>
-            <Input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} />
+            <Input
+              type="date"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Transportadora</Label>
@@ -303,7 +361,11 @@ export default function ExportacaoDados() {
             </Select>
           </div>
           <div className="md:col-span-4 flex flex-wrap items-center gap-3 pt-2">
-            <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+            <Button
+              variant="outline"
+              onClick={() => refetch()}
+              disabled={isFetching}
+            >
               {isFetching ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
@@ -357,12 +419,18 @@ export default function ExportacaoDados() {
         </CardHeader>
         <CardContent className="p-0">
           {(() => {
-            if (isLoading) return <div className="p-8 text-center text-muted-foreground">Carregando…</div>;
-            if (!rows || rows.length === 0) return (
-              <div className="p-8 text-center text-muted-foreground">
-                Nenhum registro encontrado para o filtro atual.
-              </div>
-            );
+            if (isLoading)
+              return (
+                <div className="p-8 text-center text-muted-foreground">
+                  Carregando…
+                </div>
+              );
+            if (!rows || rows.length === 0)
+              return (
+                <div className="p-8 text-center text-muted-foreground">
+                  Nenhum registro encontrado para o filtro atual.
+                </div>
+              );
             return (
               <div className="overflow-x-auto">
                 <Table>
@@ -379,19 +447,35 @@ export default function ExportacaoDados() {
                   <TableBody>
                     {rows.slice(0, 100).map((r) => (
                       <TableRow key={r.id}>
-                        <TableCell className="font-mono text-xs">{r.numero}</TableCell>
-                        <TableCell>{r.data ? format(parseISO(r.data), "dd/MM/yyyy") : "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {r.numero}
+                        </TableCell>
+                        <TableCell>
+                          {r.data
+                            ? format(parseISO(r.data), "dd/MM/yyyy")
+                            : "—"}
+                        </TableCell>
                         <TableCell>{r.transportadora}</TableCell>
-                        <TableCell className="capitalize">{r.status.replace(/_/g, " ")}</TableCell>
-                        <TableCell className="max-w-[300px] truncate" title={r.origem_destino}>{r.origem_destino}</TableCell>
-                        <TableCell className="text-right">{r.valor !== null ? `R$ ${r.valor.toFixed(2)}` : "—"}</TableCell>
+                        <TableCell className="capitalize">
+                          {r.status.replace(/_/g, " ")}
+                        </TableCell>
+                        <TableCell
+                          className="max-w-[300px] truncate"
+                          title={r.origem_destino}
+                        >
+                          {r.origem_destino}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {r.valor !== null ? `R$ ${r.valor.toFixed(2)}` : "—"}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
                 {rows.length > 100 && (
                   <p className="text-xs text-muted-foreground text-center py-3">
-                    Exibindo 100 de {rows.length} registros. A exportação inclui todos.
+                    Exibindo 100 de {rows.length} registros. A exportação inclui
+                    todos.
                   </p>
                 )}
               </div>

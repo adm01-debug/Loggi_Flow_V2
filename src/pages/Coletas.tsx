@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import {
   Target,
   History,
   BarChart3,
+  Loader2,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -110,6 +112,8 @@ export default function Coletas() {
   const {
     data: coletas = [],
     isLoading: loading,
+    isError,
+    error,
     refetch,
   } = useQuery({
     queryKey: ["coletas-list"],
@@ -236,6 +240,37 @@ export default function Coletas() {
       diasSemana,
     };
   }, [coletas]);
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar coletas"
+            description={
+              error?.message ||
+              "Não foi possível carregar as coletas. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
