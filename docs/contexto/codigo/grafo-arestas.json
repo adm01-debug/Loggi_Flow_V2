@@ -3376,7 +3376,8 @@
    "src/components/layout/MainLayout.tsx",
    "src/components/ui/tabs.tsx",
    "src/hooks/index.ts",
-   "src/hooks/logistics/useQuotationFlow.tsx"
+   "src/hooks/logistics/useQuotationFlow.tsx",
+   "src/lib/formatters.ts"
   ],
   "src/pages/CotacaoMultiCanal.tsx": [
    "src/components/common/StepProgress.tsx",
@@ -3442,6 +3443,7 @@
    "src/components/ui/button.tsx",
    "src/components/ui/tabs.tsx",
    "src/hooks/analytics/useAnalytics.tsx",
+   "src/hooks/analytics/useDashboardMetrics.tsx",
    "src/hooks/analytics/useExecutiveMetrics.tsx",
    "src/integrations/supabase/client.ts",
    "src/lib/formatters.ts",

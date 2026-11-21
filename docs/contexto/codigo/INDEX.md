@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `81e94592afadc8123e267f02105cb82b876f0c24` (2026-11-21T09:55:12-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `73b5d8cc69b3f4ad3456c6e343ba71786f71e661` (2026-11-21T10:42:30-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1472 |
 | arquivos_codigo | 878 |
-| linhas_codigo | 169437 |
+| linhas_codigo | 169525 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8549 nós · 21024 arestas · 861 comunidades · grafo do commit `81e94592`
-- comunidades maiores: lucide-react (263), react (210), utils.ts (169), db-observability/index.ts (156), client.ts (148), Button (133), input.tsx (123), useAuth (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ui/index.ts (97), cn (93), log (86)
+- 8553 nós · 21037 arestas · 871 comunidades · grafo do commit `73b5d8cc`
+- comunidades maiores: lucide-react (206), utils.ts (166), db-observability/index.ts (165), Clientes.tsx (154), react (142), date-fns (137), client.ts (122), ref_node_fs (121), App.tsx (117), button.tsx (115), ui/index.ts (114), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `73b5d8c` fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)
 - 2026-11-21 `81e9459` docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)
 - 2026-11-21 `df04cb6` fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)
 - 2026-11-21 `546b1cc` docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `fd6431b` docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)
 - 2026-11-20 `e4392b7` fix: remove simulacao de cotacao e torna retentativa real (#226)
 - 2026-11-20 `5d31fbc` docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)
-- 2026-11-20 `190f724` chore: remove migration legada 20240822_gamification_system.sql (#224)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

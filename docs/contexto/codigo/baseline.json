@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "81e94592afadc8123e267f02105cb82b876f0c24",
+  "commit": "73b5d8cc69b3f4ad3456c6e343ba71786f71e661",
   "branch": "main",
-  "data_commit": "2026-11-21T09:55:12-03:00",
+  "data_commit": "2026-11-21T10:42:30-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "73b5d8c",
+    "data": "2026-11-21",
+    "assunto": "fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)"
+   },
    {
     "sha": "81e9459",
     "data": "2026-11-21",
@@ -126,14 +131,9 @@
     "sha": "9654eed",
     "data": "2026-11-20",
     "assunto": "docs(audit): marca 2.1-2.6 como corrigidos (PRs 207/208/211) e deployados em prod (#217)"
-   },
-   {
-    "sha": "817700d",
-    "data": "2026-11-20",
-    "assunto": "fix: corrige itens 2.11, 2.13 e 2.15 da secao 2 (#215)"
    }
   ],
-  "arquivos_mudados_7d": 326,
+  "arquivos_mudados_7d": 328,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 166
+    "commits": 167
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169437,
+  "linhas_codigo": 169525,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30872
+   "linhas": 30960
   },
   "src/services": {
    "arquivos": 5,
@@ -585,6 +585,10 @@
    "linhas": 1060
   },
   {
+   "arquivo": "src/pages/DashboardExecutivo.tsx",
+   "linhas": 1010
+  },
+  {
    "arquivo": "scripts/ai-context/gerar.mjs",
    "linhas": 999
   },
@@ -595,10 +599,6 @@
   {
    "arquivo": "src/pages/CotacaoMultiCanal.tsx",
    "linhas": 967
-  },
-  {
-   "arquivo": "src/pages/DashboardExecutivo.tsx",
-   "linhas": 948
   },
   {
    "arquivo": "scripts/maintenance/lib.mjs",

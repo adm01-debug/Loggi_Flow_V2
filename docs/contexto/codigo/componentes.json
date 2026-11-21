@@ -5604,7 +5604,7 @@
     "CotacaoFrete"
    ],
    "export_default": "CotacaoFrete",
-   "linhas": 269,
+   "linhas": 295,
    "dominio": "pages",
    "hooks_locais": [
     "useQuotationFlow"
@@ -5687,11 +5687,12 @@
     "DashboardExecutivo"
    ],
    "export_default": "DashboardExecutivo",
-   "linhas": 948,
+   "linhas": 1010,
    "dominio": "pages",
    "hooks_locais": [
     "useAnalytics",
-    "useExecutiveMetrics"
+    "useExecutiveMetrics",
+    "useRecentAlerts"
    ],
    "tabelas": [
     "coletas",

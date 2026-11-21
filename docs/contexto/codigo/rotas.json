@@ -4467,6 +4467,7 @@
     "useAuth",
     "useCallback",
     "useContext",
+    "useDashboardMetrics",
     "useEffect",
     "useExecutiveMetrics",
     "useGamification",
@@ -4489,6 +4490,7 @@
     "useQRScanner",
     "useQuery",
     "useQueryClient",
+    "useRecentAlerts",
     "useRef",
     "useSLANotifications",
     "useSmartAlerts",
@@ -4499,6 +4501,7 @@
     "useToast",
     "useTouchGestures",
     "useTransform",
+    "useTransportadoraPerformance",
     "useUserPreferences",
     "useWindowSize"
    ],
@@ -4507,6 +4510,7 @@
     "useAnalytics",
     "useApiStatus",
     "useAuth",
+    "useDashboardMetrics",
     "useExecutiveMetrics",
     "useGamification",
     "useGlobalSearch",
@@ -4521,18 +4525,22 @@
     "usePerformanceMonitor",
     "usePrefetch",
     "useQRScanner",
+    "useRecentAlerts",
     "useSLANotifications",
     "useSmartAlerts",
     "useTelemetry",
     "useToast",
     "useTouchGestures",
+    "useTransportadoraPerformance",
     "useUserPreferences"
    ],
    "tabelas": [
     "achievements",
+    "ai_delay_predictions",
     "audit_logs",
     "clientes",
     "coletas",
+    "cotacoes_multicanal",
     "entregas",
     "error_events",
     "fornecedores",
@@ -4541,6 +4549,7 @@
     "profiles",
     "reward_items",
     "security_events",
+    "sla_alerts",
     "telemetry_logs",
     "transportadoras",
     "user_achievements",
@@ -4550,6 +4559,7 @@
    ],
    "rpcs": [
     "add_user_xp",
+    "get_dashboard_metrics",
     "get_monthly_analytics"
    ],
    "edges": [
@@ -4569,7 +4579,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 87
+   "arquivos_puxados": 89
   },
   {
    "protegida": true,

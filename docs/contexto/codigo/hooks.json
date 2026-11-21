@@ -1366,7 +1366,7 @@
     "useQuery"
    ],
    "canais_realtime": [],
-   "usado_por": 7,
+   "usado_por": 8,
    "usado_por_arquivos": [
     "src/components/dashboard/AlertsPanel.tsx",
     "src/components/dashboard/FavoriteMetricsBar.tsx",
@@ -1374,6 +1374,7 @@
     "src/components/dashboard/alertsFilter.ts",
     "src/hooks/index.ts",
     "src/hooks/logistics/useLogisticsIntelligence.tsx",
+    "src/pages/DashboardExecutivo.tsx",
     "src/pages/Index.tsx"
    ],
    "coberto_por_testes": 1

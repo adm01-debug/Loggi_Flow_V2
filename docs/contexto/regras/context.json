@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "81e94592afadc8123e267f02105cb82b876f0c24",
+  "sha": "73b5d8cc69b3f4ad3456c6e343ba71786f71e661",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 13:12 UTC",
+  "generated_at": "2026-11-21 13:42 UTC",
   "files_total": 1482,
   "code_files": 1140,
-  "code_lines": 185949,
+  "code_lines": 186037,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "8bf22b6177166a98",
+ "facts_hash": "316065688058b50f",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -24495,12 +24495,15 @@
     "component": "DashboardExecutivo",
     "tables_transitive": [
      "achievements",
+     "ai_delay_predictions",
      "audit_logs",
      "clientes",
+     "cotacoes_multicanal",
      "error_events",
      "profiles",
      "reward_items",
      "security_events",
+     "sla_alerts",
      "telemetry_logs",
      "transportadoras",
      "user_achievements",
@@ -24513,9 +24516,10 @@
     ],
     "rpc_transitive": [
      "add_user_xp",
+     "get_dashboard_metrics",
      "get_monthly_analytics"
     ],
-    "deps_count": 67
+    "deps_count": 69
    },
    {
     "path": "/despachos",
@@ -29890,7 +29894,7 @@
   {
    "module": "src/pages",
    "files": 80,
-   "lines": 30872,
+   "lines": 30960,
    "tables": [
     "architecture_decisions",
     "audit_logs",
@@ -47498,10 +47502,6 @@
    {
     "file": "src/pages/CotacaoMultiCanal.tsx",
     "line": "b.valor! * 0.7 + (b.prazo_dias || 0) * 50 * 0.3;"
-   },
-   {
-    "file": "src/pages/DashboardExecutivo.tsx",
-    "line": "Rodonaves para economia de 12%."
    },
    {
     "file": "src/pages/InteligenciaFrete.tsx",
@@ -81072,7 +81072,7 @@
   },
   "src/pages/CotacaoFrete.tsx": {
    "path": "src/pages/CotacaoFrete.tsx",
-   "lines": 269,
+   "lines": 295,
    "exports": [
     "function CotacaoFrete"
    ],
@@ -81243,7 +81243,7 @@
   },
   "src/pages/DashboardExecutivo.tsx": {
    "path": "src/pages/DashboardExecutivo.tsx",
-   "lines": 948,
+   "lines": 1010,
    "exports": [
     "function DashboardExecutivo"
    ],
@@ -81305,9 +81305,6 @@
    "temporal": [
     "const endLastMonth = endOfMonth(subMonths(now, 1));",
     "const lastMonth = startOfMonth(subMonths(now, 1));"
-   ],
-   "percents": [
-    "Rodonaves para economia de 12%."
    ],
    "pagination": [
     "1000",
@@ -88205,10 +88202,20 @@
   }
  },
  "git": {
-  "sha": "81e94592afadc8123e267f02105cb82b876f0c24",
+  "sha": "73b5d8cc69b3f4ad3456c6e343ba71786f71e661",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "73b5d8c",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)",
+    "files": [
+     "src/pages/CotacaoFrete.tsx",
+     "src/pages/DashboardExecutivo.tsx"
+    ]
+   },
    {
     "sha": "81e9459",
     "date": "2026-11-21",
@@ -88701,15 +88708,6 @@
      "docs/MELHORIAS.md",
      "docs/MIGRATION-GUIDE.md",
      "docs/PLANO_MELHORIAS_2026.md"
-    ]
-   },
-   {
-    "sha": "8a28944",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)",
-    "files": [
-     "src/pages/Auth.tsx"
     ]
    }
   ],
