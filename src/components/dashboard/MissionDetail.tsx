@@ -10,6 +10,7 @@ import {
   Zap,
   Navigation,
 } from "lucide-react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { UnifiedShipment } from "@/hooks/logistics/useUnifiedTracking";
 import { format, parseISO } from "date-fns";
@@ -29,49 +30,83 @@ function formatDate(date: string | null): string {
   }
 }
 
-export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
-  // Mock timeline events based on status
-  const mockTimeline = [
-    {
-      status: "Iniciado",
-      label: "Ordem Criada",
-      date: shipment.events?.[0]?.timestamp || shipment.previsao,
-      icon: Zap,
-      active: true,
-      description: "Aguardando processamento logístico",
-    },
-    {
-      status: "Processamento",
-      label: "Em Preparação",
-      date: null,
-      icon: Package,
-      active: [
-        "despachado",
-        "em_transito",
-        "saiu_entrega",
-        "entregue",
-      ].includes(shipment.status),
-      description: "Mercadoria em fase de separação e embalagem",
-    },
-    {
-      status: "Transito",
-      label: "Despachado",
-      date: shipment.dataEfetiva,
-      icon: Truck,
-      active: ["em_transito", "saiu_entrega", "entregue"].includes(
-        shipment.status,
-      ),
-      description: "Em rota para o destino final",
-    },
-    {
-      status: "Finalizado",
-      label: "Entregue",
-      date: shipment.dataEfetiva,
+type StepIcon = typeof Zap;
+
+interface MissionStep {
+  key: string;
+  label: string;
+  description: string;
+  icon: StepIcon;
+  date: string | null;
+}
+
+function stepIcon(status: string): StepIcon {
+  const s = status.toLowerCase();
+  if (s === "entregue" || s === "finalizado" || s === "cancelado") {
+    return CheckCircle2;
+  }
+  if (["em_transito", "saiu_entrega", "despachado"].includes(s)) {
+    return Truck;
+  }
+  if (s === "pronto_despacho") {
+    return Package;
+  }
+  return Zap;
+}
+
+// Timeline derivada dos eventos reais do rastreio (quando houver).
+function buildEventTimeline(shipment: UnifiedShipment): MissionStep[] {
+  return (shipment.events ?? [])
+    .map((ev) => ({
+      key: ev.id,
+      label: ev.statusLabel,
+      description: ev.description,
+      icon: stepIcon(ev.status),
+      date: ev.timestamp,
+    }))
+    .sort((a, b) => {
+      if (!a.date || !b.date) return 0;
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+}
+
+// Fallback honesto a partir do snapshot real da missão (sem datas fabricadas).
+function buildSnapshotTimeline(shipment: UnifiedShipment): MissionStep[] {
+  const steps: MissionStep[] = [];
+  steps.push({
+    key: "status",
+    label: "Status Atual",
+    description: shipment.statusLabel,
+    icon: stepIcon(shipment.status),
+    date: shipment.dataEfetiva,
+  });
+  if (shipment.dataEfetiva) {
+    steps.push({
+      key: "entrega",
+      label: "Entrega Efetivada",
+      description: "Missão concluída",
       icon: CheckCircle2,
-      active: shipment.status === "entregue",
-      description: "Missão concluída com sucesso",
-    },
-  ];
+      date: shipment.dataEfetiva,
+    });
+  }
+  if (shipment.previsao) {
+    steps.push({
+      key: "previsao",
+      label: "Previsão",
+      description: "Entrega estimada",
+      icon: Package,
+      date: shipment.previsao,
+    });
+  }
+  return steps;
+}
+
+export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
+  const timeline = useMemo(() => {
+    const real = buildEventTimeline(shipment);
+    return real.length > 0 ? real : buildSnapshotTimeline(shipment);
+  }, [shipment]);
+  const isSnapshot = (shipment.events?.length ?? 0) === 0;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -162,7 +197,7 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
                 Sincronismo Bitrix24
               </p>
               <p className="text-[9px] font-bold text-white/40 uppercase">
-                SPA ID: {shipment.id.split("-")[0]} • Status: Ativo
+                SPA ID: {shipment.id.split("-")[0]} • Sync: Manual
               </p>
             </div>
           </div>
@@ -179,17 +214,13 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
             <p className="text-[8px] font-bold text-white/20 uppercase">
               Responsável
             </p>
-            <p className="text-[10px] font-black text-white/80 uppercase">
-              Agente Nexus Alpha
-            </p>
+            <p className="text-[10px] font-black text-white/80 uppercase">—</p>
           </div>
           <div>
             <p className="text-[8px] font-bold text-white/20 uppercase">
               Última Sinc.
             </p>
-            <p className="text-[10px] font-black text-white/80 uppercase">
-              Agora mesmo
-            </p>
+            <p className="text-[10px] font-black text-white/80 uppercase">—</p>
           </div>
         </div>
       </div>
@@ -200,25 +231,10 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
           <History className="w-3 h-3 text-primary" /> Linha do Tempo da Missão
         </h4>
         <div className="relative pl-8 space-y-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/5">
-          {mockTimeline.map((item, idx) => (
-            <div
-              key={idx}
-              className={cn("relative", !item.active && "opacity-30")}
-            >
-              <div
-                className={cn(
-                  "absolute -left-8 w-6 h-6 rounded-lg flex items-center justify-center z-10 border transition-all duration-500",
-                  item.active
-                    ? "bg-primary border-white/20 shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]"
-                    : "bg-black border-white/10",
-                )}
-              >
-                <item.icon
-                  className={cn(
-                    "w-3 h-3",
-                    item.active ? "text-white" : "text-white/20",
-                  )}
-                />
+          {timeline.map((item) => (
+            <div key={item.key} className="relative">
+              <div className="absolute -left-8 w-6 h-6 rounded-lg flex items-center justify-center z-10 border bg-primary border-white/20 shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]">
+                <item.icon className="w-3 h-3 text-white" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
@@ -238,6 +254,12 @@ export function MissionDetail({ shipment, onOpenBitrix }: MissionDetailProps) {
             </div>
           ))}
         </div>
+        {isSnapshot && (
+          <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest">
+            Snapshot da missão — histórico em tempo real será exibido quando
+            eventos disponíveis
+          </p>
+        )}
       </div>
     </div>
   );
