@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: liga onMarkerClick no mapa de rotas e rastreamento em tempo real (04-07) (#258)",
+   "chore: reconcilia docs da Fase C (04-05/04-06 concluídos) (#257)",
    "fix: liga botões sem handler na Fase C (04-05) (#256)",
    "fix: corrige links para rotas inexistentes e adiciona rotas admin sem entrada (04-06) (#255)",
-   "chore: encerra Fase B no _ordem.md com PRs reais (#242-#253) (#254)",
-   "chore: reconcilia audit Fase B (3.19-3.20, 3.27, 3.29-3.30) com as PRs mergeadas (#253)",
-   "fix: estrategia Nexus com pesos reais e select funcional (3.19) (#252)"
+   "chore: encerra Fase B no _ordem.md com PRs reais (#242-#253) (#254)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

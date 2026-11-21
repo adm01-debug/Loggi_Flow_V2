@@ -6042,7 +6042,7 @@
     "MapaRotas"
    ],
    "export_default": "MapaRotas",
-   "linhas": 481,
+   "linhas": 569,
    "dominio": "pages",
    "hooks_locais": [
     "useDeliveryRoutes",
@@ -6252,7 +6252,7 @@
     "RastreamentoRealTime"
    ],
    "export_default": "RastreamentoRealTime",
-   "linhas": 777,
+   "linhas": 790,
    "dominio": "pages",
    "hooks_locais": [
     "useDelayPrediction",

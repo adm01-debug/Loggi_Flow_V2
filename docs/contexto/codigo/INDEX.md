@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `daa5f481db9e42df8ba9b7cb7aade862084cf072` (2026-11-21T14:31:18-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `fa1afdb00c93580e14d497770be1e6f656440a69` (2026-11-21T14:57:27-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1473 |
 | arquivos_codigo | 879 |
-| linhas_codigo | 171607 |
+| linhas_codigo | 171708 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,16 +274,16 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8559 nós · 21086 arestas · 868 comunidades · grafo do commit `daa5f481`
-- comunidades maiores: lucide-react (251), Clientes.tsx (153), utils.ts (150), db-observability/index.ts (146), button.tsx (132), App.tsx (131), react (123), client.ts (113), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ui/index.ts (98), ref_node_url (98), cn (94)
+- 8559 nós · 21091 arestas · 862 comunidades · grafo do commit `fa1afdb0`
+- comunidades maiores: lucide-react (228), cn (220), input.tsx (178), react (167), db-observability/index.ts (137), framer-motion (135), useAuth (129), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), @tanstack/react-query (93), client.ts (89), Index.tsx (82), rodonaves-api/index.ts (82)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
 - package-lock.json (52)
 - package.json (51)
-- docs/pendencias/_ordem.md (12)
-- docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (9)
+- docs/pendencias/_ordem.md (13)
+- docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (10)
 - .github/workflows/contexto-ia.yml (8)
 - .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
@@ -400,6 +400,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `fa1afdb` fix: liga onMarkerClick no mapa de rotas e rastreamento em tempo real (04-07) (#258)
+- 2026-11-21 `3a4e455` chore: reconcilia docs da Fase C (04-05/04-06 concluídos) (#257)
 - 2026-11-21 `daa5f48` fix: liga botões sem handler na Fase C (04-05) (#256)
 - 2026-11-21 `e271db7` fix: corrige links para rotas inexistentes e adiciona rotas admin sem entrada (04-06) (#255)
 - 2026-11-21 `560f85e` chore: encerra Fase B no _ordem.md com PRs reais (#242-#253) (#254)
@@ -413,8 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-21 `ba49b7b` fix: substitui estatisticas fixas por dados reais (03-26) (#245)
 - 2026-11-21 `ae881a3` docs: reconcilia 03-21/03-22/03-23 (Fase B) como concluidos (#244)
 - 2026-11-21 `13c9e3f` fix: torna inteligencia logistica honesta (#243)
-- 2026-11-21 `0f32426` fix: torna mapa de rotas e rastreamento em tempo real honestos (03-21/03-22) (#242)
-- 2026-11-21 `c517e6c` docs: marca 03-15 a 03-18 (Fase B) como concluidos via PRs #239 e #240 (#241)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
