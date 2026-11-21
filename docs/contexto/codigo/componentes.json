@@ -422,7 +422,7 @@
     "PickupDetailsDialog"
    ],
    "export_default": null,
-   "linhas": 477,
+   "linhas": 696,
    "dominio": "components/coletas",
    "hooks_locais": [
     "useAudioFeedback",
@@ -1678,7 +1678,7 @@
     "MaterialLabelPrinter"
    ],
    "export_default": null,
-   "linhas": 452,
+   "linhas": 450,
    "dominio": "components/labels",
    "hooks_locais": [],
    "tabelas": [

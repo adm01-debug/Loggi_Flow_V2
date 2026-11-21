@@ -58,11 +58,11 @@
  "commits": {
   "convencao": "commitlint",
   "exemplos": [
+   "fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)",
+   "docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)",
    "fix: dados reais em NegotiationAssistant e conferencia honesta sem OCR simulado (#235)",
    "docs: marca 03-08 e 03-09 (Fase B) como concluidos via PR #233 (#234)",
-   "fix: dados reais de latência e cobertura no AlertsPanel e NexusCoverageMap (#233)",
-   "docs: marca 03-06 e 03-07 (Fase B) como concluidos via PR #231 (#232)",
-   "feat: (#231)"
+   "fix: dados reais de latência e cobertura no AlertsPanel e NexusCoverageMap (#233)"
   ]
  },
  "pr_template": ".github/pull_request_template.md",

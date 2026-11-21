@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "e7cd1b44a791103793314c68294fd3f3c49aaf11",
+  "sha": "df04cb6c4e98b39469564affd3e42a273da0d99a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 12:27 UTC",
+  "generated_at": "2026-11-21 12:49 UTC",
   "files_total": 1482,
   "code_files": 1140,
-  "code_lines": 185732,
+  "code_lines": 185949,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "d7654cebca4e8049",
+ "facts_hash": "8bf22b6177166a98",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29080,7 +29080,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 49605,
+   "lines": 49822,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -46395,7 +46395,7 @@
     "file": "src/components/coletas/PickupDetailsDialog.tsx",
     "name": "generateManifestoPDF",
     "params": "",
-    "body": "playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text(\"MANIFESTO DE COLETA NEXUS\", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text(\"DADOS DA OPERAÇÃO\", 20, 55); autoTable(doc, { startY: 60, head: [['Campo', 'Informação']], body: [ ['Fornecedor', pickup.fornecedores?.nome_ …"
+    "body": "playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, \"F\"); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text(\"MANIFESTO DE COLETA NEXUS\", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text(\"DADOS DA OPERAÇÃO\", 20, 55); autoTable(doc, { startY: 60, head: [[\"Campo\", \"Informação\"]], body: [ [ \"Fornecedor\", pickup.fornecedores?.nome …"
    },
    {
     "file": "src/components/dashboard/BiometricConsentModal.tsx",
@@ -68479,7 +68479,7 @@
   },
   "src/components/coletas/PickupDetailsDialog.tsx": {
    "path": "src/components/coletas/PickupDetailsDialog.tsx",
-   "lines": 477,
+   "lines": 696,
    "exports": [
     "function PickupDetailsDialog"
    ],
@@ -68544,7 +68544,7 @@
     {
      "name": "generateManifestoPDF",
      "params": "",
-     "body": "playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text(\"MANIFESTO DE COLETA NEXUS\", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text(\"DADOS DA OPERAÇÃO\", 20, 55); autoTable(doc, { startY: 60, head: [['Campo', 'Informação']], body: [ ['Fornecedor', pickup.fornecedores?.nome_ …"
+     "body": "playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, \"F\"); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text(\"MANIFESTO DE COLETA NEXUS\", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text(\"DADOS DA OPERAÇÃO\", 20, 55); autoTable(doc, { startY: 60, head: [[\"Campo\", \"Informação\"]], body: [ [ \"Fornecedor\", pickup.fornecedores?.nome …"
     }
    ],
    "percents": [
@@ -70042,7 +70042,7 @@
   },
   "src/components/labels/MaterialLabelPrinter.tsx": {
    "path": "src/components/labels/MaterialLabelPrinter.tsx",
-   "lines": 452,
+   "lines": 450,
    "exports": [
     "function MaterialLabelPrinter"
    ],
@@ -88205,10 +88205,31 @@
   }
  },
  "git": {
-  "sha": "e7cd1b44a791103793314c68294fd3f3c49aaf11",
+  "sha": "df04cb6c4e98b39469564affd3e42a273da0d99a",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "df04cb6",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)",
+    "files": [
+     "src/components/coletas/PickupDetailsDialog.tsx",
+     "src/components/labels/MaterialLabelPrinter.tsx"
+    ]
+   },
+   {
+    "sha": "546b1cc",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)",
+    "files": [
+     "docs/pendencias/03-10-negotiation-fixo.md",
+     "docs/pendencias/03-11-pickupconference-ocr.md",
+     "docs/pendencias/_ordem.md"
+    ]
+   },
    {
     "sha": "e7cd1b4",
     "date": "2026-11-21",
@@ -88687,32 +88708,12 @@
     "files": [
      "supabase/functions/lgpd-erase-user/index.ts"
     ]
-   },
-   {
-    "sha": "99ca866",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)",
-    "files": [
-     "supabase/functions/lalamove-api/index.ts",
-     "supabase/functions/ocr-receipt-processor/index.ts",
-     "supabase/functions/send-password-reset/index.ts"
-    ]
-   },
-   {
-    "sha": "c2e148b",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)",
-    "files": [
-     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md"
-    ]
    }
   ],
   "hot_files": [
    [
     "docs/pendencias/_ordem.md",
-    8
+    9
    ],
    [
     "package-lock.json",
@@ -88724,7 +88725,15 @@
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    4
+    3
+   ],
+   [
+    "docs/pendencias/03-10-negotiation-fixo.md",
+    2
+   ],
+   [
+    "docs/pendencias/03-11-pickupconference-ocr.md",
+    2
    ],
    [
     "src/pages/CotacaoMultiCanal.tsx",
@@ -88780,14 +88789,6 @@
    ],
    [
     "docs/pendencias/02-05-predict-delays-whatsapp.md",
-    2
-   ],
-   [
-    "docs/pendencias/02-06-nexus-auto-healing-coluna.md",
-    2
-   ],
-   [
-    "supabase/migrations/20261120143337_reconcile_schema_migrations_tracking.sql",
     2
    ]
   ]

@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "e7cd1b44a791103793314c68294fd3f3c49aaf11",
+  "commit": "df04cb6c4e98b39469564affd3e42a273da0d99a",
   "branch": "main",
-  "data_commit": "2026-11-21T09:27:26-03:00",
+  "data_commit": "2026-11-21T09:48:50-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "df04cb6",
+    "data": "2026-11-21",
+    "assunto": "fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)"
+   },
+   {
+    "sha": "546b1cc",
+    "data": "2026-11-21",
+    "assunto": "docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)"
+   },
    {
     "sha": "e7cd1b4",
     "data": "2026-11-21",
@@ -121,19 +131,9 @@
     "sha": "f1d13b6",
     "data": "2026-11-20",
     "assunto": "docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)"
-   },
-   {
-    "sha": "db8f658",
-    "data": "2026-11-20",
-    "assunto": "fix(audit): corrige itens 2.7, 2.8 e 2.10 da secao 2 (#213)"
-   },
-   {
-    "sha": "35d65b9",
-    "data": "2026-11-20",
-    "assunto": "fix(audit): corrige 7 quebras da seção 2 (#211)"
    }
   ],
-  "arquivos_mudados_7d": 325,
+  "arquivos_mudados_7d": 326,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -152,15 +152,19 @@
     "mudancas": 11
    },
    {
+    "pasta": "docs/pendencias/_ordem.md",
+    "mudancas": 9
+   },
+   {
     "pasta": ".github/workflows/contexto-ia.yml",
     "mudancas": 8
    },
    {
-    "pasta": "docs/pendencias/_ordem.md",
-    "mudancas": 8
+    "pasta": ".github/workflows/types-sync.yml",
+    "mudancas": 6
    },
    {
-    "pasta": ".github/workflows/types-sync.yml",
+    "pasta": "src/components/coletas",
     "mudancas": 6
    },
    {
@@ -190,10 +194,6 @@
    {
     "pasta": "src/components/admin",
     "mudancas": 5
-   },
-   {
-    "pasta": "src/components/coletas",
-    "mudancas": 5
    }
   ],
   "arquivos_mais_mudados_90d": [
@@ -206,11 +206,11 @@
     "mudancas": 51
    },
    {
-    "arquivo": ".github/workflows/contexto-ia.yml",
-    "mudancas": 8
+    "arquivo": "docs/pendencias/_ordem.md",
+    "mudancas": 9
    },
    {
-    "arquivo": "docs/pendencias/_ordem.md",
+    "arquivo": ".github/workflows/contexto-ia.yml",
     "mudancas": 8
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 163
+    "commits": 165
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169220,
+  "linhas_codigo": 169437,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 49605
+   "linhas": 49822
   },
   "src/features": {
    "arquivos": 90,
@@ -643,7 +643,7 @@
   "ts_ignore": 0,
   "eslint_disable": 3,
   "todos": 2,
-  "arquivos_acima_500_linhas": 38
+  "arquivos_acima_500_linhas": 39
  },
  "todos": [
   {

@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e7cd1b44a7` · branch `main` · 2026-11-21 12:27 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `df04cb6c4e` · branch `main` · 2026-11-21 12:49 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1259,7 +1259,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 
 - **generateManifestoPDF()** — `src/components/coletas/PickupDetailsDialog.tsx`
   ```
-  playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("MANIFESTO DE COLETA NEXUS", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text("DADOS DA OPERAÇÃO", 20, 55); autoTable(doc, { startY: 60, head: [['Campo', 'Informação']], body: [ ['Fornecedor', pickup.fornecedores?.nome_ …
+  playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, "F"); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("MANIFESTO DE COLETA NEXUS", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text("DADOS DA OPERAÇÃO", 20, 55); autoTable(doc, { startY: 60, head: [["Campo", "Informação"]], body: [ [ "Fornecedor", pickup.fornecedores?.nome …
   ```
 - **scanButtonLabel(step: ScanStep, supported: boolean | null)** — `src/components/dashboard/BiometricConsentModal.tsx`
   ```

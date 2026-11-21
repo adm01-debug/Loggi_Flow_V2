@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `e7cd1b44a791103793314c68294fd3f3c49aaf11` (2026-11-21T09:27:26-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `df04cb6c4e98b39469564affd3e42a273da0d99a` (2026-11-21T09:48:50-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1472 |
 | arquivos_codigo | 878 |
-| linhas_codigo | 169220 |
+| linhas_codigo | 169437 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,16 +274,16 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8548 nós · 21021 arestas · 863 comunidades · grafo do commit `e7cd1b44`
-- comunidades maiores: lucide-react (234), MainLayout.tsx (212), db-observability/index.ts (170), client.ts (167), button.tsx (161), Button (144), react (113), useAuth (108), utils.ts (108), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ref_node_path (98), Header.tsx (95)
+- 8549 nós · 21024 arestas · 861 comunidades · grafo do commit `df04cb6c`
+- comunidades maiores: lucide-react (263), react (210), utils.ts (169), db-observability/index.ts (156), client.ts (148), Button (133), input.tsx (123), useAuth (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), ui/index.ts (97), cn (93), log (86)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
 ## Hotspots (arquivos mais alterados, 90 dias)
 - package-lock.json (52)
 - package.json (51)
+- docs/pendencias/_ordem.md (9)
 - .github/workflows/contexto-ia.yml (8)
-- docs/pendencias/_ordem.md (8)
 - .github/workflows/ci-nexus.yml (7)
 - .github/workflows/ci.yml (7)
 - .github/workflows/deploy-functions.yml (6)
@@ -400,6 +400,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `df04cb6` fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)
+- 2026-11-21 `546b1cc` docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)
 - 2026-11-21 `e7cd1b4` fix: dados reais em NegotiationAssistant e conferencia honesta sem OCR simulado (#235)
 - 2026-11-21 `dda0a82` docs: marca 03-08 e 03-09 (Fase B) como concluidos via PR #233 (#234)
 - 2026-11-21 `a1e670f` fix: dados reais de latência e cobertura no AlertsPanel e NexusCoverageMap (#233)
@@ -413,8 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `5d31fbc` docs(pendencias): atualiza 2.5/2.6 e cria _regras-de-negocio.md (#225)
 - 2026-11-20 `190f724` chore: remove migration legada 20240822_gamification_system.sql (#224)
 - 2026-11-20 `e2fd132` chore: remove e2e.yml morto e blinda aplicar-migration com guard de reaplicacao (#223)
-- 2026-11-20 `a1da74b` fix: reconcilia target dos inserts de schema_migrations em prod (#222)
-- 2026-11-20 `eb09cdc` chore: reconcilia tracking de migrations, zera audit com glob 14 e automatiza deploy de functions (#221)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`
