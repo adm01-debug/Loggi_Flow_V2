@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -26,6 +26,7 @@ import {
   ScenarioSimulator,
 } from "@/components/freight";
 import { TransportadoraRanking } from "@/components/dashboard/TransportadoraRanking";
+import { formatCurrency } from "@/lib/formatters";
 import { CotacoesFreteManager } from "@/components/freight/CotacoesFreteManager";
 import type { QuotationFormData } from "@/components/freight/QuotationForm";
 
@@ -57,6 +58,15 @@ export default function CotacaoFrete() {
     },
     [flow.deleteTabelaFrete],
   );
+
+  const quotationStats = useMemo(() => {
+    const results = flow.quotationResults;
+    if (!results || results.length === 0) return null;
+    const values = results.map((r) => r.valor_total);
+    const melhor = Math.min(...values);
+    const media = values.reduce((s, v) => s + v, 0) / values.length;
+    return { melhor, media, economia: media - melhor, total: results.length };
+  }, [flow.quotationResults]);
 
   // Export data for results
   const exportData = flow.quotationResults.map((r) => ({
@@ -238,22 +248,38 @@ export default function CotacaoFrete() {
                     Nossa IA compara automaticamente tabelas e histórico do
                     Bitrix24 para encontrar discrepâncias de até 50%.
                   </p>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg">
-                      <span className="text-xs uppercase font-bold">
-                        Média Mensal
-                      </span>
-                      <span className="font-bold">R$ 12.450,00</span>
+                  {quotationStats ? (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg">
+                        <span className="text-xs uppercase font-bold">
+                          Média da cotação ({quotationStats.total}{" "}
+                          transportadoras)
+                        </span>
+                        <span className="font-bold">
+                          {formatCurrency(quotationStats.media)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-success/20 rounded-lg border border-success/30">
+                        <span className="text-xs uppercase font-bold text-success">
+                          Menor preço encontrado
+                        </span>
+                        <span className="font-bold text-success">
+                          {formatCurrency(quotationStats.melhor)}
+                        </span>
+                      </div>
+                      {quotationStats.economia > 0 && (
+                        <p className="text-[10px] text-muted-foreground">
+                          Economia de {formatCurrency(quotationStats.economia)}{" "}
+                          comparado à média das transportadoras consultadas.
+                        </p>
+                      )}
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-success/20 rounded-lg border border-success/30">
-                      <span className="text-xs uppercase font-bold text-success">
-                        Economia IA
-                      </span>
-                      <span className="font-bold text-success">
-                        - R$ 3.120,00
-                      </span>
-                    </div>
-                  </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Faça uma cotação para comparar transportadoras com dados
+                      reais.
+                    </p>
+                  )}
                 </div>
                 <TransportadoraRanking
                   transportadoras={flow.transportadoras || []}

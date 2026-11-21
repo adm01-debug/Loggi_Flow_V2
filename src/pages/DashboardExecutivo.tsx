@@ -20,6 +20,7 @@ import {
   Sparkles,
   X,
   LayoutGrid,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,99 @@ import {
 } from "@/components/analytics/AnalyticsCharts";
 import { OperationalPulse } from "@/components/analytics/OperationalPulse";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
+import {
+  useRecentAlerts,
+  type RecentAlert,
+} from "@/hooks/analytics/useDashboardMetrics";
+
+interface AlertasPreditosCardProps {
+  alertas?: RecentAlert[];
+  loading?: boolean;
+}
+
+function AlertasPreditosCard({ alertas, loading }: AlertasPreditosCardProps) {
+  if (loading) {
+    return (
+      <div className="p-3 bg-background rounded-lg border text-xs flex items-center gap-2">
+        <Loader2 className="w-3 h-3 animate-spin" />
+        Carregando alertas preditivos...
+      </div>
+    );
+  }
+
+  if (!alertas || alertas.length === 0) {
+    return (
+      <div className="p-3 bg-background rounded-lg border text-xs">
+        <p className="font-semibold text-success flex items-center gap-1">
+          <CheckCircle2 className="w-3 h-3" />
+          Sem alertas preditivos no momento
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {alertas.slice(0, 3).map((a) => (
+        <div
+          key={a.id}
+          className={cn(
+            "p-3 bg-background rounded-lg border text-xs",
+            a.severity === "error"
+              ? "border-destructive/30"
+              : "border-warning/30",
+          )}
+        >
+          <p
+            className={cn(
+              "font-semibold",
+              a.severity === "error" ? "text-destructive" : "text-warning",
+            )}
+          >
+            {a.severity === "error" ? "⚠️" : "⚡"} {a.message}
+          </p>
+          <p className="text-muted-foreground mt-1 text-[10px]">
+            {format(new Date(a.createdAt), "dd/MM HH:mm")}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface MetasEmFocoCardProps {
+  otifRate: number;
+  targetOtif: number;
+}
+
+function MetasEmFocoCard({ otifRate, targetOtif }: MetasEmFocoCardProps) {
+  const faltantes = Math.max(targetOtif - otifRate, 0);
+  return (
+    <div className="card-base p-4 border-primary/30 bg-primary/5">
+      <h3 className="text-sm font-bold flex items-center gap-2 text-primary">
+        <Target className="w-4 h-4" />
+        Metas em Foco
+      </h3>
+      <div className="mt-3 space-y-2">
+        <div className="flex justify-between text-xs mb-1">
+          <span>Meta OTIF ({targetOtif}%)</span>
+          <span className="font-bold">{otifRate.toFixed(1)}%</span>
+        </div>
+        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary"
+            style={{ width: `${Math.min(otifRate, 100)}%` }}
+          />
+        </div>
+        <p className="text-[10px] text-muted-foreground italic">
+          {faltantes > 0
+            ? `Faltam ${faltantes.toFixed(1)} p.p. para atingir a meta de OTIF.`
+            : "Operação dentro da meta de OTIF no mês corrente."}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardExecutivo() {
   const [showAI, setShowAI] = useState(false);
@@ -262,6 +356,7 @@ export default function DashboardExecutivo() {
   const trendData = trends.data || [];
   const carrierData = carrierOtif.data || [];
   const avgColTime = avgCollectionTime.data || 0;
+  const { data: alertas, isLoading: alertasLoading } = useRecentAlerts();
 
   return (
     <MainLayout>
@@ -336,48 +431,15 @@ export default function DashboardExecutivo() {
                   <AlertTriangle className="w-4 h-4" />
                   Alertas Preditos (IA)
                 </h3>
-                <div className="mt-3 space-y-3">
-                  <div className="p-3 bg-background rounded-lg border text-xs">
-                    <p className="font-semibold text-destructive">
-                      ⚠️ Risco Alto: Rota Curitiba → SP
-                    </p>
-                    <p className="text-muted-foreground mt-1">
-                      Obras na BR-116 podem causar atrasos de até 4h em 12
-                      entregas.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-background rounded-lg border text-xs">
-                    <p className="font-semibold text-warning">
-                      ⚡ Oportunidade: Consolidação
-                    </p>
-                    <p className="text-muted-foreground mt-1">
-                      8 encomendas para Campinas podem ser consolidadas na
-                      Rodonaves para economia de 12%.
-                    </p>
-                  </div>
-                </div>
+                <AlertasPreditosCard
+                  alertas={alertas}
+                  loading={alertasLoading}
+                />
               </div>
-              <div className="card-base p-4 border-primary/30 bg-primary/5">
-                <h3 className="text-sm font-bold flex items-center gap-2 text-primary">
-                  <Target className="w-4 h-4" />
-                  Metas em Foco
-                </h3>
-                <div className="mt-3 space-y-2">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span>Meta OTIF (95%)</span>
-                    <span className="font-bold">92.4%</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary"
-                      style={{ width: "92.4%" }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground italic">
-                    "IA sugere priorizar coletas pendentes para subir 1.5%."
-                  </p>
-                </div>
-              </div>
+              <MetasEmFocoCard
+                otifRate={kpis.otifRate}
+                targetOtif={kpis.targetOtif}
+              />
             </div>
           </div>
         )}
