@@ -12,9 +12,10 @@
 - **Aceite**: "Cotar via API" dispara um request a uma edge/API de verdade OU rótulo deixa de
   afirmar "API" quando é cálculo local. Decisão de negócio: se não há API agregadora contratada,
   renomear UX ("Cotar padrão") mantendo o cálculo atual é a opção sem custo.
-- **Status**: CONCLUÍDO em 2026-11-20 via PR #226 (commit `e4392b7d`).
+- **Status**: CONCLUÍDO em 2026-11-20 (PR #226) e refinado em 2026-11-21 (PR #252).
 - **Resolução**: `handleCotarAPI` agora grava `status:"pendente"` com observação "Cotação via
   Nexus Blast (API) — aguardando resposta da transportadora" em vez de `"respondido"` calculado
   localmente (mesmo comportamento no estado local via `addCotacao`). A resposta real continua
   entrando pelo fluxo existente (`handleRespond`/Registrar Resposta). Nenhuma migration necessária.
+- **Refino (PR #252)**: Select "Estratégia Nexus" agora é controlado (`value`/`onValueChange`) e os pesos dos badges/árvore "Melhor Custo-Benefício" usam a tabela real `freight_selection_rules` (Normal 70/20/10, Urgente 20/60/20, Evento 40/40/20) via `STRATEGY_WEIGHTS`; comentário falso "automation would trigger here" removido.
 - **Evidência**: `npm run typecheck` limpo; eslint 0 erros; PR mergeada sem bloqueio.
