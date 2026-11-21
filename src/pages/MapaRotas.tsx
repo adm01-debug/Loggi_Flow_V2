@@ -19,6 +19,7 @@ import {
   useDeliveryRoutes,
   getStatusColor,
   getStatusLabel,
+  type DeliveryRoute,
 } from "@/hooks/logistics/useDeliveryRoutes";
 import { MapboxMap, MapMarker } from "@/components/map";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
@@ -27,6 +28,7 @@ import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import { CinematicHUD } from "@/components/map/CinematicHUD";
+import { EmptyState } from "@/components/common/EmptyState";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -46,6 +48,8 @@ interface DeliveryPoint {
   order: number;
 }
 
+const EMPTY_ROUTES: DeliveryRoute[] = [];
+
 const filterConfig: FilterConfig<DeliveryPoint> = {
   search: { fields: ["address"], placeholder: "Buscar endereço..." },
 };
@@ -53,10 +57,7 @@ const filterConfig: FilterConfig<DeliveryPoint> = {
 export default function MapaRotas() {
   const navigate = useNavigate();
   const deliveryRoutes = useDeliveryRoutes();
-  const routes = useMemo(
-    () => deliveryRoutes?.data || [],
-    [deliveryRoutes?.data],
-  );
+  const routes = deliveryRoutes?.data ?? EMPTY_ROUTES;
 
   const [showRouteLines] = useState(true);
   const [mapStyle] = useState<"dark" | "satellite">("dark");
@@ -282,6 +283,34 @@ export default function MapaRotas() {
         })),
     [filteredData],
   );
+
+  if (deliveryRoutes.isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (deliveryRoutes.isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar rotas"
+            description="Não foi possível carregar as rotas de entrega. Tente novamente em instantes."
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

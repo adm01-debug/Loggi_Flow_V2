@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useMemo, useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -147,13 +148,55 @@ function MetasEmFocoCard({ otifRate, targetOtif }: MetasEmFocoCardProps) {
   );
 }
 
+function anyError(...flags: Array<boolean | undefined>): boolean {
+  return flags.some(Boolean);
+}
+
+function AIAssistantToggle({
+  showAI,
+  onToggle,
+}: {
+  showAI: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <Button
+      variant={showAI ? "secondary" : "default"}
+      className={cn(
+        "gap-2 transition-all duration-300",
+        !showAI && "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20",
+      )}
+      onClick={onToggle}
+    >
+      {showAI ? (
+        <X className="w-4 h-4" />
+      ) : (
+        <BrainCircuit className="w-4 h-4 animate-pulse" />
+      )}
+      {showAI ? "Fechar Assistente" : "Assistente Logístico IA"}
+      {!showAI && (
+        <Badge
+          variant="secondary"
+          className="ml-1 h-5 bg-white/20 text-white border-none text-[10px]"
+        >
+          Gemini 2.0
+        </Badge>
+      )}
+    </Button>
+  );
+}
+
 export default function DashboardExecutivo() {
   const [showAI, setShowAI] = useState(false);
   const { trends, carrierOtif, avgCollectionTime } = useExecutiveMetrics();
   const { monthlyData } = useAnalytics();
 
   // Core monthly metrics (current vs previous)
-  const { data: entregasData } = useQuery({
+  const {
+    data: entregasData,
+    isLoading: isLoadingEntregas,
+    isError: isErrorEntregas,
+  } = useQuery({
     queryKey: ["exec-entregas"],
     queryFn: async () => {
       const now = new Date();
@@ -184,7 +227,11 @@ export default function DashboardExecutivo() {
     staleTime: QUERY_STALE_TIME.DASHBOARD,
   });
 
-  const { data: coletasData } = useQuery({
+  const {
+    data: coletasData,
+    isLoading: isLoadingColetas,
+    isError: isErrorColetas,
+  } = useQuery({
     queryKey: ["exec-coletas"],
     queryFn: async () => {
       const thisMonth = startOfMonth(new Date());
@@ -201,7 +248,12 @@ export default function DashboardExecutivo() {
     staleTime: QUERY_STALE_TIME.DASHBOARD,
   });
 
-  const { data: ocorrenciasData } = useQuery({
+  const {
+    data: ocorrenciasData,
+    isLoading: isLoadingOcorrencias,
+    isError: isErrorOcorrencias,
+    error: errorOcorrencias,
+  } = useQuery({
     queryKey: ["exec-ocorrencias"],
     queryFn: async () => {
       const thisMonth = startOfMonth(new Date());
@@ -358,6 +410,49 @@ export default function DashboardExecutivo() {
   const avgColTime = avgCollectionTime.data || 0;
   const { data: alertas, isLoading: alertasLoading } = useRecentAlerts();
 
+  const loading = anyError(
+    isLoadingEntregas,
+    isLoadingColetas,
+    isLoadingOcorrencias,
+    alertasLoading,
+  );
+  const hasError = anyError(
+    isErrorEntregas,
+    isErrorColetas,
+    isErrorOcorrencias,
+  );
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar o Dashboard Executivo"
+            description={
+              errorOcorrencias?.message ||
+              "Não foi possível carregar os indicadores. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -377,30 +472,10 @@ export default function DashboardExecutivo() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant={showAI ? "secondary" : "default"}
-              className={cn(
-                "gap-2 transition-all duration-300",
-                !showAI &&
-                  "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20",
-              )}
-              onClick={() => setShowAI(!showAI)}
-            >
-              {showAI ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <BrainCircuit className="w-4 h-4 animate-pulse" />
-              )}
-              {showAI ? "Fechar Assistente" : "Assistente Logístico IA"}
-              {!showAI && (
-                <Badge
-                  variant="secondary"
-                  className="ml-1 h-5 bg-white/20 text-white border-none text-[10px]"
-                >
-                  Gemini 2.0
-                </Badge>
-              )}
-            </Button>
+            <AIAssistantToggle
+              showAI={showAI}
+              onToggle={() => setShowAI(!showAI)}
+            />
           </div>
         </div>
 

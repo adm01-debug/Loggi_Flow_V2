@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useRef } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,10 +53,14 @@ export default function ConciliacaoFinanceira() {
   const {
     conciliacoes,
     isLoadingConciliacoes,
+    isErrorConciliacoes,
+    errorConciliacoes,
     selectedConciliacao,
     setSelectedConciliacao,
     itensImportados,
     isLoadingItens,
+    isErrorItens,
+    errorItens,
     entregasSistema,
     createConciliacao,
     importFile,
@@ -143,6 +148,30 @@ export default function ConciliacaoFinanceira() {
         diferenca: selectedConciliacao.diferenca_total,
       }
     : { total: 0, conciliados: 0, divergencias: 0, pendentes: 0, diferenca: 0 };
+
+  const hasError = isErrorConciliacoes || isErrorItens;
+  const errorMessage = errorConciliacoes?.message || errorItens?.message;
+
+  if (hasError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar conciliação financeira"
+            description={
+              errorMessage ||
+              "Não foi possível carregar os dados. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

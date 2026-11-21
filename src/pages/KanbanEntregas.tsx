@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -255,7 +256,12 @@ export default function KanbanEntregas() {
       queryClient.invalidateQueries({ queryKey: ["kanban-entregas"] }),
   });
 
-  const { data: entregas = [], isLoading } = useQuery({
+  const {
+    data: entregas = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["kanban-entregas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -350,6 +356,37 @@ export default function KanbanEntregas() {
         .toLowerCase()
         .includes(searchTerm.toLowerCase()),
   );
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar entregas"
+            description={
+              error?.message ||
+              "Não foi possível carregar as entregas do kanban. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

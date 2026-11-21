@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useFreightIntelligence } from "@/hooks/logistics/useFreightIntelligence";
 import { formatCurrency } from "@/lib/formatters";
@@ -55,6 +56,8 @@ export default function InteligenciaFrete() {
   const [activeTab, setActiveTab] = useState("impacto");
   const {
     isLoading,
+    isError,
+    error,
     rawData,
     regionAnalysis,
     carrierRouteComparison,
@@ -63,6 +66,27 @@ export default function InteligenciaFrete() {
     bestCarrierPerState,
     summary,
   } = useFreightIntelligence();
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar Inteligência de Frete"
+            description={
+              error?.message ||
+              "Não foi possível carregar os dados. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -2,6 +2,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -107,7 +108,12 @@ export default function LojaRecompensas() {
   const coins = userLevel?.coins || 0;
 
   // Fetch real reward items from database
-  const { data: rewardItems = [], isLoading } = useQuery({
+  const {
+    data: rewardItems = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["reward-items"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -193,6 +199,51 @@ export default function LojaRecompensas() {
     clearFilters();
     setAvailabilityFilter("all");
   };
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar loja de recompensas"
+            description={
+              error?.message ||
+              "Não foi possível carregar as recompensas. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (rewardItems.length === 0) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="data"
+            title="Nenhuma recompensa disponível"
+            description="Ainda não há recompensas cadastradas na loja."
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

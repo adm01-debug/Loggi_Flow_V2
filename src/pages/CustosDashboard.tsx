@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DollarSign,
   TrendingUp,
+  AlertTriangle,
   TrendingDown,
   Truck,
   Package,
@@ -21,6 +22,7 @@ import { useLogisticsCosts } from "@/hooks/logistics/useLogisticsCosts";
 import { DateRangePicker } from "@/components/common/DateRangePicker";
 import { useRealtime } from "@/hooks/data/useRealtime";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/common/EmptyState";
 import { subDays, format, eachMonthOfInterval, isSameMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
@@ -60,8 +62,14 @@ export default function CustosDashboard() {
   const startDate = dateRange?.from || subDays(new Date(), 90);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const endDate = dateRange?.to || new Date();
-  const { costsByCarrier, costsByRoute, summary, isLoading, entregas } =
-    useLogisticsCosts(startDate, endDate);
+  const {
+    costsByCarrier,
+    costsByRoute,
+    summary,
+    isLoading,
+    isError,
+    entregas,
+  } = useLogisticsCosts(startDate, endDate);
 
   const handleRefetch = () => setDateRange({ from: startDate, to: endDate });
   useRealtime({ table: "entregas", onUpdate: handleRefetch });
@@ -118,6 +126,25 @@ export default function CustosDashboard() {
     const prev = monthlyData[monthlyData.length - 2]?.custo || 1;
     return ((last - prev) / prev) * 100;
   }, [monthlyData]);
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            variant="error"
+            icon={AlertTriangle}
+            title="Erro ao carregar custos"
+            description="Não foi possível carregar os custos logísticos. Tente novamente."
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

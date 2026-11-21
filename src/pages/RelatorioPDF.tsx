@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StatsCard } from "@/components/common/StatsCard";
+import { EmptyState } from "@/components/common/EmptyState";
 import {
   FileText,
   Download,
@@ -43,11 +44,7 @@ import { format, subDays, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 type ReportType =
-  | "entregas"
-  | "transportadoras"
-  | "custos"
-  | "sla"
-  | "auditoria_diaria";
+  "entregas" | "transportadoras" | "custos" | "sla" | "auditoria_diaria";
 
 const REPORT_TYPES = [
   { value: "entregas", label: "Relatório de Entregas", icon: Package },
@@ -81,7 +78,12 @@ export default function RelatorioPDF() {
     return { start: subDays(new Date(), parseInt(period)), end: new Date() };
   };
 
-  const { data: entregas } = useQuery({
+  const {
+    data: entregas,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["report-entregas", period],
     queryFn: async () => {
       const { start } = getDateRange();
@@ -342,22 +344,23 @@ export default function RelatorioPDF() {
           "No Prazo?",
         ],
       ],
-      body: entregues
-        .slice(0, 80)
-        .map((e) => [
-          e.numero_entrega,
-          e.transportadora?.nome_fantasia || "N/A",
-          e.previsao_entrega
-            ? format(new Date(e.previsao_entrega), "dd/MM/yy")
-            : "—",
-          e.data_entrega_efetiva
-            ? format(new Date(e.data_entrega_efetiva), "dd/MM/yy")
-            : "—",
-          (() => {
-            if (!e.previsao_entrega || !e.data_entrega_efetiva) return "—";
-            return new Date(e.data_entrega_efetiva) <= new Date(e.previsao_entrega) ? "✅ Sim" : "❌ Não";
-          })(),
-        ]),
+      body: entregues.slice(0, 80).map((e) => [
+        e.numero_entrega,
+        e.transportadora?.nome_fantasia || "N/A",
+        e.previsao_entrega
+          ? format(new Date(e.previsao_entrega), "dd/MM/yy")
+          : "—",
+        e.data_entrega_efetiva
+          ? format(new Date(e.data_entrega_efetiva), "dd/MM/yy")
+          : "—",
+        (() => {
+          if (!e.previsao_entrega || !e.data_entrega_efetiva) return "—";
+          return new Date(e.data_entrega_efetiva) <=
+            new Date(e.previsao_entrega)
+            ? "✅ Sim"
+            : "❌ Não";
+        })(),
+      ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [34, 197, 94] },
     });
@@ -426,6 +429,54 @@ export default function RelatorioPDF() {
   };
 
   const totalEntregas = entregas?.length || 0;
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center gap-4 min-h-[60vh]">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-white/60">
+            Gerando relatório...
+          </p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            variant="error"
+            icon={FileText}
+            title="Erro ao carregar relatório"
+            description={String(
+              error?.message ?? "Falha na consulta de entregas",
+            )}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (totalEntregas === 0) {
+    return (
+      <MainLayout>
+        <div className="px-2">
+          <EmptyState
+            icon={Package}
+            title="Nenhuma entrega no período"
+            description="Ajuste o período ou gere relatório quando houver entregas registradas"
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

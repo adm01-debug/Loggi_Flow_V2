@@ -44,11 +44,7 @@ export interface UnifiedShipment {
 }
 
 export type TrackingFilter =
-  | "all"
-  | "atrasados"
-  | "em_transito"
-  | "entregue"
-  | "pendentes";
+  "all" | "atrasados" | "em_transito" | "entregue" | "pendentes";
 
 const STATUS_LABELS: Record<string, string> = {
   aguardando_producao: "Aguardando Produção",
@@ -133,6 +129,7 @@ export function useUnifiedTracking() {
   const {
     data: entregas,
     isLoading: loadingEntregas,
+    isError: isErrorEntregas,
     refetch: refetchEntregas,
   } = useQuery({
     queryKey: ["unified-tracking-entregas"],
@@ -161,6 +158,7 @@ export function useUnifiedTracking() {
   const {
     data: coletas,
     isLoading: loadingColetas,
+    isError: isErrorColetas,
     refetch: refetchColetas,
   } = useQuery({
     queryKey: ["unified-tracking-coletas"],
@@ -225,7 +223,7 @@ export function useUnifiedTracking() {
       transportadora?: { nome_fantasia: string } | null;
       cliente?: { razao_social: string } | null;
     }
-    (entregas as EntregaRow[] | undefined || []).forEach((e) => {
+    ((entregas as EntregaRow[] | undefined) || []).forEach((e) => {
       const t = e.transportadora as { nome_fantasia: string } | null;
       const c = e.cliente as { razao_social: string } | null;
       const atrasado = isAtrasado(
@@ -275,7 +273,7 @@ export function useUnifiedTracking() {
       transportadora?: { nome_fantasia: string } | null;
       fornecedor?: { razao_social: string } | null;
     }
-    (coletas as ColetaRow[] | undefined || []).forEach((c) => {
+    ((coletas as ColetaRow[] | undefined) || []).forEach((c) => {
       const t = c.transportadora as { nome_fantasia: string } | null;
       const f = c.fornecedor as { razao_social: string } | null;
       const atrasado = isAtrasado(
@@ -399,6 +397,7 @@ export function useUnifiedTracking() {
     allShipments: shipments,
     summary,
     isLoading: loadingEntregas || loadingColetas,
+    isError: isErrorEntregas || isErrorColetas,
     filter,
     setFilter,
     searchTerm,

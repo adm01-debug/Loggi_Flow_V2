@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Route, Truck, Upload } from "lucide-react";
+import { Route, Truck, Upload, Loader2 } from "lucide-react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,7 +25,7 @@ export default function RotasTransportadoras() {
     TransportadoraRota[] | null
   >(null);
 
-  const { rotas, isLoading, addRota } =
+  const { rotas, isLoading, error, addRota } =
     useTransportadoraRotas(activeFilters);
 
   // Fetch transportadoras for the form
@@ -62,6 +63,34 @@ export default function RotasTransportadoras() {
   };
 
   const displayedRotas = searchResults || rotas;
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar rotas de transportadoras"
+            description="Não foi possível carregar as rotas. Tente novamente em instantes."
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

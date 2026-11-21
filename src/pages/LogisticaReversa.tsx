@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useLogisticaReversaReal } from "@/hooks/logistics/useLogisticaReversaReal";
 import { type LogisticaReversa } from "@/hooks";
@@ -53,6 +54,8 @@ import { toast } from "sonner";
 
 export default function LogisticaReversa() {
   const { list, create, updateStatus } = useLogisticaReversaReal();
+  const listError = list.isError;
+  const listErrorMessage = list.error?.message;
   const { exportToCSV } = useExport();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
@@ -164,6 +167,27 @@ export default function LogisticaReversa() {
       { filename: "logistica-reversa" },
     );
   };
+
+  if (listError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar logística reversa"
+            description={
+              listErrorMessage ||
+              "Não foi possível carregar as solicitações. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

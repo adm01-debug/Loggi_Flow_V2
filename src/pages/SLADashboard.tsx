@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +38,7 @@ export default function SLADashboard() {
     from: subDays(new Date(), 30),
     to: new Date(),
   });
-  const { data: metrics, isLoading, refetch } = useSLAMetrics();
+  const { data: metrics, isLoading, isError, error, refetch } = useSLAMetrics();
 
   useRealtime({
     table: "entregas",
@@ -55,7 +56,9 @@ export default function SLADashboard() {
   };
   const slaRate = stats.taxaOTIF ? Math.round(stats.taxaOTIF) : 0;
 
-  const slaBadgeVariant = (rate: number): "default" | "secondary" | "destructive" => {
+  const slaBadgeVariant = (
+    rate: number,
+  ): "default" | "secondary" | "destructive" => {
     if (rate >= 95) return "default";
     if (rate >= 80) return "secondary";
     return "destructive";
@@ -85,6 +88,26 @@ export default function SLADashboard() {
     if (range) setDateRange(range);
   };
 
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar métricas de SLA"
+            description={
+              error?.message ||
+              "Não foi possível carregar as métricas de SLA. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -219,7 +242,14 @@ export default function SLADashboard() {
               <Loader2 className="w-6 h-6 animate-spin mx-auto" />
             ) : (
               (stats.performancePorTransportadora || []).map(
-                (c: { nome: string; totalEntregas: number | null; taxaOTIF: number }, i: number) => (
+                (
+                  c: {
+                    nome: string;
+                    totalEntregas: number | null;
+                    taxaOTIF: number;
+                  },
+                  i: number,
+                ) => (
                   <div
                     key={i}
                     className="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-card to-card/95 border-none shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between"
@@ -243,7 +273,12 @@ export default function SLADashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={cn("text-xl font-bold", slaTextClass(c.taxaOTIF))}>
+                      <p
+                        className={cn(
+                          "text-xl font-bold",
+                          slaTextClass(c.taxaOTIF),
+                        )}
+                      >
                         {c.taxaOTIF.toFixed(0)}%
                       </p>
                       <Progress value={c.taxaOTIF} className="w-24 h-2" />

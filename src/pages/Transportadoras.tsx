@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -193,7 +194,12 @@ export default function Transportadoras() {
   const [estadoFilter, setEstadoFilter] = useState("");
   const [ativaFilter, setAtivaFilter] = useState("");
 
-  const { data: list = [], isLoading: loading } = useQuery({
+  const {
+    data: list = [],
+    isLoading: loading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["transportadoras-list"],
     queryFn: async () => {
       // Parallel fetch for transportadoras and their performance stats
@@ -214,9 +220,14 @@ export default function Transportadoras() {
 
       // Enriched data with stats from RPC
       return transportadoras.map((t) => {
-        const tStats = (stats as Array<{ transportadora_id: string; total_entregas?: number; entregas_no_prazo?: number; score_performance?: number | null }>).find(
-          (s) => s.transportadora_id === t.id,
-        );
+        const tStats = (
+          stats as Array<{
+            transportadora_id: string;
+            total_entregas?: number;
+            entregas_no_prazo?: number;
+            score_performance?: number | null;
+          }>
+        ).find((s) => s.transportadora_id === t.id);
         return {
           ...t,
           total_entregas: Number(tStats?.total_entregas || 0),
@@ -585,7 +596,10 @@ export default function Transportadoras() {
             onValueChange={(v: string) =>
               setForm({
                 ...form,
-                non_api_config: { ...form.non_api_config, type: v as NonApiChannel },
+                non_api_config: {
+                  ...form.non_api_config,
+                  type: v as NonApiChannel,
+                },
               })
             }
           >
@@ -739,6 +753,37 @@ export default function Transportadoras() {
       </TabsContent>
     </Tabs>
   );
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar transportadoras"
+            description={
+              error?.message ||
+              "Não foi possível carregar as transportadoras. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <>
@@ -1078,7 +1123,11 @@ export default function Transportadoras() {
                             <MapPin className="w-3.5 h-3.5 text-primary" />
                           </div>
                           <span className="uppercase text-[11px] tracking-tight">
-                            {(t.coverage_details?.states || t.regioes_atendidas || [])
+                            {(
+                              t.coverage_details?.states ||
+                              t.regioes_atendidas ||
+                              []
+                            )
                               .slice(0, 3)
                               .join(", ")}
                             {(t.coverage_details?.states?.length ||

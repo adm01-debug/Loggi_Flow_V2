@@ -28,6 +28,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,7 +80,12 @@ export default function Relatorios() {
   const startDate = subDays(new Date(), periodDays[period]);
 
   // Fetch all data
-  const { data: coletas = [], isLoading: loadingColetas } = useQuery({
+  const {
+    data: coletas = [],
+    isLoading: loadingColetas,
+    isError: isErrorColetas,
+    error: errorColetas,
+  } = useQuery({
     queryKey: ["relatorios-coletas", period],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -93,7 +99,12 @@ export default function Relatorios() {
     },
   });
 
-  const { data: entregas = [], isLoading: loadingEntregas } = useQuery({
+  const {
+    data: entregas = [],
+    isLoading: loadingEntregas,
+    isError: isErrorEntregas,
+    error: errorEntregas,
+  } = useQuery({
     queryKey: ["relatorios-entregas", period],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -107,7 +118,12 @@ export default function Relatorios() {
     },
   });
 
-  const { data: fretesInternos = [], isLoading: loadingFretes } = useQuery({
+  const {
+    data: fretesInternos = [],
+    isLoading: loadingFretes,
+    isError: isErrorFretes,
+    error: errorFretes,
+  } = useQuery({
     queryKey: ["relatorios-fretes", period],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -145,6 +161,9 @@ export default function Relatorios() {
   });
 
   const isLoading = loadingColetas || loadingEntregas || loadingFretes;
+  const isError = isErrorColetas || isErrorEntregas || isErrorFretes;
+  const errorMessage =
+    errorColetas?.message || errorEntregas?.message || errorFretes?.message;
 
   // Process data for charts
   const dailyData = useMemo(() => {
@@ -297,6 +316,27 @@ export default function Relatorios() {
       value,
     });
   };
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar relatórios"
+            description={
+              errorMessage ||
+              "Não foi possível carregar os dados dos relatórios. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -84,7 +84,11 @@ export function useGamification() {
   const queryClient = useQueryClient();
 
   // Fetch user level data
-  const { data: userLevel, isLoading: isLoadingLevel } = useQuery({
+  const {
+    data: userLevel,
+    isLoading: isLoadingLevel,
+    isError: isErrorLevel,
+  } = useQuery({
     queryKey: ["userLevel", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -121,44 +125,50 @@ export function useGamification() {
   });
 
   // Fetch all achievements
-  const { data: achievements = [], isLoading: isLoadingAchievements } =
-    useQuery({
-      queryKey: ["achievements"],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from("achievements")
-          .select("*")
-          .order("category", { ascending: true });
+  const {
+    data: achievements = [],
+    isLoading: isLoadingAchievements,
+    isError: isErrorAchievements,
+  } = useQuery({
+    queryKey: ["achievements"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("achievements")
+        .select("*")
+        .order("category", { ascending: true });
 
-        if (error) throw error;
-        return data as Achievement[];
-      },
-      staleTime: QUERY_STALE_TIME.STATIC,
-    });
+      if (error) throw error;
+      return data as Achievement[];
+    },
+    staleTime: QUERY_STALE_TIME.STATIC,
+  });
 
   // Fetch user's unlocked achievements
-  const { data: userAchievements = [], isLoading: isLoadingUserAchievements } =
-    useQuery({
-      queryKey: ["userAchievements", user?.id],
-      queryFn: async () => {
-        if (!user?.id) return [];
+  const {
+    data: userAchievements = [],
+    isLoading: isLoadingUserAchievements,
+    isError: isErrorUserAchievements,
+  } = useQuery({
+    queryKey: ["userAchievements", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
 
-        const { data, error } = await supabase
-          .from("user_achievements")
-          .select(
-            `
+      const { data, error } = await supabase
+        .from("user_achievements")
+        .select(
+          `
           *,
           achievement:achievements(*)
         `,
-          )
-          .eq("user_id", user.id);
+        )
+        .eq("user_id", user.id);
 
-        if (error) throw error;
-        return data as (UserAchievement & { achievement: Achievement })[];
-      },
-      enabled: !!user?.id,
-      staleTime: QUERY_STALE_TIME.DYNAMIC,
-    });
+      if (error) throw error;
+      return data as (UserAchievement & { achievement: Achievement })[];
+    },
+    enabled: !!user?.id,
+    staleTime: QUERY_STALE_TIME.DYNAMIC,
+  });
 
   // Add XP mutation
   const addXPMutation = useMutation({
@@ -324,6 +334,7 @@ export function useGamification() {
     // Loading states
     isLoading:
       isLoadingLevel || isLoadingAchievements || isLoadingUserAchievements,
+    isError: isErrorLevel || isErrorAchievements || isErrorUserAchievements,
 
     // Actions
     addXP: addXPMutation.mutate,

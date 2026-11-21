@@ -68,7 +68,11 @@ export const useGamification = (userIdParam?: string) => {
   // saldo/XP/nivel apareciam zerados em toda a UI.
   const userId = userIdParam ?? user?.id;
 
-  const { data: profile, isLoading: loadingProfile } = useQuery({
+  const {
+    data: profile,
+    isLoading: loadingProfile,
+    isError: isErrorProfile,
+  } = useQuery({
     queryKey: ["userLevel", userId],
     enabled: !!userId,
     queryFn: async () => {
@@ -83,7 +87,11 @@ export const useGamification = (userIdParam?: string) => {
     },
   });
 
-  const { data: badges, isLoading: loadingBadges } = useQuery({
+  const {
+    data: badges,
+    isLoading: loadingBadges,
+    isError: isErrorBadges,
+  } = useQuery({
     queryKey: ["rank_badges"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -114,7 +122,11 @@ export const useGamification = (userIdParam?: string) => {
     },
   });
 
-  const { data: gifts, isLoading: loadingGifts } = useQuery({
+  const {
+    data: gifts,
+    isLoading: loadingGifts,
+    isError: isErrorGifts,
+  } = useQuery({
     queryKey: ["task_gifts"],
     queryFn: async () => {
       // P18: tabela real no banco deployado é `reward_items` (ver types.ts).
@@ -136,21 +148,24 @@ export const useGamification = (userIdParam?: string) => {
     },
   });
 
-  const { data: unlockedAchievementIds, isLoading: loadingAchievements } =
-    useQuery({
-      queryKey: ["user_achievements", userId],
-      enabled: !!userId,
-      queryFn: async () => {
-        // P18: tabela user_achievements existe neste schema (linhas com
-        // achievement_id, mesmo formato da versão .tsx).
-        const { data, error } = await supabase
-          .from("user_achievements")
-          .select("achievement_id")
-          .eq("user_id", userId as string);
-        if (error) throw error;
-        return new Set<string>((data ?? []).map((a) => a.achievement_id));
-      },
-    });
+  const {
+    data: unlockedAchievementIds,
+    isLoading: loadingAchievements,
+    isError: isErrorAchievements,
+  } = useQuery({
+    queryKey: ["user_achievements", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      // P18: tabela user_achievements existe neste schema (linhas com
+      // achievement_id, mesmo formato da versão .tsx).
+      const { data, error } = await supabase
+        .from("user_achievements")
+        .select("achievement_id")
+        .eq("user_id", userId as string);
+      if (error) throw error;
+      return new Set<string>((data ?? []).map((a) => a.achievement_id));
+    },
+  });
 
   const awardPointsMutation = useMutation({
     mutationFn: async ({ xp, coins }: { xp: number; coins: number }) => {
@@ -205,6 +220,8 @@ export const useGamification = (userIdParam?: string) => {
     },
     isLoading:
       loadingProfile || loadingBadges || loadingGifts || loadingAchievements,
+    isError:
+      isErrorProfile || isErrorBadges || isErrorGifts || isErrorAchievements,
     awardPoints: async (params: { xp: number; coins: number }) =>
       awardPointsMutation.mutateAsync(params),
     achievements: (badges || []) as RankBadge[],

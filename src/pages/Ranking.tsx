@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +60,8 @@ export default function Ranking() {
   const {
     data: leaderboard = [],
     isLoading,
+    isError,
+    error,
     refetch,
   } = useQuery({
     queryKey: ["leaderboard", period],
@@ -172,6 +175,51 @@ export default function Ranking() {
   const totalPlayers = users.length;
   const totalXP = users.reduce((sum, u) => sum + u.xp, 0);
   const totalAchievements = users.reduce((sum, u) => sum + u.achievements, 0);
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar ranking"
+            description={
+              error?.message ||
+              "Não foi possível carregar o ranking. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => window.location.reload(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (leaderboard.length === 0) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <EmptyState
+            variant="data"
+            title="Nenhum dado de ranking"
+            description="Ainda não há jogadores ranqueados."
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

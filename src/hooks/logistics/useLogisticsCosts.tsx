@@ -36,7 +36,11 @@ export interface CostSummary {
 
 export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
   const { user } = useAuth();
-  const { data: entregas, isLoading } = useQuery({
+  const {
+    data: entregas,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: [
       "logistics-costs",
       user?.id,
@@ -209,5 +213,6 @@ export const useLogisticsCosts = (startDate: Date, endDate: Date) => {
     costsByPeriod,
     summary,
     isLoading,
+    isError,
   };
 };

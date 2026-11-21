@@ -12,9 +12,15 @@ export function useDashboardData(dateRange: DateRange) {
   const {
     data: combinedData,
     isLoading,
+    isError,
     refetch,
   } = useQuery({
-    queryKey: ["dashboard-data-combined", dateRange.from, dateRange.to, user?.id],
+    queryKey: [
+      "dashboard-data-combined",
+      dateRange.from,
+      dateRange.to,
+      user?.id,
+    ],
     queryFn: async () => {
       if (!dateRange.from || !dateRange.to)
         return { coletas: [], entregas: [] };
@@ -104,5 +110,5 @@ export function useDashboardData(dateRange: DateRange) {
     return { pendentes, transito, finalizadas, problemas };
   }, [combinedData]);
 
-  return { chartData, statusStats, isLoading, refetch };
+  return { chartData, statusStats, isLoading, isError, refetch };
 }
