@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "0f32426a75e44e1348ed8419003a3bd498ac57b6",
+  "sha": "13c9e3f514ff294a893d80ffde462a626956eebf",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-21 14:34 UTC",
+  "generated_at": "2026-11-21 14:46 UTC",
   "files_total": 1482,
   "code_files": 1140,
-  "code_lines": 186062,
+  "code_lines": 186063,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "5362ae73d45d2a00",
+ "facts_hash": "b61a8fcb34c573aa",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -29530,7 +29530,7 @@
   {
    "module": "src/hooks",
    "files": 126,
-   "lines": 19325,
+   "lines": 19326,
    "tables": [
     "achievements",
     "ai_delay_predictions",
@@ -76877,7 +76877,7 @@
   },
   "src/hooks/logistics/useLogisticsIntelligence.tsx": {
    "path": "src/hooks/logistics/useLogisticsIntelligence.tsx",
-   "lines": 82,
+   "lines": 83,
    "exports": [
     "function useLogisticsIntelligence"
    ],
@@ -88200,10 +88200,19 @@
   }
  },
  "git": {
-  "sha": "0f32426a75e44e1348ed8419003a3bd498ac57b6",
+  "sha": "13c9e3f514ff294a893d80ffde462a626956eebf",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "13c9e3f",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "fix: torna inteligencia logistica honesta (#243)",
+    "files": [
+     "src/hooks/logistics/useLogisticsIntelligence.tsx"
+    ]
+   },
    {
     "sha": "0f32426",
     "date": "2026-11-21",
@@ -88678,15 +88687,6 @@
      "supabase/functions/rodonaves-api/index.ts",
      "supabase/migrations/20261120120000_restore_grant_execute_add_user_xp.sql"
     ]
-   },
-   {
-    "sha": "f1d13b6",
-    "date": "2026-11-20",
-    "author": "adm01-debug",
-    "subject": "docs(audit): marca itens 2.7, 2.8 e 2.10 como corrigidos (#214)",
-    "files": [
-     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md"
-    ]
    }
   ],
   "hot_files": [
@@ -88704,7 +88704,7 @@
    ],
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
-    4
+    3
    ],
    [
     "docs/pendencias/03-15-dashboard-executivo.md",

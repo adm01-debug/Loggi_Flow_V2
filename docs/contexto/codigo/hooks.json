@@ -3361,7 +3361,7 @@
    "hooks_exportados": [
     "useLogisticsIntelligence"
    ],
-   "linhas": 82,
+   "linhas": 83,
    "dominio": "hooks/logistics",
    "tabelas": [],
    "rpcs": [],

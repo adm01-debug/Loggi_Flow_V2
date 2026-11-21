@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "0f32426a75e44e1348ed8419003a3bd498ac57b6",
+  "commit": "13c9e3f514ff294a893d80ffde462a626956eebf",
   "branch": "main",
-  "data_commit": "2026-11-21T11:33:35-03:00",
+  "data_commit": "2026-11-21T11:46:24-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "13c9e3f",
+    "data": "2026-11-21",
+    "assunto": "fix: torna inteligencia logistica honesta (#243)"
+   },
    {
     "sha": "0f32426",
     "data": "2026-11-21",
@@ -126,25 +131,20 @@
     "sha": "3706ba6",
     "data": "2026-11-20",
     "assunto": "fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)"
-   },
-   {
-    "sha": "b7a7b5f",
-    "data": "2026-11-20",
-    "assunto": "fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)"
    }
   ],
-  "arquivos_mudados_7d": 327,
+  "arquivos_mudados_7d": 328,
   "pastas_mais_mudadas_30d": [
+   {
+    "pasta": "src/hooks/logistics",
+    "mudancas": 14
+   },
    {
     "pasta": "package-lock.json",
     "mudancas": 13
    },
    {
     "pasta": "package.json",
-    "mudancas": 13
-   },
-   {
-    "pasta": "src/hooks/logistics",
     "mudancas": 13
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 170
+    "commits": 171
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169550,
+  "linhas_codigo": 169551,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -456,7 +456,7 @@
   },
   "src/hooks": {
    "arquivos": 126,
-   "linhas": 19325
+   "linhas": 19326
   },
   "src/i18n.ts": {
    "arquivos": 1,
