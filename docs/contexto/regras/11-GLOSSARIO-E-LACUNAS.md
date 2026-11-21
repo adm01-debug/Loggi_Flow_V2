@@ -1,6 +1,6 @@
 # 11 · GLOSSÁRIO, DADOS DE REFERÊNCIA E LACUNAS
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `3d7affa0fb` · branch `main` · 2026-11-20 21:12 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `24dbf9192e` · branch `main` · 2026-11-21 11:45 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## Glossário do domínio (entidades do sistema)
@@ -221,10 +221,6 @@
 | status | valor `healthy` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/LiveStatusBar.tsx`<br>`compara:src/utils/systemTester.ts`<br>`compara:supabase/functions/health/index.ts`<br>`escreve:src/hooks/system/useNexusHealth.ts` |
 | status | valor `degraded` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/LiveStatusBar.tsx`<br>`compara:src/components/dashboard/SystemHealthWidget.tsx` |
 | status | valor `undefined` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/LiveStatusBar.tsx` |
-| status | valor `Iniciado` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
-| status | valor `Processamento` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
-| status | valor `Transito` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
-| status | valor `Finalizado` para `status` usado no código não existe em nenhum enum do banco/TS | `escreve:src/components/dashboard/MissionDetail.tsx` |
 | status | valor `operational` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/SystemHealthWidget.tsx`<br>`escreve:supabase/functions/nexus-auto-healing/index.ts` |
 | status | valor `down` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/dashboard/SystemHealthWidget.tsx` |
 | status | valor `online` para `status` usado no código não existe em nenhum enum do banco/TS | `compara:src/components/ui/badge.tsx`<br>`escreve:src/components/layout/SystemPulse.tsx`<br>`escreve:src/components/ui/badge.tsx` |

@@ -89,6 +89,7 @@
     "useTransportadoraPerformance",
     "useUnifiedTracking",
     "useUserPreferences",
+    "useWebAuthn",
     "useWindowSize"
    ],
    "hooks_locais": [
@@ -137,7 +138,8 @@
     "useTouchGestures",
     "useTransportadoraPerformance",
     "useUnifiedTracking",
-    "useUserPreferences"
+    "useUserPreferences",
+    "useWebAuthn"
    ],
    "tabelas": [
     "achievements",
@@ -166,7 +168,9 @@
     "user_levels",
     "user_onboarding",
     "user_roles",
-    "v_prediction_accuracy"
+    "v_prediction_accuracy",
+    "webauthn_challenges",
+    "webauthn_credentials"
    ],
    "rpcs": [
     "add_user_xp",
@@ -194,7 +198,7 @@
     "assistant",
     "user"
    ],
-   "arquivos_puxados": 130
+   "arquivos_puxados": 131
   },
   {
    "protegida": false,

@@ -746,7 +746,7 @@
    "modulo": "components/dashboard",
    "arquivos": 17,
    "testes": 1,
-   "linhas": 5281,
+   "linhas": 5362,
    "itens_menu": [],
    "telas": [],
    "rotas_http": [],
@@ -780,7 +780,8 @@
     "useSLAMetrics",
     "useTelemetry",
     "useTransportadoraPerformance",
-    "useUnifiedTracking"
+    "useUnifiedTracking",
+    "useWebAuthn"
    ],
    "hooks_definidos": [],
    "edges": [
@@ -801,13 +802,16 @@
     "profiles",
     "reward_items",
     "risk_zones",
+    "security_events",
     "sla_alerts",
     "system_heartbeat",
     "telemetry_logs",
     "transportadoras",
     "user_achievements",
     "user_levels",
-    "user_roles"
+    "user_roles",
+    "webauthn_challenges",
+    "webauthn_credentials"
    ],
    "rpcs": [
     "add_user_xp",
@@ -846,6 +850,7 @@
     "components/map",
     "components/ui",
     "hooks/analytics",
+    "hooks/auth",
     "hooks/common",
     "hooks/gamification",
     "hooks/logistics",
@@ -3287,6 +3292,7 @@
     "components/ai",
     "components/auth",
     "components/common",
+    "components/dashboard",
     "components/gamification",
     "components/layout",
     "components/search",

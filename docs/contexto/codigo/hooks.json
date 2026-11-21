@@ -1806,8 +1806,9 @@
     "useState"
    ],
    "canais_realtime": [],
-   "usado_por": 2,
+   "usado_por": 3,
    "usado_por_arquivos": [
+    "src/components/dashboard/BiometricConsentModal.tsx",
     "src/components/security/PasskeyManager.tsx",
     "src/hooks/index.ts"
    ],

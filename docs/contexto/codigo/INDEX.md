@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `3d7affa0fb2477f6283c038347f64106a3bd7220` (2026-11-20T17:17:50-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `24dbf9192eef98ce5ddeabcb7c780a8abcd6757f` (2026-11-21T08:44:29-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1472 |
 | arquivos_codigo | 878 |
-| linhas_codigo | 168959 |
+| linhas_codigo | 169040 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -70,7 +70,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 | módulo | itens de menu | telas/rotas | arquivos | hooks locais | edges | tabelas |
 |---|---|---|---|---|---|---|
 | components/common | 0 | 0 | 45 | 16 | 2 | 11 |
-| components/dashboard | 0 | 0 | 17 | 29 | 2 | 20 |
+| components/dashboard | 0 | 0 | 17 | 30 | 2 | 23 |
 | components/freight | 0 | 0 | 18 | 97 | 18 | 53 |
 | components/layout | 0 | 0 | 7 | 22 | 3 | 17 |
 | components/map | 0 | 0 | 6 | 7 | 0 | 2 |
@@ -274,8 +274,8 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8533 nós · 20981 arestas · 862 comunidades · grafo do commit `3d7affa0`
-- comunidades maiores: cn (219), react (207), lucide-react (180), input.tsx (177), db-observability/index.ts (164), @tanstack/react-query (138), FretesInternos.tsx (127), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), utils.ts (99), date-fns (92), client.ts (90), gerar.mjs (81)
+- 8539 nós · 20994 arestas · 864 comunidades · grafo do commit `24dbf919`
+- comunidades maiores: lucide-react (234), react (233), Envios.tsx (217), cn (185), utils.ts (151), client.ts (147), button.tsx (138), db-observability/index.ts (131), ref_node_fs (121), date-fns (112), useAuth (106), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
 
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `24dbf91` feat: (#231)
 - 2026-11-20 `3d7affa` docs: marca 03-01 a 03-05 (Fase B) como concluidos via PR #229 (#230)
 - 2026-11-20 `d952137` feat: substitui metricas simuladas por dados reais nos widgets 3.1-3.5 (#229)
 - 2026-11-20 `84f200d` fix: remove telemetria e coordenadas fixas do CinematicHUD (3.13) (#228)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-20 `3706ba6` fix: troca xlsx 0.18.5 por xlsx-js-style 1.2.0 via alias (#219)
 - 2026-11-20 `b7a7b5f` fix: override postcss-selector-parser para 6.1.5 (GHSA-rj75-hqrm-r3gf) (#218)
 - 2026-11-20 `5460176` fix: bump vite 5 para 6 e elimina vulnerabilidades do dev server (#205)
-- 2026-11-20 `eaecf14` chore(db): sincronizar artefatos com o banco [auto] (#216)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

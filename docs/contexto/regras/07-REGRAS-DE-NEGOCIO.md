@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `3d7affa0fb` · branch `main` · 2026-11-20 21:12 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `24dbf9192e` · branch `main` · 2026-11-21 11:45 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -899,16 +899,12 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `CLOSED` | compara | `src/hooks/data/useRealtime.tsx` |
 | `status` | `COMPLETED` | compara, escreve | `supabase/functions/lalamove-webhook/index.ts`<br>`supabase/functions/lalamove-webhook/index_test.ts` |
 | `status` | `ERROR` | escreve | `src/utils/systemTester.ts` |
-| `status` | `Finalizado` | escreve | `src/components/dashboard/MissionDetail.tsx` |
-| `status` | `Iniciado` | escreve | `src/components/dashboard/MissionDetail.tsx` |
 | `status` | `JOINING` | compara | `src/components/common/RealtimeBadge.tsx`<br>`src/components/common/RealtimeStatus.tsx` |
 | `status` | `PASS` | compara | `src/utils/systemTester.ts` |
-| `status` | `Processamento` | escreve | `src/components/dashboard/MissionDetail.tsx` |
 | `status` | `SUBSCRIBED` | compara | `src/components/common/RealtimeBadge.tsx`<br>`src/components/common/RealtimeStatus.tsx`<br>`src/hooks/data/useRealtime.tsx`<br>`src/hooks/system/useNexusHealth.ts`<br>`src/utils/systemTester.ts` |
 | `status` | `SUCCESS` | compara | `src/pages/IntegracaoBitrix.tsx` |
 | `status` | `Status` | escreve | `src/hooks/common/useExport.tsx`<br>`src/hooks/security/useAuditLogs.tsx`<br>`src/hooks/security/useEntityHistory.tsx` |
 | `status` | `TIMED_OUT` | compara | `src/hooks/data/useRealtime.tsx` |
-| `status` | `Transito` | escreve | `src/components/dashboard/MissionDetail.tsx` |
 | `status` | `above` | compara | `src/pages/Analytics.tsx` |
 | `status` | `aguardando_liberacao` | compara, escreve, filtra | `src/components/coletas/PickupDetailsDialog.tsx`<br>`src/components/coletas/PickupDialog.tsx`<br>`src/pages/Coletas.tsx`<br>`src/pages/PainelSLA.tsx` |
 | `status` | `aguardando_producao` | compara, escreve | `src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/pages/Envios.tsx` |
@@ -945,7 +941,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `status` | `em_execucao` | escreve | `src/hooks/predictions/useMitigationActions.ts` |
 | `status` | `em_transito` | compara, escreve | `src/components/coletas/PickupDetailsDialog.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/hooks/analytics/useDashboardData.tsx`<br>`src/hooks/logistics/useDeliveryRoutes.tsx`<br>`src/pages/Coletas.tsx`<br>… +5 |
 | `status` | `empty` | compara, escreve | `supabase/functions/accuracy-weekly-digest/index.ts` |
-| `status` | `entregue` | compara, escreve, filtra | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/components/dashboard/MissionDetail.tsx`<br>`src/hooks/analytics/useExecutiveMetrics.tsx`<br>`src/hooks/analytics/useKPIBenchmark.tsx`<br>… +14 |
+| `status` | `entregue` | compara, escreve, filtra | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/common/ActivityTimeline.tsx`<br>`src/hooks/analytics/useExecutiveMetrics.tsx`<br>`src/hooks/analytics/useKPIBenchmark.tsx`<br>`src/pages/CalendarioLogistico.tsx`<br>… +13 |
 | `status` | `error` | compara, escreve | `src/components/analytics/OperationalPulse.tsx`<br>`src/components/freight/FreightAudit.tsx`<br>`src/hooks/security/useIntegrationValidation.tsx`<br>`src/pages/Configuracoes.tsx`<br>`supabase/functions/accuracy-meta-monitor/channelHealth.ts`<br>… +2 |
 | `status` | `exceeded` | compara | `src/hooks/logistics/useCostAlerts.tsx` |
 | `status` | `expirado` | compara | `src/hooks/logistics/useCotacoesMulticanal.tsx`<br>`src/pages/DashboardCotacoes.tsx`<br>`src/pages/cotacao-multicanal/CotacaoResultsTable.tsx` |
@@ -1268,6 +1264,10 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 - **generateManifestoPDF()** — `src/components/coletas/PickupDetailsDialog.tsx`
   ```
   playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("MANIFESTO DE COLETA NEXUS", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text("DADOS DA OPERAÇÃO", 20, 55); autoTable(doc, { startY: 60, head: [['Campo', 'Informação']], body: [ ['Fornecedor', pickup.fornecedores?.nome_ …
+  ```
+- **scanButtonLabel(step: ScanStep, supported: boolean | null)** — `src/components/dashboard/BiometricConsentModal.tsx`
+  ```
+  if (supported === false) return "NÃO SUPORTADO"; if (step === "scanning") return "PROCESSANDO..."; if (step === "success") return "SUCESSO!"; if (supported === null) return "VERIFICANDO..."; return "INICIAR SINCRONIZAÇÃO";
   ```
 - **formatCurrency(value: number)** — `src/components/freight/SmartCarrierSelector.tsx`
   ```
@@ -1629,8 +1629,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `const yesterday = subDays(new Date(), 1);` | `src/components/common/DateRangePicker.tsx` |
 | `setTimeout(() => { setFile(null); setResult(null); setSheets([]); setProgress(0); }, 2000);` | `src/components/common/ExcelImporter.tsx` |
 | `const timer = setTimeout(() => setPulse(false), 2000);` | `src/components/common/RealtimeBadge.tsx` |
-| `await new Promise(r => setTimeout(r, 1000));` | `src/components/dashboard/BiometricConsentModal.tsx` |
-| `await new Promise(r => setTimeout(r, 2500));` | `src/components/dashboard/BiometricConsentModal.tsx` |
 | `const startDate = startOfMonth(subMonths(now, 1));` | `src/components/dashboard/FavoriteMetricsBar.tsx` |
 | `rotateTimeoutId = setTimeout(() => { rotateRafId = requestAnimationFrame(rotateCamera); }, 2000);` | `src/components/map/MapboxMap.tsx` |
 | `const timer = setTimeout(() => { if (window.Notification.permission === "default" && !wasDismissed) { setShowPrompt(true); } }, 3000);` | `src/components/notifications/BrowserNotificationPrompt.tsx` |
@@ -1894,6 +1892,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | Erro ao processar planilha. Verifique a estrutura do arquivo. | `src/components/common/ExcelImporter.tsx` |
 | Não foi possível ler o arquivo Excel. Verifique se o formato é .xlsx ou .xls. | `src/components/common/ExcelImporter.tsx` |
 | Protocolo de auto-reparo falhou. Verifique logs. | `src/components/common/RealtimeStatus.tsx` |
+| Seu dispositivo não suporta autenticação biométrica (WebAuthn) | `src/components/dashboard/BiometricConsentModal.tsx` |
 | Erro ao executar protocolo:  | `src/components/dashboard/LogisticsMapWidget.tsx` |
 | Preencha todos os campos para auditoria | `src/components/freight/FreightAudit.tsx` |
 | Preencha UF e peso | `src/components/freight/QuickQuoteWidget.tsx` |
@@ -2172,8 +2171,7 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | invalid URL | `supabase/functions/_shared/safeFetch.ts` |
 | private IPv4 ${host} | `supabase/functions/_shared/safeFetch.ts` |
 | private IPv6 ${host} | `supabase/functions/_shared/safeFetch.ts` |
-| scheme ${parsed.protocol} | `supabase/functions/_shared/safeFetch.ts` |
-| … +149 linhas — lista completa em `context.json` | |
+| … +150 linhas — lista completa em `context.json` | |
 
 ## J. Controle de acesso no código (checagens de perfil/permissão)
 

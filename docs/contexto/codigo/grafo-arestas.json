@@ -559,7 +559,8 @@
   ],
   "src/components/dashboard/BiometricConsentModal.tsx": [
    "src/components/ui/button.tsx",
-   "src/components/ui/dialog.tsx"
+   "src/components/ui/dialog.tsx",
+   "src/hooks/auth/useWebAuthn.tsx"
   ],
   "src/components/dashboard/DraggableDashboard.tsx": [
    "src/components/ui/badge.tsx",

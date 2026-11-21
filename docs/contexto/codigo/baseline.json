@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "3d7affa0fb2477f6283c038347f64106a3bd7220",
+  "commit": "24dbf9192eef98ce5ddeabcb7c780a8abcd6757f",
   "branch": "main",
-  "data_commit": "2026-11-20T17:17:50-03:00",
+  "data_commit": "2026-11-21T08:44:29-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "24dbf91",
+    "data": "2026-11-21",
+    "assunto": "feat: (#231)"
+   },
    {
     "sha": "3d7affa",
     "data": "2026-11-20",
@@ -126,14 +131,9 @@
     "sha": "99ca866",
     "data": "2026-11-20",
     "assunto": "fix: corrige 3 defeitos de runtime encontrados na auditoria de 2026-11-20 (#207)"
-   },
-   {
-    "sha": "c2e148b",
-    "data": "2026-11-20",
-    "assunto": "docs(audit): auditoria de funcionalidades planejadas x implementadas (#206)"
    }
   ],
-  "arquivos_mudados_7d": 322,
+  "arquivos_mudados_7d": 323,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -148,11 +148,11 @@
     "mudancas": 13
    },
    {
-    "pasta": ".github/workflows/contexto-ia.yml",
-    "mudancas": 8
+    "pasta": "src/components/dashboard",
+    "mudancas": 10
    },
    {
-    "pasta": "src/components/dashboard",
+    "pasta": ".github/workflows/contexto-ia.yml",
     "mudancas": 8
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 158
+    "commits": 159
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 168959,
+  "linhas_codigo": 169040,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 49352
+   "linhas": 49433
   },
   "src/features": {
    "arquivos": 90,

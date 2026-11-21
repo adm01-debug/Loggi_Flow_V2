@@ -1,16 +1,16 @@
 {
  "meta": {
-  "sha": "3d7affa0fb2477f6283c038347f64106a3bd7220",
+  "sha": "24dbf9192eef98ce5ddeabcb7c780a8abcd6757f",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
-  "generated_at": "2026-11-20 21:12 UTC",
+  "generated_at": "2026-11-21 11:45 UTC",
   "files_total": 1482,
   "code_files": 1140,
-  "code_lines": 185471,
+  "code_lines": 185552,
   "schema_ref": "`docs/contexto/supabase/` (snapshot do banco real)"
  },
  "version": "1.3.2",
- "facts_hash": "7fb1c43657bca87a",
+ "facts_hash": "47b47a9512392788",
  "stack": {
   "frameworks": [
    "React + Vite",
@@ -23582,7 +23582,9 @@
      "transportadoras",
      "user_achievements",
      "user_levels",
-     "user_roles"
+     "user_roles",
+     "webauthn_challenges",
+     "webauthn_credentials"
     ],
     "invokes_transitive": [
      "execute-protocol",
@@ -23594,7 +23596,7 @@
      "add_user_xp",
      "get_dashboard_metrics"
     ],
-    "deps_count": 110
+    "deps_count": 111
    },
    {
     "path": "/admin/adr",
@@ -29078,7 +29080,7 @@
   {
    "module": "src/components",
    "files": 297,
-   "lines": 49352,
+   "lines": 49433,
    "tables": [
     "audit_logs",
     "bio_sync_alert_rules",
@@ -34008,6 +34010,10 @@
    {
     "file": "src/components/common/RealtimeStatus.tsx",
     "msg": "Protocolo de auto-reparo falhou. Verifique logs."
+   },
+   {
+    "file": "src/components/dashboard/BiometricConsentModal.tsx",
+    "msg": "Seu dispositivo não suporta autenticação biométrica (WebAuthn)"
    },
    {
     "file": "src/components/dashboard/LogisticsMapWidget.tsx",
@@ -41759,6 +41765,18 @@
    {
     "file": "src/components/dashboard/BiometricConsentModal.tsx",
     "field": "step",
+    "value": "success",
+    "kind": "compara"
+   },
+   {
+    "file": "src/components/dashboard/BiometricConsentModal.tsx",
+    "field": "step",
+    "value": "scanning",
+    "kind": "compara"
+   },
+   {
+    "file": "src/components/dashboard/BiometricConsentModal.tsx",
+    "field": "step",
     "value": "idle",
     "kind": "compara"
    },
@@ -41916,36 +41934,6 @@
     "file": "src/components/dashboard/LogisticsMapWidget.tsx",
     "field": "tipo",
     "value": "entrega",
-    "kind": "compara"
-   },
-   {
-    "file": "src/components/dashboard/MissionDetail.tsx",
-    "field": "status",
-    "value": "Iniciado",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/dashboard/MissionDetail.tsx",
-    "field": "status",
-    "value": "Processamento",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/dashboard/MissionDetail.tsx",
-    "field": "status",
-    "value": "Transito",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/dashboard/MissionDetail.tsx",
-    "field": "status",
-    "value": "Finalizado",
-    "kind": "escreve"
-   },
-   {
-    "file": "src/components/dashboard/MissionDetail.tsx",
-    "field": "status",
-    "value": "entregue",
     "kind": "compara"
    },
    {
@@ -46433,6 +46421,12 @@
     "body": "playSuccess(); const doc = new jsPDF(); // Header doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text(\"MANIFESTO DE COLETA NEXUS\", 20, 25); doc.setFontSize(10); doc.text(`ID DO PROTOCOLO: ${pickup.numero_coleta}`, 20, 33); // Body doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text(\"DADOS DA OPERAÇÃO\", 20, 55); autoTable(doc, { startY: 60, head: [['Campo', 'Informação']], body: [ ['Fornecedor', pickup.fornecedores?.nome_ …"
    },
    {
+    "file": "src/components/dashboard/BiometricConsentModal.tsx",
+    "name": "scanButtonLabel",
+    "params": "step: ScanStep, supported: boolean | null",
+    "body": "if (supported === false) return \"NÃO SUPORTADO\"; if (step === \"scanning\") return \"PROCESSANDO...\"; if (step === \"success\") return \"SUCESSO!\"; if (supported === null) return \"VERIFICANDO...\"; return \"INICIAR SINCRONIZAÇÃO\";"
+   },
+   {
     "file": "src/components/freight/SmartCarrierSelector.tsx",
     "name": "formatCurrency",
     "params": "value: number",
@@ -46797,14 +46791,6 @@
    {
     "file": "src/components/common/RealtimeBadge.tsx",
     "line": "const timer = setTimeout(() => setPulse(false), 2000);"
-   },
-   {
-    "file": "src/components/dashboard/BiometricConsentModal.tsx",
-    "line": "await new Promise(r => setTimeout(r, 1000));"
-   },
-   {
-    "file": "src/components/dashboard/BiometricConsentModal.tsx",
-    "line": "await new Promise(r => setTimeout(r, 2500));"
    },
    {
     "file": "src/components/dashboard/FavoriteMetricsBar.tsx",
@@ -56589,7 +56575,6 @@
      "entregue": [
       "compara:src/components/analytics/OperationalPulse.tsx",
       "compara:src/components/common/ActivityTimeline.tsx",
-      "compara:src/components/dashboard/MissionDetail.tsx",
       "compara:src/hooks/analytics/useExecutiveMetrics.tsx",
       "compara:src/hooks/analytics/useKPIBenchmark.tsx",
       "compara:src/pages/CalendarioLogistico.tsx",
@@ -56736,18 +56721,6 @@
      ],
      "undefined": [
       "compara:src/components/dashboard/LiveStatusBar.tsx"
-     ],
-     "Iniciado": [
-      "escreve:src/components/dashboard/MissionDetail.tsx"
-     ],
-     "Processamento": [
-      "escreve:src/components/dashboard/MissionDetail.tsx"
-     ],
-     "Transito": [
-      "escreve:src/components/dashboard/MissionDetail.tsx"
-     ],
-     "Finalizado": [
-      "escreve:src/components/dashboard/MissionDetail.tsx"
      ],
      "operational": [
       "compara:src/components/dashboard/SystemHealthWidget.tsx",
@@ -57164,10 +57137,10 @@
      "scanning": [
       "compara:src/components/dashboard/BiometricConsentModal.tsx"
      ],
-     "idle": [
+     "success": [
       "compara:src/components/dashboard/BiometricConsentModal.tsx"
      ],
-     "success": [
+     "idle": [
       "compara:src/components/dashboard/BiometricConsentModal.tsx"
      ],
      "start": [
@@ -63889,34 +63862,6 @@
    },
    {
     "kind": "status",
-    "msg": "valor `Iniciado` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/dashboard/MissionDetail.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `Processamento` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/dashboard/MissionDetail.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `Transito` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/dashboard/MissionDetail.tsx"
-    ]
-   },
-   {
-    "kind": "status",
-    "msg": "valor `Finalizado` para `status` usado no código não existe em nenhum enum do banco/TS",
-    "where": [
-     "escreve:src/components/dashboard/MissionDetail.tsx"
-    ]
-   },
-   {
-    "kind": "status",
     "msg": "valor `operational` para `status` usado no código não existe em nenhum enum do banco/TS",
     "where": [
      "compara:src/components/dashboard/SystemHealthWidget.tsx",
@@ -69442,11 +69387,24 @@
   },
   "src/components/dashboard/BiometricConsentModal.tsx": {
    "path": "src/components/dashboard/BiometricConsentModal.tsx",
-   "lines": 133,
+   "lines": 192,
    "exports": [
     "function BiometricConsentModal"
    ],
+   "errors": [
+    "Seu dispositivo não suporta autenticação biométrica (WebAuthn)"
+   ],
    "status_values": [
+    {
+     "field": "step",
+     "value": "scanning",
+     "kind": "compara"
+    },
+    {
+     "field": "step",
+     "value": "success",
+     "kind": "compara"
+    },
     {
      "field": "step",
      "value": "scanning",
@@ -69478,9 +69436,12 @@
      "kind": "compara"
     }
    ],
-   "temporal": [
-    "await new Promise(r => setTimeout(r, 1000));",
-    "await new Promise(r => setTimeout(r, 2500));"
+   "calc_fns": [
+    {
+     "name": "scanButtonLabel",
+     "params": "step: ScanStep, supported: boolean | null",
+     "body": "if (supported === false) return \"NÃO SUPORTADO\"; if (step === \"scanning\") return \"PROCESSANDO...\"; if (step === \"success\") return \"SUCESSO!\"; if (supported === null) return \"VERIFICANDO...\"; return \"INICIAR SINCRONIZAÇÃO\";"
+    }
    ]
   },
   "src/components/dashboard/DraggableDashboard.tsx": {
@@ -69678,36 +69639,11 @@
   },
   "src/components/dashboard/MissionDetail.tsx": {
    "path": "src/components/dashboard/MissionDetail.tsx",
-   "lines": 245,
+   "lines": 267,
    "exports": [
     "function MissionDetail"
    ],
    "status_values": [
-    {
-     "field": "status",
-     "value": "Iniciado",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "Processamento",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "Transito",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "Finalizado",
-     "kind": "escreve"
-    },
-    {
-     "field": "status",
-     "value": "entregue",
-     "kind": "compara"
-    },
     {
      "field": "tipo",
      "value": "entrega",
@@ -88345,10 +88281,20 @@
   }
  },
  "git": {
-  "sha": "3d7affa0fb2477f6283c038347f64106a3bd7220",
+  "sha": "24dbf9192eef98ce5ddeabcb7c780a8abcd6757f",
   "branch": "main",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "commits": [
+   {
+    "sha": "24dbf91",
+    "date": "2026-11-21",
+    "author": "adm01-debug",
+    "subject": "feat: (#231)",
+    "files": [
+     "src/components/dashboard/BiometricConsentModal.tsx",
+     "src/components/dashboard/MissionDetail.tsx"
+    ]
+   },
    {
     "sha": "3d7affa",
     "date": "2026-11-20",
@@ -88840,15 +88786,6 @@
     "files": [
      ".github/workflows/branch-hygiene-audit.yml"
     ]
-   },
-   {
-    "sha": "13eb1a1",
-    "date": "2026-11-19",
-    "author": "adm01-debug",
-    "subject": "chore: arquiva mapa de integracao 20261112 como registro historico (#200)",
-    "files": [
-     "docs/agentes/mapa-integracao-20261112.md"
-    ]
    }
   ],
   "hot_files": [
@@ -88867,6 +88804,10 @@
    [
     "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
     4
+   ],
+   [
+    "src/components/dashboard/MissionDetail.tsx",
+    2
    ],
    [
     "docs/pendencias/03-01-dora-metrics-literal.md",
@@ -88926,10 +88867,6 @@
    ],
    [
     "docs/pendencias/02-07-fretes-internos-deleted-at.md",
-    2
-   ],
-   [
-    "docs/pendencias/02-08-ranking.md",
     2
    ]
   ]

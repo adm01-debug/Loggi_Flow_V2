@@ -2,7 +2,7 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "nos": 748,
- "arestas": 3090,
+ "arestas": 3091,
  "hubs": [
   {
    "arquivo": "src/components/ui/button.tsx",
@@ -252,14 +252,14 @@
    "importado_por": 36
   },
   {
+   "modulo": "hooks/auth",
+   "depende_de": 3,
+   "importado_por": 22
+  },
+  {
    "modulo": "components/layout",
    "depende_de": 22,
    "importado_por": 2
-  },
-  {
-   "modulo": "hooks/auth",
-   "depende_de": 3,
-   "importado_por": 21
   },
   {
    "modulo": "hooks/logistics",
@@ -297,14 +297,14 @@
    "importado_por": 8
   },
   {
+   "modulo": "components/dashboard",
+   "depende_de": 10,
+   "importado_por": 1
+  },
+  {
    "modulo": "hooks/notifications",
    "depende_de": 4,
    "importado_por": 7
-  },
-  {
-   "modulo": "components/dashboard",
-   "depende_de": 9,
-   "importado_por": 1
   },
   {
    "modulo": "hooks/data",
