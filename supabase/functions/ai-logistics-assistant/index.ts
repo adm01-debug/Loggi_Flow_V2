@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { getWeatherForRoutes } from "../_shared/weather.ts";
 
 // Type definitions for contextual data
 interface Transportadora {
@@ -20,6 +21,8 @@ interface Entrega {
   transportadoras: { nome_fantasia: string } | null;
   valor_frete?: number;
   created_at?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 interface Ocorrencia {
@@ -92,7 +95,7 @@ export const handler = async (req: Request) => {
       supabase
         .from("entregas")
         .select(
-          "id, status, previsao_entrega, endereco_entrega, transportadoras(nome_fantasia)",
+          "id, status, previsao_entrega, endereco_entrega, latitude, longitude, transportadoras(nome_fantasia)",
         )
         .in("status", ["despachado", "em_transito", "saiu_entrega"])
         .limit(50),
@@ -130,13 +133,34 @@ export const handler = async (req: Request) => {
       (e: Entrega) => e.previsao_entrega && new Date(e.previsao_entrega) < now,
     ).length;
 
-    // Contexto externo real (clima/tráfego) quando as functions estiverem disponíveis;
-    // mantém rótulo honesto enquanto não houver dados dinâmicos.
-    const contextAmbiental = {
+    // 3.24 — contexto externo real (clima) via OpenWeather para as entregas ativas.
+    // Query inclui latitude/longitude para alimentar rotas com coordenadas.
+    let contextAmbiental: {
+      clima: string;
+      trafego: string;
+      data_analise: string;
+      pontos_analisados?: number;
+    } = {
       clima: "Não avaliado no momento",
       trafego: "Não avaliado no momento",
       data_analise: now.toLocaleString("pt-BR"),
     };
+
+    if (entregasAtivas.length > 0) {
+      const coords = entregasAtivas
+        .filter((e) => e.latitude && e.longitude)
+        .map((e) => ({
+          lat: Number(e.latitude),
+          lon: Number(e.longitude),
+        }));
+      const weather = await getWeatherForRoutes(coords);
+      contextAmbiental = {
+        clima: weather.summary,
+        trafego: "Não avaliado no momento",
+        data_analise: now.toLocaleString("pt-BR"),
+        pontos_analisados: weather.analyzedCount,
+      };
+    }
 
     const systemPrompt = `Você é o LOGI-GPT v5.0, o Assistente Logístico de Elite da LogiFlow. 
     Seu objetivo é fornecer INSIGHTS PROATIVOS e PREVISÕES DE ATRASO com precisão cirúrgica.
