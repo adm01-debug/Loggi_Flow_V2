@@ -15,6 +15,7 @@ import {
   BarChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNexusHealth } from "@/hooks/system/useNexusHealth";
 import { motion, AnimatePresence } from "framer-motion";
 import { RecentAlert } from "@/hooks/analytics/useDashboardMetrics";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,13 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
       "nexus-alert-threshold",
       5,
     );
+
+    const { latency } = useNexusHealth();
+
+    const processingLabel = React.useMemo(() => {
+      if (latency === null) return "Processamento em Tempo Real";
+      return `Processamento em Tempo Real (${latency}ms latência)`;
+    }, [latency]);
 
     // Delta Filter Logic
     const alerts = React.useMemo(() => {
@@ -416,7 +424,7 @@ const AlertsPanel = React.forwardRef<HTMLDivElement, AlertsPanelProps>(
                   Diagnóstico Total
                 </span>
                 <p className="text-xs font-bold text-white/60 tracking-widest uppercase">
-                  Processamento em Tempo Real (8ms latência)
+                  {processingLabel}
                 </p>
               </div>
 
