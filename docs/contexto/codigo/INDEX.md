@@ -1,7 +1,7 @@
 # Contexto do projeto para agentes de IA
 
 GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.
-Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `a33c6754a88d67360406d4401877f4c9eebe525a` (2026-11-21T13:10:46-03:00).
+Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md Gere local com `node scripts/ai-context/gerar.mjs`. Commit-base: `97192d5b1f5346a4611114937162a6620c6c6a3b` (2026-11-21T13:26:49-03:00).
 
 ## Como usar (leia antes de planejar ou executar qualquer tarefa)
 1. **Tela/rota/menu** → `rotas.json` (url/vista/menu → arquivo → hooks → tabelas → edges; `rotas_http_backend` para APIs) e `modulos.json` (módulo inteiro + dependências entre módulos).
@@ -36,7 +36,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 |---|---|
 | arquivos_total | 1473 |
 | arquivos_codigo | 879 |
-| linhas_codigo | 169805 |
+| linhas_codigo | 169820 |
 | rotas | 61 |
 | rotas_http_backend | 0 |
 | vistas_por_id | 0 |
@@ -274,7 +274,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - possiveis_segredos_no_codigo: 2 — ex.: tests/security/integrations-access.spec.ts:12, tests/security/rls-access.spec.ts:13
 
 ## Grafo de código (graphify)
-- 8558 nós · 21057 arestas · 858 comunidades · grafo do commit `a33c6754`
+- 8558 nós · 21057 arestas · 858 comunidades · grafo do commit `97192d5b`
 - comunidades maiores: cn (174), App.tsx (169), db-observability/index.ts (130), Coletas.tsx (129), input.tsx (128), card.tsx (112), client.ts (111), ui/index.ts (106), react (105), Dicionário de dados — Loggi Flow V2 (gerado do catálogo em 2026-08-31) (103), badge.tsx (94), celebrationSounds.ts (88)
 - símbolos mais chamados: cn() (src/lib/utils.ts), useAuth() (src/hooks/auth/useAuth.tsx), apiGet() (supabase/functions/rodonaves-api/index.ts), q() (scripts/supabase_snapshot/snapshot.py), .write() (scripts/regras_negocio/test_generate.py), .publish() (scripts/regras_negocio/test_publish.py), .git() (scripts/regras_negocio/test_publish.py), .remote() (scripts/regras_negocio/test_publish.py), apiMutate() (supabase/functions/rodonaves-api/index.ts), getAudioContext() (src/utils/celebrationSounds.ts), .collect() (scripts/supabase_snapshot/test_snapshot.py), playNote() (src/utils/celebrationSounds.ts)
 - consulta local: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<X>"`
@@ -400,6 +400,7 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - CHANGELOG topo: [1.1.0] - 2026-09-02
 
 ## Últimos commits
+- 2026-11-21 `97192d5` fix: estrategia Nexus com pesos reais e select funcional (3.19) (#252)
 - 2026-11-21 `a33c675` fix: clima real OpenWeather nas functions de IA (03-24/03-25) (#251)
 - 2026-11-21 `2c38634` fix: remove fallback zerado do AnalyticsCharts (03-30) (#250)
 - 2026-11-21 `f8c8fad` chore: regenera quality-gate-report com dados reais (03-29) (#249)
@@ -414,7 +415,6 @@ Os JSONs são grandes: filtre com `grep`/`jq` pelo caminho/arquivo/tabela da sua
 - 2026-11-21 `73b5d8c` fix: substitui simulacoes de Alertas Preditos e Economia Garantida por dados reais (#239)
 - 2026-11-21 `81e9459` docs: marca 03-12, 03-13 e 03-14 (Fase B) como concluidos (#238)
 - 2026-11-21 `df04cb6` fix: dados reais em custos/docs da coleta e QR real no PDF de etiquetas (#237)
-- 2026-11-21 `546b1cc` docs: marca 03-10 e 03-11 (Fase B) como concluidos via PR #235 (#236)
 
 ## Arquivos deste diretório
 - `docs/contexto/codigo/rotas.json`

@@ -2,11 +2,16 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "a33c6754a88d67360406d4401877f4c9eebe525a",
+  "commit": "97192d5b1f5346a4611114937162a6620c6c6a3b",
   "branch": "main",
-  "data_commit": "2026-11-21T13:10:46-03:00",
+  "data_commit": "2026-11-21T13:26:49-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "97192d5",
+    "data": "2026-11-21",
+    "assunto": "fix: estrategia Nexus com pesos reais e select funcional (3.19) (#252)"
+   },
    {
     "sha": "a33c675",
     "data": "2026-11-21",
@@ -126,11 +131,6 @@
     "sha": "fd6431b",
     "data": "2026-11-20",
     "assunto": "docs: fecha 03-19/03-20 (Fase B) com evidencia da PR #226 (#227)"
-   },
-   {
-    "sha": "e4392b7",
-    "data": "2026-11-20",
-    "assunto": "fix: remove simulacao de cotacao e torna retentativa real (#226)"
    }
   ],
   "arquivos_mudados_7d": 334,
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 178
+    "commits": 179
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1473,
   "arquivos_codigo": 879,
-  "linhas_codigo": 169805,
+  "linhas_codigo": 169820,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 31061
+   "linhas": 31076
   },
   "src/services": {
    "arquivos": 5,
@@ -598,7 +598,7 @@
   },
   {
    "arquivo": "src/pages/CotacaoMultiCanal.tsx",
-   "linhas": 967
+   "linhas": 982
   },
   {
    "arquivo": "scripts/maintenance/lib.mjs",

@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a33c6754a8` · branch `main` · 2026-11-21 16:11 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `97192d5b1f` · branch `main` · 2026-11-21 16:27 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1507,12 +1507,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `const tolerancia = item.valor * 0.02; // 2% tolerance` | `src/pages/ConciliacaoAutomatica.tsx` |
 | `transition={{ delay: i * 0.03 }}` | `src/pages/Conquistas.tsx` |
 | `Bitrix24 para encontrar discrepâncias de até 50%.` | `src/pages/CotacaoFrete.tsx` |
-| `// Weight: 70% Price, 30% Deadline` | `src/pages/CotacaoMultiCanal.tsx` |
-| `Perf: 10%` | `src/pages/CotacaoMultiCanal.tsx` |
-| `Prazo: 20%` | `src/pages/CotacaoMultiCanal.tsx` |
-| `Preço: 70%` | `src/pages/CotacaoMultiCanal.tsx` |
-| `a.valor! * 0.7 + (a.prazo_dias \|\| 0) * 50 * 0.3;` | `src/pages/CotacaoMultiCanal.tsx` |
-| `b.valor! * 0.7 + (b.prazo_dias \|\| 0) * 50 * 0.3;` | `src/pages/CotacaoMultiCanal.tsx` |
 | `Custo superior a 20% da média histórica` | `src/pages/InteligenciaFrete.tsx` |
 | `Nenhum frete acima de 20% da média regional no mês.` | `src/pages/InteligenciaFrete.tsx` |
 | `~30% com consolidação` | `src/pages/InteligenciaFrete.tsx` |
@@ -2430,7 +2424,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | - ATRASADO: dias úteis decorridos desde a emissão > prazo previsto, | `src/lib/rodonaves/freightHealth.ts` |
 | Guarda de segurança: no máximo 10 anos de iteração. | `src/lib/rodonaves/freightHealth.ts` |
 | lançar exceção — o painel nunca deve quebrar por dado sujo do banco. | `src/lib/rodonaves/latencyTrend.ts` |
-| Weight: 70% Price, 30% Deadline | `src/pages/CotacaoMultiCanal.tsx` |
 | P18: o RPC update_user_streak estava retornando 403 (permissão negada | `src/services/api/authService.ts` |
 | Resume if suspended (required for user interaction policy) | `src/utils/celebrationSounds.ts` |
 | Aceita apenas role 'authenticated' (com sub) ou 'service_role' — o anon key é | `supabase/functions/_shared/auth.ts` |

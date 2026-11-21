@@ -5620,7 +5620,7 @@
     "CotacaoMultiCanal"
    ],
    "export_default": "CotacaoMultiCanal",
-   "linhas": 967,
+   "linhas": 982,
    "dominio": "pages",
    "hooks_locais": [
     "useCotacoesMulticanal",
