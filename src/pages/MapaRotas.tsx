@@ -19,7 +19,6 @@ import {
 import { MapboxMap, MapMarker } from "@/components/map";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { cn } from "@/lib/utils";
-import { CENTRO_DISTRIBUICAO as ORIGIN_COORDINATES } from "@/lib/centroDistribuicao";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
@@ -49,7 +48,10 @@ const filterConfig: FilterConfig<DeliveryPoint> = {
 
 export default function MapaRotas() {
   const deliveryRoutes = useDeliveryRoutes();
-  const routes = useMemo(() => deliveryRoutes?.data || [], [deliveryRoutes?.data]);
+  const routes = useMemo(
+    () => deliveryRoutes?.data || [],
+    [deliveryRoutes?.data],
+  );
 
   const [showRouteLines] = useState(true);
   const [mapStyle] = useState<"dark" | "satellite">("dark");
@@ -66,8 +68,8 @@ export default function MapaRotas() {
     { id: "1", center: [-46.6333, -23.5505], radius: 1000, severity: "high" },
     { id: "2", center: [-46.8, -23.6], radius: 1000, severity: "medium" },
   ]);
-  const [lastSync, setLastSync] = useState(new Date());
-  const [isLiveData, setIsLiveData] = useState(true);
+  const [lastSync] = useState<Date>(new Date());
+  const [isLiveData] = useState<boolean>(true);
   const [, setBioData] = useState<{
     heart_rate: number;
     fatigue_index: string;
@@ -181,19 +183,6 @@ export default function MapaRotas() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    setIsLiveData(timeTravelValue >= 95);
-    if (timeTravelValue >= 95) {
-      setLastSync(new Date());
-    } else {
-      const historyDate = new Date();
-      historyDate.setMinutes(
-        historyDate.getMinutes() - (100 - timeTravelValue),
-      );
-      setLastSync(historyDate);
-    }
-  }, [timeTravelValue]);
-
   const points: DeliveryPoint[] = useMemo(
     () =>
       (routes || []).map((r, i) => ({
@@ -263,36 +252,21 @@ export default function MapaRotas() {
     });
   };
 
-  const mapMarkers: MapMarker[] = useMemo(() => {
-    const isHistorical = timeTravelValue < 95;
-    return filteredData
-      .filter((p) => p.lat && p.lng)
-      .map((p) => {
-        let lat = p.lat!;
-        let lng = p.lng!;
-        if (
-          isHistorical &&
-          (p.status === "em_transito" || p.status === "despachado")
-        ) {
-          const factor = (100 - timeTravelValue) / 100;
-          lat =
-            ORIGIN_COORDINATES.lat +
-            (lat - ORIGIN_COORDINATES.lat) * (1 - factor);
-          lng =
-            ORIGIN_COORDINATES.lng +
-            (lng - ORIGIN_COORDINATES.lng) * (1 - factor);
-        }
-        return {
+  const mapMarkers: MapMarker[] = useMemo(
+    () =>
+      filteredData
+        .filter((p) => p.lat && p.lng)
+        .map((p) => ({
           id: p.id,
-          lat,
-          lng,
+          lat: p.lat!,
+          lng: p.lng!,
           isAnomaly: p.order % 5 === 0,
           label: `#${p.order} — ${p.address}`,
           color: p.order % 5 === 0 ? "#ef4444" : getStatusColor(p.status),
           popupHTML: `<div>UNIT_${p.order}</div>`,
-        };
-      });
-  }, [filteredData, timeTravelValue]);
+        })),
+    [filteredData],
+  );
 
   return (
     <MainLayout>
@@ -438,7 +412,6 @@ export default function MapaRotas() {
                             (log.type === "crit" && "bg-rose-500") ||
                               (log.type === "warn" && "bg-amber-500") ||
                               "bg-cyan-500/20",
-
                           )}
                         />
                         <div className="flex-1 space-y-2">
