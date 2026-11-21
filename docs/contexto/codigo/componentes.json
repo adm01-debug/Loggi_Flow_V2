@@ -402,7 +402,7 @@
     "PickupConference"
    ],
    "export_default": null,
-   "linhas": 301,
+   "linhas": 292,
    "dominio": "components/coletas",
    "hooks_locais": [
     "useAudioFeedback",
@@ -1419,7 +1419,7 @@
     "NegotiationAssistant"
    ],
    "export_default": null,
-   "linhas": 51,
+   "linhas": 77,
    "dominio": "components/freight",
    "hooks_locais": [],
    "tabelas": [],
@@ -5620,7 +5620,7 @@
     "CotacaoMultiCanal"
    ],
    "export_default": "CotacaoMultiCanal",
-   "linhas": 959,
+   "linhas": 967,
    "dominio": "pages",
    "hooks_locais": [
     "useCotacoesMulticanal",

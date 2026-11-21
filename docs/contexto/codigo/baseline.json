@@ -2,11 +2,21 @@
  "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
  "format_version": 2,
  "git": {
-  "commit": "a1e670f76fffb12310c37655e8360140939e61f5",
+  "commit": "e7cd1b44a791103793314c68294fd3f3c49aaf11",
   "branch": "main",
-  "data_commit": "2026-11-21T09:14:30-03:00",
+  "data_commit": "2026-11-21T09:27:26-03:00",
   "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
   "ultimos_commits": [
+   {
+    "sha": "e7cd1b4",
+    "data": "2026-11-21",
+    "assunto": "fix: dados reais em NegotiationAssistant e conferencia honesta sem OCR simulado (#235)"
+   },
+   {
+    "sha": "dda0a82",
+    "data": "2026-11-21",
+    "assunto": "docs: marca 03-08 e 03-09 (Fase B) como concluidos via PR #233 (#234)"
+   },
    {
     "sha": "a1e670f",
     "data": "2026-11-21",
@@ -121,19 +131,9 @@
     "sha": "35d65b9",
     "data": "2026-11-20",
     "assunto": "fix(audit): corrige 7 quebras da seção 2 (#211)"
-   },
-   {
-    "sha": "08d5a13",
-    "data": "2026-11-20",
-    "assunto": "docs: aponta docs aspiracionais para a auditoria autoritativa (#210)"
-   },
-   {
-    "sha": "8a28944",
-    "data": "2026-11-20",
-    "assunto": "feat(auth): exige 2FA no login quando conta tem TOTP ativo (#209)"
    }
   ],
-  "arquivos_mudados_7d": 324,
+  "arquivos_mudados_7d": 325,
   "pastas_mais_mudadas_30d": [
    {
     "pasta": "package-lock.json",
@@ -157,10 +157,14 @@
    },
    {
     "pasta": "docs/pendencias/_ordem.md",
-    "mudancas": 7
+    "mudancas": 8
    },
    {
     "pasta": ".github/workflows/types-sync.yml",
+    "mudancas": 6
+   },
+   {
+    "pasta": "src/components/freight",
     "mudancas": 6
    },
    {
@@ -188,11 +192,7 @@
     "mudancas": 5
    },
    {
-    "pasta": "src/components/common",
-    "mudancas": 5
-   },
-   {
-    "pasta": "src/components/freight",
+    "pasta": "src/components/coletas",
     "mudancas": 5
    }
   ],
@@ -210,15 +210,15 @@
     "mudancas": 8
    },
    {
+    "arquivo": "docs/pendencias/_ordem.md",
+    "mudancas": 8
+   },
+   {
     "arquivo": ".github/workflows/ci-nexus.yml",
     "mudancas": 7
    },
    {
     "arquivo": ".github/workflows/ci.yml",
-    "mudancas": 7
-   },
-   {
-    "arquivo": "docs/pendencias/_ordem.md",
     "mudancas": 7
    },
    {
@@ -301,7 +301,7 @@
   "autores_30d": [
    {
     "autor": "adm01-debug",
-    "commits": 161
+    "commits": 163
    },
    {
     "autor": "dependabot[bot]",
@@ -316,7 +316,7 @@
  "contagens": {
   "arquivos_total": 1472,
   "arquivos_codigo": 878,
-  "linhas_codigo": 169195,
+  "linhas_codigo": 169220,
   "rotas": 61,
   "rotas_http_backend": 0,
   "vistas_por_id": 0,
@@ -448,7 +448,7 @@
   },
   "src/components": {
    "arquivos": 297,
-   "linhas": 49588
+   "linhas": 49605
   },
   "src/features": {
    "arquivos": 90,
@@ -476,7 +476,7 @@
   },
   "src/pages": {
    "arquivos": 80,
-   "linhas": 30864
+   "linhas": 30872
   },
   "src/services": {
    "arquivos": 5,
@@ -594,7 +594,7 @@
   },
   {
    "arquivo": "src/pages/CotacaoMultiCanal.tsx",
-   "linhas": 959
+   "linhas": 967
   },
   {
    "arquivo": "src/pages/DashboardExecutivo.tsx",

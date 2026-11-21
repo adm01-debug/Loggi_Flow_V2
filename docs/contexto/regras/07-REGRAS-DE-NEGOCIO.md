@@ -1,6 +1,6 @@
 # 07 · REGRAS DE NEGÓCIO
 
-> Gerado automaticamente por AI Context Sync v1.3.2 · commit `a1e670f76f` · branch `main` · 2026-11-21 12:15 UTC
+> Gerado automaticamente por AI Context Sync v1.3.2 · commit `e7cd1b44a7` · branch `main` · 2026-11-21 12:27 UTC
 > Não edite à mão — regras humanas vão em `manual/`.
 
 ## A. Regras escritas por humanos (`manual/` — prioridade máxima, nunca sobrescrito)
@@ -1479,7 +1479,6 @@ Erros lançados por funções SQL (`RAISE EXCEPTION` = regra de negócio no banc
 | `delay: index * 0.1,` | `src/components/dashboard/TransportadoraRanking.tsx` |
 | `<span>0% Estabilidade</span>` | `src/components/dashboard/XPProgressBar.tsx` |
 | `<span>100% Evolução</span>` | `src/components/dashboard/XPProgressBar.tsx` |
-| `({carrierName}) está 12% abaixo da sua média mensal para este` | `src/components/freight/NegotiationAssistant.tsx` |
 | `transition={{ delay: i * 0.05 }}` | `src/components/freight/QuotationResults.tsx` |
 | `transition={{ delay: index * 0.1 }}` | `src/components/freight/SmartCarrierSelector.tsx` |
 | `// usually resulting in ~20% lower cost for consolidated volume` | `src/components/freight/StrategySimulator.tsx` |
