@@ -95,12 +95,26 @@ serve(async (req) => {
 
       const phone = remoteJid.split('@')[0];
 
-      // 2. Find transportadora by phone
-      const { data: carrier } = await supabaseClient
+      // E.164 validation (014) — digits only, no PostgREST interpolation
+      if (!/^\+?\d{6,15}$/.test(phone)) {
+        return new Response(JSON.stringify({ success: false, error: 'Invalid phone' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+
+      // 2. Find transportadora by phone — jsonb EXACT eq; no .or() interpolation (014)
+      let { data: carrier } = await supabaseClient
         .from('transportadoras')
         .select('id, nome_fantasia')
-        .or(`contato_whatsapp.ilike.%${phone}%,non_api_config->>phone.eq.${phone}`)
-        .single();
+        .filter('non_api_config->>phone', 'eq', phone)
+        .maybeSingle();
+
+      // fallback: contato_whatsapp ilike (safe — phone is digits-only)
+      if (!carrier) {
+        ({ data: carrier } = await supabaseClient
+          .from('transportadoras')
+          .select('id, nome_fantasia')
+          .ilike('contato_whatsapp', `%${phone}%`)
+          .maybeSingle());
+      }
 
       if (!carrier) {
         log.info('No carrier found for phone:', phone);

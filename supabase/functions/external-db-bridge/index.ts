@@ -1,9 +1,16 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
+import { requireEnum, requireString, ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 
 const SLOW_QUERY_THRESHOLD_MS = 3000;
 const VERY_SLOW_QUERY_THRESHOLD_MS = 8000;
+const ALLOWED_ACTIONS = ["select", "insert", "update", "delete", "rpc"] as const;
+const ALLOWED_TABLES = (Deno.env.get("EXTERNAL_DB_ALLOWED_TABLES") ?? "")
+  .split(",").map((s) => s.trim()).filter(Boolean);
+const ALLOWED_RPCS = (Deno.env.get("EXTERNAL_DB_ALLOWED_RPCS") ?? "")
+  .split(",").map((s) => s.trim()).filter(Boolean);
+const ALLOWED_OPERATORS = new Set(["eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "in", "is"]);
 
 interface TelemetryMeta {
   operation: string;
@@ -68,7 +75,7 @@ function emitTelemetry(meta: TelemetryMeta) {
           })
           .then(({ error: insertErr }) => {
             if (insertErr)
-              log.warn("[telemetry-persist] Insert failed:", insertErr.message);
+              log.warn("[telemetry-persist] Insert failed:", { error: insertErr.message });
           });
       }
     } catch (_e) {
@@ -119,6 +126,32 @@ Deno.serve(async (req) => {
       orderBy,
       ascending = true,
     } = body;
+    requireEnum(body, "action", ALLOWED_ACTIONS);
+    if (action === "rpc") {
+      requireString(body, "rpcName");
+      if (ALLOWED_RPCS.length > 0 && !ALLOWED_RPCS.includes(body.rpcName)) {
+        throw new ValidationError("rpcName", `rpcName must be one of: ${ALLOWED_RPCS.join(", ")}`);
+      }
+    } else {
+      requireString(body, "table");
+      if (ALLOWED_TABLES.length > 0 && !ALLOWED_TABLES.includes(body.table)) {
+        throw new ValidationError("table", `table must be one of: ${ALLOWED_TABLES.join(", ")}`);
+      }
+    }
+    if (!Array.isArray(filters)) {
+      throw new ValidationError("filters", "filters must be an array");
+    }
+    for (const f of filters) {
+      if (!f || typeof f !== "object") throw new ValidationError("filters", "each filter must be an object");
+      const op = (f as Record<string, unknown>).operator;
+      const col = (f as Record<string, unknown>).column;
+      if (typeof op !== "string" || !ALLOWED_OPERATORS.has(op)) {
+        throw new ValidationError("filters", `filter operator must be one of: ${[...ALLOWED_OPERATORS].join(", ")}`);
+      }
+      if (typeof col !== "string" || col.trim() === "") {
+        throw new ValidationError("filters", "filter column must be a non-empty string");
+      }
+    }
 
     // Extract user ID from auth header
     let userId: string | null = null;
@@ -186,7 +219,8 @@ Deno.serve(async (req) => {
       });
 
       if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        log.warn(`[external-db-bridge] ${action} failed: ${error.message}`);
+        return new Response(JSON.stringify({ error: "UPSTREAM_ERROR" }), {
           status: 400,
           headers,
         });
@@ -215,7 +249,8 @@ Deno.serve(async (req) => {
       });
 
       if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        log.warn(`[external-db-bridge] ${action} failed: ${error.message}`);
+        return new Response(JSON.stringify({ error: "UPSTREAM_ERROR" }), {
           status: 400,
           headers,
         });
@@ -248,7 +283,8 @@ Deno.serve(async (req) => {
       });
 
       if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        log.warn(`[external-db-bridge] ${action} failed: ${error.message}`);
+        return new Response(JSON.stringify({ error: "UPSTREAM_ERROR" }), {
           status: 400,
           headers,
         });
@@ -281,7 +317,8 @@ Deno.serve(async (req) => {
       });
 
       if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        log.warn(`[external-db-bridge] ${action} failed: ${error.message}`);
+        return new Response(JSON.stringify({ error: "UPSTREAM_ERROR" }), {
           status: 400,
           headers,
         });
@@ -310,7 +347,8 @@ Deno.serve(async (req) => {
       });
 
       if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        log.warn(`[external-db-bridge] ${action} failed: ${error.message}`);
+        return new Response(JSON.stringify({ error: "UPSTREAM_ERROR" }), {
           status: 400,
           headers,
         });
@@ -327,9 +365,12 @@ Deno.serve(async (req) => {
       { status: 400, headers }
     );
   } catch (err) {
-    log.error("[external-db-bridge] Error:", err);
+    if (err instanceof ValidationError) {
+      return validationErrorResponse(err, headers);
+    }
+    log.error("[external-db-bridge] Error:", { error: String(err) });
     return new Response(
-      JSON.stringify({ error: err.message || "Internal server error" }),
+      JSON.stringify({ error: "INTERNAL_ERROR" }),
       { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
     );
   }
