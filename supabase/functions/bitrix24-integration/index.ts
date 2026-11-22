@@ -33,7 +33,19 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const bitrixWebhookUrl = Deno.env.get("BITRIX24_WEBHOOK_URL");
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // ENV tem precedência; sem ela, usa o webhook_url salvo pela tela de
+    // configuração em bitrix_sync_config.
+    let bitrixWebhookUrl = Deno.env.get("BITRIX24_WEBHOOK_URL");
+    if (!bitrixWebhookUrl) {
+      const { data: cfg } = await supabase
+        .from("bitrix_sync_config")
+        .select("webhook_url")
+        .eq("is_active", true)
+        .maybeSingle();
+      if (cfg?.webhook_url) bitrixWebhookUrl = cfg.webhook_url;
+    }
 
     if (!bitrixWebhookUrl) {
       return new Response(
@@ -48,7 +60,6 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
     const body: BitrixRequest = await req.json();
 
     switch (body.action) {
@@ -350,7 +361,9 @@ serve(async (req) => {
                 OWNER_TYPE_ID: 2, // Deal
                 OWNER_ID: 1, // Default CCO Deal or similar
                 TYPE_ID: 2, // Call/Meeting/Task
-                SUBJECT: `BIO_SYNC ALERT: ${severity === "crit" ? "CRITICAL" : "WARNING"}`,
+                SUBJECT: `BIO_SYNC ALERT: ${
+                  severity === "crit" ? "CRITICAL" : "WARNING"
+                }`,
                 COMPLETED: "N",
                 PRIORITY: severity === "crit" ? 2 : 1,
                 DESCRIPTION: `${message}\nVehicle: ${vehicle_id}\nDriver: ${driver_id}\nTime: ${new Date().toLocaleString()}`,
