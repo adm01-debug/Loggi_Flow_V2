@@ -5,11 +5,18 @@ import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface WhatsAppRequest {
-  action: "send_status_update" | "send_delivery_notification" | "send_collection_alert" | "send_delay_alert" | "send_normalization_alert" | "send_custom";
+  action:
+    | "send_status_update"
+    | "send_delivery_notification"
+    | "send_collection_alert"
+    | "send_delay_alert"
+    | "send_normalization_alert"
+    | "send_custom";
   phone: string;
   entrega_id?: string;
   coleta_id?: string;
@@ -25,13 +32,21 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const aTicketApiKey = Deno.env.get("ATICKET_API_KEY");
-    const aTicketApiUrl = Deno.env.get("ATICKET_API_URL") || "https://api.a-ticket.com.br/v1";
+    const evolutionApiUrl = Deno.env.get("EVOLUTION_API_URL");
+    const evolutionApiKey = Deno.env.get("EVOLUTION_API_KEY");
+    const evolutionInstance =
+      Deno.env.get("EVOLUTION_INSTANCE_NAME") || "PRINCIPAL";
 
-    if (!aTicketApiKey) {
+    if (!evolutionApiUrl || !evolutionApiKey) {
       return new Response(
-        JSON.stringify({ success: false, error: "ATICKET_API_KEY not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          success: false,
+          error: "EVOLUTION_API_URL/EVOLUTION_API_KEY not configured",
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -41,7 +56,10 @@ serve(async (req) => {
     if (!body.phone) {
       return new Response(
         JSON.stringify({ success: false, error: "Phone number is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -55,21 +73,32 @@ serve(async (req) => {
       case "send_status_update": {
         if (!body.entrega_id) {
           return new Response(
-            JSON.stringify({ success: false, error: "entrega_id required for status updates" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({
+              success: false,
+              error: "entrega_id required for status updates",
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         const { data: entrega, error } = await supabase
           .from("entregas")
-          .select("numero_entrega, status, previsao_entrega, codigo_rastreamento, endereco_entrega")
+          .select(
+            "numero_entrega, status, previsao_entrega, codigo_rastreamento, endereco_entrega",
+          )
           .eq("id", body.entrega_id)
           .single();
 
         if (error || !entrega) {
           return new Response(
             JSON.stringify({ success: false, error: "Delivery not found" }),
-            { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+              status: 404,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
@@ -88,11 +117,16 @@ serve(async (req) => {
 
         const statusLabel = statusLabels[entrega.status] || entrega.status;
         templateName = "status_update";
-        message = `🚚 *LogiFlow - Atualização de Entrega*\n\n` +
+        message =
+          `🚚 *LogiFlow - Atualização de Entrega*\n\n` +
           `Pedido: *${entrega.numero_entrega}*\n` +
           `Status: *${statusLabel}*\n` +
-          (entrega.codigo_rastreamento ? `Rastreamento: ${entrega.codigo_rastreamento}\n` : "") +
-          (entrega.previsao_entrega ? `Previsão: ${formatDate(entrega.previsao_entrega)}\n` : "") +
+          (entrega.codigo_rastreamento
+            ? `Rastreamento: ${entrega.codigo_rastreamento}\n`
+            : "") +
+          (entrega.previsao_entrega
+            ? `Previsão: ${formatDate(entrega.previsao_entrega)}\n`
+            : "") +
           `\nAcompanhe em tempo real pelo nosso portal de rastreamento.`;
         break;
       }
@@ -101,25 +135,34 @@ serve(async (req) => {
         if (!body.entrega_id) {
           return new Response(
             JSON.stringify({ success: false, error: "entrega_id required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         const { data: entrega } = await supabase
           .from("entregas")
-          .select("numero_entrega, recebedor, data_entrega_efetiva, endereco_entrega")
+          .select(
+            "numero_entrega, recebedor, data_entrega_efetiva, endereco_entrega",
+          )
           .eq("id", body.entrega_id)
           .single();
 
         if (!entrega) {
           return new Response(
             JSON.stringify({ success: false, error: "Delivery not found" }),
-            { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+              status: 404,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         templateName = "delivery_confirmed";
-        message = `✅ *LogiFlow - Entrega Confirmada*\n\n` +
+        message =
+          `✅ *LogiFlow - Entrega Confirmada*\n\n` +
           `Pedido: *${entrega.numero_entrega}*\n` +
           `Entregue em: *${formatDate(entrega.data_entrega_efetiva)}*\n` +
           (entrega.recebedor ? `Recebedor: ${entrega.recebedor}\n` : "") +
@@ -131,25 +174,34 @@ serve(async (req) => {
         if (!body.coleta_id) {
           return new Response(
             JSON.stringify({ success: false, error: "coleta_id required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         const { data: coleta } = await supabase
           .from("coletas")
-          .select("numero_coleta, data_prevista_coleta, endereco_coleta, status")
+          .select(
+            "numero_coleta, data_prevista_coleta, endereco_coleta, status",
+          )
           .eq("id", body.coleta_id)
           .single();
 
         if (!coleta) {
           return new Response(
             JSON.stringify({ success: false, error: "Collection not found" }),
-            { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+              status: 404,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
 
         templateName = "collection_alert";
-        message = `📦 *LogiFlow - Coleta Agendada*\n\n` +
+        message =
+          `📦 *LogiFlow - Coleta Agendada*\n\n` +
           `Coleta: *${coleta.numero_coleta}*\n` +
           `Data prevista: *${formatDate(coleta.data_prevista_coleta)}*\n` +
           `Endereço: ${coleta.endereco_coleta}\n` +
@@ -159,7 +211,8 @@ serve(async (req) => {
 
       case "send_delay_alert": {
         templateName = "delay_alert";
-        message = `⚠️ *LogiFlow - Alerta de Atraso*\n\n` +
+        message =
+          `⚠️ *LogiFlow - Alerta de Atraso*\n\n` +
           `A remessa *${body.variables?.numero || "N/A"}* está com atraso detectado.\n` +
           `Ação recomendada: Contatar transportadora *${body.variables?.transportadora || "N/A"}*.\n` +
           `Link: https://loggi-flow-v2.vercel.app/rastrear?code=${body.entrega_id || ""}`;
@@ -168,7 +221,8 @@ serve(async (req) => {
 
       case "send_normalization_alert": {
         templateName = "normalization_fail";
-        message = `❌ *LogiFlow - Falha de Normalização*\n\n` +
+        message =
+          `❌ *LogiFlow - Falha de Normalização*\n\n` +
           `Ocorreu uma falha ao processar a resposta da transportadora *${body.variables?.transportadora || "N/A"}*.\n` +
           `Cotação ID: *${body.variables?.cotacao_id || "N/A"}*\n` +
           `Necessário intervenção manual no painel Nexus.`;
@@ -178,8 +232,14 @@ serve(async (req) => {
       case "send_custom": {
         if (!body.template) {
           return new Response(
-            JSON.stringify({ success: false, error: "template required for custom messages" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({
+              success: false,
+              error: "template required for custom messages",
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
           );
         }
         templateName = body.template;
@@ -189,33 +249,47 @@ serve(async (req) => {
 
       default:
         return new Response(
-          JSON.stringify({ success: false, error: `Unknown action: ${body.action}` }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({
+            success: false,
+            error: `Unknown action: ${body.action}`,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
         );
     }
 
-    // Send via A-Ticket WhatsApp API
-    const aTicketResponse = await safeFetch(`${aTicketApiUrl}/messages/send`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${aTicketApiKey}`,
+    // Send via Evolution API (EVO) — nosso próprio sistema WhatsApp
+    const evolutionResponse = await safeFetch(
+      `${evolutionApiUrl}/message/sendText/${evolutionInstance}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: evolutionApiKey,
+        },
+        body: JSON.stringify({
+          number: normalizedPhone,
+          text: message,
+        }),
       },
-      body: JSON.stringify({
-        phone: normalizedPhone,
-        message,
-        template: templateName,
-        variables: body.variables || {},
-      }),
-    });
+    );
 
-    const aTicketData = await aTicketResponse.json();
+    const evolutionData = await evolutionResponse.json();
 
-    if (!aTicketResponse.ok) {
-      log.error("A-Ticket API error:", aTicketData);
+    if (!evolutionResponse.ok) {
+      log.error("Evolution API error:", evolutionData);
       return new Response(
-        JSON.stringify({ success: false, error: "Failed to send WhatsApp message", details: aTicketData }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          success: false,
+          error: "Failed to send WhatsApp message",
+          details: evolutionData,
+        }),
+        {
+          status: 502,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -224,18 +298,28 @@ serve(async (req) => {
       table_name: "whatsapp_notification",
       record_id: body.entrega_id || body.coleta_id || "custom",
       action: "SEND",
-      new_data: { phone: normalizedPhone, template: templateName, action: body.action },
+      new_data: {
+        phone: normalizedPhone,
+        template: templateName,
+        action: body.action,
+      },
     });
 
     return new Response(
-      JSON.stringify({ success: true, messageId: aTicketData.id || aTicketData.messageId }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({
+        success: true,
+        messageId: evolutionData.key?.id || evolutionData.key?.remoteJid,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
     log.error("WhatsApp notification error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 });
@@ -252,7 +336,11 @@ function formatDate(dateStr: string | null): string {
   if (!dateStr) return "N/A";
   try {
     const date = new Date(dateStr);
-    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   } catch {
     return dateStr;
   }
