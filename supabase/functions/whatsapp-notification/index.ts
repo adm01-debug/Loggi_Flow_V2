@@ -162,7 +162,7 @@ serve(async (req) => {
         message = `⚠️ *LogiFlow - Alerta de Atraso*\n\n` +
           `A remessa *${body.variables?.numero || "N/A"}* está com atraso detectado.\n` +
           `Ação recomendada: Contatar transportadora *${body.variables?.transportadora || "N/A"}*.\n` +
-          `Link: https://logiflow-nexus.lovable.app/rastreamento/${body.entrega_id || ""}`;
+          `Link: https://loggi-flow-v2.vercel.app/rastrear?code=${body.entrega_id || ""}`;
         break;
       }
 
