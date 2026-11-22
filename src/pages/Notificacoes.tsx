@@ -30,6 +30,7 @@ import { useSelection } from "@/hooks/common/useSelection";
 import { usePagination } from "@/hooks/common/usePagination";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { useRealtime } from "@/hooks/data/useRealtime";
+import { PushNotificationCard } from "@/components/notifications/PushNotificationCard";
 
 interface Notification {
   id: string;
@@ -214,6 +215,7 @@ export default function Notificacoes() {
             <p className="text-muted-foreground mt-1">
               {stats.unread} não lida(s) de {stats.total}
             </p>
+            <PushNotificationCard />
           </div>
           <Button
             variant="outline"
