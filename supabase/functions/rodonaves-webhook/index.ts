@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
@@ -81,7 +81,7 @@ serve(async (req: Request) => {
     }
 
     const payload = JSON.parse(raw);
-    log.info("Rodonaves webhook received:", { payload });
+    log.info("Rodonaves webhook received:", { payload: redact(payload) });
 
     // Contract Validation
     const { isValid, errors } = await validateContract(

@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -117,7 +117,7 @@ serve(async (req: Request) => {
       req.headers.get("origin") || "https://loggi-flow-v2.vercel.app";
     const redirectTo = `${origin}/reset-password`;
 
-    log.info(`Generating password reset link for: ${resetRequest.email}`);
+    log.info(`Generating password reset link for: ${redact(resetRequest.email)}`);
     log.info(`Redirect URL: ${redirectTo}`);
 
     // generateLink só gera o link de recuperação — NÃO envia e-mail. O envio
@@ -147,7 +147,7 @@ serve(async (req: Request) => {
 
     const actionLink = linkData.properties.action_link;
 
-    log.info(`Sending password reset email to: ${resetRequest.email}`);
+    log.info(`Sending password reset email to: ${redact(resetRequest.email)}`);
     const { error: sendError } = await supabaseAdmin.functions.invoke(
       "resend-email",
       {

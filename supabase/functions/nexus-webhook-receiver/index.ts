@@ -5,7 +5,7 @@ import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { claimIdempotencyKey } from "../_shared/idempotency.ts";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -117,7 +117,7 @@ serve(async (req) => {
       }
 
       if (!carrier) {
-        log.info('No carrier found for phone:', phone);
+        log.info('No carrier found for phone:', redact(phone));
         return new Response(JSON.stringify({ success: false, error: 'Carrier not found' }), { headers: corsHeaders });
       }
 

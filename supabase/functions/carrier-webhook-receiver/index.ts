@@ -5,7 +5,7 @@ import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { claimIdempotencyKey } from "../_shared/idempotency.ts";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 
 /**
  * Mapeia status/evento livre de um webhook genérico para o enum entrega_status.
@@ -96,7 +96,7 @@ serve(async (req) => {
     }
 
     const payload = JSON.parse(raw);
-    log.info("Carrier Webhook received:", payload);
+    log.info("Carrier Webhook received:", redact(payload));
 
     // Contract Validation
     const { isValid, errors } = await validateContract(
