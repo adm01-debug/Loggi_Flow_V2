@@ -75,7 +75,7 @@ function emitTelemetry(meta: TelemetryMeta) {
           })
           .then(({ error: insertErr }) => {
             if (insertErr)
-              log.warn("[telemetry-persist] Insert failed:", insertErr.message);
+              log.warn("[telemetry-persist] Insert failed:", { error: insertErr.message });
           });
       }
     } catch (_e) {
@@ -368,7 +368,7 @@ Deno.serve(async (req) => {
     if (err instanceof ValidationError) {
       return validationErrorResponse(err, headers);
     }
-    log.error("[external-db-bridge] Error:", err);
+    log.error("[external-db-bridge] Error:", { error: String(err) });
     return new Response(
       JSON.stringify({ error: "INTERNAL_ERROR" }),
       { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
