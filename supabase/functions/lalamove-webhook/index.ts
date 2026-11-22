@@ -3,50 +3,13 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { validateContract } from "../_shared/contract-validator.ts";
+import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { requireString } from "../_shared/validate.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
-// Verify Lalamove webhook signature using HMAC-SHA256
-async function verifySignature(payload: string, signature: string): Promise<boolean> {
-  const secret = Deno.env.get('LALAMOVE_API_SECRET');
-  if (!secret) {
-    log.error('LALAMOVE_API_SECRET missing — refusing webhook (fail-closed)');
-    return false;
-  }
-  if (!signature) {
-    log.warn('Missing x-lalamove-signature header');
-    return false;
-  }
-
-
-  try {
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(secret);
-    const messageData = encoder.encode(payload);
-    
-    const key = await crypto.subtle.importKey(
-      'raw',
-      keyData,
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign']
-    );
-    
-    const signatureBuffer = await crypto.subtle.sign('HMAC', key, messageData);
-    const computedSignature = Array.from(new Uint8Array(signatureBuffer))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-    
-    return computedSignature === signature;
-  } catch (error) {
-    log.error('Signature verification error:', error);
-    return false;
-  }
-}
 
 // Map Lalamove status to our internal status
 function mapLalamoveStatus(status: string): string {
@@ -95,6 +58,19 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const webhookData = JSON.parse(payload);
 
+    // Etapa 009 — HMAC antes do contrato: POST sem assinatura recebe 401, não 400.
+    // Comparação constante via _shared/webhookSignature.ts.
+    if (!isTestMode) {
+      const isVerified = await verifyWebhookHmac(payload, signature, 'LALAMOVE_API_SECRET');
+      if (!isVerified) {
+        log.error('Invalid webhook signature');
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     // Contract Validation
     const { isValid, errors } = await validateContract(
       supabase,
@@ -117,22 +93,10 @@ serve(async (req) => {
       });
     }
 
-    // Skip signature verification in test mode (internal testing only)
-    if (!isTestMode) {
-      const isVerified = await verifySignature(payload, signature);
-      if (!isVerified) {
-        log.error('Invalid webhook signature');
-        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-    }
-
     const { eventType, data, eventId } = webhookData;
     const finalEventId = eventId || data?.orderId || crypto.randomUUID();
 
-    log('INFO', 'Processing Lalamove webhook', { eventType, eventId: finalEventId });
+    log.info('Processing Lalamove webhook', { eventType, eventId: finalEventId });
 
     // Idempotency check
     const { data: existingEvent } = await supabase
@@ -143,7 +107,7 @@ serve(async (req) => {
       .maybeSingle();
 
     if (existingEvent) {
-      log('INFO', 'Webhook already processed, skipping', { eventId: finalEventId });
+      log.info('Webhook already processed, skipping', { eventId: finalEventId });
       return new Response(JSON.stringify({ success: true, message: 'Already processed' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -233,7 +197,7 @@ serve(async (req) => {
     });
 
   } catch (error: any) {
-    log('ERROR', 'Webhook processing error', { error: error.message });
+    log.error('Webhook processing error', { error: error.message });
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
