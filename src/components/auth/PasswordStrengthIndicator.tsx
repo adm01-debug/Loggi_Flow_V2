@@ -4,6 +4,16 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/common/useDebounce";
 
+async function sha1Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  // HIBP k-anonymity exige SHA-1 (protocolo) — não é hash de senha sensível.
+  // eslint-disable-next-line sonarjs/hashing
+  const buf = await crypto.subtle.digest("SHA-1", data);
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 interface PasswordStrengthIndicatorProps {
   password: string;
   className?: string;
@@ -80,8 +90,11 @@ export function PasswordStrengthIndicator({
     return { criteria, strength, level, label, color, allRequiredMet };
   }, [password]);
 
-  // Check for pwned passwords
+  // Check for pwned passwords — k-anonymity (etapa 007): SHA-1 no cliente e
+  // envio apenas do prefixo de 5 hex. A senha nunca sai do navegador.
   useEffect(() => {
+    let cancelled = false;
+
     const checkPwned = async () => {
       if (debouncedPassword.length < 8) {
         setIsPwned(false);
@@ -91,25 +104,35 @@ export function PasswordStrengthIndicator({
 
       setIsCheckingPwned(true);
       try {
+        const fullHash = (await sha1Hex(debouncedPassword)).toUpperCase();
+        const prefix = fullHash.slice(0, 5);
+        const suffix = fullHash.slice(5);
+
         const { data, error } = await supabase.functions.invoke(
           "check-password-breach",
-          {
-            body: { password: debouncedPassword },
-          },
+          { body: { prefix } },
         );
 
-        if (!error && data) {
-          setIsPwned(data.pwned);
-          setPwnedCount(data.count || 0);
-        }
+        if (error || !data || cancelled) return;
+
+        // comparar o sufixo localmente contra o que a edge devolveu
+        const match = (data.hashes ?? []).find(
+          (h: { suffix: string }) => h.suffix.toUpperCase() === suffix,
+        );
+        const count = match ? match.count : 0;
+        setIsPwned(count > 0);
+        setPwnedCount(count);
       } catch {
         // Silent fail - breach check is non-critical
       } finally {
-        setIsCheckingPwned(false);
+        if (!cancelled) setIsCheckingPwned(false);
       }
     };
 
     checkPwned();
+    return () => {
+      cancelled = true;
+    };
   }, [debouncedPassword]);
 
   // Notify parent of strength changes

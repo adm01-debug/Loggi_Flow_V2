@@ -8,18 +8,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate SHA-1 hash of password
-async function sha1(str: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(str);
-  const hashBuffer = await crypto.subtle.digest("SHA-1", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("")
-    .toUpperCase();
-}
-
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -27,78 +15,54 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { password } = await req.json();
+    const { prefix } = await req.json();
 
-    if (!password || typeof password !== "string") {
-      return new Response(JSON.stringify({ error: "Password is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // k-anonymity: o cliente envia apenas o prefixo de 5 hex do SHA-1 (etapa 007).
+    // A senha completa nunca chega aqui. Devolvemos os sufixos + contagens para
+    // o cliente comparar localmente.
+    if (!prefix || typeof prefix !== "string" || !/^[0-9A-Fa-f]{5}$/.test(prefix)) {
+      return new Response(
+        JSON.stringify({ error: "Valid 5-hex prefix is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
-    // Generate SHA-1 hash of password
-    const hash = await sha1(password);
-    const prefix = hash.substring(0, 5);
-    const suffix = hash.substring(5);
+    const normalized = prefix.toUpperCase();
+    log.info(`Checking password hash prefix: ${normalized}...`);
 
-    log.info(`Checking password hash prefix: ${prefix}...`);
-
-    // Query HIBP API using k-anonymity model
-    // This only sends the first 5 characters of the hash, protecting the actual password
     const response = await safeFetch(
-      `https://api.pwnedpasswords.com/range/${prefix}`,
-      {
-        headers: {
-          "User-Agent": "LogiFlow-PasswordCheck",
-        },
-      },
+      `https://api.pwnedpasswords.com/range/${normalized}`,
+      { headers: { "User-Agent": "LogiFlow-PasswordCheck" } },
     );
 
     if (!response.ok) {
       log.error(`HIBP API error: ${response.status}`);
-      // If API fails, allow the password (fail open)
-      return new Response(JSON.stringify({ pwned: false, count: 0 }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // fail open: sem lista, sem parecer pwned
+      return new Response(
+        JSON.stringify({ hashes: [] }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     const text = await response.text();
-    const lines = text.split("\n");
+    const hashes = text
+      .split("\n")
+      .filter((l) => l.includes(":"))
+      .map((l) => {
+        const [suffix, count] = l.split(":");
+        return { suffix: suffix.trim(), count: parseInt(count.trim(), 10) || 0 };
+      });
 
-    // Check if our suffix is in the returned list
-    let pwnedCount = 0;
-    for (const line of lines) {
-      const [hashSuffix, count] = line.split(":");
-      if (hashSuffix.trim() === suffix) {
-        pwnedCount = parseInt(count.trim(), 10);
-        break;
-      }
-    }
-
-    const isPwned = pwnedCount > 0;
-
-    log.info(
-      `Password check result: ${isPwned ? `PWNED (${pwnedCount} times)` : "SAFE"}`,
-    );
+    log.info(`HIBP returned ${hashes.length} suffix entries for prefix ${normalized}`);
 
     return new Response(
-      JSON.stringify({
-        pwned: isPwned,
-        count: pwnedCount,
-        message: isPwned
-          ? `Esta senha foi encontrada em ${pwnedCount.toLocaleString()} vazamentos de dados. Escolha outra senha.`
-          : null,
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
+      JSON.stringify({ hashes }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    log.error("Unexpected error:", error);
+    log.error("Unexpected error", { error: String(error) });
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
