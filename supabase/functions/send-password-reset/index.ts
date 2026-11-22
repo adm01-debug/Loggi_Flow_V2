@@ -111,10 +111,8 @@ serve(async (req: Request) => {
       );
     }
 
-    // Get the origin from the request headers or use the production domain
-    // (AGENTS.md:88, docs/agentes/deploy.md:9). O fallback antigo apontava
-    // para o projeto Lovable morto uwbpzfcysppwikfpnzok — dívida já
-    // registrada em docs/agentes/banco.md:37 e docs/agentes/deploy.md:81.
+    // Get the origin from the request headers or use the production domain.
+    // (AGENTS.md:88, docs/agentes/deploy.md:9)
     const origin =
       req.headers.get("origin") || "https://loggi-flow-v2.vercel.app";
     const redirectTo = `${origin}/reset-password`;
